@@ -11,9 +11,9 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.microsoft.z3.Native;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings("MethodTypeParameterName")
 class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
@@ -37,12 +37,14 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final Long z3ArrayType = toSolverType(arrayFormulaType);
-
+    final Long z3ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(z3ArrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long defaultElement) {
+    return Native.mkConstArray(z3context, toSolverType(pIndexType), defaultElement);
   }
 
   @Override

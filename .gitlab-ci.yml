@@ -15,8 +15,3 @@ variables:
   REFASTER_REPO_REVISION: 31cd8ffc4966957e156665dbba76679ade5bb5c9
   # Needs to be synchronized with Error Prone version in lib/ivy.xml
   REFASTER_VERSION: 2.21.1
-
-build:jdk-17:
-  variables:
-    # https://github.com/google/error-prone/issues/1106
-    ANT_PROPS_BUILD: "-Divy.disable=true -Derrorprone.disable=true"

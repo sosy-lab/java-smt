@@ -6,7 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-%ignore InterpolationContext::InterpolationContext (SMTConfig &c, Theory &th, TermMapper &termMapper, Proof const &t, PartitionManager &pmanager);
+%ignore InterpolationContext::InterpolationContext (SMTConfig &c, Theory &th, TermMapper &termMapper, ResolutionProof const &t, PartitionManager &pmanager);
 %ignore InterpolationContext::printProofDotty ();
 %ignore InterpolationContext::getInterpolants (const std::vector< vec< int > > &partitions, vec< PTRef > &interpolants);
 %ignore InterpolationContext::getSingleInterpolant (vec< PTRef > &interpolants, const ipartitions_t &A_mask);
@@ -37,7 +37,7 @@
     for (int i = 0; i < interpolants.size(); i++)
       result.emplace_back(interpolants[i]);
     return result;
-  }
  }
+}
 
 %include "include/opensmt/InterpolationContext.h"

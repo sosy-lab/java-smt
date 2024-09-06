@@ -154,6 +154,22 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libz3" fileending="dylib"/>
     </target>
 
+    <target name="stage-bitwuzla" depends="build-dependencies, install-contrib"
+            description="deploy current version of Bitwuzla to Maven staging repository">
+        <!-- get revision from dependencies -->
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <property name="stage.solver" value="bitwuzla"/>
+        <property name="stage.revision" value="${bitwuzla.revision}"/>
+        <!-- prepare the pom-file -->
+        <generate-solver-pom-file/>
+        <!-- then publish the files -->
+        <stage-solver-file filename="bitwuzla" fileending="jar"/>
+        <stage-solver-file filename="libbitwuzlaj" fileending="so"/>
+        <stage-solver-file filename="libbitwuzlaj" fileending="dll"/>
+        <stage-solver-file filename="bitwuzla-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
+        <stage-solver-file filename="bitwuzla-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
+    </target>
+
     <target name="stage-boolector" depends="build-dependencies"
             description="deploy current version of Boolector to Maven staging repository">
         <!-- get revision from dependencies -->

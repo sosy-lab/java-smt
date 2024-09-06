@@ -41,7 +41,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
-  private final Z3FormulaManager mgr;
+  protected final Z3FormulaManager mgr;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
   @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
@@ -125,22 +125,18 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
-    Native.incRef(z3context, e);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
         String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
-
         assertContraintAndTrack(e, creator.extractInfo(t));
         storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
-        Native.decRef(z3context, e);
       } else {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
       throw creator.handleZ3Exception(exception);
     }
-    Native.decRef(z3context, e);
     return null;
   }
 

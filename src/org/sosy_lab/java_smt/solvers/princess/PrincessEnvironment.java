@@ -12,6 +12,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
+import ap.parameters.GlobalSettings;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
 import ap.parser.IAtom;
@@ -28,11 +29,11 @@ import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
 import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
-import ap.parser.SMTParser2InputAbsy.SMTType;
+import ap.parser.SMTTypes.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
-import ap.theories.ExtArray;
-import ap.theories.ExtArray.ArraySort;
+import ap.theories.arrays.ExtArray;
+import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.rationals.Rationals$;
 import ap.theories.strings.StringTheory;
@@ -51,6 +52,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -83,7 +86,6 @@ import ostrich.OstrichStringTheory;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
-import scala.collection.immutable.Set$;
 
 /**
  * This is a Wrapper around Princess. This Wrapper allows to set a logfile for all Smt-Queries
@@ -126,7 +128,8 @@ class PrincessEnvironment {
               OFlags.$lessinit$greater$default$9(),
               OFlags.$lessinit$greater$default$10(),
               OFlags.$lessinit$greater$default$11(),
-              OFlags.$lessinit$greater$default$12()));
+              OFlags.$lessinit$greater$default$12(),
+              OFlags.$lessinit$greater$default$13()));
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
 
@@ -247,8 +250,7 @@ class PrincessEnvironment {
             SimpleAPI.apply$default$8(), // tightFunctionScopes
             SimpleAPI.apply$default$9(), // genTotalityAxioms
             new scala.Some<>(randomSeed), // randomSeed
-            Set$.MODULE$.empty() // empty Set<LOG_FLAG>, no internal logging
-            );
+            GlobalSettings.DEFAULT());
 
     if (constructProofs) { // needed for interpolation and unsat cores
       newApi.setConstructProofs(true);
@@ -595,9 +597,9 @@ class PrincessEnvironment {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;
-    } else if (sort instanceof ExtArray.ArraySort) {
+    } else if (sort instanceof ArraySort) {
       Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
-      Sort elementSort = ((ExtArray.ArraySort) sort).theory().objSort();
+      Sort elementSort = ((ArraySort) sort).theory().objSort();
       assert indexSorts.iterator().size() == 1 : "unexpected index type in Array type:" + sort;
       // assert indexSorts.size() == 1; // TODO Eclipse does not like simpler code.
       return FormulaType.getArrayType(
@@ -661,20 +663,36 @@ class PrincessEnvironment {
 
   public ITerm makeSelect(ITerm array, ITerm index) {
     List<ITerm> args = ImmutableList.of(array, index);
-    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    ArraySort arraySort = (ArraySort) Sort$.MODULE$.sortOf(array);
     return new IFunApp(arraySort.theory().select(), toSeq(args));
   }
 
   public ITerm makeStore(ITerm array, ITerm index, ITerm value) {
     List<ITerm> args = ImmutableList.of(array, index, value);
-    ExtArray.ArraySort arraySort = (ExtArray.ArraySort) Sort$.MODULE$.sortOf(array);
+    ArraySort arraySort = (ArraySort) Sort$.MODULE$.sortOf(array);
     return new IFunApp(arraySort.theory().store(), toSeq(args));
+  }
+
+  public ITerm makeConstArray(ArraySort arraySort, ITerm elseTerm) {
+    // return new IFunApp(arraySort.theory().const(), elseTerm); // I love Scala! So simple! ;-)
+
+    // Scala uses keywords that are illegal in Java. Thus, we use reflection to access the method.
+    // TODO we should contact the developers of Princess and ask for a renaming.
+    final IFunction constArrayOp;
+    try {
+      Method constMethod = ExtArray.class.getMethod("const");
+      constArrayOp = (IFunction) constMethod.invoke(arraySort.theory());
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
+      throw new RuntimeException(pE);
+    }
+
+    return new IFunApp(constArrayOp, toSeq(ImmutableList.of(elseTerm)));
   }
 
   public boolean hasArrayType(IExpression exp) {
     if (exp instanceof ITerm) {
       final ITerm t = (ITerm) exp;
-      return Sort$.MODULE$.sortOf(t) instanceof ExtArray.ArraySort;
+      return Sort$.MODULE$.sortOf(t) instanceof ArraySort;
     } else {
       return false;
     }

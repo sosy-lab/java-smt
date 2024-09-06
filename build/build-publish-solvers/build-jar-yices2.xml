@@ -5,13 +5,13 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab filetype=ant : -->
-<project name="jar-yices2" basedir=".">
+<project name="jar-yices2" basedir="..">
 
     <!-- Targets for generating JAR files for Yices2 bindings. -->
 
@@ -25,7 +25,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="jar-yices2" depends="determine-version, build"
               description="Create a runnable JAR file of all classes related to Yices2">
         <property name="yices2jar.file" value="javasmt-yices2-${version}.jar"/>
-        <copy todir="${class.dir}"><fileset dir="." includes="META-INF/**"/></copy>
+        <copy todir="${class.dir}"><fileset dir=".." includes="META-INF/**"/></copy>
         <manifestclasspath property="yices2Classpath.jar" jarfile="${ivy.lib.dir}/runtime-yices2/${jar.file}" maxParentLevels="0">
             <classpath><fileset dir="${ivy.lib.dir}/runtime-yices2" includes="checker-qual.jar common.jar guava.jar"/></classpath>
         </manifestclasspath>
@@ -34,9 +34,9 @@ SPDX-License-Identifier: Apache-2.0
                 includes="${yices2Classes}"
                 excludes="${jar.excludesInYices2Jar}"
                 whenmanifestonly="fail">
-            <metainf dir="." includes="LICENSE"/>
+            <metainf dir=".." includes="LICENSE"/>
             <mappedresources>
-                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <fileset dir=".." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
                 <globmapper from="LICENSES/*" to="META-INF/*"/>
             </mappedresources>
             <manifest>
@@ -54,9 +54,9 @@ SPDX-License-Identifier: Apache-2.0
                 whenmanifestonly="fail">
             <fileset dir="${source.dir}/" includes="${yices2Sources}"/>
             <fileset dir="${source.generated.dir}/" includes="${yices2Sources}"/>
-            <metainf dir="." includes="LICENSE"/>
+            <metainf dir=".." includes="LICENSE"/>
             <mappedresources>
-                <fileset dir="." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
+                <fileset dir=".." includes="LICENSES/Apache-2.0.txt LICENSES/GPL-3.0-only.txt"/>
                 <globmapper from="LICENSES/*" to="META-INF/*"/>
             </mappedresources>
             <manifest>

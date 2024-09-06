@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -84,6 +85,13 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
       Rational pN, FloatingPointType pType, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     stats.fpOperations.getAndIncrement();
     return delegate.makeNumber(pN, pType, pFloatingPointRoundingMode);
+  }
+
+  @Override
+  public FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.makeNumber(exponent, mantissa, signBit, type);
   }
 
   @Override
@@ -261,6 +269,13 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     stats.fpOperations.getAndIncrement();
     return delegate.multiply(pNumber1, pNumber2, pFloatingPointRoundingMode);
+  }
+
+  @Override
+  public FloatingPointFormula remainder(
+      FloatingPointFormula number1, FloatingPointFormula number2) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.remainder(number1, number2);
   }
 
   @Override

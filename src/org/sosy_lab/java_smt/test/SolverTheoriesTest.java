@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -28,7 +27,6 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -95,114 +93,114 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   private void assertDivision(
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertDivision(true, numerator, denumerator, expectedResult, constraints);
+    assertDivision(true, numerator, denominator, expectedResult, constraints);
   }
 
   private void assertDivision(
       boolean includeNegation,
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildDivision(numerator, denumerator, expectedResult), constraints);
+        includeNegation, buildDivision(numerator, denominator, expectedResult), constraints);
   }
 
   private void assertDivision(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertDivision(true, numerator, denumerator, signed, expectedResult, constraints);
+    assertDivision(true, numerator, denominator, signed, expectedResult, constraints);
   }
 
   private void assertDivision(
       boolean includeNegation,
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
         includeNegation,
-        buildDivision(numerator, denumerator, signed, expectedResult),
+        buildDivision(numerator, denominator, signed, expectedResult),
         constraints);
   }
 
   private void assertModulo(
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertModulo(true, numerator, denumerator, expectedResult, constraints);
+    assertModulo(true, numerator, denominator, expectedResult, constraints);
   }
 
   private void assertModulo(
       boolean includeNegation,
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildModulo(numerator, denumerator, expectedResult), constraints);
+        includeNegation, buildModulo(numerator, denominator, expectedResult), constraints);
   }
 
   private void assertModulo(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertModulo(true, numerator, denumerator, signed, expectedResult, constraints);
+    assertModulo(true, numerator, denominator, signed, expectedResult, constraints);
   }
 
   private void assertModulo(
       boolean includeNegation,
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildModulo(numerator, denumerator, signed, expectedResult), constraints);
+        includeNegation, buildModulo(numerator, denominator, signed, expectedResult), constraints);
   }
 
   private BooleanFormula buildDivision(
-      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
-    return imgr.equal(imgr.divide(numerator, denumerator), expectedResult);
+      IntegerFormula numerator, IntegerFormula denominator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.divide(numerator, denominator), expectedResult);
   }
 
   private BooleanFormula buildDivision(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.divide(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.divide(numerator, denominator, signed), expectedResult);
   }
 
   private BooleanFormula buildModulo(
-      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
-    return imgr.equal(imgr.modulo(numerator, denumerator), expectedResult);
+      IntegerFormula numerator, IntegerFormula denominator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.modulo(numerator, denominator), expectedResult);
   }
 
   private BooleanFormula buildModulo(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.modulo(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.remainder(numerator, denominator, signed), expectedResult);
   }
 
   private void assertOperation(
@@ -279,7 +277,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
+  public void intTest3_DivModLinear_zeroDenominator() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
 
@@ -594,36 +592,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     BooleanFormula f = rmgr.equal(rmgr.add(a, a), num);
     assertThatFormula(f).isSatisfiable();
-  }
-
-  @Test
-  public void test_BitvectorIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    BitvectorFormula one = bvmgr.makeBitvector(32, 1);
-
-    // unsigned char
-    BitvectorFormula a = bvmgr.makeVariable(8, "char_a");
-    BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
-    BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
-
-    // 'cast' a to unsigned int
-    a = bvmgr.extend(a, 32 - 8, false);
-    b = bvmgr.extend(b, 32 - 8, false);
-    a = bvmgr.or(a, one);
-    b = bvmgr.or(b, one);
-    a = bvmgr.extract(a, 7, 0);
-    b = bvmgr.extract(b, 7, 0);
-    a = bvmgr.extend(a, 32 - 8, false);
-    b = bvmgr.extend(b, 32 - 8, false);
-
-    a = bvmgr.shiftLeft(a, rightOp);
-    b = bvmgr.shiftLeft(b, rightOp);
-    a = bvmgr.extract(a, 7, 0);
-    b = bvmgr.extract(b, 7, 0);
-    BooleanFormula f = bmgr.not(bvmgr.equal(a, b));
-
-    assertThatFormula(f).isUnsatisfiable();
   }
 
   @Test
@@ -1134,84 +1102,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assertThatFormula(f).isSatisfiable();
   }
 
-  @Test
-  public void bvInRange() throws SolverException, InterruptedException {
-    requireBitvectors();
-
-    assertThatFormula(
-            bvmgr.equal(
-                bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
-                bvmgr.makeBitvector(4, 7)))
-        .isTautological();
-  }
-
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void bvOutOfRange() {
-    requireBitvectors();
-
-    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
-      try {
-        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-
-    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
-      // allowed values
-      bvmgr.makeBitvector(size, (1L << size) - 1);
-      bvmgr.makeBitvector(size, -(1L << (size - 1)));
-
-      // forbitten values
-      try {
-        bvmgr.makeBitvector(size, 1L << size);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-
-    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
-      if (size > 64) {
-        assume()
-            .withMessage("Solver does not support large bitvectors")
-            .that(solverToUse())
-            .isNotEqualTo(Solvers.CVC4);
-      }
-
-      // allowed values
-      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
-      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
-
-      // forbitten values
-      try {
-        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(
-            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-    }
-  }
-
-  @Test
-  @SuppressWarnings("CheckReturnValue")
-  public void bvITETest() {
-    requireBitvectors();
-    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
-    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
-    bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
-  }
-
   private static final ImmutableSet<Solvers> VAR_TRACKING_SOLVERS =
       ImmutableSet.of(
           Solvers.SMTINTERPOL,
@@ -1283,7 +1173,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assume()
         .withMessage("Solver %s does not support UFs without arguments", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5, Solvers.BITWUZLA);
 
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);

@@ -10,6 +10,8 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
+import edu.stanford.CVC4.BitVectorRotateLeft;
+import edu.stanford.CVC4.BitVectorRotateRight;
 import edu.stanford.CVC4.BitVectorSignExtend;
 import edu.stanford.CVC4.BitVectorType;
 import edu.stanford.CVC4.BitVectorZeroExtend;
@@ -80,8 +82,20 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr shiftLeft(Expr pParam1, Expr pParam2) {
-    return exprManager.mkExpr(Kind.BITVECTOR_SHL, pParam1, pParam2);
+  protected Expr shiftLeft(Expr number, Expr toShift) {
+    return exprManager.mkExpr(Kind.BITVECTOR_SHL, number, toShift);
+  }
+
+  @Override
+  protected Expr rotateLeftByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateLeft(toRotate));
+    return exprManager.mkExpr(op, number);
+  }
+
+  @Override
+  protected Expr rotateRightByConstant(Expr number, int toRotate) {
+    Expr op = exprManager.mkConst(new BitVectorRotateRight(toRotate));
+    return exprManager.mkExpr(op, number);
   }
 
   @Override
@@ -120,9 +134,9 @@ public class CVC4BitvectorFormulaManager
   }
 
   @Override
-  protected Expr divide(Expr numerator, Expr denumerator, boolean signed) {
+  protected Expr divide(Expr numerator, Expr denominator, boolean signed) {
     final Kind operator = signed ? Kind.BITVECTOR_SDIV : Kind.BITVECTOR_UDIV;
-    final Expr division = exprManager.mkExpr(operator, numerator, denumerator);
+    final Expr division = exprManager.mkExpr(operator, numerator, denominator);
     // CVC4 does not align with SMTLIB standard when it comes to divide-by-zero.
     // For divide-by-zero, we compute the result as: return "1" with the opposite
     // sign than the numerator.
@@ -132,21 +146,32 @@ public class CVC4BitvectorFormulaManager
     final Expr maxValue = makeBitvectorImpl(bitsize, -1); // all bits equal "1"
     return exprManager.mkExpr(
         Kind.ITE,
-        exprManager.mkExpr(Kind.EQUAL, denumerator, zero),
+        exprManager.mkExpr(Kind.EQUAL, denominator, zero),
         exprManager.mkExpr(Kind.ITE, lessThan(numerator, zero, signed), one, maxValue),
         division);
   }
 
   @Override
-  protected Expr modulo(Expr numerator, Expr denumerator, boolean signed) {
+  protected Expr remainder(Expr numerator, Expr denominator, boolean signed) {
     final Kind operator = signed ? Kind.BITVECTOR_SREM : Kind.BITVECTOR_UREM;
-    final Expr remainder = exprManager.mkExpr(operator, numerator, denumerator);
+    final Expr remainder = exprManager.mkExpr(operator, numerator, denominator);
     // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
     // For modulo-by-zero, we compute the result as: "return the numerator".
     final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
     final Expr zero = makeBitvectorImpl(bitsize, 0);
     return exprManager.mkExpr(
-        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denumerator, zero), numerator, remainder);
+        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denominator, zero), numerator, remainder);
+  }
+
+  @Override
+  protected Expr smodulo(Expr numerator, Expr denominator) {
+    final Expr modulo = exprManager.mkExpr(Kind.BITVECTOR_SMOD, numerator, denominator);
+    // CVC4 does not align with SMTLIB standard when it comes to modulo-by-zero.
+    // For modulo-by-zero, we compute the result as: "return the numerator".
+    final int bitsize = ((BitvectorType) formulaCreator.getFormulaType(numerator)).getSize();
+    final Expr zero = makeBitvectorImpl(bitsize, 0);
+    return exprManager.mkExpr(
+        Kind.ITE, exprManager.mkExpr(Kind.EQUAL, denominator, zero), numerator, modulo);
   }
 
   @Override

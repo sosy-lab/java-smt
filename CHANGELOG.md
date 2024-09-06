@@ -3,12 +3,34 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 # JavaSMT ChangeLog
+
+## JavaSMT 5.0.0
+
+This major release brings support for the SMT solver Bitwuzla (version 0.4.0), some bugfixes,
+and includes several changes in the API.
+
+### New features and breaking changes:
+- User propagation can be used to provide a strategy when solving satisfiability (only Z3).
+- Array theory supports the creation of constant arrays, e.g., specifying a default value for all indices.
+- Bitvector theory provides rotation and improved modulo/remainder operations.
+- Floating-point theory has better model evaluation.
+
+### Updated solvers:
+- Bitwuzla 0.4.0
+- OpenSMT 2.6.0
+- Z3 4.12.5
+
+We slowly abandon Ubuntu 18.04 as build platform and will use Ubuntu 22.04 in the future. 
+
+## JavaSMT 4.1.1
+
+This patch release brings small fixes for Z3 and MathSAT.
 
 ## JavaSMT 4.1.0
 
@@ -31,7 +53,7 @@ and support for the theory of enumerations (domains of fixed size).
 
 ### Breaking changes:
  - The push-method in ProverEnvironments can throw InterruptedExceptions.
- - Model evalation supports enumeration theory.
+ - Model evaluation supports enumeration theory.
  - Direct construction ArrayFormulaType was replaced with a static building method.
 
 ### Updated solvers:

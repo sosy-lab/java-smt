@@ -158,12 +158,12 @@ public class CVC4BooleanFormulaManager
 
   @Override
   protected boolean isTrue(Expr pBits) {
-    return pBits.isConst() && pBits.getConstBoolean();
+    return pBits.isConst() && pBits.getKind() == Kind.CONST_BOOLEAN && pBits.getConstBoolean();
   }
 
   @Override
   protected boolean isFalse(Expr pBits) {
-    return pBits.isConst() && !pBits.getConstBoolean();
+    return pBits.isConst() && pBits.getKind() == Kind.CONST_BOOLEAN && !pBits.getConstBoolean();
   }
 
   @Override

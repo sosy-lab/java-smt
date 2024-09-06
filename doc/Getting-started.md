@@ -233,7 +233,7 @@ Creating the required constraint is straightforward:
 
 Note the types of the formulas: `IntegerFormula` and `BooleanFormula`.
 Using different classes for different types of formulas adds additional
-guarantees at compile-time: unless and unsafe cast is used, it is impossible
+guarantees at compile-time: unless an unsafe cast is used, it is impossible
 to e.g. add an integer to a boolean using JavaSMT API.
 
 Once the constraint is generated, we can solve it and get the model:

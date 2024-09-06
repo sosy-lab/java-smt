@@ -22,6 +22,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <!-- one configuration per solver -->
     <property name="ivy.solver.configurations" value="
+        runtime-bitwuzla,
         runtime-boolector,
         runtime-cvc4,
         runtime-cvc5,
@@ -78,9 +79,12 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
+        <property name="bitwuzla.path" value="${user.dir}/lib/native/source/libbitwuzla"/>
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
+            <fileset dir="${bitwuzla.path}" includes="include/"/>
+            <fileset dir="${bitwuzla.path}" includes="bitwuzla_wrap.o"/>
         </delete>
     </target>
 

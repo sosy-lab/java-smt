@@ -50,8 +50,8 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
         secure = true,
         description =
             "Further options for Boolector in addition to the default options. "
-                + "Format:  \"Optionname=value\" with ’,’ to seperate options. "
-                + "Optionname and value can be found in BtorOption or Boolector C Api."
+                + "Format:  \"Optionname=value\" with ’,’ to separate options. "
+                + "Option names and values can be found in BtorOption or Boolector C Api. "
                 + "Example: \"BTOR_OPT_MODEL_GEN=2,BTOR_OPT_INCREMENTAL=1\".")
     private String furtherOptions = "";
 

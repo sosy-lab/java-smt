@@ -36,6 +36,9 @@ For MathSAT5:
 - mklink mathsat.dll ..\..\java\runtime-mathsat\mathsat.dll
 - mklink mathsat5j.dll ..\..\java\runtime-mathsat\mathsat5j.dll
 
+For Bitwuzla:
+- mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll
+
 ### With a direct copy of the library:
 
 An alternative simple solution (without the need of administrator rights) is to copy over
@@ -51,6 +54,9 @@ For MathSAT5:
 - copy ..\..\java\runtime-mathsat\mathsat.dll mathsat.dll
 - copy ..\..\java\runtime-mathsat\mathsat5j.dll mathsat5j.dll
 
+For Bitwuzla:
+- copy ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll libbitwuzlaj.dll
+
 Or simply use a wildcard:
 - copy ..\..\java\runtime-*\*dll .\
 
@@ -58,5 +64,5 @@ Or simply use a wildcard:
 
 To execute JavaSMT with MathSAT on a Windows system,
 please make sure that you have installed the [Visual C++ 2013 Redistributable Package](https://support.microsoft.com/en-us/help/4032938/update-for-visual-c-2013-redistributable-package).
-The library might already exist in your system when installed from another program or via some developemnt tools.
+The library might already exist in your system when installed from another program or via some development tools.
 Without an installation of this library you might get an `UnsatisfiedLinkError` because of the missing system library `msvcr120.dll`.

@@ -61,7 +61,7 @@ public class NQueens {
     Solvers solver = Solvers.SMTINTERPOL;
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
-      try (Scanner sc = new Scanner(System.in, Charset.defaultCharset().name())) {
+      try (Scanner sc = new Scanner(System.in, Charset.defaultCharset())) {
         // Takes input from the user for number of queens to be placed
         System.out.println("Enter the number of Queens to be " + "placed on the board:");
         int n = sc.nextInt();

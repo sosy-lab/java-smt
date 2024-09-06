@@ -14,9 +14,9 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings("MethodTypeParameterName")
 public class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, Sort, Solver, Term> {
 
   private final Solver solver;
@@ -40,10 +40,15 @@ public class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, S
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    final ArrayFormulaType<TI, TE> arrayFormulaType =
-        FormulaType.getArrayType(pIndexType, pElementType);
-    final Sort cvc5ArrayType = toSolverType(arrayFormulaType);
+    final Sort cvc5ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
     return getFormulaCreator().makeVariable(cvc5ArrayType, pName);
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term defaultElement) {
+    final Sort cvc5ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
+    return solver.mkConstArray(cvc5ArrayType, defaultElement);
   }
 
   @Override

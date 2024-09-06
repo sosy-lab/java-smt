@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
@@ -18,28 +19,77 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
  * <p>Most operations are overloaded: there is an option of either using the default rounding mode
  * (set via the option {@code solver.floatingPointRoundingMode}), or providing the rounding mode
  * explicitly.
+ *
+ * <p>If the result of an operation can not be exactly represented by the available floating-point
+ * type, i.e., the given precision is insufficient, the result is rounded to the nearest possible
+ * floating-point representation, depending on the given rounding mode.
+ *
+ * <p>Example: If the input number is too large to be represented as a floating point with the given
+ * type, it will be converted to positive infinity (+inf) or negative infinity (-inf). If the input
+ * number is too small to be represented with the given type (closer to zero than the smallest
+ * possible floating-point number), it will be converted to zero, with the sign preserved.
  */
 public interface FloatingPointFormulaManager {
 
+  /**
+   * Creates a floating point formula representing the given double value with the specified type.
+   */
   FloatingPointFormula makeNumber(double n, FloatingPointType type);
 
+  /**
+   * Creates a floating point formula representing the given double value with the specified type
+   * and rounding mode.
+   */
   FloatingPointFormula makeNumber(
       double n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
+  /**
+   * Creates a floating point formula representing the given BigDecimal value with the specified
+   * type.
+   */
   FloatingPointFormula makeNumber(BigDecimal n, FloatingPointType type);
 
+  /**
+   * Creates a floating point formula representing the given BigDecimal value with the specified
+   * type and rounding mode.
+   */
   FloatingPointFormula makeNumber(
       BigDecimal n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
+  /**
+   * Creates a floating point formula representing the given string value with the specified type.
+   */
   FloatingPointFormula makeNumber(String n, FloatingPointType type);
 
+  /**
+   * Creates a floating point formula representing the given string value with the specified type
+   * and rounding mode.
+   */
   FloatingPointFormula makeNumber(
       String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
+  /**
+   * Creates a floating point formula representing the given Rational value with the specified type.
+   */
   FloatingPointFormula makeNumber(Rational n, FloatingPointType type);
 
+  /**
+   * Creates a floating point formula representing the given Rational value with the specified type
+   * and rounding mode.
+   */
   FloatingPointFormula makeNumber(
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  /**
+   * Creates a floating point formula from the given exponent, mantissa, and sign bit with the
+   * specified type.
+   *
+   * @param exponent the exponent part of the floating point number
+   * @param mantissa the mantissa part of the floating point number
+   * @param signBit the sign bit of the floating point number, e.g., true for negative numbers
+   */
+  FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
 
   /**
    * Creates a variable with exactly the given name.
@@ -200,6 +250,13 @@ public interface FloatingPointFormulaManager {
       FloatingPointFormula number1,
       FloatingPointFormula number2,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  /**
+   * remainder: x - y * n, where n in Z is nearest to x/y. The result can be negative even for two
+   * positive arguments, e.g. "rem(5, 4) == 1" and "rem(5, 6) == -1", as opposed to integer modulo
+   * operators.
+   */
+  FloatingPointFormula remainder(FloatingPointFormula dividend, FloatingPointFormula divisor);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 

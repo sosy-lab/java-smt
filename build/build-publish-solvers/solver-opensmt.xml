@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-opensmt" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="macros.xml"/>
+
+    <target name="package-opensmt">
+        <fail unless="opensmt.path">
+            Please specify the path to OpenSMT with the flag -Dopensmt.path=/path/to/opensmt.
+            The path has to point to the root OpenSMT folder, i.e.,
+            a checkout of the official git repository from
+            'https://github.com/usi-verification-and-security/opensmt.git'.
+            Note that shell substitutions do not work and a full absolute path has to be specified.
+        </fail>
+        <fail unless="opensmt.customRev">
+            Please specify a custom revision with the flag -Dopensmt.customRev=XXX.
+            The custom revision has to be unique amongst the already known version
+            numbers from the ivy repository. The script will append the git revision.
+        </fail>
+
+        <!-- Get a naive version -->
+        <exec executable="git" dir="${opensmt.path}" outputproperty="opensmt.revision" failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="opensmt.version" value="${opensmt.customRev}-g${opensmt.revision}"/>
+        <echo message="Building OpenSMT in version '${opensmt.version}'"/>
+
+        <!-- Create build directories -->
+        <property name="path.build"   value="${opensmt.path}/build"/>
+        <property name="path.install" value="${opensmt.path}/install"/>
+        <property name="path.source"  value="${user.dir}/lib/native/source/opensmt"/>
+
+        <mkdir dir="${path.build}"/>
+        <mkdir dir="${path.install}"/>
+
+        <!-- Patch OpenSMT to avoid swig errors and add some required features -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${path.source}/api.patch"/>
+        </exec>
+
+        <!-- Build OpenSMT -->
+        <exec executable="cmake" dir="${path.build}" failonerror="true">
+            <arg value="-DCMAKE_INSTALL_PREFIX:PATH=${path.install}"/>
+            <arg value="-DFORCE_STATIC_GMP=ON"/>
+            <arg value=".."/>
+        </exec>
+
+        <exec executable="make" dir="${path.build}" failonerror="true">
+            <arg value="install"/>
+        </exec>
+
+        <!-- Revert the patch -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${path.source}/api.patch"/>
+        </exec>
+
+        <!-- Copy swig files to the install directory -->
+        <copy todir="${path.install}" >
+          <fileset dir="${path.source}" includes="**"/>
+        </copy>
+
+        <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
+        <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
+
+        <!-- Run swig to generate java proxies and the jni wrapper -->
+        <mkdir dir="${path.install}/java/opensmt"/>
+        <exec executable="swig" dir="${path.install}" failonerror="true">
+            <arg value="-java"/>
+            <arg value="-c++"/>
+            <arg value="-werror"/>
+            <arg value="-package"/>
+            <arg value="org.sosy_lab.java_smt.solvers.opensmt.api"/>
+            <arg value="-outdir"/>
+            <arg value="java/opensmt"/>
+            <arg value="-o"/>
+            <arg value="opensmt-wrap.cpp"/>
+            <arg value="swig/opensmt.i"/>
+        </exec>
+
+        <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
+             if the OpenSMT interface changed, but the swig header wasn't updated  -->
+        <copy todir="${path.source}/src/org/sosy_lab/java_smt/solvers/opensmt/api">
+            <fileset dir="${path.install}/java/opensmt">
+                <include name="ArithLogic.java"/>
+                <include name="InterpolationContext.java"/>
+                <include name="Logic.java"/>
+                <include name="LogicFactory.java"/>
+                <include name="Logic_t.java"/>
+                <include name="MainSolver.java"/>
+                <include name="Model.java"/>
+                <include name="OsmtNativeJNI.java"/>
+                <include name="Pterm.java"/>
+                <include name="PTRef.java"/>
+                <include name="SMTConfig.java"/>
+                <include name="SMTOption.java"/>
+                <include name="Sort.java"/>
+                <include name="SortSymbol.java"/>
+                <include name="SRef.java"/>
+                <include name="sstat.java"/>
+                <include name="SSymRef.java"/>
+                <include name="Symbol.java"/>
+                <include name="SymRef.java"/>
+                <include name="TemplateFunction.java"/>
+                <include name="VectorInt.java"/>
+                <include name="VectorPTRef.java"/>
+                <include name="VectorSRef.java"/>
+                <include name="VectorSymRef.java"/>
+                <include name="VectorVectorInt.java"/>
+            </fileset>
+        </copy>
+
+        <!-- Package swig generated source code -->
+        <jar destfile="opensmt-${opensmt.version}-sources.jar" basedir="${path.source}/src"/>
+
+        <!-- Generate and package javadoc documentation -->
+        <mkdir dir="${path.source}/doc"/>
+        <javadoc sourcepath="${path.source}/src" destdir="${path.source}/doc"/>
+        <jar destfile="opensmt-${opensmt.version}-javadoc.jar" basedir="${path.source}/doc"/>
+        <delete dir="${path.source}/doc"/>
+
+        <!-- Copy the lib to the root directory for later packaging-->
+        <copy file="${path.install}/lib/libopensmt.so" toFile="libopensmt-${opensmt.version}.so"/>
+
+        <!-- Compile the wrapper and move the object file the source tree -->
+        <exec executable="gcc" dir="${path.install}" failonerror="true">
+            <arg value="-fPIC"/>
+            <arg value="-std=c++17"/>
+            <arg value="-o"/>
+            <arg value="${path.source}/opensmt-wrap.o"/>
+            <arg value="-c"/>
+            <arg value="opensmt-wrap.cpp"/>
+            <arg value="-I${java.home}/include/"/>
+            <arg value="-I${java.home}/include/linux"/>
+        </exec>
+
+        <!-- Link the wrapper and create a new lib -->
+        <symlink link="libopensmt.so" resource="libopensmt-${opensmt.version}.so"/>
+        <exec executable="gcc" dir="${path.source}" failonerror="true">
+            <arg value="-shared"/>
+            <arg value="-o"/>
+            <arg value="${user.dir}/libopensmtjava-${opensmt.version}.so"/>
+            <arg value="opensmt-wrap.o"/>
+            <arg value="-L${user.dir}"/>
+            <arg value="-lopensmt"/>
+            <arg value="-lstdc++"/>
+            <arg value="-l:libgmp.a"/>
+        </exec>
+        <delete file="libopensmt.so"/>
+        <delete file="lib/native/source/opensmt/opensmt-wrap.o"/>
+
+        <!-- Compile java proxies and create jar file -->
+        <mkdir dir="${path.source}/bin"/>
+        <javac srcdir="${path.source}/src/" destdir="${path.source}/bin/" includeantruntime="false">
+            <include name="org/sosy_lab/java_smt/solvers/opensmt/api/*.java"/>
+        </javac>
+        <jar destfile="opensmt-${opensmt.version}.jar" basedir="${path.source}/bin"/>
+        <delete dir="${path.source}/bin"/>
+        <delete dir="lib/native/source/opensmt/src"/>
+    </target>
+
+    <target name="publish-opensmt" depends="package-opensmt, load-ivy"
+        description="Publish OpenSMT binaries to Ivy repository.">
+        <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml" />
+        <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}"/>
+    </target>
+</project>

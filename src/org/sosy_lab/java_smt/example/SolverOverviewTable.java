@@ -132,7 +132,7 @@ public class SolverOverviewTable {
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       prover.unsatCoreOverAssumptions(ImmutableList.of());
       features.add("UnsatCore /w Assumption");
-    } catch (UnsupportedOperationException e) {
+    } catch (UnsupportedOperationException | IllegalStateException e) {
       // ignore, feature is not supported.
     }
 
@@ -244,9 +244,9 @@ public class SolverOverviewTable {
     // Minimum number of lines so that you can be sure a solver was added
     private static final int MIN_NUM_OF_LINES = 4;
     private static final int SOLVER_COLUMN_WIDTH = 11;
-    private static final int VERSION_COLUMN_WIDTH = 38;
+    private static final int VERSION_COLUMN_WIDTH = 40;
     private static final int THEORIES_COLUMN_WIDTH = 40;
-    private static final int FEATURES_COLUMN_WIDTH = 30;
+    private static final int FEATURES_COLUMN_WIDTH = 40;
 
     private static final String INFO_COLUMN =
         "| %-"

@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -827,15 +828,15 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         prover.push(bvmgr.greaterThan(x, bvmgr.makeBitvector(8, 0), true));
         assertThat(prover).isSatisfiable();
         try (Model m = prover.getModel()) {
-          if (solver != Solvers.BOOLECTOR) {
-            assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
-          } else {
+          if (solver == Solvers.BOOLECTOR || solver == Solvers.BITWUZLA) {
             assertThat(m.evaluate(x)).isEqualTo(BigInteger.valueOf(64));
+          } else {
+            assertThat(m.evaluate(x)).isEqualTo(BigInteger.ONE);
           }
           // it works now, but maybe the model "x=1" for the constraint "x>0" is not valid for new
           // solvers.
-          // Can confirm ;D Boolector likes to take the "max" values for bitvectors instead of the
-          // min; as a result it returns 64
+          // Can confirm ;D Boolector/Bitwuzla like to take the "max" values for bitvectors
+          // instead of the min; as a result it returns 64
         }
       }
     }
@@ -1110,6 +1111,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays6() throws SolverException, InterruptedException {
     requireArrays();
+    requireIntegers();
     requireArrayModel();
     requireParser();
 
@@ -1137,6 +1139,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1179,6 +1182,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays4() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1235,6 +1239,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     // create formula for "arr[5:6]==[x,x] && x==123"
     BooleanFormula f =
@@ -1260,6 +1265,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5b() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1315,6 +1321,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5c() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1351,6 +1358,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5d() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1387,6 +1395,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5e() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1423,6 +1432,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetArrays5f() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -1788,8 +1798,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assignmentFormulas.add(va.getAssignmentAsFormula());
       assertThatFormula(va.getAssignmentAsFormula())
           .isEqualTo(makeAssignment(va.getKey(), va.getValueAsFormula()));
-      assertThat(va.getValue().getClass())
-          .isIn(ImmutableList.of(Boolean.class, BigInteger.class, Rational.class, Double.class));
+      assertThat(
+              ImmutableList.of(
+                      Boolean.class,
+                      BigInteger.class,
+                      Rational.class,
+                      Double.class,
+                      FloatingPointNumber.class)
+                  .stream()
+                  .anyMatch(cls -> cls.isInstance(va.getValue())))
+          .isTrue();
     }
 
     // Check that model is not contradicting
@@ -2132,6 +2150,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     for (String query :
         ImmutableList.of(
@@ -2147,6 +2166,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireOptimization();
+    requireIntegers();
     requireFloats();
     requireBitvectors();
     // only Z3 fulfills these requirements
@@ -2184,6 +2204,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void arrayTest3() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     requireArrays();
     requireArrayModel();
 
@@ -2195,6 +2216,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void arrayTest4() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
+    requireIntegers();
     requireBitvectors();
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);
@@ -2210,9 +2232,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
-    // TODO regression:
-    //  the Z3 library was able to solve this in v4.11.2, but no longer in v4.12.1-glibc_2.27.
+        .isNotEqualTo(Solvers.PRINCESS);
 
     BooleanFormula formula =
         context

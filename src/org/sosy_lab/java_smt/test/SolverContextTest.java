@@ -99,7 +99,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(term.hashCode()).isEqualTo(hash);
     assertThat(term).isEqualTo(term2);
 
-    // For CVC4, we close the solver, however do not finalize and cleanup the terms,
+    // For CVC4 and Bitwuzla, we close the solver, however do not finalize and cleanup the terms,
     // thus direct access is possible, operations are forbidden.
     // See https://github.com/sosy-lab/java-smt/issues/169
     assume()
@@ -107,7 +107,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
             "Solver %s does not support to access formulae after closing the context",
             solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
+        .isNoneOf(Solvers.CVC4, Solvers.BITWUZLA);
 
     // Java-based solvers allow more, i.e. they wait for GC, which is nice.
 

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+            xmlns:e="http://ant.apache.org/ivy/extra"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-bitwuzla">
+      <license name="MIT License" url="https://github.com/bitwuzla/bitwuzla/blob/main/COPYING"/>
+        <description>
+            Bitwuzla solver and JavaSMT JNI wrapper.
+            Bitwuzla is provided under the MIT License.
+        </description>
+    </info>
+
+    <configurations>
+        <!-- TODO: Add windows support -->
+        <conf name="solver-bitwuzla" extends="solver-bitwuzla-linux, solver-bitwuzla-windows"/>
+        <conf name="solver-bitwuzla-linux" extends="solver-bitwuzla-common"/>
+        <conf name="solver-bitwuzla-windows" extends="solver-bitwuzla-common"/>
+        <conf name="solver-bitwuzla-common" visibility="private"/>
+        <conf name="sources"/>
+        <conf name="javadoc"/>
+    </configurations>
+
+    <publications defaultconf="solver-bitwuzla">
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-linux" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-windows" type="shared-object" ext="dll"/>
+        <!-- Java code, docs and source -->
+        <artifact name="bitwuzla" conf="solver-bitwuzla-common" ext="jar"/>
+        <artifact name="bitwuzla" conf="sources" e:classifier="sources" type="source" ext="jar"/>
+        <artifact name="bitwuzla" conf="javadoc" e:classifier="javadoc" type="javadoc" ext="jar"/>
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>
