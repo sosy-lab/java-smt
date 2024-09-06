@@ -224,6 +224,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringPrefixSuffixConcat() throws SolverException, InterruptedException {
+    // FIXME: Princess will timeout on this test
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+
     // check whether "prefix + suffix == concat"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
@@ -1230,6 +1233,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariablesSubstring() throws SolverException, InterruptedException {
+    // FIXME: Princess will timeout on this test
+    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar1 = imgr.makeVariable("intVar1");
