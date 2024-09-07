@@ -11,12 +11,9 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 
 import ap.parser.IAtom;
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
-import ap.parser.INot;
 import ap.parser.ITerm;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
@@ -50,9 +47,8 @@ public class PrincessStringFormulaManager
 
   @Override
   protected IFormula greaterThan(IExpression pParam1, IExpression pParam2) {
-    IFormula leq = greaterOrEquals(pParam1, pParam2);
-    IFormula eq = equal(pParam1, pParam2);
-    return new IBinFormula(IBinJunctor.And(), leq, new INot(eq));
+    // just reverse the order
+    return greaterOrEquals(pParam2, pParam1);
   }
 
   @Override
@@ -68,9 +64,7 @@ public class PrincessStringFormulaManager
 
   @Override
   protected IFormula lessThan(IExpression pParam1, IExpression pParam2) {
-    IFormula leq = lessOrEquals(pParam1, pParam2);
-    IFormula eq = equal(pParam1, pParam2);
-    return new IBinFormula(IBinJunctor.And(), leq, new INot(eq));
+    return new IAtom(PrincessEnvironment.stringTheory.str_$less(), toITermSeq(pParam1, pParam2));
   }
 
   @Override
