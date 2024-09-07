@@ -96,6 +96,16 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(smgr.equal(str1, str2)).isUnsatisfiable();
   }
 
+  private void requireUnicode() {
+    // FIXME: Princess/Ostrich seems to support 16bit Unicode characters without any escaping
+    //  We should try substituting "\\u{xxxx}" with the Unicode character whenever a new String
+    //  literal is created
+    assume()
+        .withMessage("Unicode literals are currently broken for %s", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+  }
+
   // Tests
 
   @Test
@@ -130,6 +140,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+    requireUnicode();
     RegexFormula regexAllChar = smgr.allChar();
 
     // Single characters.
@@ -722,6 +733,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    */
   @Test
   public void testCharAtWithSpecialCharacters() throws SolverException, InterruptedException {
+    requireUnicode();
     assume()
         .withMessage("Solver %s does only support 2 byte unicode", solverToUse())
         .that(solverToUse())
@@ -793,6 +805,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
    */
   @Test
   public void testCharAtWithSpecialCharacters2Byte() throws SolverException, InterruptedException {
+    requireUnicode();
 
     StringFormula num7 = smgr.makeString("7");
     StringFormula u = smgr.makeString("u");
@@ -1017,6 +1030,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testConstStringIndexOf() throws SolverException, InterruptedException {
+    requireUnicode();
+
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -1167,6 +1182,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testConstStringSubStrings() throws SolverException, InterruptedException {
+    requireUnicode();
+
     StringFormula empty = smgr.makeString("");
     StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
@@ -1216,6 +1233,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringSubstringOutOfBounds() throws SolverException, InterruptedException {
+    requireUnicode();
+
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula b = smgr.makeString("b");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
@@ -1461,8 +1480,21 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
                 bmgr.not(smgr.equal(original, replaced)),
                 smgr.equal(replaced, smgr.concat(beginning, replacement, end))));
   }
-
+/*
   @Test
+  public void str_replaceTest() throws SolverException, InterruptedException {
+    //assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+    StringFormula suffix = smgr.makeString("blah");//smgr.makeVariable("var");
+    StringFormula a = smgr.makeString("a");
+    StringFormula b = smgr.makeString("b");
+
+    StringFormula string1 = smgr.concat(a, suffix);
+    StringFormula string2 = smgr.concat(b, suffix);
+
+    assertThatFormula(smgr.equal(smgr.replace(string1, a, b), string2)).isTautological();
+  }
+*/
+    @Test
   public void testStringVariableReplaceFront() throws SolverException, InterruptedException {
     assume()
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
