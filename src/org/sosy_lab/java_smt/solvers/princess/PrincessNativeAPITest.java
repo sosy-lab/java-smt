@@ -196,4 +196,31 @@ public class PrincessNativeAPITest {
       }
     }
   }
+
+  @Test
+  public void constContainsTest() {
+    ITerm a = stringTheory.string2Term("ab");
+    ITerm b = stringTheory.string2Term("b");
+    IFormula formula =
+        new IAtom(
+            stringTheory.str_contains(),
+            collectionAsScalaIterableConverter(List.of(a, b)).asScala().toSeq());
+    api.addAssertion(formula);
+    Value r = api.checkSat(true);
+    assertThat(r.toString()).isEqualTo("Sat");
+  }
+
+  @Ignore
+  @Test
+  public void variableContainsTest() {
+    ITerm a = api.createConstant("var1", stringTheory.StringSort());
+    ITerm b = api.createConstant("var2", stringTheory.StringSort());
+    IFormula formula =
+        new IAtom(
+            stringTheory.str_contains(),
+            collectionAsScalaIterableConverter(List.of(a, b)).asScala().toSeq());
+    api.addAssertion(formula);
+    Value r = api.checkSat(true);
+    assertThat(r.toString()).isEqualTo("Sat");
+  }
 }
