@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 
 import ap.parser.IAtom;
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
@@ -53,7 +55,16 @@ public class PrincessStringFormulaManager
 
   @Override
   protected IFormula lessOrEquals(IExpression pParam1, IExpression pParam2) {
-    return new IAtom(PrincessEnvironment.stringTheory.str_$less$eq(), toITermSeq(pParam1, pParam2));
+    // FIXME: Report this as a bug
+    // This should also work, but fails if the two Strings are equal:
+    // return new IAtom(PrincessEnvironment.stringTheory.str_$less$eq(), toITermSeq(pParam1,
+    //    pParam2));
+    return new IBinFormula(
+        IBinJunctor.Or(),
+        ((ITerm) pParam1).$eq$eq$eq((ITerm) pParam2),
+        new IAtom(
+            PrincessEnvironment.stringTheory.str_$less(),
+            PrincessEnvironment.toITermSeq(List.of(pParam1, pParam2))));
   }
 
   @Override
