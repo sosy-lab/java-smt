@@ -223,4 +223,48 @@ public class PrincessNativeAPITest {
     Value r = api.checkSat(true);
     assertThat(r.toString()).isEqualTo("Sat");
   }
+
+  @Ignore
+  @Test
+  public void variableLessOrEqualTest() {
+    // Running backward propagation
+    // Warning: cyclic definitions found, ignoring some function applications
+    //   ... disequality is not satisfied: suffix != prefix
+    //
+    // ap.api.SimpleAPI$SimpleAPIForwardedException: Internal exception: java.lang.Exception:
+    // Model extraction failed: Right(List(0)) != Right(Vector(1))
+
+    ITerm a = api.createConstant("var1", stringTheory.StringSort());
+    ITerm b = api.createConstant("var2", stringTheory.StringSort());
+    IFormula formula =
+        new IAtom(
+            stringTheory.str_$less$eq(),
+            collectionAsScalaIterableConverter(List.of(a, b)).asScala().toSeq());
+    api.addAssertion(formula);
+    Value r = api.checkSat(true);
+    assertThat(r.toString()).isEqualTo("Sat");
+  }
+
+  @Ignore
+  @Test
+  public void prefixSuffixTest() {
+    ITerm a = api.createConstant("var1", stringTheory.StringSort());
+    ITerm b = api.createConstant("var2", stringTheory.StringSort());
+    IFormula formula =
+        new IBinFormula(
+            IBinJunctor.Or(),
+            new INot(
+                new IBinFormula(
+                    IBinJunctor.And(),
+                    new IAtom(
+                        stringTheory.str_prefixof(),
+                        collectionAsScalaIterableConverter(List.of(a, b)).asScala().toSeq()),
+                    new IAtom(
+                        stringTheory.str_suffixof(),
+                        collectionAsScalaIterableConverter(List.of(b, a)).asScala().toSeq()))),
+            a.$eq$eq$eq(b));
+    api.addAssertion(new INot(formula));
+    Value r = api.checkSat(true);
+    assertThat(r.toString()).isEqualTo("Unsat");
+  }
 }
