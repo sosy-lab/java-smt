@@ -19,6 +19,7 @@ import ap.parser.IFunApp;
 import ap.parser.INot;
 import ap.parser.ITerm;
 import ap.types.Sort;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
@@ -79,7 +80,13 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm concatImpl(List<IExpression> parts) {
-    return new IFunApp(PrincessEnvironment.stringTheory.str_$plus$plus(), toITermSeq(parts));
+    return toITermSeq(parts)
+        .foldRight(
+            (ITerm) makeStringImpl(""),
+            (s, acc) ->
+                new IFunApp(
+                    PrincessEnvironment.stringTheory.str_$plus$plus(),
+                    PrincessEnvironment.toSeq(ImmutableList.of(s, acc))));
   }
 
   @Override
