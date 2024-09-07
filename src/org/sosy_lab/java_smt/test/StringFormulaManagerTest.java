@@ -1480,20 +1480,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
                 bmgr.not(smgr.equal(original, replaced)),
                 smgr.equal(replaced, smgr.concat(beginning, replacement, end))));
   }
-/*
-  @Test
-  public void str_replaceTest() throws SolverException, InterruptedException {
-    //assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-    StringFormula suffix = smgr.makeString("blah");//smgr.makeVariable("var");
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
 
-    StringFormula string1 = smgr.concat(a, suffix);
-    StringFormula string2 = smgr.concat(b, suffix);
-
-    assertThatFormula(smgr.equal(smgr.replace(string1, a, b), string2)).isTautological();
-  }
-*/
     @Test
   public void testStringVariableReplaceFront() throws SolverException, InterruptedException {
     assume()

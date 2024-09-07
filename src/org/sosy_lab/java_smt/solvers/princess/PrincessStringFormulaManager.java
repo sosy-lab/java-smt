@@ -48,7 +48,7 @@ public class PrincessStringFormulaManager
   @Override
   protected IFormula greaterThan(IExpression pParam1, IExpression pParam2) {
     // just reverse the order
-    return greaterOrEquals(pParam2, pParam1);
+    return lessThan(pParam2, pParam1);
   }
 
   @Override
