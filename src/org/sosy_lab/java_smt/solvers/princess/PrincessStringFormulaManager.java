@@ -18,6 +18,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
 import ap.types.Sort;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
@@ -31,9 +32,100 @@ public class PrincessStringFormulaManager
     super(pCreator);
   }
 
+  /**
+   * Tries to parse an escaped unicode character
+   *
+   * <p>Returns the original String if parsing is not possible.
+   */
+  private static String literalOrSkip(String pToken) {
+    String literal;
+    if (pToken.startsWith("\\u{")) {
+      if (pToken.length() > 9) {
+        // Abort if there are too many digits
+        // The longest allowed literal is \\u{d5 d4 d3 d2 d1}
+        return pToken;
+      }
+      literal = pToken.substring(3, pToken.length() - 1);
+    } else {
+      if (pToken.length() != 6) {
+        // Abort if there are not exactly 4 digits
+        // The literal must have this form: \\u d3 d2 d1 d0
+        return pToken;
+      }
+      literal = pToken.substring(2);
+    }
+
+    // Try to parse the digits as an (hexadecimal) integer
+    // Abort if there is an error
+    int value;
+    try {
+      value = Integer.parseInt(literal, 16);
+    } catch (NumberFormatException e) {
+      return pToken;
+    }
+
+    // Return the unicode letter if it fits into a single 16bit character
+    // Abort otherwise
+    char[] chars = Character.toChars(value);
+    if (chars.length != 1) {
+      return pToken;
+    } else {
+      return String.valueOf(chars[0]);
+    }
+  }
+
+  /** Replace escape sequences for unicode letters with their UTF16 representation */
+  private static String unescapeString(String pInput) {
+    StringBuilder builder = new StringBuilder();
+    while (!pInput.isEmpty()) {
+      // Search for the next escape sequence
+      int start = pInput.indexOf("\\u");
+      if (start == -1) {
+        // Append the rest of the String to the output if there are no more escaped unicode
+        // characters
+        builder.append(pInput);
+        pInput = "";
+      } else {
+        // Store the prefix up to the escape sequence
+        String prefix = pInput.substring(0, start);
+
+        // Skip ahead and get the escape sequence
+        pInput = pInput.substring(start);
+        String value;
+        if (pInput.charAt(2) == '{') {
+          // Sequence has the form \\u{d5 d4 d3 d2 d1 d0}
+          int stop = pInput.indexOf('}');
+          Preconditions.checkArgument(stop != -1); // Panic if there is no closing bracket
+          value = pInput.substring(0, stop + 1);
+          pInput = pInput.substring(stop + 1);
+        } else {
+          // Sequence has the form \\u d3 d2 d1 d0
+          int stop = 2;
+          while (stop < pInput.length()) {
+            char c = pInput.charAt(stop);
+            if (Character.digit(c, 16) == -1) {
+              break;
+            }
+            stop++;
+          }
+          value = pInput.substring(0, stop);
+          pInput = pInput.substring(stop);
+        }
+
+        // Try to parse the escape sequence to replace it with its 16bit unicode character
+        // If parsing fails just keep it in the String
+        String nextToken = literalOrSkip(value);
+
+        // Collect the prefix and the (possibly) translated escape sequence
+        builder.append(prefix).append(nextToken);
+      }
+    }
+    return builder.toString();
+  }
+
   @Override
   protected IExpression makeStringImpl(String value) {
-    return PrincessEnvironment.stringTheory.string2Term(value);
+    return PrincessEnvironment.stringTheory.string2Term(unescapeString(value));
   }
 
   @Override
