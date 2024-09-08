@@ -14,14 +14,20 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
+import ap.api.PartialModel;
 import ap.api.SimpleAPI;
+import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
+import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.IIntLit;
 import ap.parser.INot;
 import ap.parser.ITerm;
+import ap.theories.rationals.Rationals$;
 import ap.theories.strings.StringTheory;
+import ap.types.Sort;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.util.Comparator;
@@ -33,6 +39,7 @@ import ostrich.OFlags;
 import ostrich.OstrichStringTheory;
 import ostrich.automata.Transducer;
 import scala.Enumeration.Value;
+import scala.Option;
 import scala.Tuple2;
 import scala.collection.JavaConverters;
 
@@ -265,5 +272,50 @@ public class PrincessNativeAPITest {
     api.addAssertion(new INot(formula));
     Value r = api.checkSat(true);
     assertThat(r.toString()).isEqualTo("Unsat");
+  }
+
+  @Test
+  public void testIntegerEvaluation() {
+    // See bug report:
+    // https://github.com/uuverifiers/princess/issues/7
+    ITerm num2 = new IIntLit(IdealInt.apply(2));
+    ITerm x = api.createConstant("x", Sort.Integer$.MODULE$);
+    IFormula eq = num2.$eq$eq$eq(x);
+    api.addAssertion(eq);
+    Value result = api.checkSat(true); // --> SAT
+    PartialModel model = api.partialModel();
+    Option<IExpression> eval = model.evalExpression(num2.$plus(x));
+    System.out.println(eval); // -> Some(4) :-) GOOD BEHAVIOUR
+    assertThat(eval.nonEmpty()).isTrue();
+  }
+
+  @Ignore
+  @Test
+  public void testRationalEvaluation() {
+    // See bug report:
+    // https://github.com/uuverifiers/princess/issues/7
+    ITerm num2 = Rationals$.MODULE$.int2ring(new IIntLit(IdealInt.apply(2)));
+    ITerm x = api.createConstant("x", Rationals$.MODULE$.dom());
+    IFormula eq = num2.$eq$eq$eq(x);
+    api.addAssertion(eq);
+    Value result = api.checkSat(true); // --> SAT
+    PartialModel model = api.partialModel();
+    Option<IExpression> eval = model.evalExpression(num2.$plus(x));
+    System.out.println(eval); // -> None :-( BAD BEHAVIOUR
+    assertThat(eval.nonEmpty()).isTrue();
+  }
+
+  @Ignore
+  @Test
+  public void testRationalEvaluation2() {
+    // See bug report:
+    // https://github.com/uuverifiers/princess/issues/8
+    ITerm num2 = Rationals$.MODULE$.int2ring(new IIntLit(IdealInt.apply(2)));
+    ITerm x = api.createConstant("x", Rationals$.MODULE$.dom());
+    Value result = api.checkSat(true); // --> we have not added any constraints, so this is SAT
+    PartialModel model = api.partialModel();
+    Option<IExpression> eval = model.evalExpression(Rationals$.MODULE$.div(x, num2)); // --> CRASH
+    System.out.println(eval); // -> Some(0) would be nice to receive
+    assertThat(eval.nonEmpty()).isTrue();
   }
 }
