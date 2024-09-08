@@ -32,13 +32,14 @@ import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractInterpolatingProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula> {
+abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula, FormulaType> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
