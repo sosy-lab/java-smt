@@ -24,6 +24,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
@@ -31,8 +32,9 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormula.ArrayFormulaImpl;
 
-public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProverWithAllSat<F>
-    implements InterpolatingProverEnvironment<F> {
+public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
+    extends AbstractProverWithAllSat<TFormulaInfo>
+    implements InterpolatingProverEnvironment<TFormulaInfo> {
 
   private final FormulaCreator<?, ?, ?, ?> creator;
   private final QuantifiedFormulaManager qfmgr;
@@ -51,14 +53,14 @@ public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProv
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<F> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
       throws SolverException, InterruptedException {
     return getModelBasedInterpolant(pFormulasOfA);
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<F>> partitionedFormulas,
+      List<? extends Collection<TFormulaInfo>> partitionedFormulas,
       int[] startOfSubTree) throws SolverException, InterruptedException {
     return List.of();
   }
@@ -79,7 +81,7 @@ public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProv
    *    return answer.eval(Itp(shared))
    * return None
    */
-  private BooleanFormula getModelBasedInterpolant(Collection<F> pFormulasOfA) {
+  private BooleanFormula getModelBasedInterpolant(Collection<TFormulaInfo> pFormulasOfA) {
     checkState(!closed);
     checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -97,8 +99,8 @@ public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProv
     for (Formula var : sharedFormulas) {
       if (var instanceof IntegerFormula) {
         ArrayFormulaImpl varInt = (ArrayFormulaImpl) var;
-        typesForSharedBuilder.add(creator.getArrayType(varInt.getIndexType(),
-            varInt.getElementType()));
+        // typesForSharedBuilder.add(creator.getArrayType(varInt.getIndexType(),
+            //varInt.getElementType()));
       }
     }
     List<TType> typesForShared = typesForSharedBuilder.build();
