@@ -177,13 +177,14 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm concatImpl(List<IExpression> parts) {
-    return toITermSeq(parts)
-        .foldRight(
-            (ITerm) makeStringImpl(""),
-            (s, acc) ->
-                new IFunApp(
-                    PrincessEnvironment.stringTheory.str_$plus$plus(),
-                    PrincessEnvironment.toSeq(ImmutableList.of(s, acc))));
+    ITerm result = (ITerm) makeStringImpl("");
+    for (IExpression expr : parts) {
+      result =
+          new IFunApp(
+              PrincessEnvironment.stringTheory.str_$plus$plus(),
+              PrincessEnvironment.toSeq(ImmutableList.of(result, (ITerm) expr)));
+    }
+    return result;
   }
 
   @Override
