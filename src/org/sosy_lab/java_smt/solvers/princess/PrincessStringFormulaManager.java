@@ -74,7 +74,7 @@ public class PrincessStringFormulaManager
     }
   }
 
-  /** Replace escape sequences for unicode letters with their UTF16 representation */
+  /** Replace escape sequences for unicode letters with their UTF16 representation. */
   private static String unescapeString(String pInput) {
     StringBuilder builder = new StringBuilder();
     while (!pInput.isEmpty()) {
