@@ -24,7 +24,6 @@ import ap.parser.ITerm;
 import ap.theories.strings.StringTheory;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.Before;
@@ -35,6 +34,7 @@ import ostrich.OstrichStringTheory;
 import ostrich.automata.Transducer;
 import scala.Enumeration.Value;
 import scala.Tuple2;
+import scala.collection.JavaConverters;
 
 public class PrincessNativeAPITest {
   private StringTheory stringTheory;
@@ -55,11 +55,10 @@ public class PrincessNativeAPITest {
             SimpleAPI.apply$default$9(),
             SimpleAPI.apply$default$10(),
             SimpleAPI.apply$default$11());
+    ImmutableList<Tuple2<String, Transducer>> empty = ImmutableList.of();
     stringTheory =
         new OstrichStringTheory(
-            collectionAsScalaIterableConverter(new ArrayList<Tuple2<String, Transducer>>())
-                .asScala()
-                .toSeq(),
+            JavaConverters.asScalaIteratorConverter(empty.iterator()).asScala().toSeq(),
             new OFlags(
                 OFlags.$lessinit$greater$default$1(),
                 OFlags.$lessinit$greater$default$2(),
