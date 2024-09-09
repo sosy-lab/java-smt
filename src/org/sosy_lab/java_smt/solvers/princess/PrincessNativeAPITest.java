@@ -233,13 +233,6 @@ public class PrincessNativeAPITest {
   @Ignore
   @Test
   public void variableLessOrEqualTest() {
-    // Running backward propagation
-    // Warning: cyclic definitions found, ignoring some function applications
-    //   ... disequality is not satisfied: suffix != prefix
-    //
-    // ap.api.SimpleAPI$SimpleAPIForwardedException: Internal exception: java.lang.Exception:
-    // Model extraction failed: Right(List(0)) != Right(Vector(1))
-
     ITerm a = api.createConstant("var1", stringTheory.StringSort());
     ITerm b = api.createConstant("var2", stringTheory.StringSort());
     IFormula formula =
@@ -254,6 +247,13 @@ public class PrincessNativeAPITest {
   @Ignore
   @Test
   public void prefixSuffixTest() {
+    // Running backward propagation
+    // Warning: cyclic definitions found, ignoring some function applications
+    //   ... disequality is not satisfied: suffix != prefix
+    //
+    // ap.api.SimpleAPI$SimpleAPIForwardedException: Internal exception: java.lang.Exception:
+    // Model extraction failed: Right(List(0)) != Right(Vector(1))
+
     ITerm a = api.createConstant("var1", stringTheory.StringSort());
     ITerm b = api.createConstant("var2", stringTheory.StringSort());
     IFormula formula =
