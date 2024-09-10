@@ -121,7 +121,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     Level level = trackingStack.pop();
     api.addBooleanVariables(asScala(level.booleanSymbols));
-    api.addConstants(asScala(level.intSymbols));
+    api.addConstants(asScala(level.theorySymbols));
     level.functionSymbols.forEach(api::addFunction);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().mergeWithHigher(level);
@@ -213,12 +213,12 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     }
   }
 
-  /** add external definition: integer variable. */
+  /** add external definition: theory variable (integer, rational, string, etc). */
   void addSymbol(ITerm f) {
     Preconditions.checkState(!closed);
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.peek().intSymbols.add(f);
+      trackingStack.peek().theorySymbols.add(f);
     }
   }
 
@@ -233,7 +233,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   static class Level {
     final List<IFormula> booleanSymbols = new ArrayList<>();
-    final List<ITerm> intSymbols = new ArrayList<>();
+    final List<ITerm> theorySymbols = new ArrayList<>();
     final List<IFunction> functionSymbols = new ArrayList<>();
 
     Level() {}
@@ -241,13 +241,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
       this.booleanSymbols.addAll(other.booleanSymbols);
-      this.intSymbols.addAll(other.intSymbols);
+      this.theorySymbols.addAll(other.theorySymbols);
       this.functionSymbols.addAll(other.functionSymbols);
     }
 
     @Override
     public String toString() {
-      return String.format("{%s, %s, %s}", booleanSymbols, intSymbols, functionSymbols);
+      return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
     }
   }
 }
