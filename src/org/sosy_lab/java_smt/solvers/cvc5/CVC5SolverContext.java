@@ -223,7 +223,12 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5TheoremProver(
-        creator, shutdownNotifier, randomSeed, pOptions, getFormulaManager());
+        creator,
+        shutdownNotifier,
+        randomSeed,
+        pOptions,
+        getFormulaManager(),
+        settings.furtherOptionsMap);
   }
 
   @Override
@@ -241,6 +246,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         randomSeed,
         pOptions,
         getFormulaManager(),
+        settings.furtherOptionsMap,
         settings.validateInterpolants);
   }
 
