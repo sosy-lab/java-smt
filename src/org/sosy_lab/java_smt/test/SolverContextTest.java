@@ -17,6 +17,10 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -136,6 +140,29 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
     try (var context2 = factory2.generateContext()) {
       // create and ignore
+    }
+  }
+
+  @Test(timeout = 1000)
+  @SuppressWarnings({"try", "CheckReturnValue"})
+  public void testCVC5WithValidOptionsTimeLimit()
+      throws InvalidConfigurationException, InterruptedException {
+    assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
+
+    //  tlimit-per is time limit in ms of wall clock time per query
+    var configValid =
+        createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "tlimit-per=1").build();
+    var factoryWOption = new SolverContextFactory(configValid, logger, shutdownNotifierToUse());
+    try (SolverContext contextWTimeLimit = factoryWOption.generateContext()) {
+      FormulaManager fmgrTimeLimit = contextWTimeLimit.getFormulaManager();
+      HardIntegerFormulaGenerator hifg =
+          new HardIntegerFormulaGenerator(
+              fmgrTimeLimit.getIntegerFormulaManager(), fmgrTimeLimit.getBooleanFormulaManager());
+      BooleanFormula hardProblem = hifg.generate(100);
+      try (ProverEnvironment proverTimeLimited = contextWTimeLimit.newProverEnvironment()) {
+        proverTimeLimited.addConstraint(hardProblem);
+        assertThrows(SolverException.class, proverTimeLimited::isUnsat);
+      }
     }
   }
 
