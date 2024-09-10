@@ -79,7 +79,9 @@ public class PrincessNativeAPITest {
                 OFlags.$lessinit$greater$default$10(),
                 OFlags.$lessinit$greater$default$11(),
                 OFlags.$lessinit$greater$default$12(),
-                OFlags.$lessinit$greater$default$13()));
+                OFlags.$lessinit$greater$default$13(),
+                OFlags.$lessinit$greater$default$14(),
+                OFlags.$lessinit$greater$default$15()));
   }
 
   private static final ImmutableList<String> WORDS =
@@ -317,8 +319,7 @@ public class PrincessNativeAPITest {
     api.addAssertion(eq);
     Value result = api.checkSat(true); // --> SAT
     assertThat(result.toString()).isEqualTo("Sat");
-    PartialModel model = api.partialModel();
-    IExpression eval = api.evalToTerm(num2.$plus((x)));
+    IExpression eval = api.evalToTerm(num2.$plus(x));
     System.out.println(eval); // -> None :-( BAD BEHAVIOUR
     assertThat(eval.toString()).isEqualTo("4");
   }
