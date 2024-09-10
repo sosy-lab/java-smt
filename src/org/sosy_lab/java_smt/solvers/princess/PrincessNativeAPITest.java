@@ -283,6 +283,7 @@ public class PrincessNativeAPITest {
     IFormula eq = num2.$eq$eq$eq(x);
     api.addAssertion(eq);
     Value result = api.checkSat(true); // --> SAT
+    assertThat(result.toString()).isEqualTo("Sat");
     PartialModel model = api.partialModel();
     Option<IExpression> eval = model.evalExpression(num2.$plus(x));
     System.out.println(eval); // -> Some(4) :-) GOOD BEHAVIOUR
@@ -299,6 +300,7 @@ public class PrincessNativeAPITest {
     IFormula eq = num2.$eq$eq$eq(x);
     api.addAssertion(eq);
     Value result = api.checkSat(true); // --> SAT
+    assertThat(result.toString()).isEqualTo("Sat");
     PartialModel model = api.partialModel();
     Option<IExpression> eval = model.evalExpression(num2.$plus(x));
     System.out.println(eval); // -> None :-( BAD BEHAVIOUR
@@ -313,6 +315,7 @@ public class PrincessNativeAPITest {
     ITerm num2 = Rationals$.MODULE$.int2ring(new IIntLit(IdealInt.apply(2)));
     ITerm x = api.createConstant("x", Rationals$.MODULE$.dom());
     Value result = api.checkSat(true); // --> we have not added any constraints, so this is SAT
+    assertThat(result.toString()).isEqualTo("Sat");
     PartialModel model = api.partialModel();
     Option<IExpression> eval = model.evalExpression(Rationals$.MODULE$.div(x, num2)); // --> CRASH
     System.out.println(eval); // -> Some(0) would be nice to receive
