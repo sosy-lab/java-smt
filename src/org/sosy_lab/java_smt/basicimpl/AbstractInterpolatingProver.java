@@ -14,7 +14,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -23,15 +22,12 @@ import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormula.ArrayFormulaImpl;
 
-public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProverWithAllSat<F>
+public abstract class AbstractInterpolatingProver<F> extends AbstractProverWithAllSat<F>
     implements InterpolatingProverEnvironment<F> {
 
   private final FormulaCreator<?, ?, ?, ?> creator;
@@ -91,17 +87,8 @@ public abstract class AbstractInterpolatingProver<F, TType> extends AbstractProv
     final Set<?> b = Sets.difference(assertedFormulas, a);
 
     // shared variables between a and b
-    final Set<Formula> sharedFormulas = (Set<Formula>) Sets.intersection(a, b);
+    final Set<?> sharedFormulas = Sets.intersection(a, b);
 
-    ImmutableList.Builder<TType> typesForSharedBuilder = ImmutableList.builder();
-    for (Formula var : sharedFormulas) {
-      if (var instanceof IntegerFormula) {
-        ArrayFormulaImpl varInt = (ArrayFormulaImpl) var;
-        typesForSharedBuilder.add(creator.getArrayType(varInt.getIndexType(),
-            varInt.getElementType()));
-      }
-    }
-    List<TType> typesForShared = typesForSharedBuilder.build();
 
     return null;
   }
