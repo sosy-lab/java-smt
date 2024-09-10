@@ -12,6 +12,7 @@ import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
+import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -19,10 +20,13 @@ import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.parser.ITimes;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
+import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.collect.ArrayListMultimap;
@@ -37,20 +41,21 @@ import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import scala.Option;
 
 class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
+  private final PrincessAbstractProver<?> prover;
+
   private final PartialModel model;
   private final SimpleAPI api;
 
   PrincessModel(
-      AbstractProver<?> pProver,
+      PrincessAbstractProver<?> pProver,
       PartialModel partialModel,
       FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
       SimpleAPI pApi) {
     super(pProver, creator);
+    this.prover = pProver;
     this.model = partialModel;
     this.api = pApi;
   }
@@ -240,26 +245,53 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   @Override
   public void close() {}
 
-  @Override
-  protected @Nullable IExpression evalImpl(IExpression formula) {
-    IExpression evaluation = evaluate(formula);
-    if (evaluation == null) {
-      // fallback: try to simplify the query and evaluate again.
-      evaluation = evaluate(creator.getEnv().simplify(formula));
+  /** Tries to determine the Sort of a Term */
+  private Sort getSort(ITerm pTerm) {
+    // Just using sortof() won't work as Princess may have simplified the original term
+    // FIXME: This may also affect other parts of the code that use sortof()
+    if (pTerm instanceof ITimes) {
+      ITimes times = (ITimes) pTerm;
+      return getSort(times.subterm());
+    } else {
+      // TODO: Do we need more cases?
+      return Sort$.MODULE$.sortOf(pTerm);
     }
-    return evaluation;
   }
 
-  @Nullable
-  private IExpression evaluate(IExpression formula) {
-    if (formula instanceof ITerm) {
-      Option<ITerm> out = model.evalToTerm((ITerm) formula);
-      return out.isEmpty() ? null : out.get();
-    } else if (formula instanceof IFormula) {
-      Option<IExpression> out = model.evalExpression(formula);
-      return out.isEmpty() ? null : out.get();
+  /**
+   * Simplify rational values.
+   *
+   * <p>Rewrite <code>a/1</code> as <code>a</code>, otherwise return the term unchanged
+   */
+  private ITerm simplifyRational(ITerm pTerm) {
+    // TODO: Reduce the term further?
+    // TODO: Also do this for the values in the model?
+    if (Sort$.MODULE$.sortOf(pTerm).equals(creator.getRationalType())
+        && pTerm instanceof IFunApp
+        && ((IFunApp) pTerm).fun().name().equals("Rat_frac")
+        && (pTerm.apply(1).equals(new IIntLit(IdealInt.ONE())))) {
+      return Rationals.int2ring((ITerm) pTerm.apply(0));
+    }
+    return pTerm;
+  }
+
+  @Override
+  protected @Nullable IExpression evalImpl(IExpression formula) {
+    Sort sort = getSort((ITerm) formula);
+    if (sort.equals(creator.getRationalType())) {
+      // Extending the partial model does not seem to work in Princess if the formula uses rational
+      // variables. To work around this issue we (temporarily) add the formula to the assertion
+      // stack and then repeat the sat-check to get the value.
+      api.push();
+      ITerm var =
+          api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort((ITerm) formula));
+      api.addAssertion(var.$eq$eq$eq((ITerm) formula));
+      api.checkSat(true);
+      ITerm evaluated = api.evalToTerm(var);
+      api.pop();
+      return simplifyRational(evaluated);
     } else {
-      throw new AssertionError("unexpected formula: " + formula);
+      return api.evalToTerm((ITerm) formula);
     }
   }
 }
