@@ -24,6 +24,7 @@ import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.IPlus;
 import ap.parser.ITerm;
+import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
@@ -541,16 +542,22 @@ class PrincessEnvironment {
   static FormulaType<?> getFormulaType(IExpression pFormula) {
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITerm) {
-      ITerm formula = (ITerm) pFormula;
-      if (pFormula instanceof ITimes) {
-        // coeff is always INT, lets check the subterm.
-        formula = ((ITimes) formula).subterm();
-      } else if (pFormula instanceof IPlus) {
-        return mergeFormulaTypes(
-            getFormulaType(((IPlus) pFormula).t1()), getFormulaType(((IPlus) pFormula).t2()));
-      }
-      final Sort sort = Sort$.MODULE$.sortOf(formula);
+    } else if (pFormula instanceof ITimes) {
+      // coeff is always INT, lets check the subterm.
+      ITimes times = (ITimes) pFormula;
+      return getFormulaType(times.subterm());
+    } else if (pFormula instanceof IPlus) {
+      IPlus plus = (IPlus) pFormula;
+      FormulaType<?> t1 = getFormulaType(plus.t1());
+      FormulaType<?> t2 = getFormulaType(plus.t2());
+      return mergeFormulaTypes(t1, t2);
+    } else if (pFormula instanceof ITermITE) {
+      ITermITE plus = (ITermITE) pFormula;
+      FormulaType<?> t1 = getFormulaType(plus.left());
+      FormulaType<?> t2 = getFormulaType(plus.right());
+      return mergeFormulaTypes(t1, t2);
+    } else {
+      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
@@ -562,9 +569,6 @@ class PrincessEnvironment {
             e);
       }
     }
-    throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
   }
 
   /**
