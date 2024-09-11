@@ -290,8 +290,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       // variables. To work around this issue we (temporarily) add the formula to the assertion
       // stack and then repeat the sat-check to get the value.
       api.push();
-      ITerm var =
-          api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(formula));
+      ITerm var = api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(formula));
       api.addAssertion(var.$eq$eq$eq((ITerm) formula));
       api.checkSat(true);
       ITerm evaluated = api.evalToTerm(var);
