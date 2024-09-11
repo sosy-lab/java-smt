@@ -80,8 +80,7 @@ class PrincessFormulaCreator
   // Java-SMT kind
   private static final Map<IFunction, FunctionDeclarationKind> theoryFunctionKind = new HashMap<>();
   private static final Map<Predicate, FunctionDeclarationKind> theoryPredKind = new HashMap<>();
-  private static final Set<String> CONSTANT_UFS =
-      ImmutableSet.of("str_cons", "str_empty", "Rat_int", "Rat_frac");
+  private static final Set<String> CONSTANT_UFS = ImmutableSet.of("str_cons", "str_empty");
 
   static {
     theoryFunctionKind.put(ModuloArithmetic.bv_concat(), FunctionDeclarationKind.BV_CONCAT);
