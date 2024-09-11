@@ -265,8 +265,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringPrefixSuffix() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
-
     // check whether "prefix == suffix iff equal length"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
