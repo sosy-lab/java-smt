@@ -269,7 +269,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     if (Sort$.MODULE$.sortOf(pTerm).equals(creator.getRationalType())
         && pTerm instanceof IFunApp
         && ((IFunApp) pTerm).fun().name().equals("Rat_frac")
-        && (pTerm.apply(1).equals(new IIntLit(IdealInt.ONE())))) {
+        && pTerm.apply(1).equals(new IIntLit(IdealInt.ONE()))) {
       return Rationals.int2ring((ITerm) pTerm.apply(0));
     }
     return pTerm;
