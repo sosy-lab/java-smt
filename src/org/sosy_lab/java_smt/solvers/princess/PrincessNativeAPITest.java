@@ -79,7 +79,9 @@ public class PrincessNativeAPITest {
                 OFlags.$lessinit$greater$default$10(),
                 OFlags.$lessinit$greater$default$11(),
                 OFlags.$lessinit$greater$default$12(),
-                OFlags.$lessinit$greater$default$13()));
+                OFlags.$lessinit$greater$default$13(),
+                OFlags.$lessinit$greater$default$14(),
+                OFlags.$lessinit$greater$default$15()));
   }
 
   private static final ImmutableList<String> WORDS =
@@ -244,7 +246,6 @@ public class PrincessNativeAPITest {
     assertThat(r.toString()).isEqualTo("Sat");
   }
 
-  @Ignore
   @Test
   public void prefixSuffixTest() {
     // Running backward propagation
