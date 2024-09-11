@@ -196,6 +196,9 @@ class PrincessFormulaCreator
     if (value instanceof IFunApp) {
       IFunApp fun = (IFunApp) value;
       switch (fun.fun().name()) {
+        case "true":
+          Preconditions.checkArgument(fun.fun().arity() == 0);
+          return true;
         case "false":
           Preconditions.checkArgument(fun.fun().arity() == 0);
           return false;
