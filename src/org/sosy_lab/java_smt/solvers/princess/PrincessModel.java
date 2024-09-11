@@ -42,6 +42,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import scala.Option;
 
 class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PrincessAbstractProver<?> prover;
@@ -245,16 +246,18 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   @Override
   public void close() {}
 
-  /** Tries to determine the Sort of a Term */
-  private Sort getSort(ITerm pTerm) {
+  /** Tries to determine the Sort of a Term. */
+  private Sort getSort(IExpression pTerm) {
     // Just using sortof() won't work as Princess may have simplified the original term
     // FIXME: This may also affect other parts of the code that use sortof()
     if (pTerm instanceof ITimes) {
       ITimes times = (ITimes) pTerm;
       return getSort(times.subterm());
+    } else if (pTerm instanceof IFormula) {
+      return creator.getBoolType();
     } else {
       // TODO: Do we need more cases?
-      return Sort$.MODULE$.sortOf(pTerm);
+      return Sort$.MODULE$.sortOf((ITerm) pTerm);
     }
   }
 
@@ -277,7 +280,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression formula) {
-    Sort sort = getSort((ITerm) formula);
+    Sort sort = getSort(formula);
     if (sort.equals(creator.getRationalType())) {
       // Extending the partial model does not seem to work in Princess if the formula uses rational
       // variables. To work around this issue we (temporarily) add the formula to the assertion
@@ -291,7 +294,15 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       api.pop();
       return simplifyRational(evaluated);
     } else {
-      return api.evalToTerm((ITerm) formula);
+      if (formula instanceof ITerm) {
+        Option<ITerm> out = model.evalToTerm((ITerm) formula);
+        return out.isEmpty() ? null : out.get();
+      } else if (formula instanceof IFormula) {
+        Option<IExpression> out = model.evalExpression(formula);
+        return out.isEmpty() ? null : out.get();
+      } else {
+        throw new AssertionError("unexpected formula: " + formula);
+      }
     }
   }
 }
