@@ -82,11 +82,17 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression makeNumberImpl(BigDecimal pNumber) {
-    List<ITerm> args =
-        ImmutableList.of(
-            pInteger.makeNumberImpl(pNumber.unscaledValue()),
-            pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
-    return new IFunApp(PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
+    if (pNumber.scale() <= 0) {
+      return PrincessEnvironment.rationalTheory.int2ring(
+          pInteger.makeNumberImpl(pNumber.toBigInteger()));
+    } else {
+      List<ITerm> args =
+          ImmutableList.of(
+              pInteger.makeNumberImpl(pNumber.unscaledValue()),
+              pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
+      return new IFunApp(
+          PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
+    }
   }
 
   @Override
