@@ -21,6 +21,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IIntLit;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
 import ap.parser.ITimes;
 import ap.terfor.preds.Predicate;
@@ -253,6 +254,9 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     if (pTerm instanceof ITimes) {
       ITimes times = (ITimes) pTerm;
       return getSort(times.subterm());
+    } else if (pTerm instanceof IPlus) {
+      IPlus plus = (IPlus) pTerm;
+      return getSort(plus.apply(0));
     } else if (pTerm instanceof IFormula) {
       return creator.getBoolType();
     } else {
@@ -294,15 +298,26 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       api.pop();
       return simplifyRational(evaluated);
     } else {
-      if (formula instanceof ITerm) {
-        Option<ITerm> out = model.evalToTerm((ITerm) formula);
-        return out.isEmpty() ? null : out.get();
-      } else if (formula instanceof IFormula) {
-        Option<IExpression> out = model.evalExpression(formula);
-        return out.isEmpty() ? null : out.get();
-      } else {
-        throw new AssertionError("unexpected formula: " + formula);
+      IExpression evaluation = evaluate(formula);
+      if (evaluation == null) {
+        // fallback: try to simplify the query and evaluate again.
+        // This is needed for array expressions
+        evaluation = evaluate(creator.getEnv().simplify(formula));
       }
+      return evaluation;
+    }
+  }
+
+  @Nullable
+  private IExpression evaluate(IExpression formula) {
+    if (formula instanceof ITerm) {
+      Option<ITerm> out = model.evalToTerm((ITerm) formula);
+      return out.isEmpty() ? null : out.get();
+    } else if (formula instanceof IFormula) {
+      Option<IExpression> out = model.evalExpression(formula);
+      return out.isEmpty() ? null : out.get();
+    } else {
+      throw new AssertionError("unexpected formula: " + formula);
     }
   }
 }
