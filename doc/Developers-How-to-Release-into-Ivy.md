@@ -46,18 +46,22 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
+### From official binaries (for Linux, Windows, and OSX)
+
+To publish Z3, download the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
 In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
-For simpler handling, we then copy the files from the three `bin` directories together into one directory,
-and include the sources (we can keep the internal structure of each directory, just copy them above each other).
+For simpler handling, we then copy the files together into two directories:
+- use the source directory as `Z3_DIR`.
+- from the three `*x64*/bin` directories together into directory `$Z3_DIR`,
+- from the three `*arm64*/bin` directories together into another directory `Z3_DIR_ARM64`.
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
 and `$Z3_VERSION` is the version number:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
+ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.pathArm64=$Z3_DIR_ARM64/bin -Dz3.version=$Z3_VERSION
 ```
-Finally follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end.
 
 #### Optional (from source for Linux target with older GLIBC)
 This step is for the following use case:
