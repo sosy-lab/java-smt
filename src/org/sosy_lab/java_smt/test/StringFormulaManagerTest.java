@@ -96,6 +96,17 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(smgr.equal(str1, str2)).isUnsatisfiable();
   }
 
+  private void requireVariableStringLiterals() {
+    // FIXME: Remove once support for operations on non-singleton Strings has been added
+    // See https://github.com/uuverifiers/ostrich/issues/88
+    assume()
+        .withMessage(
+            "Princess currently requires at least one of the arguments to be a "
+                + "singleton string")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+  }
+
   // Tests
 
   @Test
@@ -114,6 +125,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testRegexAllChar() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     RegexFormula regexAllChar = smgr.allChar();
 
     assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
@@ -130,6 +143,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     RegexFormula regexAllChar = smgr.allChar();
 
     // Single characters.
@@ -161,6 +176,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringRegex2() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }
@@ -248,6 +265,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringPrefixSuffix() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     // check whether "prefix == suffix iff equal length"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
@@ -389,6 +408,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .isNotEqualTo(Solvers.CVC5);
     // TODO regression:
     // - CVC5 was able to solve this in v1.0.2, but no longer in v1.0.5
+
+    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("0");
     StringFormula var2 = smgr.makeVariable("1");
@@ -957,6 +978,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableContains() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
 
@@ -1004,6 +1027,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
+
+    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1068,6 +1093,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableIndexOf() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar = imgr.makeVariable("intVar");
@@ -1151,6 +1178,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s runs endlessly on this task", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.Z3, Solvers.CVC4);
+
+    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1320,6 +1349,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
+    requireVariableStringLiterals();
+
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
     StringFormula prefix = smgr.makeVariable("prefix");
@@ -1422,6 +1453,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.Z3);
 
+    requireVariableStringLiterals();
+
     StringFormula original = smgr.makeVariable("original");
     StringFormula replacement = smgr.makeVariable("replacement");
     StringFormula replaced = smgr.makeVariable("replaced");
@@ -1472,6 +1505,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s runs endlessly on this task.", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.Z3, Solvers.CVC5);
+
+    requireVariableStringLiterals();
 
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
@@ -1534,6 +1569,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
+    requireVariableStringLiterals();
+
     // 2 concats is the max number CVC4 supports without running endlessly
     for (int numOfConcats = 0; numOfConcats < 3; numOfConcats++) {
 
@@ -1567,6 +1604,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .withMessage("Solver %s does not support replaceAll()", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
+
+    requireVariableStringLiterals();
 
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
