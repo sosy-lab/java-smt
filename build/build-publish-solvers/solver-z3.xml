@@ -25,13 +25,21 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the path to Z3 with the flag -Dz3.path=/path/to/z3 (e.g. `bin` directory).
             The path has to point to the root Z3 folder (i.e., the path is ending with '/bin') and can be relative or absolute.
             Note that shell substitutions do not work.
-            Please provide all releases (Linux64, MacOS, and Windows64) together in the same root directory,
+            Please provide all releases (Linux, MacOS, and Windows for x64 architecture) together in the same root directory,
             e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
             The only overlap between those releases is the JAR file, which should be equal anyway.
             Additionally, make the Java sources available in this directory.
             This can be done by:
             - copying the content of sources-zip into the current directory (or vice versa)
             - executing `python scripts/mk_make.py --java` to generate all Java related files. Executing `make` is not required.
+        </fail>
+        <fail unless="z3.pathArm64">
+            Please specify the path to Z3 (ARM64 version) with the flag -Dz3.pathArm64=/path/to/z3-arm64 (e.g. `bin` directory).
+            The path has to point to the root Z3 folder (i.e., the path is ending with '/bin') and can be relative or absolute.
+            Note that shell substitutions do not work.
+            Please provide all releases (Linux, MacOS, and Windows for ARM64 architecture) together in the same root directory,
+            e.g., copy the releases (especially the content of their `bin` directories) together into one directory.
+            The only overlap between those releases is the JAR file, which should be equal anyway.
         </fail>
         <exec executable="readelf" dir="${z3.path}" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
@@ -45,14 +53,20 @@ SPDX-License-Identifier: Apache-2.0
             Please run 'patchelf --set-soname libz3.so ${z3.path}/libz3.so'.
         </fail>
         <!-- Linux64 files -->
-        <copy file="${z3.path}/libz3.so" tofile="libz3-${z3.version}.so"/>
-        <copy file="${z3.path}/libz3java.so" tofile="libz3java-${z3.version}.so"/>
+        <copy file="${z3.path}/libz3.so" tofile="libz3-x64-${z3.version}.so"/>
+        <copy file="${z3.path}/libz3java.so" tofile="libz3java-x64-${z3.version}.so"/>
+        <copy file="${z3.pathArm64}/libz3.so" tofile="libz3-arm64-${z3.version}.so"/>
+        <copy file="${z3.pathArm64}/libz3java.so" tofile="libz3java-arm64-${z3.version}.so"/>
         <!-- Windows64 files -->
-        <copy file="${z3.path}/libz3.dll" tofile="libz3-${z3.version}.dll"/>
-        <copy file="${z3.path}/libz3java.dll" tofile="libz3java-${z3.version}.dll"/>
+        <copy file="${z3.path}/libz3.dll" tofile="libz3-x64-${z3.version}.dll"/>
+        <copy file="${z3.path}/libz3java.dll" tofile="libz3java-x64-${z3.version}.dll"/>
+        <copy file="${z3.pathArm64}/libz3.dll" tofile="libz3-arm64-${z3.version}.dll"/>
+        <copy file="${z3.pathArm64}/libz3java.dll" tofile="libz3java-arm64-${z3.version}.dll"/>
         <!-- MacOS files -->
-        <copy file="${z3.path}/libz3.dylib" tofile="libz3-${z3.version}.dylib"/>
-        <copy file="${z3.path}/libz3java.dylib" tofile="libz3java-${z3.version}.dylib"/>
+        <copy file="${z3.path}/libz3.dylib" tofile="libz3-x64-${z3.version}.dylib"/>
+        <copy file="${z3.path}/libz3java.dylib" tofile="libz3java-x64-${z3.version}.dylib"/>
+        <copy file="${z3.pathArm64}/libz3.dylib" tofile="libz3-arm64-${z3.version}.dylib"/>
+        <copy file="${z3.pathArm64}/libz3java.dylib" tofile="libz3java-arm64-${z3.version}.dylib"/>
         <!-- common Java file, Java is platform independent -->
         <copy file="${z3.path}/com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
     </target>
