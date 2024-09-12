@@ -296,6 +296,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // TODO: Use partialModel.evalTerm() for formulas that have rational numbers in them
     // TODO: Report this as a bug and have it fixed
 
+    // FIXME: This probably isn't consistent. Find a better way and rewrite the code.
+
     if (expr instanceof ITerm) {
       ITerm term = (ITerm) expr;
       api.push();
