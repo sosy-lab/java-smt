@@ -133,7 +133,6 @@ public class PrincessNativeAPITest {
     }
   }
 
-  @Ignore
   @Test
   public void lessOrEqualTest() {
     for (int i = 0; i < WORDS.size(); i++) {
