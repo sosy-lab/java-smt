@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,10 +10,17 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -119,5 +126,53 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula opTerm = bmgr.and(notTerm, term2);
     assertThat(bmgr.isTrue(opTerm)).isFalse();
     assertThat(bmgr.isFalse(opTerm)).isFalse();
+  }
+
+  @Test
+  @SuppressWarnings("try")
+  public void testCVC5WithValidOptions() throws InvalidConfigurationException {
+    assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
+
+    var config2 =
+        createTestConfigBuilder()
+            .setOption("solver.cvc5.furtherOptions", "solve-bv-as-int=bitwise")
+            .build();
+    var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    try (var context2 = factory2.generateContext()) {
+      // create and ignore
+    }
+  }
+
+  @Test(timeout = 1000)
+  @SuppressWarnings({"try", "CheckReturnValue"})
+  public void testCVC5WithValidOptionsTimeLimit()
+      throws InvalidConfigurationException, InterruptedException {
+    assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
+
+    //  tlimit-per is time limit in ms of wall clock time per query
+    var configValid =
+        createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "tlimit-per=1").build();
+    var factoryWOption = new SolverContextFactory(configValid, logger, shutdownNotifierToUse());
+    try (SolverContext contextWTimeLimit = factoryWOption.generateContext()) {
+      FormulaManager fmgrTimeLimit = contextWTimeLimit.getFormulaManager();
+      HardIntegerFormulaGenerator hifg =
+          new HardIntegerFormulaGenerator(
+              fmgrTimeLimit.getIntegerFormulaManager(), fmgrTimeLimit.getBooleanFormulaManager());
+      BooleanFormula hardProblem = hifg.generate(100);
+      try (ProverEnvironment proverTimeLimited = contextWTimeLimit.newProverEnvironment()) {
+        proverTimeLimited.addConstraint(hardProblem);
+        assertThrows(SolverException.class, proverTimeLimited::isUnsat);
+      }
+    }
+  }
+
+  @Test
+  public void testCVC5WithInvalidOptions() throws InvalidConfigurationException {
+    assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
+
+    var config2 =
+        createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "foo=bar").build();
+    var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    assertThrows(InvalidConfigurationException.class, factory2::generateContext);
   }
 }
