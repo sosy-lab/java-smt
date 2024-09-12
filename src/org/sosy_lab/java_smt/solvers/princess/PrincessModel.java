@@ -162,6 +162,11 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // then handle assignments for non-array cases.
     // we expect exactly one assignment per model entry.
 
+    // FIXME: Princess may return multiply mappings for UFs if the arguments are rational, f.ex
+    //  "uf(17/3) -> 3" and "uf(34/6) -> 3" may both appear in the same model even thought 17/3 and
+    //  34/6 are the same. We should look into this and reduce the fractions in the model if this
+    //  is causing us any issues.
+
     String name;
     IFormula fAssignment;
     List<Object> argumentInterpretations = ImmutableList.of();
