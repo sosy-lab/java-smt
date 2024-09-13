@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
+import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asJavaCollection;
 
 import ap.basetypes.IdealInt;
@@ -42,6 +43,8 @@ import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
+import ap.theories.rationals.Fractions;
+import ap.theories.rationals.Rationals$;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;
@@ -49,6 +52,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -347,6 +351,33 @@ class PrincessFormulaCreator
     }
   }
 
+  /** Returns true if the expression is a constant number */
+  private static boolean isConstant(IFunApp pExpr) {
+    for (IExpression sub : asJava(pExpr.args())) {
+      if (!(sub instanceof IIntLit)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /** Returns true if the expression is an integer literal */
+  private static boolean isRatInt(IFunApp pExpr) {
+    // We need to use reflection to get Rationals.int() as `int` can't be a method name in Java
+    final IFunction ratInt;
+    try {
+      ratInt = (IFunction) Fractions.class.getMethod("int").invoke(Rationals$.MODULE$);
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
+      throw new RuntimeException(pE);
+    }
+    return isConstant(pExpr) && pExpr.fun().equals(ratInt);
+  }
+
+  /** Returns true if the expression is a faction literal */
+  private static boolean isRatFrac(IFunApp pExpr) {
+    return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
+  }
+
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
@@ -357,8 +388,12 @@ class PrincessFormulaCreator
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
 
-      // this is a quantifier
+    } else if (input instanceof IFunApp
+        && (isRatInt((IFunApp) input) || isRatFrac((IFunApp) input))) {
+      return visitor.visitConstant(f, convertValue(input));
+
     } else if (input instanceof IQuantified) {
+      // this is a quantifier
 
       BooleanFormula body = encapsulateBoolean(((IQuantified) input).subformula());
       return visitor.visitQuantifier(
