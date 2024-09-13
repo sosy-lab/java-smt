@@ -540,6 +540,8 @@ class PrincessEnvironment {
   }
 
   static FormulaType<?> getFormulaType(IExpression pFormula) {
+    // TODO: We could use Sort.sortof() here, but it sometimes returns `integer` even though the
+    //  term is rational. We should figure out why and then open a new issue for this.
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
     } else if (pFormula instanceof ITimes) {
