@@ -99,7 +99,7 @@ abstract class PrincessFunctionDeclaration {
           termArg =
               new ITermITE(
                   (IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
-        } else if (!isRationalSortArg(arg) && isRationalSortArgument(i)) {
+        } else if (!exprIsRational(arg) && functionTakesRational(i)) {
           // sort does not match, so we need  to cast the argument to rational theory.
           termArg = PrincessEnvironment.rationalTheory.int2ring((ITerm) arg);
         } else {
@@ -120,7 +120,8 @@ abstract class PrincessFunctionDeclaration {
       }
     }
 
-    private boolean isRationalSortArg(IExpression arg) {
+    /** Check if the expression returns a <code>Rational</code> */
+    private boolean exprIsRational(IExpression arg) {
       if (arg instanceof IFunApp) {
         IFunction fun = ((IFunApp) arg).fun();
         if (fun instanceof MonoSortedIFunction) {
@@ -135,10 +136,12 @@ abstract class PrincessFunctionDeclaration {
           return PrincessEnvironment.FRACTION_SORT.equals(sort);
         }
       }
+      // TODO: What about other terms?
       return false;
     }
 
-    private boolean isRationalSortArgument(Integer index) {
+    /** Checks if the k-th argument of the function is a <code>Rational</code> */
+    private boolean functionTakesRational(Integer index) {
       // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
       if (declarationItem instanceof MonoSortedIFunction) {
         Sort sort = ((MonoSortedIFunction) declarationItem).argSorts().apply(index);
