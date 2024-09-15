@@ -351,7 +351,7 @@ class PrincessFormulaCreator
     }
   }
 
-  /** Returns true if the expression is a constant number */
+  /** Returns true if the expression is a constant number. */
   private static boolean isConstant(IFunApp pExpr) {
     for (IExpression sub : asJava(pExpr.args())) {
       if (!(sub instanceof IIntLit)) {
@@ -361,7 +361,7 @@ class PrincessFormulaCreator
     return true;
   }
 
-  /** Returns true if the expression is an integer literal */
+  /** Returns true if the expression is an integer literal. */
   private static boolean isRatInt(IFunApp pExpr) {
     // We need to use reflection to get Rationals.int() as `int` can't be a method name in Java
     final IFunction ratInt;
@@ -373,7 +373,7 @@ class PrincessFormulaCreator
     return isConstant(pExpr) && pExpr.fun().equals(ratInt);
   }
 
-  /** Returns true if the expression is a faction literal */
+  /** Returns true if the expression is a faction literal. */
   private static boolean isRatFrac(IFunApp pExpr) {
     return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
   }
