@@ -24,14 +24,14 @@ public class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  private PrincessIntegerFormulaManager pInteger;
+  private PrincessIntegerFormulaManager ifmgr;
 
   PrincessRationalFormulaManager(
       PrincessFormulaCreator pCreator,
       NonLinearArithmetic pNonLinearArithmetic,
-      PrincessIntegerFormulaManager pInteger) {
+      PrincessIntegerFormulaManager pIntegerFormulaManager) {
     super(pCreator, pNonLinearArithmetic);
-    this.pInteger = pInteger;
+    this.ifmgr = pIntegerFormulaManager;
   }
 
   @Override
@@ -42,10 +42,10 @@ public class PrincessRationalFormulaManager
         case "int":
         case "Rat_int":
           assert fun.fun().arity() == 1;
-          return pInteger.isNumeral(fun.apply(0));
+          return ifmgr.isNumeral(fun.apply(0));
         case "frac":
           assert fun.fun().arity() == 2;
-          return pInteger.isNumeral(fun.apply(0)) && pInteger.isNumeral(fun.apply(1));
+          return ifmgr.isNumeral(fun.apply(0)) && ifmgr.isNumeral(fun.apply(1));
       }
     }
     return false;
@@ -57,12 +57,12 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression makeNumberImpl(long i) {
-    return fromInteger(pInteger.makeNumberImpl(i));
+    return fromInteger(ifmgr.makeNumberImpl(i));
   }
 
   @Override
   protected IExpression makeNumberImpl(BigInteger i) {
-    return fromInteger(pInteger.makeNumberImpl(i));
+    return fromInteger(ifmgr.makeNumberImpl(i));
   }
 
   @Override
@@ -86,14 +86,14 @@ public class PrincessRationalFormulaManager
       // We have an integer number
       // Return the term for a/1
       return PrincessEnvironment.rationalTheory.int2ring(
-          pInteger.makeNumberImpl(pNumber.toBigInteger()));
+          ifmgr.makeNumberImpl(pNumber.toBigInteger()));
     } else {
       // We have a fraction a/b
       // Convert the numerator and the divisor and then return the fraction
       List<ITerm> args =
           ImmutableList.of(
-              pInteger.makeNumberImpl(pNumber.unscaledValue()),
-              pInteger.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
+              ifmgr.makeNumberImpl(pNumber.unscaledValue()),
+              ifmgr.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
       return new IFunApp(
           PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
     }
