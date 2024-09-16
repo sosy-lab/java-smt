@@ -8,14 +8,17 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
 import ap.parser.IFunApp;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -111,7 +114,19 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression multiply(IExpression number1, IExpression number2) {
-    return PrincessEnvironment.rationalTheory.mul((ITerm) number1, (ITerm) number2);
+    FormulaType<?> sort1 = getFormulaCreator().getFormulaType(number1);
+    FormulaType<?> sort2 = getFormulaCreator().getFormulaType(number1);
+
+    IExpression result = PrincessEnvironment.rationalTheory.mul((ITerm) number1, (ITerm) number2);
+
+    if (result instanceof IIntLit && ((IIntLit) result).value().equals(IdealInt.apply(0))) {
+      // If the result is (integer) zero we may have lost our type
+      // Check the type of both arguments and convert the result back to rational if needed
+      if (sort1.isRationalType() || sort2.isRationalType()) {
+        result = PrincessEnvironment.rationalTheory.int2ring((IIntLit) result);
+      }
+    }
+    return result;
   }
 
   @Override
