@@ -82,10 +82,14 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression makeNumberImpl(BigDecimal pNumber) {
-    if (pNumber.scale() <= 0) {
+    if (pNumber.stripTrailingZeros().scale() <= 0) {
+      // We have an integer number
+      // Return the term for a/1
       return PrincessEnvironment.rationalTheory.int2ring(
           pInteger.makeNumberImpl(pNumber.toBigInteger()));
     } else {
+      // We have a fraction a/b
+      // Convert the numerator and the divisor and then return the fraction
       List<ITerm> args =
           ImmutableList.of(
               pInteger.makeNumberImpl(pNumber.unscaledValue()),
