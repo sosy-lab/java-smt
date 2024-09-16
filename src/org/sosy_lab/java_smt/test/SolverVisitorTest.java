@@ -335,6 +335,42 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void arrayVisitBitvector() {
+    requireArrays();
+    requireBitvectors();
+
+    var arrayType =
+        getArrayType(
+            FormulaType.getBitvectorTypeWithSize(32), FormulaType.getBitvectorTypeWithSize(4));
+    BitvectorFormula index = bvmgr.makeBitvector(32, 17);
+    BitvectorFormula elem = bvmgr.makeBitvector(4, 2);
+
+    var arr = amgr.makeArray("some_array", arrayType);
+    BitvectorFormula selectedElem = amgr.select(arr, index);
+    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.SELECT);
+    assertThat(mgr.visit(selectedElem, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(17));
+
+    var store = amgr.store(arr, index, elem);
+    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.STORE);
+    assertThat(mgr.visit(store, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(17), BigInteger.valueOf(2));
+
+    assume()
+        .withMessage("Solver %s does not support initialization of arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+
+    var initializedArr = amgr.makeArray(arrayType, elem);
+    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther()))
+        .containsExactly(FunctionDeclarationKind.CONST);
+    assertThat(mgr.visit(initializedArr, new ConstantsVisitor(true)))
+        .containsExactly(BigInteger.valueOf(2));
+  }
+
+  @Test
   public void arrayTransform() throws SolverException, InterruptedException {
     requireArrays();
     requireIntegers();

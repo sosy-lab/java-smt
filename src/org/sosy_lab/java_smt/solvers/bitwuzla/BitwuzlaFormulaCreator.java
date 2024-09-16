@@ -195,6 +195,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return FunctionDeclarationKind.SELECT;
     } else if (kind.equals(Kind.ARRAY_STORE)) {
       return FunctionDeclarationKind.STORE;
+    } else if (kind.equals(Kind.CONST_ARRAY)) {
+      return FunctionDeclarationKind.CONST;
     } else if (kind.equals(Kind.BV_ADD)) {
       return FunctionDeclarationKind.BV_ADD;
     } else if (kind.equals(Kind.BV_AND)) {
