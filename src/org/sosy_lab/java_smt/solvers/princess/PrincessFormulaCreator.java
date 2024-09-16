@@ -407,17 +407,17 @@ class PrincessFormulaCreator
           new ArrayList<>(),
           body);
 
-      // variable bound by a quantifier
     } else if (input instanceof IVariable) {
+      // variable bound by a quantifier
       return visitor.visitBoundVariable(f, ((IVariable) input).index());
 
-      // nullary atoms and constant are variables
     } else if (((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
         || input instanceof IConstant) {
+      // nullary atoms and constant are variables
       return visitor.visitFreeVariable(f, input.toString());
 
-      // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
     } else if (input instanceof ITimes) {
+      // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
       assert input.length() == 1;
 
       ITimes multiplication = (ITimes) input;
