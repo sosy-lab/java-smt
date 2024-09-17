@@ -23,31 +23,44 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-        <conf name="solver-z3" extends="solver-z3-linux,solver-z3-windows,solver-z3-os"/>
-        <conf name="solver-z3-linux" extends="solver-z3-common"/>
-        <conf name="solver-z3-windows" extends="solver-z3-common"/>
-        <conf name="solver-z3-os" extends="solver-z3-common"/>
-        <conf name="solver-z3-common" visibility="private"/>
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-z3" extends="solver-z3-x64"/>
+
+        <!-- public main configurations -->
+        <conf name="solver-z3-x64" extends="solver-z3-linux-x64,solver-z3-windows-x64,solver-z3-os-x64"/>
+        <conf name="solver-z3-arm64" extends="solver-z3-linux-arm64,solver-z3-windows-arm64,solver-z3-os-arm64"/>
         <conf name="sources"/>
         <conf name="javadoc"/>
+
+        <!-- private basic configurations -->
+        <conf name="solver-z3-linux-x64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-linux-arm64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-windows-x64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-windows-arm64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-os-x64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-os-arm64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="solver-z3">
         <!-- Linux64 files -->
-        <artifact name="libz3" conf="solver-z3-linux" type="shared-object" ext="so"/>
-        <artifact name="libz3java" conf="solver-z3-linux" type="shared-object" ext="so"/>
-        <artifact name="libz3" conf="solver-z3-linux" e:classifier="arm64" type="shared-object" ext="so"/>
-        <artifact name="libz3java" conf="solver-z3-linux" e:classifier="arm64" type="shared-object" ext="so"/>
+        <artifact name="libz3" conf="solver-z3-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libz3java" conf="solver-z3-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libz3" conf="solver-z3-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        <artifact name="libz3java" conf="solver-z3-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+
         <!-- Windows64 files -->
-        <artifact name="libz3" conf="solver-z3-windows" type="dll" ext="dll"/>
-        <artifact name="libz3java" conf="solver-z3-windows" type="dll" ext="dll"/>
-        <artifact name="libz3" conf="solver-z3-windows" e:classifier="arm64" type="dll" ext="dll"/>
-        <artifact name="libz3java" conf="solver-z3-windows" e:classifier="arm64" type="dll" ext="dll"/>
+        <artifact name="libz3" conf="solver-z3-windows-x64" e:arch="x64" type="dll" ext="dll"/>
+        <artifact name="libz3java" conf="solver-z3-windows-x64" e:arch="x64" type="dll" ext="dll"/>
+        <artifact name="libz3" conf="solver-z3-windows-arm64" e:arch="arm64" type="dll" ext="dll"/>
+        <artifact name="libz3java" conf="solver-z3-windows-arm64" e:arch="arm64" type="dll" ext="dll"/>
+
         <!-- MacOS files -->
-        <artifact name="libz3" conf="solver-z3-os" type="dylib" ext="dylib"/>
-        <artifact name="libz3java" conf="solver-z3-os" type="dylib" ext="dylib"/>
-        <artifact name="libz3" conf="solver-z3-os" e:classifier="arm64" type="dylib" ext="dylib"/>
-        <artifact name="libz3java" conf="solver-z3-os" e:classifier="arm64" type="dylib" ext="dylib"/>
+        <artifact name="libz3" conf="solver-z3-os-x64" e:arch="x64" type="dylib" ext="dylib"/>
+        <artifact name="libz3java" conf="solver-z3-os-x64" e:arch="x64" type="dylib" ext="dylib"/>
+        <artifact name="libz3" conf="solver-z3-os-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
+        <artifact name="libz3java" conf="solver-z3-os-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
+
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3" conf="solver-z3-common" ext="jar"/>
         <artifact name="com.microsoft.z3" conf="sources" e:classifier="sources" type="source" ext="jar"/>

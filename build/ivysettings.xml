@@ -22,14 +22,17 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Resolver for downloading dependencies -->
         <url name="Sosy-Lab" descriptor="required">
             <ivy pattern="${ivy.repo.url}/[organisation]/[module]/ivy-[revision].xml" />
-            <artifact pattern="${ivy.repo.url}/[organisation]/[module]/[artifact]-[revision](-[classifier]).[ext]" />
+            <artifact
+                    pattern="${ivy.repo.url}/[organisation]/[module]/([arch]/)[artifact]-[revision](-[classifier]).[ext]" />
         </url>
 
         <!-- Resolver for publishing this project -->
         <filesystem name="Sosy-Lab-Publish">
             <ivy pattern="${repo.dir}/[organisation]/[module]/ivy-[revision].xml" />
-            <artifact pattern="${repo.dir}/[organisation]/[module]/[artifact]-[revision](-[classifier]).[ext]" />
+            <artifact
+                    pattern="${repo.dir}/[organisation]/[module]/([arch]/)[artifact]-[revision](-[classifier]).[ext]" />
         </filesystem>
     </resolvers>
-    <caches defaultCacheDir="${ivy.cache.dir}"/>
+    <caches defaultCacheDir="${ivy.cache.dir}"
+            artifactPattern="[organisation]/[module]/[revision]/[type]s/([arch]/)[artifact](-[classifier]).[ext]"/>
 </ivysettings>
