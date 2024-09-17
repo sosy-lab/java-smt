@@ -28,6 +28,9 @@ public class BitwuzlaFloatingPointManager
   private final TermManager termManager;
   private final Term roundingMode;
 
+  // Keeps track of the temporary variables that are created for fp-to-bv casts
+  private static int counter = 0;
+
   protected BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(pCreator);
@@ -198,9 +201,12 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
+  private String newVariable() {
+    return "__CAST_FROM_BV_" + counter++;
+  }
+
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
-    // FIXME: We should use a reserved symbol for the fresh variables
     int sizeExp = pNumber.sort().fp_exp_size();
     int sizeSig = pNumber.sort().fp_sig_size();
 
@@ -213,7 +219,8 @@ public class BitwuzlaFloatingPointManager
     Term bvNaN =
         termManager.mk_bv_value(bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2));
 
-    Term bvVar = termManager.mk_const(bvSort, pNumber.symbol() + "_toIeeeBitvector");
+    String newVariable = newVariable();
+    Term bvVar = termManager.mk_const(bvSort, newVariable);
     Term equal =
         termManager.mk_term(
             Kind.ITE,
