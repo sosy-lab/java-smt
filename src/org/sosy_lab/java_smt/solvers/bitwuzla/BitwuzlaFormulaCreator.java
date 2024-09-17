@@ -221,6 +221,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return FunctionDeclarationKind.BV_SGT;
     } else if (kind.equals(Kind.BV_SHL)) {
       return FunctionDeclarationKind.BV_SHL;
+    } else if (kind.equals(Kind.BV_SHR)) {
+      return FunctionDeclarationKind.BV_LSHR;
     } else if (kind.equals(Kind.BV_SLE)) {
       return FunctionDeclarationKind.BV_SLE;
     } else if (kind.equals(Kind.BV_SLT)) {
