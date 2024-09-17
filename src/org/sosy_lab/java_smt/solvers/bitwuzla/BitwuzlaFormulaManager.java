@@ -186,6 +186,10 @@ public final class BitwuzlaFormulaManager
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
+        if (pTerm.is_value()) {
+          out.append("(assert " + pTerm + ")");
+          return;
+        }
         Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
         for (Term t : creator.getVariableCasts()) {
           bitwuzla.assert_formula(t);
