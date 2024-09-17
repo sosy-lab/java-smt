@@ -213,7 +213,7 @@ public enum FunctionDeclarationKind {
   /** Division over floating points. */
   FP_DIV,
 
-  /** Remainder of the floating point division */
+  /** Remainder of the floating point division. */
   FP_REM,
 
   /** Multiplication over floating points. */
