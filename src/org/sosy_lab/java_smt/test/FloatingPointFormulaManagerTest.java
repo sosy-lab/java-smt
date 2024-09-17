@@ -783,6 +783,11 @@ public class FloatingPointFormulaManagerTest
   private <T> void proveForAll(Function<T, BooleanFormula> f, List<T> args)
       throws InterruptedException, SolverException {
     try (ProverEnvironment prover = context.newProverEnvironment()) {
+      if (solverToUse().equals(Solvers.BITWUZLA)) {
+        // Adding this line speeds up performance in checkIeeeBv2FpConversion32 by a factor of 10
+        // FIXME: I've no idea why this would work
+        prover.addConstraint(bmgr.makeTrue());
+      }
       for (T value : args) {
         prover.push();
         prover.addConstraint(f.apply(value));
