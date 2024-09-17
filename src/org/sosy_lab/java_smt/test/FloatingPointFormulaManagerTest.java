@@ -935,22 +935,6 @@ public class FloatingPointFormulaManagerTest
     return dbls;
   }
 
-  private void checkBV2FP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
-      throws SolverException, InterruptedException {
-    FloatingPointFormula ieeeFp = fpmgr.fromIeeeBitvector(bv, type);
-    assertThat(mgr.getFormulaType(ieeeFp)).isEqualTo(mgr.getFormulaType(flt));
-    assertEqualsAsFp(flt, ieeeFp);
-  }
-
-  private void checkFP2BV(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
-      throws SolverException, InterruptedException {
-    BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
-    BitvectorFormula ieeeBv = fpmgr.toIeeeBitvector(flt);
-    assertThat(mgr.getFormulaType(ieeeBv)).isEqualTo(mgr.getFormulaType(var));
-    assertThatFormula(bvmgr.equal(bv, ieeeBv)).isTautological();
-    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, ieeeBv))).isSatisfiable();
-  }
-
   @Test
   public void fpModelContent() throws SolverException, InterruptedException {
     FloatingPointFormula zeroVar = fpmgr.makeVariable("zero", singlePrecType);
