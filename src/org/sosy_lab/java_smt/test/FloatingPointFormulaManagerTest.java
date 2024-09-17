@@ -828,6 +828,12 @@ public class FloatingPointFormulaManagerTest
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
+    // FIXME: This test is still painfully slow in Bitwuzla. Both fp2bv and bv2fp ultimately map
+    //  to the same operation in Bitwuzla as we define "b = fp2bv(f)" by adding the
+    //  side-condition "f = bv2fp(b)" to the constraints and then simply returning the new bitvector
+    //  variable `b`. The slow down here seems to be related the side-conditions that have to be
+    //  added to the assertions whenever isUnsat() is called.
+
     proveForAll(
         // makeBV(value.bits) == fromFP(makeFP(value.float))
         pFloat ->
