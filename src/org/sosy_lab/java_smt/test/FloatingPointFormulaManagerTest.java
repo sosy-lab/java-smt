@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.Rational;
@@ -773,24 +774,46 @@ public class FloatingPointFormulaManagerTest
         .isTautological();
   }
 
-  @Test
-  public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
-    for (float f : getListOfFloats()) {
-      checkBV2FP(
-          singlePrecType,
-          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
-          fpmgr.makeNumber(f, singlePrecType));
+  /**
+   * Map the function over the input list and prove the returned assertions.
+   *
+   * @param f A function that takes values from the list and returns assertions
+   * @param args A list of arguments to the function
+   */
+  private <T> void proveForAll(Function<T, BooleanFormula> f, List<T> args)
+      throws InterruptedException, SolverException {
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      for (T value : args) {
+        prover.push();
+        prover.addConstraint(f.apply(value));
+        assertThat(prover).isSatisfiable();
+        prover.pop();
+      }
     }
   }
 
   @Test
+  public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
+    proveForAll(
+        // makeFP(value.float) == fromBV(makeBV(value.bits))
+        pFloat ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pFloat, singlePrecType),
+                fpmgr.fromIeeeBitvector(
+                    bvmgr.makeBitvector(32, Float.floatToRawIntBits(pFloat)), singlePrecType)),
+        getListOfFloats());
+  }
+
+  @Test
   public void checkIeeeBv2FpConversion64() throws SolverException, InterruptedException {
-    for (double d : getListOfDoubles()) {
-      checkBV2FP(
-          doublePrecType,
-          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
-          fpmgr.makeNumber(d, doublePrecType));
-    }
+    proveForAll(
+        // makeFP(value.float) == fromBV(makeBV(value.bits))
+        pDouble ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pDouble, doublePrecType),
+                fpmgr.fromIeeeBitvector(
+                    bvmgr.makeBitvector(64, Double.doubleToRawLongBits(pDouble)), doublePrecType)),
+        getListOfDoubles());
   }
 
   @Test
@@ -800,12 +823,13 @@ public class FloatingPointFormulaManagerTest
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    for (float f : getListOfFloats()) {
-      checkFP2BV(
-          singlePrecType,
-          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
-          fpmgr.makeNumber(f, singlePrecType));
-    }
+    proveForAll(
+        // makeBV(value.bits) == fromFP(makeFP(value.float))
+        pFloat ->
+            bvmgr.equal(
+                bvmgr.makeBitvector(32, Float.floatToRawIntBits(pFloat)),
+                fpmgr.toIeeeBitvector(fpmgr.makeNumber(pFloat, singlePrecType))),
+        getListOfFloats());
   }
 
   @Test
@@ -815,12 +839,13 @@ public class FloatingPointFormulaManagerTest
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    for (double d : getListOfDoubles()) {
-      checkFP2BV(
-          doublePrecType,
-          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
-          fpmgr.makeNumber(d, doublePrecType));
-    }
+    proveForAll(
+        // makeBV(value.bits) == fromFP(makeFP(value.float))
+        pDouble ->
+            bvmgr.equal(
+                bvmgr.makeBitvector(64, Double.doubleToRawLongBits(pDouble)),
+                fpmgr.toIeeeBitvector(fpmgr.makeNumber(pDouble, doublePrecType))),
+        getListOfFloats());
   }
 
   private List<Float> getListOfFloats() {
@@ -1030,32 +1055,38 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpFrom32BitPattern() throws SolverException, InterruptedException {
-    for (float f : getListOfFloats()) {
-      int bits = Float.floatToRawIntBits(f);
-      int exponent = (bits >>> 23) & 0xFF;
-      int mantissa = bits & 0x7FFFFF;
-      boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
-      final FloatingPointFormula fpFromBv =
-          fpmgr.makeNumber(
-              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
-      final FloatingPointFormula fp = fpmgr.makeNumber(f, singlePrecType);
-      assertEqualsAsFormula(fpFromBv, fp);
-    }
+    proveForAll(
+        pFloat -> {
+          // makeFP(value.bits.sign, value.bits.exponent, value.bits.mantissa) = makeFP(value.float)
+          int bits = Float.floatToRawIntBits(pFloat);
+          int exponent = (bits >>> 23) & 0xFF;
+          int mantissa = bits & 0x7FFFFF;
+          boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
+          final FloatingPointFormula fpFromBv =
+              fpmgr.makeNumber(
+                  BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
+          final FloatingPointFormula fp = fpmgr.makeNumber(pFloat, singlePrecType);
+          return fpmgr.assignment(fpFromBv, fp);
+        },
+        getListOfFloats());
   }
 
   @Test
   public void fpFrom64BitPattern() throws SolverException, InterruptedException {
-    for (double d : getListOfDoubles()) {
-      long bits = Double.doubleToRawLongBits(d);
-      long exponent = (bits >>> 52) & 0x7FF;
-      long mantissa = bits & 0xFFFFFFFFFFFFFL;
-      boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
-      final FloatingPointFormula fpFromBv =
-          fpmgr.makeNumber(
-              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
-      final FloatingPointFormula fp = fpmgr.makeNumber(d, doublePrecType);
-      assertEqualsAsFormula(fpFromBv, fp);
-    }
+    proveForAll(
+        // makeFP(value.bits.sign, value.bits.exponent, value.bits.mantissa) = makeFP(value.float)
+        pDouble -> {
+          long bits = Double.doubleToRawLongBits(pDouble);
+          long exponent = (bits >>> 52) & 0x7FF;
+          long mantissa = bits & 0xFFFFFFFFFFFFFL;
+          boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
+          final FloatingPointFormula fpFromBv =
+              fpmgr.makeNumber(
+                  BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
+          final FloatingPointFormula fp = fpmgr.makeNumber(pDouble, doublePrecType);
+          return fpmgr.assignment(fpFromBv, fp);
+        },
+        getListOfDoubles());
   }
 
   @Test
