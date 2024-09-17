@@ -726,6 +726,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_DIV;
       case Z3_OP_FPA_MUL:
         return FunctionDeclarationKind.FP_MUL;
+      case Z3_OP_FPA_REM:
+        return FunctionDeclarationKind.FP_REM;
       case Z3_OP_FPA_LT:
         return FunctionDeclarationKind.FP_LT;
       case Z3_OP_FPA_LE:

@@ -283,6 +283,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return FunctionDeclarationKind.FP_MIN;
     } else if (kind.equals(Kind.FP_MUL)) {
       return FunctionDeclarationKind.FP_MUL;
+    } else if (kind.equals(Kind.FP_REM)) {
+      return FunctionDeclarationKind.FP_REM;
     } else if (kind.equals(Kind.FP_NEG)) {
       return FunctionDeclarationKind.FP_NEG;
     } else if (kind.equals(Kind.FP_RTI)) {
