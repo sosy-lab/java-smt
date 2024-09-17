@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -127,7 +128,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final Result result = env.check_sat(new Vector_Term(creator.getVariableCasts()));
+    Iterable<Term> assertions = env.get_assertions();
+    final Result result = env.check_sat(new Vector_Term(creator.getVariableCasts(assertions)));
     return readSATResult(result);
   }
 
@@ -142,12 +144,21 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    Vector_Term ass = new Vector_Term(creator.getVariableCasts());
+
+    // Extract Terms from the assumptions
+    Vector_Term newAssumptions = new Vector_Term();
     for (BooleanFormula formula : assumptions) {
       BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
-      ass.add(bitwuzlaFormula.getTerm());
+      newAssumptions.add(bitwuzlaFormula.getTerm());
     }
-    final Result result = env.check_sat(ass);
+
+    // Collect side condition for any casts and add them to the assumptions
+    Iterable<Term> allAsserted =
+        FluentIterable.concat(
+            newAssumptions,
+            creator.getVariableCasts(FluentIterable.concat(env.get_assertions(), newAssumptions)));
+
+    final Result result = env.check_sat(new Vector_Term(allAsserted));
     return readSATResult(result);
   }
 

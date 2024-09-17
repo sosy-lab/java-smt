@@ -231,7 +231,7 @@ public class BitwuzlaFloatingPointManager
                 termManager.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
                 pNumber));
 
-    bitwuzlaCreator.addVariableCast(equal);
+    bitwuzlaCreator.addVariableCast(newVariable, equal);
     return bvVar;
   }
 

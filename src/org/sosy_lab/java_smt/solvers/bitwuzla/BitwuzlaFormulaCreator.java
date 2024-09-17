@@ -13,12 +13,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -55,7 +59,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
-  private final Set<Term> variableCasts = new HashSet<>();
+  private final Map<String, Term> variableCasts = new HashMap<>();
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(null, pTermManager.mk_bool_sort(), null, null, null, null);
@@ -568,11 +572,44 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     throw new AssertionError("Unknown value type.");
   }
 
-  public void addVariableCast(Term equal) {
-    variableCasts.add(equal);
+  public void addVariableCast(String newVariable, Term equal) {
+    variableCasts.put(newVariable, equal);
   }
 
-  public Iterable<Term> getVariableCasts() {
-    return variableCasts;
+  private Map<String, Set<String>> calculateTransitions(Map<String, Term> pVariableCasts) {
+    return Maps.transformValues(
+        pVariableCasts,
+        term ->
+            Sets.intersection(
+                pVariableCasts.keySet(), extractVariablesAndUFs(term, false).keySet()));
+  }
+
+  private Set<String> initialSet(Iterable<Term> pTerms) {
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    for (Term term : pTerms) {
+      builder.addAll(extractVariablesAndUFs(term, false).keySet());
+    }
+    return builder.build();
+  }
+
+  private Set<String> takeAStep(Map<String, Set<String>> pTransitions, Set<String> pVariables) {
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    for (String var : pVariables) {
+      builder.addAll(pTransitions.get(var));
+    }
+    return builder.build();
+  }
+
+  public Iterable<Term> getVariableCasts(Iterable<Term> pTerms) {
+    Map<String, Set<String>> transitions = calculateTransitions(variableCasts);
+
+    Set<String> r0 = ImmutableSet.of();
+    Set<String> r1 = Sets.intersection(initialSet(pTerms), transitions.keySet());
+    while (!r0.equals(r1)) {
+      r0 = r1;
+      r1 = takeAStep(transitions, r0);
+    }
+
+    return Maps.filterKeys(variableCasts, r0::contains).values();
   }
 }
