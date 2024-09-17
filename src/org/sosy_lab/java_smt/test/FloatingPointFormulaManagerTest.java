@@ -869,17 +869,15 @@ public class FloatingPointFormulaManagerTest
       flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
     }
 
-    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
-    for (int i = 1; i < 20; i += stepSize) {
-      for (int j = 1; j < 20; j += stepSize) {
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
         flts.add((float) (i * Math.pow(10, j)));
         flts.add((float) (-i * Math.pow(10, j)));
       }
     }
 
-    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < numRandom; i++) {
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
       float flt = Float.intBitsToFloat(rand.nextInt());
       if (!Float.isNaN(flt)) {
         flts.add(flt);
@@ -908,17 +906,15 @@ public class FloatingPointFormulaManagerTest
       dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
     }
 
-    final int stepSize = solverToUse() == Solvers.BITWUZLA ? 10 : 1;
-    for (int i = 1; i < 20; i += stepSize) {
-      for (int j = 1; j < 20; j += stepSize) {
+    for (int i = 1; i < 20; i++) {
+      for (int j = 1; j < 20; j++) {
         dbls.add(i * Math.pow(10, j));
         dbls.add(-i * Math.pow(10, j));
       }
     }
 
-    final int numRandom = solverToUse() == Solvers.BITWUZLA ? 5 : NUM_RANDOM_TESTS;
     Random rand = new Random(0);
-    for (int i = 0; i < numRandom; i++) {
+    for (int i = 0; i < NUM_RANDOM_TESTS; i++) {
       double d = Double.longBitsToDouble(rand.nextLong());
       if (!Double.isNaN(d)) {
         dbls.add(d);
