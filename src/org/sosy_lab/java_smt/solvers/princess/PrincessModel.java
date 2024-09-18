@@ -16,6 +16,7 @@ import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
+import ap.parser.IBoolLit$;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
@@ -288,25 +289,37 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   }
 
   @Override
-  protected @Nullable IExpression evalImpl(IExpression formula) {
-    Sort sort = getSort(formula);
+  protected @Nullable IExpression evalImpl(IExpression expr) {
+    Sort sort = getSort(expr);
     if (sort.equals(creator.getRationalType())) {
       // Extending the partial model does not seem to work in Princess if the formula uses rational
       // variables. To work around this issue we (temporarily) add the formula to the assertion
       // stack and then repeat the sat-check to get the value.
       api.push();
-      ITerm var = api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(formula));
-      api.addAssertion(var.$eq$eq$eq((ITerm) formula));
+      ITerm var = api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(expr));
+      api.addAssertion(var.$eq$eq$eq((ITerm) expr));
       api.checkSat(true);
       ITerm evaluated = api.evalToTerm(var);
       api.pop();
       return simplifyRational(evaluated);
     } else {
-      IExpression evaluation = evaluate(formula);
+      IExpression evaluation = evaluate(expr);
       if (evaluation == null) {
-        // fallback: try to simplify the query and evaluate again.
-        // This is needed for array expressions
-        evaluation = evaluate(creator.getEnv().simplify(formula));
+        if (expr instanceof IFormula) {
+          // If the partial model can't evaluate our formula try extending
+          IFormula formula = (IFormula) expr;
+          api.push();
+          IFormula var = api.createBooleanVariable("__var_" + prover.idGenerator.getFreshId());
+          api.addAssertion(var.$less$eq$greater(formula));
+          api.checkSat(true);
+          IExpression evaluated = IBoolLit$.MODULE$.apply(api.eval(var));
+          api.pop();
+          return evaluated;
+        } else {
+          // fallback: try to simplify the query and evaluate again.
+          // This is needed for array expressions
+          evaluation = evaluate(creator.getEnv().simplify(expr));
+        }
       }
       return evaluation;
     }
