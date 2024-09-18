@@ -36,10 +36,10 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   private static final String BOOL_CHECK =
       "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";
 
-  private static final String BOOL_VARS_W_LOGIC = "(set-logic all)" + BOOL_CHECK;
+  private static final String BOOL_VARS_W_LOGIC = "(set-logic ALL)" + BOOL_CHECK;
 
   private static final String BOOL_VARS_W_LOGIC_AND_COMMENT =
-      ";; Some comment in SMTLIB2\n" + BOOL_VARS_W_LOGIC;
+      "; Some comment in SMTLIB2\n" + BOOL_VARS_W_LOGIC;
 
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
