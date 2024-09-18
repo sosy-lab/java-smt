@@ -147,12 +147,6 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   public void testRationalIndexRationalValue() throws SolverException, InterruptedException {
     requireRationals();
 
-    // Princess does not support arrays with rational indices or elements:
-    // java.lang.Exception: Universal quantifiers over fractions/rationals are currently not
-    // supported
-    // FIXME: Open a ticket
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
     RationalFormula num2 = rmgr.makeNumber(2);
     RationalFormula num4 = rmgr.makeNumber(4);

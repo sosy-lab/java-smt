@@ -800,13 +800,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     requireRationals();
     requireIntegers();
 
-    // Princess does not support arrays with rational indices or elements:
-    // java.lang.Exception: Universal quantifiers over fractions/rationals are currently not
-    // supported
-    // FIXME: This apparently still worked in 13c01a683c0c75e61a422d5493a5386a82e40be8 and might
-    //  have been broken when Princess was updated?
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
     IntegerFormula _i = imgr.makeVariable("i");
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, RationalFormula>> multi =
         amgr.makeArray(
