@@ -202,11 +202,18 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Test
   public void testDivisionByZero() throws SolverException, InterruptedException {
     // OpenSmt and Yices do not allow division by zero and throw an exception.
-    // Princess does not allow division by zero and returns UNSAT.
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT, Solvers.PRINCESS);
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
+
+    if (formulaType.isRationalType()) {
+      // Division by zero does not work for rationals with Princess.
+      assume()
+          .withMessage("Solver %s does not support division by zero", solverToUse())
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+    }
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
