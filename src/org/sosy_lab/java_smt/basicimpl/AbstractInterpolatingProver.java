@@ -40,6 +40,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
         implements InterpolatingProverEnvironment<TFormulaInfo> {
 
   private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
+  private final FormulaManager mgr;
   private final QuantifiedFormulaManager qfmgr;
   private final BooleanFormulaManager bmgr;
 
@@ -51,6 +52,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
           ShutdownNotifier pShutdownNotifier,
           FormulaCreator<?, ?, ?, ?> pCreator) {
     super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
+    mgr = pMgr;
     bmgr = pBmgr;
     creator = (FormulaCreator<TFormulaInfo, TType, ?, ?>) pCreator;
     qfmgr = pQfmgr;
@@ -91,8 +93,23 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
             "interpolation can only be done over previously asserted formulas.");
 
     final Set<TFormulaInfo> assertedFormulas = (Set<TFormulaInfo>) getAssertedFormulas();
+    System.out.println(assertedFormulas);
     final Set<TFormulaInfo> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
+    System.out.println(formulasOfA);
     final Set<TFormulaInfo> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
+    System.out.println(formulasOfB);
+
+    // free arithmetic variables a and b
+    for (TFormulaInfo formula : formulasOfA) {
+      TFormulaInfo f = creator.extractInfo((Formula) formula);
+      Set<String> arithVarOfA = mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+    }
+
+    for (TFormulaInfo formula : formulasOfB) {
+      TFormulaInfo f = creator.extractInfo((Formula) formula);
+      Set<String> arithVarOfB = mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+    }
+
 
     return null;
   }
