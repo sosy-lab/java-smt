@@ -91,10 +91,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
             "interpolation can only be done over previously asserted formulas.");
 
     final Set<TFormulaInfo> assertedFormulas = (Set<TFormulaInfo>) getAssertedFormulas();
-    final Set<TFormulaInfo> a = ImmutableSet.copyOf(pFormulasOfA);
-    final Set<TFormulaInfo> b = Sets.difference(assertedFormulas, a);
-
-
+    final Set<TFormulaInfo> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
+    final Set<TFormulaInfo> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
 
     return null;
   }
