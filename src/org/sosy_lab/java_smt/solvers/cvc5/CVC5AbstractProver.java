@@ -47,7 +47,7 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr, pMgr.getBooleanFormulaManager(), pMgr.getQuantifiedFormulaManager(), pShutdownNotifier);
 
     mgr = pMgr;
     creator = pFormulaCreator;

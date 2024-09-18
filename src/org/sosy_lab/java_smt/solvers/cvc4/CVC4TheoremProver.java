@@ -29,8 +29,10 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -63,8 +65,10 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Formula>
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+      FormulaManager pMgr,
+      BooleanFormulaManager pBmgr,
+      QuantifiedFormulaManager pQfmgr) {
+    super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);

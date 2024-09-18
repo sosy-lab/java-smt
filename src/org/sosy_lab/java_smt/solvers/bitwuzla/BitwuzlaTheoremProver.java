@@ -56,7 +56,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Formula> implements
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pManager, pManager.getBooleanFormulaManager(),
+        pManager.getQuantifiedFormulaManager(), pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
 

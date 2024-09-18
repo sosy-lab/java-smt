@@ -36,8 +36,10 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -71,9 +73,11 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Formula> implements P
   protected Yices2TheoremProver(
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
+      FormulaManager pMgr,
       BooleanFormulaManager pBmgr,
+      QuantifiedFormulaManager pQfmgr,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     this.creator = creator;
     curCfg = yices_new_config();
     yices_set_config(curCfg, "solver-type", "dpllt");

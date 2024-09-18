@@ -18,6 +18,8 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -29,14 +31,20 @@ import org.sosy_lab.java_smt.api.SolverException;
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
   protected final ShutdownNotifier shutdownNotifier;
+  private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
+  private final QuantifiedFormulaManager qfmgr;
 
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
+      FormulaManager pMgr,
       BooleanFormulaManager pBmgr,
+      QuantifiedFormulaManager pQfmgr,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
+    mgr = pMgr;
     bmgr = pBmgr;
+    qfmgr = pQfmgr;
     shutdownNotifier = pShutdownNotifier;
   }
 

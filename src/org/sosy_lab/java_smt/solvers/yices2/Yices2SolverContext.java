@@ -23,13 +23,16 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public class Yices2SolverContext extends AbstractSolverContext {
 
   private final Yices2FormulaCreator creator;
+  private final FormulaManager fmgr;
   private final BooleanFormulaManager bfmgr;
+  private final QuantifiedFormulaManager qfmgr;
   private final ShutdownNotifier shutdownManager;
 
   private static int numLoadedInstances = 0;
@@ -39,10 +42,13 @@ public class Yices2SolverContext extends AbstractSolverContext {
       FormulaManager pFmgr,
       Yices2FormulaCreator creator,
       BooleanFormulaManager pBfmgr,
+      QuantifiedFormulaManager pQfmgr,
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
+    fmgr = pFmgr;
     this.creator = creator;
     bfmgr = pBfmgr;
+    qfmgr = pQfmgr;
     shutdownManager = pShutdownManager;
   }
 
@@ -75,7 +81,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
             creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
-    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
+    return new Yices2SolverContext(manager, creator, booleanTheory,
+        manager.getQuantifiedFormulaManager(), pShutdownManager);
   }
 
   @Override
@@ -104,7 +111,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2TheoremProver(creator, pOptions, fmgr, bfmgr, qfmgr, shutdownManager);
   }
 
   @Override

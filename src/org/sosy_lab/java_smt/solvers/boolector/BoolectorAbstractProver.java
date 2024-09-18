@@ -45,7 +45,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
       AtomicBoolean pIsAnyStackAlive) {
-    super(pOptions, manager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, manager, manager.getBooleanFormulaManager(),
+        manager.getQuantifiedFormulaManager(), pShutdownNotifier);
     this.manager = manager;
     this.creator = creator;
     this.btor = btor;

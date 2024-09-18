@@ -59,7 +59,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       SimpleAPI pApi,
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(pOptions, pMgr, pMgr.getBooleanFormulaManager(), pMgr.getQuantifiedFormulaManager(),
+        pShutdownNotifier);
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);

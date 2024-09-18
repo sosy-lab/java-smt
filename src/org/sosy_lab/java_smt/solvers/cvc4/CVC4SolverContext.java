@@ -134,7 +134,9 @@ public final class CVC4SolverContext extends AbstractSolverContext {
         shutdownNotifier,
         randomSeed,
         pOptions,
-        getFormulaManager().getBooleanFormulaManager());
+        getFormulaManager(),
+        getFormulaManager().getBooleanFormulaManager(),
+        getFormulaManager().getQuantifiedFormulaManager());
   }
 
   @Override
