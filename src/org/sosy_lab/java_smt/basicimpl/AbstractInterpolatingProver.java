@@ -99,16 +99,27 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     final Set<TFormulaInfo> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
     System.out.println(formulasOfB);
 
+    Set<TFormulaInfo> varOfA = Set.of();
+    Set<TFormulaInfo> varOfB = Set.of();
+
     // free arithmetic variables a and b
     for (TFormulaInfo formula : formulasOfA) {
       TFormulaInfo f = creator.extractInfo((Formula) formula);
-      Set<String> arithVarOfA = mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+      Set<TFormulaInfo> arithVarOfA =
+          (Set<TFormulaInfo>) mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+      varOfA = arithVarOfA;
     }
 
     for (TFormulaInfo formula : formulasOfB) {
       TFormulaInfo f = creator.extractInfo((Formula) formula);
-      Set<String> arithVarOfB = mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+      Set<TFormulaInfo> arithVarOfB =
+          (Set<TFormulaInfo>) mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
+      varOfB = arithVarOfB;
     }
+
+    // shared variables between a and b
+    final Set<TFormulaInfo> sharedVariables = Sets.intersection(varOfA, varOfB);
+    System.out.println(sharedVariables);
 
 
     return null;
