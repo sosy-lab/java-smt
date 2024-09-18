@@ -25,6 +25,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -44,11 +45,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
 
   protected AbstractInterpolatingProver(
           Set<ProverOptions> pOptions,
+          FormulaManager pMgr,
           BooleanFormulaManager pBmgr,
+          QuantifiedFormulaManager pQfmgr,
           ShutdownNotifier pShutdownNotifier,
-          FormulaCreator<?, ?, ?, ?> pCreator,
-          QuantifiedFormulaManager pQfmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+          FormulaCreator<?, ?, ?, ?> pCreator) {
+    super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     bmgr = pBmgr;
     creator = (FormulaCreator<TFormulaInfo, TType, ?, ?>) pCreator;
     qfmgr = pQfmgr;
