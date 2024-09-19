@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -93,8 +94,19 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+    Term formula = ((BitwuzlaBooleanFormula) constraint).getTerm();
+
+    // Assert the formula
+    env.assert_formula(formula);
+
+    // Collect side-conditions for all variable casts and push them onto the stack
+    for (Term t : creator.getVariableCasts(ImmutableList.of(formula))) {
+      env.assert_formula(t);
+    }
+
+    // Set the state to 'changed'
     wasLastSatCheckSat = false;
-    env.assert_formula(((BitwuzlaBooleanFormula) constraint).getTerm());
+
     return null;
   }
 
@@ -128,8 +140,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    Iterable<Term> assertions = env.get_assertions();
-    final Result result = env.check_sat(new Vector_Term(creator.getVariableCasts(assertions)));
+    final Result result = env.check_sat();
     return readSATResult(result);
   }
 
@@ -154,9 +165,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
     // Collect side condition for any casts and add them to the assumptions
     Iterable<Term> allAsserted =
-        FluentIterable.concat(
-            newAssumptions,
-            creator.getVariableCasts(FluentIterable.concat(env.get_assertions(), newAssumptions)));
+        FluentIterable.concat(newAssumptions, creator.getVariableCasts(newAssumptions));
 
     final Result result = env.check_sat(new Vector_Term(allAsserted));
     return readSATResult(result);
