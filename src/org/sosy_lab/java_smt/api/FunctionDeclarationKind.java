@@ -181,6 +181,24 @@ public enum FunctionDeclarationKind {
   /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
   BV_ASHR,
 
+  /** Performs a circular left rotation on the bitvector. */
+  BV_ROTATE_LEFT,
+
+  /** Performs a circular right rotation on the bitvector. */
+  BV_ROTATE_RIGHT,
+
+  /**
+   * Performs a circular left rotation on the bitvector by a specified number of positions,
+   * determined by an integer value.
+   */
+  BV_ROTATE_LEFT_BY_INT,
+
+  /**
+   * Performs a circular right rotation on the bitvector by a specified number of positions,
+   * determined by an integer value.
+   */
+  BV_ROTATE_RIGHT_BY_INT,
+
   /** Cast an unsigned bitvector to a floating-point number. */
   BV_UCASTTO_FP,
 
