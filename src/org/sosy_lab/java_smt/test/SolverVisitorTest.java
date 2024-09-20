@@ -230,7 +230,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.negate(x),
               bvmgr.extract(x, 7, 5),
               bvmgr.extract(x, 7, 5),
-              bvmgr.concat(x, y))) {
+              bvmgr.concat(x, y),
+              bvmgr.rotateLeft(x, 1),
+              bvmgr.rotateRight(x, 1),
+              bvmgr.rotateLeft(x, y),
+              bvmgr.rotateRight(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
         if (Solvers.PRINCESS != solver) {
           // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
