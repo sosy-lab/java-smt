@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -61,10 +62,15 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
-  private final class FunctionDeclarationVisitorNoOther
+  public static final class FunctionDeclarationVisitorNoOther
       extends DefaultFormulaVisitor<List<FunctionDeclarationKind>> {
 
     private final List<FunctionDeclarationKind> found = new ArrayList<>();
+    private final FormulaManager manager;
+
+    FunctionDeclarationVisitorNoOther(FormulaManager pMgr) {
+      manager = pMgr;
+    }
 
     @Override
     public List<FunctionDeclarationKind> visitFunction(
@@ -77,7 +83,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
           .that(functionDeclaration.getKind())
           .isNotEqualTo(FunctionDeclarationKind.OTHER);
       for (Formula arg : args) {
-        mgr.visit(arg, this);
+        manager.visit(arg, this);
       }
       return visitDefault(f);
     }
@@ -207,7 +213,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         if (Solvers.PRINCESS != solver) {
           // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
           // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         }
         BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
@@ -239,7 +245,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         if (Solvers.PRINCESS != solver) {
           // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
           // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         }
         BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
@@ -258,7 +264,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       if (Solvers.PRINCESS != solver) {
         // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
         // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-        mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       }
       BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
@@ -315,13 +321,13 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     ArrayFormula<IntegerFormula, IntegerFormula> arr = amgr.makeArray("some_array", arrayType);
     IntegerFormula selectedElem = amgr.select(arr, index);
-    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.SELECT);
     assertThat(mgr.visit(selectedElem, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(1));
 
     ArrayFormula<IntegerFormula, IntegerFormula> store = amgr.store(arr, index, elem);
-    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.STORE);
     assertThat(mgr.visit(store, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(1), BigInteger.valueOf(123));
@@ -332,7 +338,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .isNotEqualTo(Solvers.OPENSMT);
 
     ArrayFormula<IntegerFormula, IntegerFormula> initializedArr = amgr.makeArray(arrayType, elem);
-    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.CONST);
     assertThat(mgr.visit(initializedArr, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(123));
@@ -351,13 +357,13 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     var arr = amgr.makeArray("some_array", arrayType);
     BitvectorFormula selectedElem = amgr.select(arr, index);
-    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(selectedElem, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.SELECT);
     assertThat(mgr.visit(selectedElem, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(17));
 
     var store = amgr.store(arr, index, elem);
-    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(store, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.STORE);
     assertThat(mgr.visit(store, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(17), BigInteger.valueOf(2));
@@ -368,7 +374,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .isNotEqualTo(Solvers.OPENSMT);
 
     var initializedArr = amgr.makeArray(arrayType, elem);
-    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther()))
+    assertThat(mgr.visit(initializedArr, new FunctionDeclarationVisitorNoOther(mgr)))
         .containsExactly(FunctionDeclarationKind.CONST);
     assertThat(mgr.visit(initializedArr, new ConstantsVisitor(true)))
         .containsExactly(BigInteger.valueOf(2));
@@ -510,7 +516,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_POSITIVE),
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_NEGATIVE),
             fpmgr.round(x, FloatingPointRoundingMode.TOWARD_ZERO))) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       mgr.visit(f, new FunctionDeclarationVisitorNoUF());
       Formula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
@@ -715,7 +721,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             smgr.suffix(x, y),
             smgr.in(x, r))) {
       mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(f).isEquivalentTo(f2);
@@ -743,7 +749,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
     for (StringFormula f : formulas.build()) {
       mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       StringFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(smgr.equal(f, f2))).isUnsatisfiable();
@@ -768,7 +774,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     }
     for (RegexFormula f : formulas.build()) {
       mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       RegexFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
     }
@@ -784,7 +790,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     for (IntegerFormula f :
         ImmutableList.of(smgr.indexOf(x, y, offset), smgr.length(x), smgr.toIntegerFormula(x))) {
       mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
       IntegerFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(imgr.equal(f, f2))).isUnsatisfiable();
@@ -792,7 +798,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   private void checkKind(Formula f, FunctionDeclarationKind expected) {
-    FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther();
+    FunctionDeclarationVisitorNoOther visitor = new FunctionDeclarationVisitorNoOther(mgr);
     mgr.visit(f, visitor);
     Truth.assert_()
         .withMessage(
