@@ -326,10 +326,6 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return FunctionDeclarationKind.FP_CASTTO_UBV;
     } else if (kind.equals(Kind.BV_XOR)) {
       return FunctionDeclarationKind.BV_XOR;
-    } else if (ImmutableList.of(Kind.BV_ROL, Kind.BV_ROLI, Kind.BV_ROR, Kind.BV_RORI)
-        .contains(kind)) {
-      // Rotations are not yet supported by FunctionDeclarationKind
-      return FunctionDeclarationKind.OTHER;
     }
     throw new UnsupportedOperationException("Can not discern formula kind " + kind);
   }
