@@ -9,18 +9,20 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,7 +62,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
   /**
-   * Maps symbols from fp-to-bv casts to their defining equation.
+   * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
+   * defining equation.
    *
    * <p>Bitwuzla does not support casts from floating-point to bitvector natively. The reason given
    * is that the value is undefined for NaN and that the SMT-LIB standard also does not include such
@@ -72,7 +75,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
    * the newly introduced variable symbols and the values are the defining equations as mentioned
    * above.
    */
-  private final Map<String, Term> variableCasts = new HashMap<>();
+  private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
     super(null, pTermManager.mk_bool_sort(), null, null, null, null);
@@ -593,52 +596,34 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     throw new AssertionError("Unknown value type.");
   }
 
-  /** Add a side-condition from a fp-to-bv to the set. */
-  public void addVariableCast(String newVariable, Term equal) {
-    variableCasts.put(newVariable, equal);
+  /** Add a constraint that is pushed onto the prover stack whenever the variable is used. */
+  public void addConstraintForVariable(String variable, Term constraint) {
+    constraintsForVariables.put(variable, constraint);
   }
 
   /**
-   * Returns a set of side-conditions that are needed to handle the variable casts in the terms.
+   * Returns a set of additional constraints (side-conditions) that are needed to use some variables
+   * from the given term, such as utility variables from casts.
    *
    * <p>Bitwuzla does not support fp-to-bv conversion natively. We have to use side-conditions as a
    * workaround. When a term containing fp-to-bv casts is added to the assertion stack these
    * side-conditions need to be collected by calling this method and then also adding them to the
    * assertion stack.
    */
-  public Iterable<Term> getVariableCasts(Iterable<Term> pTerms) {
-    // Build the transition function from the side-conditions. We map the variables on the left
-    // side of the defining equation to the set of variables on the right side.
-    // f.ex __CAST_TO_BV_0 -> fp.to_fp(CAST_TO_BV_0) = (+ a b)
-    // becomes
-    // Map.of(__CAST_TO_BV, Set.of(__CAST_TO_BV, a b))
-    Map<String, Set<String>> transitions =
-        Maps.transformValues(
-            variableCasts,
-            term ->
-                Sets.intersection(
-                    variableCasts.keySet(), extractVariablesAndUFs(term, false).keySet()));
-
-    // Calculate the initial set of symbols from the terms in the argument
-    ImmutableSet.Builder<String> initBuilder = ImmutableSet.builder();
-    for (Term term : pTerms) {
-      initBuilder.addAll(extractVariablesAndUFs(term, false).keySet());
-    }
-    ImmutableSet<String> initialSet = initBuilder.build();
-
-    Set<String> r0 = ImmutableSet.of();
-    Set<String> r1 = Sets.intersection(initialSet, transitions.keySet());
-    // Calculate the fixpoint for the transition function
-    while (!r0.equals(r1)) {
-      r0 = r1;
-      // Iterate the transition function
-      ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-      for (String var : r0) {
-        builder.addAll(transitions.get(var));
+  public Collection<Term> getConstraintsForTerm(Term pTerm) {
+    final Set<String> usedConstraintVariables = new LinkedHashSet<>();
+    final Deque<String> waitlist = new ArrayDeque<>(extractVariablesAndUFs(pTerm, false).keySet());
+    while (!waitlist.isEmpty()) {
+      String current = waitlist.pop();
+      if (constraintsForVariables.containsKey(current)) { // ignore variables without constraints
+        if (usedConstraintVariables.add(current)) {
+          // if we found a new variable with constraint, get transitive variables from constraint
+          Term constraint = constraintsForVariables.get(current);
+          waitlist.addAll(extractVariablesAndUFs(constraint, false).keySet());
+        }
       }
-      r1 = builder.build();
     }
 
-    return Maps.filterKeys(variableCasts, r0::contains).values();
+    return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
   }
 }

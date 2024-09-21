@@ -191,7 +191,7 @@ public final class BitwuzlaFormulaManager
           return;
         }
         Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
-        for (Term t : creator.getVariableCasts(ImmutableList.of(pTerm))) {
+        for (Term t : creator.getConstraintsForTerm(pTerm)) {
           bitwuzla.assert_formula(t);
         }
         bitwuzla.assert_formula(pTerm);
