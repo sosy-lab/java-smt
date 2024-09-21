@@ -99,13 +99,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
     api.setPartitionNumber(formulaId);
 
-    // FIXME: Fix term abbreviations
-    // This feature was turned off as it was causing crashes with non-linear formulas. We should
-    // investigate if this only happens for rational formulas, and if there is something we're
-    // doing wrong on our side.
     final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    api.addAssertion(
-        t /*api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation())*/);
+    api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
 
     return formulaId;
   }
