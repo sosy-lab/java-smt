@@ -458,6 +458,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)

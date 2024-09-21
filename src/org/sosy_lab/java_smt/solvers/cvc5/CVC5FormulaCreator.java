@@ -578,6 +578,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)

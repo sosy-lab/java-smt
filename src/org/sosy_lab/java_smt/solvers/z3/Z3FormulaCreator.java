@@ -707,6 +707,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_SIGN_EXTENSION;
       case Z3_OP_ZERO_EXT:
         return FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case Z3_OP_ROTATE_LEFT:
+        return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case Z3_OP_ROTATE_RIGHT:
+        return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
+      case Z3_OP_EXT_ROTATE_LEFT:
+        return FunctionDeclarationKind.BV_ROTATE_LEFT;
+      case Z3_OP_EXT_ROTATE_RIGHT:
+        return FunctionDeclarationKind.BV_ROTATE_RIGHT;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
