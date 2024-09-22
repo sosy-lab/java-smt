@@ -201,10 +201,6 @@ public class BitwuzlaFloatingPointManager
         pTargetType.getMantissaSize() + 1);
   }
 
-  private String newVariable() {
-    return "__CAST_FROM_BV_" + counter++;
-  }
-
   @Override
   protected Term toIeeeBitvectorImpl(Term pNumber) {
     int sizeExp = pNumber.sort().fp_exp_size();
@@ -225,11 +221,13 @@ public class BitwuzlaFloatingPointManager
     // Note that NaN is handled as a special case in this method. This is not strictly necessary,
     // but if we just use "fpTerm = to_fp(bvVar)" the NaN will be given a random payload (and
     // sign). Since NaN payloads are not preserved here anyway we might as well pick a canonical
-    // representation.
-    Term bvNaN =
-        termManager.mk_bv_value(bvSort, "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2));
+    // representation, e.g., which is "0 11111111 10000000000000000000000" for single precision.
+    String nanRepr = "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2);
+    Term bvNaN = termManager.mk_bv_value(bvSort, nanRepr);
 
-    String newVariable = newVariable();
+    // TODO creating our own utility variables might eb unexpected from the user.
+    //   We might need to exclude such variables in models and formula traversal.
+    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter++;
     Term bvVar = termManager.mk_const(bvSort, newVariable);
     Term equal =
         termManager.mk_term(
