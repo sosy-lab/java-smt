@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,7 +25,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
@@ -93,7 +93,11 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     wasLastSatCheckSat = false;
-    env.assert_formula(((BitwuzlaBooleanFormula) constraint).getTerm());
+    Term formula = creator.extractInfo(constraint);
+    env.assert_formula(formula);
+    for (Term t : creator.getConstraintsForTerm(formula)) {
+      env.assert_formula(t);
+    }
     return null;
   }
 
@@ -127,7 +131,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    final Result result = env.check_sat(new Vector_Term(creator.getVariableCasts()));
+    final Result result = env.check_sat();
     return readSATResult(result);
   }
 
@@ -142,12 +146,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
-    Vector_Term ass = new Vector_Term(creator.getVariableCasts());
+
+    Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
-      BitwuzlaBooleanFormula bitwuzlaFormula = (BitwuzlaBooleanFormula) formula;
-      ass.add(bitwuzlaFormula.getTerm());
+      Term term = creator.extractInfo(formula);
+      newAssumptions.add(term);
+      newAssumptions.addAll(creator.getConstraintsForTerm(term));
     }
-    final Result result = env.check_sat(ass);
+
+    final Result result = env.check_sat(new Vector_Term(newAssumptions));
     return readSATResult(result);
   }
 
