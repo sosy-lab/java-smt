@@ -93,11 +93,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
             "interpolation can only be done over previously asserted formulas.");
 
     final Set<TFormulaInfo> assertedFormulas = (Set<TFormulaInfo>) getAssertedFormulas();
-    System.out.println(assertedFormulas);
     final Set<TFormulaInfo> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
-    System.out.println(formulasOfA);
     final Set<TFormulaInfo> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
-    System.out.println(formulasOfB);
 
     Set<TFormulaInfo> varOfA = Set.of();
     Set<TFormulaInfo> varOfB = Set.of();
@@ -118,9 +115,13 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     }
 
     // shared variables between a and b
-    final Set<TFormulaInfo> sharedVariables = Sets.intersection(varOfA, varOfB);
-    System.out.println(sharedVariables);
+    final Set<TFormulaInfo> sharedVars = Sets.intersection(varOfA, varOfB);
 
+    Builder<TType> typesForSharedBuilder = ImmutableList.builder();
+    for (TFormulaInfo var : sharedVars) {
+      creator.getFormulaType(var);
+    }
+    List<TType> typesForShared = typesForSharedBuilder.build();
 
     return null;
   }
