@@ -34,15 +34,22 @@ cd ${DIR}
 
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
+RELATIVE_ROOT_DIR="../../../.."
+YICES_SRC_DIR=$RELATIVE_ROOT_DIR/"$1"/src/include
+YICES_LIB_DIR=$RELATIVE_ROOT_DIR/"$1"/build/x86_64-pc-linux-gnu-release/lib/
+GMP_HEADER_DIR=$RELATIVE_ROOT_DIR/"$2"
+GMP_LIB_DIR=$GMP_HEADER_DIR/.libs
+GPERF_HEADER_DIR=$RELATIVE_ROOT_DIR/"$3"
+GPERF_LIB_DIR=$GPERF_HEADER_DIR/lib
+
+LDFLAGS="-L. $LDFLAGS"
 add_include_lib() {
     [ -d "$1" ] && CFLAGS="$CFLAGS -I$1"
     [ -d "$2" ] && LDFLAGS="$LDFLAGS -L$2"
 }
-RELATIVE_ROOT_DIR="../../../.."
-add_include_lib "$RELATIVE_ROOT_DIR/$1/src/include" "$RELATIVE_ROOT_DIR/$1/build/x86_64-pc-linux-gnu-release/lib"
-add_include_lib "$RELATIVE_ROOT_DIR/$2" "$RELATIVE_ROOT_DIR/$2/.libs"
-add_include_lib "$RELATIVE_ROOT_DIR/$3" "$RELATIVE_ROOT_DIR/$3/lib"
-LDFLAGS="-L. $LDFLAGS"
+add_include_lib "$YICES_SRC_DIR" "$YICES_LIB_DIR"
+add_include_lib "$GMP_HEADER_DIR" "$GMP_LIB_DIR"
+add_include_lib "$GPERF_HEADER_DIR" "$GPERF_LIB_DIR"
 
 command_exists() {
     command -v "$1" >/dev/null 2>&1
