@@ -32,11 +32,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
     super(pCreator);
   }
 
-  private StringFormula wrapString(TFormulaInfo formulaInfo) {
+  protected StringFormula wrapString(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateString(formulaInfo);
   }
 
-  private RegexFormula wrapRegex(TFormulaInfo formulaInfo) {
+  protected RegexFormula wrapRegex(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateRegex(formulaInfo);
   }
 

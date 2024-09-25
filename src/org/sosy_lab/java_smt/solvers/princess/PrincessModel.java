@@ -12,17 +12,23 @@ import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
+import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
+import ap.parser.IBoolLit$;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
+import ap.parser.IIntLit;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
+import ap.parser.ITimes;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
+import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.collect.ArrayListMultimap;
@@ -37,20 +43,22 @@ import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import scala.Option;
 
 class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
+  private final PrincessAbstractProver<?> prover;
+
   private final PartialModel model;
   private final SimpleAPI api;
 
   PrincessModel(
-      AbstractProver<?> pProver,
+      PrincessAbstractProver<?> pProver,
       PartialModel partialModel,
       FormulaCreator<IExpression, Sort, PrincessEnvironment, ?> creator,
       SimpleAPI pApi) {
     super(pProver, creator);
+    this.prover = pProver;
     this.model = partialModel;
     this.api = pApi;
   }
@@ -155,6 +163,11 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // then handle assignments for non-array cases.
     // we expect exactly one assignment per model entry.
 
+    // FIXME: Princess may return multiply mappings for UFs if the arguments are rational, f.ex
+    //  "uf(17/3) -> 3" and "uf(34/6) -> 3" may both appear in the same model even thought 17/3 and
+    //  34/6 are the same. We should look into this and reduce the fractions in the model if this
+    //  is causing us any issues.
+
     String name;
     IFormula fAssignment;
     List<Object> argumentInterpretations = ImmutableList.of();
@@ -240,14 +253,76 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   @Override
   public void close() {}
 
-  @Override
-  protected IExpression evalImpl(IExpression formula) {
-    IExpression evaluation = evaluate(formula);
-    if (evaluation == null) {
-      // fallback: try to simplify the query and evaluate again.
-      evaluation = evaluate(creator.getEnv().simplify(formula));
+  /** Tries to determine the Sort of a Term. */
+  private Sort getSort(IExpression pTerm) {
+    // Just using sortof() won't work as Princess may have simplified the original term
+    // FIXME: This may also affect other parts of the code that use sortof()
+    if (pTerm instanceof ITimes) {
+      ITimes times = (ITimes) pTerm;
+      return getSort(times.subterm());
+    } else if (pTerm instanceof IPlus) {
+      IPlus plus = (IPlus) pTerm;
+      return getSort(plus.apply(0));
+    } else if (pTerm instanceof IFormula) {
+      return creator.getBoolType();
+    } else {
+      // TODO: Do we need more cases?
+      return Sort$.MODULE$.sortOf((ITerm) pTerm);
     }
-    return evaluation;
+  }
+
+  /**
+   * Simplify rational values.
+   *
+   * <p>Rewrite <code>a/1</code> as <code>a</code>, otherwise return the term unchanged
+   */
+  private ITerm simplifyRational(ITerm pTerm) {
+    // TODO: Reduce the term further?
+    // TODO: Also do this for the values in the model?
+    if (Sort$.MODULE$.sortOf(pTerm).equals(creator.getRationalType())
+        && pTerm instanceof IFunApp
+        && ((IFunApp) pTerm).fun().name().equals("Rat_frac")
+        && pTerm.apply(1).equals(new IIntLit(IdealInt.ONE()))) {
+      return Rationals.int2ring((ITerm) pTerm.apply(0));
+    }
+    return pTerm;
+  }
+
+  @Override
+  protected @Nullable IExpression evalImpl(IExpression expr) {
+    Sort sort = getSort(expr);
+    if (sort.equals(creator.getRationalType())) {
+      // Extending the partial model does not seem to work in Princess if the formula uses rational
+      // variables. To work around this issue we (temporarily) add the formula to the assertion
+      // stack and then repeat the sat-check to get the value.
+      api.push();
+      ITerm var = api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(expr));
+      api.addAssertion(var.$eq$eq$eq((ITerm) expr));
+      api.checkSat(true);
+      ITerm evaluated = api.evalToTerm(var);
+      api.pop();
+      return simplifyRational(evaluated);
+    } else {
+      IExpression evaluation = evaluate(expr);
+      if (evaluation == null) {
+        if (expr instanceof IFormula) {
+          // If the partial model can't evaluate our formula try extending
+          IFormula formula = (IFormula) expr;
+          api.push();
+          IFormula var = api.createBooleanVariable("__var_" + prover.idGenerator.getFreshId());
+          api.addAssertion(var.$less$eq$greater(formula));
+          api.checkSat(true);
+          IExpression evaluated = IBoolLit$.MODULE$.apply(api.eval(var));
+          api.pop();
+          return evaluated;
+        } else {
+          // fallback: try to simplify the query and evaluate again.
+          // This is needed for array expressions
+          evaluation = evaluate(creator.getEnv().simplify(expr));
+        }
+      }
+      return evaluation;
+    }
   }
 
   @Nullable
