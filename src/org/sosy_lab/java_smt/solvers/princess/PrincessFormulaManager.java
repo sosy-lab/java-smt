@@ -64,7 +64,7 @@ final class PrincessFormulaManager
   }
 
   @Override
-  public Appender dumpFormula(final IExpression formula) {
+  public Appender dumpFormulaImpl(final IExpression formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return getEnvironment().dumpFormula((IFormula) formula, creator);

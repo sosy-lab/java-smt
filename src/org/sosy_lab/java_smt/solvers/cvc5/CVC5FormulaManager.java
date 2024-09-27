@@ -73,7 +73,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
   }
 
   @Override
-  public Appender dumpFormula(Term f) {
+  public Appender dumpFormulaImpl(Term f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 

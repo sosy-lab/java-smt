@@ -57,7 +57,7 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   }
 
   @Override
-  public Appender dumpFormula(PTRef f) {
+  public Appender dumpFormulaImpl(PTRef f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 

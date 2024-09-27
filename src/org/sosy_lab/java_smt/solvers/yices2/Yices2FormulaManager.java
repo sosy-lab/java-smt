@@ -74,7 +74,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Appender dumpFormula(final Integer formula) {
+  public Appender dumpFormulaImpl(final Integer formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return new Appenders.AbstractAppender() {

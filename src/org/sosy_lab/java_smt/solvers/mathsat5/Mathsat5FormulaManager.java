@@ -70,7 +70,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public Appender dumpFormula(final Long f) {
+  public Appender dumpFormulaImpl(final Long f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 

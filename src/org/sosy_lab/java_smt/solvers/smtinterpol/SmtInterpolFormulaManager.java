@@ -98,7 +98,7 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
-  public Appender dumpFormula(final Term formula) {
+  public Appender dumpFormulaImpl(final Term formula) {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 

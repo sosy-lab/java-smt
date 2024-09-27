@@ -44,7 +44,7 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public Appender dumpFormula(Long pT) {
+  public Appender dumpFormulaImpl(Long pT) {
     return new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {

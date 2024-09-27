@@ -170,7 +170,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public Appender dumpFormula(final Long expr) {
+  public Appender dumpFormulaImpl(final Long expr) {
     assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 

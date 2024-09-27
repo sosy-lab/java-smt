@@ -268,11 +268,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.encapsulateBoolean(parseImpl(formulaStr));
   }
 
-  public abstract Appender dumpFormula(TFormulaInfo t);
+  protected abstract Appender dumpFormulaImpl(TFormulaInfo t);
 
   @Override
   public Appender dumpFormula(BooleanFormula t) {
-    return dumpFormula(formulaCreator.extractInfo(t));
+    return dumpFormulaImpl(formulaCreator.extractInfo(t));
   }
 
   @Override

@@ -176,7 +176,7 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public Appender dumpFormula(Term pTerm) {
+  public Appender dumpFormulaImpl(Term pTerm) {
     // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
     // bitwuzla_term_print_fmt(), which print a single formula, and bitwuzla_print_formula(),
     // which prints the complete assertion stack of the bitwuzla instance given to the function.

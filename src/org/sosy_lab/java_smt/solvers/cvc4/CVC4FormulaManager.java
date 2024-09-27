@@ -71,7 +71,7 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public Appender dumpFormula(Expr f) {
+  public Appender dumpFormulaImpl(Expr f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
