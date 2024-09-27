@@ -54,13 +54,13 @@ final class PrincessFormulaManager
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public IExpression parseImpl(String pS) throws IllegalArgumentException {
     List<? extends IExpression> formulas = getEnvironment().parseStringToTerms(pS, creator);
     Preconditions.checkState(
         formulas.size() == 1,
         "parsing expects exactly one asserted term, but got %s terms",
         formulas.size());
-    return encapsulateBooleanFormula(formulas.get(0));
+    return formulas.get(0);
   }
 
   @Override

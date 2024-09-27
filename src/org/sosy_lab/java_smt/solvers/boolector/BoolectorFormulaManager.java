@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 import java.io.IOException;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -40,7 +39,7 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public Long parseImpl(String pS) throws IllegalArgumentException {
     throw new UnsupportedOperationException("Boolector can not parse single formulas.");
   }
 

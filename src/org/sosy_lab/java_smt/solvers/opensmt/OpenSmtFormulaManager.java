@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
@@ -53,8 +52,8 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    return creator.encapsulateBoolean(osmtLogic.parseFormula(stripSMTLIB2String(pS)));
+  public PTRef parseImpl(String pS) throws IllegalArgumentException {
+    return osmtLogic.parseFormula(stripSMTLIB2String(pS));
   }
 
   @Override

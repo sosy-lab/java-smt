@@ -29,7 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -69,9 +68,9 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public Integer parseImpl(String pS) throws IllegalArgumentException {
     // TODO Might expect Yices input language instead of smt-lib2 notation
-    return getFormulaCreator().encapsulateBoolean(yices_parse_term(pS));
+    return yices_parse_term(pS);
   }
 
   @Override

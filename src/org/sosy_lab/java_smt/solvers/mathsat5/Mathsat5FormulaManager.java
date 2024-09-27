@@ -65,9 +65,8 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    long f = msat_from_smtlib2(getEnvironment(), pS);
-    return getFormulaCreator().encapsulateBoolean(f);
+  public Long parseImpl(String pS) throws IllegalArgumentException {
+    return msat_from_smtlib2(getEnvironment(), pS);
   }
 
   @Override

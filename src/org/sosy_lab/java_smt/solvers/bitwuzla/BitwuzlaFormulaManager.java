@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
@@ -61,7 +60,7 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+  public Term parseImpl(String formulaStr) throws IllegalArgumentException {
     // Strip the input string and remove everything but declarations and assertions
     String s = stripSMTLIB2String(formulaStr);
 
@@ -155,7 +154,7 @@ public final class BitwuzlaFormulaManager
     result = creator.getTermManager().substitute_term(result, subst);
 
     // Return the updated term
-    return creator.encapsulateBoolean(result);
+    return result;
   }
 
   private String stripSMTLIB2String(String pFormulaStr) {

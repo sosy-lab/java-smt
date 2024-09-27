@@ -21,7 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -69,7 +68,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public Term parseImpl(String formulaStr) throws IllegalArgumentException {
     throw new UnsupportedOperationException();
   }
 

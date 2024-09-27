@@ -72,7 +72,7 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public Term parseImpl(String pS) throws IllegalArgumentException {
     FormulaCollectionScript parseScript =
         new FormulaCollectionScript(getEnvironment(), getEnvironment().getTheory());
     LogProxy logProxy = new LogProxyForwarder(logger.withComponentName("SMTInterpol"));
@@ -94,7 +94,7 @@ public class SmtInterpolFormulaManager
     }
 
     Term term = getOnlyElement(parseScript.getAssertedTerms());
-    return encapsulateBooleanFormula(new FormulaUnLet().unlet(term));
+    return new FormulaUnLet().unlet(term);
   }
 
   @Override

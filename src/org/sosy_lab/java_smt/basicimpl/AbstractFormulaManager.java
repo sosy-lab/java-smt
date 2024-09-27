@@ -261,6 +261,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return enumManager;
   }
 
+  protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
+
+  @Override
+  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+    return formulaCreator.encapsulateBoolean(parseImpl(formulaStr));
+  }
+
   public abstract Appender dumpFormula(TFormulaInfo t);
 
   @Override

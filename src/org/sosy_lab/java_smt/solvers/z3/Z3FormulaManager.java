@@ -60,7 +60,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public BooleanFormula parse(String str) throws IllegalArgumentException {
+  public Long parseImpl(String str) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
     // but requires all symbols as part of the query.
@@ -123,7 +123,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     // last step: all parsed symbols need to be declared again to have them tracked in the creator.
     declareAllSymbols(term);
 
-    return getFormulaCreator().encapsulateBoolean(term);
+    return term;
   }
 
   @SuppressWarnings("CheckReturnValue")
