@@ -107,7 +107,11 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support integer theory", translateFrom)
         .that(translateFrom)
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
+    assume()
+        .withMessage("Solver %s does not support integer theory", translateTo)
+        .that(translateTo)
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   @Test
@@ -134,6 +138,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingForIContextIdentity() throws SolverException, InterruptedException {
+    requireIntegers();
     assume().that(translateTo).isEqualTo(translateFrom);
     FormulaManager manager = managerFrom;
 
@@ -146,6 +151,7 @@ public class TranslateFormulaTest {
 
   @Test
   public void testTranslatingForContextSibling() throws SolverException, InterruptedException {
+    requireIntegers();
     assume().that(translateTo).isEqualTo(translateFrom);
 
     assume()

@@ -33,6 +33,8 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/runtime-cvc5/cvc5.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth-java8-extension.jar" sourcepath="lib/java-contrib/truth-java8-extension-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/checker-qual.jar" sourcepath="lib/java-contrib/checker-qual-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-opensmt/opensmt.jar" sourcepath="lib/java-contrib/opensmt-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-bitwuzla/bitwuzla.jar" sourcepath="lib/java-contrib/bitwuzla-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11">
 		<attributes>
 			<attribute name="module" value="true"/>

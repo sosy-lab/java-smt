@@ -47,7 +47,7 @@ public class OpenSmtArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> PTRef internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, PTRef elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, PTRef defaultElement) {
     throw new UnsupportedOperationException();
   }
 

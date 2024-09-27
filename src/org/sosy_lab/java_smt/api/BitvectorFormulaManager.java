@@ -107,75 +107,104 @@ public interface BitvectorFormulaManager {
    *   <li>-10 / (-3) = 3
    * </ul>
    *
-   * <p>If the denumerator evaluates to zero (division-by-zero), either directly as value or
-   * indirectly via an additional constraint, then the result of the division is defined as:
+   * <p>If the divisor evaluates to zero (division-by-zero), either directly as value or indirectly
+   * via an additional constraint, then the result of the division is defined as:
    *
    * <ul>
-   *   <li>"-1" interpreted as bitvector (i.e., all bits set to "1"), if the numerator is
+   *   <li>"-1" interpreted as bitvector (i.e., all bits set to "1"), if the dividend is
    *       non-negative, and
    *   <li>"1" interpreted as bitvector (i.e., all bits set to "0", except the last bit), if the
-   *       numerator is negative.
+   *       dividend is negative.
    * </ul>
    *
-   * <p>We refer to the SMTLIB standard for the division and modulo operators in BV theory.
+   * <p>We refer to the SMTLIB standard version 2.6 for the division and remainder operators in BV
+   * theory.
    *
-   * @param numerator dividend
-   * @param denumerator divisor
+   * @param dividend dividend of the operation.
+   * @param divisor divisor of the operation.
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
-  BitvectorFormula divide(BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
+  BitvectorFormula divide(BitvectorFormula dividend, BitvectorFormula divisor, boolean signed);
 
   /**
-   * This method returns the Signed Modular Remainder for two bitvector formulas.
+   * Deprecated and unsupported operation.
    *
-   * <p>The sign of the result follows the sign of the denumerator, e.g., a user can assume the
-   * following equations:
+   * <p>Returns the remainder of the given bitvectors and behaves equally to {@link
+   * #remainder(BitvectorFormula, BitvectorFormula, boolean)}.
    *
-   * <ul>
-   *   <li>10 % 5 = 0
-   *   <li>10 % 3 = 1
-   *   <li>10 % (-3) = -2
-   *   <li>-10 % 5 = 0
-   *   <li>-10 % 3 = 2
-   *   <li>-10 % (-3) = -1
-   * </ul>
-   *
-   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
-   * indirectly via an additional constraint, then the result of the modulo operation is defined as
-   * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
-   * BV theory.
-   *
-   * @param numerator dividend
-   * @param denumerator divisor
+   * <p>Deprecated in favor of remainder() and smodulo() due to confusing method naming and
+   * inconsistent behavior (for signed modulo, the sign of the result follows the divisor, but for
+   * signed remainder() it follows the dividend). Unsigned remainder() is equivalent to unsigned
+   * modulo().
    */
-  BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator);
+  @Deprecated(forRemoval = true)
+  default BitvectorFormula modulo(
+      BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
+    return remainder(dividend, divisor, signed);
+  }
 
   /**
-   * This method returns the remainder (modulo) for two bitvector formulas.
+   * This method returns the two complement signed remainder for the Euclidean division (modulo) of
+   * two bitvector formulas.
    *
-   * <p>For signed bitvectors, the sign of the result follows the sign of the numerator, e.g., a
-   * user can assume the following equations:
+   * <p>The sign of the result follows the sign of the divisor, i.e. the quotient calculated in the
+   * modulo operation is rounded in such a way that the result of the smodulo operation follows the
+   * sign of the divisor, e.g., a user can assume the following equations, with bitvectors
+   * interpreted as signed decimal numbers and % representing signed modulo, to hold:
    *
    * <ul>
-   *   <li>10 % 5 = 0
-   *   <li>10 % 3 = 1
-   *   <li>10 % (-3) = 1
-   *   <li>-10 % 5 = 0
-   *   <li>-10 % 3 = -1
-   *   <li>-10 % (-3) = -1
+   *   <li>10 % 5 == 0
+   *   <li>10 % 3 == 1
+   *   <li>10 % (-3) == -2
+   *   <li>-10 % 5 == 0
+   *   <li>-10 % 3 == 2
+   *   <li>-10 % (-3) == -1
    * </ul>
    *
-   * <p>If the denumerator evaluates to zero (modulo-by-zero), either directly as value or
-   * indirectly via an additional constraint, then the result of the modulo operation is defined as
-   * the numerator itself. We refer to the SMTLIB standard for the division and modulo operators in
-   * BV theory.
+   * <p>If the divisor evaluates to zero (modulo-by-zero), either directly as value or indirectly
+   * via an additional constraint, then the result of the modulo operation is defined as the
+   * dividend itself. We refer to the SMTLIB standard version 2.6 for the division and remainder
+   * operators in BV theory.
    *
-   * @param numerator dividend
-   * @param denumerator divisor
+   * <p>For unsigned modulo, we refer to the unsigned remainder method.
+   *
+   * @param dividend dividend of the operation.
+   * @param divisor divisor of the operation.
+   */
+  BitvectorFormula smodulo(BitvectorFormula dividend, BitvectorFormula divisor);
+
+  /**
+   * This method returns the remainder for two bitvector formulas using the {@link
+   * #divide(BitvectorFormula, BitvectorFormula, boolean)} operation.
+   *
+   * <p>For unsigned bitvectors, this returns the remainder of unsigned bitvector division.
+   *
+   * <p>For signed bitvectors, the sign of the result follows the sign of the dividend, i.e. the
+   * quotient of the division is rounded in such a way that the sign of the result of the remainder
+   * operation follows the sign of the dividend, e.g., a user can assume the following equations,
+   * with bitvectors interpreted as signed decimal numbers and % representing signed remainder
+   * (similar to the C programming language), to hold:
+   *
+   * <ul>
+   *   <li>10 % 5 == 0
+   *   <li>10 % 3 == 1
+   *   <li>10 % (-3) == 1
+   *   <li>-10 % 5 == 0
+   *   <li>-10 % 3 == -1
+   *   <li>-10 % (-3) == -1
+   * </ul>
+   *
+   * <p>If the divisor evaluates to zero (modulo-by-zero), either directly as value or indirectly
+   * via an additional constraint, then the result of the modulo operation is defined as the
+   * dividend itself. We refer to the SMTLIB standard version 2.6 for the division and remainder
+   * operators in BV theory.
+   *
+   * @param dividend dividend of the operation. The sign bit is carried over from this bitvector for
+   *     signed operations.
+   * @param divisor divisor of the operation.
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
-  BitvectorFormula remainder(
-      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed);
+  BitvectorFormula remainder(BitvectorFormula dividend, BitvectorFormula divisor, boolean signed);
 
   /**
    * This method returns the multiplication of the given bitvectors. The result has the same length

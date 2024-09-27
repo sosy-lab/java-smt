@@ -97,13 +97,17 @@ public class SolverContextFactoryTest {
       case YICES2:
         assume.that(IS_LINUX).isTrue();
         return;
+      case BITWUZLA:
+        assume.that(IS_LINUX).isTrue();
+        assume.that(isSufficientVersionOfLibcxx("bitwuzlaj")).isTrue();
+        return;
       case MATHSAT5:
         assume.that(IS_LINUX || IS_WINDOWS).isTrue();
         return;
       case Z3:
         assume.that(IS_LINUX || IS_WINDOWS || IS_MAC).isTrue();
         if (IS_LINUX) {
-          assume.that(isSufficientVersionOfLibcxx()).isTrue();
+          assume.that(isSufficientVersionOfLibcxx("z3")).isTrue();
         }
         return;
       default:
@@ -111,16 +115,15 @@ public class SolverContextFactoryTest {
     }
   }
 
-  /**
-   * The official Z3 release does only run with GLIBCXX in version 3.4.26 or newer. This excludes
-   * Ubuntu 18.04.
-   */
-  private boolean isSufficientVersionOfLibcxx() {
+  /** Some libraries require GLIBCXX in version 3.4.26 or newer. This excludes Ubuntu 18.04. */
+  private boolean isSufficientVersionOfLibcxx(String library) {
     try {
-      NativeLibraries.loadLibrary("z3");
+      NativeLibraries.loadLibrary(library);
     } catch (UnsatisfiedLinkError e) {
-      if (e.getMessage().contains("version `GLIBCXX_3.4.26' not found")) {
-        return false;
+      for (String version : new String[] {"3.4.26", "3.4.29"}) {
+        if (e.getMessage().contains("version `GLIBCXX_" + version + "' not found")) {
+          return false;
+        }
       }
     }
     return true;

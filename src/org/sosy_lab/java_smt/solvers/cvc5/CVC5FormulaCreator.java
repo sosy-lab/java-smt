@@ -258,8 +258,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         throw new AssertionError(
             String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
       } catch (CVC5ApiException pE) {
-        pE.printStackTrace();
-        return null;
+        throw new AssertionError("Unexpected error when accessing sort.", pE);
       }
     }
   }
@@ -579,6 +578,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
@@ -601,6 +602,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.FLOATINGPOINT_ADD, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
+          .put(Kind.FLOATINGPOINT_REM, FunctionDeclarationKind.FP_REM)
           .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
           .put(Kind.FLOATINGPOINT_NEG, FunctionDeclarationKind.FP_NEG)
           .put(Kind.FLOATINGPOINT_LT, FunctionDeclarationKind.FP_LT)

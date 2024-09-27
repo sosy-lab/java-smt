@@ -46,9 +46,9 @@ public class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, S
 
   @Override
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term defaultElement) {
     final Sort cvc5ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return solver.mkConstArray(cvc5ArrayType, elseElem);
+    return solver.mkConstArray(cvc5ArrayType, defaultElement);
   }
 
   @Override

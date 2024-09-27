@@ -2,7 +2,7 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -15,15 +15,15 @@ clone_depth: 1
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.8" )) {
+      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.14" )) {
         (new-object System.Net.WebClient).DownloadFile(
-        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.8-bin.zip',
+        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.14-bin.zip',
           'C:\ant-bin.zip'
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
   - SET JAVA_HOME=C:\Program Files\Java\jdk14
-  - SET PATH=C:\ant\apache-ant-1.10.8\bin;%JAVA_HOME%\bin;%PATH%
+  - SET PATH=C:\ant\apache-ant-1.10.14\bin;%JAVA_HOME%\bin;%PATH%
   - SET IVY_CACHE_DIR=C:\ivy
   - echo %USERPROFILE%
   - echo %PATH%
@@ -36,6 +36,7 @@ build_script:
   # See lib\native\x86_64-windows\README.md for details.
   - copy lib\java\runtime-z3\*dll lib\native\x86_64-windows\
   - copy lib\java\runtime-mathsat\*dll lib\native\x86_64-windows\
+  - copy lib\java\runtime-bitwuzla\*dll lib\native\x86_64-windows\
 
 test_script:
   - ant unit-tests

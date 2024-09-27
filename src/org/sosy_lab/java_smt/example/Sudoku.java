@@ -151,7 +151,7 @@ public class Sudoku {
     Integer[][] grid = new Integer[SIZE][SIZE];
     System.out.println("Insert Sudoku:");
     @SuppressWarnings("resource") // closing Scanner will close StdIn, and we do not want this
-    Scanner s = new Scanner(System.in, Charset.defaultCharset().name());
+    Scanner s = new Scanner(System.in, Charset.defaultCharset());
     for (int row = 0; row < SIZE; row++) {
       String line = s.nextLine().trim();
       for (int col = 0; col < Math.min(line.length(), SIZE); col++) {

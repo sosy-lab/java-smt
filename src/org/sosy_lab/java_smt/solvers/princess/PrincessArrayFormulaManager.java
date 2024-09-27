@@ -51,9 +51,9 @@ class PrincessArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> IExpression internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, IExpression elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, IExpression defaultElement) {
     final Sort arrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return env.makeConstArray((ArraySort) arrayType, (ITerm) elseElem);
+    return env.makeConstArray((ArraySort) arrayType, (ITerm) defaultElement);
   }
 
   @Override

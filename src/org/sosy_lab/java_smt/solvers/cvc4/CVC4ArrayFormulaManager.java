@@ -49,9 +49,9 @@ public class CVC4ArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> Expr internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Expr elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Expr defaultElement) {
     final Type cvc4ArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return exprManager.mkConst(new ArrayStoreAll((ArrayType) cvc4ArrayType, elseElem));
+    return exprManager.mkConst(new ArrayStoreAll((ArrayType) cvc4ArrayType, defaultElement));
   }
 
   @Override

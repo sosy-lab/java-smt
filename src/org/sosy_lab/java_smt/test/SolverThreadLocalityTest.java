@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -347,7 +348,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             Solvers.SMTINTERPOL,
             Solvers.Z3,
             Solvers.PRINCESS,
-            Solvers.BOOLECTOR);
+            Solvers.BOOLECTOR,
+            Solvers.BITWUZLA);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
@@ -368,15 +370,20 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     //    key not found: i@15
     //  Boolector crashes with a segfault:
     //    boolector_assert: argument 'exp' belongs to different Boolector instance
+    //  Bitwuzla:
+    //    java.lang.IllegalArgumentException: invalid call to
+    //    'void bitwuzla::Bitwuzla::assert_formula(const bitwuzla::Term&)',
+    //    mismatching term manager for asserted formula
     //
     // To fix this issue, we would need to track which formula was created in which context,
     // which might result in quite some management and memory overhead.
     // We might want to see this as very low priority, as there is no real benefit for the user,
     // except having a nice error message.
 
-    // Boolector does not support integer, so we have to use two different versions for this test.
+    // Boolector and Bitwuzla do not support integers, so we have to use two different versions
+    // for this test.
     BooleanFormula formula =
-        solverToUse() == Solvers.BOOLECTOR
+        List.of(Solvers.BOOLECTOR, Solvers.BITWUZLA).contains(solverToUse())
             ? bmgr.makeFalse()
             : hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 

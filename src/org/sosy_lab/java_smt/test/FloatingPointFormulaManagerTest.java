@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.rationals.Rational;
@@ -55,6 +56,7 @@ public class FloatingPointFormulaManagerTest
   private FloatingPointFormula negInf;
   private FloatingPointFormula zero;
   private FloatingPointFormula one;
+  private FloatingPointFormula negZero;
 
   @Before
   public void init() {
@@ -66,6 +68,7 @@ public class FloatingPointFormulaManagerTest
     posInf = fpmgr.makePlusInfinity(singlePrecType);
     negInf = fpmgr.makeMinusInfinity(singlePrecType);
     zero = fpmgr.makeNumber(0.0, singlePrecType);
+    negZero = fpmgr.makeNumber(-0.0, singlePrecType);
     one = fpmgr.makeNumber(1.0, singlePrecType);
   }
 
@@ -131,8 +134,7 @@ public class FloatingPointFormulaManagerTest
   public void negativeZeroDivision() throws SolverException, InterruptedException {
     BooleanFormula formula =
         fpmgr.equalWithFPSemantics(
-            fpmgr.divide(
-                one, fpmgr.makeNumber(-0.0, singlePrecType), FloatingPointRoundingMode.TOWARD_ZERO),
+            fpmgr.divide(one, negZero, FloatingPointRoundingMode.TOWARD_ZERO),
             fpmgr.makeMinusInfinity(singlePrecType));
     assertThatFormula(formula).isSatisfiable();
     assertThatFormula(bmgr.not(formula)).isUnsatisfiable();
@@ -267,8 +269,8 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
     assertThatFormula(fpmgr.isSubnormal(zero)).isUnsatisfiable();
 
-    FloatingPointFormula negZero = fpmgr.makeNumber(-0.0, singlePrecType);
     assertThatFormula(fpmgr.isZero(negZero)).isTautological();
+    assertThatFormula(fpmgr.equalWithFPSemantics(zero, negZero)).isTautological();
     assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
     assertThatFormula(fpmgr.isSubnormal(negZero)).isUnsatisfiable();
 
@@ -566,6 +568,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void round() throws SolverException, InterruptedException {
+    requireIntegers();
 
     // constants
     round0(0, 0, 0, 0, 0, 0);
@@ -667,6 +670,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void rationalToFpMinusOne() throws SolverException, InterruptedException {
+    requireRationals();
     requireBitvectors();
 
     NumeralFormula ratOne = rmgr.makeNumber(-1);
@@ -770,24 +774,44 @@ public class FloatingPointFormulaManagerTest
         .isTautological();
   }
 
-  @Test
-  public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
-    for (float f : getListOfFloats()) {
-      checkBV2FP(
-          singlePrecType,
-          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
-          fpmgr.makeNumber(f, singlePrecType));
+  /**
+   * Map the function over the input list and prove the returned assertions.
+   *
+   * @param args A list of arguments to the function
+   * @param f A function that takes values from the list and returns assertions
+   */
+  private <T> void proveForAll(List<T> args, Function<T, BooleanFormula> f)
+      throws InterruptedException, SolverException {
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      for (T value : args) {
+        prover.addConstraint(f.apply(value));
+        assertThat(prover).isSatisfiable();
+      }
     }
   }
 
   @Test
+  public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
+    proveForAll(
+        // makeFP(value.float) == fromBV(makeBV(value.bits))
+        getListOfFloats(),
+        pFloat ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pFloat, singlePrecType),
+                fpmgr.fromIeeeBitvector(
+                    bvmgr.makeBitvector(32, Float.floatToRawIntBits(pFloat)), singlePrecType)));
+  }
+
+  @Test
   public void checkIeeeBv2FpConversion64() throws SolverException, InterruptedException {
-    for (double d : getListOfDoubles()) {
-      checkBV2FP(
-          doublePrecType,
-          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
-          fpmgr.makeNumber(d, doublePrecType));
-    }
+    proveForAll(
+        // makeFP(value.float) == fromBV(makeBV(value.bits))
+        getListOfDoubles(),
+        pDouble ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pDouble, doublePrecType),
+                fpmgr.fromIeeeBitvector(
+                    bvmgr.makeBitvector(64, Double.doubleToRawLongBits(pDouble)), doublePrecType)));
   }
 
   @Test
@@ -797,12 +821,13 @@ public class FloatingPointFormulaManagerTest
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    for (float f : getListOfFloats()) {
-      checkFP2BV(
-          singlePrecType,
-          bvmgr.makeBitvector(32, Float.floatToRawIntBits(f)),
-          fpmgr.makeNumber(f, singlePrecType));
-    }
+    proveForAll(
+        // makeBV(value.bits) == fromFP(makeFP(value.float))
+        getListOfFloats(),
+        pFloat ->
+            bvmgr.equal(
+                bvmgr.makeBitvector(32, Float.floatToRawIntBits(pFloat)),
+                fpmgr.toIeeeBitvector(fpmgr.makeNumber(pFloat, singlePrecType))));
   }
 
   @Test
@@ -812,12 +837,13 @@ public class FloatingPointFormulaManagerTest
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    for (double d : getListOfDoubles()) {
-      checkFP2BV(
-          doublePrecType,
-          bvmgr.makeBitvector(64, Double.doubleToRawLongBits(d)),
-          fpmgr.makeNumber(d, doublePrecType));
-    }
+    proveForAll(
+        // makeBV(value.bits) == fromFP(makeFP(value.float))
+        getListOfFloats(),
+        pDouble ->
+            bvmgr.equal(
+                bvmgr.makeBitvector(64, Double.doubleToRawLongBits(pDouble)),
+                fpmgr.toIeeeBitvector(fpmgr.makeNumber(pDouble, doublePrecType))));
   }
 
   private List<Float> getListOfFloats() {
@@ -831,11 +857,15 @@ public class FloatingPointFormulaManagerTest
             Float.MAX_VALUE,
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
-            0.0f, // , -0.0f // MathSat5 fails for NEGATIVE_ZERO
+            0.0f,
             1f,
             -1f,
             2f,
             -2f);
+
+    if (solverToUse() != Solvers.MATHSAT5) {
+      flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
+    }
 
     for (int i = 1; i < 20; i++) {
       for (int j = 1; j < 20; j++) {
@@ -864,11 +894,15 @@ public class FloatingPointFormulaManagerTest
             Double.MAX_VALUE,
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
-            0.0, // , -0.0 // MathSat5 fails for NEGATIVE_ZERO
+            0.0,
             1d,
             -1d,
             2d,
             -2d);
+
+    if (solverToUse() != Solvers.MATHSAT5) {
+      dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
+    }
 
     for (int i = 1; i < 20; i++) {
       for (int j = 1; j < 20; j++) {
@@ -886,22 +920,6 @@ public class FloatingPointFormulaManagerTest
     }
 
     return dbls;
-  }
-
-  private void checkBV2FP(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
-      throws SolverException, InterruptedException {
-    FloatingPointFormula ieeeFp = fpmgr.fromIeeeBitvector(bv, type);
-    assertThat(mgr.getFormulaType(ieeeFp)).isEqualTo(mgr.getFormulaType(flt));
-    assertEqualsAsFp(flt, ieeeFp);
-  }
-
-  private void checkFP2BV(FloatingPointType type, BitvectorFormula bv, FloatingPointFormula flt)
-      throws SolverException, InterruptedException {
-    BitvectorFormula var = bvmgr.makeVariable(type.getTotalSize(), "x");
-    BitvectorFormula ieeeBv = fpmgr.toIeeeBitvector(flt);
-    assertThat(mgr.getFormulaType(ieeeBv)).isEqualTo(mgr.getFormulaType(var));
-    assertThatFormula(bvmgr.equal(bv, ieeeBv)).isTautological();
-    assertThatFormula(bmgr.and(bvmgr.equal(bv, var), bvmgr.equal(var, ieeeBv))).isSatisfiable();
   }
 
   @Test
@@ -1015,31 +1033,60 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpFrom32BitPattern() throws SolverException, InterruptedException {
-    for (float f : getListOfFloats()) {
-      int bits = Float.floatToRawIntBits(f);
-      int exponent = (bits >>> 23) & 0xFF;
-      int mantissa = bits & 0x7FFFFF;
-      boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
-      final FloatingPointFormula fpFromBv =
-          fpmgr.makeNumber(
-              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
-      final FloatingPointFormula fp = fpmgr.makeNumber(f, singlePrecType);
-      assertEqualsAsFormula(fpFromBv, fp);
-    }
+    proveForAll(
+        getListOfFloats(),
+        pFloat -> {
+          // makeFP(value.bits.sign, value.bits.exponent, value.bits.mantissa) = makeFP(value.float)
+          int bits = Float.floatToRawIntBits(pFloat);
+          int exponent = (bits >>> 23) & 0xFF;
+          int mantissa = bits & 0x7FFFFF;
+          boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
+          final FloatingPointFormula fpFromBv =
+              fpmgr.makeNumber(
+                  BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
+          final FloatingPointFormula fp = fpmgr.makeNumber(pFloat, singlePrecType);
+          return fpmgr.assignment(fpFromBv, fp);
+        });
   }
 
   @Test
   public void fpFrom64BitPattern() throws SolverException, InterruptedException {
-    for (double d : getListOfDoubles()) {
-      long bits = Double.doubleToRawLongBits(d);
-      long exponent = (bits >>> 52) & 0x7FF;
-      long mantissa = bits & 0xFFFFFFFFFFFFFL;
-      boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
-      final FloatingPointFormula fpFromBv =
-          fpmgr.makeNumber(
-              BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
-      final FloatingPointFormula fp = fpmgr.makeNumber(d, doublePrecType);
-      assertEqualsAsFormula(fpFromBv, fp);
+    proveForAll(
+        // makeFP(value.bits.sign, value.bits.exponent, value.bits.mantissa) = makeFP(value.float)
+        getListOfDoubles(),
+        pDouble -> {
+          long bits = Double.doubleToRawLongBits(pDouble);
+          long exponent = (bits >>> 52) & 0x7FF;
+          long mantissa = bits & 0xFFFFFFFFFFFFFL;
+          boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
+          final FloatingPointFormula fpFromBv =
+              fpmgr.makeNumber(
+                  BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
+          final FloatingPointFormula fp = fpmgr.makeNumber(pDouble, doublePrecType);
+          return fpmgr.assignment(fpFromBv, fp);
+        });
+  }
+
+  @Test
+  public void fpFromNumberIntoTooNarrowType() throws SolverException, InterruptedException {
+    // near zero rounds to zero, if precision is too narrow
+    for (double nearZero : new double[] {Double.MIN_VALUE, Float.MIN_VALUE / 2d}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(zero, fpmgr.makeNumber(nearZero, singlePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(negZero, fpmgr.makeNumber(-nearZero, singlePrecType)))
+          .isTautological();
+    }
+
+    // near infinity rounds to infinity, if precision is too narrow
+    for (double nearInf : new double[] {Double.MAX_VALUE, Float.MAX_VALUE * 2d}) {
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(posInf, fpmgr.makeNumber(nearInf, singlePrecType)))
+          .isTautological();
+      assertThatFormula(
+              fpmgr.equalWithFPSemantics(negInf, fpmgr.makeNumber(-nearInf, singlePrecType)))
+          .isTautological();
     }
   }
 }

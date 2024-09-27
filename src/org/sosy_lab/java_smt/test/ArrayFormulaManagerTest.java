@@ -193,23 +193,23 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         .isNotEqualTo(Solvers.OPENSMT);
 
     for (int elem : new int[] {0, 1, 5, 100, -100}) {
-      IntegerFormula elseElem = imgr.makeNumber(elem);
+      IntegerFormula defaultElement = imgr.makeNumber(elem);
       IntegerFormula otherElem = imgr.makeNumber(elem + 1);
 
       ArrayFormula<IntegerFormula, IntegerFormula> arr =
-          amgr.makeArray(FormulaType.getArrayType(IntegerType, IntegerType), elseElem);
+          amgr.makeArray(FormulaType.getArrayType(IntegerType, IntegerType), defaultElement);
 
       for (int i : new int[] {1, 3, 9, 13}) {
         IntegerFormula index = imgr.makeNumber(i);
 
-        // select(arr, i) == elseElem, and not otherElem
-        assertThatFormula(imgr.equal(elseElem, amgr.select(arr, index))).isTautological();
+        // select(arr, i) == defaultElement, and not otherElem
+        assertThatFormula(imgr.equal(defaultElement, amgr.select(arr, index))).isTautological();
         assertThatFormula(imgr.equal(otherElem, amgr.select(arr, index))).isUnsatisfiable();
 
-        // select(store(arr, i, j)) == j, and not elseElem
+        // select(store(arr, i, j)) == j, and not defaultElement
         IntegerFormula selectFromStore = amgr.select(amgr.store(arr, index, otherElem), index);
         assertThatFormula(imgr.equal(otherElem, selectFromStore)).isTautological();
-        assertThatFormula(imgr.equal(elseElem, selectFromStore)).isUnsatisfiable();
+        assertThatFormula(imgr.equal(defaultElement, selectFromStore)).isUnsatisfiable();
       }
     }
   }
@@ -225,24 +225,24 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
     final int size = 8;
 
     for (int elem : new int[] {0, 1, 5, 100, -100}) {
-      BitvectorFormula elseElem = bvmgr.makeBitvector(size, elem);
+      BitvectorFormula defaultElement = bvmgr.makeBitvector(size, elem);
       BitvectorFormula otherElem = bvmgr.makeBitvector(size, elem + 1);
 
       BitvectorType bvType = getBitvectorTypeWithSize(size);
       ArrayFormula<BitvectorFormula, BitvectorFormula> arr =
-          amgr.makeArray(FormulaType.getArrayType(bvType, bvType), elseElem);
+          amgr.makeArray(FormulaType.getArrayType(bvType, bvType), defaultElement);
 
       for (int i : new int[] {1, 3, 9, 13}) {
         BitvectorFormula index = bvmgr.makeBitvector(size, i);
 
-        // select(arr, i) == elseElem, and not otherElem
-        assertThatFormula(bvmgr.equal(elseElem, amgr.select(arr, index))).isTautological();
+        // select(arr, i) == defaultElement, and not otherElem
+        assertThatFormula(bvmgr.equal(defaultElement, amgr.select(arr, index))).isTautological();
         assertThatFormula(bvmgr.equal(otherElem, amgr.select(arr, index))).isUnsatisfiable();
 
-        // select(store(arr, i, j)) == j, and not elseElem
+        // select(store(arr, i, j)) == j, and not defaultElement
         BitvectorFormula selectFromStore = amgr.select(amgr.store(arr, index, otherElem), index);
         assertThatFormula(bvmgr.equal(otherElem, selectFromStore)).isTautological();
-        assertThatFormula(bvmgr.equal(elseElem, selectFromStore)).isUnsatisfiable();
+        assertThatFormula(bvmgr.equal(defaultElement, selectFromStore)).isUnsatisfiable();
       }
     }
   }

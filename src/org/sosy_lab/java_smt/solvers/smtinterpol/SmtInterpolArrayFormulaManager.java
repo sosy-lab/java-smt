@@ -48,9 +48,9 @@ class SmtInterpolArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term defaultElement) {
     final Sort arraySort = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return env.term("const", null, arraySort, elseElem);
+    return env.term("const", null, arraySort, defaultElement);
   }
 
   @Override

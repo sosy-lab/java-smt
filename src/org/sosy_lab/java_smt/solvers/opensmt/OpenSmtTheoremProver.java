@@ -28,7 +28,7 @@ class OpenSmtTheoremProver extends OpenSmtAbstractProver<Void> implements Prover
         pFormulaCreator,
         pMgr,
         pShutdownNotifier,
-        getConfigInstance(pSolverOptions, false),
+        getConfigInstance(pOptions, pSolverOptions, false),
         pOptions);
   }
 
