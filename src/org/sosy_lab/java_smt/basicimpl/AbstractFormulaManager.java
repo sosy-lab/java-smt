@@ -332,6 +332,33 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return token.matches("\\(\\s*(declare-const|declare-fun).*");
   }
 
+  /**
+   * Check if the token is an <code>(assert ...)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  protected static boolean isAssertToken(String token) {
+    return token.matches("\\(\\s*assert.*");
+  }
+
+  /**
+   * Check if the token is <code>(set-logic ..)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  protected static boolean isSetLogicToken(String token) {
+    return token.matches("\\(\\s*set-logic.*");
+  }
+
+  /**
+   * Check if the token is <code>(exit ...)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  protected static boolean isExitToken(String token) {
+    return token.matches("\\(\\s*exit.*");
+  }
+
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
     return formulaCreator.encapsulateBoolean(parseImpl(formulaStr));
