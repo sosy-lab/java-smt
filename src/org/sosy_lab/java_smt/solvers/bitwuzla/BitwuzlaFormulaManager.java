@@ -72,7 +72,7 @@ public final class BitwuzlaFormulaManager
     // Process the declarations
     ImmutableList.Builder<String> processed = ImmutableList.builder();
     for (String token : tokens) {
-      if (isDecl(token)) {
+      if (isDeclarationToken(token)) {
         Parser declParser = new Parser(creator.getTermManager(), bitwuzlaOption);
         declParser.parse(token, true, false);
         Term parsed = declParser.get_declared_funs().get(0);
@@ -207,62 +207,5 @@ public final class BitwuzlaFormulaManager
 
   static Term getBitwuzlaTerm(Formula pT) {
     return ((BitwuzlaFormula) pT).getTerm();
-  }
-
-  // Split up a sequence of lisp expressions
-  // f.ex "(define-const a Int)(assert (= a 0)" becomes ["(define-const a Int)", "(assert (= a 0))"]
-  public static List<String> tokenize(String input) {
-    ImmutableList.Builder<String> builder = ImmutableList.builder();
-    int level = 0;
-    StringBuilder read = new StringBuilder();
-    boolean inComment = false;
-    for (int i = 0; i < input.length(); i++) {
-      char c = input.charAt(i);
-      if (inComment) {
-        if (c == '\n') {
-          inComment = false;
-        }
-        continue;
-      }
-      if (c == ';') {
-        // Comment
-        inComment = true;
-        continue;
-      }
-      if (level == 0) {
-        if (!Character.isWhitespace(c)) {
-          if (c == '(') {
-            read.append("(");
-            level++;
-          } else {
-            // All top-level expressions should have parentheses around them
-            throw new IllegalArgumentException();
-          }
-        }
-      } else {
-        read.append(c);
-        if (c == '(') {
-          level++;
-        }
-        if (c == ')') {
-          if (level == 1) {
-            builder.add(read.toString());
-            read = new StringBuilder();
-          }
-          level--;
-        }
-      }
-    }
-    if (level != 0) {
-      // Missing closing parenthesis
-      throw new IllegalArgumentException();
-    }
-    return builder.build();
-  }
-
-  // Check if the token is a function or variable declaration
-  public static boolean isDecl(String token) {
-    // TODO: How to handle function *definitions*? And are they supported by Bitwuzla?
-    return token.matches("\\(\\s*(declare-const|declare-fun).*");
   }
 }

@@ -15,6 +15,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -262,6 +263,74 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
+
+  /**
+   * Split up a sequence of lisp expressions.
+   *
+   * <p>This is used by {@link #parse(String)} as part of the preprocessing before the input is
+   * passed on to the solver. SMT-LIB2 scripts are sequences of commands that are just r-expression.
+   * We split them up and then return the list.
+   *
+   * <p>As an example <code>tokenize("(define-const a Int)(assert (= a 0)")</code> will return the
+   * sequence <code>["(define-const a Int)", "(assert (= a 0))"]</code>
+   */
+  protected static List<String> tokenize(String input) {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    int level = 0;
+    StringBuilder read = new StringBuilder();
+    boolean inComment = false;
+    for (int i = 0; i < input.length(); i++) {
+      char c = input.charAt(i);
+      if (inComment) {
+        if (c == '\n') {
+          inComment = false;
+        }
+        continue;
+      }
+      if (c == ';') {
+        // Comment
+        inComment = true;
+        continue;
+      }
+      if (level == 0) {
+        if (!Character.isWhitespace(c)) {
+          if (c == '(') {
+            read.append("(");
+            level++;
+          } else {
+            // All top-level expressions should have parentheses around them
+            throw new IllegalArgumentException();
+          }
+        }
+      } else {
+        read.append(c);
+        if (c == '(') {
+          level++;
+        }
+        if (c == ')') {
+          if (level == 1) {
+            builder.add(read.toString());
+            read = new StringBuilder();
+          }
+          level--;
+        }
+      }
+    }
+    if (level != 0) {
+      // Missing closing parenthesis
+      throw new IllegalArgumentException();
+    }
+    return builder.build();
+  }
+
+  /**
+   * Check if the token is a function or variable declaration.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  protected static boolean isDeclarationToken(String token) {
+    return token.matches("\\(\\s*(declare-const|declare-fun).*");
+  }
 
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
