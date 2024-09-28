@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -278,56 +279,102 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   protected static List<String> tokenize(String input) {
     ImmutableList.Builder<String> builder = ImmutableList.builder();
-    StringBuilder read = new StringBuilder();
     boolean inComment = false;
+    boolean inString = false;
+    boolean inQuoted = false;
+
     int level = 0;
+
+    StringBuilder token = new StringBuilder();
     for (int i = 0; i < input.length(); i++) {
       char c = input.charAt(i);
       if (inComment) {
         // End of a comment
         if (c == '\n') {
           inComment = false;
+          token.append(' '); // Add a space to keep the lines separate after removing the comment
         }
-        continue;
-      }
-      if (c == ';') {
+
+      } else if (inString) {
+        if (c == '"') {
+          // We have a double quote.
+          // Check that it's not followed by another and actually closes the string.
+          Optional<Character> n =
+              (i == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(i + 1));
+          if (n.isEmpty() || n.orElseThrow() != '"') {
+            // Close the string
+            inString = false;
+          } else {
+            // Add double quotes to keep the escape sequence intact
+            token.append('"');
+          }
+        }
+        token.append(c);
+
+      } else if (inQuoted) {
+        if (c == '|') {
+          // Close the quotes
+          inQuoted = false;
+        }
+        if (c == '\\') {
+          // Backslash is not allowed inside quoted symbols
+          throw new IllegalArgumentException();
+        }
+        token.append(c);
+
+      } else if (c == ';') {
         // Start of a comment
         inComment = true;
-        continue;
-      }
-      if (level == 0) {
-        // We're at the top-level
-        if (!Character.isWhitespace(c)) {
-          if (c == '(') {
-            // Handle opening brackets
-            read.append("(");
-            level++;
-          } else {
-            // Should be unreachable: all top-level expressions need parentheses around them
-            throw new IllegalArgumentException();
-          }
-        }
+
+      } else if (c == '"') {
+        // Start of a string literal
+        inString = true;
+        token.append(c);
+
+      } else if (c == '|') {
+        // Start of a quoted symbol
+        inQuoted = true;
+        token.append(c);
+
       } else {
-        // We're inside an r-expression
-        if (c != '\n') {
-          // Append the letter to the token unless it is a newline character
-          read.append(c);
-        }
-        // Handle opening/closing brackets
-        if (c == '(') {
-          level++;
-        }
-        if (c == ')') {
-          if (level == 1) {
-            builder.add(read.toString());
-            read = new StringBuilder();
+        // Just a regular character outside of comments, quotes or string literals
+        if (level == 0) {
+          // We're at the top-level
+          if (!Character.isWhitespace(c)) {
+            if (c == '(') {
+              // Handle opening brackets
+              token.append("(");
+              level++;
+            } else {
+              // Should be unreachable: all top-level expressions need parentheses around them
+              throw new IllegalArgumentException();
+            }
           }
-          level--;
+        } else {
+          // We're inside an r-expression
+          if (c != '\n') {
+            // Append the letter to the token
+            token.append(c);
+          } else {
+            // If it's a newline character, replace it with space
+            token.append(' ');
+          }
+          // Handle opening/closing brackets
+          if (c == '(') {
+            level++;
+          }
+          if (c == ')') {
+            if (level == 1) {
+              builder.add(token.toString());
+              token = new StringBuilder();
+            }
+            level--;
+          }
         }
       }
     }
     if (level != 0) {
-      // Missing closing parenthesis
+      // Throw an exception if the brackets don't match
       throw new IllegalArgumentException();
     }
     return builder.build();
