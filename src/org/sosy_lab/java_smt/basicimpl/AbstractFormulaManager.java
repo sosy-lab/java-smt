@@ -308,13 +308,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
               (i == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(i + 1));
           if (n.isEmpty() || n.orElseThrow() != '"') {
             // Close the string
+            token.append(c);
             inString = false;
           } else {
-            // Add double quote to keep the escape sequence intact
-            token.append('"');
+            // Add both quotes to the token and skip one character ahead
+            token.append(c);
+            token.append(n.orElseThrow());
+            i++;
           }
         }
-        token.append(c);
 
       } else if (inQuoted) {
         if (c == '|') {
