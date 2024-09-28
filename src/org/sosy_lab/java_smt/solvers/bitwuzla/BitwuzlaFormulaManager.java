@@ -67,6 +67,7 @@ public final class BitwuzlaFormulaManager
     ImmutableList.Builder<String> processed = ImmutableList.builder();
     for (String token : tokens) {
       if (isDeclarationToken(token)) {
+        // FIXME: Do we need to support function definitions here?
         Parser declParser = new Parser(creator.getTermManager(), bitwuzlaOption);
         declParser.parse(token, true, false);
         Term parsed = declParser.get_declared_funs().get(0);

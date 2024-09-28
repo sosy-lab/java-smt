@@ -339,7 +339,16 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isDeclarationToken(String token) {
-    return token.matches("\\(\\s*(declare-const|declare-fun|define-fun).*");
+    return token.matches("\\(\\s*(declare-const|declare-fun).*");
+  }
+
+  /**
+   * Check if the token is a function definition.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  protected static boolean isDefinitionToken(String token) {
+    return token.matches("\\(\\s*define-fun.*");
   }
 
   /**
@@ -392,7 +401,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // Skip any (exit) command at the end of the input
         Preconditions.checkArgument(pos == tokens.size());
 
-      } else if (isDeclarationToken(token) || isAssertToken(token)) {
+      } else if (isDeclarationToken(token) || isDefinitionToken(token) || isAssertToken(token)) {
         // Keep only declaration, definitions and assertion
         builder.append(token).append('\n');
 
