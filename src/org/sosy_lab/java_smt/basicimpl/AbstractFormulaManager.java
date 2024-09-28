@@ -289,28 +289,28 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     for (int i = 0; i < input.length(); i++) {
       char c = input.charAt(i);
       if (inComment) {
-        // End of a comment
         if (c == '\n') {
+          // End of a comment
           inComment = false;
           if (level > 0) {
-            // If we're in an expression we need to close the entire comment (+ the newline) with
+            // If we're in an expression we need to replace the entire comment (+ the newline) with
             // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
-            // a problem at level 0 where terms are always surrounded by brackets.
+            // a problem at the top-level where all terms are surrounded by brackets.
             token.append(' ');
           }
         }
 
       } else if (inString) {
         if (c == '"') {
-          // We have a double quote.
-          // Check that it's not followed by another and actually closes the string.
+          // We have a double quote: Check that it's not followed by another and actually closes
+          // the string.
           Optional<Character> n =
               (i == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(i + 1));
           if (n.isEmpty() || n.orElseThrow() != '"') {
             // Close the string
             inString = false;
           } else {
-            // Add double quotes to keep the escape sequence intact
+            // Add double quote to keep the escape sequence intact
             token.append('"');
           }
         }
@@ -322,7 +322,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           inQuoted = false;
         }
         if (c == '\\') {
-          // Backslash is not allowed inside quoted symbols
+          // The SMT-LIB2 standard does not allow backslash inside quoted symbols:
+          // Throw an exception
           throw new IllegalArgumentException();
         }
         token.append(c);
@@ -358,10 +359,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         } else {
           // We're inside an r-expression
           if (c != '\n') {
-            // Append the letter to the token
+            // Append the letter to the token, unless it's a newline
             token.append(c);
           } else {
-            // If it's a newline character, replace it with space
+            // Replace newline with space
             token.append(' ');
           }
           // Handle opening/closing brackets
