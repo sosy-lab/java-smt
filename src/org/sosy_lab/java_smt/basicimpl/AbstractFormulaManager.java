@@ -369,8 +369,15 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return token.matches("\\(\\s*exit.*");
   }
 
-  @Override
-  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+  /**
+   * Takes a SMT-LIB2 script and cleans it up.
+   *
+   * <p>We remove all comments and put each command on its own line. Declarations and asserts are
+   * kept and everything else is removed. For <code>(set-logic ..)</code> we make sure that it's at
+   * the top of the file before removing it, and for <code>(exit)</code> we make sure that it can
+   * only occur as the last command.
+   */
+  private String sanitize(String formulaStr) {
     List<String> tokens = tokenize(formulaStr);
 
     StringBuilder builder = new StringBuilder();
@@ -394,7 +401,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       }
       pos++;
     }
-    return formulaCreator.encapsulateBoolean(parseImpl(builder.toString()));
+    return builder.toString();
+  }
+
+  @Override
+  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
@@ -405,7 +417,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       @Override
       public void appendTo(Appendable out) throws IOException {
         String raw = dumpFormulaImpl(formulaCreator.extractInfo(t));
-        out.append(raw);
+        out.append(sanitize(raw));
       }
     };
   }
