@@ -276,38 +276,42 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   protected static List<String> tokenize(String input) {
     ImmutableList.Builder<String> builder = ImmutableList.builder();
-    int level = 0;
     StringBuilder read = new StringBuilder();
     boolean inComment = false;
+    int level = 0;
     for (int i = 0; i < input.length(); i++) {
       char c = input.charAt(i);
       if (inComment) {
+        // End of a comment
         if (c == '\n') {
           inComment = false;
         }
         continue;
       }
       if (c == ';') {
-        // Comment
+        // Start of a comment
         inComment = true;
         continue;
       }
       if (level == 0) {
+        // We're at the top-level
         if (!Character.isWhitespace(c)) {
           if (c == '(') {
+            // Handle opening brackets
             read.append("(");
             level++;
           } else {
-            // All top-level expressions should have parentheses around them
+            // Should be unreachable: all top-level expressions need parentheses around them
             throw new IllegalArgumentException();
           }
         }
       } else {
-        read.append(c);
+        // We're inside an r-expression
         if (c != '\n') {
           // Append the letter to the token unless it is a newline character
           read.append(c);
         }
+        // Handle opening/closing brackets
         if (c == '(') {
           level++;
         }
