@@ -304,6 +304,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         }
       } else {
         read.append(c);
+        if (c != '\n') {
+          // Append the letter to the token unless it is a newline character
+          read.append(c);
+        }
         if (c == '(') {
           level++;
         }
