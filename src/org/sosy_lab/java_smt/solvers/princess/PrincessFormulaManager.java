@@ -12,8 +12,8 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.types.Sort;
 import com.google.common.base.Preconditions;
+import java.io.IOException;
 import java.util.List;
-import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -64,7 +64,7 @@ final class PrincessFormulaManager
   }
 
   @Override
-  public Appender dumpFormulaImpl(final IExpression formula) {
+  public String dumpFormulaImpl(final IExpression formula) throws IOException {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return getEnvironment().dumpFormula((IFormula) formula, creator);

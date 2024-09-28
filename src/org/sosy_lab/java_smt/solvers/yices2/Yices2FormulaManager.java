@@ -27,7 +27,6 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
-import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -74,10 +73,12 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Appender dumpFormulaImpl(final Integer formula) {
+  public String dumpFormulaImpl(final Integer formula) throws IOException {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return new Appenders.AbstractAppender() {
+
+    StringBuilder builder = new StringBuilder();
+    new Appenders.AbstractAppender() {
 
       @Override
       public void appendTo(Appendable out) throws IOException {
@@ -124,7 +125,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         String typeRepr = yices_type_to_string(type);
         return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
       }
-    };
+    }.appendTo(builder);
+    return builder.toString();
   }
 
   /**

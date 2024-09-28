@@ -8,9 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.boolector;
 
-import java.io.IOException;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
@@ -44,60 +41,52 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
   }
 
   @Override
-  public Appender dumpFormulaImpl(Long pT) {
-    return new Appenders.AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
+  public String dumpFormulaImpl(Long pT) {
+    // TODO
 
-        // TODO
+    // -- Possibility 1:
+    // Boolector can dump valid SMTLIB2 for a complete solver stack,
+    // thus we can create a new solver stack through cloning,
+    // assert the current node, and dump it.
+    // As the cloned stack also copies the existing stack from the original context,
+    // this method only works for an empty solver stack.
+    //
+    // The following code does not work:
+    // The cloned instance does only contain a TRUE assertion. ???
+    //
+    // long clone = BtorJNI.boolector_clone(getEnvironment());
+    // long matchingNode = BtorJNI.boolector_match_node(clone, pT);
+    // BtorJNI.boolector_assert(clone, matchingNode);
+    // String dump = BtorJNI.boolector_help_dump_smt2(clone);
+    // BtorJNI.boolector_delete(clone);
+    //
+    // // cleanup the string
+    // String suffix = "\n(check-sat)\n(exit)\n";
+    // Preconditions.checkState(dump.endsWith(suffix));
+    // dump = dump.substring(0, dump.length() - suffix.length());
+    // out.append(dump);
+    // -- End Possibility 1
 
-        // -- Possibility 1:
-        // Boolector can dump valid SMTLIB2 for a complete solver stack,
-        // thus we can create a new solver stack through cloning,
-        // assert the current node, and dump it.
-        // As the cloned stack also copies the existing stack from the original context,
-        // this method only works for an empty solver stack.
-        //
-        // The following code does not work:
-        // The cloned instance does only contain a TRUE assertion. ???
-        //
-        // long clone = BtorJNI.boolector_clone(getEnvironment());
-        // long matchingNode = BtorJNI.boolector_match_node(clone, pT);
-        // BtorJNI.boolector_assert(clone, matchingNode);
-        // String dump = BtorJNI.boolector_help_dump_smt2(clone);
-        // BtorJNI.boolector_delete(clone);
-        //
-        // // cleanup the string
-        // String suffix = "\n(check-sat)\n(exit)\n";
-        // Preconditions.checkState(dump.endsWith(suffix));
-        // dump = dump.substring(0, dump.length() - suffix.length());
-        // out.append(dump);
-        // -- End Possibility 1
+    // -- Possibility 2:
+    // Dump a single node from Boolector via boolector_help_dump_node_smt2.
+    // Therefore, we need to dump all used symbols and add SMTLIB2-related parts
+    // like "assert" and "declare-fun" on our own.
+    // This requires direct access to the children/sub-formulae of a formula,
+    // which is not available in Boolector.
+    // This is the same reason why visitor is not fully implemented.
+    // -- End Possibility 2
 
-        // -- Possibility 2:
-        // Dump a single node from Boolector via boolector_help_dump_node_smt2.
-        // Therefore, we need to dump all used symbols and add SMTLIB2-related parts
-        // like "assert" and "declare-fun" on our own.
-        // This requires direct access to the children/sub-formulae of a formula,
-        // which is not available in Boolector.
-        // This is the same reason why visitor is not fully implemented.
-        // -- End Possibility 2
+    // -- Possibility 3: minimal working solution with invalid SMTLIB2.
+    // This method only dumps the current node, i.e.,
+    // in case of "symbol" we only get the declaration, in case of "formula with
+    // operator" we get a nice String, but without any symbol declaration.
+    // The name of a symbol might be prefixed with "BTOR_%d@".format(solver.level).
+    // As Boolector supports only one stack at the moment,
+    // the name of a symbol in the dump depends on the overall context.
 
-        // -- Possibility 3: minimal working solution with invalid SMTLIB2.
-        // This method only dumps the current node, i.e.,
-        // in case of "symbol" we only get the declaration, in case of "formula with
-        // operator" we get a nice String, but without any symbol declaration.
-        // The name of a symbol might be prefixed with "BTOR_%d@".format(solver.level).
-        // As Boolector supports only one stack at the moment,
-        // the name of a symbol in the dump depends on the overall context.
+    return BtorJNI.boolector_help_dump_node_smt2(getEnvironment(), pT);
 
-        String dump = BtorJNI.boolector_help_dump_node_smt2(getEnvironment(), pT);
-        // strip removes the newline at the end of the string
-        out.append(dump.strip());
-
-        // -- End Possibility 3
-      }
-    };
+    // -- End Possibility 3
   }
 
   static long getBtorTerm(Formula pT) {

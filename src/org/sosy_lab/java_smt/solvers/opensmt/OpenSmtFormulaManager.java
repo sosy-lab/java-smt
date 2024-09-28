@@ -10,10 +10,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import java.io.IOException;
 import java.util.Map;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
@@ -57,30 +54,26 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   }
 
   @Override
-  public Appender dumpFormulaImpl(PTRef f) {
+  public String dumpFormulaImpl(PTRef f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
+    StringBuilder out = new StringBuilder();
+    Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
 
-    return new Appenders.AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        Map<String, PTRef> userDeclarations = creator.extractVariablesAndUFs(f, true);
+    for (PTRef term : userDeclarations.values()) {
+      SymRef ref = osmtLogic.getSymRef(term);
+      Symbol sym = osmtLogic.getSym(ref);
 
-        for (PTRef term : userDeclarations.values()) {
-          SymRef ref = osmtLogic.getSymRef(term);
-          Symbol sym = osmtLogic.getSym(ref);
-
-          out.append("(declare-fun ")
-              .append(osmtLogic.protectName(ref))
-              .append(" (")
-              .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::printSort)))
-              .append(") ")
-              .append(osmtLogic.printSort(sym.rsort()))
-              .append(")\n");
-        }
-        out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(String.valueOf(')'));
-      }
-    };
+      out.append("(declare-fun ")
+          .append(osmtLogic.protectName(ref))
+          .append(" (")
+          .append(Joiner.on(' ').join(Lists.transform(sym.getArgTypes(), osmtLogic::printSort)))
+          .append(") ")
+          .append(osmtLogic.printSort(sym.rsort()))
+          .append(")\n");
+    }
+    out.append("(assert ").append(osmtLogic.dumpWithLets(f)).append(')');
+    return out.toString();
   }
 
   // TODO: this is ignoring escape chars etc.

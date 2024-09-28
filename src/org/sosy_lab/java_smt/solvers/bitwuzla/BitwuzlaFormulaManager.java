@@ -13,10 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
-import java.io.IOException;
 import java.util.List;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
@@ -176,33 +173,21 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public Appender dumpFormulaImpl(Term pTerm) {
+  public String dumpFormulaImpl(Term pTerm) {
     // There are 2 ways of SMT2 printing in Bitwuzla, bitwuzla_term_print() and
     // bitwuzla_term_print_fmt(), which print a single formula, and bitwuzla_print_formula(),
     // which prints the complete assertion stack of the bitwuzla instance given to the function.
     // Only bitwuzla_print_formula() gives us the proper SMT2 format, with (check-sat) etc.
     // Note: bitwuzla_print_formula() is wrapped in dump_assertions_smt2()
-    return new Appenders.AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        if (pTerm.is_value()) {
-          out.append("(assert " + pTerm + ")");
-          return;
-        }
-        Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
-        for (Term t : creator.getConstraintsForTerm(pTerm)) {
-          bitwuzla.assert_formula(t);
-        }
-        bitwuzla.assert_formula(pTerm);
-        String dump = bitwuzla.print_formula();
-        if (dump.startsWith("(set-logic ")) {
-          dump = dump.substring(1 + dump.indexOf(')'));
-        }
-        dump = dump.replace("(check-sat)", "");
-        dump = dump.replace("(exit)", "");
-        out.append(dump);
-      }
-    };
+    if (pTerm.is_value()) {
+      return "(assert " + pTerm + ")";
+    }
+    Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
+    for (Term t : creator.getConstraintsForTerm(pTerm)) {
+      bitwuzla.assert_formula(t);
+    }
+    bitwuzla.assert_formula(pTerm);
+    return bitwuzla.print_formula();
   }
 
   static Term getBitwuzlaTerm(Formula pT) {

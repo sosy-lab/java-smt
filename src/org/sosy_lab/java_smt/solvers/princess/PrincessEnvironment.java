@@ -330,7 +330,8 @@ class PrincessEnvironment {
    * <p>We return an {@link Appender} to avoid storing larger Strings in memory. We sort the symbols
    * and abbreviations for the export only "on demand".
    */
-  public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
+  public String dumpFormula(IFormula formula, final PrincessFormulaCreator creator)
+      throws IOException {
     // remove redundant expressions
     // TODO do we want to remove redundancy completely (as checked in the unit
     // tests (SolverFormulaIOTest class)) or do we want to remove redundancy up
@@ -340,8 +341,8 @@ class PrincessEnvironment {
     final IExpression lettedFormula = tuple._1();
     final Map<IExpression, IExpression> abbrevMap = asJava(tuple._2());
 
-    return new Appenders.AbstractAppender() {
-
+    StringBuilder builder = new StringBuilder();
+    new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
         try {
@@ -489,7 +490,9 @@ class PrincessEnvironment {
         return ImmutableSet.copyOf(
             creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
       }
-    };
+    }.appendTo(builder);
+
+    return builder.toString();
   }
 
   private static String getName(IExpression var) {

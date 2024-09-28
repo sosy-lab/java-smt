@@ -19,11 +19,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -395,11 +397,17 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.encapsulateBoolean(parseImpl(builder.toString()));
   }
 
-  protected abstract Appender dumpFormulaImpl(TFormulaInfo t);
+  protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
 
   @Override
   public Appender dumpFormula(BooleanFormula t) {
-    return dumpFormulaImpl(formulaCreator.extractInfo(t));
+    return new Appenders.AbstractAppender() {
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        String raw = dumpFormulaImpl(formulaCreator.extractInfo(t));
+        out.append(raw);
+      }
+    };
   }
 
   @Override

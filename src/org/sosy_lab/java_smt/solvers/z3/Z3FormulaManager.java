@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -170,24 +168,18 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public Appender dumpFormulaImpl(final Long expr) {
+  public String dumpFormulaImpl(final Long expr) {
     assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    return Appenders.fromToStringMethod(
-        new Object() {
-          @Override
-          public String toString() {
-            // Serializing a solver is the simplest way to dump a formula in Z3,
-            // cf https://github.com/Z3Prover/z3/issues/397
-            long z3solver = Native.mkSolver(getEnvironment());
-            Native.solverIncRef(getEnvironment(), z3solver);
-            Native.solverAssert(getEnvironment(), z3solver, expr);
-            String serialized = Native.solverToString(getEnvironment(), z3solver);
-            Native.solverDecRef(getEnvironment(), z3solver);
-            return serialized;
-          }
-        });
+    // Serializing a solver is the simplest way to dump a formula in Z3,
+    // cf https://github.com/Z3Prover/z3/issues/397
+    long z3solver = Native.mkSolver(getEnvironment());
+    Native.solverIncRef(getEnvironment(), z3solver);
+    Native.solverAssert(getEnvironment(), z3solver, expr);
+    String serialized = Native.solverToString(getEnvironment(), z3solver);
+    Native.solverDecRef(getEnvironment(), z3solver);
+    return serialized;
   }
 
   @Override
