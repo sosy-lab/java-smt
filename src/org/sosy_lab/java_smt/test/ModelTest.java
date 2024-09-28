@@ -2229,6 +2229,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
+    assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())

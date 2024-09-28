@@ -292,7 +292,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // End of a comment
         if (c == '\n') {
           inComment = false;
-          token.append(' '); // Add a space to keep the lines separate after removing the comment
+          if (level > 0) {
+            // If we're in an expression we need to close the entire comment (+ the newline) with
+            // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
+            // a problem at level 0 where terms are always surrounded by brackets.
+            token.append(' ');
+          }
         }
 
       } else if (inString) {
