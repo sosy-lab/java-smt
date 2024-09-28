@@ -361,7 +361,30 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
-    return formulaCreator.encapsulateBoolean(parseImpl(formulaStr));
+    List<String> tokens = tokenize(formulaStr);
+
+    StringBuilder builder = new StringBuilder();
+    int pos = 1; // index of the current token
+
+    for (String token : tokens) {
+      if (isSetLogicToken(token)) {
+        // Skip the (set-logic ...) command at the beginning of the input
+        Preconditions.checkArgument(pos == 1);
+
+      } else if (isExitToken(token)) {
+        // Skip any (exit) command at the end of the input
+        Preconditions.checkArgument(pos == tokens.size());
+
+      } else if (isDeclarationToken(token) || isAssertToken(token)) {
+        // Keep only declaration, definitions and assertion
+        builder.append(token).append('\n');
+
+      } else {
+        // Remove everything else
+      }
+      pos++;
+    }
+    return formulaCreator.encapsulateBoolean(parseImpl(builder.toString()));
   }
 
   protected abstract Appender dumpFormulaImpl(TFormulaInfo t);
