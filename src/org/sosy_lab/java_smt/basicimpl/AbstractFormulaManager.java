@@ -329,7 +329,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isDeclarationToken(String token) {
-    return token.matches("\\(\\s*(declare-const|declare-fun).*");
+    return token.matches("\\(\\s*(declare-const|declare-fun|define-fun).*");
   }
 
   /**
