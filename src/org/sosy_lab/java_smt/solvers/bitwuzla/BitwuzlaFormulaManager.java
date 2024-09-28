@@ -58,11 +58,8 @@ public final class BitwuzlaFormulaManager
 
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    // Strip the input string and remove everything but declarations and assertions
-    String s = stripSMTLIB2String(formulaStr);
-
     // Split the input string into a list of SMT-LIB2 commands
-    List<String> tokens = tokenize(s);
+    List<String> tokens = tokenize(formulaStr);
 
     Table<String, Sort, Term> cache = creator.getCache();
 
@@ -152,24 +149,6 @@ public final class BitwuzlaFormulaManager
 
     // Return the updated term
     return result;
-  }
-
-  private String stripSMTLIB2String(String pFormulaStr) {
-    String s = pFormulaStr;
-    int setLogicIndex = s.indexOf("(set-logic ");
-    if (setLogicIndex != -1) {
-      int endLogicIndex = s.indexOf(')', setLogicIndex + 1);
-      String s1 = s.substring(0, setLogicIndex);
-      String s2 = s.substring(endLogicIndex + 1);
-      s = s1 + s2;
-    }
-    if (s.contains("(check-sat)")) {
-      s = s.replace("(check-sat)", "");
-    }
-    if (s.contains("(exit)")) {
-      s = s.replace("(exit)", "");
-    }
-    return s;
   }
 
   @Override
