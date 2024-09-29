@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -477,12 +476,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public Appender dumpFormula(BooleanFormula t) {
-    return new Appenders.AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        String raw = dumpFormulaImpl(formulaCreator.extractInfo(t));
-        out.append(sanitize(raw));
-      }
+    return out -> {
+      String raw = dumpFormulaImpl(formulaCreator.extractInfo(t));
+      out.append(sanitize(raw));
     };
   }
 
