@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_web_example</groupId>
   <artifactId>java-smt-web-example</artifactId>
-  <version>1.10</version>
+  <version>1.11</version>
   <packaging>war</packaging>
   <name>java-smt-maven-web-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries in a web project.</description>
@@ -70,6 +70,10 @@ SPDX-License-Identifier: Apache-2.0
     <project.dependency.relativepath>dependency</project.dependency.relativepath>
     <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
 
+    <!-- Some solvers are provided for more than x64, e.g., also for arm64. -->
+    <system.arch>x64</system.arch>
+
+    <!-- versions of dependencies -->
     <javasmt.version>5.0.0</javasmt.version>
     <bitwuzla.version>0.4.0-g4dbf3b1f</bitwuzla.version>
     <boolector.version>3.2.2-g1a89c229</boolector.version>
@@ -79,7 +83,7 @@ SPDX-License-Identifier: Apache-2.0
     <opensmt.version>2.6.0-g2f72cc0e</opensmt.version>
     <javasmt-yices.version>4.1.1-734-g3732f7e08</javasmt-yices.version>
     <yices.version>2.6.2-396-g194350c1</yices.version>
-    <z3.version>4.12.5</z3.version>
+    <z3.version>4.13.0</z3.version>
   </properties>
 
   <dependencies>
@@ -103,22 +107,20 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
-      <type>jar</type>
-      <classifier>com.microsoft.z3</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
       <type>so</type>
-      <classifier>libz3</classifier>
+      <classifier>libz3-${system.arch}</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
       <type>so</type>
-      <classifier>libz3java</classifier>
+      <classifier>libz3java-${system.arch}</classifier>
     </dependency>
 
     <!-- Bitwuzla has two dependencies (on Linux) -->
@@ -421,14 +423,14 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-z3</artifactId>
               <type>so</type>
-              <classifier>libz3java</classifier>
+              <classifier>libz3java-${system.arch}</classifier>
               <destFileName>libz3java.so</destFileName>
             </artifactItem>
             <artifactItem>
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-z3</artifactId>
               <type>so</type>
-              <classifier>libz3</classifier>
+              <classifier>libz3-${system.arch}</classifier>
               <destFileName>libz3.so</destFileName>
             </artifactItem>
 
