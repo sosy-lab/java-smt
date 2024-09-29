@@ -444,16 +444,16 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     List<String> tokens = tokenize(formulaStr);
 
     StringBuilder builder = new StringBuilder();
-    int pos = 1; // index of the current token
+    int pos = 0; // index of the current token
 
     for (String token : tokens) {
       if (isSetLogicToken(token)) {
         // Skip the (set-logic ...) command at the beginning of the input
-        Preconditions.checkArgument(pos == 1);
+        Preconditions.checkArgument(pos == 0);
 
       } else if (isExitToken(token)) {
         // Skip any (exit) command at the end of the input
-        Preconditions.checkArgument(pos == tokens.size());
+        Preconditions.checkArgument(pos == tokens.size() - 1);
 
       } else if (isDeclarationToken(token) || isDefinitionToken(token) || isAssertToken(token)) {
         // Keep only declaration, definitions and assertion
