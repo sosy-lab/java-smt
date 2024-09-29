@@ -27,8 +27,8 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="solver-z3" extends="solver-z3-x64"/>
 
         <!-- public main configurations -->
-        <conf name="solver-z3-x64" extends="solver-z3-linux-x64,solver-z3-windows-x64,solver-z3-os-x64"/>
-        <conf name="solver-z3-arm64" extends="solver-z3-linux-arm64,solver-z3-windows-arm64,solver-z3-os-arm64"/>
+        <conf name="solver-z3-x64" extends="solver-z3-linux-x64,solver-z3-windows-x64,solver-z3-macos-x64"/>
+        <conf name="solver-z3-arm64" extends="solver-z3-linux-arm64,solver-z3-windows-arm64,solver-z3-macos-arm64"/>
         <conf name="sources"/>
         <conf name="javadoc"/>
 
@@ -37,29 +37,32 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="solver-z3-linux-arm64" extends="solver-z3-common" visibility="private"/>
         <conf name="solver-z3-windows-x64" extends="solver-z3-common" visibility="private"/>
         <conf name="solver-z3-windows-arm64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-os-x64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-os-arm64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-macos-x64" extends="solver-z3-common" visibility="private"/>
+        <conf name="solver-z3-macos-arm64" extends="solver-z3-common" visibility="private"/>
         <conf name="solver-z3-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="solver-z3">
-        <!-- Linux64 files -->
+        <!-- Linux files -->
         <artifact name="libz3" conf="solver-z3-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
         <artifact name="libz3java" conf="solver-z3-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <!-- TODO: Z3 forgot to include Java bindings into its Linux-ARM64 release in 4.13.2,
+              so we ignore those files currently. See https://github.com/Z3Prover/z3/issues/7406
         <artifact name="libz3" conf="solver-z3-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
         <artifact name="libz3java" conf="solver-z3-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        -->
 
-        <!-- Windows64 files -->
+        <!-- Windows files -->
         <artifact name="libz3" conf="solver-z3-windows-x64" e:arch="x64" type="dll" ext="dll"/>
         <artifact name="libz3java" conf="solver-z3-windows-x64" e:arch="x64" type="dll" ext="dll"/>
         <artifact name="libz3" conf="solver-z3-windows-arm64" e:arch="arm64" type="dll" ext="dll"/>
         <artifact name="libz3java" conf="solver-z3-windows-arm64" e:arch="arm64" type="dll" ext="dll"/>
 
         <!-- MacOS files -->
-        <artifact name="libz3" conf="solver-z3-os-x64" e:arch="x64" type="dylib" ext="dylib"/>
-        <artifact name="libz3java" conf="solver-z3-os-x64" e:arch="x64" type="dylib" ext="dylib"/>
-        <artifact name="libz3" conf="solver-z3-os-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
-        <artifact name="libz3java" conf="solver-z3-os-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
+        <artifact name="libz3" conf="solver-z3-macos-x64" e:arch="x64" type="dylib" ext="dylib"/>
+        <artifact name="libz3java" conf="solver-z3-macos-x64" e:arch="x64" type="dylib" ext="dylib"/>
+        <artifact name="libz3" conf="solver-z3-macos-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
+        <artifact name="libz3java" conf="solver-z3-macos-arm64" e:arch="arm64" type="dylib" ext="dylib"/>
 
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3" conf="solver-z3-common" ext="jar"/>
