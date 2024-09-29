@@ -27,7 +27,6 @@ import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -72,61 +71,57 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     return yices_parse_term(pS);
   }
 
+  /** Helper function to (pretty) print yices2 sorts */
+  private String getTypeRepr(int type) {
+    if (yices_type_is_bitvector(type)) {
+      return "(_ BitVec " + yices_bvtype_size(type) + ")";
+    }
+    String typeRepr = yices_type_to_string(type);
+    return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
+  }
+
   @Override
   public String dumpFormulaImpl(final Integer formula) throws IOException {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    StringBuilder builder = new StringBuilder();
-    new Appenders.AbstractAppender() {
-
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        Map<String, Formula> varsAndUFs =
-            extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(formula));
-        for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
-          final int term = ((Yices2Formula) entry.getValue()).getTerm();
-          final int type;
-          if (yices_term_constructor(term) == YICES_APP_TERM) {
-            // Is an UF. Correct type is carried by first child.
-            type = yices_type_of_term(yices_term_child(term, 0));
-          } else {
-            type = yices_type_of_term(term);
-          }
-          final int[] types;
-          if (yices_type_num_children(type) == 0) {
-            types = new int[] {type};
-          } else {
-            types = yices_type_children(type); // adds children types and then return type
-          }
-          if (types.length > 0) {
-            out.append("(declare-fun ");
-            out.append(quote(entry.getKey()));
-            out.append(" (");
-            for (int i = 0; i < types.length - 1; i++) {
-              out.append(getTypeRepr(types[i]));
-              if (i + 1 < types.length - 1) {
-                out.append(' ');
-              }
-            }
-            out.append(") ");
-            out.append(getTypeRepr(types[types.length - 1]));
-            out.append(")\n");
+    StringBuilder out = new StringBuilder();
+    Map<String, Formula> varsAndUFs =
+        extractVariablesAndUFs(getFormulaCreator().encapsulateWithTypeOf(formula));
+    for (Map.Entry<String, Formula> entry : varsAndUFs.entrySet()) {
+      final int term = ((Yices2Formula) entry.getValue()).getTerm();
+      final int type;
+      if (yices_term_constructor(term) == YICES_APP_TERM) {
+        // Is an UF. Correct type is carried by first child.
+        type = yices_type_of_term(yices_term_child(term, 0));
+      } else {
+        type = yices_type_of_term(term);
+      }
+      final int[] types;
+      if (yices_type_num_children(type) == 0) {
+        types = new int[] {type};
+      } else {
+        types = yices_type_children(type); // adds children types and then return type
+      }
+      if (types.length > 0) {
+        out.append("(declare-fun ");
+        out.append(quote(entry.getKey()));
+        out.append(" (");
+        for (int i = 0; i < types.length - 1; i++) {
+          out.append(getTypeRepr(types[i]));
+          if (i + 1 < types.length - 1) {
+            out.append(' ');
           }
         }
-        // TODO fold formula to avoid exp. overhead
-        out.append("(assert ").append(yices_term_to_string(formula)).append(")");
+        out.append(") ");
+        out.append(getTypeRepr(types[types.length - 1]));
+        out.append(")\n");
       }
+    }
+    // TODO fold formula to avoid exp. overhead
+    out.append("(assert ").append(yices_term_to_string(formula)).append(")");
 
-      private String getTypeRepr(int type) {
-        if (yices_type_is_bitvector(type)) {
-          return "(_ BitVec " + yices_bvtype_size(type) + ")";
-        }
-        String typeRepr = yices_type_to_string(type);
-        return typeRepr.substring(0, 1).toUpperCase(Locale.getDefault()) + typeRepr.substring(1);
-      }
-    }.appendTo(builder);
-    return builder.toString();
+    return out.toString();
   }
 
   /**
