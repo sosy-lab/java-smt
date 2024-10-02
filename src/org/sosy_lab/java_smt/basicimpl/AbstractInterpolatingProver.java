@@ -92,37 +92,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
             "interpolation can only be done over previously asserted formulas.");
 
-    final Set<TFormulaInfo> assertedFormulas = (Set<TFormulaInfo>) getAssertedFormulas();
-    final Set<TFormulaInfo> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
-    final Set<TFormulaInfo> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
-
-    Set<TFormulaInfo> varOfA = Set.of();
-    Set<TFormulaInfo> varOfB = Set.of();
-
-    // free arithmetic variables a and b
-    for (TFormulaInfo formula : formulasOfA) {
-      TFormulaInfo f = creator.extractInfo((Formula) formula);
-      Set<TFormulaInfo> arithVarOfA =
-          (Set<TFormulaInfo>) mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
-      varOfA = arithVarOfA;
-    }
-
-    for (TFormulaInfo formula : formulasOfB) {
-      TFormulaInfo f = creator.extractInfo((Formula) formula);
-      Set<TFormulaInfo> arithVarOfB =
-          (Set<TFormulaInfo>) mgr.extractVariablesAndUFs(creator.encapsulateBoolean(f)).keySet();
-      varOfB = arithVarOfB;
-    }
-
-    // shared variables between a and b
-    final Set<TFormulaInfo> sharedVars = Sets.intersection(varOfA, varOfB);
-
-    Builder<TType> typesForSharedBuilder = ImmutableList.builder();
-    for (TFormulaInfo var : sharedVars) {
-      creator.getFormulaType(var);
-    }
-    List<TType> typesForShared = typesForSharedBuilder.build();
-
     return null;
   }
 }
