@@ -36,7 +36,7 @@ public class TokenizerTest {
   @Test
   public void parenthesesInComment() {
     String smtlib = "(assert (= 3;)\n(- 4 1)))";
-    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly("(assert (= 3 (- 4 1)))");
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly("(assert (= 3\n(- 4 1)))");
   }
 
   @Test
@@ -60,27 +60,22 @@ public class TokenizerTest {
 
   @Test
   public void skipWhitespace() {
-    String part1 = "(define-const ";
-    String part2 = "v Int)";
-    String part3 = "(assert ";
-    String part4 = "(= v (+ 2 1)))";
-    String smtlib = " " + part1 + " " + part2 + " \n" + part3 + "\n" + part4;
-    assertThat(AbstractFormulaManager.tokenize(smtlib))
-        .containsExactly(part1 + part2, part3 + part4);
+    String part1 = "(define-const \n v Int)";
+    String part2 = "(assert \n(= v (+ 2 1)))";
+    String smtlib = " " + part1 + " \n" + part2 + "\n";
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(part1, part2);
   }
 
   @Test
   public void windowsNewlines() {
-    String part1 = "(define-const ";
-    String part2 = "v Int)";
-    String smtlib = part1 + "\r\n" + part2;
-    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(part1 + part2);
+    String smtlib = "(define-const\r\nv Int)";
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(smtlib);
   }
 
   @Test
   public void avoidLinewraps() {
     String smtlib = "(define-const;comment\nv\nInt)";
-    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly("(define-const v Int)");
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly("(define-const\nv\nInt)");
   }
 
   @Test
@@ -99,7 +94,7 @@ public class TokenizerTest {
   public void tokenTest() {
     String smtlib = "(assert\n(= v (+ 2 1)))";
     String token = AbstractFormulaManager.tokenize(smtlib).get(0);
-    assertThat(token).isEqualTo("(assert (= v (+ 2 1)))");
+    assertThat(token).isEqualTo(smtlib);
     assertThat(AbstractFormulaManager.isAssertToken(token)).isTrue();
   }
 

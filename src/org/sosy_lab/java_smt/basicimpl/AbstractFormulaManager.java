@@ -296,7 +296,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             // If we're in an expression we need to replace the entire comment (+ the newline) with
             // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
             // a problem at the top-level where all terms are surrounded by brackets.
-            token.append(' ');
+            token.append(c);
           }
         }
 
@@ -362,13 +362,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           }
         } else {
           // We're inside an r-expression
-          if (c != '\n') {
-            // Append the letter to the token, unless it's a newline
-            token.append(c);
-          } else {
-            // Replace newline with space
-            token.append(' ');
-          }
+          token.append(c);
           // Handle opening/closing brackets
           if (c == '(') {
             level++;
