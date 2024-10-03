@@ -133,13 +133,17 @@ public class Tokenizer {
     return builder.build();
   }
 
+  private static boolean matchesOneOf(String token, String... regexp) {
+    return token.matches("\\(\\s*(" + String.join("|", regexp) + ")[\\S\\s]*");
+  }
+
   /**
    * Check if the token is a function or variable declaration.
    *
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isDeclarationToken(String token) {
-    return token.matches("\\(\\s*(declare-const|declare-fun)[\\S\\s]*");
+    return matchesOneOf(token, "declare-const", "declare-fun");
   }
 
   /**
@@ -148,7 +152,7 @@ public class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isDefinitionToken(String token) {
-    return token.matches("\\(\\s*define-fun[\\S\\s]*");
+    return matchesOneOf(token, "define-fun");
   }
 
   /**
@@ -157,7 +161,7 @@ public class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isAssertToken(String token) {
-    return token.matches("\\(\\s*assert[\\S\\s]*");
+    return matchesOneOf(token, "assert");
   }
 
   /**
@@ -166,7 +170,7 @@ public class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isSetLogicToken(String token) {
-    return token.matches("\\(\\s*set-logic[\\S\\s]*");
+    return matchesOneOf(token, "set-logic");
   }
 
   /**
@@ -175,6 +179,6 @@ public class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isExitToken(String token) {
-    return token.matches("\\(\\s*exit[\\S\\s]*");
+    return matchesOneOf(token, "exit");
   }
 }
