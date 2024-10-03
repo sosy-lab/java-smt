@@ -14,16 +14,28 @@ import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.*;
 
 public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-  ImmutableList<Integer> testValues = ImmutableList.of(-5, -3, -2, -1, 1, 2, 3, 5);
+  ImmutableList<Integer> testValues;
 
   @Before
   public void init() {
-    requireIntegers();
+    requireBitvectors();
+    ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+    Random random = new Random(0);
+    int c = 0;
+    while (c < 20) {
+      int r = random.nextInt();
+      if (r != 0) {
+        builder.add(r);
+        c++;
+      }
+    }
+    testValues = builder.build();
   }
 
   private int euclideanDivision(int x, int y) {
