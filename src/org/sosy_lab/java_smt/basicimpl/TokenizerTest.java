@@ -99,7 +99,7 @@ public class TokenizerTest {
   }
 
   @Test
-  public void tokenTestBroken() {
+  public void tokenTestWithString() {
     String smtlib = "(assert (= v \"\n\"))";
     String token = AbstractFormulaManager.tokenize(smtlib).get(0);
     assertThat(token).isEqualTo(smtlib);
