@@ -41,7 +41,7 @@ public class TokenizerTest {
 
   @Test
   public void parenthesesInString() {
-    String smtlib = "(assert (= v \"three\"))";
+    String smtlib = "(assert (= v \")\"))";
     assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(smtlib);
   }
 
