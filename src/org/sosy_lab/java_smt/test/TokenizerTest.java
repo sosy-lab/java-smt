@@ -8,17 +8,19 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.basicimpl;
+package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import com.google.common.truth.Truth;
 import org.junit.Test;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 public class TokenizerTest {
   @Test
   public void validBrackets() {
     String smtlib = "(assert (= 3 (+ 2 1)))";
-    assertThat(Tokenizer.tokenize(smtlib)).containsExactly(smtlib);
+    Truth.assertThat(Tokenizer.tokenize(smtlib)).containsExactly(smtlib);
   }
 
   @Test(expected = IllegalArgumentException.class)
