@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -19,7 +18,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -29,6 +27,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -481,19 +480,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
-    String lineUnderTest = getLast(lines);
-
-    if (solver == Solvers.OPENSMT) {
-      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
-      // heuristic: the last line starting with a plain bracket.
-      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
-    }
-
+    String lastCommand = getLast(Tokenizer.tokenize(dump));
     assertWithMessage("last line(s) of <\n" + dump + ">")
-        .that(lineUnderTest)
+        .that(lastCommand)
         .startsWith("(assert ");
-    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")
