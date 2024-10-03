@@ -46,6 +46,12 @@ public class TokenizerTest {
   }
 
   @Test
+  public void parenthesesInQuotedSymbol() {
+    String smtlib = "(assert (= |)v| 0))";
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(smtlib);
+  }
+
+  @Test
   public void splitCommands() {
     String part1 = "(define-const v Int)";
     String part2 = "(assert (= v (+ 2 1)))";
@@ -75,5 +81,33 @@ public class TokenizerTest {
   public void avoidLinewraps() {
     String smtlib = "(define-const;comment\nv\nInt)";
     assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly("(define-const v Int)");
+  }
+
+  @Test
+  public void newlineInString() {
+    String smtlib = "(assert (= v \"\n\"))";
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(smtlib);
+  }
+
+  @Test
+  public void newlineInQuotedSymbol() {
+    String smtlib = "(assert (= |\n| 0))";
+    assertThat(AbstractFormulaManager.tokenize(smtlib)).containsExactly(smtlib);
+  }
+
+  @Test
+  public void tokenTest() {
+    String smtlib = "(assert\n(= v (+ 2 1)))";
+    String token = AbstractFormulaManager.tokenize(smtlib).get(0);
+    assertThat(token).isEqualTo("(assert (= v (+ 2 1)))");
+    assertThat(AbstractFormulaManager.isAssertToken(token)).isTrue();
+  }
+
+  @Test
+  public void tokenTestBroken() {
+    String smtlib = "(assert (= v \"\n\"))";
+    String token = AbstractFormulaManager.tokenize(smtlib).get(0);
+    assertThat(token).isEqualTo(smtlib);
+    assertThat(AbstractFormulaManager.isAssertToken(token)).isTrue();
   }
 }
