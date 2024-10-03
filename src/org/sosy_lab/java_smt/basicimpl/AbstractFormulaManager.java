@@ -316,6 +316,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             token.append(n.orElseThrow());
             i++;
           }
+        } else {
+          token.append(c);
         }
 
       } else if (inQuoted) {
