@@ -396,7 +396,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isDeclarationToken(String token) {
-    return token.matches("\\(\\s*(declare-const|declare-fun).*");
+    return token.matches("\\(\\s*(declare-const|declare-fun)[\\S\\s]*");
   }
 
   /**
@@ -405,7 +405,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isDefinitionToken(String token) {
-    return token.matches("\\(\\s*define-fun.*");
+    return token.matches("\\(\\s*define-fun[\\S\\s]*");
   }
 
   /**
@@ -414,7 +414,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isAssertToken(String token) {
-    return token.matches("\\(\\s*assert.*");
+    return token.matches("\\(\\s*assert[\\S\\s]*");
   }
 
   /**
@@ -423,7 +423,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isSetLogicToken(String token) {
-    return token.matches("\\(\\s*set-logic.*");
+    return token.matches("\\(\\s*set-logic[\\S\\s]*");
   }
 
   /**
@@ -432,7 +432,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   protected static boolean isExitToken(String token) {
-    return token.matches("\\(\\s*exit.*");
+    return token.matches("\\(\\s*exit[\\S\\s]*");
   }
 
   /**
