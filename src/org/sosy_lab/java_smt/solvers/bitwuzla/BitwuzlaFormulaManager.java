@@ -16,6 +16,7 @@ import com.google.common.collect.Table.Cell;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
@@ -59,14 +60,14 @@ public final class BitwuzlaFormulaManager
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
-    List<String> tokens = tokenize(formulaStr);
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
 
     Table<String, Sort, Term> cache = creator.getCache();
 
     // Process the declarations
     ImmutableList.Builder<String> processed = ImmutableList.builder();
     for (String token : tokens) {
-      if (isDeclarationToken(token)) {
+      if (Tokenizer.isDeclarationToken(token)) {
         // FIXME: Do we need to support function definitions here?
         Parser declParser = new Parser(creator.getTermManager(), bitwuzlaOption);
         declParser.parse(token, true, false);

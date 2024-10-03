@@ -15,7 +15,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -268,168 +266,6 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
 
   /**
-   * Split up a sequence of lisp expressions.
-   *
-   * <p>This is used by {@link #parse(String)} as part of the preprocessing before the input is
-   * passed on to the solver. SMT-LIB2 scripts are sequences of commands that are just r-expression.
-   * We split them up and then return the list.
-   *
-   * <p>As an example <code>tokenize("(define-const a Int)(assert (= a 0)")</code> will return the
-   * sequence <code>["(define-const a Int)", "(assert (= a 0))"]</code>
-   */
-  protected static List<String> tokenize(String input) {
-    ImmutableList.Builder<String> builder = ImmutableList.builder();
-    boolean inComment = false;
-    boolean inString = false;
-    boolean inQuoted = false;
-
-    int level = 0;
-
-    StringBuilder token = new StringBuilder();
-    for (int i = 0; i < input.length(); i++) {
-      char c = input.charAt(i);
-      if (inComment) {
-        if (c == '\n') {
-          // End of a comment
-          inComment = false;
-          if (level > 0) {
-            // If we're in an expression we need to replace the entire comment (+ the newline) with
-            // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
-            // a problem at the top-level where all terms are surrounded by brackets.
-            token.append(c);
-          }
-        }
-
-      } else if (inString) {
-        if (c == '"') {
-          // We have a double quote: Check that it's not followed by another and actually closes
-          // the string.
-          Optional<Character> n =
-              (i == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(i + 1));
-          if (n.isEmpty() || n.orElseThrow() != '"') {
-            // Close the string
-            token.append(c);
-            inString = false;
-          } else {
-            // Add both quotes to the token and skip one character ahead
-            token.append(c);
-            token.append(n.orElseThrow());
-            i++;
-          }
-        } else {
-          token.append(c);
-        }
-
-      } else if (inQuoted) {
-        if (c == '|') {
-          // Close the quotes
-          inQuoted = false;
-        }
-        if (c == '\\') {
-          // The SMT-LIB2 standard does not allow backslash inside quoted symbols:
-          // Throw an exception
-          throw new IllegalArgumentException();
-        }
-        token.append(c);
-
-      } else if (c == ';') {
-        // Start of a comment
-        inComment = true;
-
-      } else if (c == '"') {
-        // Start of a string literal
-        inString = true;
-        token.append(c);
-
-      } else if (c == '|') {
-        // Start of a quoted symbol
-        inQuoted = true;
-        token.append(c);
-
-      } else {
-        // Just a regular character outside of comments, quotes or string literals
-        if (level == 0) {
-          // We're at the top-level
-          if (!Character.isWhitespace(c)) {
-            if (c == '(') {
-              // Handle opening brackets
-              token.append("(");
-              level++;
-            } else {
-              // Should be unreachable: all top-level expressions need parentheses around them
-              throw new IllegalArgumentException();
-            }
-          }
-        } else {
-          // We're inside an r-expression
-          token.append(c);
-          // Handle opening/closing brackets
-          if (c == '(') {
-            level++;
-          }
-          if (c == ')') {
-            if (level == 1) {
-              builder.add(token.toString());
-              token = new StringBuilder();
-            }
-            level--;
-          }
-        }
-      }
-    }
-    if (level != 0) {
-      // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException();
-    }
-    return builder.build();
-  }
-
-  /**
-   * Check if the token is a function or variable declaration.
-   *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
-   */
-  protected static boolean isDeclarationToken(String token) {
-    return token.matches("\\(\\s*(declare-const|declare-fun)[\\S\\s]*");
-  }
-
-  /**
-   * Check if the token is a function definition.
-   *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
-   */
-  protected static boolean isDefinitionToken(String token) {
-    return token.matches("\\(\\s*define-fun[\\S\\s]*");
-  }
-
-  /**
-   * Check if the token is an <code>(assert ...)</code>.
-   *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
-   */
-  protected static boolean isAssertToken(String token) {
-    return token.matches("\\(\\s*assert[\\S\\s]*");
-  }
-
-  /**
-   * Check if the token is <code>(set-logic ..)</code>.
-   *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
-   */
-  protected static boolean isSetLogicToken(String token) {
-    return token.matches("\\(\\s*set-logic[\\S\\s]*");
-  }
-
-  /**
-   * Check if the token is <code>(exit ...)</code>.
-   *
-   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
-   */
-  protected static boolean isExitToken(String token) {
-    return token.matches("\\(\\s*exit[\\S\\s]*");
-  }
-
-  /**
    * Takes a SMT-LIB2 script and cleans it up.
    *
    * <p>We remove all comments and put each command on its own line. Declarations and asserts are
@@ -438,21 +274,23 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * only occur as the last command.
    */
   private String sanitize(String formulaStr) {
-    List<String> tokens = tokenize(formulaStr);
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
 
     StringBuilder builder = new StringBuilder();
     int pos = 0; // index of the current token
 
     for (String token : tokens) {
-      if (isSetLogicToken(token)) {
+      if (Tokenizer.isSetLogicToken(token)) {
         // Skip the (set-logic ...) command at the beginning of the input
         Preconditions.checkArgument(pos == 0);
 
-      } else if (isExitToken(token)) {
+      } else if (Tokenizer.isExitToken(token)) {
         // Skip any (exit) command at the end of the input
         Preconditions.checkArgument(pos == tokens.size() - 1);
 
-      } else if (isDeclarationToken(token) || isDefinitionToken(token) || isAssertToken(token)) {
+      } else if (Tokenizer.isDeclarationToken(token)
+          || Tokenizer.isDefinitionToken(token)
+          || Tokenizer.isAssertToken(token)) {
         // Keep only declaration, definitions and assertion
         builder.append(token).append('\n');
 
