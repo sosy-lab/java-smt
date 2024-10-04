@@ -29,8 +29,7 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     Random random = new Random(0);
     int c = 0;
     while (c < 20) {
-      // FIXME: Fails if the numbers are too large
-      int r = random.nextInt(200000) - 10000;
+      int r = random.nextInt();
       if (r != 0) {
         builder.add(r);
         c++;
@@ -40,8 +39,12 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
   }
 
   private int euclideanDivision(int x, int y) {
-    long noRemainder = x - euclideanRemainder(x, y);
-    return (int) (noRemainder / y);
+    int div = x / y;
+    if (x < 0 && x != y * div) {
+      return div - Integer.signum(y);
+    } else {
+      return div;
+    }
   }
 
   private int euclideanRemainder(int x, int y) {
