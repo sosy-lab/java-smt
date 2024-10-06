@@ -25,126 +25,90 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void validLogicTest() throws SolverException, InterruptedException {
+  public void logicTest() throws SolverException, InterruptedException {
+    // Valid input string that sets the logic to QF_ALL
     BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
+    BooleanFormula validLogic =
         mgr.parse("(set-logic QF_ALL)" + "(declare-const v Int)" + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
-  }
+    assertThatFormula(expected).isEquivalentTo(validLogic);
 
-  @Test
-  public void wrongLogicTest() {
-    // When we change the code to not use sanitize() solver seem to just ignore set-logic
-    // Except for OpenSMT, which always crashes
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> mgr.parse("(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))"));
-  }
+    // Invalid string that sets QF_UF, even though integers are needed
+    // Most solvers seem to just ignore the logic that was chosen
+    String wrongLogic = "(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(wrongLogic));
 
-  @Test
-  public void logicAfterOptionTest() {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            mgr.parse(
-                "(set-option :produce-models true)"
-                    + "(set-logic ALL)"
-                    + "(declare-const v Int)"
-                    + "(assert (= v 3))"));
-  }
+    // Try setting logic after another command was already used
+    String logicAfterOption =
+        "(set-option :produce-models true)"
+            + "(set-logic ALL)"
+            + "(declare-const v Int)"
+            + "(assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterOption));
 
-  @Test
-  public void logicUsedTwiceTest() {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            mgr.parse(
-                "(set-logic ALL)"
-                    + "(declare-const v Int)"
-                    + "(set-logic QF_UF)"
-                    + "(assert (= v 3))"));
+    // Try setting the logic again after it has already been set
+    String logicTwice =
+        "(set-logic ALL)" + "(declare-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicTwice));
+
+    // Call (reset) and *then* set the logic again
+    String logicReset =
+        "(set-logic QF_UF)"
+            + "(reset)"
+            + "(set-logic ALL)"
+            + "(declare-const v Int)"
+            + "(assert (= v 3))";
+    assertThatFormula(mgr.parse(logicReset)).isEquivalentTo(expected);
   }
 
   @Test
   public void exitAtTheEnd() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken = mgr.parse("(declare-const v Int)" + "(assert (= v 3))" + "(exit)");
-    assertThatFormula(expected).isEquivalentTo(broken);
-  }
+    BooleanFormula expected = mgr.parse("(declare-const v Int)" + "(assert (= v 3))");
 
-  @Test
-  public void exitNotTheEnd() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            mgr.parse(
-                "(declare-const v Int)" + "(assert (= v 3))" + "(exit)" + "(assert (= v 0))"));
-  }
+    // A valid input string with (exit) at the end
+    BooleanFormula exitAtTheEnd =
+        mgr.parse("(declare-const v Int)" + "(assert (= v 3))" + "(exit)");
+    assertThatFormula(expected).isEquivalentTo(exitAtTheEnd);
 
-  @Test
-  public void logicResetTest() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(set-logic QF_UF)"
-                + "(reset)"
-                + "(set-logic ALL)"
-                + "(declare-const v Int)"
-                + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+    // An invalid input string where (exit) is used before the end of the file
+    String exitNotAtTheEnd =
+        "(declare-const v Int)" + "(assert (= v 3))" + "(exit)" + "(assert (= v 0))";
+    assertThrows(IllegalArgumentException.class, () -> mgr.parse(exitNotAtTheEnd));
   }
 
   @Test
   public void stackPushTest() throws SolverException, InterruptedException {
     BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(declare-const v Int)"
-                + "(push 1)"
-                + "(assert (= v 0))"
-                + "(pop 1)"
-                + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
-  }
 
-  @Test
-  public void stackResetAssertionsTest() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(declare-const v Int)"
-                + "(assert (= v 3))"
-                + "(reset-assertions)"
-                + "(declare-const v Int)"
-                + "(assert (= v 0))");
-    assertThatFormula(expected).isEquivalentTo(broken);
-  }
+    // Push assertions and then pop the stack to remove them
+    String stackPush =
+        "(declare-const v Int)" + "(push 1)" + "(assert (= v 0))" + "(pop 1)" + "(assert (= v 3))";
+    assertThatFormula(mgr.parse(stackPush)).isEquivalentTo(expected);
 
-  @Test
-  public void globalStackResetAssertionsTest() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(set-option :global-declarations true)"
-                + "(declare-const v Int)"
-                + "(assert (= v 3))"
-                + "(reset-assertions)"
-                + "(assert (= v 0))");
-    assertThatFormula(expected).isEquivalentTo(broken);
-  }
+    // Use (reset-assertions) to remove all assertions from the stack
+    String stackResetAssertions =
+        "(declare-const v Int)"
+            + "(assert (= v 3))"
+            + "(reset-assertions)"
+            + "(declare-const v Int)"
+            + "(assert (= v 0))";
+    assertThatFormula((mgr.parse(stackResetAssertions))).isEquivalentTo(expected);
 
-  @Test
-  public void stackResetTest() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(declare-const v Int)"
-                + "(assert (= v 0))"
-                + "(reset)"
-                + "(declare-const v Int)"
-                + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+    // With :global-declarations the reset will also remove all declarations
+    String globalStackResetAssertions =
+        "(set-option :global-declarations true)"
+            + "(declare-const v Int)"
+            + "(assert (= v 3))"
+            + "(reset-assertions)"
+            + "(assert (= v 0))";
+    assertThatFormula(mgr.parse(globalStackResetAssertions)).isEquivalentTo(expected);
+
+    // Just calling (reset) will also clear the stack
+    String stackReset =
+        "(declare-const v Int)"
+            + "(assert (= v 0))"
+            + "(reset)"
+            + "(declare-const v Int)"
+            + "(assert (= v 3))";
+    assertThatFormula(mgr.parse(stackReset)).isEquivalentTo(expected);
   }
 }
