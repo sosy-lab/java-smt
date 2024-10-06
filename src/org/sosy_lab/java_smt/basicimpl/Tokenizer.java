@@ -181,4 +181,22 @@ public class Tokenizer {
   public static boolean isExitToken(String token) {
     return matchesOneOf(token, "exit");
   }
+
+  /**
+   * Check if this is an unsupported token.
+   *
+   * <p>The list of unsupported tokens contains:
+   *
+   * <ul>
+   *   <li>push
+   *   <li>pop
+   *   <li>reset-assertions
+   *   <li>reset
+   * </ul>
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  public static boolean isUnsupportedToken(String token) {
+    return matchesOneOf(token, "push", "pop", "reset-assertions", "reset");
+  }
 }
