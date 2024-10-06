@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.truth.Truth;
 import org.junit.Test;
@@ -23,16 +24,16 @@ public class TokenizerTest {
     Truth.assertThat(Tokenizer.tokenize(smtlib)).containsExactly(smtlib);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void invalidClose() {
     String smtlib = "(assert (= 3 (+ 2 1))))";
-    assertThat(Tokenizer.tokenize(smtlib)).containsExactly(smtlib);
+    assertThrows(IllegalArgumentException.class, () -> Tokenizer.tokenize(smtlib));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void invalidOpen() {
     String smtlib = "(assert (= 3 (+ 2 1))";
-    assertThat(Tokenizer.tokenize(smtlib)).containsExactly(smtlib);
+    assertThrows(IllegalArgumentException.class, () -> Tokenizer.tokenize(smtlib));
   }
 
   @Test

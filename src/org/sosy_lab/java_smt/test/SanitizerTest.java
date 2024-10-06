@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -30,35 +32,39 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     assertThatFormula(expected).isEquivalentTo(broken);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void wrongLogicTest() throws SolverException, InterruptedException {
+  @Test
+  public void wrongLogicTest() {
     // When we change the code to not use sanitize() solver seem to just ignore set-logic
     // Except for OpenSMT, which always crashes
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse("(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> mgr.parse("(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void logicAfterOptionTest() throws SolverException, InterruptedException {
+  @Test
+  public void logicAfterOptionTest() {
     BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(set-option :produce-models true)"
-                + "(set-logic ALL)"
-                + "(declare-const v Int)"
-                + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            mgr.parse(
+                "(set-option :produce-models true)"
+                    + "(set-logic ALL)"
+                    + "(declare-const v Int)"
+                    + "(assert (= v 3))"));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void logicUsedTwiceTest() throws SolverException, InterruptedException {
+  @Test
+  public void logicUsedTwiceTest() {
     BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse(
-            "(set-logic ALL)" + "(declare-const v Int)" + "(set-logic QF_UF)" + "(assert (= v 3))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            mgr.parse(
+                "(set-logic ALL)"
+                    + "(declare-const v Int)"
+                    + "(set-logic QF_UF)"
+                    + "(assert (= v 3))"));
   }
 
   @Test
@@ -68,12 +74,13 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     assertThatFormula(expected).isEquivalentTo(broken);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void exitNotTheEnd() throws SolverException, InterruptedException {
-    BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
-    BooleanFormula broken =
-        mgr.parse("(declare-const v Int)" + "(assert (= v 3))" + "(exit)" + "(assert (= v 0))");
-    assertThatFormula(expected).isEquivalentTo(broken);
+  @Test
+  public void exitNotTheEnd() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            mgr.parse(
+                "(declare-const v Int)" + "(assert (= v 3))" + "(exit)" + "(assert (= v 0))"));
   }
 
   @Test
@@ -130,8 +137,6 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Test
   public void stackResetTest() throws SolverException, InterruptedException {
-    requireParser();
-    requireIntegers();
     BooleanFormula expected = mgr.parse("(declare-const v Int)(assert (= v 3))");
     BooleanFormula broken =
         mgr.parse(
