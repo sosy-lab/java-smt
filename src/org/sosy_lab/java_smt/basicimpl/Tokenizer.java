@@ -36,10 +36,11 @@ public class Tokenizer {
     boolean inQuoted = false;
 
     int level = 0;
+    int pos = 0;
 
     StringBuilder token = new StringBuilder();
-    for (int i = 0; i < input.length(); i++) {
-      char c = input.charAt(i);
+    while (pos < input.length()) {
+      char c = input.charAt(pos);
       if (inComment) {
         if (c == '\n') {
           // End of a comment
@@ -57,7 +58,7 @@ public class Tokenizer {
           // We have a double quote: Check that it's not followed by another and actually closes
           // the string.
           Optional<Character> n =
-              (i == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(i + 1));
+              (pos == input.length() - 1) ? Optional.empty() : Optional.of(input.charAt(pos + 1));
           if (n.isEmpty() || n.orElseThrow() != '"') {
             // Close the string
             token.append(c);
@@ -66,7 +67,7 @@ public class Tokenizer {
             // Add both quotes to the token and skip one character ahead
             token.append(c);
             token.append(n.orElseThrow());
-            i++;
+            pos++;
           }
         } else {
           token.append(c);
@@ -128,6 +129,7 @@ public class Tokenizer {
           }
         }
       }
+      pos++;
     }
     if (level != 0) {
       // Throw an exception if the brackets don't match
