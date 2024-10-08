@@ -238,8 +238,8 @@ public class Tokenizer {
    */
   public static boolean isForbiddenToken(String token) {
     return isPushToken(token)
-        | isPopToken(token)
-        | isResetAssertionsToken(token)
-        | isResetToken(token);
+        || isPopToken(token)
+        || isResetAssertionsToken(token)
+        || isResetToken(token);
   }
 }
