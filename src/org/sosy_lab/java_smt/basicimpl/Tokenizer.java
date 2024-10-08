@@ -219,9 +219,9 @@ public class Tokenizer {
   }
 
   /**
-   * Check if this is an unsupported token.
+   * Check if this is a forbidden token.
    *
-   * <p>The list of unsupported tokens contains:
+   * <p>The list of forbidden tokens contains:
    *
    * <ul>
    *   <li>push
@@ -230,9 +230,13 @@ public class Tokenizer {
    *   <li>reset
    * </ul>
    *
+   * <p>Forbidden tokens manipulate the stack and are not supported while parsing SMT-lIB2 string.
+   * When a forbidden token is found parsing should be aborted by throwing an {@link
+   * IllegalArgumentException} exception.
+   *
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
-  public static boolean isUnsupportedToken(String token) {
+  public static boolean isForbiddenToken(String token) {
     return isPushToken(token)
         | isPopToken(token)
         | isResetAssertionsToken(token)

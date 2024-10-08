@@ -281,7 +281,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         // Keep only declaration, definitions and assertion
         builder.append(token).append('\n');
 
-      } else if (Tokenizer.isUnsupportedToken(token)) {
+      } else if (Tokenizer.isForbiddenToken(token)) {
         // Throw an exception if the script contains commands like (pop) or (reset) that change the
         // state of the assertion stack.
         // We could keep track of the state of the stack and only consider the formulas that remain
