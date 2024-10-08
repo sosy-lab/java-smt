@@ -138,6 +138,15 @@ public class Tokenizer {
   }
 
   /**
+   * Check if the token is <code>(set-logic ..)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  public static boolean isSetLogicToken(String token) {
+    return matchesOneOf(token, "set-logic");
+  }
+
+  /**
    * Check if the token is a function or variable declaration.
    *
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
@@ -165,16 +174,43 @@ public class Tokenizer {
   }
 
   /**
-   * Check if the token is <code>(set-logic ..)</code>.
+   * Check if the token is an <code>(push ...)</code>.
    *
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
-  public static boolean isSetLogicToken(String token) {
-    return matchesOneOf(token, "set-logic");
+  public static boolean isPushToken(String token) {
+    return matchesOneOf(token, "push");
   }
 
   /**
-   * Check if the token is <code>(exit ...)</code>.
+   * Check if the token is an <code>(pop ...)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  public static boolean isPopToken(String token) {
+    return matchesOneOf(token, "pop");
+  }
+
+  /**
+   * Check if the token is an <code>(reset-assertions ...)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  public static boolean isResetAssertionsToken(String token) {
+    return matchesOneOf(token, "reset-assertions");
+  }
+
+  /**
+   * Check if the token is an <code>(reset)</code>.
+   *
+   * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
+   */
+  public static boolean isResetToken(String token) {
+    return matchesOneOf(token, "reset");
+  }
+
+  /**
+   * Check if the token is <code>(exit)</code>.
    *
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
@@ -197,6 +233,9 @@ public class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isUnsupportedToken(String token) {
-    return matchesOneOf(token, "push", "pop", "reset-assertions", "reset");
+    return isPushToken(token)
+        | isPopToken(token)
+        | isResetAssertionsToken(token)
+        | isResetToken(token);
   }
 }
