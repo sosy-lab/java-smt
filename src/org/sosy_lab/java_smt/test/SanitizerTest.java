@@ -36,7 +36,7 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     String wrongLogic = "(set-logic QF_UF)" + "(declare-const v Int)" + "(assert (= v 3))";
     assertThatFormula(mgr.parse(wrongLogic)).isEquivalentTo(expected);
 
-    // Try setting logic after another command was already used
+    // Try setting the logic when it's not the beginning of the input string
     String logicAfterOption =
         "(set-option :produce-models true)"
             + "(set-logic ALL)"
@@ -44,7 +44,7 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             + "(assert (= v 3))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicAfterOption));
 
-    // Try setting the logic again after it has already been set
+    // Try setting the logic when it's already been set
     String logicTwice =
         "(set-logic ALL)" + "(declare-const v Int)" + "(set-logic QF_UF)" + " (assert (= v 3))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(logicTwice));
