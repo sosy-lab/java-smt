@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
@@ -19,7 +18,6 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
-import java.util.List;
 import java.util.function.Supplier;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -29,9 +27,19 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  private static final String BOOL_CHECK =
+      "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";
+
+  private static final String BOOL_VARS_W_LOGIC = "(set-logic ALL)" + BOOL_CHECK;
+
+  private static final String BOOL_VARS_W_LOGIC_AND_COMMENT =
+      "; Some comment in SMTLIB2\n" + BOOL_VARS_W_LOGIC;
+
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"
@@ -96,6 +104,40 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
           + "(declare-fun u () Bool)\n"
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
+
+  @Test
+  public void logicsParseTest() throws SolverException, InterruptedException {
+    requireParser();
+    // Some solvers have problems with (set-logic xxx) in the beginning
+
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula expr = bmgr.equivalence(y, x);
+
+    // actual test
+    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC);
+    assertThatFormula(parsedForm).isEquivalentTo(expr);
+  }
+
+  @Test
+  public void commentsParseTest() throws SolverException, InterruptedException {
+    requireParser();
+    // Some solvers have problems with comments in the beginning
+
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula expr = bmgr.equivalence(y, x);
+
+    // actual test
+    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC_AND_COMMENT);
+    assertThatFormula(parsedForm).isEquivalentTo(expr);
+  }
 
   @Test
   public void varDumpTest() {
@@ -438,19 +480,11 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
-    String lineUnderTest = getLast(lines);
-
-    if (solver == Solvers.OPENSMT) {
-      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
-      // heuristic: the last line starting with a plain bracket.
-      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
-    }
-
+    String lastCommand = getLast(Tokenizer.tokenize(dump));
     assertWithMessage("last line(s) of <\n" + dump + ">")
-        .that(lineUnderTest)
+        .that(lastCommand)
         .startsWith("(assert ");
-    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")

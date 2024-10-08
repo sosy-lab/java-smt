@@ -14,14 +14,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -65,34 +61,15 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
-    long f = msat_from_smtlib2(getEnvironment(), pS);
-    return getFormulaCreator().encapsulateBoolean(f);
+  public Long parseImpl(String pS) throws IllegalArgumentException {
+    return msat_from_smtlib2(getEnvironment(), pS);
   }
 
   @Override
-  public Appender dumpFormula(final Long f) {
+  public String dumpFormulaImpl(final Long f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-
-    // Lazy invocation of msat_to_smtlib2 wrapped in an Appender.
-    return new Appenders.AbstractAppender() {
-      @Override
-      public void appendTo(Appendable out) throws IOException {
-        String msatString = msat_to_smtlib2(getEnvironment(), f);
-        // Adjust line breaks: assert needs to be on last line, so we remove all following breaks.
-        boolean needsLinebreak = true;
-        for (String part : Splitter.on('\n').split(msatString)) {
-          out.append(part);
-          if (needsLinebreak && part.startsWith("(assert")) {
-            needsLinebreak = false;
-          }
-          if (needsLinebreak) {
-            out.append('\n');
-          }
-        }
-      }
-    };
+    return msat_to_smtlib2(getEnvironment(), f);
   }
 
   @Override
