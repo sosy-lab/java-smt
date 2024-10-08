@@ -24,7 +24,7 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Before
   public void init() {
-    requireBitvectors();
+    requireIntegers();
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
     Random random = new Random(0);
     int c = 0;
