@@ -41,24 +41,6 @@ public class RemainderBitvectorTest extends SolverBasedTest0.ParameterizedSolver
     testValues = builder.build();
   }
 
-  private int euclideanDivision(int x, int y) {
-    int div = x / y;
-    if (x < 0 && x != y * div) {
-      return div - Integer.signum(y);
-    } else {
-      return div;
-    }
-  }
-
-  private int euclideanRemainder(int x, int y) {
-    int mod = x % y;
-    if (mod < 0) {
-      return mod + Math.abs(y);
-    } else {
-      return mod;
-    }
-  }
-
   private int truncatedDivision(int x, int y) {
     return x / y;
   }
