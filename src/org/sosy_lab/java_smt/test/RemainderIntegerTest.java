@@ -17,7 +17,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   ImmutableList<Integer> testValues;
