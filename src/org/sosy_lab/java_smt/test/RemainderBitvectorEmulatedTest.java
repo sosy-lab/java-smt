@@ -26,6 +26,9 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
   public void init() {
     requireBitvectors();
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+    builder.add(0);
+    builder.add(1);
+    builder.add(Integer.MIN_VALUE);
     Random random = new Random(0);
     int c = 0;
     while (c < 20) {
@@ -72,9 +75,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
       for (int y : testValues) {
         var bv0 = bvmgr.makeBitvector(32, x);
         var bv1 = bvmgr.makeBitvector(32, y);
-        assertWithMessage("divide(%s, %s)", x, y)
-            .that(eval(bvmgr.divide(bv0, bv1, true)))
-            .isEqualTo(truncatedDivision(x, y));
+        if (y != 0) {
+          assertWithMessage("divide(%s, %s)", x, y)
+              .that(eval(bvmgr.divide(bv0, bv1, true)))
+              .isEqualTo(truncatedDivision(x, y));
+        }
       }
     }
   }
@@ -94,9 +99,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
       for (int y : testValues) {
         var bv0 = bvmgr.makeBitvector(32, x);
         var bv1 = bvmgr.makeBitvector(32, y);
-        assertWithMessage("remainder(%s, %s)", x, y)
-            .that(eval(bvmgr.remainder(bv0, bv1, true)))
-            .isEqualTo(truncatedRemainder(x, y));
+        if (y != 0) {
+          assertWithMessage("remainder(%s, %s)", x, y)
+              .that(eval(bvmgr.remainder(bv0, bv1, true)))
+              .isEqualTo(truncatedRemainder(x, y));
+        }
       }
     }
   }
@@ -116,9 +123,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
       for (int y : testValues) {
         var bv0 = bvmgr.makeBitvector(32, x);
         var bv1 = bvmgr.makeBitvector(32, y);
-        assertWithMessage("smodulo(%s, %s)", x, y)
-            .that(eval(bvmgr.smodulo(bv0, bv1)))
-            .isEqualTo(floorRemainder(x, y));
+        if (y != 0) {
+          assertWithMessage("smodulo(%s, %s)", x, y)
+              .that(eval(bvmgr.smodulo(bv0, bv1)))
+              .isEqualTo(floorRemainder(x, y));
+        }
       }
     }
   }

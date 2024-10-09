@@ -26,6 +26,9 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
   public void init() {
     requireIntegers();
     ImmutableList.Builder<Integer> builder = ImmutableList.builder();
+    builder.add(0);
+    builder.add(1);
+    builder.add(Integer.MIN_VALUE);
     Random random = new Random(0);
     int c = 0;
     while (c < 20) {
@@ -53,9 +56,11 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
       for (int y : testValues) {
         var i0 = imgr.makeNumber(x);
         var i1 = imgr.makeNumber(y);
-        assertWithMessage("divide(%s, %s)", x, y)
-            .that(eval(imgr.divide(i0, i1)))
-            .isEqualTo(euclideanDivision(x, y));
+        if (y != 0) {
+          assertWithMessage("divide(%s, %s)", x, y)
+              .that(eval(imgr.divide(i0, i1)))
+              .isEqualTo(euclideanDivision(x, y));
+        }
       }
     }
   }
@@ -75,9 +80,11 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
       for (int y : testValues) {
         var i0 = imgr.makeNumber(x);
         var i1 = imgr.makeNumber(y);
-        assertWithMessage("modulo(%s, %s)", x, y)
-            .that(eval(imgr.modulo(i0, i1)))
-            .isEqualTo(euclideanRemainder(x, y));
+        if (y != 0) {
+          assertWithMessage("modulo(%s, %s)", x, y)
+              .that(eval(imgr.modulo(i0, i1)))
+              .isEqualTo(euclideanRemainder(x, y));
+        }
       }
     }
   }
