@@ -555,6 +555,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
+    // FIXME: Broken on yices2
+    //  Yices does not quote symbols when dumping a formula, f.ex for the variable "(" we get
+    //    (declare-fun |(| () Bool)
+    //    (assert ()
+    //  which is not a valid SMTLIB script.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -566,6 +572,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testEqBoolVariableDump() {
+    // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
