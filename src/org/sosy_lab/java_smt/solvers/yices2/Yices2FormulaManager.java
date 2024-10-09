@@ -71,7 +71,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     return yices_parse_term(pS);
   }
 
-  /** Helper function to (pretty) print yices2 sorts */
+  /** Helper function to (pretty) print yices2 sorts. */
   private String getTypeRepr(int type) {
     if (yices_type_is_bitvector(type)) {
       return "(_ BitVec " + yices_bvtype_size(type) + ")";

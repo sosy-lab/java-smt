@@ -77,7 +77,7 @@ public class SanitizerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   @Test
-  public void stackPushTest() throws SolverException, InterruptedException {
+  public void stackPushTest() {
     // FIXME: We currently don't support stack operations and expect an exceptions to be thrown for
     // these inputs
 

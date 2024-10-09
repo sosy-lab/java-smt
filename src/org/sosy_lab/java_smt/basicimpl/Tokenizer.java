@@ -14,8 +14,11 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 
-/** Helper class for splitting up an SMT-LIB2 file into a string of commands */
+/** Helper class for splitting up an SMT-LIB2 file into a string of commands. */
 public class Tokenizer {
+
+  private Tokenizer() {}
+
   /**
    * Split up a sequence of lisp expressions.
    *

@@ -481,9 +481,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
     String lastCommand = getLast(Tokenizer.tokenize(dump));
-    assertWithMessage("last line(s) of <\n" + dump + ">")
-        .that(lastCommand)
-        .startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).startsWith("(assert ");
     assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).endsWith(")");
   }
 
