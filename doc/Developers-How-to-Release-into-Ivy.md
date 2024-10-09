@@ -46,18 +46,35 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
+### From official binaries (for Linux, Windows, and OSX)
+
+To publish Z3, download the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
-In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
-For simpler handling, we then copy the files from the three `bin` directories together into one directory,
-and include the sources (we can keep the internal structure of each directory, just copy them above each other).
+For example, the directory structure can look like this:
+
+```
+z3/                                 // <-- parent directory
+ |-- z3-4.13.2-arm64-glibc-2.34/    // <-- unpacked release artifact
+ |-- z3-4.13.2-arm64-osx-11.0/
+ |-- z3-4.13.2-arm64-win/
+ |-- z3-4.13.2-x64-glibc-2.35/
+ |-- z3-4.13.2-x64-osx-12.7.6/
+ |-- z3-4.13.2-x64-win/
+ |-- z3-z3-4.13.2/                  // <-- sources directory used as 'z3.path'
+```
+
+In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
 Then execute the following command in the JavaSMT directory,
-where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
-and `$Z3_VERSION` is the version number:
+where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
+ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
 ```
-Finally follow the instructions shown in the message at the end.
+Example:
+```
+ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.2 -Dz3.version=4.13.2
+```
+Finally, follow the instructions shown in the message at the end.
+
 
 #### Optional (from source for Linux target with older GLIBC)
 This step is for the following use case:
@@ -69,15 +86,16 @@ in which the following build command can be run in the unpacked source directory
 ```
 python3 scripts/mk_make.py --java && cd build && make -j 2
 ```
-Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory `./build` into `./bin`.
+Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory 
+`./build` into `./bin` (if needed, adjust the directory to match the x64 or arm64 path for Linux).
 Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
 and publish the directory `./bin` with an ant command like the one from above:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION-glibc_2.27
+ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION-glibc_2.27
 ```
 
 
-#### Optional (outdated: from source for Linux target)
+#### Optional (from source for Linux target) (Info: this step is outdated and no longer used for releases of JavaSMT)
 To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 16.04 system:
 ```
