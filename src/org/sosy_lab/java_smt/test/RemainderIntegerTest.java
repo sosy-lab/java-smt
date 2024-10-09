@@ -11,12 +11,14 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.Random;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -80,6 +82,8 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void integerModuloTest() {
+    // Mathsat does not support modulo for integer formulas
+    assume().that(solverToUse()).isNotEqualTo(SolverContextFactory.Solvers.MATHSAT5);
     for (int x : testValues) {
       for (int y : testValues) {
         var i0 = imgr.makeNumber(x);
