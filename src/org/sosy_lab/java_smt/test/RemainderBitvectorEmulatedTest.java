@@ -23,6 +23,13 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Test the behavior of bitvector division, modulo and remainder in JavaSMT based on Euclidean
+ * division.
+ *
+ * <p>This class is meant to demonstrate how the truncated/floored division needed for bitvector
+ * logic can be reduced to the Euclidean division used by integers formulas.
+ */
 public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   ImmutableList<Integer> testValues;
 
@@ -45,26 +52,13 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     testValues = builder.build();
   }
 
-  private int euclideanDivision(int x, int y) {
-    int div = x / y;
-    if (x < 0 && x != y * div) {
-      return div - Integer.signum(y);
-    } else {
-      return div;
-    }
-  }
-
-  private int euclideanRemainder(int x, int y) {
-    int mod = x % y;
-    if (mod < 0) {
-      return mod + Math.abs(y);
-    } else {
-      return mod;
-    }
-  }
-
+  /**
+   * Truncated division.
+   *
+   * <p>Same as Java division, but here we define it based on Euclidean division.
+   */
   private int truncatedDivision(int x, int y) {
-    int div = euclideanDivision(x, y);
+    int div = RemainderIntegerTest.euclideanDivision(x, y);
     int mod = truncatedRemainder(x, y);
     if (mod < 0) {
       return div - Integer.signum(x) * Integer.signum(y);
@@ -73,6 +67,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     }
   }
 
+  /**
+   * Test bitvector division.
+   *
+   * <p>Truncated division, just like <code>/</code> in Java
+   */
   @Test
   public void bitvectorDivisionTest() {
     for (int x : testValues) {
@@ -88,8 +87,13 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     }
   }
 
+  /**
+   * Truncated remainder.
+   *
+   * <p>Same as <code>%</code> in Java, but here we define it in terms of the Euclidean remainder.
+   */
   private int truncatedRemainder(int x, int y) {
-    int mod = euclideanRemainder(x, y);
+    int mod = RemainderIntegerTest.euclideanRemainder(x, y);
     if (x < 0 && mod > 0) {
       return mod - Math.abs(y);
     } else {
@@ -97,6 +101,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     }
   }
 
+  /**
+   * Test the bitvector remainder.
+   *
+   * <p>Truncated remainder, matches <code>%</code> in Java
+   */
   @Test
   public void bitvectorRemainderTest() {
     for (int x : testValues) {
@@ -112,8 +121,14 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     }
   }
 
+  /**
+   * Floored remainder.
+   *
+   * <p>Matches {@link Math#floorMod} in Java, but here we define it in terms of the Euclidean
+   * remainder.
+   */
   private int floorRemainder(int x, int y) {
-    int mod = euclideanRemainder(x, y);
+    int mod = RemainderIntegerTest.euclideanRemainder(x, y);
     if (y < 0 && mod > 0) {
       return mod - Math.abs(y);
     } else {
@@ -121,6 +136,11 @@ public class RemainderBitvectorEmulatedTest extends SolverBasedTest0.Parameteriz
     }
   }
 
+  /**
+   * Test bitvector modulo.
+   *
+   * <p>Floored remainder, matches {@link Math#floorMod} in Java
+   */
   @Test
   public void bitvectorModuloTest() {
     for (int x : testValues) {

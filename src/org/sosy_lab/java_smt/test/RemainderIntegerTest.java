@@ -25,6 +25,10 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Test the behavior of integer division and modulo in JavaSMT and compare it to the same operations
+ * in Java.
+ */
 public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   ImmutableList<Integer> testValues;
 
@@ -47,7 +51,18 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
     testValues = builder.build();
   }
 
-  private int euclideanDivision(int x, int y) {
+  /**
+   * Euclidean division.
+   *
+   * <p>In Euclidean division the remainder is always positive and the quotient needs to be rounded
+   * accordingly.
+   *
+   * <p>More formally, when dividing <code>a</code> by <code>b</code> we have <code>a = k*b + r
+   * </code> where <code> k</code> is the quotient <code>a/b</code> and <code>r</code> is the
+   * remainder of the division. In Euclidean division we now requires <code>0 <= r < b</code> to
+   * hold, which uniquely determines the equation.
+   */
+  static int euclideanDivision(int x, int y) {
     int div = x / y;
     if (x < 0 && x != y * div) {
       return div - Integer.signum(y);
@@ -56,6 +71,11 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
     }
   }
 
+  /**
+   * Test Integer division.
+   *
+   * <p>JavaSMT uses {@link #euclideanDivision(int, int) Euclidean division} for integer formulas.
+   */
   @Test
   public void integerDivisionTest() {
     for (int x : testValues) {
@@ -71,7 +91,12 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
     }
   }
 
-  private int euclideanRemainder(int x, int y) {
+  /**
+   * Euclidean remainder.
+   *
+   * <p>See {@link #euclideanDivision(int, int)} for the definition.
+   */
+  static int euclideanRemainder(int x, int y) {
     int mod = x % y;
     if (mod < 0) {
       return mod + Math.abs(y);
@@ -80,6 +105,12 @@ public class RemainderIntegerTest extends SolverBasedTest0.ParameterizedSolverBa
     }
   }
 
+  /**
+   * Test Integer modulo.
+   *
+   * <p>JavaSMT uses the {@link #euclideanRemainder(int, int) Euclidean remainder} for integer
+   * formulas.
+   */
   @Test
   public void integerModuloTest() {
     // Mathsat does not support modulo for integer formulas

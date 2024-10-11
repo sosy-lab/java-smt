@@ -23,6 +23,10 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
+/**
+ * Test the behavior of bitvector division, modulo and remainder in JavaSMT and compare it to the
+ * same operations in Java.
+ */
 public class RemainderBitvectorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   ImmutableList<Integer> testValues;
 
@@ -49,6 +53,11 @@ public class RemainderBitvectorTest extends SolverBasedTest0.ParameterizedSolver
     return x / y;
   }
 
+  /**
+   * Test bitvector division.
+   *
+   * <p>Truncated division, just like <code>/</code> in Java
+   */
   @Test
   public void bitvectorDivisionTest() {
     for (int x : testValues) {
@@ -68,6 +77,11 @@ public class RemainderBitvectorTest extends SolverBasedTest0.ParameterizedSolver
     return x % y;
   }
 
+  /**
+   * Test bitvector remainder.
+   *
+   * <p>Truncated remainder, matches <code>%</code> in Java
+   */
   @Test
   public void bitvectorRemainderTest() {
     for (int x : testValues) {
@@ -87,6 +101,11 @@ public class RemainderBitvectorTest extends SolverBasedTest0.ParameterizedSolver
     return Math.floorMod(x, y);
   }
 
+  /**
+   * Test bitvector modulo.
+   *
+   * <p>Floored remainder, matches {@link Math#floorMod} in Java
+   */
   @Test
   public void bitvectorModuloTest() {
     for (int x : testValues) {
