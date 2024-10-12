@@ -37,6 +37,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
  * Generates a model by executing Princess with the contents of "Out.smt2" as input and parsing
  * Princess' output model from the file "Model.smt2" back to JavaSMT.
  */
+// TODO Add support for arbitrary SMTLIB compatible solvers
 public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> mgr;
   private final BooleanFormulaManager bmgr;

@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
+// TODO Use AutoValue
+// TODO Can we make this typesafe?
 public class FunctionEnvironment {
 
   Object result;

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 /** Exception thrown if there is an error during parsing the model from SMTLIB2. */
+// TODO Do we need those exception classes?
 public class ModelException extends RuntimeException {
   /** Constructs an UnsupportedOperationException with no detail message. */
   public ModelException() {}

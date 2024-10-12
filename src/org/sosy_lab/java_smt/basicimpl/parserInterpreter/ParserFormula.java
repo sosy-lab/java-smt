@@ -12,6 +12,9 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.FormulaType;
 
+// TODO Make this typesafe
+// TODO Do we need the @Nullables?
+// TODO Use AutoValue?
 public class ParserFormula {
 
   @Nullable String type;

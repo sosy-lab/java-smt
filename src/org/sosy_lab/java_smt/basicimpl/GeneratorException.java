@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 /** Exception thrown if there is an error during Generating SMTLIB2. */
+// TODO Do we need those exception classes?
 public class GeneratorException extends RuntimeException {
 
   private static final long serialVersionUID = 176487434783322L;

@@ -28,6 +28,7 @@ public interface FormulaManager {
    * @param pString SMT-LIB2 formula as String that will be parsed
    * @return BooleanFormula equivalent to the SMT-LIB2 string
    */
+  // TODO Clean up exceptions?
   BooleanFormula universalParseFromString(String pString)
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException;
 
@@ -37,6 +38,7 @@ public interface FormulaManager {
    *
    * @throws IOException if writing to file fails
    */
+  // TODO Return a String, instead of writing to a file
   void dumpSMTLIB2() throws IOException;
 
   /**

@@ -160,7 +160,6 @@ public class SolverContextFactory {
       throws InvalidConfigurationException {
     pConfig.inject(this);
     if (useBinary && !generateSMTLIB2) {
-      // FIXME: Maybe this should be just one option?
       throw new InvalidConfigurationException(
           "Can't use option solver.useBinary without also enabling solver.generateSMTLIB2.");
     }

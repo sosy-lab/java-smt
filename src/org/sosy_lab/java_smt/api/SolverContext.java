@@ -55,6 +55,7 @@ public interface SolverContext extends AutoCloseable {
     /** Whether the solver should enable support for formulae build in SL theory. */
     ENABLE_SEPARATION_LOGIC,
 
+    // TODO Document this option
     USE_BINARY
   }
 

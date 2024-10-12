@@ -72,15 +72,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * saves all created Formulas that are not part of a let statement as ParserFormula objects with
    * their variable name or value as key.
    */
+  // TODO Are these declarations?
   private final Map<String, ParserFormula> variables = new HashMap<>();
 
   /**
    * saves all created Formulas that are part of a let statement as ParserFormula objects with their
    * variable name or value as key.
    */
+  // TODO They are declarations!
   private final Map<String, ParserFormula> letVariables = new HashMap<>();
 
   /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry. */
+  // TODO Here we collect the formulas
   private final List<BooleanFormula> constraints = new ArrayList<>();
 
   private final FormulaManager fmgr;
@@ -92,10 +95,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   private final UFManager umgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
 
+  // TODO Should we support push,etc?
   public List<BooleanFormula> getConstraints() {
     return constraints;
   }
 
+  // TODO This seems to be used to collect function definitions in the model:
+  //  Do we actually need it?
   public List<ValueAssignment> getAssignments() {
     return assignments;
   }
@@ -103,6 +109,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   /** is set to 'true' if a node 'model' is encountered. */
   private boolean isModel = false;
 
+  // TODO Does the visitor use its own solver instance, or should the formulas be added to an
+  //  existing instance?
   public Visitor(
       FormulaManager fmgr,
       BooleanFormulaManager bmgr,
@@ -121,6 +129,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   }
 
   @Override
+  // TODO Is this for sort declarations? If so, we may not need it.
   public List<String> visitId_symb(Id_symbContext ctx) {
     List<String> sort = new ArrayList<>();
     sort.add(ctx.getText());
@@ -241,6 +250,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return ret;
   }
 
+  // TODO Use an enum here
   public static String getNumericType(String strNum) {
     if (isInteger(strNum)) {
       return "Integer";
@@ -337,6 +347,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
   }
 
+  // TODO Can we get a better return type?
   @Override
   public Object visitMultiterm(MultitermContext ctx) {
     Object identifier = visit(ctx.qual_identifer());
@@ -1022,6 +1033,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
       case "const":
+        // TODO I believe JavaSMT now supports const arrays?
         if (isModel) {
           variables.put(
               "temp",
@@ -1163,6 +1175,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     String keyString = replaceReplacedChars(key.toString());
     String valueString = value.toString();
+    // TODO Does this add function definitions to the model?
     if (isModel) {
       Model.ValueAssignment assignment =
           new ValueAssignment(
@@ -1306,6 +1319,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * @param variable String that is checked and modified if necessary
    * @return String with no forbidden characters
    */
+  // TODO This won't work for something like "|PIPE|"
+  //  But, do we need to replace the symbols anyway? Maybe we just remove the "|"s?
   public String replaceReservedChars(String variable) {
     if (variable.startsWith("|")) {
       return variable.replaceAll("\\|", "PIPE");

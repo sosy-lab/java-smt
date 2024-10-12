@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
+// TODO Just use IllegalArgumentException?
 /** Exception thrown if there is an error during Generating SMTLIB2. */
 public class ParserException extends RuntimeException {
 
