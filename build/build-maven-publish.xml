@@ -162,12 +162,10 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libz3" classifier="libz3-x64" filedirectory="${libDir.x64}" fileending="dll"/>
         <stage-solver-file filename="libz3" classifier="libz3-x64" filedirectory="${libDir.x64}" fileending="dylib"/>
         <!-- for arm64 arch -->
-        <!-- TODO: Z3 forgot to include Java bindings into its Linux-ARM64 release in 4.13.2,
-              so we ignore those files currently. See https://github.com/Z3Prover/z3/issues/7406 -->
-        <!-- <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="so"/> -->
+        <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="dll"/>
         <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
-        <!-- <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="so"/> -->
+        <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="dll"/>
         <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
     </target>
