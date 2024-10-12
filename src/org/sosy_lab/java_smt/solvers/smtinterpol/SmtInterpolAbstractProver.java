@@ -105,10 +105,12 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public boolean isUnsat() throws InterruptedException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     checkState(!closed);
 

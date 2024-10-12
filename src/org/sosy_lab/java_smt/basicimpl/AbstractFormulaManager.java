@@ -202,7 +202,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public void dumpSMTLIB2() throws IOException {
-    Generator.dumpSMTLIB2();
+    if (Generator.isLoggingEnabled()) {
+      Generator.dumpSMTLIB2();
+    } else {
+      throw new UnsupportedOperationException("Generator needs to be enabled");
+    }
   }
 
   @Override

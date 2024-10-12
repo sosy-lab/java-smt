@@ -164,10 +164,12 @@ public class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     Preconditions.checkState(!closed);
     closeAllEvaluators();

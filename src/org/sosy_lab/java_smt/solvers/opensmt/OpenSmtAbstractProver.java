@@ -219,10 +219,12 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     closeAllEvaluators();
     changedSinceLastSatQuery = false;

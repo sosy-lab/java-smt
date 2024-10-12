@@ -126,16 +126,22 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     switch (pBits.size()) {
       case 0:
         BooleanFormula result0 = makeTrue();
-        BooleanGenerator.logMakeTrue(result0, "true");
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logMakeTrue(result0, "true");
+        }
         return result0;
       case 1:
         BooleanFormula result1 = pBits.iterator().next();
-        BooleanGenerator.logAnd(result1, pBits);
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logAnd(result1, pBits);
+        }
         return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
         BooleanFormula result2 = and(it.next(), it.next());
-        BooleanGenerator.logAnd(result2, pBits);
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logAnd(result2, pBits);
+        }
         return result2;
       default:
         BooleanFormula result = wrap(andImpl(Collections2.transform(pBits, this::extractInfo)));
@@ -209,16 +215,22 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     switch (pBits.size()) {
       case 0:
         BooleanFormula result0 = makeFalse();
-        BooleanGenerator.logMakeFalse(result0, "false");
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logMakeFalse(result0, "false");
+        }
         return result0;
       case 1:
         BooleanFormula result1 = pBits.iterator().next();
-        BooleanGenerator.logOr(result1, pBits);
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logOr(result1, pBits);
+        }
         return result1;
       case 2:
         Iterator<BooleanFormula> it = pBits.iterator();
         BooleanFormula result2 = or(it.next(), it.next());
-        BooleanGenerator.logOr(result2, pBits);
+        if (Generator.isLoggingEnabled()) {
+          BooleanGenerator.logOr(result2, pBits);
+        }
         return result2;
       default:
         BooleanFormula result = wrap(orImpl(Collections2.transform(pBits, this::extractInfo)));

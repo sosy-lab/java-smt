@@ -196,7 +196,9 @@ public abstract class SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       emgr = null;
     }
-    Generator.resetGenerator();
+    if (Generator.isLoggingEnabled()) {
+      Generator.resetGenerator();
+    }
   }
 
   @After

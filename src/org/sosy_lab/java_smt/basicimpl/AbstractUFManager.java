@@ -40,8 +40,11 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public final <T extends Formula> FunctionDeclaration<T> declareUF(
       String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
     checkVariableName(pName);
-    if (pName.contains("PIPE")) {
-      pName = pName.replaceAll("PIPE", "|");
+    if (Generator.isLoggingEnabled()) {
+      // FIXME Find a better way to handle quoted symbols
+      if (pName.contains("PIPE")) {
+        pName = pName.replaceAll("PIPE", "|");
+      }
     }
     List<TType> argTypes = Lists.transform(pArgTypes, this::toSolverType);
     FunctionDeclaration<T> result =
@@ -87,8 +90,11 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
     checkVariableName(name);
-    if (name.contains("PIPE")) {
-      name = name.replaceAll("PIPE", "|");
+    if (Generator.isLoggingEnabled()) {
+      // FIXME Find a better way to handle quoted symbols
+      if (name.contains("PIPE")) {
+        name = name.replaceAll("PIPE", "|");
+      }
     }
     List<FormulaType<?>> argTypes = Lists.transform(pArgs, getFormulaCreator()::getFormulaType);
     FunctionDeclaration<T> func = declareUF(name, pReturnType, argTypes);

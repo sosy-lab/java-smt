@@ -120,10 +120,12 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     Preconditions.checkState(!closed);
     boolean unsat;

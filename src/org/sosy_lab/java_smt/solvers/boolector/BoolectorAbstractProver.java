@@ -84,11 +84,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    */
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      // FIXME: Find a better way to handle the IOException
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        // FIXME Find a better way to handle the IOException
+        throw new RuntimeException(pE);
+      }
     }
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;

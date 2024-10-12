@@ -135,10 +135,12 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public boolean isUnsat() throws Z3SolverException, InterruptedException {
-    try {
-      Generator.dumpSMTLIB2();
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    if (Generator.isLoggingEnabled()) {
+      try {
+        Generator.dumpSMTLIB2();
+      } catch (IOException pE) {
+        throw new RuntimeException(pE);
+      }
     }
     Preconditions.checkState(!closed);
     logSolverStack();
