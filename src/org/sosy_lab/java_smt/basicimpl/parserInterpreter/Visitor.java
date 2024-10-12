@@ -256,12 +256,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       return "Integer";
     } else if (isLong(strNum)) {
       return "Long";
-    } else if (isDouble(strNum)) {
-      return "Double";
     } else if (isBigInteger(strNum)) {
       return "BigInteger";
     } else if (isFloat(strNum)) {
       return "Float";
+    } else if (isDouble(strNum)) {
+      return "Double";
     } else {
       return "other";
     }
@@ -273,7 +273,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     if (variables.containsKey(operand)) {
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Integer")
-        || getNumericType(operand).equals("Long")) {
+        || getNumericType(operand).equals("Long")
+        || getNumericType(operand).equals("BigInteger")) {
       variables.put(operand, new ParserFormula(Objects.requireNonNull(imgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Double")
@@ -427,10 +428,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           try {
             Iterator<Formula> it = operands.iterator();
-            return bmgr.ifThenElse(
-                (BooleanFormula) it.next(), (BooleanFormula) it.next(), (BooleanFormula) it.next());
+            return bmgr.ifThenElse((BooleanFormula) it.next(), it.next(), it.next());
           } catch (Exception e) {
-            throw new ParserException("Operands for " + operator + " need to be of Boolean type");
+            throw new ParserException(
+                "Condition for "
+                    + operator
+                    + " need to be of Boolean type and the types of both branches need to match.");
           }
         }
       case "+":
