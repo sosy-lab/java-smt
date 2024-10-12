@@ -43,11 +43,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
-    if (solverToUse() == Solvers.PRINCESS) {
-      newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
-      newConfig.setOption("solver.useBinary", String.valueOf(true));
-    }
-    return newConfig;
+    return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
   }
 
   /* ARRAY CONSTRAINT TESTS. */

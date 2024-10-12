@@ -11,11 +11,17 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("checkstyle:linelength")
 public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    ConfigurationBuilder newConfig = super.createTestConfigBuilder();
+    return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
 
   @Test
   public void testMakeVariable() {
