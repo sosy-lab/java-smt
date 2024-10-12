@@ -433,8 +433,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
             throw new ParserException("Operands for " + operator + " need to be of Boolean type");
           }
         }
-        // numeral operators
       case "+":
+        // numeral operators
         if (!operands.isEmpty()) {
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
@@ -656,8 +656,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one real operands as input. ");
         }
 
-        // BitVec operators
       case "bvneg":
+        // BitVec operators
         if (operands.size() != 1) {
           throw new ParserException(operator + " takes one bitvector operand as input.");
         } else {
@@ -1006,8 +1006,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       case "repeat":
         throw new ParserException(operator + " is not available in JavaSMT");
 
-        // array operators
       case "select":
+        // array operators
         if (operands.size() == 2) {
           try {
             return Objects.requireNonNull(amgr)
@@ -1056,8 +1056,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
-        // UF
       case "UF":
+        // UF
         try {
           return umgr.callUF(
               (FunctionDeclaration<? extends Formula>) Objects.requireNonNull(ufOperator),
@@ -1066,8 +1066,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
 
-        // overloaded operators
       case "=":
+        // overloaded operators
         if (operands.size() == 2) {
           try {
             if (operands.stream().anyMatch(c -> c instanceof ArrayFormula)) {
