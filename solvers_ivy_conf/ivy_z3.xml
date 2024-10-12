@@ -26,19 +26,20 @@ SPDX-License-Identifier: Apache-2.0
         <!-- default config, provides only x64 for backwards-compatibility -->
         <conf name="solver-z3" extends="solver-z3-x64"/>
 
-        <!-- public main configurations -->
+        <!-- main configurations -->
         <conf name="solver-z3-x64" extends="solver-z3-linux-x64,solver-z3-windows-x64,solver-z3-macos-x64"/>
         <conf name="solver-z3-arm64" extends="solver-z3-linux-arm64,solver-z3-windows-arm64,solver-z3-macos-arm64"/>
         <conf name="sources"/>
         <conf name="javadoc"/>
 
-        <!-- private basic configurations -->
-        <conf name="solver-z3-linux-x64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-linux-arm64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-windows-x64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-windows-arm64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-macos-x64" extends="solver-z3-common" visibility="private"/>
-        <conf name="solver-z3-macos-arm64" extends="solver-z3-common" visibility="private"/>
+        <!-- basic configurations -->
+        <conf name="solver-z3-linux-x64" extends="solver-z3-common"/>
+        <conf name="solver-z3-linux-arm64" extends="solver-z3-common"/>
+        <conf name="solver-z3-windows-x64" extends="solver-z3-common"/>
+        <conf name="solver-z3-windows-arm64" extends="solver-z3-common"/>
+        <conf name="solver-z3-macos-x64" extends="solver-z3-common"/>
+        <conf name="solver-z3-macos-arm64" extends="solver-z3-common"/>
+
         <conf name="solver-z3-common" visibility="private"/>
     </configurations>
 
