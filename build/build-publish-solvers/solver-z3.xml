@@ -48,8 +48,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="package-z3" depends="check-z3-path,get-z3-version, package-z3-sources, package-z3-javadoc">
         <!-- collect all files -->
-        <!-- TODO: Z3 forgot to include Java bindings into its Linux-ARM64 release in 4.13.2,
-              so we ignore those files currently. See https://github.com/Z3Prover/z3/issues/7406 -->
         <copy todir="./" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
                 <include name="z3-*-x64-glibc-*/bin/com.microsoft.z3.jar"/>
@@ -64,7 +62,7 @@ SPDX-License-Identifier: Apache-2.0
         </copy>
         <copy todir="arm64/" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
-                <!-- <include name="z3-*-arm64-glibc-*/bin/libz3*.so"/> -->
+                <include name="z3-*-arm64-glibc-*/bin/libz3*.so"/>
                 <include name="z3-*-arm64-osx-*/bin/libz3*.dylib"/>
                 <include name="z3-*-arm64-win/bin/**/*z3*.dll"/>
             </fileset>
@@ -86,8 +84,8 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Linux files -->
         <move file="x64/libz3.so" tofile="x64/libz3-${z3.version}.so" verbose="true"/>
         <move file="x64/libz3java.so" tofile="x64/libz3java-${z3.version}.so" verbose="true"/>
-        <!-- <move file="arm64/libz3.so" tofile="arm64/libz3-${z3.version}.so"/> -->
-        <!-- <move file="arm64/libz3java.so" tofile="arm64/libz3java-${z3.version}.so"/> -->
+        <move file="arm64/libz3.so" tofile="arm64/libz3-${z3.version}.so"/>
+        <move file="arm64/libz3java.so" tofile="arm64/libz3java-${z3.version}.so"/>
         <!-- Windows files -->
         <move file="x64/libz3.dll" tofile="x64/libz3-${z3.version}.dll" verbose="true"/>
         <move file="x64/libz3java.dll" tofile="x64/libz3java-${z3.version}.dll" verbose="true"/>

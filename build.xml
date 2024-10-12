@@ -81,7 +81,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="clean" description="Clean">
         <property name="libraryFiles" value="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${libraryFiles}"/>
+            <fileset dir="." includes="${libraryFiles} Javadoc-z3/"/>
             <fileset dir="x64" includes="${libraryFiles}"/>
             <fileset dir="arm64" includes="${libraryFiles}"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>

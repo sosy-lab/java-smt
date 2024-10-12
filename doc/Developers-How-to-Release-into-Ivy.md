@@ -54,13 +54,13 @@ For example, the directory structure can look like this:
 
 ```
 z3/                                 // <-- parent directory
- |-- z3-4.13.2-arm64-glibc-2.34/    // <-- unpacked release artifact
- |-- z3-4.13.2-arm64-osx-11.0/
- |-- z3-4.13.2-arm64-win/
- |-- z3-4.13.2-x64-glibc-2.35/
- |-- z3-4.13.2-x64-osx-12.7.6/
- |-- z3-4.13.2-x64-win/
- |-- z3-z3-4.13.2/                  // <-- sources directory used as 'z3.path'
+ |-- z3-4.13.3-arm64-glibc-2.34/    // <-- unpacked release artifact
+ |-- z3-4.13.3-arm64-osx-13.7/
+ |-- z3-4.13.3-arm64-win/
+ |-- z3-4.13.3-x64-glibc-2.35/
+ |-- z3-4.13.3-x64-osx-13.7/
+ |-- z3-4.13.3-x64-win/
+ |-- z3-z3-4.13.3/                  // <-- sources directory used as 'z3.path'
 ```
 
 In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
@@ -71,7 +71,7 @@ ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
 ```
 Example:
 ```
-ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.2 -Dz3.version=4.13.2
+ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.3 -Dz3.version=4.13.3
 ```
 Finally, follow the instructions shown in the message at the end.
 
