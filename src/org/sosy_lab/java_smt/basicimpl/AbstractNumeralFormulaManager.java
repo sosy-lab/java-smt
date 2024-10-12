@@ -138,6 +138,7 @@ public abstract class AbstractNumeralFormulaManager<
   public ResultFormulaType makeNumber(double pNumber) {
     ResultFormulaType result = wrap(makeNumberImpl(pNumber));
     if (Generator.isLoggingEnabled()) {
+      // FIXME Broken when used in IntegerFormulaManager
       NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
     }
     return wrap(makeNumberImpl(pNumber));

@@ -1179,6 +1179,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     String keyString = replaceReplacedChars(key.toString());
     String valueString = value.toString();
     // TODO Does this add function definitions to the model?
+    //  UPDATE Actually this is used together with `visitResp_get_model` to parse the model returned
+    //         by the solver after (get-model) is used.
     if (isModel) {
       Model.ValueAssignment assignment =
           new ValueAssignment(

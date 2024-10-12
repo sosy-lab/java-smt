@@ -29,6 +29,7 @@ public class BitvectorGenerator {
     inputParams.add(i.toString());
     Function<List<Object>, String> functionToString =
         inPlaceInputParamsString -> {
+          // FIXME Fix the conversion to String
           String formatString = "%0" + length + "d";
           BigInteger binaryNumber =
               new BigInteger(
@@ -40,11 +41,13 @@ public class BitvectorGenerator {
   }
 
   protected static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
+    // TODO We need to convert the integer formula to bitvector. It doesn't have to be a constant.
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(pI.toString());
     Function<List<Object>, String> functionToString =
         inPlaceInputParamsString -> {
+          // FIXME Fix the conversion to String
           String formatString = "%0" + length + "d";
           int binaryNumber =
               Integer.parseInt(
