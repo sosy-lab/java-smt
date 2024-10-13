@@ -15,15 +15,15 @@ clone_depth: 1
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.14" )) {
+      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.15" )) {
         (new-object System.Net.WebClient).DownloadFile(
-        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.14-bin.zip',
+        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip',
           'C:\ant-bin.zip'
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
-  - SET JAVA_HOME=C:\Program Files\Java\jdk14
-  - SET PATH=C:\ant\apache-ant-1.10.14\bin;%JAVA_HOME%\bin;%PATH%
+  - SET JAVA_HOME=C:\Program Files\Java\jdk17
+  - SET PATH=C:\ant\apache-ant-1.10.15\bin;%JAVA_HOME%\bin;%PATH%
   - SET IVY_CACHE_DIR=C:\ivy
   - echo %USERPROFILE%
   - echo %PATH%
