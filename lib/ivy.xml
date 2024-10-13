@@ -84,7 +84,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencies>
         <!-- SoSy-Lab Common Library -->
-        <dependency org="org.sosy_lab" name="common" rev="0.3000-585-g7a5f95c1" conf="core->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="common" rev="0.3000-609-g90a352c" conf="core->runtime; contrib->sources"/>
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
