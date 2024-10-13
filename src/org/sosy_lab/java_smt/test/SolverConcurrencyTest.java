@@ -737,11 +737,9 @@ public class SolverConcurrencyTest {
             .map(
                 ex -> {
                   StringWriter sw = new StringWriter();
-                  // CHECKSTYLE:OFF IllegalInstantiation
-                  try (PrintWriter pw = new PrintWriter(sw)) {
-                    // CHECKSTYLE:ON
-                    ex.printStackTrace(pw);
-                  }
+                  @SuppressWarnings("checkstyle:IllegalInstantiation")
+                  PrintWriter pw = new PrintWriter(sw);
+                  ex.printStackTrace(pw);
                   return sw.toString();
                 })
             .collect(Collectors.toList());
