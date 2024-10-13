@@ -115,18 +115,32 @@ public class SolverContextFactoryTest {
     }
   }
 
-  /** Some libraries require GLIBCXX in version 3.4.26 or newer. This excludes Ubuntu 18.04. */
+  /**
+   * Some libraries require GLIBC in version 2.34 or GLIBCXX in version 3.4.26 or newer. This
+   * excludes Ubuntu 18.04 or 20.04 for some solvers.
+   */
   private boolean isSufficientVersionOfLibcxx(String library) {
     try {
       NativeLibraries.loadLibrary(library);
     } catch (UnsatisfiedLinkError e) {
-      for (String version : new String[] {"3.4.26", "3.4.29"}) {
-        if (e.getMessage().contains("version `GLIBCXX_" + version + "' not found")) {
+      for (String dependency : getRequiredLibcxx(library)) {
+        if (e.getMessage().contains("version `" + dependency + "' not found")) {
           return false;
         }
       }
     }
     return true;
+  }
+
+  private String[] getRequiredLibcxx(String library) {
+    switch (library) {
+      case "z3":
+        return new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "bitwuzlaj":
+        return new String[] {"GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      default:
+        return new String[] {};
+    }
   }
 
   @Before
