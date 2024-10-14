@@ -40,10 +40,10 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final <T extends Formula> T eval(T f) {
     Preconditions.checkState(!isClosed());
-    TFormulaInfo evaluation = evalImpl(creator.extractInfo(f));
     if (Generator.isLoggingEnabled()) {
       Generator.getLines().append("(get-value (" + f + "))\n");
     }
+    TFormulaInfo evaluation = evalImpl(creator.extractInfo(f));
     return evaluation == null ? null : (T) creator.encapsulateWithTypeOf(evaluation);
   }
 
@@ -64,6 +64,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
     if (Generator.isLoggingEnabled()) {
       Generator.getLines().append("(get-value (" + f + "))\n");
     }
+    Object value = evaluateImpl(creator.extractInfo(f));
     if (value instanceof BigInteger) {
       // We simplified the value internally. Here, we need to convert it back to Rational.
       return Rational.ofBigInteger((BigInteger) value);
@@ -86,6 +87,9 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final String evaluate(StringFormula f) {
     Preconditions.checkState(!isClosed());
+    if (Generator.isLoggingEnabled()) {
+      Generator.getLines().append("(get-value (" + f + "))\n");
+    }
     return (String) evaluateImpl(creator.extractInfo(f));
   }
 
@@ -93,6 +97,9 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public final String evaluate(EnumerationFormula f) {
     Preconditions.checkState(!isClosed());
+    if (Generator.isLoggingEnabled()) {
+      Generator.getLines().append("(get-value (" + f + "))\n");
+    }
     return (String) evaluateImpl(creator.extractInfo(f));
   }
 
