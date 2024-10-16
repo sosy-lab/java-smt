@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
  * @param <ParamFormulaType> formulaType of the parameters
  * @param <ResultFormulaType> formulaType of arithmetic results
  */
+@SuppressWarnings("InterfaceTypeParameterName")
 public interface NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula> {
 

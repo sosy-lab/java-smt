@@ -46,7 +46,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.smtinterpol")
-  private static class SmtInterpolSettings {
+  private static final class SmtInterpolSettings {
 
     @Option(
         secure = true,

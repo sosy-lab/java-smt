@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.cvc5")
-  private static class CVC5Settings {
+  private static final class CVC5Settings {
 
     @Option(
         secure = true,

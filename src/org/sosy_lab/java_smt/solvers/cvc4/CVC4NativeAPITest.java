@@ -655,8 +655,8 @@ public class CVC4NativeAPITest {
                 // 1 is not enough!
                 Thread.sleep(10);
                 smtEngine.interrupt();
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
+              } catch (InterruptedException exception) {
+                throw new UnsupportedOperationException("Unexpected interrupt", exception);
               }
             });
 

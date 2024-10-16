@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** Helper class for splitting up an SMT-LIB2 file into a string of commands. */
-public class Tokenizer {
+public final class Tokenizer {
 
   private Tokenizer() {}
 
