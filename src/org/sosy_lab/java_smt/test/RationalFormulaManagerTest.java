@@ -37,7 +37,6 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
     requireRationals();
     requireRationalFloor();
 
-    requireRationalFloor();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       RationalFormula r = rmgr.makeNumber(v);
