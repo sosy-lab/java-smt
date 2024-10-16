@@ -13,9 +13,9 @@ RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         tzdata locales locales-all \
  && apt-get clean
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
 
 # Install basic packages for building several solvers
 RUN apt-get update \
@@ -23,6 +23,8 @@ RUN apt-get update \
         wget curl git build-essential cmake patchelf unzip \
         openjdk-11-jdk ant maven \
         gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix \
+        gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+        binutils-aarch64-linux-gnu libc6-dev-arm64-cross \
         zlib1g-dev m4 \
  && apt-get clean
 
