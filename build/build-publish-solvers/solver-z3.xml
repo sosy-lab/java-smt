@@ -98,16 +98,6 @@ SPDX-License-Identifier: Apache-2.0
         <move file="arm64/libz3java.dylib" tofile="arm64/libz3java-${z3.version}.dylib" verbose="true"/>
         <!-- common Java file, Java is platform independent -->
         <move file="com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
-
-        <!--
-          We additionally provide x64-files without arch-attribute for backwards compatibility,
-          such that applications can load dependencies without changing their Ivy configuration.
-          Those files are not part of any direct configuration, but will be resolved if the
-          arch-attribute is not used.
-        -->
-        <copy todir="./" flatten="true" verbose="true">
-            <fileset dir="x64/"/>
-        </copy>
     </target>
 
     <target name="get-z3-version" unless="z3.version" depends="check-z3-path">
