@@ -205,33 +205,32 @@ but in the normal system environment, where some testing can be applied by the d
 
 We publish MathSAT for both Linux and Windows systems at once.
 The build process can fully be done on a Linux system.
-We prefer to use the Docker container based on Ubuntu 18.04 for compiling the dependencies and assembling the libraries,
-because GMP and MPIR might cause problems with newer versions of GCC and MinGW during compilation.
+For publishing MathSAT, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
+We prefer to use the Docker container based on Ubuntu 22.04 for compiling the dependencies and assembling the libraries.
 
-For publishing MathSAT5, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
-then provide the necessary dependencies (GMP for Linux and MPIR/JDK for Windows) as described in the compilation scripts.
+then provide the necessary dependencies (GMP for Linux and GMP/JDK for Windows) as described in the compilation scripts.
 (see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH_LINUX` and `$MATHSAT_PATH_WINDOWS` are the paths to the MathSAT root directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: less than 5s):
 ```
   ant publish-mathsat \
-      -Dmathsat.path=$MATHSAT_PATH_LINUX \
-      -Dgmp.path=$GMP_PATH \
-      -Dmathsat-windows.path=$MATHSAT_PATH_WINDOWS \
-      -Dmpir-windows.path=$MPIR_PATH \
-      -Djdk-windows.path=$JDK_11_PATH \
+      -Dmathsat-linux-x64.path=$MATHSAT_PATH_LINUX \
+      -Dgmp-linux-x64.path=$GMP_PATH \
+      -Dmathsat-windows-x64.path=$MATHSAT_PATH_WINDOWS \
+      -Dgmp-windows-x64.path=$GMP_PATH_WINDOWS \
+      -Djdk-windows-x64.path=$JDK_11_PATH \
       -Dmathsat.version=$MATHSAT_VERSION
 ```
-Concrete example (`$WD` is a working directory where all dependencies are located):
+Example:
 ```
   ant publish-mathsat \
-      -Dmathsat.path=$WD/mathsat-5.6.7-linux-x86_64-reentrant \
-      -Dgmp.path=$WD/gmp-6.1.2 \
-      -Dmathsat-windows.path=$WD/mathsat-5.6.7-win64-msvc \
-      -Dmpir-windows.path=$WD/mpir-2.7.2-win \
-      -Djdk-windows.path=$WD/jdk-11 \
-      -Dmathsat.version=5.6.7
+      -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-x86_64-reentrant \
+      -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0 \
+      -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-win64-msvc \
+      -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
+      -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-windows \
+      -Dmathsat.version=5.6.11
 ```
 Finally follow the instructions shown in the message at the end.
 
