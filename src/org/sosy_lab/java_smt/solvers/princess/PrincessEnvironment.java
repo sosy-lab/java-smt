@@ -130,7 +130,9 @@ class PrincessEnvironment {
               OFlags.$lessinit$greater$default$10(),
               OFlags.$lessinit$greater$default$11(),
               OFlags.$lessinit$greater$default$12(),
-              OFlags.$lessinit$greater$default$13()));
+              OFlags.$lessinit$greater$default$13(),
+              OFlags.$lessinit$greater$default$14(),
+              OFlags.$lessinit$greater$default$15()));
   public static final Sort STRING_SORT = stringTheory.StringSort();
   public static final Sort REGEX_SORT = stringTheory.RegexSort();
 
