@@ -118,6 +118,18 @@ class PrincessEnvironment {
       new OstrichStringTheory(
           toSeq(new ArrayList<>()),
           new OFlags(
+              /* OFlag default values:
+               * -- Pre-image specific options
+               * eagerAutomataOperations : false,
+               * measureTimes            : false,
+               * useLength               : OFlags.LengthOptions.Auto,
+               * useParikhConstraints    : true,
+               * minimizeAutomata        : false,
+               * forwardPropagation      : false,
+               * backwardPropagation     : true,
+               * nielsenSplitter         : true,
+               * regexTranslator         : OFlags.RegexTranslator.Hybrid,
+               */
               OFlags.$lessinit$greater$default$1(),
               OFlags.$lessinit$greater$default$2(),
               OFlags.$lessinit$greater$default$3(),
@@ -127,6 +139,14 @@ class PrincessEnvironment {
               OFlags.$lessinit$greater$default$7(),
               OFlags.$lessinit$greater$default$8(),
               OFlags.$lessinit$greater$default$9(),
+              /* -- Options for the cost-enriched-automata solver
+               * ceaBackend              : OFlags.CEABackend.Unary,
+               * useCostEnriched         : false,
+               * debug                   : false,
+               * underApprox             : true,
+               * underApproxBound        : 15,
+               * simplifyAut             : true
+               */
               OFlags.$lessinit$greater$default$10(),
               OFlags.$lessinit$greater$default$11(),
               OFlags.$lessinit$greater$default$12(),
