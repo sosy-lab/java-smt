@@ -203,36 +203,43 @@ but in the normal system environment, where some testing can be applied by the d
 
 ### Publishing (Opti)-MathSAT5
 
-We publish MathSAT for both Linux and Windows systems at once.
-The build process can fully be done on a Linux system.
-For publishing MathSAT, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
+We publish MathSAT for Linux (x64 and arm64) and Windows (x64) systems at once.
+The build process can fully be done on a Linux system, 
+and requires several dependencies, such as gcc, x86_64-w64-mingw32-gcc, and aarch64-linux-gnu-gcc.
 We prefer to use the Docker container based on Ubuntu 22.04 for compiling the dependencies and assembling the libraries.
 
-First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
-then provide the necessary dependencies (GMP for Linux and GMP/JDK for Windows) as described in the compilation scripts.
-(see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
-where `$MATHSAT_PATH_LINUX` and `$MATHSAT_PATH_WINDOWS` are the paths to the MathSAT root directory,
-and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: less than 5s):
+First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them.
+Then provide the necessary dependencies (GMP/JDK for Linux (x64 and arm64) and GMP/JDK for Windows (x64))
+as described in the compilation scripts (see `lib/native/source/libmathsat5j/compileFor<PLATFORM>.sh`).
+Then execute the following command in the JavaSMT directory,
+where `$MATHSAT_PATH_<ARCH>` is the paths to the corresponding MathSAT root directory,
+and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one command, runtime is about 10s):
 ```
-  ant publish-mathsat \
-      -Dmathsat-linux-x64.path=$MATHSAT_PATH_LINUX \
-      -Dgmp-linux-x64.path=$GMP_PATH \
-      -Dmathsat-windows-x64.path=$MATHSAT_PATH_WINDOWS \
-      -Dgmp-windows-x64.path=$GMP_PATH_WINDOWS \
-      -Djdk-windows-x64.path=$JDK_11_PATH \
-      -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat \
+    -Dmathsat-linux-x64.path=$MATHSAT_PATH_LINUX_X64 \
+    -Dgmp-linux-x64.path=$GMP_PATH_LINUX_X64 \
+    -Dmathsat-windows-x64.path=$MATHSAT_PATH_WINDOWS_X64 \
+    -Dgmp-windows-x64.path=$GMP_PATH_WINDOWS_X64 \
+    -Djdk-windows-x64.path=$JDK_PATH_WINDOWS_X64 \
+    -Dmathsat-linux-arm64.path=$MATHSAT_PATH_LINUX_ARM64 \
+    -Dgmp-linux-arm64.path=$GMP_PATH_LINUX_ARM64 \
+    -Djdk-linux-arm64.path=$JDK_PATH_LINUX_ARM64 \
+    -Dmathsat.version=$MATHSAT_VERSION
 ```
 Example:
 ```
-  ant publish-mathsat \
-      -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-x86_64-reentrant \
-      -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0 \
-      -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-win64-msvc \
-      -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
-      -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-windows \
-      -Dmathsat.version=5.6.11
+ant publish-mathsat \
+     -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-x86_64-reentrant \
+     -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+     -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-win64-msvc \
+     -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
+     -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-win-x64 \
+     -Dmathsat-linux-arm64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-aarch64-reentrant \
+     -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
+     -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2 \
+     -Dmathsat.version=5.6.11
 ```
-Finally follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end.
 
 A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
 except that Windows is not yet supported and the publishing command is simpler:
