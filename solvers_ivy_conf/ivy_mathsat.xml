@@ -22,18 +22,30 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-        <conf name="solver-mathsat" extends="solver-mathsat-linux,solver-mathsat-windows"/>
-        <conf name="solver-mathsat-linux" />
-        <conf name="solver-mathsat-windows" />
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-mathsat" extends="solver-mathsat-x64"/>
+
+        <!-- main configurations -->
+        <conf name="solver-mathsat-x64" extends="solver-mathsat-linux-x64,solver-mathsat-windows-x64"/>
+        <conf name="solver-mathsat-arm64" extends="solver-mathsat-linux-arm64"/>
+
+        <!-- basic configurations -->
+        <conf name="solver-mathsat-linux-x64"/>
+        <conf name="solver-mathsat-linux-arm64"/>
+        <conf name="solver-mathsat-windows-x64"/>
     </configurations>
 
     <publications defaultconf="solver-mathsat">
-        <!-- Linux64 files -->
-        <artifact name="libmathsat5j" conf="solver-mathsat-linux" type="shared-object" ext="so" />
-        <!-- Windows64 files -->
-        <artifact name="mathsat5j" conf="solver-mathsat-windows" type="dll" ext="dll" />
-        <artifact name="mathsat"   conf="solver-mathsat-windows" type="dll" ext="dll" />
-        <artifact name="mpir"      conf="solver-mathsat-windows" type="dll" ext="dll" />
+        <!-- Linux x64 files -->
+        <artifact name="libmathsat5j" conf="solver-mathsat-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+
+        <!-- Linux arm64 files -->
+        <artifact name="libmathsat5j" conf="solver-mathsat-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+
+        <!-- Windows x64 files -->
+        <artifact name="mathsat5j" conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
+        <artifact name="mathsat"   conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
+        <artifact name="mpir"      conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
     </publications>
     <dependencies></dependencies>
 

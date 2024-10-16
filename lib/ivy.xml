@@ -31,7 +31,9 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="core" visibility="private" description="minimal configuration, no solver included"/>
 
         <!-- The normal dependencies with only one solver included. -->
-        <conf name="runtime-mathsat" extends="core" description="only one solver included"/>
+        <conf name="runtime-mathsat" extends="runtime-mathsat-x64,runtime-mathsat-arm64" description="only one solver included"/>
+        <conf name="runtime-mathsat-x64" extends="core" description="only one solver included"/>
+        <conf name="runtime-mathsat-arm64" extends="core" description="only one solver included"/>
         <conf name="runtime-opensmt" extends="core" description="only one solver included"/>
         <conf name="runtime-optimathsat" extends="core" description="only one solver included"/>
         <conf name="runtime-smtinterpol" extends="core" description="only one solver included"/>
@@ -60,10 +62,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-x64-without-gpl"
-              extends="runtime-mathsat,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5,runtime-boolector,runtime-bitwuzla"
+              extends="runtime-mathsat-x64,runtime-opensmt,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5,runtime-boolector,runtime-bitwuzla"
               description="all solvers for x64 architecture included, except those under GPL"/>
         <conf name="runtime-arm64-without-gpl"
-              extends="runtime-smtinterpol,runtime-princess,runtime-z3-arm64"
+              extends="runtime-mathsat-arm64,runtime-smtinterpol,runtime-princess,runtime-z3-arm64"
               description="all solvers for arm64 architecture included, except those under GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
@@ -172,7 +174,8 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.10" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11" conf="runtime-mathsat->solver-mathsat-x64" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11" conf="runtime-mathsat->solver-mathsat-arm64" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.13.3" conf="runtime-z3-x64->solver-z3-x64; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.13.3" conf="runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.6.0-g2f72cc0e" conf="runtime-opensmt->solver-opensmt; contrib->sources,javadoc" />
