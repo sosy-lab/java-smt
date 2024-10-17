@@ -3,7 +3,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -79,12 +79,14 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
-        <property name="bitwuzla.path" value="${user.dir}/lib/native/source/libbitwuzla"/>
+        <property name="jarFiles" value="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
+        <property name="libraryFiles" value="*.so *.dll *.dylib x64/*.so x64/*.dll x64/*.dylib arm64/*.so arm64/*.dll arm64/*.dylib"/>
+
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
+            <fileset dir="." includes="${libraryFiles} ${jarFiles} Javadoc-z3/"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="${bitwuzla.path}" includes="include/"/>
-            <fileset dir="${bitwuzla.path}" includes="bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/libbitwuzla" includes="include/"/>
+            <fileset dir="lib/native/source/libbitwuzla" includes="bitwuzla_wrap.o"/>
         </delete>
     </target>
 
