@@ -61,11 +61,11 @@ public class PrincessStringFormulaManager
       return pToken;
     }
 
-    // Return the unicode letter if it fits into a single 16bit character
-    // Abort otherwise
+    // Return the Unicode letter if it fits into a single 16bit character
+    // Otherwise throw an exception as we don't support Unicode characters with more than 4 digits
     char[] chars = Character.toChars(value);
     if (chars.length != 1) {
-      return pToken;
+      throw new IllegalArgumentException();
     } else {
       return String.valueOf(chars[0]);
     }

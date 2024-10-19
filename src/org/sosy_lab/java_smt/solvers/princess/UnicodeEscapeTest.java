@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -24,15 +25,10 @@ public class UnicodeEscapeTest {
       ImmutableMap.of(
           "\\uabcd", "ꯍ", "\\u{a}", "\n", "\\u{ab}", "«", "\\u{abc}", "઼", "\\u{abcd}", "ꯍ");
 
-  /**
-   * Examples of invalid encodings for Unicode characters.
-   *
-   * <p>Note that <code>"\\u{abcde}"</code> is in fact valid in STMLIB, but we can't translate it to
-   * a single UTF16 character for Princess.
-   */
+  /** Examples of invalid encodings for Unicode characters. */
   List<String> invalidCodes =
       ImmutableList.of(
-          "\\uabc", "\\uabcde", "\\u000g", "\\u{}", "\\u" + "{abcde}", "\\u{g}", "\\u{abcd");
+          "\\uabc", "\\uabcde", "\\u000g", "\\u{}", "\\u{abcdef}", "\\u{g}", "\\u{abcd");
 
   @Test
   public void validCodesTest() {
@@ -49,5 +45,16 @@ public class UnicodeEscapeTest {
       // them over.
       assertThat(PrincessStringFormulaManager.unescapeString(code)).isEqualTo(code);
     }
+  }
+
+  @Test
+  public void unsupportedCodesTest() {
+    // We don't support \\u{...} with 5 digits, even though it is legal in SMTLIB, as the code
+    // can't be represented as a single UTF16 character. If such a code is found we expect an
+    // exception to be thrown.
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> PrincessStringFormulaManager.unescapeString("\\u{abcde}"));
+    assertThat(PrincessStringFormulaManager.unescapeString("\\u{abcdg}")).isEqualTo("\\u{abcdg}");
   }
 }
