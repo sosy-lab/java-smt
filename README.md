@@ -54,21 +54,21 @@ JavaSMT can express formulas in the following theories:
 The concrete support for a certain theory depends on the underlying SMT solver.
 Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
 
-Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
+JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.md) for installation):
 
-| SMT Solver | Linux | Windows | MacOS | Description |
-| --- |:---:|:---:|:---:|:--- |
-| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: | :heavy_check_mark: |  | a fast solver for bitvector logic |
-| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
-| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
-| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |
-| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: |  |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  |  |
-| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  | based on MathSAT5, with support for optimization queries |
-| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
-| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
-| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
-| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
+| SMT Solver | Linux x64 | Linux arm64 | Windows x64 | Windows arm64 | MacOS x64 | MacOS arm64 | Description |
+| --- |:---:|:---:|:---:|:---:|:---:|:---:|:--- |
+| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |  | a fast solver for bitvector logic |
+| [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  |  |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
+| [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
+| [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  |  |  |  |  |
+| [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  |  |  |  | based on MathSAT5, with support for optimization queries |
+| [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
+| [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
+| [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  |  |  |  |
+| [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
 
 #### Operating System and Architecture Support
 We support a reasonable list of operating systems and versions.
@@ -76,7 +76,7 @@ Our main target is Linux (64-bit, mainly Ubuntu 22.04 or newer,
 several solver libraries also work on Ubuntu 18.04, or comparable Linux distributions).
 Windows 10/11 and MacOS are supported for several SMT solvers.
 Our main development architecture is x64 (x86-64).
-We also provide some solvers for ARM64 (AArch64 for ARMv8-A), e.g., Java-based SMT solvers and Z3.
+We also provide some solvers for ARM64 (AArch64 for ARMv8-A), e.g., Java-based SMT solvers, Z3, and MathSAT.
 If a specific operating system or architecture is missing and required,
 please do not hesitate and open an issue!
 
@@ -102,9 +102,9 @@ If something specific is missing, please [look for or file an issue](https://git
 | [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: | :heavy_check_mark: |
-| [CVC5](https://cvc4.github.io/) | :question: | |
+| [CVC5](https://cvc4.github.io/) | :question: |  |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: | |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :question: |  |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: |  |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: |  |
