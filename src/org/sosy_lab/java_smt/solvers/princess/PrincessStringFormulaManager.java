@@ -16,7 +16,6 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
 import ap.types.Sort;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.RegexFormula;
@@ -38,8 +37,8 @@ public class PrincessStringFormulaManager
   private static String literalOrSkip(String pToken) {
     String literal;
     if (pToken.startsWith("\\u{")) {
-      if (pToken.length() > 9) {
-        // Abort if there are too many digits
+      if (pToken.length() > 9 || !pToken.endsWith("}")) {
+        // Abort if there is no closing bracket, or if there are too many digits for the literal
         // The longest allowed literal is \\u{d5 d4 d3 d2 d1}
         return pToken;
       }
@@ -92,8 +91,12 @@ public class PrincessStringFormulaManager
         String value;
         if (pInput.charAt(2) == '{') {
           // Sequence has the form \\u{d5 d4 d3 d2 d1 d0}
+          // Find the closing bracket for the literal:
           int stop = pInput.indexOf('}');
-          Preconditions.checkArgument(stop != -1); // Panic if there is no closing bracket
+          if (stop == -1) {
+            // Use the index right after "\\u{" if there is no closing bracket
+            stop = 2;
+          }
           value = pInput.substring(0, stop + 1);
           pInput = pInput.substring(stop + 1);
         } else {
