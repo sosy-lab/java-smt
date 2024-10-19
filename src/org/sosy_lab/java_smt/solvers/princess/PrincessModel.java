@@ -80,7 +80,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     // then iterate over the model and generate the assignments
     ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
     for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
-      if (!isAbbrev(abbrevs, entry.getKey())) {
+      if (!entry.getKey().toString().equals("Rat_denom") && !isAbbrev(abbrevs, entry.getKey())) {
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
       }
     }
