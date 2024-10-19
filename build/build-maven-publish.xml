@@ -127,11 +127,11 @@ SPDX-License-Identifier: Apache-2.0
     <target name="stage-mathsat5" depends="build-dependencies, install-contrib"
             description="deploy current version of MathSAT to Maven staging repository">
         <!-- get revision from dependencies -->
-        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]" conf="runtime-mathsat"/>
         <property name="stage.solver" value="mathsat"/>
         <property name="stage.revision" value="${mathsat.revision}"/>
-        <property name="libDir.x64" value="lib/java-contrib/x64"/>
-        <property name="libDir.arm64" value="lib/java-contrib/arm64"/>
+        <property name="libDir.x64" value="lib/java/runtime-mathsat/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-mathsat/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
