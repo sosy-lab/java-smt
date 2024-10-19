@@ -30,7 +30,7 @@ public class PrincessStringFormulaManager
   }
 
   /**
-   * Tries to parse an escaped unicode character
+   * Tries to parse an escaped Unicode character
    *
    * <p>Returns the original String if parsing is not possible.
    */
@@ -52,7 +52,7 @@ public class PrincessStringFormulaManager
       literal = pToken.substring(2);
     }
 
-    // Try to parse the digits as an (hexadecimal) integer
+    // Try to parse the digits as a (hexadecimal) integer
     // Abort if there is an error
     int value;
     try {
@@ -78,7 +78,7 @@ public class PrincessStringFormulaManager
       // Search for the next escape sequence
       int start = pInput.indexOf("\\u");
       if (start == -1) {
-        // Append the rest of the String to the output if there are no more escaped unicode
+        // Append the rest of the String to the output if there are no more escaped Unicode
         // characters
         builder.append(pInput);
         pInput = "";
@@ -113,7 +113,7 @@ public class PrincessStringFormulaManager
           pInput = pInput.substring(stop);
         }
 
-        // Try to parse the escape sequence to replace it with its 16bit unicode character
+        // Try to parse the escape sequence to replace it with its 16bit Unicode character
         // If parsing fails just keep it in the String
         String nextToken = literalOrSkip(value);
 
