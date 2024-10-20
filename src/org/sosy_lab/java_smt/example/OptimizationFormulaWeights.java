@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * the satisfied formulas should be maximal and the weight of unsatisfied formulas should be
  * minimal.
  */
-public class OptimizationFormulaWeights {
+public final class OptimizationFormulaWeights {
 
   private OptimizationFormulaWeights() {
     // never called

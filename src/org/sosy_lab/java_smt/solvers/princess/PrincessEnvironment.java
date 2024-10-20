@@ -622,8 +622,8 @@ class PrincessEnvironment {
     try {
       Method constMethod = ExtArray.class.getMethod("const");
       constArrayOp = (IFunction) constMethod.invoke(arraySort.theory());
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
-      throw new RuntimeException(pE);
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException exception) {
+      throw new RuntimeException(exception);
     }
 
     return new IFunApp(constArrayOp, toSeq(ImmutableList.of(elseTerm)));

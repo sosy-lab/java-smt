@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
 
-public class OpenSmtSolverContext extends AbstractSolverContext {
+public final class OpenSmtSolverContext extends AbstractSolverContext {
   private final OpenSmtFormulaCreator creator;
   private final OpenSmtFormulaManager manager;
 
