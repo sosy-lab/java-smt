@@ -46,18 +46,35 @@ there are scripts for publishing available at the root of the [Ivy Repository](h
 We prefer to use the official Z3 binaries,
 please build from source only if necessary (e.g., in case of an important bugfix).
 
-To publish Z3, download the **Ubuntu**, **Windows**, and **OSX** binary
+### From official binaries (for Linux, Windows, and OSX)
+
+To publish Z3, download the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
-In the unpacked sources directory, prepare Java sources via `python scripts/mk_make.py --java`.
-For simpler handling, we then copy the files from the three `bin` directories together into one directory,
-and include the sources (we can keep the internal structure of each directory, just copy them above each other).
+For example, the directory structure can look like this:
+
+```
+z3/                                 // <-- parent directory
+ |-- z3-4.13.3-arm64-glibc-2.34/    // <-- unpacked release artifact
+ |-- z3-4.13.3-arm64-osx-13.7/
+ |-- z3-4.13.3-arm64-win/
+ |-- z3-4.13.3-x64-glibc-2.35/
+ |-- z3-4.13.3-x64-osx-13.7/
+ |-- z3-4.13.3-x64-win/
+ |-- z3-z3-4.13.3/                  // <-- sources directory used as 'z3.path'
+```
+
+In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
 Then execute the following command in the JavaSMT directory,
-where `$Z3_DIR` is the absolute path of the unpacked Z3 directory
-and `$Z3_VERSION` is the version number:
+where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION
+ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
 ```
-Finally follow the instructions shown in the message at the end.
+Example:
+```
+ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.3 -Dz3.version=4.13.3
+```
+Finally, follow the instructions shown in the message at the end.
+
 
 #### Optional (from source for Linux target with older GLIBC)
 This step is for the following use case:
@@ -69,15 +86,16 @@ in which the following build command can be run in the unpacked source directory
 ```
 python3 scripts/mk_make.py --java && cd build && make -j 2
 ```
-Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory `./build` into `./bin`.
+Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory 
+`./build` into `./bin` (if needed, adjust the directory to match the x64 or arm64 path for Linux).
 Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
 and publish the directory `./bin` with an ant command like the one from above:
 ```
-ant publish-z3 -Dz3.path=$Z3_DIR/bin -Dz3.version=$Z3_VERSION-glibc_2.27
+ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION-glibc_2.27
 ```
 
 
-#### Optional (outdated: from source for Linux target)
+#### Optional (from source for Linux target) (Info: this step is outdated and no longer used for releases of JavaSMT)
 To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
 it with the following command in its directory on a 64bit Ubuntu 16.04 system:
 ```
@@ -185,37 +203,44 @@ but in the normal system environment, where some testing can be applied by the d
 
 ### Publishing (Opti)-MathSAT5
 
-We publish MathSAT for both Linux and Windows systems at once.
-The build process can fully be done on a Linux system.
-We prefer to use the Docker container based on Ubuntu 18.04 for compiling the dependencies and assembling the libraries,
-because GMP and MPIR might cause problems with newer versions of GCC and MinGW during compilation.
+We publish MathSAT for Linux (x64 and arm64) and Windows (x64) systems at once.
+The build process can fully be done on a Linux system, 
+and requires several dependencies, such as gcc, x86_64-w64-mingw32-gcc, and aarch64-linux-gnu-gcc.
+We prefer to use the Docker container based on Ubuntu 22.04 (better use Ubuntu 18.04 for older GLIBC!)
+for compiling the dependencies and assembling the libraries.
 
-For publishing MathSAT5, you need to use a Linux machine with at least GCC 7.5.0 and x86_64-w64-mingw32-gcc 7.3.
-First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them,
-then provide the necessary dependencies (GMP for Linux and MPIR/JDK for Windows) as described in the compilation scripts.
-(see `lib/native/source/libmathsat5j/`), and then execute the following command in the JavaSMT directory,
-where `$MATHSAT_PATH_LINUX` and `$MATHSAT_PATH_WINDOWS` are the paths to the MathSAT root directory,
-and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one, runtime: less than 5s):
+First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them.
+Then provide the necessary dependencies (GMP/JDK for Linux (x64 and arm64) and GMP/JDK for Windows (x64))
+as described in the compilation scripts (see `lib/native/source/libmathsat5j/compileFor<PLATFORM>.sh`).
+Then execute the following command in the JavaSMT directory,
+where `$MATHSAT_PATH_<ARCH>` is the paths to the corresponding MathSAT root directory,
+and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one command, runtime is about 10s):
 ```
-  ant publish-mathsat \
-      -Dmathsat.path=$MATHSAT_PATH_LINUX \
-      -Dgmp.path=$GMP_PATH \
-      -Dmathsat-windows.path=$MATHSAT_PATH_WINDOWS \
-      -Dmpir-windows.path=$MPIR_PATH \
-      -Djdk-windows.path=$JDK_11_PATH \
-      -Dmathsat.version=$MATHSAT_VERSION
+ant publish-mathsat \
+    -Dmathsat-linux-x64.path=$MATHSAT_PATH_LINUX_X64 \
+    -Dgmp-linux-x64.path=$GMP_PATH_LINUX_X64 \
+    -Dmathsat-windows-x64.path=$MATHSAT_PATH_WINDOWS_X64 \
+    -Dgmp-windows-x64.path=$GMP_PATH_WINDOWS_X64 \
+    -Djdk-windows-x64.path=$JDK_PATH_WINDOWS_X64 \
+    -Dmathsat-linux-arm64.path=$MATHSAT_PATH_LINUX_ARM64 \
+    -Dgmp-linux-arm64.path=$GMP_PATH_LINUX_ARM64 \
+    -Djdk-linux-arm64.path=$JDK_PATH_LINUX_ARM64 \
+    -Dmathsat.version=$MATHSAT_VERSION
 ```
-Concrete example (`$WD` is a working directory where all dependencies are located):
+Example:
 ```
-  ant publish-mathsat \
-      -Dmathsat.path=$WD/mathsat-5.6.7-linux-x86_64-reentrant \
-      -Dgmp.path=$WD/gmp-6.1.2 \
-      -Dmathsat-windows.path=$WD/mathsat-5.6.7-win64-msvc \
-      -Dmpir-windows.path=$WD/mpir-2.7.2-win \
-      -Djdk-windows.path=$WD/jdk-11 \
-      -Dmathsat.version=5.6.7
+ant publish-mathsat \
+     -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-x86_64-reentrant \
+     -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+     -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-win64-msvc \
+     -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
+     -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-win-x64 \
+     -Dmathsat-linux-arm64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-aarch64-reentrant \
+     -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
+     -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2 \
+     -Dmathsat.version=5.6.11
 ```
-Finally follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end.
 
 A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
 except that Windows is not yet supported and the publishing command is simpler:

@@ -22,7 +22,34 @@ which would automatically fetch `JavaSMT` and all of its dependencies.
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="java-smt" rev="3.7.0"/>
+<dependency org="org.sosy_lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
+```
+
+#### Architecture specification
+
+JavaSMT includes native binaries for several SMT solvers and only installs for x64 architecture, by default.
+Starting with version 5.0.?, JavaSMT also supports additional architectures, such as x64 and arm64.
+For a full list of supported solvers and architectures, refer to the [Readme](../README.md).
+You can configure and download dependencies for specific architectures, or even multiple architectures in parallel.
+To specify an architecture, the Ivy configuration must recognize the `arch` attribute.
+An example Ivy configuration for this setup can be found in the [Ivy settings](../build/ivysettings.xml) of JavaSMT.
+
+Afterwards, you can use JavaSMT for other architectures with:
+
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="5.0.?" conf="runtime->runtime-x64"/>
+```
+
+or
+
+```xml
+<dependency org="org.sosy_lab" name="java-smt" rev="5.0.?" conf="runtime->runtime-arm64"/>
+```
+
+Or specify a specific architecture for a solver directly:
+
+```xml
+<dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.13.3" conf="runtime->solver-z3-arm64"/>
 ```
 
 ### Automatic Installation from Maven Central (possibly outdated)
@@ -36,7 +63,7 @@ For Maven:
 <dependency>
   <groupId>org.sosy-lab</groupId>
   <artifactId>java-smt</artifactId>
-  <version>3.7.0-61-gea80187e</version>
+  <version>5.0.0-61-gea80187e</version>
 </dependency>
 ```
 
@@ -123,15 +150,15 @@ In order to perform the manual installation, the following steps should be follo
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
    **JavaSMT might not yet support the latest version on the solver's webpage,
    but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
- - Suppose the version `3.7.0` was chosen.
-   Ivy description file [`ivy-3.7.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-3.7.0.xml) can
+ - Suppose the version `5.0.0` was chosen.
+   Ivy description file [`ivy-5.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-5.0.0.xml) can
    be consulted in order to determine all the files which should be fetched.
  - The artifacts tag specifies what files the release depends on.
-   In the example case, those are `java-smt-3.7.0.jar` and (optionally)
-   `java-smt-3.7.0-sources.jar`, located in the same directory.
+   In the example case, those are `java-smt-5.0.0.jar` and (optionally)
+   `java-smt-5.0.0-sources.jar`, located in the same directory.
  - Finally, the dependencies can be manually followed and resolved.
-   E.g. in the example, Z3 version `4.8.9-sosy0` is specified,
-   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.8.9-sosy0.xml)
+   E.g. in the example, Z3 version `4.13.3` is specified,
+   which is described by the corresponding [XML](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/ivy-4.13.3.xml)
    file, specifying what binaries should be fetched from the corresponding
    [directory](https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/).
 
@@ -140,7 +167,7 @@ In order to perform the manual installation, the following steps should be follo
 
 When using Ivy or Maven for installation on a 64-bit Linux platform,
 solver binaries for native solvers are downloaded automatically, if available.
-Some solvers are also available for supporting Windows or MacOS.
+The [Readme](../README.md) contains a list of solvers and supported platforms.
 Everything should work as is after installation.
 
 Without Ivy or Maven you need to download and install the binaries manually as described above under [Manual Installation](#manual-installation).
@@ -148,8 +175,8 @@ You can either copy them into the directory of the JavaSMT JAR file,
 or in a directory `../native/<arch>-<os>/` relative to the directory of the JAR file.
 See [NativeLibraries][] documentation for more details on which path is searched.
 
-For systems other than 64-bit Linux (e.g., Windows, MacOS, or 32-bit systems) we might not always provide binaries,
-so you need to download or compile them for yourself.
+We might not provide binaries for some platforms,
+so you need to download or compile them for yourself, if supported by the SMT solver.
 You can find the necessary steps for compiling and using solver binaries in [`lib/native/source/`](../lib/native/source/) and [`build`](../build).
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
