@@ -44,7 +44,6 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import scala.Option;
 
 class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   private final PrincessAbstractProver<?> prover;
@@ -245,9 +244,6 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     return model.toString();
   }
 
-  @Override
-  public void close() {}
-
   /** Tries to determine the Sort of a Term. */
   private Sort getSort(IExpression pTerm) {
     // Just using sortof() won't work as Princess may have simplified the original term
@@ -285,51 +281,35 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression expr) {
-    Sort sort = getSort(expr);
-    if (sort.equals(creator.getRationalType())) {
-      // Extending the partial model does not seem to work in Princess if the formula uses rational
-      // variables. To work around this issue we (temporarily) add the formula to the assertion
-      // stack and then repeat the sat-check to get the value.
+    // Extending the partial model does not seem to work in Princess if the formula uses rational
+    // variables. To work around this issue we (temporarily) add the formula to the assertion
+    // stack and then repeat the sat-check to get the value.
+    if (expr instanceof ITerm) {
+      ITerm term = (ITerm) expr;
       api.push();
-      ITerm var = api.createConstant("__var_" + prover.idGenerator.getFreshId(), getSort(expr));
-      api.addAssertion(var.$eq$eq$eq((ITerm) expr));
-      api.checkSat(true);
-      ITerm evaluated = api.evalToTerm(var);
-      api.pop();
-      return simplifyRational(evaluated);
-    } else {
-      IExpression evaluation = evaluate(expr);
-      if (evaluation == null) {
-        if (expr instanceof IFormula) {
-          // If the partial model can't evaluate our formula try extending
-          IFormula formula = (IFormula) expr;
-          api.push();
-          IFormula var = api.createBooleanVariable("__var_" + prover.idGenerator.getFreshId());
-          api.addAssertion(var.$less$eq$greater(formula));
-          api.checkSat(true);
-          IExpression evaluated = IBoolLit$.MODULE$.apply(api.eval(var));
-          api.pop();
-          return evaluated;
-        } else {
-          // fallback: try to simplify the query and evaluate again.
-          // This is needed for array expressions
-          evaluation = evaluate(creator.getEnv().simplify(expr));
-        }
+      for (IFormula fixed : prover.getEvaluatedTerms()) {
+        api.addAssertion(fixed);
       }
-      return evaluation;
-    }
-  }
-
-  @Nullable
-  private IExpression evaluate(IExpression formula) {
-    if (formula instanceof ITerm) {
-      Option<ITerm> out = model.evalToTerm((ITerm) formula);
-      return out.isEmpty() ? null : out.get();
-    } else if (formula instanceof IFormula) {
-      Option<IExpression> out = model.evalExpression(formula);
-      return out.isEmpty() ? null : out.get();
+      ITerm var = api.createConstant("__tmp_", getSort(term));
+      api.addAssertion(var.$eq$eq$eq(term));
+      api.checkSat(true);
+      ITerm value = simplifyRational(api.evalToTerm(var));
+      api.pop();
+      prover.addEvaluatedTerm(value.$eq$eq$eq(term));
+      return value;
     } else {
-      throw new AssertionError("unexpected formula: " + formula);
+      IFormula formula = (IFormula) expr;
+      api.push();
+      for (IFormula fixed : prover.getEvaluatedTerms()) {
+        api.addAssertion(fixed);
+      }
+      IFormula var = api.createBooleanVariable("__tmp_");
+      api.addAssertion(var.$less$eq$greater(formula));
+      api.checkSat(true);
+      IFormula value = IBoolLit$.MODULE$.apply(api.eval(var));
+      api.pop();
+      prover.addEvaluatedTerm(value.$less$eq$greater(formula));
+      return value;
     }
   }
 }

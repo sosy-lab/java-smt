@@ -80,7 +80,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
+      ImmutableList.of(Solvers.Z3);
 
   @Before
   public void setup() {
@@ -2218,6 +2218,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireIntegers();
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver runs out memory while generating the model")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);
   }

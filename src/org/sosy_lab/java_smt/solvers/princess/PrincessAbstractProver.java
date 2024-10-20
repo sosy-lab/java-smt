@@ -32,6 +32,7 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -45,6 +46,15 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
   protected final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
+
+  /**
+   * Values returned by {@link Model#evaluate(Formula)}.
+   *
+   * <p>We need to record these to make sure that the values returned by the evaluator are
+   * consistant. Calling {@link #isUnsat()} will reset this list as the underlying model has been
+   * updated.
+   */
+  protected final List<IFormula> evaluatedTerms = new ArrayList<>();
 
   // assign a unique partition number for eah added constraint, for unsat-core and interpolation.
   protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
@@ -76,9 +86,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
+    evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       wasLastSatCheckSat = true;
+      evaluatedTerms.add(api.partialModelAsFormula());
       return false;
     } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
@@ -129,6 +141,20 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     partitions.pop();
   }
 
+  /**
+   * Get a list of all terms that have been evaluated in the current model.
+   *
+   * <p>The formulas in this list are assignments that extend the original model.
+   */
+  List<IFormula> getEvaluatedTerms() {
+    return evaluatedTerms;
+  }
+
+  /** Add a new term to the list of evaluated terms. */
+  void addEvaluatedTerm(IFormula pFormula) {
+    evaluatedTerms.add(pFormula);
+  }
+
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
@@ -146,7 +172,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     } catch (SimpleAPIException ex) {
       throw new SolverException(ex.getMessage(), ex);
     }
-    return new PrincessModel(this, partialModel, creator, api);
+    return registerEvaluator(new PrincessModel(this, partialModel, creator, api));
   }
 
   /**
