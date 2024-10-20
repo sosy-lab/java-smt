@@ -206,7 +206,8 @@ but in the normal system environment, where some testing can be applied by the d
 We publish MathSAT for Linux (x64 and arm64) and Windows (x64) systems at once.
 The build process can fully be done on a Linux system, 
 and requires several dependencies, such as gcc, x86_64-w64-mingw32-gcc, and aarch64-linux-gnu-gcc.
-We prefer to use the Docker container based on Ubuntu 22.04 for compiling the dependencies and assembling the libraries.
+We prefer to use the Docker container based on Ubuntu 22.04 (better use Ubuntu 18.04 for older GLIBC!)
+for compiling the dependencies and assembling the libraries.
 
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them.
 Then provide the necessary dependencies (GMP/JDK for Linux (x64 and arm64) and GMP/JDK for Windows (x64))
