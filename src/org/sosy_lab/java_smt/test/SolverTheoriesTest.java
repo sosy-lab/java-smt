@@ -768,6 +768,33 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
+  public void testNestedIntegerArray() {
+    requireArrays();
+    requireIntegers();
+
+    IntegerFormula _i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>> multi =
+        amgr.makeArray(
+            "multi",
+            FormulaType.IntegerType,
+            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+
+    IntegerFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_int` (`read_int_T(17)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    }
+  }
+
+  @Test
   public void testNestedRationalArray() {
     requireArrays();
     requireRationals();
@@ -786,6 +813,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case MATHSAT5:
         assertThat(valueInMulti.toString())
             .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");

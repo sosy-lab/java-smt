@@ -221,6 +221,13 @@ public class SolverAllSatTest extends SolverBasedTest0 {
           .isNotEqualTo(Solvers.PRINCESS);
     }
 
+    if ("normal".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a partial model when using quantifiers")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+    }
+
     // (y = 1)
     // & (PRED1 <-> (y = 1))
     // & (PRED3 <-> ALL x_0. (3 * x_0 != y))

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
@@ -147,7 +148,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected void closeAllEvaluators() {
-    evaluators.forEach(Evaluator::close);
+    ImmutableList.copyOf(evaluators).forEach(Evaluator::close);
     evaluators.clear();
   }
 
