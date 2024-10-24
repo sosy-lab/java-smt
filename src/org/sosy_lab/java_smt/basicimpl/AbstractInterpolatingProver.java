@@ -13,23 +13,25 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
+public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, TType>
         extends AbstractProverWithAllSat<TFormulaInfo>
         implements InterpolatingProverEnvironment<TFormulaInfo> {
 
-  private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
   private final FormulaManager mgr;
   private final QuantifiedFormulaManager qfmgr;
   private final BooleanFormulaManager bmgr;
@@ -44,14 +46,23 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     mgr = pMgr;
     bmgr = pBmgr;
-    creator = (FormulaCreator<TFormulaInfo, TType, ?, ?>) pCreator;
     qfmgr = pQfmgr;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
           throws SolverException, InterruptedException {
-    return getModelBasedInterpolant(pFormulasOfA);
+    checkState(!closed);
+    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
+        "interpolation can only be done over previously asserted formulas.");
+
+    final ImmutableCollection<Formula> assertedFormulas =
+        ImmutableList.copyOf(getAssertedFormulas());
+    final Collection<BooleanFormula> formulasA =
+        (Collection<BooleanFormula>) ImmutableList.copyOf(pFormulasOfA);
+    final Collection<BooleanFormula> formulasB = null;
+
+    return getModelBasedInterpolant(formulasA, formulasB);
   }
 
   @Override
@@ -61,11 +72,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     return List.of();
   }
 
-  private BooleanFormula getModelBasedInterpolant(Collection<TFormulaInfo> pFormulasOfA) {
-    checkState(!closed);
-    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
-            "interpolation can only be done over previously asserted formulas.");
-
+  private BooleanFormula getModelBasedInterpolant(
+      Collection<BooleanFormula> formulasA, Collection<BooleanFormula> formulasB) {
     return null;
   }
 }
