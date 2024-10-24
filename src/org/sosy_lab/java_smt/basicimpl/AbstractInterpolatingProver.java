@@ -41,8 +41,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
           FormulaManager pMgr,
           BooleanFormulaManager pBmgr,
           QuantifiedFormulaManager pQfmgr,
-          ShutdownNotifier pShutdownNotifier,
-          FormulaCreator<?, ?, ?, ?> pCreator) {
+          ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     mgr = pMgr;
     bmgr = pBmgr;
