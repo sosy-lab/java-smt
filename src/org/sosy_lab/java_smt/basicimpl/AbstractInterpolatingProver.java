@@ -55,13 +55,16 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
-    final ImmutableCollection<Formula> assertedFormulas =
+    final ImmutableCollection<BooleanFormula> assertedFormulas =
         ImmutableList.copyOf(getAssertedFormulas());
-    final Collection<BooleanFormula> formulasA =
+    final Collection<BooleanFormula> formulasOfA =
         (Collection<BooleanFormula>) ImmutableList.copyOf(pFormulasOfA);
-    final Collection<BooleanFormula> formulasB = null;
+    final Collection<BooleanFormula> formulasOfB =
+        assertedFormulas.stream()
+            .filter(formula -> !formulasOfA.contains(formula))
+            .collect(ImmutableList.toImmutableList());
 
-    return getModelBasedInterpolant(formulasA, formulasB);
+    return getModelBasedInterpolant(formulasOfA, formulasOfB);
   }
 
   @Override
@@ -72,7 +75,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   private BooleanFormula getModelBasedInterpolant(
-      Collection<BooleanFormula> formulasA, Collection<BooleanFormula> formulasB) {
+      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+
+    BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
+    BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
+
     return null;
   }
 }
