@@ -85,17 +85,12 @@ public class IndependentInterpolation {
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula two = imgr.makeNumber(2);
 
-    /*
-     * A /\ NOT I is UNSAT
-     * I /\ B is UNSAT
-     * I contains only symbols from both A and B
-     *
-     * A := (x = 0)
-     * B := (y = x + 2) AND (y % 2 != 0)
-     */
-
     // create and assert some formulas
+    // instead of 'named' formulas, we return a 'handle' (of generic type T)
+
+    // A := (x = 0)
     T ip0 = prover.addConstraint(imgr.equal(x, zero));
+    // B := (y = x + 2) AND (y % 2 != 0)
     T ip1 = prover.addConstraint(bmgr.and(imgr.equal(y, imgr.add(x, two)),
         bmgr.not(imgr.equal(imgr.modulo(y, two), zero))));
 

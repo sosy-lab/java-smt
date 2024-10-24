@@ -61,22 +61,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo, TType>
     return List.of();
   }
 
-  /**
-   * As = free_arith_vars(A)
-   * Bs = free_arith_vars(B)
-   *
-   * shared = [s for s in As & Bs ]
-   *
-   * Itp = z3.Function('Itp', [s.sort() for s in shared] + [z3.BoolSort()])
-   * left = z3.ForAll([a for a in As], z3.Implies(A, Itp(shared)))
-   * right = z3.ForAll([b for b in Bs], z3.Implies(Itp(shared), z3.Not(B)))
-   *
-   * res, answer = solve_horn([left, right])
-   *
-   * if res == z3.sat:
-   *    return answer.eval(Itp(shared))
-   * return None
-   */
   private BooleanFormula getModelBasedInterpolant(Collection<TFormulaInfo> pFormulasOfA) {
     checkState(!closed);
     checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
