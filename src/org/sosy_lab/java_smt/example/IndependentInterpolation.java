@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -27,7 +26,6 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -51,10 +49,10 @@ public class IndependentInterpolation {
     Solvers solver = Solvers.Z3;
 
     // setup context
-    try (SolverContext context = SolverContextFactory.createSolverContext(config, logger,
-        notifier, solver);
+    try (SolverContext context =
+             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
          InterpolatingProverEnvironment<?> prover =
-             context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
+             context.newProverEnvironmentWithInterpolation()) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -62,22 +60,24 @@ public class IndependentInterpolation {
 
       // example
       prover.push();
-      interpolateExample(prover, imgr, bmgr, logger);
+      interpolateExample(prover, bmgr, imgr, logger);
       prover.pop();
+
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
 
       // on some machines we support only some solvers,
       // thus we can ignore these errors.
       logger.logUserException(Level.INFO, e, "Solver " + solver + " is not available.");
+
     } catch (UnsupportedOperationException e) {
       logger.logUserException(Level.INFO, e, e.getMessage());
     }
   }
 
   private static <T> void interpolateExample(
-      InterpolatingProverEnvironment<T> prover, IntegerFormulaManager imgr,
-      BooleanFormulaManager bmgr, LogManager logger)
-      throws InterruptedException, SolverException, InvalidConfigurationException {
+      InterpolatingProverEnvironment<T> prover, BooleanFormulaManager bmgr,
+      IntegerFormulaManager imgr, LogManager logger)
+      throws InterruptedException, SolverException {
 
     // create some variables
     IntegerFormula x = imgr.makeVariable("x");
@@ -85,34 +85,23 @@ public class IndependentInterpolation {
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula two = imgr.makeNumber(2);
 
-    // create and assert some formulas
-    // instead of 'named' formulas, we return a 'handle' (of generic type T)
+    /*
+     * A /\ NOT I is UNSAT
+     * I /\ B is UNSAT
+     * I contains only symbols from both A and B
+     *
+     * A := (x = 0)
+     * B := (y = x + 2) AND (y % 2 != 0)
+     */
 
-    // A := (x = 0)
+    // create and assert some formulas
     T ip0 = prover.addConstraint(imgr.equal(x, zero));
-    // B := (y = x + 2) AND (y % 2 != 0)
     T ip1 = prover.addConstraint(bmgr.and(imgr.equal(y, imgr.add(x, two)),
         bmgr.not(imgr.equal(imgr.modulo(y, two), zero))));
 
-    /*
-    T ip0 = prover.addConstraint(imgr.equal(x, zero));
-    T ip1 = prover.addConstraint(imgr.equal(y, imgr.add(x, two)));
-    T ip2 = prover.addConstraint(bmgr.not(imgr.equal(imgr.modulo(y, two), zero)));
-     */
-
-    /*
-    T ip0 = prover.addConstraint(imgr.greaterThan(x, y));
-    T ip1 = prover.addConstraint(imgr.equal(x, zero));
-    T ip2 = prover.addConstraint(imgr.greaterThan(y, zero));
-     */
-
     // check for satisfiability
     boolean unsat = prover.isUnsat();
-    Preconditions.checkState(unsat, "the example for interpolation should be UNSAT");
-
-    // works when there are exactly two (!) groups of formulas
-    // only one part is given as parameter, the rest is taken from the already asserted formulas
-    System.out.println("prover: \n" + prover);
+    Preconditions.checkState(unsat, "The example for interpolation should be UNSAT");
 
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip0));
     logger.log(Level.INFO, "Interpolants are:", itp);

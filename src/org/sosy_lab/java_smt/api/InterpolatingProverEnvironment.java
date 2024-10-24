@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 
 /**
  * This class provides an interface to an incremental SMT solver with methods for pushing and

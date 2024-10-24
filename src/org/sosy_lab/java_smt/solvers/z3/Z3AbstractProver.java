@@ -53,7 +53,7 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula, For
       @Nullable PathCounterTemplate pLogfile,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr, pMgr.getBooleanFormulaManager(), pMgr.getQuantifiedFormulaManager(),
-        pShutdownNotifier, pCreator, pMgr.getUFManager());
+        pShutdownNotifier, pCreator);
     creator = pCreator;
     z3context = creator.getEnv();
 
