@@ -8,6 +8,21 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ASSERT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ASSERT_REFS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_ADD;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_MUL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_SIZE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_UDIV;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_UREM;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_EAGER_REFINE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_EQUAL;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_INC_BITBLAST;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_INITIAL_LEMMAS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ITE;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_VALUE_LIMIT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_VALUE_ONLY;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.BV_SOLVER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_MODEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_UNSAT_CORE;
@@ -18,10 +33,10 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.MEMORY_LIMIT;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.NUM_OPTS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_CONTRADICTING_ANDS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_ELIM_BV_EXTRACTS;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_ELIM_BV_UDIV;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_EMBEDDED_CONSTR;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_FLATTEN_AND;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_NORMALIZE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_NORMALIZE_SHARE_AWARE;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_SKELETON_PREPROC;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_BV_INEQ;
@@ -41,6 +56,7 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PATH_SEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_RANDOM_INPUT;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_USE_INV_VALUE;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_SEXT;
+import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.RELEVANT_TERMS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.REWRITE_LEVEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SAT_SOLVER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SEED;
@@ -206,7 +222,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       String optionValue = option.getValue();
       Option bitwuzlaOption = getBitwuzlaOptByString(optionName);
       try {
-        if (pOptions.is_numeric(bitwuzlaOption)) {
+        if (pOptions.is_numeric(bitwuzlaOption) || pOptions.is_bool(bitwuzlaOption)) {
           pOptions.set(bitwuzlaOption, Integer.parseInt(optionValue));
         } else {
           pOptions.set(bitwuzlaOption, option.getValue());
@@ -330,6 +346,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         return TIME_LIMIT_PER;
       case "MEMORY_LIMIT":
         return MEMORY_LIMIT;
+      case "RELEVANT_TERMS":
+        return RELEVANT_TERMS;
       case "BV_SOLVER":
         return BV_SOLVER;
       case "REWRITE_LEVEL":
@@ -356,20 +374,50 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         return PROP_SEXT;
       case "PROP_NORMALIZE":
         return PROP_NORMALIZE;
+      case "ABSTRACTION":
+        return ABSTRACTION;
+      case "ABSTRACTION_BV_SIZE":
+        return ABSTRACTION_BV_SIZE;
+      case "ABSTRACTION_EAGER_REFINE":
+        return ABSTRACTION_EAGER_REFINE;
+      case "ABSTRACTION_VALUE_LIMIT":
+        return ABSTRACTION_VALUE_LIMIT;
+      case "ABSTRACTION_VALUE_ONLY":
+        return ABSTRACTION_VALUE_ONLY;
+      case "ABSTRACTION_ASSERT":
+        return ABSTRACTION_ASSERT;
+      case "ABSTRACTION_ASSERT_REFS":
+        return ABSTRACTION_ASSERT_REFS;
+      case "ABSTRACTION_INITIAL_LEMMAS":
+        return ABSTRACTION_INITIAL_LEMMAS;
+      case "ABSTRACTION_INC_BITBLAST":
+        return ABSTRACTION_INC_BITBLAST;
+      case "ABSTRACTION_BV_ADD":
+        return ABSTRACTION_BV_ADD;
+      case "ABSTRACTION_BV_MUL":
+        return ABSTRACTION_BV_MUL;
+      case "ABSTRACTION_BV_UDIV":
+        return ABSTRACTION_BV_UDIV;
+      case "ABSTRACTION_BV_UREM":
+        return ABSTRACTION_BV_UREM;
+      case "ABSTRACTION_EQUAL":
+        return ABSTRACTION_EQUAL;
+      case "ABSTRACTION_ITE":
+        return ABSTRACTION_ITE;
       case "PREPROCESS":
         return PREPROCESS;
       case "PP_CONTRADICTING_ANDS":
         return PP_CONTRADICTING_ANDS;
       case "PP_ELIM_BV_EXTRACTS":
         return PP_ELIM_BV_EXTRACTS;
+      case "PP_ELIM_BV_UDIV":
+        return PP_ELIM_BV_UDIV;
       case "PP_EMBEDDED_CONSTR":
         return PP_EMBEDDED_CONSTR;
       case "PP_FLATTEN_AND":
         return PP_FLATTEN_AND;
       case "PP_NORMALIZE":
         return PP_NORMALIZE;
-      case "PP_NORMALIZE_SHARE_AWARE":
-        return PP_NORMALIZE_SHARE_AWARE;
       case "PP_SKELETON_PREPROC":
         return PP_SKELETON_PREPROC;
       case "PP_VARIABLE_SUBST":
