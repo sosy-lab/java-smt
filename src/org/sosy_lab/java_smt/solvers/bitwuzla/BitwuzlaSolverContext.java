@@ -222,7 +222,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       String optionValue = option.getValue();
       Option bitwuzlaOption = getBitwuzlaOptByString(optionName);
       try {
-        if (pOptions.is_numeric(bitwuzlaOption)) {
+        if (pOptions.is_numeric(bitwuzlaOption) || pOptions.is_bool(bitwuzlaOption)) {
           pOptions.set(bitwuzlaOption, Integer.parseInt(optionValue));
         } else {
           pOptions.set(bitwuzlaOption, option.getValue());
