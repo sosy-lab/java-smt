@@ -15,6 +15,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -79,6 +81,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
+
+    // free arithmetic variables A and B
+    ImmutableCollection<?> arithVarsOfA = mgr.extractVariablesAndUFs(formulasOfA).values();
+    ImmutableCollection<?> arithVarsOfB = mgr.extractVariablesAndUFs(formulasOfB).values();
 
     return null;
   }
