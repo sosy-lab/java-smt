@@ -29,24 +29,28 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.UFManager;
 
 public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, TType>
         extends AbstractProverWithAllSat<TFormulaInfo>
         implements InterpolatingProverEnvironment<TFormulaInfo> {
 
   private final FormulaManager mgr;
-  private final QuantifiedFormulaManager qfmgr;
   private final BooleanFormulaManager bmgr;
+  private final UFManager ufmgr;
+  private final QuantifiedFormulaManager qfmgr;
 
   protected AbstractInterpolatingProver(
           Set<ProverOptions> pOptions,
           FormulaManager pMgr,
           BooleanFormulaManager pBmgr,
+          UFManager pUfmgr,
           QuantifiedFormulaManager pQfmgr,
           ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     mgr = pMgr;
     bmgr = pBmgr;
+    ufmgr = pUfmgr;
     qfmgr = pQfmgr;
   }
 
