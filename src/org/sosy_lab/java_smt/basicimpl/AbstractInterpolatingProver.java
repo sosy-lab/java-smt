@@ -86,6 +86,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     ImmutableCollection<?> arithVarsOfA = mgr.extractVariablesAndUFs(formulasOfA).values();
     ImmutableCollection<?> arithVarsOfB = mgr.extractVariablesAndUFs(formulasOfB).values();
 
+    // shared variables between A and B
+    ImmutableList<?> sharedVariables = arithVarsOfA.stream()
+        .filter(arithVarsOfB::contains)
+        .collect(ImmutableList.toImmutableList());
+
     return null;
   }
 }
