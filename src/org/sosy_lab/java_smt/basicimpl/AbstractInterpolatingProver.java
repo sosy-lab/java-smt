@@ -114,6 +114,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
       }
     }
 
-    return null;
+    return bmgr.makeFalse();
   }
 }
