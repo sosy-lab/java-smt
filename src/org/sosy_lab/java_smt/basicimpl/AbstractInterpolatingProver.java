@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -87,13 +88,16 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
     // free arithmetic variables A and B
-    ImmutableCollection<?> arithVarsOfA = mgr.extractVariablesAndUFs(formulasOfA).values();
-    ImmutableCollection<?> arithVarsOfB = mgr.extractVariablesAndUFs(formulasOfB).values();
+    ImmutableCollection<Formula> arithVarsOfA = mgr.extractVariablesAndUFs(formulasOfA).values();
+    ImmutableCollection<Formula> arithVarsOfB = mgr.extractVariablesAndUFs(formulasOfB).values();
 
     // shared variables between A and B
-    ImmutableList<?> sharedVariables = arithVarsOfA.stream()
+    ImmutableList<Formula> sharedVariables = arithVarsOfA.stream()
         .filter(arithVarsOfB::contains)
         .collect(ImmutableList.toImmutableList());
+
+    BooleanFormula itp = ufmgr.declareAndCallUF(
+        "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVariables);
 
     return null;
   }
