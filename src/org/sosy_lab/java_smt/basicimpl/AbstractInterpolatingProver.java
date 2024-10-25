@@ -83,7 +83,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
   private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
