@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -109,7 +110,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     if (!isUnsat()) {
       try (Model model = getModel()) {
-        return model.eval(itp);
+        return Objects.requireNonNull(model.eval(itp));
       }
     }
 
