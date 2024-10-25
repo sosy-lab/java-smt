@@ -81,7 +81,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   private BooleanFormula getModelBasedInterpolant(
-      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
+      throws InterruptedException {
 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
@@ -101,6 +102,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(arithVarsOfA, bmgr.and(bmgr.implication(formulasOfA, itp)));
     BooleanFormula right = qfmgr.forall(arithVarsOfB, bmgr.and(bmgr.implication(itp,
         bmgr.not(formulasOfB))));
+
+    pop();
+    push(bmgr.and(left, right));
 
     return null;
   }
