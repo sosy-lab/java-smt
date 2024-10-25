@@ -99,6 +99,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
         "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVariables);
 
     BooleanFormula left = qfmgr.forall(arithVarsOfA, bmgr.and(bmgr.implication(formulasOfA, itp)));
+    BooleanFormula right = qfmgr.forall(arithVarsOfB, bmgr.and(bmgr.implication(itp,
+        bmgr.not(formulasOfB))));
 
     return null;
   }
