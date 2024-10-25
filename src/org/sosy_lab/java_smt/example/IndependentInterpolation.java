@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -52,7 +53,7 @@ public class IndependentInterpolation {
     try (SolverContext context =
              SolverContextFactory.createSolverContext(config, logger, notifier, solver);
          InterpolatingProverEnvironment<?> prover =
-             context.newProverEnvironmentWithInterpolation()) {
+             context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
