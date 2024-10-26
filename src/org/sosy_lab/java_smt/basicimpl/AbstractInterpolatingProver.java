@@ -90,8 +90,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
     // free arithmetic variables A and B
-    List<Formula> arithVarsOfA = new ArrayList<>(mgr.extractVariablesAndUFs(formulasOfA).values());
-    List<Formula> arithVarsOfB = new ArrayList<>(mgr.extractVariablesAndUFs(formulasOfB).values());
+    List<Formula> arithVarsOfA = getFreeArithmeticVars(formulasOfA);
+    List<Formula> arithVarsOfB = getFreeArithmeticVars(formulasOfB);
 
     // shared variables between A and B
     ImmutableList<Formula> sharedVariables = arithVarsOfA.stream()
@@ -115,5 +115,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     }
 
     return bmgr.makeFalse();
+  }
+
+  private List<Formula> getFreeArithmeticVars(BooleanFormula pFormula) {
+    return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
   }
 }
