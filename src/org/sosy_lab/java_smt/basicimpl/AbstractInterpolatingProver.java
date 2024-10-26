@@ -96,10 +96,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     // shared variables between A and B
     ImmutableList<Formula> sharedVariables = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula itp = buildInterpolant(sharedVariables);
+    BooleanFormula interpolant = buildInterpolant(sharedVariables);
 
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.and(bmgr.implication(formulasOfA, itp)));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.and(bmgr.implication(itp,
+    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.and(bmgr.implication(formulasOfA, interpolant)));
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.and(bmgr.implication(interpolant,
         bmgr.not(formulasOfB))));
 
     pop();
@@ -107,7 +107,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     if (!isUnsat()) {
       try (Model model = getModel()) {
-        return Objects.requireNonNull(model.eval(itp));
+        return Objects.requireNonNull(model.eval(interpolant));
       }
     }
 
