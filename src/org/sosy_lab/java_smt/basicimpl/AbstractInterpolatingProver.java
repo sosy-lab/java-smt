@@ -91,18 +91,18 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     // free arithmetic variables A and B
     List<Formula> varsOfA = getFreeArithmeticVars(formulasOfA);
-    List<Formula> arithVarsOfB = getFreeArithmeticVars(formulasOfB);
+    List<Formula> varsOfB = getFreeArithmeticVars(formulasOfB);
 
     // shared variables between A and B
     ImmutableList<Formula> sharedVariables = varsOfA.stream()
-        .filter(arithVarsOfB::contains)
+        .filter(varsOfB::contains)
         .collect(ImmutableList.toImmutableList());
 
     BooleanFormula itp = ufmgr.declareAndCallUF(
         "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVariables);
 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.and(bmgr.implication(formulasOfA, itp)));
-    BooleanFormula right = qfmgr.forall(arithVarsOfB, bmgr.and(bmgr.implication(itp,
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.and(bmgr.implication(itp,
         bmgr.not(formulasOfB))));
 
     pop();
