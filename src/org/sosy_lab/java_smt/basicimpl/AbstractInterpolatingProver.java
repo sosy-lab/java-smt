@@ -97,7 +97,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     ImmutableList<Formula> sharedVariables = getSharedVars(varsOfA, varsOfB);
 
     BooleanFormula interpolant = buildInterpolant(sharedVariables);
-
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
