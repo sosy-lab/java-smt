@@ -89,11 +89,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
-    // free arithmetic variables A and B
     List<Formula> varsOfA = getFreeArithmeticVars(formulasOfA);
     List<Formula> varsOfB = getFreeArithmeticVars(formulasOfB);
 
-    // shared variables between A and B
     ImmutableList<Formula> sharedVariables = getSharedVars(varsOfA, varsOfB);
 
     BooleanFormula interpolant = buildInterpolant(sharedVariables);
