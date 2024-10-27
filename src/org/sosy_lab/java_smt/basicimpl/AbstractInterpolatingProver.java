@@ -81,6 +81,31 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return List.of();
   }
 
+  /**
+   * Computes Craig interpolants for a pair of formulas using a model-based approach.
+   *
+   * <p>The model-based approach takes two groups of Boolean formulas, A and B, as input and
+   * returns an interpolant Itp. The interpolant Itp satisfies the definition of Craig
+   * interpolation, meaning:
+   *
+   * <ol>
+   *   <li>(A -> Itp) is unsatisfiable,
+   *   <li>(Itp -> not B) is unsatisfiable, and
+   *   <li>Itp only contains symbols that appear in both formulas A and B.
+   * </ol>
+   *
+   * <p>The variables shared between A and B are used to define the interpolant Itp, ensuring Itp
+   * depends only on shared symbols. The constraints are created and checked for satisfiability:
+   *
+   * <ol>
+   *   <li>For all (a, c). (A(a, c) -> Itp(c)), and
+   *   <li>For all (b, c). (Itp(c) -> not (B(b, c))).
+   * </ol>
+   *
+   * @param pFormulasOfA A Collection of Boolean formulas of A.
+   * @param pFormulasOfB A Collection of Boolean formulas of B.
+   * @return the Craig interpolant Itp if it satisfies the conditions, otherwise returns false.
+   */
   private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
