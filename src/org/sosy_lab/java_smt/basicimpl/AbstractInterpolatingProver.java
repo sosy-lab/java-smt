@@ -94,7 +94,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVariables = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = buildInterpolant(sharedVariables);
+    BooleanFormula interpolant = ufmgr.declareAndCallUF(
+        "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
@@ -109,11 +110,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return varsOfA.stream()
         .filter(varsOfB::contains)
         .collect(ImmutableList.toImmutableList());
-  }
-
-  private BooleanFormula buildInterpolant(ImmutableList<Formula> sharedVars) {
-    return ufmgr.declareAndCallUF(
-        "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
   }
 
   private BooleanFormula validateInterpolant(
