@@ -98,23 +98,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
-    return validateInterpolant(interpolant, left, right);
-  }
-
-  private List<Formula> getFreeArithVars(BooleanFormula pFormula) {
-    return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
-  }
-
-  private ImmutableList<Formula> getSharedVars(List<Formula> pVarsOfA, List<Formula> pVarsOfB) {
-    return pVarsOfA.stream()
-        .filter(pVarsOfB::contains)
-        .collect(ImmutableList.toImmutableList());
-  }
-
-  private BooleanFormula validateInterpolant(
-      BooleanFormula interpolant, BooleanFormula left, BooleanFormula right)
-      throws SolverException, InterruptedException {
-
     pop(); // clear previous stack
     push(bmgr.and(left, right));
 
@@ -125,5 +108,15 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     }
 
     return bmgr.makeFalse();
+  }
+
+  private List<Formula> getFreeArithVars(BooleanFormula pFormula) {
+    return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
+  }
+
+  private ImmutableList<Formula> getSharedVars(List<Formula> pVarsOfA, List<Formula> pVarsOfB) {
+    return pVarsOfA.stream()
+        .filter(pVarsOfB::contains)
+        .collect(ImmutableList.toImmutableList());
   }
 }
