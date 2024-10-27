@@ -92,7 +92,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     List<Formula> varsOfA = getFreeArithmeticVars(formulasOfA);
     List<Formula> varsOfB = getFreeArithmeticVars(formulasOfB);
 
-    ImmutableList<Formula> sharedVariables = getSharedVars(varsOfA, varsOfB);
+    ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
     BooleanFormula interpolant = ufmgr.declareAndCallUF(
         "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
