@@ -105,9 +105,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
   }
 
-  private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
-    return varsOfA.stream()
-        .filter(varsOfB::contains)
+  private ImmutableList<Formula> getSharedVars(List<Formula> pVarsOfA, List<Formula> pVarsOfB) {
+    return pVarsOfA.stream()
+        .filter(pVarsOfB::contains)
         .collect(ImmutableList.toImmutableList());
   }
 
