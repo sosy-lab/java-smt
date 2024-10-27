@@ -98,9 +98,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
-    interpolant = checkInterpolationCriteria(interpolant, left, right);
-
-    return interpolant;
+    return checkInterpolationCriteria(interpolant, left, right);
   }
 
   private List<Formula> getFreeArithmeticVars(BooleanFormula pFormula) {
