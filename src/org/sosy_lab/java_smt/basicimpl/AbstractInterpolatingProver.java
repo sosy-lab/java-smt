@@ -89,20 +89,19 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
-    List<Formula> varsOfA = getFreeArithmeticVars(formulasOfA);
-    List<Formula> varsOfB = getFreeArithmeticVars(formulasOfB);
+    List<Formula> varsOfA = getFreeArithVars(formulasOfA);
+    List<Formula> varsOfB = getFreeArithVars(formulasOfB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = ufmgr.declareAndCallUF(
-        "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
+    BooleanFormula interpolant = ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
     return validateInterpolant(interpolant, left, right);
   }
 
-  private List<Formula> getFreeArithmeticVars(BooleanFormula pFormula) {
+  private List<Formula> getFreeArithVars(BooleanFormula pFormula) {
     return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
   }
 
