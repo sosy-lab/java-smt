@@ -98,11 +98,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
-    pop();
-    push(bmgr.and(left, right));
+    pop(); // clear previous solver stack
+    push(bmgr.and(left, right)); // solve left and right
 
     if (isUnsat()) {
-      return bmgr.makeFalse();
+      return bmgr.makeFalse(); // return false as the interpolant
     }
 
     return Objects.requireNonNull(getModel().eval(itp));
