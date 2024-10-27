@@ -13,7 +13,7 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-bitwuzla" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
-    <property name="bitwuzla.buildForLinux" value="true"/>
+    <property name="bitwuzla.buildForLinuxX64" value="true"/>
     <property name="bitwuzla.buildForWindows" value="true"/>
 
     <import file="macros.xml"/>
@@ -59,18 +59,18 @@ SPDX-License-Identifier: Apache-2.0
         <property name="bitwuzla.version" value="${bitwuzla.customRev}-g${bitwuzla.revision}"/>
         <property name="bitwuzla.installPath" location="${bitwuzla.path}/install"/>
         <property name="source.path" location="lib/native/source/libbitwuzla"/>
-        <property name="source.installPathLinux" location="${source.path}/install-linux"/>
+        <property name="source.installPathLinuxX64" location="${source.path}/install-linux-x64"/>
         <property name="source.installPathWindows" location="${source.path}/install-windows"/>
 
         <!-- cleanup target directories, will be created and filled during the build-process -->
-        <delete dir="${source.installPathLinux}" quiet="true"/>
+        <delete dir="${source.installPathLinuxX64}" quiet="true"/>
         <delete dir="${source.installPathWindows}" quiet="true"/>
         <delete dir="${source.path}/build" quiet="true"/>
         <delete dir="${source.path}/doc" quiet="true"/>
         <delete dir="${source.path}/install" quiet="true"/>
     </target>
 
-    <target name="compile-bitwuzla-linux" if="${bitwuzla.buildForLinux}"
+    <target name="compile-bitwuzla-linux-x64" if="${bitwuzla.buildForLinuxX64}"
             depends="set-properties-for-bitwuzla">
         <delete dir="${bitwuzla.installPath}" quiet="true"/>
         <echo message="Building Bitwuzla in version '${bitwuzla.version}' for Linux"/>
@@ -87,7 +87,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- copy Bitwuzla include files to JavaSMT -->
-        <copy todir="${source.installPathLinux}">
+        <copy todir="${source.installPathLinuxX64}">
             <fileset dir="${bitwuzla.installPath}"/>
         </copy>
     </target>
@@ -118,8 +118,8 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Run swig to generate a new wrapper. Only executed if rebuildWrapper was specified. -->
     <!-- Depends on build-bitwuzla for generating the API files. -->
     <target name="build-wrapper" if="${bitwuzla.rebuildWrapper}"
-            depends="compile-bitwuzla-linux, compile-bitwuzla-windows">
-        <fail unless="bitwuzla.buildForLinux">
+            depends="compile-bitwuzla-linux-x64, compile-bitwuzla-windows">
+        <fail unless="bitwuzla.buildForLinuxX64">
             This ant-step uses the Linux dependencies for building the SWIG-wrapper.
             The Windows dependencies are identical and would also work.
         </fail>
@@ -132,7 +132,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="swig" dir="${source.path}" failonerror="true">
             <arg value="-java"/>
             <arg value="-c++"/>
-            <arg value="-I${source.installPathLinux}"/>
+            <arg value="-I${source.installPathLinuxX64}"/>
             <arg value="-package"/>
             <arg value="org.sosy_lab.java_smt.solvers.bitwuzla.api"/>
             <arg value="-outdir"/>
@@ -155,8 +155,8 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="build-bitwuzla-bindings-jni"
-            depends="compile-bitwuzla-linux, compile-bitwuzla-windows, build-wrapper">
-    <!-- compile java proxies and create jar file -->
+            depends="compile-bitwuzla-linux-x64, compile-bitwuzla-windows, build-wrapper">
+        <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
         <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
@@ -172,7 +172,7 @@ SPDX-License-Identifier: Apache-2.0
         <jar destfile="bitwuzla-${bitwuzla.version}-sources.jar" basedir="${source.path}/src"/>
     </target>
 
-    <target name="build-bitwuzla-bindings-linux" if="${bitwuzla.buildForLinux}"
+    <target name="build-bitwuzla-bindings-linux-x64" if="${bitwuzla.buildForLinuxX64}"
             depends="build-bitwuzla-bindings-jni">
         <!-- compile the swig wrapper -->
         <exec executable="g++" dir="${source.path}" failonerror="true">
@@ -180,7 +180,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-c"/>
             <arg value="bitwuzla_wrap.cpp"/>
             <arg value="-I${source.path}/include"/>
-            <arg value="-I${source.installPathLinux}/include"/>
+            <arg value="-I${source.installPathLinuxX64}/include"/>
             <arg value="-I${java.home}/include"/>
             <arg value="-I${java.home}/include/linux"/>
         </exec>
@@ -199,12 +199,12 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libbitwuzlaj.so"/>
             <arg value="bitwuzla_wrap.o"/>
             <arg value="-Wl,--whole-archive"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libbitwuzla.a"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libbitwuzlabb.a"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libbitwuzlabv.a"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libbitwuzlals.a"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libgmp.a"/>
-            <arg value="${source.installPathLinux}/lib/x86_64-linux-gnu/libgmpxx.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzla.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlabb.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlabv.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlals.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libgmp.a"/>
+            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libgmpxx.a"/>
             <arg value="-Wl,--no-whole-archive,--allow-multiple-definition"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
@@ -264,8 +264,8 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
     </target>
 
-    <target name="build-bitwuzla-linux" if="${bitwuzla.buildForLinux}"
-            depends="compile-bitwuzla-linux, build-wrapper, build-bitwuzla-bindings-linux">
+    <target name="build-bitwuzla-linux-x64" if="${bitwuzla.buildForLinuxX64}"
+            depends="compile-bitwuzla-linux-x64, build-wrapper, build-bitwuzla-bindings-linux-x64">
     </target>
 
     <target name="build-bitwuzla-windows" if="${bitwuzla.buildForWindows}"
@@ -273,7 +273,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="publish-bitwuzla"
-            depends="build-bitwuzla-linux, build-bitwuzla-windows, load-ivy"
+            depends="build-bitwuzla-linux-x64, build-bitwuzla-windows, load-ivy"
             description="Publish Bitwuzla binaries to Ivy repository.">
         <!-- copy library files into directory to be published for Ivy -->
         <move file="${source.path}/libbitwuzlaj.so" tofile="libbitwuzlaj-${bitwuzla.version}.so" failonerror="true"/>
