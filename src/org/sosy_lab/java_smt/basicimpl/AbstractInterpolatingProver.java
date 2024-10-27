@@ -94,9 +94,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
+    BooleanFormula itp = ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
+    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
     pop();
     push(bmgr.and(left, right));
@@ -105,7 +105,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
       return bmgr.makeFalse();
     }
 
-    return Objects.requireNonNull(getModel().eval(interpolant));
+    return Objects.requireNonNull(getModel().eval(itp));
 
   }
 
