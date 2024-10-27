@@ -98,16 +98,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
-    pop(); // clear previous stack
-    push(bmgr.and(left, right));
+    interpolant = checkInterpolationCriteria(interpolant, left, right);
 
-    if (!isUnsat()) {
-      try (Model model = getModel()) {
-        return Objects.requireNonNull(model.eval(interpolant));
-      }
-    }
-
-    return bmgr.makeFalse();
+    return interpolant;
   }
 
   private List<Formula> getFreeArithmeticVars(BooleanFormula pFormula) {
@@ -123,5 +116,21 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private BooleanFormula buildInterpolant(ImmutableList<Formula> sharedVars) {
     return ufmgr.declareAndCallUF(
         "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
+  }
+
+  private BooleanFormula checkInterpolationCriteria(
+      BooleanFormula interpolant, BooleanFormula left, BooleanFormula right)
+      throws SolverException, InterruptedException {
+
+    pop(); // clear previous stack
+    push(bmgr.and(left, right));
+
+    if (!isUnsat()) {
+      try (Model model = getModel()) {
+        return Objects.requireNonNull(model.eval(interpolant));
+      }
+    }
+
+    return bmgr.makeFalse();
   }
 }
