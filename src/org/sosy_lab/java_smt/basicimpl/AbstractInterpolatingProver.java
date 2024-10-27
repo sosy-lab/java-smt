@@ -27,7 +27,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
