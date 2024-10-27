@@ -98,7 +98,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, interpolant));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(interpolant, bmgr.not(formulasOfB)));
 
-    return checkInterpolationCriteria(interpolant, left, right);
+    return validateInterpolant(interpolant, left, right);
   }
 
   private List<Formula> getFreeArithmeticVars(BooleanFormula pFormula) {
@@ -116,7 +116,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
         "Func_model-based_craig-itp", FormulaType.BooleanType, sharedVars);
   }
 
-  private BooleanFormula checkInterpolationCriteria(
+  private BooleanFormula validateInterpolant(
       BooleanFormula interpolant, BooleanFormula left, BooleanFormula right)
       throws SolverException, InterruptedException {
 
