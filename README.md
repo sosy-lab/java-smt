@@ -58,7 +58,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 
 | SMT Solver | Linux x64 | Linux arm64 | Windows x64 | Windows arm64 | MacOS x64 | MacOS arm64 | Description |
 | --- |:---:|:---:|:---:|:---:|:---:|:---:|:--- |
-| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  | :heavy_check_mark: |  |  |  | a fast solver for bitvector logic |
+| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  |  |  | a fast solver for bitvector logic |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  |  |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
 | [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
