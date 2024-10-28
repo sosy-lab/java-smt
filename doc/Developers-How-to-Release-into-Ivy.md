@@ -183,18 +183,26 @@ To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwu
 Then execute the following command in the JavaSMT directory:
 ```
 ant publish-bitwuzla \
-    -Dbitwuzla.path=$BITWUZLA_DIR -Dbitwuzla.customRev=$VERSION \
-    -Dbitwuzla.rebuildWrapper=$BOOL -Djdk-windows.path=$JNI_DIR
+     -Dbitwuzla.path=$BITWUZLA_DIR \
+     -Dbitwuzla.customRev=$VERSION \
+     -Dbitwuzla.rebuildWrapper=false \
+     -Djdk-windows.path=$JDK_DIR_WINDOWS \
+     -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
 Example:
 ```
 ant publish-bitwuzla \
-    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 \
-    -Dbitwuzla.rebuildWrapper=false -Djdk-windows.path=/dependencies/jdk-11/
+    -Dbitwuzla.path=/workspace/solvers/bitwuzla/bitwuzla/ \
+    -Dbitwuzla.customRev=0.6.0 \
+    -Dbitwuzla.rebuildWrapper=false \
+    -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2/ \
+    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2/
 ```
-The build-scripts Bitwuzla will download and build necessary dependencies like GMP automatically.
-Our build script will automatically append the git-revision of Bitwuzla, if available.
-The build-steps will produce a Linux and a Windows library and publish them.
+The build-scripts for Bitwuzla ... :
+- run for about 10 minutes (we build everything from scratch, three times).
+- download and build necessary dependencies like GMP automatically. 
+- automatically append the git-revision of Bitwuzla, if available.
+- produce two Linux (x64 and arm64) and one Windows (x64) library and publish them.
 
 Finally, follow the instructions shown in the message at the end.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,

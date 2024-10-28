@@ -179,11 +179,14 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="bitwuzla"/>
         <property name="stage.revision" value="${bitwuzla.revision}"/>
+        <property name="libDir.x64" value="lib/java/runtime-z3/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-z3/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="bitwuzla" fileending="jar"/>
-        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj" fileending="so"/>
+        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj" fileending="dll"/>
         <stage-solver-file filename="bitwuzla-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
         <stage-solver-file filename="bitwuzla-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
