@@ -160,7 +160,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="swig" dir="${source.path}" failonerror="true">
             <arg value="-java"/>
             <arg value="-c++"/>
-            <arg value="-I${source.installPathLinuxArm64}"/>
+            <arg value="-I${source.installPathLinuxX64}"/>
             <arg value="-package"/>
             <arg value="org.sosy_lab.java_smt.solvers.bitwuzla.api"/>
             <arg value="-outdir"/>
