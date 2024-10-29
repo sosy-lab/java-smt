@@ -72,7 +72,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, Z3SolverException {
+  public OptStatus check() throws InterruptedException {
     Preconditions.checkState(!closed);
     int status;
     try {
@@ -132,7 +132,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
+  public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     logSolverStack();
     return check() == OptStatus.UNSAT;

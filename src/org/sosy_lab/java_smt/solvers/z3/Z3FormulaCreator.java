@@ -23,6 +23,7 @@ import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
@@ -157,11 +158,36 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
+  /**
+   * Utility helper method to hide a checked exception as RuntimeException.
+   *
+   * <p>The generic E simulates a RuntimeException at compile time and lets us throw the correct
+   * Exception at run time.
+   */
+  @SuppressWarnings("unchecked")
+  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
+  private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
+    throw (E) e;
+  }
+
+  /**
+   * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
+   * Otherwise, the given exception is returned to be thrown by the caller.
+   *
+   * <p>We handle Z3Exceptions in several places, including usage in Java interfaces like
+   * Iterable/Iterator, where checked exceptions can not be specified. This method signature does
+   * not specify a checked exception like {@link InterruptedException} to be thrown.
+   */
+  final Z3Exception handleZ3Exception(Z3Exception e) {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
-      shutdownNotifier.shutdownIfNecessary();
+      try {
+        shutdownNotifier.shutdownIfNecessary();
+      } catch (InterruptedException interrupt) {
+        throwCheckedAsUnchecked(interrupt);
+      }
     }
-    throw e;
+    throwCheckedAsUnchecked(new SolverException("Z3 has thrown an exception", e));
+    return null; // unreachable code, we throw something before this line.
   }
 
   @Override
@@ -995,10 +1021,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * Apply multiple tactics in sequence.
    *
    * @throws InterruptedException thrown by JNI code in case of termination request
-   * @throws SolverException thrown by JNI code in case of error
    */
   public long applyTactics(long z3context, final Long pF, String... pTactics)
-      throws InterruptedException, SolverException {
+      throws InterruptedException {
     long overallResult = pF;
     for (String tactic : pTactics) {
       overallResult = applyTactic(z3context, overallResult, tactic);

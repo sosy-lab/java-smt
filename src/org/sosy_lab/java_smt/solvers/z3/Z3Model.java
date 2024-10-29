@@ -13,6 +13,7 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -45,23 +47,29 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
-    // Iterate through constants.
-    for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
-      long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
-      Native.incRef(z3context, keyDecl);
-      out.addAll(getConstAssignments(keyDecl));
-      Native.decRef(z3context, keyDecl);
-    }
+    try {
 
-    // Iterate through function applications.
-    for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
-      long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
-      Native.incRef(z3context, funcDecl);
-      if (!isInternalSymbol(funcDecl)) {
-        String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-        out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+      // Iterate through constants.
+      for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
+        long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
+        Native.incRef(z3context, keyDecl);
+        out.addAll(getConstAssignments(keyDecl));
+        Native.decRef(z3context, keyDecl);
       }
-      Native.decRef(z3context, funcDecl);
+
+      // Iterate through function applications.
+      for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
+        long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+        Native.incRef(z3context, funcDecl);
+        if (!isInternalSymbol(funcDecl)) {
+          String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+          out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+        }
+        Native.decRef(z3context, funcDecl);
+      }
+
+    } catch (Z3Exception exception) {
+      throw z3creator.handleZ3Exception(exception);
     }
 
     return out.build();
@@ -363,7 +371,11 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   @Override
   public String toString() {
     Preconditions.checkState(!isClosed());
-    return Native.modelToString(z3context, model);
+    try {
+      return Native.modelToString(z3context, model);
+    } catch (Z3Exception exception) {
+      throw z3creator.handleZ3Exception(exception);
+    }
   }
 
   @Override
@@ -375,9 +387,14 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected Long evalImpl(Long formula) {
+  protected @Nullable Long evalImpl(Long formula) {
     LongPtr resultPtr = new LongPtr();
-    boolean satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    boolean satisfiableModel;
+    try {
+      satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    } catch (Z3Exception exception) {
+      throw z3creator.handleZ3Exception(exception);
+    }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {
       // unknown evaluation
