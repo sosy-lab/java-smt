@@ -66,7 +66,7 @@ class SynchronizedModelWithContext implements Model {
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula pF) {
+  public @Nullable Boolean evaluate(BooleanFormula pF) throws InterruptedException {
     BooleanFormula f;
     synchronized (sync) {
       f = otherManager.translateFrom(pF, manager);

@@ -80,12 +80,13 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     return delegate.getModel();
   }
 
   @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     return delegate.getModelAssignments();
   }
 

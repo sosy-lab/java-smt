@@ -87,7 +87,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
    * temporary symbols. There should be at least a value-assignment for each free symbol.
    */
-  Model getModel() throws SolverException;
+  Model getModel() throws SolverException, InterruptedException;
 
   /**
    * Get a temporary view on the current satisfying assignment. This should be called only
@@ -95,7 +95,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * should no longer be used as soon as any constraints are added to, pushed, or popped from the
    * prover stack.
    */
-  default Evaluator getEvaluator() throws SolverException {
+  default Evaluator getEvaluator() throws InterruptedException, SolverException {
     return getModel();
   }
 
@@ -107,7 +107,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  default ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     try (Model model = getModel()) {
       return model.asList();
     }

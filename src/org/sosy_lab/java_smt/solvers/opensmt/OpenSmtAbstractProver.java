@@ -145,7 +145,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     return super.getModelAssignments();

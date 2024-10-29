@@ -104,18 +104,18 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() {
+  public Model getModel() throws InterruptedException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
-  protected Z3Model getEvaluatorWithoutChecks() {
+  protected Z3Model getEvaluatorWithoutChecks() throws InterruptedException {
     return new Z3Model(this, z3context, getZ3Model(), creator);
   }
 
-  protected abstract long getZ3Model();
+  protected abstract long getZ3Model() throws InterruptedException;
 
   protected abstract void assertContraint(long constraint);
 

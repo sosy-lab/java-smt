@@ -91,7 +91,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     synchronized (sync) {
       return new SynchronizedModelWithContext(delegate.getModel(), sync, manager, otherManager);
     }

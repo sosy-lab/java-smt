@@ -35,7 +35,7 @@ public class CachingModel implements Model {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException {
     if (modelAssignments == null) {
       modelAssignments = delegate.asList();
     }
@@ -48,47 +48,48 @@ public class CachingModel implements Model {
   }
 
   @Override
-  public <T extends Formula> @Nullable T eval(T formula) {
+  public <T extends Formula> @Nullable T eval(T formula) throws InterruptedException {
     return delegate.eval(formula);
   }
 
   @Override
-  public @Nullable Object evaluate(Formula formula) {
+  public @Nullable Object evaluate(Formula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(IntegerFormula formula) {
+  public @Nullable BigInteger evaluate(IntegerFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable Rational evaluate(RationalFormula formula) {
+  public @Nullable Rational evaluate(RationalFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula formula) {
+  public @Nullable Boolean evaluate(BooleanFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(BitvectorFormula formula) {
+  public @Nullable BigInteger evaluate(BitvectorFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable String evaluate(StringFormula formula) {
+  public @Nullable String evaluate(StringFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable String evaluate(EnumerationFormula formula) {
+  public @Nullable String evaluate(EnumerationFormula formula) throws InterruptedException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula) {
+  public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula)
+      throws InterruptedException {
     return delegate.evaluate(formula);
   }
 

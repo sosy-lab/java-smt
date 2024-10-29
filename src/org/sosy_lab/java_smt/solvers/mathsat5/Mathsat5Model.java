@@ -48,7 +48,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
@@ -71,7 +71,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     return assignments.build();
   }
 
-  private ValueAssignment getAssignment(long key, long value) {
+  private ValueAssignment getAssignment(long key, long value) throws InterruptedException {
     List<Object> argumentInterpretation = new ArrayList<>();
     for (int i = 0; i < msat_term_arity(key); i++) {
       long arg = msat_term_get_arg(key, i);
@@ -89,7 +89,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
 
   /** split an array-assignment into several assignments for all positions. */
   private Collection<ValueAssignment> getArrayAssignments(
-      long symbol, long key, long array, List<Object> upperIndices) {
+      long symbol, long key, long array, List<Object> upperIndices) throws InterruptedException {
     Collection<ValueAssignment> assignments = new ArrayList<>();
     Set<Long> indices = new HashSet<>();
     while (msat_term_is_array_write(creator.getEnv(), array)) {

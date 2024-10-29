@@ -137,8 +137,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
+  protected long getZ3Model() throws InterruptedException {
+    try {
+      return Native.solverGetModel(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw new InterruptedException("Z3 model generation interrupted.");
+    }
   }
 
   @Override

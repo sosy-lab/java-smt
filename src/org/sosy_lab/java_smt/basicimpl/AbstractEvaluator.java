@@ -40,7 +40,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @SuppressWarnings("unchecked")
   @Nullable
   @Override
-  public final <T extends Formula> T eval(T f) {
+  public final <T extends Formula> T eval(T f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     TFormulaInfo evaluation = evalImpl(creator.extractInfo(f));
     return evaluation == null ? null : (T) creator.encapsulateWithTypeOf(evaluation);
@@ -48,14 +48,14 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Nullable
   @Override
-  public final BigInteger evaluate(IntegerFormula f) {
+  public final BigInteger evaluate(IntegerFormula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (BigInteger) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
   @Override
-  public Rational evaluate(RationalFormula f) {
+  public Rational evaluate(RationalFormula f) throws InterruptedException {
     Object value = evaluateImpl(creator.extractInfo(f));
     if (value instanceof BigInteger) {
       // We simplified the value internally. Here, we need to convert it back to Rational.
@@ -67,41 +67,42 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   @Nullable
   @Override
-  public final Boolean evaluate(BooleanFormula f) {
+  public final Boolean evaluate(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (Boolean) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
   @Override
-  public final String evaluate(StringFormula f) {
+  public final String evaluate(StringFormula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (String) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
   @Override
-  public final String evaluate(EnumerationFormula f) {
+  public final String evaluate(EnumerationFormula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (String) evaluateImpl(creator.extractInfo(f));
   }
 
   @Override
-  public final @Nullable FloatingPointNumber evaluate(FloatingPointFormula f) {
+  public final @Nullable FloatingPointNumber evaluate(FloatingPointFormula f)
+      throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (FloatingPointNumber) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
   @Override
-  public final BigInteger evaluate(BitvectorFormula f) {
+  public final BigInteger evaluate(BitvectorFormula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     return (BigInteger) evaluateImpl(creator.extractInfo(f));
   }
 
   @Nullable
   @Override
-  public final Object evaluate(Formula f) {
+  public final Object evaluate(Formula f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(
         !(f instanceof ArrayFormula),
@@ -114,7 +115,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
    * set in the model and evaluation aborts, return <code>null</code>.
    */
   @Nullable
-  protected abstract TFormulaInfo evalImpl(TFormulaInfo formula);
+  protected abstract TFormulaInfo evalImpl(TFormulaInfo formula) throws InterruptedException;
 
   /**
    * Simplify the given formula and replace all symbols with their model values. If a symbol is not
@@ -122,7 +123,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
    * formula into a Java object as far as possible, i.e., try to match a primitive or simple type.
    */
   @Nullable
-  protected final Object evaluateImpl(TFormulaInfo f) {
+  protected final Object evaluateImpl(TFormulaInfo f) throws InterruptedException {
     Preconditions.checkState(!isClosed());
     TFormulaInfo evaluatedF = evalImpl(f);
     return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);

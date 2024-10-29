@@ -154,5 +154,6 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
    *
    * @throws SolverException if model can not be constructed.
    */
-  protected abstract Evaluator getEvaluatorWithoutChecks() throws SolverException;
+  protected abstract Evaluator getEvaluatorWithoutChecks()
+      throws SolverException, InterruptedException;
 }
