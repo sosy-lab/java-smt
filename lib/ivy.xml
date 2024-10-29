@@ -160,14 +160,14 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.10" conf="runtime-mathsat->solver-mathsat" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.12.5" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11-glibc2.27" conf="runtime-mathsat->solver-mathsat" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.13.2" conf="runtime-z3->solver-z3; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.6.0-g2f72cc0e" conf="runtime-opensmt->solver-opensmt; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.1-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.0.5-g4cb2ab9eb" conf="runtime-cvc5->solver-cvc5" />
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.6.0-gab3db0e6" conf="runtime-bitwuzla->solver-bitwuzla; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.6.0-g2b3d69a7" conf="runtime-bitwuzla->solver-bitwuzla; contrib->sources,javadoc"/>
 
         <!-- additional JavaSMT components with Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.1.1-734-g3732f7e08" conf="runtime-yices2->runtime; contrib->sources" />
