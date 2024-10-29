@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -2306,22 +2307,19 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
   }
 
-  @SuppressWarnings("resource")
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModel();
-      assert_().fail();
+      assertThrows(IllegalArgumentException.class, () -> prover.getModel());
     }
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModelAssignments();
-      assert_().fail();
+      assertThrows(IllegalArgumentException.class, () -> prover.getModelAssignments());
     }
   }
 

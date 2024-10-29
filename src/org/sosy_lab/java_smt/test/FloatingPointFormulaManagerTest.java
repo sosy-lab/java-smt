@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -1024,11 +1024,9 @@ public class FloatingPointFormulaManagerTest
     }
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidString() {
-    fpmgr.makeNumber("a", singlePrecType);
-    assert_().fail();
+    assertThrows(Exception.class, () -> fpmgr.makeNumber("a", singlePrecType));
   }
 
   @Test
