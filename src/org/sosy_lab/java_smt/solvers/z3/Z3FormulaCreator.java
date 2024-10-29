@@ -172,11 +172,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
-   * Otherwise, the given exception is returned to be thrown by the caller.
+   * Otherwise, the given exception is thrown.
    *
    * <p>We handle Z3Exceptions in several places, including usage in Java interfaces like
    * Iterable/Iterator, where checked exceptions can not be specified. This method signature does
-   * not specify a checked exception like {@link InterruptedException} to be thrown.
+   * not specify a checked exception like {@link InterruptedException} to be thrown, but uses {@link
+   * RuntimeException}.
    */
   final Z3Exception handleZ3Exception(Z3Exception e) {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
