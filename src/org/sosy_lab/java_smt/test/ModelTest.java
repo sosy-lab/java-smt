@@ -1209,11 +1209,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
