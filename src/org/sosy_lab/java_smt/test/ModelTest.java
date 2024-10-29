@@ -185,7 +185,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Test that different names are no problem for Bools in the model. */
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    // Some names are specificly chosen to test the Boolector model
+    // Some names are specifically chosen to test the Boolector model
     for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
     }
@@ -1208,7 +1208,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         ImmutableList.of(BigInteger.valueOf(5)));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   @SuppressWarnings("CheckReturnValue")
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
@@ -1230,7 +1230,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT)));
       }
     }
   }
@@ -2311,7 +2313,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalArgumentException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
     }
   }
 
@@ -2319,7 +2321,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalArgumentException.class, () -> prover.getModelAssignments());
+      assertThrows(IllegalStateException.class, () -> prover.getModelAssignments());
     }
   }
 
