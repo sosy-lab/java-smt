@@ -159,10 +159,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   /**
-   * Utility helper method to hide a checked exception as RuntimeException.
+   * Utility helper method to hide a checked exception as unchecked exception.
    *
-   * <p>The generic E simulates a RuntimeException at compile time and lets us throw the correct
-   * Exception at run time.
+   * <p>The generic E simulates a generic (unchecked) Exception at compile time and lets us throw
+   * the correct (checked) Exception at run time.
    */
   @SuppressWarnings("unchecked")
   @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
@@ -176,8 +176,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    *
    * <p>We handle Z3Exceptions in several places, including usage in Java interfaces like
    * Iterable/Iterator, where checked exceptions can not be specified. This method signature does
-   * not specify a checked exception like {@link InterruptedException} to be thrown, but uses {@link
-   * RuntimeException}.
+   * not specify a checked exception like {@link InterruptedException} to be thrown.
+   *
+   * @return actually nothing, because an exception is thrown.
    */
   final Z3Exception handleZ3Exception(Z3Exception e) {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
@@ -188,7 +189,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       }
     }
     throwCheckedAsUnchecked(new SolverException("Z3 has thrown an exception", e));
-    return null; // unreachable code, we throw something before this line.
+    throw new AssertionError("unreachable code"); // we throw something before this line
   }
 
   @Override
