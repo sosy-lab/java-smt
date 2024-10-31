@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -184,7 +185,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Test that different names are no problem for Bools in the model. */
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    // Some names are specificly chosen to test the Boolector model
+    // Some names are specifically chosen to test the Boolector model
     for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
     }
@@ -1207,12 +1208,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         ImmutableList.of(BigInteger.valueOf(5)));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1229,7 +1230,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT)));
       }
     }
   }
@@ -2306,22 +2309,19 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
   }
 
-  @SuppressWarnings("resource")
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModel();
-      assert_().fail();
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
     }
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModelAssignments();
-      assert_().fail();
+      assertThrows(IllegalStateException.class, () -> prover.getModelAssignments());
     }
   }
 

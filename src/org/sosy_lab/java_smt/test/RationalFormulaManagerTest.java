@@ -9,8 +9,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -139,10 +139,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
     }
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidString() {
-    rmgr.makeNumber("a");
-    assert_().fail();
+    assertThrows(Exception.class, () -> rmgr.makeNumber("a"));
   }
 }
