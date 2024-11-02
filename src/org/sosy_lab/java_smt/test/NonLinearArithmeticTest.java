@@ -52,7 +52,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(Solvers.values()),
+            Arrays.asList(ParameterizedSolverBasedTest0.getAllSolvers()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
             Arrays.asList(NonLinearArithmetic.values()))
         .stream()
