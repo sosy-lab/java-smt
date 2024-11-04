@@ -275,66 +275,6 @@ Decimal
     ;
 
 
-//Floating Points
-FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
-    : [2-9] Digit*
-    ;
-
-FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
-    : ParOpen ShortFloats '0' ParClose
-    ;
-
-NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
-    : ParOpen GRW_Underscore 'FloatingPoint' FloatingPointNumeral FloatingPointNumeral ParClose
-    ;
-
-DecimalFloatingPoint //supports formats like: (123.45 or 123e4) TODO: Is the format 123.45 not
-// already supported?
-    : Decimal + ([eE] [+-]? Digit+)?
-    ;
-
-BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
-    : ParOpen 'fp' Binary Binary Binary ParClose
-    ;
-
-HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p+1)
-    : '#' 'x' HexDigit+ '.' HexDigit* 'p' [+-]? [0-9]+
-    ;
-
-FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
-// FloatingPoint eb
-// sb))
-    : ParOpen ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose
-    ParOpen NumeralFloatingPoint ParClose ParClose
-    | ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose //short
-    // variant e.g. (_ +oo 2 3)
-    ;
-
-FloatingPointPlusOrMinusZero // Plus and Minus Zero : ((_ +zero eb sb) (_ FloatingPoint eb sb))
-    :ParOpen ParOpen GRW_Underscore [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose
-     ParOpen GRW_Underscore NumeralFloatingPoint ParClose ParClose
-     | ParOpen [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose // short variant
-     // e.g. (_ +zero 3 )
-    ;
-
-NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
-    : ParOpen ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
-    ParOpen NumeralFloatingPoint ParClose ParClose
-    | ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
-    // e.g. (_ Nan 3 4)
-    ;
-
-
-FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater than 1
-     : NumeralFloatingPoint
-     | FloatingPointShortVariant
-     | DecimalFloatingPoint
-     | BinaryFloatingPoint
-     | HexadecimalFloatingPoint
-     | FloatingPointPlusOrMinusInfinity
-     | NotANumberFloatingPoint
-     ;
-
 
 fragment HexDigit
     : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
@@ -347,12 +287,6 @@ Colon
 
 fragment Digit
     : [0-9]
-    ;
-fragment ShortFloats
-    : 'Float16'
-    | 'Float32'
-    | 'Float64'
-    | 'Float128'
     ;
 
 fragment Sym
@@ -681,10 +615,6 @@ string
     : String
     ;
 
-floatingpoint
-    : FloatingPoint
-    ;
-
 keyword
     : predefKeyword                                                   #pre_key
     | Colon simpleSymbol                                              #key_simsymb
@@ -698,7 +628,6 @@ spec_constant
     | hexadecimal                                                     #spec_constant_hex
     | binary                                                          #spec_constant_bin
     | string                                                          #spec_constant_string
-    | floatingpoint                                                   #spec_constant_floating_point
     ;
 
 
@@ -777,69 +706,6 @@ term
     | ParOpen GRW_Exclamation term attribute+ ParClose                #term_exclam
     ;
 
-// Floating Point Operations
-
-fp_abs : 'fp.abs';
-fp_neg : 'fp.neg';
-fp_add : 'fp.add' ;
-fp_sub : 'fp.sub' ;
-fp_mul : 'fp.mul' ;
-fp_div : 'fp.div' ;
-fp_fma : 'fp.fma'; //fused multiplication and addition
-fp_sqrt : 'fp.sqrt';
-fp_rem: 'fp.rem'; //remainder
-fp_roundToIntegral: 'fp.roundToIntegral';
-fp_min: 'fp.min';
-fp_max: 'fp.max';
-fp_leq: 'fp.leq';
-fp_lt: 'fp.lt';
-fp_geq: 'fp.geq';
-fp_gt: 'fp.gt';
-fp_eq  : 'fp.eq'  ;
-fp_isNormal: 'fp.isNormal';
-fp_isSubnormal: 'fp.isSubnormal';
-fp_isZero: 'fp.isZero';
-fp_isInfinite: 'fp.isInfinite';
-fp_isNegative: 'fp.isNegative';
-fp_isPositive: 'fp.isPositive';
-
-//rounding modes for floating point operations
-rounding_mode
-    : 'RNE'
-    | 'RNA'
-    | 'RTP'
-    | 'RTN'
-    | 'RTZ'
-    ;
-
-
-floating_point_operator_with_1_input // f(x) = x e.g. fp.isNegative(x) = Bool
-:fp_abs
-|fp_neg
-|fp_sqrt
-|fp_roundToIntegral
-|fp_isNormal
-|fp_isSubnormal
-|fp_isZero
-|fp_isInfinite
-|fp_isNegative
-|fp_isPositive
-;
-floating_point_operator_with_2_inputs // f(x,y) = z e.g. fp.add
-:fp_add
-|fp_sub
-|fp_mul
-|fp_div
-|fp_fma
-|fp_rem
-|fp_min
-|fp_max
-|fp_leq
-|fp_lt
-|fp_geq
-|fp_gt
-|fp_eq
-;
 
 // Theory Declarations
 
