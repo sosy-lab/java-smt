@@ -274,6 +274,13 @@ Decimal
     : Numeral '.' '0'* Numeral
     ;
 
+RoundingModes //needed for floating point operations
+    : 'RNE'
+    | 'RNA'
+    | 'RTP'
+    | 'RTN'
+    | 'RTZ'
+    ;
 
 //Floating Points
 FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
@@ -775,6 +782,7 @@ term
     | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose   #term_exists
     | ParOpen GRW_Match term ParOpen match_case+ ParClose ParClose    #term_match
     | ParOpen GRW_Exclamation term attribute+ ParClose                #term_exclam
+    | ParOpen floating_point_operations                               #term_floating_point
     ;
 
 // Floating Point Operations
@@ -803,21 +811,11 @@ fp_isInfinite: 'fp.isInfinite';
 fp_isNegative: 'fp.isNegative';
 fp_isPositive: 'fp.isPositive';
 
-//rounding modes for floating point operations
-rounding_mode
-    : 'RNE'
-    | 'RNA'
-    | 'RTP'
-    | 'RTN'
-    | 'RTZ'
-    ;
 
 
 floating_point_operator_with_1_input // f(x) = x e.g. fp.isNegative(x) = Bool
 :fp_abs
 |fp_neg
-|fp_sqrt
-|fp_roundToIntegral
 |fp_isNormal
 |fp_isSubnormal
 |fp_isZero
@@ -825,13 +823,9 @@ floating_point_operator_with_1_input // f(x) = x e.g. fp.isNegative(x) = Bool
 |fp_isNegative
 |fp_isPositive
 ;
+
 floating_point_operator_with_2_inputs // f(x,y) = z e.g. fp.add
-:fp_add
-|fp_sub
-|fp_mul
-|fp_div
-|fp_fma
-|fp_rem
+:fp_rem
 |fp_min
 |fp_max
 |fp_leq
@@ -839,6 +833,46 @@ floating_point_operator_with_2_inputs // f(x,y) = z e.g. fp.add
 |fp_geq
 |fp_gt
 |fp_eq
+;
+
+floating_points_with_RM_1_input
+:fp_sqrt
+|fp_roundToIntegral
+;
+
+floating_points_with_RM_2_inputs
+:fp_add
+|fp_sub
+|fp_mul
+|fp_div
+;
+
+floating_point_funs_with_RM_3_inputs
+:fp_fma
+;
+
+
+floating_point_operations //TODO: Check if only Numeral Floating Points are accepted
+: ParOpen floating_point_operator_with_1_input FloatingPoint ParClose
+| ParOpen floating_point_operator_with_2_inputs FloatingPoint FloatingPoint ParClose
+| ParOpen floating_points_with_RM_1_input RoundingModes FloatingPoint ParClose
+| ParOpen floating_points_with_RM_2_inputs RoundingModes FloatingPoint FloatingPoint ParClose
+| ParOpen floating_point_funs_with_RM_3_inputs RoundingModes FloatingPoint FloatingPoint
+FloatingPoint ParClose
+;
+
+
+//Floating Point Conversions (to_fp functions)
+
+to_fp_input
+: ParOpen GRW_Underscore 'to_fp' FloatingPointNumeral FloatingPointNumeral ParClose
+;
+
+to_fp_operations
+: ParOpen to_fp_input ParOpen Binary ParClose ParClose
+|ParOpen to_fp_input RoundingModes FloatingPoint ParClose
+//TODO: add conversion function for reals if wanted, because reals aren't implemented yet.
+
 ;
 
 // Theory Declarations
