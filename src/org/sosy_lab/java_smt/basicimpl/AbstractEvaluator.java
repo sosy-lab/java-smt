@@ -61,7 +61,6 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
   @Override
   public Rational evaluate(RationalFormula f) {
     Preconditions.checkState(!isClosed());
-    Object value = evaluateImpl(creator.extractInfo(f));
     if (Generator.isLoggingEnabled()) {
       Generator.getLines().append("(get-value (" + f + "))\n");
     }
