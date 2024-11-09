@@ -375,9 +375,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
   }
 
-  /**
-   * Eliminate UFs from the given input formula.
-   */
+  /** Eliminate UFs from the given input formula. */
   protected BooleanFormula applyUFEImpl(BooleanFormula pF) {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
