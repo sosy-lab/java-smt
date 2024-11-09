@@ -102,6 +102,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws InterruptedException {
     Preconditions.checkState(!closed);
