@@ -377,10 +377,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   /**
    * Eliminate UFs from the given input formula.
-   *
-   * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
@@ -390,6 +388,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This is the light version that does not need to eliminate all quantifiers.
    *
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
   protected BooleanFormula applyQELightImpl(BooleanFormula pF)
       throws InterruptedException, SolverException {
@@ -404,6 +403,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @param pF Input to apply the CNF transformation to.
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
   protected BooleanFormula applyCNFImpl(BooleanFormula pF)
       throws InterruptedException, SolverException {
@@ -417,6 +417,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * Apply negation normal form (NNF) transformation to the given input formula.
    *
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
   protected BooleanFormula applyNNFImpl(BooleanFormula input)
       throws InterruptedException, SolverException {
@@ -434,6 +435,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This does not need to change something, but it might simplify the formula.
    *
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
   protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException, SolverException {
     return f;
