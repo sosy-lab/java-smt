@@ -8,8 +8,8 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -238,11 +238,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
         qmgr.exists(
             ImmutableList.of(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
-    try {
-      ackermannization.eliminateUfs(f);
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-    }
+    assertThrows(IllegalArgumentException.class, () -> ackermannization.eliminateUfs(f));
   }
 
   @Test

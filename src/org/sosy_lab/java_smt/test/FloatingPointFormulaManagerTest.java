@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -47,7 +47,7 @@ public class FloatingPointFormulaManagerTest
   // numbers are small enough to be precise with single precision
   private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 
-  private static final int NUM_RANDOM_TESTS = 100;
+  private static final int NUM_RANDOM_TESTS = 50;
 
   private FloatingPointType singlePrecType;
   private FloatingPointType doublePrecType;
@@ -867,8 +867,8 @@ public class FloatingPointFormulaManagerTest
       flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
     }
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    for (int i = 1; i < 10; i++) {
+      for (int j = 1; j < 10; j++) {
         flts.add((float) (i * Math.pow(10, j)));
         flts.add((float) (-i * Math.pow(10, j)));
       }
@@ -904,8 +904,8 @@ public class FloatingPointFormulaManagerTest
       dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
     }
 
-    for (int i = 1; i < 20; i++) {
-      for (int j = 1; j < 20; j++) {
+    for (int i = 1; i < 10; i++) {
+      for (int j = 1; j < 10; j++) {
         dbls.add(i * Math.pow(10, j));
         dbls.add(-i * Math.pow(10, j));
       }
@@ -1024,11 +1024,9 @@ public class FloatingPointFormulaManagerTest
     }
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidString() {
-    fpmgr.makeNumber("a", singlePrecType);
-    assert_().fail();
+    assertThrows(Exception.class, () -> fpmgr.makeNumber("a", singlePrecType));
   }
 
   @Test

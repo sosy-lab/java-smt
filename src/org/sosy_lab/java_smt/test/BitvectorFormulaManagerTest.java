@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -534,11 +533,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   @SuppressWarnings("CheckReturnValue")
   public void bvOutOfRange() {
     for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
-      try {
-        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]));
     }
 
     for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
@@ -547,16 +544,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       bvmgr.makeBitvector(size, -(1L << (size - 1)));
 
       // forbitten values
-      try {
-        bvmgr.makeBitvector(size, 1L << size);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
+      assertThrows(IllegalArgumentException.class, () -> bvmgr.makeBitvector(size, 1L << size));
+      assertThrows(
+          IllegalArgumentException.class, () -> bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1));
     }
 
     for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
@@ -572,17 +562,14 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
 
       // forbitten values
-      try {
-        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
-      try {
-        bvmgr.makeBitvector(
-            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
-        assert_().fail();
-      } catch (IllegalArgumentException expected) {
-      }
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size)));
+      assertThrows(
+          IllegalArgumentException.class,
+          () ->
+              bvmgr.makeBitvector(
+                  size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE)));
     }
   }
 

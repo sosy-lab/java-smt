@@ -199,7 +199,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNesteQuantifierTest() throws InterruptedException, SolverException {
+  public void ufEliminationNestedQuantifierTest() throws InterruptedException, SolverException {
     requireIntegers();
     requireQuantifiers();
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)

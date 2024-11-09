@@ -294,7 +294,7 @@ public class FormulaClassifier {
             nonLinearArithmetic = true;
             return allArgLevel + 1;
           }
-          // $FALL-THROUGH$
+        // $FALL-THROUGH$
         default:
           if (pFunctionDeclaration.getType().isBooleanType()) {
             if (EnumSet.of(

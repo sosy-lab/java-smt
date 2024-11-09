@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 /**
  * This JUnit test class is mainly intended for automated CI checks on different operating systems,
@@ -50,7 +51,7 @@ public class SolverContextFactoryTest {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
-    return Solvers.values();
+    return ParameterizedSolverBasedTest0.getAllSolvers();
   }
 
   @Parameter(0)
