@@ -89,7 +89,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   /** dump the current solver stack into a new SMTLIB file. */
-  protected void logSolverStack() throws Z3SolverException {
+  protected void logSolverStack() throws SolverException {
     if (logfile != null) { // if logging is not disabled
       try {
         // write stack content to logfile
@@ -97,7 +97,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         MoreFiles.createParentDirectories(filename);
         Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
-        throw new Z3SolverException("Cannot write Z3 log file: " + e.getMessage());
+        throw new SolverException("Cannot write Z3 log file", e);
       }
     }
   }
