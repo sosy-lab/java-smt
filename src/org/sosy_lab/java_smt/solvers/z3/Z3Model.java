@@ -48,23 +48,27 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
-    // Iterate through constants.
-    for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
-      long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
-      Native.incRef(z3context, keyDecl);
-      out.addAll(getConstAssignments(keyDecl));
-      Native.decRef(z3context, keyDecl);
-    }
-
-    // Iterate through function applications.
-    for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
-      long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
-      Native.incRef(z3context, funcDecl);
-      if (!isInternalSymbol(funcDecl)) {
-        String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-        out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+    try {
+      // Iterate through constants.
+      for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
+        long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
+        Native.incRef(z3context, keyDecl);
+        out.addAll(getConstAssignments(keyDecl));
+        Native.decRef(z3context, keyDecl);
       }
-      Native.decRef(z3context, funcDecl);
+
+      // Iterate through function applications.
+      for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
+        long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+        Native.incRef(z3context, funcDecl);
+        if (!isInternalSymbol(funcDecl)) {
+          String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+          out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+        }
+        Native.decRef(z3context, funcDecl);
+      }
+    } catch (Z3Exception e) {
+      throw z3creator.handleZ3Exception(e);
     }
 
     return out.build();
