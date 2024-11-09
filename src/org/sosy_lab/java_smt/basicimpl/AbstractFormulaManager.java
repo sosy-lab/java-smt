@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -358,7 +359,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
+  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
+      throws InterruptedException, SolverException {
     switch (tactic) {
       case ACKERMANNIZATION:
         return applyUFEImpl(f);
@@ -389,7 +391,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
 
     // Returning the untouched formula is valid according to QE_LIGHT contract.
     // TODO: substitution-based implementation.
@@ -402,7 +405,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * @param pF Input to apply the CNF transformation to.
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
 
     // TODO: generic implementation.
     throw new UnsupportedOperationException(
@@ -414,12 +418,13 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
+  protected BooleanFormula applyNNFImpl(BooleanFormula input)
+      throws InterruptedException, SolverException {
     return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
 
   @Override
-  public <T extends Formula> T simplify(T f) throws InterruptedException {
+  public <T extends Formula> T simplify(T f) throws InterruptedException, SolverException {
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
@@ -430,7 +435,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @throws InterruptedException Can be thrown by the native code.
    */
-  protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException {
+  protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException, SolverException {
     return f;
   }
 

@@ -47,7 +47,7 @@ public interface Evaluator extends AutoCloseable {
    * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
    *     better evaluation.
    */
-  @Nullable <T extends Formula> T eval(T formula) throws InterruptedException;
+  @Nullable <T extends Formula> T eval(T formula) throws InterruptedException, SolverException;
 
   /**
    * Evaluate a given formula substituting the values from the model.
@@ -62,56 +62,60 @@ public interface Evaluator extends AutoCloseable {
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
    * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
    */
-  @Nullable Object evaluate(Formula formula) throws InterruptedException;
+  @Nullable Object evaluate(Formula formula) throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for integer formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable BigInteger evaluate(IntegerFormula formula) throws InterruptedException;
+  @Nullable BigInteger evaluate(IntegerFormula formula)
+      throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable Rational evaluate(RationalFormula formula) throws InterruptedException;
+  @Nullable Rational evaluate(RationalFormula formula) throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable Boolean evaluate(BooleanFormula formula) throws InterruptedException;
+  @Nullable Boolean evaluate(BooleanFormula formula) throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable BigInteger evaluate(BitvectorFormula formula) throws InterruptedException;
+  @Nullable BigInteger evaluate(BitvectorFormula formula)
+      throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for string formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable String evaluate(StringFormula formula) throws InterruptedException;
+  @Nullable String evaluate(StringFormula formula) throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for enumeration formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable String evaluate(EnumerationFormula formula) throws InterruptedException;
+  @Nullable String evaluate(EnumerationFormula formula)
+      throws InterruptedException, SolverException;
 
   /**
    * Type-safe evaluation for floating-point formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    */
-  @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula) throws InterruptedException;
+  @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula)
+      throws InterruptedException, SolverException;
 
   /**
    * Free resources associated with this evaluator (existing {@link Formula} instances stay valid,

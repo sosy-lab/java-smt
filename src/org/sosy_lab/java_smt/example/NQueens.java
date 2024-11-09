@@ -261,7 +261,7 @@ public final class NQueens {
    * @return true if a queen is placed on the cell, false otherwise.
    */
   private boolean getValue(BooleanFormula[][] symbols, Model model, int row, int col)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     return Boolean.TRUE.equals(model.evaluate(symbols[row][col]));
   }
 

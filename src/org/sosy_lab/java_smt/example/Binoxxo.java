@@ -193,7 +193,8 @@ public final class Binoxxo {
     /** convert one user-given value at given coordinate into a constraint for the solver. */
     abstract BooleanFormula getAssignment(S symbols, int row, int col, char value);
 
-    abstract char getValue(S symbols, Model model, int row, int col) throws InterruptedException;
+    abstract char getValue(S symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException;
 
     /**
      * Solves a Binoxxo using the given grid values and returns a possible solution. Return <code>
@@ -325,7 +326,7 @@ public final class Binoxxo {
 
     @Override
     char getValue(IntegerFormula[][] symbols, Model model, int row, int col)
-        throws InterruptedException {
+        throws InterruptedException, SolverException {
       @Nullable BigInteger value = model.evaluate(symbols[row][col]);
       return value == null ? '.' : value.intValue() == 0 ? 'O' : 'X';
     }
@@ -423,7 +424,7 @@ public final class Binoxxo {
 
     @Override
     char getValue(BooleanFormula[][] symbols, Model model, int row, int col)
-        throws InterruptedException {
+        throws InterruptedException, SolverException {
       @Nullable Boolean value = model.evaluate(symbols[row][col]);
       return value == null ? '.' : value ? 'X' : 'O';
     }

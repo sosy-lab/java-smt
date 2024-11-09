@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 class StatisticsModel implements Model {
@@ -36,62 +37,68 @@ class StatisticsModel implements Model {
   }
 
   @Override
-  public <T extends Formula> @Nullable T eval(T pFormula) throws InterruptedException {
+  public <T extends Formula> @Nullable T eval(T pFormula)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.eval(pFormula);
   }
 
   @Override
-  public @Nullable Object evaluate(Formula pF) throws InterruptedException {
+  public @Nullable Object evaluate(Formula pF) throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(IntegerFormula pF) throws InterruptedException {
+  public @Nullable BigInteger evaluate(IntegerFormula pF)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable Rational evaluate(RationalFormula pF) throws InterruptedException {
+  public @Nullable Rational evaluate(RationalFormula pF)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula pF) throws InterruptedException {
+  public @Nullable Boolean evaluate(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(BitvectorFormula pF) throws InterruptedException {
+  public @Nullable BigInteger evaluate(BitvectorFormula pF)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable String evaluate(StringFormula pF) throws InterruptedException {
+  public @Nullable String evaluate(StringFormula pF) throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public @Nullable String evaluate(EnumerationFormula pF) throws InterruptedException {
+  public @Nullable String evaluate(EnumerationFormula pF)
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
   public @Nullable FloatingPointNumber evaluate(FloatingPointFormula pF)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     stats.modelEvaluations.getAndIncrement();
     return delegate.evaluate(pF);
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() throws InterruptedException {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     stats.modelListings.getAndIncrement();
     return delegate.asList();
   }

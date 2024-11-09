@@ -36,14 +36,15 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula constraint)
+      throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(constraint);
     return delegate.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     delegate.push();
   }

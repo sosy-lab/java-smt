@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 class SynchronizedModelWithContext implements Model {
@@ -66,7 +67,8 @@ class SynchronizedModelWithContext implements Model {
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula pF) throws InterruptedException {
+  public @Nullable Boolean evaluate(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     BooleanFormula f;
     synchronized (sync) {
       f = otherManager.translateFrom(pF, manager);

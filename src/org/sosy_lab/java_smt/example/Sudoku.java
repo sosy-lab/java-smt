@@ -195,7 +195,8 @@ public final class Sudoku {
     /** convert one user-given value at given coordinate into a constraint for the solver. */
     abstract BooleanFormula getAssignment(S symbols, int row, int col, Integer value);
 
-    abstract Integer getValue(S symbols, Model model, int row, int col) throws InterruptedException;
+    abstract Integer getValue(S symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException;
 
     /**
      * Solves a sudoku using the given grid values and returns a possible solution. Return <code>
@@ -315,7 +316,7 @@ public final class Sudoku {
 
     @Override
     Integer getValue(IntegerFormula[][] symbols, Model model, int row, int col)
-        throws InterruptedException {
+        throws InterruptedException, SolverException {
       return model.evaluate(symbols[row][col]).intValue();
     }
   }
@@ -415,7 +416,7 @@ public final class Sudoku {
 
     @Override
     Integer getValue(BooleanFormula[][][] symbols, Model model, int row, int col)
-        throws InterruptedException {
+        throws InterruptedException, SolverException {
       for (int value = 0; value < SIZE; value++) {
         if (model.evaluate(symbols[row][col][value])) {
           return value + 1; // off-by-one!
@@ -519,7 +520,7 @@ public final class Sudoku {
 
     @Override
     Integer getValue(EnumerationFormula[][] symbols, Model model, int row, int col)
-        throws InterruptedException {
+        throws InterruptedException, SolverException {
       String value = model.evaluate(symbols[row][col]);
       for (int i = 0; i < VALUES.length; i++) {
         if (VALUES[i].equals(value)) {

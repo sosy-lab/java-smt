@@ -101,7 +101,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected void pushImpl() throws InterruptedException {
+  protected void pushImpl() throws InterruptedException, SolverException {
     push0();
     try {
       Native.optimizePush(z3context, z3optSolver);

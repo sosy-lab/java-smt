@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 public class CachingModel implements Model {
@@ -35,7 +36,7 @@ public class CachingModel implements Model {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() throws InterruptedException {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     if (modelAssignments == null) {
       modelAssignments = delegate.asList();
     }
@@ -48,48 +49,55 @@ public class CachingModel implements Model {
   }
 
   @Override
-  public <T extends Formula> @Nullable T eval(T formula) throws InterruptedException {
+  public <T extends Formula> @Nullable T eval(T formula)
+      throws InterruptedException, SolverException {
     return delegate.eval(formula);
   }
 
   @Override
-  public @Nullable Object evaluate(Formula formula) throws InterruptedException {
+  public @Nullable Object evaluate(Formula formula) throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(IntegerFormula formula) throws InterruptedException {
+  public @Nullable BigInteger evaluate(IntegerFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable Rational evaluate(RationalFormula formula) throws InterruptedException {
+  public @Nullable Rational evaluate(RationalFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula formula) throws InterruptedException {
+  public @Nullable Boolean evaluate(BooleanFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable BigInteger evaluate(BitvectorFormula formula) throws InterruptedException {
+  public @Nullable BigInteger evaluate(BitvectorFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable String evaluate(StringFormula formula) throws InterruptedException {
+  public @Nullable String evaluate(StringFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
-  public @Nullable String evaluate(EnumerationFormula formula) throws InterruptedException {
+  public @Nullable String evaluate(EnumerationFormula formula)
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 
   @Override
   public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     return delegate.evaluate(formula);
   }
 

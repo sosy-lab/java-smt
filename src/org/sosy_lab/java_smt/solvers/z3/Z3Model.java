@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -42,7 +44,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() throws InterruptedException {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
@@ -88,7 +90,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
    * @return ValueAssignments for a constant declaration in the model
    */
   private Collection<ValueAssignment> getConstAssignments(long keyDecl)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
@@ -142,7 +144,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   /** unrolls an constant array assignment. */
   private Collection<ValueAssignment> getConstantArrayAssignment(
-      long arraySymbol, long value, long decl) throws InterruptedException {
+      long arraySymbol, long value, long decl) throws InterruptedException, SolverException {
 
     long arrayFormula = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
     Native.incRef(z3context, arrayFormula);
@@ -209,7 +211,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
    */
   private Collection<ValueAssignment> getArrayAssignments(
       long arraySymbol, long arrayFormula, long value, List<Object> upperIndices)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
@@ -378,13 +380,14 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected Long evalImpl(Long formula) throws InterruptedException {
+  @Nullable
+  protected Long evalImpl(Long formula) throws InterruptedException, SolverException {
     LongPtr resultPtr = new LongPtr();
     boolean satisfiableModel;
     try {
       satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
     } catch (Z3Exception e) {
-      throw new InterruptedException("Z3 model evaluation was interrupted.");
+      throw z3creator.handleZ3Exception(e);
     }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {

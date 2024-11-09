@@ -32,7 +32,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   @Nullable
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) throws InterruptedException {
+  default T push(BooleanFormula f) throws InterruptedException, SolverException {
     push();
     return addConstraint(f);
   }
@@ -46,7 +46,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
-  T addConstraint(BooleanFormula constraint) throws InterruptedException;
+  T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException;
 
   /**
    * Create a new backtracking point, i.e., a new level on the assertion stack. Each level can hold
@@ -55,7 +55,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>If formulas are added before creating the first backtracking point, they can not be removed
    * via a POP-operation.
    */
-  void push() throws InterruptedException;
+  void push() throws InterruptedException, SolverException;
 
   /**
    * Get the number of backtracking points/levels on the current stack.
