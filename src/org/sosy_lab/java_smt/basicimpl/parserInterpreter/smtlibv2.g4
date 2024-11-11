@@ -266,6 +266,10 @@ Binary
     : '#b' BinaryDigit+
     ;
 
+Real //The official website declares reals in their theories which is just decimal.
+    :Decimal
+    ;
+
 HexDecimal
     : '#x' HexDigit+
     ;
@@ -859,20 +863,31 @@ floating_point_operations //TODO: Check if only Numeral Floating Points are acce
 | ParOpen floating_points_with_RM_2_inputs RoundingModes FloatingPoint FloatingPoint ParClose
 | ParOpen floating_point_funs_with_RM_3_inputs RoundingModes FloatingPoint FloatingPoint
 FloatingPoint ParClose
+|floating_point_conversions
 ;
 
 
 //Floating Point Conversions (to_fp functions)
 
+floating_point_conversions
+: from_fp_operations
+| to_fp_operations
+;
+
 to_fp_input
 : ParOpen GRW_Underscore 'to_fp' FloatingPointNumeral FloatingPointNumeral ParClose
 ;
 
-to_fp_operations
-: ParOpen to_fp_input ParOpen Binary ParClose ParClose
-|ParOpen to_fp_input RoundingModes FloatingPoint ParClose
-//TODO: add conversion function for reals if wanted, because reals aren't implemented yet.
+to_fp_operations //REMEMBER THAT ALL CONVERSIONS ARE UNSPECIFIED FOR NAN AND INFINITY VALUES
+: ParOpen to_fp_input Binary ParClose
+|ParOpen to_fp_input RoundingModes NumeralFloatingPoint ParClose
+|ParOpen to_fp_input RoundingModes Real ParClose
+|ParOpen to_fp_input RoundingModes Binary ParClose //if the bitvec should be interpreted as 2^n
+|//unsigned integers don't exist in Java so we don't allow them
+;
 
+from_fp_operations
+:ParOpen ParOpen GRW_Underscore 'fp.to_sbv' FloatingPointNumeral ParClose RoundingModes NumeralFloatingPoint
 ;
 
 // Theory Declarations
