@@ -93,6 +93,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   private final @Nullable BitvectorFormulaManager bimgr;
   private final @Nullable ArrayFormulaManager amgr;
   private final UFManager umgr;
+  private final FloatingPointManager fpmgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
 
   // TODO Should we support push,etc?
@@ -1222,7 +1223,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               Objects.requireNonNull(bimgr)
                   .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
-    } else if (sort.isArrayType()) {
+    }else if(sort.isFloatType()){
+
+    }
+    else if (sort.isArrayType()) {
       variables.put(
           variableSymbol,
           new ParserFormula(
@@ -1364,6 +1368,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         inputParams.add((FormulaType<?>) visit(ctx.sort(i)));
       }
     }
+    //TODO: ONLY IF DECL_FUN IS NOT A FLOATING POINT RETURN AN UF OBJECT.IF IT IS A FLOATING
+    // POINT WE will return something like: return new ParselFormula(fpmgr.blablabla))
 
     ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnType, inputParams));
     temp.setType("UF");

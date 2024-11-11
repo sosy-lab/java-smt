@@ -292,20 +292,20 @@ FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
     ;
 
 FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
-    : ParOpen ShortFloats '0' ParClose
+    : ParOpen ShortFloats ParClose
     ;
 
 NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
     : ParOpen GRW_Underscore 'FloatingPoint' FloatingPointNumeral FloatingPointNumeral ParClose
     ;
 
-DecimalFloatingPoint //supports formats like: (123.45 or 123e4) TODO: Is the format 123.45 not
+DecimalFloatingPoint //supports formats like: (123.45 or 123e4)
 // already supported?
     : Decimal + ([eE] [+-]? Digit+)?
     ;
 
 BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
-    : ParOpen 'fp' Binary Binary Binary ParClose
+    : ParOpen 'fp' Binary Binary ParClose
     ;
 
 HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p+1)
@@ -315,24 +315,15 @@ HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p
 FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
 // FloatingPoint eb
 // sb))
-    : ParOpen ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose
-    ParOpen NumeralFloatingPoint ParClose ParClose
-    | ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose //short
-    // variant e.g. (_ +oo 2 3)
+    : ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose
     ;
 
 FloatingPointPlusOrMinusZero // Plus and Minus Zero : ((_ +zero eb sb) (_ FloatingPoint eb sb))
-    :ParOpen ParOpen GRW_Underscore [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose
-     ParOpen GRW_Underscore NumeralFloatingPoint ParClose ParClose
-     | ParOpen [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose // short variant
-     // e.g. (_ +zero 3 )
+    :ParOpen GRW_Underscore [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose
     ;
 
 NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
-    : ParOpen ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
-    ParOpen NumeralFloatingPoint ParClose ParClose
-    | ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
-    // e.g. (_ Nan 3 4)
+    : ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
     ;
 
 
@@ -786,7 +777,7 @@ term
     | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose   #term_exists
     | ParOpen GRW_Match term ParOpen match_case+ ParClose ParClose    #term_match
     | ParOpen GRW_Exclamation term attribute+ ParClose                #term_exclam
-    | ParOpen floating_point_operations                               #term_floating_point
+    | floating_point_operations                                       #term_floating_point
     ;
 
 // Floating Point Operations
@@ -857,12 +848,12 @@ floating_point_funs_with_RM_3_inputs
 
 
 floating_point_operations //TODO: Check if only Numeral Floating Points are accepted
-: ParOpen floating_point_operator_with_1_input FloatingPoint ParClose
-| ParOpen floating_point_operator_with_2_inputs FloatingPoint FloatingPoint ParClose
-| ParOpen floating_points_with_RM_1_input RoundingModes FloatingPoint ParClose
-| ParOpen floating_points_with_RM_2_inputs RoundingModes FloatingPoint FloatingPoint ParClose
-| ParOpen floating_point_funs_with_RM_3_inputs RoundingModes FloatingPoint FloatingPoint
-FloatingPoint ParClose
+: ParOpen floating_point_operator_with_1_input NumeralFloatingPoint ParClose
+| ParOpen floating_point_operator_with_2_inputs NumeralFloatingPoint NumeralFloatingPoint ParClose
+| ParOpen floating_points_with_RM_1_input RoundingModes NumeralFloatingPoint ParClose
+| ParOpen floating_points_with_RM_2_inputs RoundingModes NumeralFloatingPoint NumeralFloatingPoint ParClose
+| ParOpen floating_point_funs_with_RM_3_inputs RoundingModes NumeralFloatingPoint NumeralFloatingPoint
+NumeralFloatingPoint ParClose
 |floating_point_conversions
 ;
 
@@ -883,7 +874,7 @@ to_fp_operations //REMEMBER THAT ALL CONVERSIONS ARE UNSPECIFIED FOR NAN AND INF
 |ParOpen to_fp_input RoundingModes NumeralFloatingPoint ParClose
 |ParOpen to_fp_input RoundingModes Real ParClose
 |ParOpen to_fp_input RoundingModes Binary ParClose //if the bitvec should be interpreted as 2^n
-|//unsigned integers don't exist in Java so we don't allow them
+// unsigned integers don't exist in Java so we don't allow them
 ;
 
 from_fp_operations
@@ -1009,7 +1000,7 @@ cmd_declareDatatypes
     ;
 
 cmd_declareFun
-    : CMD_DeclareFun symbol ParOpen sort* ParClose sort
+    : CMD_DeclareFun symbol ParOpen sort* ParClose sort //here is where the fps need to be added
     ;
 
 cmd_declareSort
