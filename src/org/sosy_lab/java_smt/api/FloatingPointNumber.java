@@ -68,12 +68,24 @@ public abstract class FloatingPointNumber {
     return of(sign, exponent, mantissa, exponentSize, mantissaSize);
   }
 
-  private boolean isSinglePrecision() {
+  /**
+   * Returns true if this floating-point number is an IEEE-754-2008 single precision type with 32
+   * bits length consisting of an 8 bit exponent, a 23 bit mantissa and a single sign bit.
+   *
+   * @return true for IEEE-754 single precision type, false otherwise.
+   */
+  public boolean isIEEE754SinglePrecision() {
     return getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
         && getMantissaSize() == SINGLE_PRECISION_MANTISSA_SIZE;
   }
 
-  private boolean isDoublePrecision() {
+  /**
+   * Returns true if this floating-point number is an IEEE-754-2008 double precision type with 64
+   * bits length consisting of an 11 bit exponent, a 52 bit mantissa and a single sign bit.
+   *
+   * @return true for IEEE-754 double precision type, false otherwise.
+   */
+  public boolean isIEEE754DoublePrecision() {
     return getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
         && getMantissaSize() == DOUBLE_PRECISION_MANTISSA_SIZE;
   }
@@ -81,7 +93,7 @@ public abstract class FloatingPointNumber {
   /** compute a representation as Java-based float value, if possible. */
   public float floatValue() {
     Preconditions.checkArgument(
-        isSinglePrecision(),
+        isIEEE754SinglePrecision(),
         "Can not represent floating point number %s as Java-based float value.",
         this);
     var bits = getBits();
@@ -91,10 +103,10 @@ public abstract class FloatingPointNumber {
   /** compute a representation as Java-based double value, if possible. */
   public double doubleValue() {
     Preconditions.checkArgument(
-        isSinglePrecision() || isDoublePrecision(),
+        isIEEE754SinglePrecision() || isIEEE754DoublePrecision(),
         "Can not represent floating point number %s as Java-based double value.",
         this);
-    if (isSinglePrecision()) {
+    if (isIEEE754SinglePrecision()) {
       // lets be nice to the user and automatically convert from single to double precision
       return floatValue();
     }
