@@ -1239,15 +1239,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               Objects.requireNonNull(bimgr)
                   .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
+    } else if(sort.isFloatingPointType()){
+      variables.put(
+          variableSymbol,
+          new ParserFormula(Objects.requireNonNull(fpmgr).makeVariable(variableSymbol,
+              (FormulaType.FloatingPointType) sort)) //TODO check if the last cast is correct.
+      );
     }
-      //TODO: REMEMBER THIS SPOT
-      /*
-      }else if(sort.isFloatType()){
-
-    }
-       */
-
-    else if (sort.isArrayType()) {
+else if (sort.isArrayType()) {
       variables.put(
           variableSymbol,
           new ParserFormula(
@@ -1400,6 +1399,13 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
     return visitChildren(ctx);
   }
+
+  /**
+   * Method for parsing a String to the matching Rounding Mode from the FloatingPointRoundMode
+   * Interface
+   * @param roundingModeInSMTLIB SMTLIB2 String
+   * @return matching FloatingPointRoundingMode
+   */
   public static FloatingPointRoundingMode parseRoundingModesToJavaSMTFormat(String roundingModeInSMTLIB){
     if(roundingModeInSMTLIB.equals("RNE") || roundingModeInSMTLIB.equals("roundNearestTiesToEven")){
       return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
