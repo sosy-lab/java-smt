@@ -1,4 +1,5 @@
 // Generated from /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -1857,24 +1858,6 @@ public class smtlibv2Parser extends Parser {
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
-	public static class Id_fpContext extends IdentifierContext {
-		public TerminalNode FloatingPoint() { return getToken(smtlibv2Parser.FloatingPoint, 0); }
-		public Id_fpContext(IdentifierContext ctx) { copyFrom(ctx); }
-		@Override
-		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof smtlibv2Listener ) ((smtlibv2Listener)listener).enterId_fp(this);
-		}
-		@Override
-		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof smtlibv2Listener ) ((smtlibv2Listener)listener).exitId_fp(this);
-		}
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitId_fp(this);
-			else return visitor.visitChildren(this);
-		}
-	}
-	@SuppressWarnings("CheckReturnValue")
 	public static class Id_symbContext extends IdentifierContext {
 		public SymbolContext symbol() {
 			return getRuleContext(SymbolContext.class,0);
@@ -1900,7 +1883,7 @@ public class smtlibv2Parser extends Parser {
 		enterRule(_localctx, 34, RULE_identifier);
 		int _la;
 		try {
-			setState(342);
+			setState(341);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case QuotedSymbol:
@@ -1954,14 +1937,6 @@ public class smtlibv2Parser extends Parser {
 				} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & 281472829227008L) != 0) || _la==Numeral || _la==UndefinedSymbol );
 				setState(339);
 				match(ParClose);
-				}
-				break;
-			case FloatingPoint:
-				_localctx = new Id_fpContext(_localctx);
-				enterOuterAlt(_localctx, 3);
-				{
-				setState(341);
-				match(FloatingPoint);
 				}
 				break;
 			default:
@@ -2062,7 +2037,7 @@ public class smtlibv2Parser extends Parser {
 		enterRule(_localctx, 36, RULE_attribute_value);
 		int _la;
 		try {
-			setState(354);
+			setState(353);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case String:
@@ -2074,7 +2049,7 @@ public class smtlibv2Parser extends Parser {
 				_localctx = new Attr_specContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(344);
+				setState(343);
 				spec_constant();
 				}
 				break;
@@ -2099,7 +2074,7 @@ public class smtlibv2Parser extends Parser {
 				_localctx = new Attr_symbContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(345);
+				setState(344);
 				symbol();
 				}
 				break;
@@ -2107,23 +2082,23 @@ public class smtlibv2Parser extends Parser {
 				_localctx = new Attr_s_exprContext(_localctx);
 				enterOuterAlt(_localctx, 3);
 				{
-				setState(346);
+				setState(345);
 				match(ParOpen);
-				setState(350);
+				setState(349);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 281474037186560L) != 0) || ((((_la - 91)) & ~0x3f) == 0 && ((1L << (_la - 91)) & 864691128455102491L) != 0)) {
 					{
 					{
-					setState(347);
+					setState(346);
 					s_expr();
 					}
 					}
-					setState(352);
+					setState(351);
 					_errHandler.sync(this);
 					_la = _input.LA(1);
 				}
-				setState(353);
+				setState(352);
 				match(ParClose);
 				}
 				break;
@@ -2202,14 +2177,14 @@ public class smtlibv2Parser extends Parser {
 		AttributeContext _localctx = new AttributeContext(_ctx, getState());
 		enterRule(_localctx, 38, RULE_attribute);
 		try {
-			setState(360);
+			setState(359);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,12,_ctx) ) {
 			case 1:
 				_localctx = new Attr_keyContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(356);
+				setState(355);
 				keyword();
 				}
 				break;
@@ -2217,9 +2192,9 @@ public class smtlibv2Parser extends Parser {
 				_localctx = new Attr_key_attrContext(_localctx);
 				enterOuterAlt(_localctx, 2);
 				{
-				setState(357);
+				setState(356);
 				keyword();
-				setState(358);
+				setState(357);
 				attribute_value();
 				}
 				break;
@@ -2246,6 +2221,24 @@ public class smtlibv2Parser extends Parser {
 		public SortContext() { }
 		public void copyFrom(SortContext ctx) {
 			super.copyFrom(ctx);
+		}
+	}
+	@SuppressWarnings("CheckReturnValue")
+	public static class Sort_fpContext extends SortContext {
+		public TerminalNode FloatingPoint() { return getToken(smtlibv2Parser.FloatingPoint, 0); }
+		public Sort_fpContext(SortContext ctx) { copyFrom(ctx); }
+		@Override
+		public void enterRule(ParseTreeListener listener) {
+			if ( listener instanceof smtlibv2Listener ) ((smtlibv2Listener)listener).enterSort_fp(this);
+		}
+		@Override
+		public void exitRule(ParseTreeListener listener) {
+			if ( listener instanceof smtlibv2Listener ) ((smtlibv2Listener)listener).exitSort_fp(this);
+		}
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof smtlibv2Visitor ) return ((smtlibv2Visitor<? extends T>)visitor).visitSort_fp(this);
+			else return visitor.visitChildren(this);
 		}
 	}
 	@SuppressWarnings("CheckReturnValue")
@@ -2309,13 +2302,21 @@ public class smtlibv2Parser extends Parser {
 				_localctx = new Sort_idContext(_localctx);
 				enterOuterAlt(_localctx, 1);
 				{
-				setState(362);
+				setState(361);
 				identifier();
 				}
 				break;
 			case 2:
-				_localctx = new MultisortContext(_localctx);
+				_localctx = new Sort_fpContext(_localctx);
 				enterOuterAlt(_localctx, 2);
+				{
+				setState(362);
+				match(FloatingPoint);
+				}
+				break;
+			case 3:
+				_localctx = new MultisortContext(_localctx);
+				enterOuterAlt(_localctx, 3);
 				{
 				setState(363);
 				match(ParOpen);
@@ -12415,10 +12416,10 @@ public class smtlibv2Parser extends Parser {
 		"\u0142\t\u000f\u0001\u000f\u0003\u000f\u0145\b\u000f\u0001\u0010\u0001"+
 		"\u0010\u0003\u0010\u0149\b\u0010\u0001\u0011\u0001\u0011\u0001\u0011\u0001"+
 		"\u0011\u0001\u0011\u0004\u0011\u0150\b\u0011\u000b\u0011\f\u0011\u0151"+
-		"\u0001\u0011\u0001\u0011\u0001\u0011\u0003\u0011\u0157\b\u0011\u0001\u0012"+
-		"\u0001\u0012\u0001\u0012\u0001\u0012\u0005\u0012\u015d\b\u0012\n\u0012"+
-		"\f\u0012\u0160\t\u0012\u0001\u0012\u0003\u0012\u0163\b\u0012\u0001\u0013"+
-		"\u0001\u0013\u0001\u0013\u0001\u0013\u0003\u0013\u0169\b\u0013\u0001\u0014"+
+		"\u0001\u0011\u0001\u0011\u0003\u0011\u0156\b\u0011\u0001\u0012\u0001\u0012"+
+		"\u0001\u0012\u0001\u0012\u0005\u0012\u015c\b\u0012\n\u0012\f\u0012\u015f"+
+		"\t\u0012\u0001\u0012\u0003\u0012\u0162\b\u0012\u0001\u0013\u0001\u0013"+
+		"\u0001\u0013\u0001\u0013\u0003\u0013\u0168\b\u0013\u0001\u0014\u0001\u0014"+
 		"\u0001\u0014\u0001\u0014\u0001\u0014\u0004\u0014\u016f\b\u0014\u000b\u0014"+
 		"\f\u0014\u0170\u0001\u0014\u0001\u0014\u0003\u0014\u0175\b\u0014\u0001"+
 		"\u0015\u0001\u0015\u0001\u0015\u0001\u0015\u0001\u0015\u0001\u0015\u0001"+
@@ -12543,8 +12544,8 @@ public class smtlibv2Parser extends Parser {
 		"\u0000\u0000\u0000\u0016\u0128\u0001\u0000\u0000\u0000\u0018\u012a\u0001"+
 		"\u0000\u0000\u0000\u001a\u012f\u0001\u0000\u0000\u0000\u001c\u0137\u0001"+
 		"\u0000\u0000\u0000\u001e\u0144\u0001\u0000\u0000\u0000 \u0148\u0001\u0000"+
-		"\u0000\u0000\"\u0156\u0001\u0000\u0000\u0000$\u0162\u0001\u0000\u0000"+
-		"\u0000&\u0168\u0001\u0000\u0000\u0000(\u0174\u0001\u0000\u0000\u0000*"+
+		"\u0000\u0000\"\u0155\u0001\u0000\u0000\u0000$\u0161\u0001\u0000\u0000"+
+		"\u0000&\u0167\u0001\u0000\u0000\u0000(\u0174\u0001\u0000\u0000\u0000*"+
 		"\u017d\u0001\u0000\u0000\u0000,\u017f\u0001\u0000\u0000\u0000.\u0184\u0001"+
 		"\u0000\u0000\u00000\u0193\u0001\u0000\u0000\u00002\u0195\u0001\u0000\u0000"+
 		"\u00004\u01e0\u0001\u0000\u0000\u00006\u01e2\u0001\u0000\u0000\u00008"+
@@ -12638,31 +12639,31 @@ public class smtlibv2Parser extends Parser {
 		"\u0000\u0144\u013c\u0001\u0000\u0000\u0000\u0145\u001f\u0001\u0000\u0000"+
 		"\u0000\u0146\u0149\u0003\u000e\u0007\u0000\u0147\u0149\u0003\f\u0006\u0000"+
 		"\u0148\u0146\u0001\u0000\u0000\u0000\u0148\u0147\u0001\u0000\u0000\u0000"+
-		"\u0149!\u0001\u0000\u0000\u0000\u014a\u0157\u0003\f\u0006\u0000\u014b"+
+		"\u0149!\u0001\u0000\u0000\u0000\u014a\u0156\u0003\f\u0006\u0000\u014b"+
 		"\u014c\u0005\u001b\u0000\u0000\u014c\u014d\u0005O\u0000\u0000\u014d\u014f"+
 		"\u0003\f\u0006\u0000\u014e\u0150\u0003 \u0010\u0000\u014f\u014e\u0001"+
 		"\u0000\u0000\u0000\u0150\u0151\u0001\u0000\u0000\u0000\u0151\u014f\u0001"+
 		"\u0000\u0000\u0000\u0151\u0152\u0001\u0000\u0000\u0000\u0152\u0153\u0001"+
-		"\u0000\u0000\u0000\u0153\u0154\u0005\u001c\u0000\u0000\u0154\u0157\u0001"+
-		"\u0000\u0000\u0000\u0155\u0157\u0005j\u0000\u0000\u0156\u014a\u0001\u0000"+
-		"\u0000\u0000\u0156\u014b\u0001\u0000\u0000\u0000\u0156\u0155\u0001\u0000"+
-		"\u0000\u0000\u0157#\u0001\u0000\u0000\u0000\u0158\u0163\u0003\u001c\u000e"+
-		"\u0000\u0159\u0163\u0003\f\u0006\u0000\u015a\u015e\u0005\u001b\u0000\u0000"+
-		"\u015b\u015d\u0003\u001e\u000f\u0000\u015c\u015b\u0001\u0000\u0000\u0000"+
-		"\u015d\u0160\u0001\u0000\u0000\u0000\u015e\u015c\u0001\u0000\u0000\u0000"+
-		"\u015e\u015f\u0001\u0000\u0000\u0000\u015f\u0161\u0001\u0000\u0000\u0000"+
-		"\u0160\u015e\u0001\u0000\u0000\u0000\u0161\u0163\u0005\u001c\u0000\u0000"+
-		"\u0162\u0158\u0001\u0000\u0000\u0000\u0162\u0159\u0001\u0000\u0000\u0000"+
-		"\u0162\u015a\u0001\u0000\u0000\u0000\u0163%\u0001\u0000\u0000\u0000\u0164"+
-		"\u0169\u0003\u001a\r\u0000\u0165\u0166\u0003\u001a\r\u0000\u0166\u0167"+
-		"\u0003$\u0012\u0000\u0167\u0169\u0001\u0000\u0000\u0000\u0168\u0164\u0001"+
-		"\u0000\u0000\u0000\u0168\u0165\u0001\u0000\u0000\u0000\u0169\'\u0001\u0000"+
-		"\u0000\u0000\u016a\u0175\u0003\"\u0011\u0000\u016b\u016c\u0005\u001b\u0000"+
-		"\u0000\u016c\u016e\u0003\"\u0011\u0000\u016d\u016f\u0003(\u0014\u0000"+
-		"\u016e\u016d\u0001\u0000\u0000\u0000\u016f\u0170\u0001\u0000\u0000\u0000"+
-		"\u0170\u016e\u0001\u0000\u0000\u0000\u0170\u0171\u0001\u0000\u0000\u0000"+
-		"\u0171\u0172\u0001\u0000\u0000\u0000\u0172\u0173\u0005\u001c\u0000\u0000"+
-		"\u0173\u0175\u0001\u0000\u0000\u0000\u0174\u016a\u0001\u0000\u0000\u0000"+
+		"\u0000\u0000\u0000\u0153\u0154\u0005\u001c\u0000\u0000\u0154\u0156\u0001"+
+		"\u0000\u0000\u0000\u0155\u014a\u0001\u0000\u0000\u0000\u0155\u014b\u0001"+
+		"\u0000\u0000\u0000\u0156#\u0001\u0000\u0000\u0000\u0157\u0162\u0003\u001c"+
+		"\u000e\u0000\u0158\u0162\u0003\f\u0006\u0000\u0159\u015d\u0005\u001b\u0000"+
+		"\u0000\u015a\u015c\u0003\u001e\u000f\u0000\u015b\u015a\u0001\u0000\u0000"+
+		"\u0000\u015c\u015f\u0001\u0000\u0000\u0000\u015d\u015b\u0001\u0000\u0000"+
+		"\u0000\u015d\u015e\u0001\u0000\u0000\u0000\u015e\u0160\u0001\u0000\u0000"+
+		"\u0000\u015f\u015d\u0001\u0000\u0000\u0000\u0160\u0162\u0005\u001c\u0000"+
+		"\u0000\u0161\u0157\u0001\u0000\u0000\u0000\u0161\u0158\u0001\u0000\u0000"+
+		"\u0000\u0161\u0159\u0001\u0000\u0000\u0000\u0162%\u0001\u0000\u0000\u0000"+
+		"\u0163\u0168\u0003\u001a\r\u0000\u0164\u0165\u0003\u001a\r\u0000\u0165"+
+		"\u0166\u0003$\u0012\u0000\u0166\u0168\u0001\u0000\u0000\u0000\u0167\u0163"+
+		"\u0001\u0000\u0000\u0000\u0167\u0164\u0001\u0000\u0000\u0000\u0168\'\u0001"+
+		"\u0000\u0000\u0000\u0169\u0175\u0003\"\u0011\u0000\u016a\u0175\u0005j"+
+		"\u0000\u0000\u016b\u016c\u0005\u001b\u0000\u0000\u016c\u016e\u0003\"\u0011"+
+		"\u0000\u016d\u016f\u0003(\u0014\u0000\u016e\u016d\u0001\u0000\u0000\u0000"+
+		"\u016f\u0170\u0001\u0000\u0000\u0000\u0170\u016e\u0001\u0000\u0000\u0000"+
+		"\u0170\u0171\u0001\u0000\u0000\u0000\u0171\u0172\u0001\u0000\u0000\u0000"+
+		"\u0172\u0173\u0005\u001c\u0000\u0000\u0173\u0175\u0001\u0000\u0000\u0000"+
+		"\u0174\u0169\u0001\u0000\u0000\u0000\u0174\u016a\u0001\u0000\u0000\u0000"+
 		"\u0174\u016b\u0001\u0000\u0000\u0000\u0175)\u0001\u0000\u0000\u0000\u0176"+
 		"\u017e\u0003\"\u0011\u0000\u0177\u0178\u0005\u001b\u0000\u0000\u0178\u0179"+
 		"\u0005P\u0000\u0000\u0179\u017a\u0003\"\u0011\u0000\u017a\u017b\u0003"+
@@ -13200,8 +13201,8 @@ public class smtlibv2Parser extends Parser {
 		"\u0000\u0530\u0532\u0001\u0000\u0000\u0000\u0531\u0529\u0001\u0000\u0000"+
 		"\u0000\u0531\u052a\u0001\u0000\u0000\u0000\u0531\u052b\u0001\u0000\u0000"+
 		"\u0000\u0531\u052c\u0001\u0000\u0000\u0000\u0532\u0101\u0001\u0000\u0000"+
-		"\u0000S\u010e\u0114\u011e\u012f\u0137\u0140\u0144\u0148\u0151\u0156\u015e"+
-		"\u0162\u0168\u0170\u0174\u017d\u018f\u0193\u01a1\u01ab\u01b7\u01c3\u01d0"+
+		"\u0000S\u010e\u0114\u011e\u012f\u0137\u0140\u0144\u0148\u0151\u0155\u015d"+
+		"\u0161\u0167\u0170\u0174\u017d\u018f\u0193\u01a1\u01ab\u01b7\u01c3\u01d0"+
 		"\u01db\u01e0\u0218\u0222\u0226\u022c\u0251\u0255\u0275\u0286\u0293\u029e"+
 		"\u02a8\u02ad\u02b2\u02bb\u02c3\u02c8\u02ce\u02d5\u02de\u02ed\u02f5\u02fe"+
 		"\u030b\u0313\u0326\u032f\u0339\u0340\u0345\u034d\u0359\u0366\u036b\u0378"+

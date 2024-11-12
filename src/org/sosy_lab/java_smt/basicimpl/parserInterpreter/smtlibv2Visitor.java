@@ -1,4 +1,5 @@
 // Generated from /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -238,13 +239,6 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code id_fp}
-	 * labeled alternative in {@link smtlibv2Parser#identifier}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitId_fp(smtlibv2Parser.Id_fpContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code attr_spec}
 	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
 	 * @param ctx the parse tree
@@ -286,6 +280,13 @@ public interface smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitSort_id(smtlibv2Parser.Sort_idContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code sort_fp}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSort_fp(smtlibv2Parser.Sort_fpContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code multisort}
 	 * labeled alternative in {@link smtlibv2Parser#sort}.

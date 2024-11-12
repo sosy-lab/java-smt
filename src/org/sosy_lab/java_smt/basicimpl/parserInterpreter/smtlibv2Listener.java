@@ -1,4 +1,5 @@
 // Generated from /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -395,18 +396,6 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 */
 	void exitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx);
 	/**
-	 * Enter a parse tree produced by the {@code id_fp}
-	 * labeled alternative in {@link smtlibv2Parser#identifier}.
-	 * @param ctx the parse tree
-	 */
-	void enterId_fp(smtlibv2Parser.Id_fpContext ctx);
-	/**
-	 * Exit a parse tree produced by the {@code id_fp}
-	 * labeled alternative in {@link smtlibv2Parser#identifier}.
-	 * @param ctx the parse tree
-	 */
-	void exitId_fp(smtlibv2Parser.Id_fpContext ctx);
-	/**
 	 * Enter a parse tree produced by the {@code attr_spec}
 	 * labeled alternative in {@link smtlibv2Parser#attribute_value}.
 	 * @param ctx the parse tree
@@ -478,6 +467,18 @@ public interface smtlibv2Listener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSort_id(smtlibv2Parser.Sort_idContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code sort_fp}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void enterSort_fp(smtlibv2Parser.Sort_fpContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code sort_fp}
+	 * labeled alternative in {@link smtlibv2Parser#sort}.
+	 * @param ctx the parse tree
+	 */
+	void exitSort_fp(smtlibv2Parser.Sort_fpContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code multisort}
 	 * labeled alternative in {@link smtlibv2Parser#sort}.

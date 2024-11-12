@@ -25,6 +25,8 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -38,6 +40,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_assertContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_declareConstContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_declareFunContext;
@@ -85,7 +88,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry. */
   // TODO Here we collect the formulas
   private final List<BooleanFormula> constraints = new ArrayList<>();
-
   private final FormulaManager fmgr;
   private final BooleanFormulaManager bmgr;
   private final @Nullable IntegerFormulaManager imgr;
@@ -93,7 +95,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   private final @Nullable BitvectorFormulaManager bimgr;
   private final @Nullable ArrayFormulaManager amgr;
   private final UFManager umgr;
-  private final FloatingPointManager fpmgr;
+  private final @Nullable FloatingPointFormulaManager fpmgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
 
   // TODO Should we support push,etc?
@@ -119,7 +121,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       @Nullable RationalFormulaManager rmgr,
       @Nullable BitvectorFormulaManager bimgr,
       @Nullable ArrayFormulaManager amgr,
-      UFManager umgr) {
+      UFManager umgr,
+      @Nullable FloatingPointFormulaManager fpmgr) {
     this.fmgr = fmgr;
     this.bmgr = bmgr;
     this.imgr = imgr;
@@ -127,6 +130,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     this.bimgr = bimgr;
     this.amgr = amgr;
     this.umgr = umgr;
+    this.fpmgr = fpmgr;
   }
 
   @Override
@@ -1060,6 +1064,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
+          case "fp.add":
+        if (operands.size() == 3) {
+          return fpmgr.add((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1),
+              parseRoundingModesToJavaSMTFormat(operands.get(2).toString()));
+        } else {
+          throw new ParserException("fp.add requires a rounding mode and exactly two "
+              + "FloatingPointFormula operands.");
+        }
+
+
+
       case "UF":
         // UF
         try {
@@ -1223,9 +1239,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               Objects.requireNonNull(bimgr)
                   .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
-    }else if(sort.isFloatType()){
+    }
+      //TODO: REMEMBER THIS SPOT
+      /*
+      }else if(sort.isFloatType()){
 
     }
+       */
+
     else if (sort.isArrayType()) {
       variables.put(
           variableSymbol,
@@ -1378,6 +1399,24 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     variables.put(variable, temp);
 
     return visitChildren(ctx);
+  }
+  public static FloatingPointRoundingMode parseRoundingModesToJavaSMTFormat(String roundingModeInSMTLIB){
+    if(roundingModeInSMTLIB.equals("RNE") || roundingModeInSMTLIB.equals("roundNearestTiesToEven")){
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    }
+    if(roundingModeInSMTLIB.equals("RNA") || roundingModeInSMTLIB.equals("roundNearestTiesToAway")){
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    }
+    if(roundingModeInSMTLIB.equals("RTP") || roundingModeInSMTLIB.equals("roundTowardPositive")){
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    }
+    if(roundingModeInSMTLIB.equals("RTN") || roundingModeInSMTLIB.equals("roundTowardNegative")){
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    }
+    if(roundingModeInSMTLIB.equals("RTZ") || roundingModeInSMTLIB.equals("roundTowardZero")){
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    }
+    throw new ParserException("Rounding Mode does not exist.");
   }
 
   @Override

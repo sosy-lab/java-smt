@@ -280,10 +280,15 @@ Decimal
 
 RoundingModes //needed for floating point operations
     : 'RNE'
+    | 'roundNearestTiesToEven'
     | 'RNA'
+    | 'roundNearestTiesToAway'
     | 'RTP'
+    | 'roundTowardPositive'
     | 'RTN'
+    | 'roundTowardNegative'
     | 'RTZ'
+    | 'roundTowardZero'
     ;
 
 //Floating Points
@@ -721,8 +726,6 @@ index
 identifier
     : symbol                                                          #id_symb
     | ParOpen GRW_Underscore symbol index+ ParClose                   #id_symb_idx
-    | FloatingPoint                                                   #id_fp
-    //TODO: because floating points can be used with declare_fun I added them for now in here
     ;
 
 // Attributes
@@ -742,6 +745,7 @@ attribute
 
 sort
     : identifier                                                      #sort_id
+    | FloatingPoint #sort_fp
     | ParOpen identifier sort+ ParClose                               #multisort
     ;
 
