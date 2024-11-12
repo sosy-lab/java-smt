@@ -1064,15 +1064,141 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } else {
           throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
-          case "fp.add":
+        case "fp.abs":
+        if (operands.size() == 1) {
+          return fpmgr.abs((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.abs requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+        case "fp.neg":
+        if (operands.size() == 1) {
+          return fpmgr.negate((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.neg requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+        case "fp.add":
         if (operands.size() == 3) {
-          return fpmgr.add((FloatingPointFormula) operands.get(0),
-              (FloatingPointFormula) operands.get(1),
-              parseRoundingModesToJavaSMTFormat(operands.get(2).toString()));
+          return fpmgr.add((FloatingPointFormula) operands.get(1),
+              (FloatingPointFormula) operands.get(2),
+              parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException("fp.add requires a rounding mode and exactly two "
               + "FloatingPointFormula operands.");
         }
+        case "fp.sub":
+        if (operands.size() == 3) {
+          return fpmgr.subtract((FloatingPointFormula) operands.get(1),
+              (FloatingPointFormula) operands.get(2),
+              parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
+        } else {
+          throw new ParserException("fp.sub requires a rounding mode and exactly two "
+              + "FloatingPointFormula operands.");
+        }
+        case "fp.mul":
+          if (operands.size() == 3) {
+            return fpmgr.multiply((FloatingPointFormula) operands.get(1),
+                (FloatingPointFormula) operands.get(2),
+                parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
+          } else {
+            throw new ParserException("fp.mul requires a rounding mode and exactly two "
+                + "FloatingPointFormula operands.");
+          }
+      case "fp.div":
+        if (operands.size() == 3) {
+          return fpmgr.divide((FloatingPointFormula) operands.get(1),
+              (FloatingPointFormula) operands.get(2),
+              parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
+        } else {
+          throw new ParserException("fp.div requires a rounding mode and exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.fma":
+        //TODO: Seems to not be supported yet, but can be implemented
+          throw new ParserException("fp.fma isn't supported by JavaSMT");
+      case "fp.sqrt":
+      if (operands.size() == 2) {
+      return fpmgr.sqrt((FloatingPointFormula) operands.get(1),
+          parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
+      } else {
+      throw new ParserException("fp.sqrt requires a rounding mode and exactly one "
+          + "FloatingPointFormula operand.");
+       }
+      case "fp.rem":
+          throw new ParserException("fp.rem is not suuported by JavaSMT");
+      case "fp.roundToIntegral":
+        throw new ParserException("fp.roundToIntegral is not supported by JavaSMT");
+      case "fp.min" :
+        if (operands.size() == 2) {
+          return fpmgr.min((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.min requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.max" :
+        if (operands.size() == 2) {
+          return fpmgr.max((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.max requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.leq":
+        if (operands.size() == 2) {
+          return fpmgr.lessOrEquals((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.leq requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.lt":
+        if (operands.size() == 2) {
+          return fpmgr.lessThan((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.lt requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.geq":
+        if (operands.size() == 2) {
+          return fpmgr.greaterOrEquals((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.geq requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+        case "fp.gt":
+          if (operands.size() == 2) {
+            return fpmgr.greaterThan((FloatingPointFormula) operands.get(0),
+                (FloatingPointFormula) operands.get(1));
+          } else {
+            throw new ParserException("fp.gt requires exactly two "
+                + "FloatingPointFormula operands.");
+          }
+      case "fp.eq":
+        if (operands.size() == 2) {
+          return fpmgr.equalWithFPSemantics((FloatingPointFormula) operands.get(0),
+              (FloatingPointFormula) operands.get(1));
+        } else {
+          throw new ParserException("fp.eq requires exactly two "
+              + "FloatingPointFormula operands.");
+        }
+      case "fp.isNormal":
+        if (operands.size() == 1) {
+          return fpmgr.isNormal((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.isNormal requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+
+
+
+
+
+
+
 
 
 
