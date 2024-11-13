@@ -177,6 +177,18 @@ SPDX-License-Identifier: Apache-2.0
     <orderEntry type="module-library">
       <library>
         <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/ultimate-model-checker-utils.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/ultimate-model-checker-utils-sources
+          .zip!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/smtinterpol.jar!/" />
         </CLASSES>
         <JAVADOC />
