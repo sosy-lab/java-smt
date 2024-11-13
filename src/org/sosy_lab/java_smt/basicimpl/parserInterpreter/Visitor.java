@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
@@ -284,9 +285,24 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Double")
         || getNumericType(operand).equals("Float")) {
-      variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)
+          ));
+      //TODO: I think this needs to be changed to using the fpmgr. MIT DANIEL ABSPRECHEN
       return variables.get(operand).javaSmt;
-    } else if (operand.startsWith("#b")) {
+    }
+    //TODO: add floating Point recognization if rationals are used, that aren't "floats" or doubles
+    /*
+    else if (false){
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
+          FloatingPointType.getSinglePrecisionFloatingPointType())));
+    }else if(getNumericType(operand).equals("Double")){
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
+          FloatingPointType.getDoublePrecisionFloatingPointType())));
+           }
+     */
+
+
+    else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
       int index = binVal.length();
       int value = Integer.parseInt(binVal, 2);
@@ -296,7 +312,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       int index = (hexVal.length() * 4);
       BigInteger value = new BigInteger(hexVal, 16);
       return Objects.requireNonNull(bimgr).makeBitvector(index, value);
-    } else {
+    }
+    else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
   }
@@ -1192,16 +1209,36 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException("fp.isNormal requires exactly one "
               + "FloatingPointFormula operand.");
         }
-
-
-
-
-
-
-
-
-
-
+      case "fp.isSubnormal":
+        if (operands.size() == 1) {
+          return fpmgr.isSubnormal((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.isSubnormal requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+      case "fp.isZero":
+        if (operands.size() == 1) {
+          return fpmgr.isZero((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.isZero requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+      case "fp.isInfinity":
+        if (operands.size() == 1) {
+          return fpmgr.isInfinity((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.isZero requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+      case "fp.isNegative":
+        if (operands.size() == 1) {
+          return fpmgr.isNegative((FloatingPointFormula) operands.get(0));
+        } else {
+          throw new ParserException("fp.isNegative requires exactly one "
+              + "FloatingPointFormula operand.");
+        }
+      case "fp.isPositive":
+        throw new ParserException("fp.isPositive is not supported by JavaSMT");
       case "UF":
         // UF
         try {
@@ -1211,7 +1248,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } catch (Exception e) {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
-
       case "=":
         // overloaded operators
         if (operands.size() == 2) {
@@ -1371,7 +1407,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           new ParserFormula(Objects.requireNonNull(fpmgr).makeVariable(variableSymbol,
               (FormulaType.FloatingPointType) sort)) //TODO check if the last cast is correct.
       );
-    }
+  }
+
+
 else if (sort.isArrayType()) {
       variables.put(
           variableSymbol,
@@ -1388,7 +1426,7 @@ else if (sort.isArrayType()) {
   /**
    * maps FormulaType to the corresponding SMT-LIB2 sort for the String representation of the model.
    *
-   * @param type FormulaType that is needs to be translated to SMT-LIB2
+   * @param type FormulaType that needs to be translated to SMT-LIB2
    * @return String representation of FormulaType in SMT-LIB2
    */
   public static String getArrayStrings(FormulaType<?> type) {
@@ -1399,7 +1437,13 @@ else if (sort.isArrayType()) {
       return "Int";
     } else if (type.isRationalType()) {
       return "Real";
-    } else if (type.isBitvectorType()) {
+    }
+    /*
+    else if (type.isFloatingPointType()){
+    return "(_ FloatingPoint ";
+    }
+     */
+    else if (type.isBitvectorType()) {
       return "(_ BitVec " + ((BitvectorType) type).getSize() + ")";
     } else if (type.isArrayType()) {
       return "(Array "
