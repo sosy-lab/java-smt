@@ -135,7 +135,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() {
+  public CVC4Model getModel() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
@@ -174,7 +174,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     return super.getModelAssignments();

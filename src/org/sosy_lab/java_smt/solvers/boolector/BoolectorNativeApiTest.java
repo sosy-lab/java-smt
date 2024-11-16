@@ -153,7 +153,7 @@ public class BoolectorNativeApiTest {
 
   @Test
   public void dumpVariableWithAssertionsOnStackTest()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     ConfigurationBuilder config = Configuration.builder();
     try (BoolectorSolverContext context =
         BoolectorSolverContext.create(

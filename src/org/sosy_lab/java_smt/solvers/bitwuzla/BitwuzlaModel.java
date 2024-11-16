@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
@@ -50,7 +51,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   /** Build a list of assignments that stays valid after closing the model. */
   @Override
-  public ImmutableList<ValueAssignment> asList() {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
@@ -108,13 +109,15 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         argumentInterpretation);
   }
 
-  private Collection<ValueAssignment> getArrayAssignment(Term pTerm) {
+  private Collection<ValueAssignment> getArrayAssignment(Term pTerm)
+      throws InterruptedException, SolverException {
     return getArrayAssignments(pTerm, ImmutableList.of());
   }
 
   // TODO: check this in detail. I think this might be incomplete.
   // We should add more Model tests in general. As most are parsing and int based!
-  private Collection<ValueAssignment> getArrayAssignments(Term pTerm, List<Object> upperIndices) {
+  private Collection<ValueAssignment> getArrayAssignments(Term pTerm, List<Object> upperIndices)
+      throws InterruptedException, SolverException {
     // Array children for store are structured in the following way:
     // {starting array, index, value} in "we add value at index to array"
     // Selections are structured: {starting array, index}

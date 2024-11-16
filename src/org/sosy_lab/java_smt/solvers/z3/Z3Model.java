@@ -13,6 +13,7 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayList;
@@ -21,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -41,27 +44,31 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() {
+  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
-    // Iterate through constants.
-    for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
-      long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
-      Native.incRef(z3context, keyDecl);
-      out.addAll(getConstAssignments(keyDecl));
-      Native.decRef(z3context, keyDecl);
-    }
-
-    // Iterate through function applications.
-    for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
-      long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
-      Native.incRef(z3context, funcDecl);
-      if (!isInternalSymbol(funcDecl)) {
-        String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-        out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+    try {
+      // Iterate through constants.
+      for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
+        long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
+        Native.incRef(z3context, keyDecl);
+        out.addAll(getConstAssignments(keyDecl));
+        Native.decRef(z3context, keyDecl);
       }
-      Native.decRef(z3context, funcDecl);
+
+      // Iterate through function applications.
+      for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
+        long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+        Native.incRef(z3context, funcDecl);
+        if (!isInternalSymbol(funcDecl)) {
+          String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+          out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+        }
+        Native.decRef(z3context, funcDecl);
+      }
+    } catch (Z3Exception e) {
+      throw z3creator.handleZ3Exception(e);
     }
 
     return out.build();
@@ -86,7 +93,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   /**
    * @return ValueAssignments for a constant declaration in the model
    */
-  private Collection<ValueAssignment> getConstAssignments(long keyDecl) {
+  private Collection<ValueAssignment> getConstAssignments(long keyDecl)
+      throws InterruptedException, SolverException {
     Preconditions.checkArgument(
         Native.getArity(z3context, keyDecl) == 0, "Declaration is not a constant");
 
@@ -140,7 +148,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   /** unrolls an constant array assignment. */
   private Collection<ValueAssignment> getConstantArrayAssignment(
-      long arraySymbol, long value, long decl) {
+      long arraySymbol, long value, long decl) throws InterruptedException, SolverException {
 
     long arrayFormula = Native.mkConst(z3context, arraySymbol, Native.getSort(z3context, value));
     Native.incRef(z3context, arrayFormula);
@@ -206,7 +214,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
    * @return a list of assignments {@code a[1]=0; a[2]=0; a[5]=0}.
    */
   private Collection<ValueAssignment> getArrayAssignments(
-      long arraySymbol, long arrayFormula, long value, List<Object> upperIndices) {
+      long arraySymbol, long arrayFormula, long value, List<Object> upperIndices)
+      throws InterruptedException, SolverException {
     long evalDecl = Native.getAsArrayFuncDecl(z3context, value);
     Native.incRef(z3context, evalDecl);
     long interp = Native.modelGetFuncInterp(z3context, model, evalDecl);
@@ -375,9 +384,15 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
-  protected Long evalImpl(Long formula) {
+  @Nullable
+  protected Long evalImpl(Long formula) throws InterruptedException, SolverException {
     LongPtr resultPtr = new LongPtr();
-    boolean satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    boolean satisfiableModel;
+    try {
+      satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    } catch (Z3Exception e) {
+      throw z3creator.handleZ3Exception(e);
+    }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {
       // unknown evaluation

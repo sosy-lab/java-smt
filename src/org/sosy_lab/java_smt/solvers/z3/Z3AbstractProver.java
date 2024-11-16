@@ -89,7 +89,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   /** dump the current solver stack into a new SMTLIB file. */
-  protected void logSolverStack() throws Z3SolverException {
+  protected void logSolverStack() throws SolverException {
     if (logfile != null) { // if logging is not disabled
       try {
         // write stack content to logfile
@@ -97,32 +97,32 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         MoreFiles.createParentDirectories(filename);
         Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
-        throw new Z3SolverException("Cannot write Z3 log file: " + e.getMessage());
+        throw new SolverException("Cannot write Z3 log file", e);
       }
     }
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() {
+  public Model getModel() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
-  protected Z3Model getEvaluatorWithoutChecks() {
+  protected Z3Model getEvaluatorWithoutChecks() throws InterruptedException, SolverException {
     return new Z3Model(this, z3context, getZ3Model(), creator);
   }
 
-  protected abstract long getZ3Model();
+  protected abstract long getZ3Model() throws InterruptedException, SolverException;
 
   protected abstract void assertContraint(long constraint);
 
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {

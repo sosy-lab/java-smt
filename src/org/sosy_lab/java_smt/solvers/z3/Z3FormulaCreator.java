@@ -157,11 +157,16 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
+  /**
+   * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
+   * Otherwise, the given exception is wrapped and thrown as a SolverException.
+   */
+  final SolverException handleZ3Exception(Z3Exception e)
+      throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
       shutdownNotifier.shutdownIfNecessary();
     }
-    throw e;
+    throw new SolverException("Z3 has thrown an exception", e);
   }
 
   @Override
@@ -1015,7 +1020,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return Z3_ast
    * @throws InterruptedException If execution gets interrupted.
    */
-  public long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
+  public long applyTactic(long z3context, long pF, String tactic)
+      throws InterruptedException, SolverException {
     long tacticObject = Native.mkTactic(z3context, tactic);
     Native.tacticIncRef(z3context, tacticObject);
 

@@ -412,7 +412,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentIntegerStack()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
@@ -445,7 +445,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentBitvectorStack()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     requireBitvectors();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
