@@ -164,6 +164,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
     final PartialModel partialModel;
