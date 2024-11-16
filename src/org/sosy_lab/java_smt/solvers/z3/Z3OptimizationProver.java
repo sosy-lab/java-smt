@@ -197,11 +197,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected long getZ3Model() throws InterruptedException {
+  protected long getZ3Model() throws InterruptedException, SolverException {
     try {
       return Native.optimizeGetModel(z3context, z3optSolver);
     } catch (Z3Exception e) {
-      throw new InterruptedException("Z3 model generation interrupted.");
+      throw creator.handleZ3Exception(e);
     }
   }
 
