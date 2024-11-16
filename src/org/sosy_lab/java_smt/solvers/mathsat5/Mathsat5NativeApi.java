@@ -18,7 +18,7 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
-class Mathsat5NativeApi {
+final class Mathsat5NativeApi {
   private Mathsat5NativeApi() {}
 
   // msat_result

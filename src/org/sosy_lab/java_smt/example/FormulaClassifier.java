@@ -187,7 +187,7 @@ public class FormulaClassifier {
     return logic.toString();
   }
 
-  private static class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
+  private static final class AtomCollector extends DefaultBooleanFormulaVisitor<TraversalProcess> {
 
     private final Collection<BooleanFormula> atoms = new LinkedHashSet<>();
     boolean hasQuantifiers = false;
@@ -215,7 +215,7 @@ public class FormulaClassifier {
     }
   }
 
-  private class Classifier implements FormulaVisitor<Integer> {
+  private final class Classifier implements FormulaVisitor<Integer> {
 
     boolean hasUFs = false;
     boolean hasQuantifiers = false;
@@ -294,7 +294,7 @@ public class FormulaClassifier {
             nonLinearArithmetic = true;
             return allArgLevel + 1;
           }
-          // $FALL-THROUGH$
+        // $FALL-THROUGH$
         default:
           if (pFunctionDeclaration.getType().isBooleanType()) {
             if (EnumSet.of(

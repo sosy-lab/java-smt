@@ -10,6 +10,10 @@ SPDX-License-Identifier: Apache-2.0
 
 # JavaSMT ChangeLog
 
+## JavaSMT 5.0.1
+
+This patch release improves documentation and brings smaller improvements for CVC5.
+
 ## JavaSMT 5.0.0
 
 This major release brings support for the SMT solver Bitwuzla (version 0.4.0), some bugfixes,

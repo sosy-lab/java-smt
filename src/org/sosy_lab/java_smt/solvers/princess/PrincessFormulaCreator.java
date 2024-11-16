@@ -367,8 +367,8 @@ class PrincessFormulaCreator
     final IFunction ratInt;
     try {
       ratInt = (IFunction) Fractions.class.getMethod("int").invoke(Rationals$.MODULE$);
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
-      throw new RuntimeException(pE);
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
+      throw new RuntimeException(ex);
     }
     return isConstant(pExpr) && pExpr.fun().equals(ratInt);
   }

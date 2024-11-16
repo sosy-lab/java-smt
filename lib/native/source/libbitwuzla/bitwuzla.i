@@ -291,6 +291,7 @@ namespace bitwuzla {
 /** Bitwuzla */
 %ignore Bitwuzla::Bitwuzla(const Options &options = Options());
 %ignore Bitwuzla::is_unsat_assumption (const Term &term);
+%ignore Bitwuzla::print_unsat_core(std::ostream &out, const std::string &format = "smt2") const;
 %ignore Bitwuzla::print_formula (std::ostream &out, const std::string &format="smt2") const;
 %extend Bitwuzla {
   std::string print_formula () {
@@ -308,7 +309,7 @@ namespace bitwuzla {
 namespace bitwuzla::parser {
 %ignore Parser::Parser(TermManager &tm, Options &options, const std::string &language, std::ostream *out);
 %ignore Parser::Parser(TermManager &tm, Options &options, std::ostream *out);
-
+%ignore Parser::configure_auto_print_model(bool value);
 %ignore Parser::parse(const std::string &infile_name, std::istream &input, bool parse_only=false);
 
 %exception {

@@ -51,7 +51,7 @@ import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationCallb
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.mathsat5")
-  private static class Mathsat5Settings {
+  private static final class Mathsat5Settings {
 
     @Option(
         secure = true,

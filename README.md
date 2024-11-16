@@ -11,7 +11,7 @@ SPDX-License-Identifier: Apache-2.0
 # JavaSMT
 
 [![Build Status](https://gitlab.com/sosy-lab/software/java-smt/badges/master/pipeline.svg)](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
-[![Build Status on Windows](https://ci.appveyor.com/api/projects/status/uehe0fwa8bil8sha/branch/master?svg=true)](https://ci.appveyor.com/project/PhilippWendler/java-smt/branch/master)
+[![Build Status on Windows](https://ci.appveyor.com/api/projects/status/08sy37awx7kvflo7/branch/master?svg=true)](https://ci.appveyor.com/project/sosy-lab/java-smt/branch/master)
 ![Test Coverage](https://gitlab.com/sosy-lab/software/java-smt/badges/master/coverage.svg)
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt)

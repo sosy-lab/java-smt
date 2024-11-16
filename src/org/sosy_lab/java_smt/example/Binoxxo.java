@@ -77,7 +77,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * </pre>
  */
 @SuppressWarnings("unused")
-public class Binoxxo {
+public final class Binoxxo {
 
   private static final char[][] UNSOLVABLE_BINOXXO = null;
 

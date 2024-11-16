@@ -217,7 +217,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   public void close() {
     if (!closed) {
       annotatedTerms.clear();
-      env.pop(size());
+      env.resetAssertions();
+      env.exit();
     }
     super.close();
   }

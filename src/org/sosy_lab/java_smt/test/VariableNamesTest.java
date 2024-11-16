@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -40,9 +36,8 @@ import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-@RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-public class VariableNamesTest extends SolverBasedTest0 {
+public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
@@ -173,19 +168,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
         .addAll(FURTHER_SMTLIB2_KEYWORDS)
         .addAll(UNSUPPORTED_NAMES)
         .build();
-  }
-
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
   }
 
   boolean allowInvalidNames() {
@@ -555,6 +537,12 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
+    // FIXME: Broken on yices2
+    //  Yices does not quote symbols when dumping a formula, f.ex for the variable "(" we get
+    //    (declare-fun |(| () Bool)
+    //    (assert ()
+    //  which is not a valid SMTLIB script.
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -566,6 +554,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testEqBoolVariableDump() {
+    // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {

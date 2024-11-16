@@ -282,7 +282,7 @@ public abstract class FormulaType<T extends Formula> {
   public static final FormulaType<FloatingPointRoundingModeFormula> FloatingPointRoundingModeType =
       new FloatingPointRoundingModeType();
 
-  private static class FloatingPointRoundingModeType
+  private static final class FloatingPointRoundingModeType
       extends FormulaType<FloatingPointRoundingModeFormula> {
 
     @Override

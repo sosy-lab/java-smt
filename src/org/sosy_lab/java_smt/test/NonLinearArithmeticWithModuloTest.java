@@ -34,7 +34,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(Solvers.values()), Arrays.asList(NonLinearArithmetic.values()))
+            Arrays.asList(ParameterizedSolverBasedTest0.getAllSolvers()),
+            Arrays.asList(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());

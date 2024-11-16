@@ -37,7 +37,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Parameters(name = "{0} with delay {1}")
   public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
-    for (Solvers solver : Solvers.values()) {
+    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
       for (int delay : DELAYS) {
         lst.add(new Object[] {solver, delay});
       }
@@ -136,8 +136,8 @@ public class TimeoutTest extends SolverBasedTest0 {
               try {
                 Thread.sleep(delay);
                 shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
+              } catch (InterruptedException exception) {
+                throw new UnsupportedOperationException("Unexpected interrupt", exception);
               }
             });
 
