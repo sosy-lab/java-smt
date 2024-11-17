@@ -37,7 +37,6 @@ import ap.types.Sort$;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     Multimap<IFunApp, ITerm> arrays = getArrays(interpretation);
 
     // then iterate over the model and generate the assignments
-    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
     for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (!entry.getKey().toString().equals("Rat_denom") && !isAbbrev(abbrevs, entry.getKey())) {
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
