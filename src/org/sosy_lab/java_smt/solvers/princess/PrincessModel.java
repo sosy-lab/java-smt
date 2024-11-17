@@ -287,8 +287,9 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression expr) {
-    // TODO creating our own utility variables might eb unexpected from the user.
-    //   We might need to exclude such variables in models and formula traversal.
+    // The utility variable only appears temporarily on the solver's stack.
+    // The user should never notice it.
+    // We might not even need an index/counter for the variable.
     String newVariable = "__JAVASMT__MODEL_EVAL_" + counter++;
 
     // Extending the partial model does not seem to work in Princess if the formula uses rational
