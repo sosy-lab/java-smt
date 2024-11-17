@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
@@ -28,18 +29,21 @@ import ap.parser.ITimes;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
+import ap.theories.arrays.ExtArray.Select$;
+import ap.theories.arrays.ExtArray.Store$;
 import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
@@ -50,6 +54,9 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   private final PartialModel model;
   private final SimpleAPI api;
+
+  // Keeps track of the temporary variables created for explicit term evaluations in the model.
+  private static int counter = 0;
 
   PrincessModel(
       PrincessAbstractProver<?> pProver,
@@ -77,8 +84,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     Multimap<IFunApp, ITerm> arrays = getArrays(interpretation);
 
     // then iterate over the model and generate the assignments
-    ImmutableSet.Builder<ValueAssignment> assignments = ImmutableSet.builder();
-    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    Builder<ValueAssignment> assignments = ImmutableSet.builder();
+    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (!entry.getKey().toString().equals("Rat_denom") && !isAbbrev(abbrevs, entry.getKey())) {
         assignments.addAll(getAssignments(entry.getKey(), entry.getValue(), arrays));
       }
@@ -116,13 +123,13 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
   private Multimap<IFunApp, ITerm> getArrays(
       scala.collection.Map<IExpression, IExpression> interpretation) {
     Multimap<IFunApp, ITerm> arrays = ArrayListMultimap.create();
-    for (Map.Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
+    for (Entry<IExpression, IExpression> entry : asJava(interpretation).entrySet()) {
       if (entry.getKey() instanceof IConstant) {
         ITerm maybeArray = (IConstant) entry.getKey();
         IExpression value = entry.getValue();
         if (creator.getEnv().hasArrayType(maybeArray)
             && value instanceof IFunApp
-            && ExtArray.Store$.MODULE$.unapply(((IFunApp) value).fun()).isDefined()) {
+            && Store$.MODULE$.unapply(((IFunApp) value).fun()).isDefined()) {
           // It is value -> variables, hence if 2+ vars have the same value we need a list
           arrays.put((IFunApp) value, maybeArray);
         }
@@ -147,7 +154,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
         return ImmutableList.of();
       }
       Sort sort = Sort$.MODULE$.sortOf(cKey);
-      if (ExtArray.Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
+      if (Select$.MODULE$.unapply(cKey.fun()).isDefined()) {
         return getAssignmentsFromArraySelect(value, cKey, pArrays);
       } else if (sort instanceof ArraySort) {
         ExtArray arrayTheory = ((ArraySort) sort).theory();
@@ -281,35 +288,40 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression expr) {
+    // TODO creating our own utility variables might eb unexpected from the user.
+    //   We might need to exclude such variables in models and formula traversal.
+    String newVariable = "__JAVASMT__MODEL_EVAL_" + counter++;
+
     // Extending the partial model does not seem to work in Princess if the formula uses rational
     // variables. To work around this issue we (temporarily) add the formula to the assertion
     // stack and then repeat the sat-check to get the value.
-    if (expr instanceof ITerm) {
-      ITerm term = (ITerm) expr;
-      api.push();
-      for (IFormula fixed : prover.getEvaluatedTerms()) {
-        api.addAssertion(fixed);
+    api.push();
+    for (IFormula fixed : prover.getEvaluatedTerms()) {
+      api.addAssertion(fixed);
+    }
+
+    IFormula modelAssignment = null;
+    try {
+      if (expr instanceof ITerm) {
+        ITerm term = (ITerm) expr;
+        ITerm var = api.createConstant(newVariable, getSort(term));
+        api.addAssertion(var.$eq$eq$eq(term));
+        api.checkSat(true);
+        ITerm value = simplifyRational(api.evalToTerm(var));
+        modelAssignment = value.$eq$eq$eq(term);
+        return value;
+      } else {
+        IFormula formula = (IFormula) expr;
+        IFormula var = api.createBooleanVariable(newVariable);
+        api.addAssertion(var.$less$eq$greater(formula));
+        api.checkSat(true);
+        IFormula value = IBoolLit$.MODULE$.apply(api.eval(var));
+        modelAssignment = value.$less$eq$greater(formula);
+        return value;
       }
-      ITerm var = api.createConstant("__tmp_", getSort(term));
-      api.addAssertion(var.$eq$eq$eq(term));
-      api.checkSat(true);
-      ITerm value = simplifyRational(api.evalToTerm(var));
+    } finally {
       api.pop();
-      prover.addEvaluatedTerm(value.$eq$eq$eq(term));
-      return value;
-    } else {
-      IFormula formula = (IFormula) expr;
-      api.push();
-      for (IFormula fixed : prover.getEvaluatedTerms()) {
-        api.addAssertion(fixed);
-      }
-      IFormula var = api.createBooleanVariable("__tmp_");
-      api.addAssertion(var.$less$eq$greater(formula));
-      api.checkSat(true);
-      IFormula value = IBoolLit$.MODULE$.apply(api.eval(var));
-      api.pop();
-      prover.addEvaluatedTerm(value.$less$eq$greater(formula));
-      return value;
+      prover.addEvaluatedTerm(checkNotNull(modelAssignment));
     }
   }
 }

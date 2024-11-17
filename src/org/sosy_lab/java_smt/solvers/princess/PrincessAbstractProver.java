@@ -23,7 +23,9 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,7 +56,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * consistant. Calling {@link #isUnsat()} will reset this list as the underlying model has been
    * updated.
    */
-  protected final List<IFormula> evaluatedTerms = new ArrayList<>();
+  protected final Set<IFormula> evaluatedTerms = new LinkedHashSet<>();
 
   // assign a unique partition number for eah added constraint, for unsat-core and interpolation.
   protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
@@ -142,15 +144,14 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   /**
-   * Get a list of all terms that have been evaluated in the current model.
-   *
-   * <p>The formulas in this list are assignments that extend the original model.
+   * Get all terms that have been evaluated in the current model. The formulas are assignments that
+   * extend the original model.
    */
-  List<IFormula> getEvaluatedTerms() {
-    return evaluatedTerms;
+  Collection<IFormula> getEvaluatedTerms() {
+    return Collections.unmodifiableCollection(evaluatedTerms);
   }
 
-  /** Add a new term to the list of evaluated terms. */
+  /** Track an assignment `term == value` for an evaluated term and its value. */
   void addEvaluatedTerm(IFormula pFormula) {
     evaluatedTerms.add(pFormula);
   }
