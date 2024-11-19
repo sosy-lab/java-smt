@@ -55,6 +55,7 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Multisor
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.MultitermContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Qual_id_sortContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Resp_get_modelContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Sort_fpContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Sort_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_exclamContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_existsContext;
@@ -166,15 +167,181 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return result;
   }
 
-  @Override
-  public FormulaType<?> visitSort_id(Sort_idContext ctx) {
-    String type = ctx.getText();
+  /**
+   * Returns all the first parts without numbers of legal Strings how a floating Point can be
+   * defined in SMTLIB2 where Integers are used as exponent and mantissa.
+   * @return ArrayList with the fitting strings
+   */
+  private static ArrayList<String> getAllAllowedFPBeginningsWithInts() {
+    ArrayList<String> beginnings = new ArrayList<>();
 
+    // Numeral FloatingPoint: (_ FloatingPoint 5 11)
+    beginnings.add("(_ FloatingPoint");
+
+    // FloatingPointPlusOrMinusInfinity: ((_ +oo eb sb) ...)
+    beginnings.add("(_ +oo");
+    beginnings.add("(_ -oo");
+
+    // FloatingPointPlusOrMinusZero: ((_ +zero eb sb) ...)
+    beginnings.add("(_ +zero");
+    beginnings.add("(_ -zero");
+
+    // NotANumberFloatingPoint: ((_ NaN eb sb) ...)
+    beginnings.add("(_ NaN");
+
+    return beginnings;
+  }
+  /**
+   * Returns all the first parts without numbers of legal Strings how a floating Point can be
+   * defined in SMTLIB2 where non-Integers are used, f.e. Bitvectors and Hexadecimal Floating-Points
+   * @return ArrayList with the fitting strings
+   */
+  private static ArrayList<String> getAllAllowedFPBeginningsWithoutInts() {
+    ArrayList<String> beginnings = new ArrayList<>();
+
+    // FloatingPointShortVariant: (Float128)
+    beginnings.add("(Float");
+
+    // BinaryFloatingPoint: (fp #b)
+    beginnings.add("(fp #b");
+
+    // HexadecimalFloatingPoint: #x1.8p+1
+    beginnings.add("#x");
+
+    return beginnings;
+  }
+
+  /**
+   * This method parses a bitvector or hexadecimal SMTLIB2-String to an integer.
+   * @param input String in  hexadecimal or bitvector format according to smtlibv2
+   * @return the parsed integer
+   */
+  public static int parseBitOrHexToInt(String input) {
+    if (input.startsWith("#b")) {
+      String binaryPart = input.substring(2);
+      try {
+        return Integer.parseInt(binaryPart, 2);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("invalid bit format: " + input, e);
+      }
+    } else if (input.startsWith("#x")) {
+      String hexPart = input.substring(2);
+      try {
+        return Integer.parseInt(hexPart, 16);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("invalid hex format: " + input, e);
+      }
+    } else {
+      throw new IllegalArgumentException("string could not be detected as bitv or hex: " + input);
+    }
+  }
+
+  /**
+   * Checks if the beginning of the String matches one from a list.
+   * @param checkedString String which beginning should be checked
+   * @param listWithBeginnings ArrayList with the Strings that could match the checkedString
+   * @return true if at least one item of the list matches the beginning of the String
+   */
+  public static boolean beginningMatchesList(String checkedString,
+                                          ArrayList<String> listWithBeginnings){
+    for(String x : listWithBeginnings){
+      if(checkedString.startsWith(x)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Checks if the String has the format of a Bitvector in SMTLIBv2 and creates the matching
+   * FormulaType.
+   * @param type SMTLIB2 String (not a whole file, just one Formula)
+   * @return matching FormulaType
+   */
+  public FormulaType<?> parseToBitVecFormulaTypeIfMatching(String type){
     String bvSize = "";
     if (type.startsWith("(_BitVec")) {
       bvSize = Iterables.get(Splitter.on("_BitVec").split(type), 1);
       bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
-      type = "BitVec";
+      return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
+    }
+    throw new ParserException("Invalid Bitvector format: " + type);
+
+  }
+  /**
+   * Checks if the String has the format of a FloatingPoint in SMTLIBv2 and creates the matching
+   * FormulaType.
+   * @param type SMTLIB2 String (not a whole file, just one Formula)
+   * @return matching FormulaType
+   */
+  public FormulaType<?> parseToFloatingPointFormulaTypeIfMatching(String type){
+    if (beginningMatchesList(type, getAllAllowedFPBeginningsWithInts())){
+      try {
+        String[] parts = type.split(" ");
+        int exponent = Integer.parseInt(parts[2]);
+        int mantissa = Integer.parseInt(parts[3].replace(")", ""));
+        return FormulaType.getFloatingPointType(exponent, mantissa);
+      } catch (Exception e) {
+        throw new ParserException("Invalid FloatingPoint format: " + type, e);
+      }
+    }
+    if (beginningMatchesList(type, getAllAllowedFPBeginningsWithoutInts())) {
+      if(type.startsWith("(Float16")){
+        int exponent = 5;
+        int mantissa = 11;
+        return FormulaType.getFloatingPointType(exponent, mantissa);
+      }
+      if(type.startsWith("(Float32")){
+        return FormulaType.getSinglePrecisionFloatingPointType();
+      }
+      if(type.startsWith("(Float64")){
+        return FormulaType.getDoublePrecisionFloatingPointType();
+      }
+      if(type.startsWith("(Float128")){
+        int exponent = 15;
+        int mantissa = 113;
+        return FormulaType.getFloatingPointType(exponent, mantissa);
+      }
+      if(type.startsWith("(fp")){
+        //NOT TO BE HANDLED HERE - see visitSpec_Const
+      }
+      if(type.startsWith("#x")){
+        //NOT TO BE HANDLED HERE - see visitSpec_Const
+      }
+    }
+    throw new ParserException("Invalid Floating Point Format: " + type);
+  }
+
+  /**
+   * Sees if a SMT2 String is a Bitvector
+   * @param smt2 Smt2 String
+   * @return true if it starts with "(_Bitvec"
+   */
+  public static boolean isABitVecInSMT2(String smt2){
+    return smt2.startsWith("(_BitVec");
+  }
+
+  /**
+   * Sees if SMT2 String is a FloatingPoint by comparing it's beginning to the accepted ways of
+   * defining a Floating-Point in SMT2
+   * @param smt2 String in smt2 format
+   * @return true if at least one beginning is matched
+   */
+  public static boolean isAFloatingPointInSMT2(String smt2){
+    return beginningMatchesList(smt2, getAllAllowedFPBeginningsWithoutInts())
+        || beginningMatchesList(smt2, getAllAllowedFPBeginningsWithoutInts());
+  }
+
+
+  @Override
+  public FormulaType<?> visitSort_id(Sort_idContext ctx) {
+    String type = ctx.getText();
+
+    if(isABitVecInSMT2(type)){
+      return parseToBitVecFormulaTypeIfMatching(type);
+    }
+    if(isAFloatingPointInSMT2(type)){
+      return parseToFloatingPointFormulaTypeIfMatching(type);
     }
 
     switch (type) {
@@ -184,8 +351,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return FormulaType.BooleanType;
       case "Real":
         return FormulaType.RationalType;
-      case "BitVec":
-        return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
       default:
         throw new ParserException(type + " is not a known Array sort. ");
     }

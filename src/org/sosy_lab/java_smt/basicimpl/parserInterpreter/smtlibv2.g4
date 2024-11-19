@@ -304,11 +304,6 @@ NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
     : ParOpen GRW_Underscore 'FloatingPoint' FloatingPointNumeral FloatingPointNumeral ParClose
     ;
 
-DecimalFloatingPoint //supports formats like: (123.45 or 123e4)
-// already supported?
-    : Decimal + ([eE] [+-]? Digit+)?
-    ;
-
 BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
     : ParOpen 'fp' Binary Binary ParClose
     ;
@@ -335,7 +330,6 @@ NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
 FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater than 1
      : NumeralFloatingPoint
      | FloatingPointShortVariant
-     | DecimalFloatingPoint
      | BinaryFloatingPoint
      | HexadecimalFloatingPoint
      | FloatingPointPlusOrMinusInfinity
@@ -745,7 +739,6 @@ attribute
 
 sort
     : identifier                                                      #sort_id
-    | FloatingPoint #sort_fp
     | ParOpen identifier sort+ ParClose                               #multisort
     ;
 
