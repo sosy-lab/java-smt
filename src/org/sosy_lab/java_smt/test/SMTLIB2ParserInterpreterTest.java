@@ -23,6 +23,8 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
@@ -413,6 +415,60 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula expectedResult = bmgr.makeFalse();
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+  @Test
+  public void testDeclareFloatingPoints()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testFloatingPointAddition()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun c () (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.add RNE a b)))\n";
+
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula additionResult =
+        fpmgr.add(a, b, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, additionResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+
 
   @Test
   public void testNot()

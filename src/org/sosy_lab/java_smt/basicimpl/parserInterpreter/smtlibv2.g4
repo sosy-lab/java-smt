@@ -266,10 +266,6 @@ Binary
     : '#b' BinaryDigit+
     ;
 
-Real //The official website declares reals in their theories which is just decimal.
-    :Decimal
-    ;
-
 HexDecimal
     : '#x' HexDigit+
     ;
@@ -277,65 +273,6 @@ HexDecimal
 Decimal
     : Numeral '.' '0'* Numeral
     ;
-
-RoundingModes //needed for floating point operations
-    : 'RNE'
-    | 'roundNearestTiesToEven'
-    | 'RNA'
-    | 'roundNearestTiesToAway'
-    | 'RTP'
-    | 'roundTowardPositive'
-    | 'RTN'
-    | 'roundTowardNegative'
-    | 'RTZ'
-    | 'roundTowardZero'
-    ;
-
-//Floating Points
-FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
-    : [2-9] Digit*
-    ;
-
-FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
-    : ParOpen ShortFloats ParClose
-    ;
-
-NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
-    : ParOpen GRW_Underscore 'FloatingPoint' FloatingPointNumeral FloatingPointNumeral ParClose
-    ;
-
-BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
-    : ParOpen 'fp' Binary Binary ParClose
-    ;
-
-HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p+1)
-    : '#' 'x' HexDigit+ '.' HexDigit* 'p' [+-]? [0-9]+
-    ;
-
-FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
-// FloatingPoint eb
-// sb))
-    : ParOpen GRW_Underscore [+-]'oo' FloatingPointNumeral FloatingPointNumeral ParClose
-    ;
-
-FloatingPointPlusOrMinusZero // Plus and Minus Zero : ((_ +zero eb sb) (_ FloatingPoint eb sb))
-    :ParOpen GRW_Underscore [+-]'zero' FloatingPointNumeral FloatingPointNumeral ParClose
-    ;
-
-NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
-    : ParOpen GRW_Underscore 'NaN' FloatingPointNumeral FloatingPointNumeral ParClose
-    ;
-
-
-FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater than 1
-     : NumeralFloatingPoint
-     | FloatingPointShortVariant
-     | BinaryFloatingPoint
-     | HexadecimalFloatingPoint
-     | FloatingPointPlusOrMinusInfinity
-     | NotANumberFloatingPoint
-     ;
-
 
 fragment HexDigit
     : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
@@ -349,12 +286,7 @@ Colon
 fragment Digit
     : [0-9]
     ;
-fragment ShortFloats
-    : 'Float16'
-    | 'Float32'
-    | 'Float64'
-    | 'Float128'
-    ;
+
 
 fragment Sym
     : 'a'..'z'
@@ -682,10 +614,6 @@ string
     : String
     ;
 
-floatingpoint
-    : FloatingPoint
-    ;
-
 keyword
     : predefKeyword                                                   #pre_key
     | Colon simpleSymbol                                              #key_simsymb
@@ -699,7 +627,6 @@ spec_constant
     | hexadecimal                                                     #spec_constant_hex
     | binary                                                          #spec_constant_bin
     | string                                                          #spec_constant_string
-    | floatingpoint                                                   #spec_constant_floating_point
     ;
 
 
@@ -776,111 +703,7 @@ term
     | ParOpen GRW_Exists ParOpen sorted_var+ ParClose term ParClose   #term_exists
     | ParOpen GRW_Match term ParOpen match_case+ ParClose ParClose    #term_match
     | ParOpen GRW_Exclamation term attribute+ ParClose                #term_exclam
-    | floating_point_operations                                       #term_floating_point
     ;
-
-// Floating Point Operations
-
-fp_abs : 'fp.abs';
-fp_neg : 'fp.neg';
-fp_add : 'fp.add' ;
-fp_sub : 'fp.sub' ;
-fp_mul : 'fp.mul' ;
-fp_div : 'fp.div' ;
-fp_fma : 'fp.fma'; //fused multiplication and addition
-fp_sqrt : 'fp.sqrt';
-fp_rem: 'fp.rem'; //remainder
-fp_roundToIntegral: 'fp.roundToIntegral';
-fp_min: 'fp.min';
-fp_max: 'fp.max';
-fp_leq: 'fp.leq';
-fp_lt: 'fp.lt';
-fp_geq: 'fp.geq';
-fp_gt: 'fp.gt';
-fp_eq  : 'fp.eq'  ;
-fp_isNormal: 'fp.isNormal';
-fp_isSubnormal: 'fp.isSubnormal';
-fp_isZero: 'fp.isZero';
-fp_isInfinite: 'fp.isInfinite';
-fp_isNegative: 'fp.isNegative';
-fp_isPositive: 'fp.isPositive';
-
-
-
-floating_point_operator_with_1_input // f(x) = x e.g. fp.isNegative(x) = Bool
-:fp_abs
-|fp_neg
-|fp_isNormal
-|fp_isSubnormal
-|fp_isZero
-|fp_isInfinite
-|fp_isNegative
-|fp_isPositive
-;
-
-floating_point_operator_with_2_inputs // f(x,y) = z e.g. fp.add
-:fp_rem
-|fp_min
-|fp_max
-|fp_leq
-|fp_lt
-|fp_geq
-|fp_gt
-|fp_eq
-;
-
-floating_points_with_RM_1_input
-:fp_sqrt
-|fp_roundToIntegral
-;
-
-floating_points_with_RM_2_inputs
-:fp_add
-|fp_sub
-|fp_mul
-|fp_div
-;
-
-floating_point_funs_with_RM_3_inputs
-:fp_fma
-;
-
-
-floating_point_operations //TODO: Check if only Numeral Floating Points are accepted
-: ParOpen floating_point_operator_with_1_input NumeralFloatingPoint ParClose
-| ParOpen floating_point_operator_with_2_inputs NumeralFloatingPoint NumeralFloatingPoint ParClose
-| ParOpen floating_points_with_RM_1_input RoundingModes NumeralFloatingPoint ParClose
-| ParOpen floating_points_with_RM_2_inputs RoundingModes NumeralFloatingPoint NumeralFloatingPoint ParClose
-| ParOpen floating_point_funs_with_RM_3_inputs RoundingModes NumeralFloatingPoint NumeralFloatingPoint
-NumeralFloatingPoint ParClose
-|floating_point_conversions
-;
-
-
-//Floating Point Conversions (to_fp functions)
-
-floating_point_conversions
-: from_fp_operations
-| to_fp_operations
-;
-
-to_fp_input
-: ParOpen GRW_Underscore 'to_fp' FloatingPointNumeral FloatingPointNumeral ParClose
-;
-
-to_fp_operations //REMEMBER THAT ALL CONVERSIONS ARE UNSPECIFIED FOR NAN AND INFINITY VALUES
-: ParOpen to_fp_input Binary ParClose
-|ParOpen to_fp_input RoundingModes NumeralFloatingPoint ParClose
-|ParOpen to_fp_input RoundingModes Real ParClose
-|ParOpen to_fp_input RoundingModes Binary ParClose //if the bitvec should be interpreted as 2^n
-// unsigned integers don't exist in Java so we don't allow them
-;
-
-from_fp_operations
-:ParOpen ParOpen GRW_Underscore 'fp.to_sbv' FloatingPointNumeral ParClose RoundingModes NumeralFloatingPoint
-;
-
-// Theory Declarations
 
 sort_symbol_decl
     : ParOpen identifier numeral attribute* ParClose;

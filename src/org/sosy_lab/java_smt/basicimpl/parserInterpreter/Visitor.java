@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ import scala.Tuple2;
  * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
  * form of action in order to transform the parsed SMT-LIB2 into JavaSMT.
  */
-@SuppressWarnings({"CheckReturnValue", "unchecked"})
+@SuppressWarnings({"CheckReturnValue", "unchecked", "NonApiType", "StringSplitter"})
 public class Visitor extends smtlibv2BaseVisitor<Object> {
 
   /**
@@ -247,7 +248,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * @param type SMTLIB2 String (not a whole file, just one Formula)
    * @return matching FormulaType
    */
-  public FormulaType<?> parseToBitVecFormulaTypeIfMatching(String type){
+  public static FormulaType<?> parseToBitVecFormulaTypeIfMatching(String type){
     String bvSize = "";
     if (type.startsWith("(_BitVec")) {
       bvSize = Iterables.get(Splitter.on("_BitVec").split(type), 1);
@@ -263,7 +264,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * @param type SMTLIB2 String (not a whole file, just one Formula)
    * @return matching FormulaType
    */
-  public FormulaType<?> parseToFPOnlyNumeral(String type){
+  public static  FormulaType<?> parseToFPOnlyNumeral(String type){
     if (beginningMatchesList(type, getAllAllowedFPBeginningsWithInts())){
       try {
         String[] parts = type.split(" ");
@@ -294,7 +295,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
     throw new ParserException("Invalid Floating Point Format: " + type);
   }
-  public ParserFormula createParserFormulaForFP(FloatingPointFormulaManager fpmgr, String operand) {
+
+  /**
+   *
+   * This method detects all allowed ways to declare a floating-point in smt2. It extracts the
+   * exponent and mantissa (in case of bitvectors the significant too) and creates a
+   * ParserFormula Object with the give information.
+   * @param fpmgr FloatingPointManager declared in the class
+   * @param operand String from the tree branch (ANTLR)
+   * @return ParserFormula Object containing the Floating-Point
+   */
+  private ParserFormula createParserFormulaForFP(FloatingPointFormulaManager fpmgr,
+                                                 String operand) {
     if (beginningMatchesList(operand, getAllAllowedFPBeginningsWithInts())) {
       try {
         String[] parts = operand.split(" ");
@@ -314,26 +326,26 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
             FloatingPointType.getFloatingPointType(exponent, mantissa)));
       }
-      if (operand.startsWith("(Float32")) {
+      else if (operand.startsWith("(Float32")) {
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
             FloatingPointType.getSinglePrecisionFloatingPointType()));
       }
-      if (operand.startsWith("(Float64")) {
+      else if (operand.startsWith("(Float64")) {
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
             FloatingPointType.getDoublePrecisionFloatingPointType()));
       }
-      if (operand.startsWith("(Float128")) {
+      else if (operand.startsWith("(Float128")) {
         int exponent = 15;
         int mantissa = 113;
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
             FloatingPointType.getFloatingPointType(exponent, mantissa)));
       }
-      if (operand.startsWith("(fp")) {
+      else if (operand.startsWith("(fp")) {
         try {
           String[] parts = operand.split(" ");
           String signPart = parts[1];      // (_ BitVec 1)
           String exponentPart = parts[2]; // (_ BitVec eb)
-          String mantissaPart = parts[3]; // (_ BitVec i)
+          String mantissaPart = parts[3]; // (_ BitVec man)
 
           int sign = parseBitVec(signPart);
           int exponent = parseBitVec(exponentPart);
@@ -354,7 +366,43 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         } catch (Exception e) {
           throw new ParserException("Invalid FloatingPoint format: " + operand, e);
         }
+      }else if (operand.startsWith("#x")) {
+        try {
+          String hexValue = operand.substring(2);
+          int pIndex = hexValue.indexOf('p');
+          if (pIndex == -1) {
+            throw new ParserException("Missing exponent in hexadecimal floating-point format: " + operand);
+          }
+
+          String mantissaPart = hexValue.substring(0, pIndex);
+          String exponentPart = hexValue.substring(pIndex + 1);
+
+          String[] mantissaParts = mantissaPart.split("\\.");
+          BigInteger wholePart = new BigInteger(mantissaParts[0], 16); // Ganzzahliger Teil
+          BigInteger fractionalPart = (mantissaParts.length > 1) ?
+                                      new BigInteger(mantissaParts[1], 16) : BigInteger.ZERO; // Nachkommastellen
+          int fractionalLength = (mantissaParts.length > 1) ? mantissaParts[1].length() * 4 : 0; // Anzahl der Bits nach dem Punkt
+
+          // Konvertiere die Mantisse in einen BigDecimal-Wert
+          BigDecimal mantissa = new BigDecimal(wholePart)
+              .add(new BigDecimal(fractionalPart).divide(BigDecimal.valueOf(1L << fractionalLength)));
+
+          // Parse den Exponenten
+          int exponent = Integer.parseInt(exponentPart);
+
+          // Finaler Wert: Mantisse * 2^Exponent
+          BigDecimal finalValue = mantissa.multiply(BigDecimal.valueOf(Math.pow(2, exponent)));
+
+          // Erstelle den Floating-Point-Wert
+          FloatingPointFormula fpFormula = fpmgr.makeNumber(finalValue, FloatingPointType.getDoublePrecisionFloatingPointType());
+          return new ParserFormula(fpFormula);
+
+        } catch (Exception e) {
+          throw new ParserException("Invalid SMT2 hexadecimal floating-point format: " + operand, e);
+        }
       }
+
+
     }
 
     throw new ParserException("Invalid Floating Point Format: " + operand);
@@ -392,7 +440,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * @return true if at least one beginning is matched
    */
   public static boolean isAFloatingPointInSMT2(String smt2){
-    return beginningMatchesList(smt2, getAllAllowedFPBeginningsWithoutInts())
+    return beginningMatchesList(smt2, getAllAllowedFPBeginningsWithInts())
         || beginningMatchesList(smt2, getAllAllowedFPBeginningsWithoutInts());
   }
 
@@ -516,14 +564,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         || getNumericType(operand).equals("Float")) {
       variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)
           ));
-      //TODO: I think this needs to be changed to using the fpmgr. MIT DANIEL ABSPRECHEN
       return variables.get(operand).javaSmt;
     }
-    //TODO: add floating Point recognization if rationals are used, that aren't "floats" or doubles
-
     else if (beginningMatchesList(operand, getAllAllowedFPBeginnigs())) {
-      variables.put(operand, createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand));
-     return variables.get(operand).javaSmt;
+     return createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand);
     }
     else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
@@ -1660,12 +1704,9 @@ else if (sort.isArrayType()) {
       return "Int";
     } else if (type.isRationalType()) {
       return "Real";
-    }
-    /*
-    else if (type.isFloatingPointType()){
+    } else if (type.isFloatingPointType()){
     return "(_ FloatingPoint ";
     }
-     */
     else if (type.isBitvectorType()) {
       return "(_ BitVec " + ((BitvectorType) type).getSize() + ")";
     } else if (type.isArrayType()) {
