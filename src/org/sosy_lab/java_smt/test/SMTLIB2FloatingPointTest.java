@@ -23,6 +23,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -91,4 +92,160 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  @Test
+  public void testDeclareFloatingPointsWithBitVectors()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+            + "(assert (= a ((_ to_fp 8 24) #b010000000000000000000000)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(1, new BigInteger("010000000000000000000000",
+                2)),
+            FormulaType.getFloatingPointType(8, 24));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloatingPointsWithHexadecimal()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+            + "(assert (= a ((_ to_fp 8 24) #x40400000)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(1, new BigInteger("0x400000",16)),
+            FormulaType.getFloatingPointType(8, 24));
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloat8()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 5 3))\n"
+            + "(declare-fun b () (_ FloatingPoint 5 3))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(5, 3));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(5, 3));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloat16()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 5 11))\n"
+            + "(declare-fun b () (_ FloatingPoint 5 11))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(5, 11));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(5, 11));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloat32()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloat64()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 11 53))\n"
+            + "(declare-fun b () (_ FloatingPoint 11 53))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(11, 53));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(11, 53));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testDeclareFloat128()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-fun a () (_ FloatingPoint 15 113))\n"
+            + "(declare-fun b () (_ FloatingPoint 15 113))\n"
+            + "(assert (= a b))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(15, 113));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(15, 113));
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
 }
