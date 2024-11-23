@@ -41,6 +41,9 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Cmd_assertContext;
@@ -65,6 +68,8 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_qua
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_spec_constContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import scala.concurrent.impl.FutureConvertersImpl.P;
 
 /**
  * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
@@ -98,6 +103,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
   private final @Nullable ArrayFormulaManager amgr;
   private final UFManager umgr;
   private final @Nullable FloatingPointFormulaManager fpmgr;
+  private final @Nullable StringFormulaManager smgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
 
   // TODO Should we support push,etc?
@@ -124,7 +130,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       @Nullable BitvectorFormulaManager bimgr,
       @Nullable ArrayFormulaManager amgr,
       UFManager umgr,
-      @Nullable FloatingPointFormulaManager fpmgr) {
+      @Nullable FloatingPointFormulaManager fpmgr,
+      @Nullable StringFormulaManager smgr) {
     this.fmgr = fmgr;
     this.bmgr = bmgr;
     this.imgr = imgr;
@@ -133,6 +140,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     this.amgr = amgr;
     this.umgr = umgr;
     this.fpmgr = fpmgr;
+    this.smgr = smgr;
   }
 
   @Override
@@ -373,27 +381,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           if (pIndex == -1) {
             throw new ParserException("Missing exponent in hexadecimal floating-point format: " + operand);
           }
-
           String mantissaPart = hexValue.substring(0, pIndex);
           String exponentPart = hexValue.substring(pIndex + 1);
-
           String[] mantissaParts = mantissaPart.split("\\.");
           BigInteger wholePart = new BigInteger(mantissaParts[0], 16); // Ganzzahliger Teil
           BigInteger fractionalPart = (mantissaParts.length > 1) ?
                                       new BigInteger(mantissaParts[1], 16) : BigInteger.ZERO; // Nachkommastellen
           int fractionalLength = (mantissaParts.length > 1) ? mantissaParts[1].length() * 4 : 0; // Anzahl der Bits nach dem Punkt
-
-          // Konvertiere die Mantisse in einen BigDecimal-Wert
           BigDecimal mantissa = new BigDecimal(wholePart)
               .add(new BigDecimal(fractionalPart).divide(BigDecimal.valueOf(1L << fractionalLength)));
-
-          // Parse den Exponenten
           int exponent = Integer.parseInt(exponentPart);
-
-          // Finaler Wert: Mantisse * 2^Exponent
           BigDecimal finalValue = mantissa.multiply(BigDecimal.valueOf(Math.pow(2, exponent)));
 
-          // Erstelle den Floating-Point-Wert
           FloatingPointFormula fpFormula = fpmgr.makeNumber(finalValue, FloatingPointType.getDoublePrecisionFloatingPointType());
           return new ParserFormula(fpFormula);
 
@@ -406,6 +405,14 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
 
     throw new ParserException("Invalid Floating Point Format: " + operand);
+  }
+  private ParserFormula createParserFormulaForString(String operand) {
+    if(!(operand.startsWith("\"")&&operand.endsWith("\""))){
+      throw new ParserException("Invalid string format: " + operand);
+    }
+    return new ParserFormula(Objects.requireNonNull(smgr).makeString(operand.substring(1,
+        operand.length()-1)));
+    //TODO: Do I need extra handling if a String contains a escape sequence like double ""?
   }
 
   private static int parseBitVec(String bitVecPart) {
@@ -463,6 +470,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return FormulaType.BooleanType;
       case "Real":
         return FormulaType.RationalType;
+      case "String":
+        return FormulaType.StringType;
       default:
         throw new ParserException(type + " is not a known Array sort. ");
     }
@@ -568,6 +577,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     }
     else if (beginningMatchesList(operand, getAllAllowedFPBeginnigs())) {
      return createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand);
+    }
+    else if (operand.startsWith("\"")){
+      return createParserFormulaForString(operand);
     }
     else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
@@ -1349,22 +1361,22 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
         case "fp.abs":
-        if (operands.size() == 1) {
-          return fpmgr.abs((FloatingPointFormula) operands.get(0));
+        if (operands.size() == 1 ) {
+          return Objects.requireNonNull(fpmgr).abs((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.abs requires exactly one "
               + "FloatingPointFormula operand.");
         }
         case "fp.neg":
         if (operands.size() == 1) {
-          return fpmgr.negate((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).negate((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.neg requires exactly one "
               + "FloatingPointFormula operand.");
         }
         case "fp.add":
         if (operands.size() == 3) {
-          return fpmgr.add((FloatingPointFormula) operands.get(1),
+          return Objects.requireNonNull(fpmgr).add((FloatingPointFormula) operands.get(1),
               (FloatingPointFormula) operands.get(2),
               parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
@@ -1373,7 +1385,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
         case "fp.sub":
         if (operands.size() == 3) {
-          return fpmgr.subtract((FloatingPointFormula) operands.get(1),
+          return Objects.requireNonNull(fpmgr).subtract((FloatingPointFormula) operands.get(1),
               (FloatingPointFormula) operands.get(2),
               parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
@@ -1382,7 +1394,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
         case "fp.mul":
           if (operands.size() == 3) {
-            return fpmgr.multiply((FloatingPointFormula) operands.get(1),
+            return Objects.requireNonNull(fpmgr).multiply((FloatingPointFormula) operands.get(1),
                 (FloatingPointFormula) operands.get(2),
                 parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
           } else {
@@ -1391,7 +1403,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           }
       case "fp.div":
         if (operands.size() == 3) {
-          return fpmgr.divide((FloatingPointFormula) operands.get(1),
+          return Objects.requireNonNull(fpmgr).divide((FloatingPointFormula) operands.get(1),
               (FloatingPointFormula) operands.get(2),
               parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
@@ -1403,19 +1415,19 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           throw new ParserException("fp.fma isn't supported by JavaSMT");
       case "fp.sqrt":
       if (operands.size() == 2) {
-      return fpmgr.sqrt((FloatingPointFormula) operands.get(1),
+      return Objects.requireNonNull(fpmgr).sqrt((FloatingPointFormula) operands.get(1),
           parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
       } else {
       throw new ParserException("fp.sqrt requires a rounding mode and exactly one "
           + "FloatingPointFormula operand.");
        }
       case "fp.rem":
-          throw new ParserException("fp.rem is not suuported by JavaSMT");
+          throw new ParserException("fp.rem is not supported by JavaSMT");
       case "fp.roundToIntegral":
         throw new ParserException("fp.roundToIntegral is not supported by JavaSMT");
       case "fp.min" :
         if (operands.size() == 2) {
-          return fpmgr.min((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).min((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.min requires exactly two "
@@ -1423,7 +1435,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.max" :
         if (operands.size() == 2) {
-          return fpmgr.max((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).max((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.max requires exactly two "
@@ -1431,7 +1443,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.leq":
         if (operands.size() == 2) {
-          return fpmgr.lessOrEquals((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).lessOrEquals((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.leq requires exactly two "
@@ -1439,7 +1451,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.lt":
         if (operands.size() == 2) {
-          return fpmgr.lessThan((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).lessThan((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.lt requires exactly two "
@@ -1447,7 +1459,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.geq":
         if (operands.size() == 2) {
-          return fpmgr.greaterOrEquals((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).greaterOrEquals((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.geq requires exactly two "
@@ -1455,7 +1467,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
         case "fp.gt":
           if (operands.size() == 2) {
-            return fpmgr.greaterThan((FloatingPointFormula) operands.get(0),
+            return Objects.requireNonNull(fpmgr).greaterThan((FloatingPointFormula) operands.get(0),
                 (FloatingPointFormula) operands.get(1));
           } else {
             throw new ParserException("fp.gt requires exactly two "
@@ -1463,7 +1475,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           }
       case "fp.eq":
         if (operands.size() == 2) {
-          return fpmgr.equalWithFPSemantics((FloatingPointFormula) operands.get(0),
+          return Objects.requireNonNull(fpmgr).equalWithFPSemantics((FloatingPointFormula) operands.get(0),
               (FloatingPointFormula) operands.get(1));
         } else {
           throw new ParserException("fp.eq requires exactly two "
@@ -1471,41 +1483,194 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.isNormal":
         if (operands.size() == 1) {
-          return fpmgr.isNormal((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).isNormal((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.isNormal requires exactly one "
               + "FloatingPointFormula operand.");
         }
       case "fp.isSubnormal":
         if (operands.size() == 1) {
-          return fpmgr.isSubnormal((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).isSubnormal((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.isSubnormal requires exactly one "
               + "FloatingPointFormula operand.");
         }
       case "fp.isZero":
         if (operands.size() == 1) {
-          return fpmgr.isZero((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).isZero((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.isZero requires exactly one "
               + "FloatingPointFormula operand.");
         }
       case "fp.isInfinity":
         if (operands.size() == 1) {
-          return fpmgr.isInfinity((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).isInfinity((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.isZero requires exactly one "
               + "FloatingPointFormula operand.");
         }
       case "fp.isNegative":
         if (operands.size() == 1) {
-          return fpmgr.isNegative((FloatingPointFormula) operands.get(0));
+          return Objects.requireNonNull(fpmgr).isNegative((FloatingPointFormula) operands.get(0));
         } else {
           throw new ParserException("fp.isNegative requires exactly one "
               + "FloatingPointFormula operand.");
         }
       case "fp.isPositive":
         throw new ParserException("fp.isPositive is not supported by JavaSMT");
+      case "str.++":
+        if (operands.size() != 2) {
+          throw new ParserException("str.++ requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).concat((StringFormula) operands.get(0),
+            (StringFormula)   operands.get(1));
+      case "str.len":
+        if (operands.size() != 1) {
+          throw new ParserException("str.len requires exactly 1 operand.");
+        }
+        return Objects.requireNonNull(smgr).length((StringFormula) operands.get(0));
+      case "str.at":
+        if (operands.size() != 2) {
+          throw new ParserException("str.at requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).charAt((StringFormula) operands.get(0), (IntegerFormula) operands.get(1));
+
+      case "str.<":
+        throw new ParserException("str.< is not supported in JavaSMT");
+      case "str.<=":
+        throw new ParserException("str.<= is not supported in JavaSMT");
+      case "str.substr":
+        if(operands.size()!=3){
+          throw new ParserException("str.substr requires exactly 3 operands.");
+        }
+        return Objects.requireNonNull(smgr).substring((StringFormula) operands.get(0),
+            (IntegerFormula) operands.get(1), (IntegerFormula) operands.get(2));
+      case "str.prefixof":
+        if(operands.size()!=2){
+          throw new ParserException("str.prefixof requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).prefix((StringFormula) operands.get(0), (StringFormula) operands.get(1));
+      case "str.suffixof":
+        if(operands.size()!=2){
+          throw new ParserException("str.suffixof requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).suffix((StringFormula) operands.get(0), (StringFormula) operands.get(1));
+      case "str.contains":
+        if(operands.size()!=2){
+          throw new ParserException("str.contains requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).contains((StringFormula) operands.get(0), (StringFormula) operands.get(1));
+      case "str.indexof":
+        if(operands.size()!=3){
+          throw new ParserException("str.indexof requires exactly 3 operands.");
+        }
+        return Objects.requireNonNull(smgr).indexOf((StringFormula) operands.get(0),
+            (StringFormula) operands.get(1), (IntegerFormula) operands.get(2));
+      case "str.replace":
+        if(operands.size()!=3){
+          throw new ParserException("str.replace requires exactly 3 operands.");
+        }
+        return Objects.requireNonNull(smgr).replace((StringFormula) operands.get(0),
+            (StringFormula) operands.get(1), (StringFormula) operands.get(2));
+      case "str.replace_all":
+        if(operands.size()!=3){
+          throw new ParserException("str.replace_all requires exactly 3 operands.");
+        }
+        return Objects.requireNonNull(smgr).replaceAll((StringFormula) operands.get(0),
+            (StringFormula) operands.get(1), (StringFormula) operands.get(2));
+      case "str.to_int":
+        if(operands.size()!=1){
+          throw new ParserException("str.to_int requires exactly 1 operand.");
+        }
+        return Objects.requireNonNull(smgr).toIntegerFormula((StringFormula) operands.get(0));
+      case "str.from_int":
+        if(operands.size()!=1){
+          throw new ParserException("str.from_int requires exactly 1 operand.");
+        }
+        return Objects.requireNonNull(smgr).toStringFormula((IntegerFormula) operands.get(0));
+      case "str.to_code":
+        throw new ParserException("str.to_code is not supported in JavaSMT");
+      case "str.from_code":
+        throw new ParserException("str.from_code is not supported in JavaSMT");
+      case "str.to_re":
+        if(operands.size()!=1){
+          throw new ParserException("str.to_re requires exactly 1 operand.");
+        }
+        return Objects.requireNonNull(smgr).makeRegex(operands.get(0).toString());
+      case "str.in_re":
+        if(operands.size()!=2){
+          throw new ParserException("str.in_re requires exactly 2 operands.");
+        }
+        if (!(operands.get(1) instanceof RegexFormula)) {
+          throw new ParserException("Second operand of str.in_re must be a RegexFormula.");
+        }
+        return Objects.requireNonNull(smgr).in((StringFormula) operands.get(0),
+            (RegexFormula) operands.get(1));
+      case "re.none":
+        if(!operands.isEmpty()){
+          throw new ParserException("re.none requires no operands");
+        }
+        return Objects.requireNonNull(smgr).none();
+      case "re.all":
+        if(!operands.isEmpty()){
+          throw new ParserException("re.all requires no operands");
+        }
+        return Objects.requireNonNull(smgr).all();
+      case "re.++":
+        if (operands.isEmpty()) {
+          throw new ParserException("re.++ requires at least one operand.");
+        }
+        return Objects.requireNonNull(smgr).concat(operands.stream().map(o -> (RegexFormula) o).toArray(RegexFormula[]::new));
+
+      case "re.union":
+        if (operands.size()!=2) {
+          throw new ParserException("re.union requires exactly two operand.");
+        }
+        return Objects.requireNonNull(smgr).union((RegexFormula) operands.get(0), (RegexFormula) operands.get(1));
+      case "re.*":
+        if (operands.size() != 1) {
+          throw new ParserException("re.* requires exactly one operand.");
+        }
+        return Objects.requireNonNull(smgr).closure((RegexFormula) operands.get(0));
+      case "re.allchar":
+        if(!operands.isEmpty()){
+          throw new ParserException("re.allchar requires exactly 0 operands.");
+        }
+        return Objects.requireNonNull(smgr).allChar();
+      case "re.inter":
+        if(operands.size()!=2){
+          throw new ParserException("re.inter requires exactly two operands.");
+        }
+        return Objects.requireNonNull(smgr).intersection((RegexFormula) operands.get(0), (RegexFormula) operands.get(1));
+      case "re.comp":
+        if(operands.size()!=1){
+          throw new ParserException("re.comp requires exactly one operand.");
+        }
+        return Objects.requireNonNull(smgr).complement((RegexFormula) operands.get(0));
+      case "re.diff":
+        if(operands.size()!=2){
+          throw new ParserException("re.diff requires exactly two operands.");
+        }
+        return Objects.requireNonNull(smgr).difference((RegexFormula) operands.get(0), (RegexFormula) operands.get(1));
+      case "re.+":
+        if(operands.size()!=1){
+          throw new ParserException("re.+ requires exactly one operand.");
+        }
+        return Objects.requireNonNull(smgr).cross((RegexFormula) operands.get(0));
+      case "re.opt":
+        if(operands.size()!=1){
+          throw new ParserException("re.opt requires exactly one operand.");
+        }
+        return Objects.requireNonNull(smgr).optional((RegexFormula) operands.get(0));
+      case "re.range":
+        if(operands.size()!=2){
+          throw new ParserException("re.range requires exactly one operand.");
+        }
+        return Objects.requireNonNull(smgr).range((StringFormula) operands.get(0), (StringFormula) operands.get(1));
+      case "re.^":
+        //TODO THINK OF A WAY OF IMPLEMENTING AS THE SYNTAX HAS EXTRA BRACKETS
+      case "re.loop":
+        throw new ParserException("re.^ and re.loop is not implemented yet.");
       case "UF":
         // UF
         try {
@@ -1634,6 +1799,30 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       assignments.add(assignment);
     }
     return visitChildren(ctx);
+  }
+
+  public static boolean formulaMatchesRequestedType(FormulaTypesForChecking type, Formula formula){
+    return formula.getClass().getName().equals(parseToCorrectName(type));
+  }
+  public static String parseToCorrectName(FormulaTypesForChecking type) {
+    switch (type){
+      case REGEX:
+        return "RegexFormula";
+      case STRING:
+        return "StringFormula";
+      case FLOATING_POINT:
+        return "FloatingPointFormula";
+      case INTEGER:
+        return "IntegerFormula";
+      case BITVECTOR:
+        return "BitvectorFormula";
+      case ARRAY:
+        return "ArrayFormula";
+      case RATIONAL:
+        return "RationalFormula";
+      default:
+        return "UnknownFormulaType";
+    }
   }
 
   @Override
@@ -1832,6 +2021,11 @@ else if (sort.isArrayType()) {
     variables.put(variable, temp);
 
     return visitChildren(ctx);
+  }
+
+
+  private boolean operandsHaveCorrectTypes(int numberOfOperands){
+    return true;
   }
 
   /**

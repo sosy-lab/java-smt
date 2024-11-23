@@ -194,7 +194,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             this.bitvectorManager,
             this.arrayManager,
             this.functionManager,
-            this.floatingPointManager);
+            this.floatingPointManager,
+            this.strManager);
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();
 

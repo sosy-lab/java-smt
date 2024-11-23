@@ -136,7 +136,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private List<ValueAssignment> parseModel(String output) {
     smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(output));
     smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr, null);
+    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr, null, null);
     visitor.visit(parser.start());
     return visitor.getAssignments();
   }
