@@ -98,7 +98,8 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.apache.ivy" name="ivy" rev="${ivy.target_version}" conf="build->default"/>
 
         <!-- Google Auto-Value
-             Library for auto-generating value types. --><dependency org="com.google.auto.value" name="auto-value" rev="1.11.0" conf="build->default"/>
+             Library for auto-generating value types. -->
+        <dependency org="com.google.auto.value" name="auto-value" rev="1.11.0" conf="build->default"/>
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.11.0" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
@@ -149,13 +150,19 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-01-12" conf="runtime-princess-with-javacup->default; contrib->sources"/>
-        <!-- Princess for our Ivy release-->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-01-12" conf="runtime-princess->default; contrib->sources">
-          <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-11-08" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <!-- Princess and Ostrich for our Ivy release -->
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-11-08" conf="runtime-princess->default; contrib->sources">
+            <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
-          <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
+            <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
+        </dependency>
+        <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="1.4.1" conf="runtime-princess->default; contrib->sources">
+            <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
+               We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
+               because the latter does not provide a separate JAR for java-cup-runtime. -->
+            <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
         </dependency>
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
