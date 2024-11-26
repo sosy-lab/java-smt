@@ -1860,8 +1860,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     } else if(sort.isFloatingPointType()){
       variables.put(
           variableSymbol,
-          new ParserFormula(Objects.requireNonNull(fpmgr).makeVariable(variableSymbol,
-              (FormulaType.FloatingPointType) sort)) //TODO check if the last cast is correct.
+          new ParserFormula(
+              Objects.requireNonNull(fpmgr)
+                  .makeVariable(variableSymbol,(FormulaType.FloatingPointType) sort))
+          //TODO check if the last cast is correct.
       );
   }
 
@@ -2011,9 +2013,6 @@ else if (sort.isArrayType()) {
         inputParams.add((FormulaType<?>) visit(ctx.sort(i)));
       }
     }
-    //TODO: ONLY IF DECL_FUN IS NOT A FLOATING POINT RETURN AN UF OBJECT.IF IT IS A FLOATING
-    // POINT WE will return something like: return new ParselFormula(fpmgr.blablabla))
-
     ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnType, inputParams));
     temp.setType("UF");
     temp.setReturnType(returnType);

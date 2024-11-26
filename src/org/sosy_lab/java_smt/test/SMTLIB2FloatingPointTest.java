@@ -29,7 +29,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
-import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -39,13 +38,23 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
   protected Solvers solverToUse() {
     return Solvers.Z3;
   }
+
+  @Test
+  public void simpleTestDeclaration(){
+    String x = "(declare-const a (_ FloatingPoint 8 24))\n";
+  }
+  @Test
+  public void simpleTestFPfunc(){
+    String x = "(declare-fun a () (_ FloatingPoint 8 24))\n";
+  }
+
   @Test
   public void testDeclareFloatingPoints()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+        "(declare-const a  (_ FloatingPoint 8 24))\n"
+            + "(declare-const b  (_ FloatingPoint 8 24))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -67,9 +76,9 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun c () (_ FloatingPoint 8 24))\n"
+        "(declare-const a  (_ FloatingPoint 8 24))\n"
+            + "(declare-const b  (_ FloatingPoint 8 24))\n"
+            + "(declare-const c  (_ FloatingPoint 8 24))\n"
             + "(assert (= c (fp.add RNE a b)))\n";
 
 
@@ -97,8 +106,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+        "(declare-const a  (_ FloatingPoint 8 24))\n"
+            + "(declare-const b  (_ FloatingPoint 8 24))\n"
             + "(assert (= a ((_ to_fp 8 24) #b010000000000000000000000)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -121,8 +130,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+        "(declare-const a  (_ FloatingPoint 8 24))\n"
+            + "(declare-const b  (_ FloatingPoint 8 24))\n"
             + "(assert (= a ((_ to_fp 8 24) #x40400000)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -143,8 +152,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 5 3))\n"
-            + "(declare-fun b () (_ FloatingPoint 5 3))\n"
+        "(declare-const a (_ FloatingPoint 5 3))\n"
+            + "(declare-const b  (_ FloatingPoint 5 3))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -165,8 +174,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 5 11))\n"
-            + "(declare-fun b () (_ FloatingPoint 5 11))\n"
+        "(declare-const a (_ FloatingPoint 5 11))\n"
+            + "(declare-const b (_ FloatingPoint 5 11))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -187,8 +196,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 8 24))\n"
-            + "(declare-fun b () (_ FloatingPoint 8 24))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -209,8 +218,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 11 53))\n"
-            + "(declare-fun b () (_ FloatingPoint 11 53))\n"
+        "(declare-const a (_ FloatingPoint 11 53))\n"
+            + "(declare-const b (_ FloatingPoint 11 53))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
@@ -231,8 +240,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-fun a () (_ FloatingPoint 15 113))\n"
-            + "(declare-fun b () (_ FloatingPoint 15 113))\n"
+        "(declare-const a (_ FloatingPoint 15 113))\n"
+            + "(declare-const b (_ FloatingPoint 15 113))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);

@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +51,9 @@ public class Generator {
     REAL,
     BITVEC,
     UFFUN,
-    ARRAY
+    ARRAY,
+    STRING,
+    FLOATING_POINT
   }
 
   private static boolean loggingEnabled = false;
@@ -146,6 +149,9 @@ public class Generator {
           lines.append(newEntry);
         }
       }
+      if (variable.expressionType.equals(Keyword.STRING)){
+        String newEntry = "(declare-const " + variable.inputParams.get(0) + " String)\n";
+      }
       if (variable.expressionType.equals(Keyword.BITVEC)) {
         String newEntry =
             "(declare-const "
@@ -157,6 +163,20 @@ public class Generator {
           lines.append(newEntry);
         }
       }
+      if (variable.expressionType.equals(Keyword.FLOATING_POINT)){
+        String newEntry =
+            "(declare-const "
+            + variable.inputParams.get(0)
+            + " (_ FloatingPoint "
+            + variable.exponent
+            + " "
+            + variable.mantissa
+            + "))\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        }
+      }
+
       if (variable.expressionType.equals(Keyword.ARRAY)) {
         String newEntry =
             "(declare-const "
