@@ -15,6 +15,7 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="bin/"/>
 	<classpathentry kind="lib" path="lib/java/core/guava.jar" sourcepath="lib/java-contrib/guava-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-model-checker-utils.jar" sourcepath="lib/java-contrib/ultimate-model-checker-utils-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/ultimate-core.jar" sourcepath="lib/java-contrib/ultimate-core-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/guava-testlib.jar" sourcepath="lib/java-contrib/guava-testlib-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth.jar" sourcepath="lib/java-contrib/truth-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/junit.jar"/>

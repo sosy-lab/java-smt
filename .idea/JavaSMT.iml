@@ -1,15 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!--
-This file is part of JavaSMT,
-an API wrapper for a collection of SMT solvers:
-https://github.com/sosy-lab/java-smt
-
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
-
-SPDX-License-Identifier: Apache-2.0
--->
-
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/bin" />
@@ -181,8 +170,7 @@ SPDX-License-Identifier: Apache-2.0
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/ultimate-model-checker-utils-sources
-          .zip!/" />
+          <root url="jar://$MODULE_DIR$/lib/java-contrib/ultimate-model-checker-utils-sources           .zip!/" />
         </SOURCES>
       </library>
     </orderEntry>
@@ -347,6 +335,15 @@ SPDX-License-Identifier: Apache-2.0
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/java/runtime-bitwuzla/bitwuzla.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/java/core/ultimate-core.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

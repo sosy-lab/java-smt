@@ -149,6 +149,8 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
         <dependency org="de.uni-freiburg.informatik.ultimate" name="ultimate-model-checker-utils"
                     rev="2022-10-13-r05bfb7ad3d" conf="core->runtime; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="ultimate-core"
+                    rev="2021-10-08-r997cd7c355" conf="core->runtime; contrib->sources"/>
 
         <!-- Princess for our Maven release -->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-01-12" conf="runtime-princess-with-javacup->default; contrib->sources"/>
