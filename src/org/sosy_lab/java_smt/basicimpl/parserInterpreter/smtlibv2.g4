@@ -274,6 +274,58 @@ Decimal
     : Numeral '.' '0'* Numeral
     ;
 
+NumeralExponentsWithSpace
+: Space FloatingPointNumeral Space FloatingPointNumeral
+      ;
+
+//Floating Points
+FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
+    : [2-9] Digit*
+    ;
+
+FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
+    : ParOpen ShortFloats ParClose
+    ;
+
+NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
+    : ParOpen GRW_Underscore Space  'FloatingPoint' NumeralExponentsWithSpace
+    ParClose
+    ;
+
+BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
+    : ParOpen 'fp' Space Binary Space Binary Space Binary ParClose
+    ;
+
+HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p+1)
+    : '#' 'x' HexDigit+ '.' HexDigit* 'p' [+-]? [0-9]+
+    ;
+
+FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
+// FloatingPoint eb
+// sb))
+    : ParOpen GRW_Underscore Space [+-]'oo' NumeralExponentsWithSpace
+    ParClose
+    ;
+
+FloatingPointPlusOrMinusZero // Plus and Minus Zero : ((_ +zero eb sb) (_ FloatingPoint eb sb))
+    :ParOpen GRW_Underscore Space [+-]'zero' NumeralExponentsWithSpace ParClose
+    ;
+
+NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
+    : ParOpen GRW_Underscore Space 'NaN' NumeralExponentsWithSpace ParClose
+    ;
+
+
+FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater than 1
+     : NumeralFloatingPoint
+     | FloatingPointShortVariant
+     | BinaryFloatingPoint
+     | HexadecimalFloatingPoint
+     | FloatingPointPlusOrMinusInfinity
+     | NotANumberFloatingPoint
+     ;
+
+
 fragment HexDigit
     : '0' .. '9' | 'a' .. 'f' | 'A' .. 'F'
     ;
@@ -286,7 +338,12 @@ Colon
 fragment Digit
     : [0-9]
     ;
-
+fragment ShortFloats
+    : 'Float16'
+    | 'Float32'
+    | 'Float64'
+    | 'Float128'
+    ;
 
 fragment Sym
     : 'a'..'z'
@@ -345,14 +402,15 @@ fragment WhiteSpaceChar
     : '\u0009'
     | '\u000A'
     | '\u000D'
-    | '\u0020'
+    | Space
+    ;
+fragment Space
+    : '\u0020'
     ;
 
 // Lexer Rules End
 
 // Predefined Keywords
-
-
 
 PK_AllStatistics
     : ':all-statistics'
@@ -614,6 +672,10 @@ string
     : String
     ;
 
+floatingpoint
+    : FloatingPoint
+    ;
+
 keyword
     : predefKeyword                                                   #pre_key
     | Colon simpleSymbol                                              #key_simsymb
@@ -627,6 +689,7 @@ spec_constant
     | hexadecimal                                                     #spec_constant_hex
     | binary                                                          #spec_constant_bin
     | string                                                          #spec_constant_string
+    | floatingpoint                                                   #spec_constant_floating_point
     ;
 
 

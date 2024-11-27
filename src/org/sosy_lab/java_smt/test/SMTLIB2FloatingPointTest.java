@@ -30,7 +30,9 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
@@ -40,8 +42,12 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
   }
 
   @Test
-  public void simpleTestDeclaration(){
+  public void simpleTestDeclaration() throws
+  IOException, SolverException, InterruptedException, InvalidConfigurationException {
     String x = "(declare-const a (_ FloatingPoint 8 24))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    FloatingPointFormula a = fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8,24));
+    assertThat(actualResult).isEqualTo(a);
   }
   @Test
   public void simpleTestFPfunc(){
@@ -53,8 +59,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a  (_ FloatingPoint 8 24))\n"
-            + "(declare-const b  (_ FloatingPoint 8 24))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (= a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
