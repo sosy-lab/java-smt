@@ -288,7 +288,7 @@ FloatingPointShortVariant //support for the official short variant e.g: (Float12
     ;
 
 NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
-    : ParOpen GRW_Underscore Space  'FloatingPoint' NumeralExponentsWithSpace
+    : ParOpen GRW_Underscore  'FloatingPoint' NumeralExponentsWithSpace
     ParClose
     ;
 

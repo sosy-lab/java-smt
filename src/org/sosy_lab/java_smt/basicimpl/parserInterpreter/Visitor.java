@@ -188,12 +188,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    */
   private static ArrayList<String> getAllAllowedFPBeginningsWithInts() {
     ArrayList<String> beginnings = new ArrayList<>();
-    beginnings.add("(_ FloatingPoint");
-    beginnings.add("(_ +oo");
-    beginnings.add("(_ -oo");
-    beginnings.add("(_ +zero");
-    beginnings.add("(_ -zero");
-    beginnings.add("(_ NaN");
+    beginnings.add("(_FloatingPoint");
+    beginnings.add("(_+oo");
+    beginnings.add("(_-oo");
+    beginnings.add("(_+zero");
+    beginnings.add("(_-zero");
+    beginnings.add("(_NaN");
     return beginnings;
   }
   /**
@@ -203,7 +203,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    */
   private static ArrayList<String> getAllAllowedFPBeginningsWithoutInts() {
     ArrayList<String> beginnings = new ArrayList<>();
-    beginnings.add("(Float");
+    beginnings.add("Float");
     beginnings.add("(fp #b");
     beginnings.add("#x");
     return beginnings;
@@ -276,26 +276,26 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     if (beginningMatchesList(type, getAllAllowedFPBeginningsWithInts())){
       try {
         String[] parts = type.split(" ");
-        int exponent = Integer.parseInt(parts[2]);
-        int mantissa = Integer.parseInt(parts[3].replace(")", ""));
+        int exponent = Integer.parseInt(parts[1]);
+        int mantissa = Integer.parseInt(parts[2].replace(")", ""));
         return FormulaType.getFloatingPointType(exponent, mantissa);
       } catch (Exception e) {
         throw new ParserException("Invalid FloatingPoint format: " + type, e);
       }
     }
     if (beginningMatchesList(type, getAllAllowedFPBeginningsWithoutInts())) {
-      if(type.startsWith("(Float16")){
+      if(type.startsWith("Float16")){
         int exponent = 5;
         int mantissa = 11;
         return FormulaType.getFloatingPointType(exponent, mantissa);
       }
-      if(type.startsWith("(Float32")){
+      if(type.startsWith("Float32")){
         return FormulaType.getSinglePrecisionFloatingPointType();
       }
-      if(type.startsWith("(Float64")){
+      if(type.startsWith("Float64")){
         return FormulaType.getDoublePrecisionFloatingPointType();
       }
-      if(type.startsWith("(Float128")){
+      if(type.startsWith("Float128")){
         int exponent = 15;
         int mantissa = 113;
         return FormulaType.getFloatingPointType(exponent, mantissa);
@@ -2022,10 +2022,6 @@ else if (sort.isArrayType()) {
     return visitChildren(ctx);
   }
 
-
-  private boolean operandsHaveCorrectTypes(int numberOfOperands){
-    return true;
-  }
 
   /**
    * Method for parsing a String to the matching Rounding Mode from the FloatingPointRoundMode
