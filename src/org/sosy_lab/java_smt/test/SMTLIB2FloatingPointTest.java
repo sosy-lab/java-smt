@@ -50,6 +50,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
     FloatingPointFormula a = Objects.requireNonNull(fpmgr).makeVariable("a",
         FormulaType.getFloatingPointType(8,
         24));
+    assertThat(actualResult).isNotNull();
     assertThat(actualResult.equals(a));
   }
   @Test
@@ -262,6 +263,260 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
 
     assertThat(expectedResult.equals(actualResult));;
   }
+  @Test
+  public void testFloatingPointMultiplication()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.mul RNE a b)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula multiplicationResult =
+        fpmgr.multiply(a, b, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, multiplicationResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointSubtraction()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.sub RNE a b)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula subtractionResult =
+        fpmgr.subtract(a, b, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, subtractionResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointDivision()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.div RNE a b)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula divisionResult =
+        fpmgr.divide(a, b, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, divisionResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointNegation()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (= b (fp.neg a)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula negationResult = fpmgr.negate(a);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(b, negationResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointAbsoluteValue()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (= b (fp.abs a)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula absResult = fpmgr.abs(a);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(b, absResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointMax()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.max a b)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula maxResult = fpmgr.max(a, b);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, maxResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointMin()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (= c (fp.min a b)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula minResult = fpmgr.min(a, b);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(c, minResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointSquareRoot()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x =
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (= b (fp.sqrt RNE a)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
+
+    FloatingPointFormula sqrtResult =
+        fpmgr.sqrt(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(b, sqrtResult);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointInfinity()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x = "(declare-const inf (_ FloatingPoint 8 24))\n" + "(assert (= inf (_ +oo 8 24)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula inf = fpmgr.makePlusInfinity(FormulaType.getFloatingPointType(8, 24));
+
+    BooleanFormula constraint = fpmgr.isInfinity(inf);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+  @Test
+  public void testFloatingPointNaN()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+
+    String x = "(declare-const nan (_ FloatingPoint 8 24))\n" + "(assert (= nan (_ NaN 8 24)))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula nan = fpmgr.makeNaN(FormulaType.getFloatingPointType(8, 24));
+
+    BooleanFormula constraint = fpmgr.isNaN(nan);
+
+    BooleanFormula expectedResult = constraint;
+
+    assertThat(expectedResult.equals(actualResult));
+  }
+
+
   /*
  Make Test for this :
 (
