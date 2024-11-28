@@ -46,7 +46,8 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private final BitvectorFormulaManager bvmgr;
   private final ArrayFormulaManager amgr;
   private final UFManager umgr;
-  // private final FloatingPointManager fpmgr  --> Princess doesn't support fps
+  // private final FloatingPointManager fpmgr  --> Princess doesn't support FP Theory
+  // private final StringFormulaManager smgr --> Princess doesn't support String Theory
 
   /** Model.ValuesAssignments for the parsed Princess model. */
   private ImmutableList<ValueAssignment> finalList = ImmutableList.of();
