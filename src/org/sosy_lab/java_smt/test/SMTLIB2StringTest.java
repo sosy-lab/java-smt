@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -34,16 +35,19 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SMTLIB2StringTest extends SolverBasedTest0 {
+  @Override
+  protected Solvers solverToUse() {
+    return Solvers.Z3;
+  }
 
   @Test
   public void testDeclareString() throws IOException, SolverException, InterruptedException,
                                          InvalidConfigurationException {
     String x = "(declare-const a String)\n";
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    BooleanFormula actualResult = Objects.requireNonNull(mgr).universalParseFromString(x);
 
-    StringFormula a = smgr.makeVariable("a");
+    StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
 
-    // Check if parsing result matches the expected variable
     assertThat(actualResult).isNotNull();
   }
 
@@ -61,7 +65,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
     BooleanFormula constraint = smgr.equal(a, b);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint)).isTrue();
   }
 
   @Test
@@ -82,7 +86,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
     BooleanFormula constraint = smgr.equal(c, concatenationResult);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint)).isTrue();
   }
   /*
   @Test
@@ -101,7 +105,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
     BooleanFormula constraint = mgr.getIntegerFormulaManager().equal(len, lengthResult);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(expectedResult.equals(actualResult));;
   }
    */
 
@@ -126,7 +130,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
     BooleanFormula constraint = smgr.equal(sub, substringResult);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint)).isTrue();
   }
 
   @Test
@@ -158,11 +162,11 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
     StringFormula a = smgr.makeVariable("a");
     StringFormula prefix = smgr.makeVariable("prefix");
 
-    BooleanFormula prefixResult = smgr.prefix(a, prefix);
+    BooleanFormula prefixResult = smgr.prefix(prefix, a);
 
-    assertThat(actualResult).isEqualTo(prefixResult);
+    assertThat(actualResult.equals(prefixResult)).isTrue();
   }
-  /*
+
   @Test
   public void testStringSuffix() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
     String x =
@@ -175,10 +179,10 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
     StringFormula a = smgr.makeVariable("a");
     StringFormula suffix = smgr.makeVariable("suffix");
 
-    BooleanFormula suffixResult = smgr.endsWith(a, suffix);
+    BooleanFormula suffixResult = smgr.suffix(suffix, a);
 
-    assertThat(actualResult).isEqualTo(suffixResult);
+    assertThat(actualResult.equals(suffixResult)).isTrue();
   }
-   */
+
 
 }

@@ -1705,7 +1705,18 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
                       .equal(
                           (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
               return result;
-            } else {
+            } else if (operands.stream().anyMatch(c -> c instanceof  FloatingPointFormula)){
+              return  Objects.requireNonNull(fpmgr)
+                  .equalWithFPSemantics(
+                  (FloatingPointFormula) operands.get(0), (FloatingPointFormula) operands.get(1)
+              );
+            } else if (operands.stream().anyMatch(c -> c instanceof  StringFormula)){
+              return Objects.requireNonNull(smgr)
+                  .equal(
+                      (StringFormula) operands.get(0), (StringFormula) operands.get(1)
+                  );
+            }
+            else {
               throw new ParserException(
                   "Operands for " + operator + " need to be of the same type" + operands);
             }
@@ -1863,9 +1874,17 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               Objects.requireNonNull(fpmgr)
                   .makeVariable(variableSymbol,(FormulaType.FloatingPointType) sort))
-          //TODO check if the last cast is correct.
+
       );
-  }
+    } else if (sort.isStringType()) {
+      variables.put(
+          variableSymbol,
+          new ParserFormula(
+              Objects.requireNonNull(smgr)
+                  .makeVariable(variableSymbol)
+          )
+      );
+    }
 
 
 else if (sort.isArrayType()) {

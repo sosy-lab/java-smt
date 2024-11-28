@@ -62,7 +62,12 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
             + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq a b))\n";
 
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    checkAndCreate(x);
+  }
+
+  private void checkAndCreate(String pX)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    BooleanFormula actualResult = mgr.universalParseFromString(pX);
 
     FloatingPointFormula a =
         fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
@@ -206,18 +211,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
             + "(declare-const b Float32)\n"
             + "(assert (fp.eq a b))\n";
 
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
-
-    FloatingPointFormula a =
-        fpmgr.makeVariable("a", FormulaType.getFloatingPointType(8, 24));
-    FloatingPointFormula b =
-        fpmgr.makeVariable("b", FormulaType.getFloatingPointType(8, 24));
-
-    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
-
-    BooleanFormula expectedResult = constraint;
-
-    assertThat(expectedResult.equals(actualResult));;
+    checkAndCreate(x);
+    ;
   }
   @Test
   public void testDeclareFloat64()
