@@ -56,7 +56,7 @@ public class Generator {
     FLOATING_POINT
   }
 
-  private static boolean loggingEnabled = false;
+  private static boolean loggingEnabled = true;
 
   // TODO Add an option to set the output path. Better yet, just return the String
   private static final String file = "Out.smt2";
