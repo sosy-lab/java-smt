@@ -151,6 +151,9 @@ public class Generator {
       }
       if (variable.expressionType.equals(Keyword.STRING)){
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " String)\n";
+        if (lines.indexOf(newEntry) == -1) {
+          lines.append(newEntry);
+        }
       }
       if (variable.expressionType.equals(Keyword.BITVEC)) {
         String newEntry =

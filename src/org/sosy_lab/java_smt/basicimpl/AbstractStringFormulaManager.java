@@ -42,7 +42,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula makeString(String value) {
-    return wrapString(makeStringImpl(value));
+    StringFormula result = wrapString(makeStringImpl(value));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logMakeString(result, value);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeStringImpl(String value);
@@ -50,101 +54,157 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   @Override
   public StringFormula makeVariable(String pVar) {
     checkVariableName(pVar);
-    return wrapString(makeVariableImpl(pVar));
+    StringFormula result = wrapString(makeVariableImpl(pVar));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logMakeVariable(result, pVar);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeVariableImpl(String pVar);
 
   @Override
   public BooleanFormula equal(StringFormula str1, StringFormula str2) {
-    return wrapBool(equal(extractInfo(str1), extractInfo(str2)));
+    BooleanFormula result = wrapBool(equal(extractInfo(str1), extractInfo(str2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logEqual(result, str1, str2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo equal(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
-    return wrapBool(greaterThan(extractInfo(str1), extractInfo(str2)));
+    BooleanFormula result = wrapBool(greaterThan(extractInfo(str1), extractInfo(str2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logGreaterThan(result, str1, str2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
-    return wrapBool(greaterOrEquals(extractInfo(str1), extractInfo(str2)));
+    BooleanFormula result = wrapBool(greaterOrEquals(extractInfo(str1), extractInfo(str2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logGreaterOrEquals(result, str1, str2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo greaterOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessThan(StringFormula str1, StringFormula str2) {
-    return wrapBool(lessThan(extractInfo(str1), extractInfo(str2)));
+    BooleanFormula result = wrapBool(lessThan(extractInfo(str1), extractInfo(str2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logLessThan(result, str1, str2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BooleanFormula lessOrEquals(StringFormula str1, StringFormula str2) {
-    return wrapBool(lessOrEquals(extractInfo(str1), extractInfo(str2)));
+    BooleanFormula result = wrapBool(lessOrEquals(extractInfo(str1), extractInfo(str2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logLessOrEquals(result, str1, str2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo lessOrEquals(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public NumeralFormula.IntegerFormula length(StringFormula str) {
-    return getFormulaCreator().encapsulate(FormulaType.IntegerType, length(extractInfo(str)));
+    IntegerFormula result = getFormulaCreator().encapsulate(FormulaType.IntegerType, length(extractInfo(str)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logLength(result, str);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo length(TFormulaInfo pParam);
 
   @Override
   public StringFormula concat(List<StringFormula> parts) {
+    StringFormula result;
     switch (parts.size()) {
       case 0:
-        return makeString(""); // empty sequence
+        result = makeString(""); // empty sequence
+        break;
       case 1:
-        return Iterables.getOnlyElement(parts);
+        result = Iterables.getOnlyElement(parts);
+        break;
       default:
-        return wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
+        result = wrapString(concatImpl(Lists.transform(parts, this::extractInfo)));
+        break;
     }
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logConcat(result, parts);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo concatImpl(List<TFormulaInfo> parts);
 
   @Override
   public BooleanFormula prefix(StringFormula prefix, StringFormula str) {
-    return wrapBool(prefix(extractInfo(prefix), extractInfo(str)));
+    BooleanFormula result = wrapBool(prefix(extractInfo(prefix), extractInfo(str)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logPrefix(result, prefix, str);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo prefix(TFormulaInfo prefix, TFormulaInfo str);
 
   @Override
   public BooleanFormula suffix(StringFormula suffix, StringFormula str) {
-    return wrapBool(suffix(extractInfo(suffix), extractInfo(str)));
+    BooleanFormula result = wrapBool(suffix(extractInfo(suffix), extractInfo(str)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logSuffix(result, suffix, str);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo suffix(TFormulaInfo suffix, TFormulaInfo str);
 
   @Override
   public BooleanFormula in(StringFormula str, RegexFormula regex) {
-    return wrapBool(in(extractInfo(str), extractInfo(regex)));
+    BooleanFormula result = wrapBool(in(extractInfo(str), extractInfo(regex)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logIn(result, str, regex);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo in(TFormulaInfo str, TFormulaInfo regex);
 
   @Override
   public BooleanFormula contains(StringFormula str, StringFormula part) {
-    return wrapBool(contains(extractInfo(str), extractInfo(part)));
+    BooleanFormula result = wrapBool(contains(extractInfo(str), extractInfo(part)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logContains(result, str, part);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo contains(TFormulaInfo str, TFormulaInfo part);
 
   @Override
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    return getFormulaCreator()
+    IntegerFormula result = getFormulaCreator()
         .encapsulate(
             FormulaType.IntegerType,
             indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logIndexOf(result, str, part, startIndex);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo indexOf(
@@ -152,33 +212,48 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula charAt(StringFormula str, IntegerFormula index) {
-    return wrapString(charAt(extractInfo(str), extractInfo(index)));
+    StringFormula result = wrapString(charAt(extractInfo(str), extractInfo(index)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logCharAt(result, str, index);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo charAt(TFormulaInfo str, TFormulaInfo index);
 
   @Override
   public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
-    return wrapString(substring(extractInfo(str), extractInfo(index), extractInfo(length)));
+    StringFormula result = wrapString(substring(extractInfo(str), extractInfo(index), extractInfo(length)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logSubstring(result, str, index, length);
+    }
+    return result;
   }
+
 
   protected abstract TFormulaInfo substring(
       TFormulaInfo str, TFormulaInfo index, TFormulaInfo length);
 
   @Override
-  public StringFormula replace(
-      StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    return wrapString(replace(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+  public StringFormula replace(StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    StringFormula result = wrapString(replace(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logReplace(result, fullStr, target, replacement);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo replace(
       TFormulaInfo fullStr, TFormulaInfo target, TFormulaInfo replacement);
 
   @Override
-  public StringFormula replaceAll(
-      StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    return wrapString(
+  public StringFormula replaceAll(StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    StringFormula result = wrapString(
         replaceAll(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logReplaceAll(result, fullStr, target, replacement);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo replaceAll(
@@ -186,84 +261,132 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula makeRegex(String value) {
-    return wrapRegex(makeRegexImpl(value));
+    RegexFormula result = wrapRegex(makeRegexImpl(value));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logMakeRegex(result, value);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeRegexImpl(String value);
 
   @Override
   public RegexFormula none() {
-    return wrapRegex(noneImpl());
+    RegexFormula result = wrapRegex(noneImpl());
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexNone(result);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo noneImpl();
 
   @Override
   public RegexFormula all() {
-    return wrapRegex(allImpl());
+    RegexFormula result = wrapRegex(allImpl());
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexAll(result);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo allImpl();
 
   @Override
   public RegexFormula allChar() {
-    return wrapRegex(allCharImpl());
+    RegexFormula result = wrapRegex(allCharImpl());
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexAllChar(result);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo allCharImpl();
 
   @Override
   public RegexFormula range(StringFormula start, StringFormula end) {
-    return wrapRegex(range(extractInfo(start), extractInfo(end)));
+    RegexFormula result = wrapRegex(range(extractInfo(start), extractInfo(end)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexRange(result, start, end);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo range(TFormulaInfo start, TFormulaInfo end);
 
   @Override
   public RegexFormula concatRegex(List<RegexFormula> parts) {
+    RegexFormula result;
     switch (parts.size()) {
       case 0:
-        return none(); // empty sequence
+        result = none(); // empty sequence
+        break;
       case 1:
-        return Iterables.getOnlyElement(parts);
+        result = Iterables.getOnlyElement(parts);
+        break;
       default:
-        return wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
+        result = wrapRegex(concatRegexImpl(Lists.transform(parts, this::extractInfo)));
+        break;
     }
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexConcat(result, parts);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo concatRegexImpl(List<TFormulaInfo> parts);
 
   @Override
   public RegexFormula union(RegexFormula regex1, RegexFormula regex2) {
-    return wrapRegex(union(extractInfo(regex1), extractInfo(regex2)));
+    RegexFormula result = wrapRegex(union(extractInfo(regex1), extractInfo(regex2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexUnion(result, regex1, regex2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo union(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public RegexFormula intersection(RegexFormula regex1, RegexFormula regex2) {
-    return wrapRegex(intersection(extractInfo(regex1), extractInfo(regex2)));
+    RegexFormula result = wrapRegex(intersection(extractInfo(regex1), extractInfo(regex2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexIntersection(result, regex1, regex2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo intersection(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public RegexFormula closure(RegexFormula regex) {
-    return wrapRegex(closure(extractInfo(regex)));
+    RegexFormula result = wrapRegex(closure(extractInfo(regex)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexClosure(result, regex);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo closure(TFormulaInfo pParam);
 
   @Override
   public RegexFormula complement(RegexFormula regex) {
-    return wrapRegex(complement(extractInfo(regex)));
+    RegexFormula result = wrapRegex(complement(extractInfo(regex)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexComplement(result, regex);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo complement(TFormulaInfo pParam);
 
   @Override
   public RegexFormula difference(RegexFormula regex1, RegexFormula regex2) {
-    return wrapRegex(difference(extractInfo(regex1), extractInfo(regex2)));
+    RegexFormula result = wrapRegex(difference(extractInfo(regex1), extractInfo(regex2)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexDifference(result, regex1, regex2);
+    }
+    return result;
   }
 
   protected TFormulaInfo difference(TFormulaInfo pParam1, TFormulaInfo pParam2) {
@@ -272,30 +395,49 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public RegexFormula cross(RegexFormula regex) {
-    return concat(regex, closure(regex));
+    RegexFormula result = concat(regex, closure(regex));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexCross(result, regex);
+    }
+    return result;
   }
 
   @Override
   public RegexFormula optional(RegexFormula regex) {
-    return union(regex, makeRegex(""));
+    RegexFormula result = union(regex, makeRegex(""));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexOptional(result, regex);
+    }
+    return result;
   }
-
   @Override
   public RegexFormula times(RegexFormula regex, int repetitions) {
-    return concatRegex(Collections.nCopies(repetitions, regex));
+    RegexFormula result = concatRegex(Collections.nCopies(repetitions, regex));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logRegexTimes(result, regex, repetitions);
+    }
+    return result;
   }
 
   @Override
   public IntegerFormula toIntegerFormula(StringFormula str) {
-    return getFormulaCreator()
+    IntegerFormula result = getFormulaCreator()
         .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logToInteger(result, str);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo toIntegerFormula(TFormulaInfo pParam);
 
   @Override
   public StringFormula toStringFormula(IntegerFormula number) {
-    return wrapString(toStringFormula(extractInfo(number)));
+    StringFormula result = wrapString(toStringFormula(extractInfo(number)));
+    if (Generator.isLoggingEnabled()) {
+      StringGenerator.logToString(result, number);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo toStringFormula(TFormulaInfo pParam);
