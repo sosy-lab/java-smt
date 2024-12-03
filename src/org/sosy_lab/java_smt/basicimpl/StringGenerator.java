@@ -33,27 +33,36 @@ public class StringGenerator {
 
   private StringGenerator() {}
 
-  protected static void logMakeString(StringFormula result, String value) {
+  protected static void logMakeString(Object result, String value) {
     List<Object> params = new ArrayList<>();
     params.add(value);
-    String format = "%s";
+    String format = "\"%s\"";
     Function<List<Object>, String> functionToString = inputs -> String.format(format, inputs.toArray());
     FunctionEnvironment newEntry = new  FunctionEnvironment(result, params, functionToString,
-        Keyword.SKIP);
+        Keyword.DIRECT);
     Generator.getExecutedAggregator().add(
         newEntry
     );
 
   }
 
-  protected static void logMakeVariable(StringFormula result, String varName) {
-    List<Object> inputParams = List.of(varName);
-    logOperation(result, inputParams, "(declare-const %s () String)", Keyword.STRING);
+  protected static void logMakeVariable(Object result, String pVar) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(pVar);
+    Function<List<Object>, String> functionToString =
+        inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.STRING));
   }
 
-  protected static void logConcat(StringFormula result, List<StringFormula> parts) {
+  protected static void logConcat(Object result, List<StringFormula> parts) {
     List<Object> inputParams = new ArrayList<>(parts);
-    logOperation(result, inputParams, "(str.++ %s)", Keyword.SKIP);
+    String format = "(str.++";
+    for (int i = 0; i < parts.size(); i++) {
+      format += " %s";
+    }
+    format += ")";
+    logOperation(result, inputParams, format, Keyword.SKIP);
   }
 
   protected static void logEqual(BooleanFormula result, StringFormula str1, StringFormula str2) {
@@ -124,57 +133,57 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.indexof %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logCharAt(StringFormula result, StringFormula str, IntegerFormula index) {
+  protected static void logCharAt(Object result, StringFormula str, IntegerFormula index) {
     List<Object> inputParams = List.of(str, index);
     logOperation(result, inputParams, "(str.at %s %s)", Keyword.SKIP);
   }
 
-  protected static void logSubstring(StringFormula result, StringFormula str, IntegerFormula index, IntegerFormula length) {
+  protected static void logSubstring(Object result, StringFormula str, IntegerFormula index, IntegerFormula length) {
     List<Object> inputParams = List.of(str, index, length);
     logOperation(result, inputParams, "(str.substr %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logReplace(StringFormula result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
+  protected static void logReplace(Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
     List<Object> inputParams = List.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replace %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logReplaceAll(StringFormula result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
+  protected static void logReplaceAll(Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
     List<Object> inputParams = List.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
 
   }
   protected static void logMakeRegex(RegexFormula result, String value) {
     List<Object> inputParams = List.of(value);
-    logOperation(result, inputParams, "(re.from_str \"%s\")", Keyword.STRING);
+    logOperation(result, inputParams, "(re.from_str \"%s\")", Keyword.SKIP);
   }
 
   protected static void logRegexAll(RegexFormula result) {
-    logOperation(result, List.of(), "(re.all)", Keyword.STRING);
+    logOperation(result, List.of(), "(re.all)", Keyword.SKIP);
   }
 
   protected static void logRegexNone(RegexFormula result) {
-    logOperation(result, List.of(), "(re.none)", Keyword.STRING);
+    logOperation(result, List.of(), "(re.none)", Keyword.SKIP);
   }
 
   protected static void logRegexAllChar(RegexFormula result) {
-    logOperation(result, List.of(), "(re.allchar)", Keyword.STRING);
+    logOperation(result, List.of(), "(re.allchar)", Keyword.SKIP);
   }
 
   protected static void logRegexConcat(RegexFormula result, List<RegexFormula> parts) {
-    logOperation(result, new ArrayList<>(parts), "(re.++ %s)", Keyword.STRING);
+    logOperation(result, new ArrayList<>(parts), "(re.++ %s %s)", Keyword.SKIP);
   }
 
   protected static void logRegexOptional(RegexFormula result, RegexFormula regex) {
-    logOperation(result, List.of(regex), "(re.opt %s)", Keyword.STRING);
+    logOperation(result, List.of(regex), "(re.opt %s)", Keyword.SKIP);
   }
 
   protected static void logRegexTimes(RegexFormula result, RegexFormula regex, int repetitions) {
-    logOperation(result, List.of(regex, repetitions), "(re.tms %s %d)", Keyword.STRING);
+    logOperation(result, List.of(regex, repetitions), "(re.tms %s %d)", Keyword.SKIP);
   }
 
   protected static void logRegexCross(RegexFormula result, RegexFormula regex) {
-    logOperation(result, List.of(regex), "(re.cross %s)", Keyword.STRING);
+    logOperation(result, List.of(regex), "(re.cross %s)", Keyword.SKIP);
   }
 
 
@@ -193,7 +202,7 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.to_int %s)", Keyword.SKIP);
   }
 
-  protected static void logToString(StringFormula result, IntegerFormula number) {
+  protected static void logToString(Object result, IntegerFormula number) {
     List<Object> inputParams = List.of(number);
     logOperation(result, inputParams, "(int.to_str %s)", Keyword.SKIP);
   }

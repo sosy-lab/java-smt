@@ -33,6 +33,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.Generator;
+import scala.Int;
 
 public class SMTLIB2StringTest extends SolverBasedTest0 {
   @Override
@@ -43,6 +45,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
   @Test
   public void testDeclareString() throws IOException, SolverException, InterruptedException,
                                          InvalidConfigurationException {
+    requireStrings();
     String x = "(declare-const a String)\n";
     BooleanFormula actualResult = Objects.requireNonNull(mgr).universalParseFromString(x);
 
@@ -53,6 +56,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
   @Test
   public void testStringEquality() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const b String)\n"
@@ -70,6 +74,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
   @Test
   public void testStringConcatenation() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const b String)\n"
@@ -88,7 +93,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
     assertThat(actualResult.equals(constraint)).isTrue();
   }
-  /*
+
   @Test
   public void testStringLength() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
     String x =
@@ -96,22 +101,22 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
             + "(declare-const len Int)\n"
             + "(assert (= len (str.len a)))\n";
 
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    BooleanFormula expectedResult = mgr.universalParseFromString(x);
 
     StringFormula a = smgr.makeVariable("a");
-    NumeralFormula len = imgr.makeVariable("len", FormulaType.IntegerType);
+    IntegerFormula len = imgr.makeVariable("len");
 
-    NumeralFormula lengthResult = smgr.length(a);
+    IntegerFormula lengthResult = smgr.length(a);
 
-    BooleanFormula constraint = mgr.getIntegerFormulaManager().equal(len, lengthResult);
-
-    assertThat(expectedResult.equals(actualResult));;
+    BooleanFormula constraint = imgr.equal(len, lengthResult);
+        assertThat(expectedResult.equals(constraint));;
   }
-   */
+
 
 
   @Test
   public void testStringSubstring() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const sub String)\n"
@@ -135,6 +140,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
   @Test
   public void testStringContains() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const b String)\n"
@@ -152,6 +158,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
   @Test
   public void testStringPrefix() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const prefix String)\n"
@@ -169,6 +176,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0 {
 
   @Test
   public void testStringSuffix() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String x =
         "(declare-const a String)\n"
             + "(declare-const suffix String)\n"

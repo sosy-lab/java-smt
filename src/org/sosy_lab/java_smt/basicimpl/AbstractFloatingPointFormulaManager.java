@@ -221,35 +221,36 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public <T extends Formula> T castTo(
-      FloatingPointFormula pNumber, boolean pSigned, FormulaType<T> pTargetType) {
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("Logging Conversion castTo ist not supported yet");
-    }
-    return getFormulaCreator()
+      FloatingPointFormula number, boolean signed, FormulaType<T> targetType) {
+    T result = getFormulaCreator()
         .encapsulate(
-            pTargetType,
-            castToImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
+            targetType,
+            castToImpl(extractInfo(number), signed, targetType, getDefaultRoundingMode()));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFPCastTo(result, number, targetType.toString(), "default");
+    }
+    return result;
   }
 
   @Override
   public <T extends Formula> T castTo(
       FloatingPointFormula number,
-      boolean pSigned,
+      boolean signed,
       FormulaType<T> targetType,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+      FloatingPointRoundingMode roundingMode) {
     T result = getFormulaCreator()
         .encapsulate(
             targetType,
             castToImpl(
                 extractInfo(number),
-                pSigned,
+                signed,
                 targetType,
-                getRoundingMode(pFloatingPointRoundingMode)));
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("Logging Conversion castTo ist not supported yet");
+                getRoundingMode(roundingMode)));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFPCastTo(result, number, targetType.toString(), roundingMode.name());
     }
     return result;
-    }
+  }
 
 
   protected abstract TFormulaInfo castToImpl(
@@ -260,11 +261,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula castFrom(
-      Formula pNumber, boolean pSigned, FormulaType.FloatingPointType pTargetType) {
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("Logging Conversion castFrom ist not supported yet");
+      Formula number, boolean signed, FloatingPointType targetType) {
+    FloatingPointFormula result = wrap(castFromImpl(extractInfo(number), signed, targetType, getDefaultRoundingMode()));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFPCastFrom(result, number, "generic", "default");
     }
-    return wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
+    return result;
   }
 
   @Override
@@ -272,13 +274,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       Formula number,
       boolean signed,
       FloatingPointType targetType,
-      FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("Logging Conversion castFrom ist not supported yet");
-    }
-    return wrap(
+      FloatingPointRoundingMode roundingMode) {
+    FloatingPointFormula result = wrap(
         castFromImpl(
-            extractInfo(number), signed, targetType, getRoundingMode(pFloatingPointRoundingMode)));
+            extractInfo(number), signed, targetType, getRoundingMode(roundingMode)));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFPCastFrom(result, number, "generic", roundingMode.name());
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo castFromImpl(
@@ -292,8 +295,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula number, FloatingPointType targetType) {
     FloatingPointFormula result = wrap(fromIeeeBitvectorImpl(extractInfo(number), targetType));
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("Logging Conversion from IeeeBitvector ist not supported yet");
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFromIeeeBitvector(result, number, targetType);
     }
     return result;
   }
@@ -302,8 +305,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       TFormulaInfo pNumber, FloatingPointType pTargetType);
 
   @Override
-  public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
-    return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
+  public BitvectorFormula toIeeeBitvector(FloatingPointFormula number) {
+    BitvectorFormula result = getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(number)));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logToIeeeBitvector(result, number);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
@@ -478,11 +485,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
-  public BooleanFormula assignment(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
-    TFormulaInfo param1 = extractInfo(pNumber1);
-    TFormulaInfo param2 = extractInfo(pNumber2);
-
-    return wrapBool(assignment(param1, param2));
+  public BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2) {
+    BooleanFormula result = wrapBool(assignment(extractInfo(number1), extractInfo(number2)));
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logFPAssignment(result, number1, number2);
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo assignment(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -621,7 +629,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       FloatingPointFormula number, FloatingPointRoundingMode roundingMode) {
     FloatingPointFormula result = wrap(round(extractInfo(number), roundingMode));
     if (Generator.isLoggingEnabled()) {
-      throw new GeneratorException("Rounding is not supported in the FloatingPointFormulaManager");
+      FloatingPointGenerator.logFPRound(result, number, roundingMode.name());
     }
     return result;
   }

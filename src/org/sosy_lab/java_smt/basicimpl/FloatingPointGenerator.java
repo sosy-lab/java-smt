@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -168,6 +169,50 @@ public class FloatingPointGenerator {
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
   }
+
+  // FloatingPointGenerator - Ergänzung der fehlenden Funktionen
+  protected static void logFPRound(
+      FloatingPointFormula result, FloatingPointFormula n, String roundingMode) {
+    logUnaryOpWithMode(result, "fp.round", roundingMode, n);
+  }
+
+  protected static void logFPAssignment(BooleanFormula result, FloatingPointFormula n1, FloatingPointFormula n2) {
+    logBinaryOp(result, "fp.assign", n1, n2);
+  }
+
+  protected static void logFPCastTo(
+      Formula result, FloatingPointFormula number, String targetType, String roundingMode) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(number);
+    inputParams.add(roundingMode);
+    Function<List<Object>, String> functionToString = inPlaceInputParams ->
+        "((_ to_" + targetType + " " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+    Generator.getExecutedAggregator().add(
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
+    );
+  }
+
+  protected static void logFPCastFrom(
+      FloatingPointFormula result, Formula number, String sourceType, String roundingMode) {
+    List<Object> inputParams = new ArrayList<>();
+    inputParams.add(number);
+    inputParams.add(roundingMode);
+    Function<List<Object>, String> functionToString = inPlaceInputParams ->
+        "((_ from_" + sourceType + " " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+    Generator.getExecutedAggregator().add(
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
+    );
+  }
+
+  protected static void logFromIeeeBitvector(
+      FloatingPointFormula result, BitvectorFormula number, FloatingPointType type) {
+    logSimple(result, "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ") " + number + ")");
+  }
+
+  protected static void logToIeeeBitvector(BitvectorFormula result, FloatingPointFormula number) {
+    logUnaryOp(result, "fp.to_ieee", number);
+  }
+
 
   private static void logUnaryOp(Object result, String op, Object n) {
     List<Object> inputParams = List.of(n);

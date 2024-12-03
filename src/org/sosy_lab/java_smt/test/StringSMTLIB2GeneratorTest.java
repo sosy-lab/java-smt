@@ -31,6 +31,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -64,17 +65,15 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
         + "(declare-const test String)\n"
         + "(assert (= a test))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
-    //assertThat(mgr.universalParseFromString(actualResult)).isEqualTo(mgr
-    // .universalParseFromString(expectedResult));
   }
 
   @Test
   public void testConcat() {
     requireStrings();
-    StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
+    StringFormula a = smgr.makeVariable("a");
     StringFormula b = smgr.makeVariable("b");
-    StringFormula result = smgr.concat(a, b);
-    BooleanFormula constraint = smgr.equal(result, smgr.concat(a, b));
+    StringFormula result = smgr.makeVariable("result");
+    BooleanFormula constraint = smgr.equal(smgr.concat(a, b), result);
 
     Generator.assembleConstraint(constraint);
 
@@ -83,7 +82,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResult = "(declare-const a String)\n"
         + "(declare-const b String)\n"
         + "(declare-const result String)\n"
-        + "(assert (= result (str.++ a b)))\n";
+        + "(assert (= (str.++ a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -111,16 +110,14 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
     StringFormula str = Objects.requireNonNull(smgr).makeVariable("str");
     StringFormula part = smgr.makeString("find");
     IntegerFormula startIndex = imgr.makeNumber(0);
-    IntegerFormula result = smgr.indexOf(str, part, startIndex);
+    IntegerFormula result = imgr.makeVariable("result");
+    Generator.assembleConstraint(imgr.equal(smgr.indexOf(str, part, startIndex), result));
     String actualResult = String.valueOf(Generator.getLines());
-
-    Generator.assembleConstraint(imgr.equal(result, smgr.indexOf(str, part, startIndex)));
-
 
 
     String expectedResult = "(declare-const str String)\n"
         + "(declare-const result Int)\n"
-        + "(assert (= result (str.indexof str \"find\" 0)))\n";
+        + "(assert (= (str.indexof str \"find\" 0) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -128,18 +125,19 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testSubstring() {
     requireStrings();
+
     StringFormula str = Objects.requireNonNull(smgr).makeVariable("str");
     IntegerFormula startIndex = imgr.makeNumber(2);
     IntegerFormula length = imgr.makeNumber(4);
-    StringFormula result = smgr.substring(str, startIndex, length);
+    StringFormula result = smgr.makeVariable("result");
 
-    Generator.assembleConstraint(smgr.equal(result, smgr.substring(str, startIndex, length)));
+    Generator.assembleConstraint(smgr.equal(smgr.substring(str, startIndex, length), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const str String)\n"
         + "(declare-const result String)\n"
-        + "(assert (= result (str.substr str 2 4)))\n";
+        + "(assert (= (str.substr str 2 4) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -150,15 +148,15 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
     StringFormula str = Objects.requireNonNull(smgr).makeVariable("str");
     StringFormula target = smgr.makeString("target");
     StringFormula replacement = smgr.makeString("replace");
-    StringFormula result = smgr.replace(str, target, replacement);
+    StringFormula result = smgr.makeVariable("result");
 
-    Generator.assembleConstraint(smgr.equal(result, smgr.replace(str, target, replacement)));
+    Generator.assembleConstraint(smgr.equal(smgr.replace(str, target, replacement), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const str String)\n"
         + "(declare-const result String)\n"
-        + "(assert (= result (str.replace str \"target\" \"replace\")))\n";
+        + "(assert (= (str.replace str \"target\" \"replace\") result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -167,15 +165,15 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testLength() {
     requireStrings();
     StringFormula str = Objects.requireNonNull(smgr).makeVariable("str");
-    IntegerFormula result = smgr.length(str);
+    IntegerFormula result = imgr.makeVariable("result");
 
-    Generator.assembleConstraint(imgr.equal(result, smgr.length(str)));
+    Generator.assembleConstraint(imgr.equal(smgr.length(str), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const str String)\n"
         + "(declare-const result Int)\n"
-        + "(assert (= result (str.len str)))\n";
+        + "(assert (= (str.len str) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -191,7 +189,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const str String)\n"
-        + "(assert (str.in_re str .*test.*))\n";
+        + "(assert (str.in_re str (re.from_str \".*test.*\")))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -200,15 +198,15 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testToInteger() {
     requireStrings();
     StringFormula str = Objects.requireNonNull(smgr).makeVariable("str");
-    IntegerFormula result = smgr.toIntegerFormula(str);
+    IntegerFormula result = imgr.makeVariable("result");
 
-    Generator.assembleConstraint(imgr.equal(result, smgr.toIntegerFormula(str)));
+    Generator.assembleConstraint(imgr.equal(smgr.toIntegerFormula(str), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const str String)\n"
         + "(declare-const result Int)\n"
-        + "(assert (= result (str.to_int str)))\n";
+        + "(assert (= (str.to_int str) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -216,16 +214,15 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testToString() {
     requireStrings();
-    IntegerFormula number = imgr.makeNumber(42);
-    StringFormula result = smgr.toStringFormula(number);
+    StringFormula result = Objects.requireNonNull(smgr).makeVariable("result");
+    IntegerFormula number = imgr.makeNumber("42");
 
-    Generator.assembleConstraint(smgr.equal(result, smgr.toStringFormula(number)));
+    Generator.assembleConstraint(smgr.equal(smgr.toStringFormula(number), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const number Int)\n"
-        + "(declare-const result String)\n"
-        + "(assert (= result (int.to_str 42)))\n";
+    String expectedResult = "(declare-const result String)\n"
+        + "(assert (= (int.to_str 42) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
