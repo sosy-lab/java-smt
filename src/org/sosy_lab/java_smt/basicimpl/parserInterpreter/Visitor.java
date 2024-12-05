@@ -1412,7 +1412,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         }
       case "fp.fma":
         //TODO: Seems to not be supported yet, but can be implemented
-          throw new ParserException("fp.fma isn't supported by JavaSMT");
+          throw new UnsupportedOperationException("fp.fma isn't supported by JavaSMT");
       case "fp.sqrt":
       if (operands.size() == 2) {
       return Objects.requireNonNull(fpmgr).sqrt((FloatingPointFormula) operands.get(1),
@@ -1422,9 +1422,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           + "FloatingPointFormula operand.");
        }
       case "fp.rem":
-          throw new ParserException("fp.rem is not supported by JavaSMT");
+          throw new UnsupportedOperationException("fp.rem is not supported by JavaSMT");
       case "fp.roundToIntegral":
-        throw new ParserException("fp.roundToIntegral is not supported by JavaSMT");
+        throw new UnsupportedOperationException("fp.roundToIntegral is not supported by JavaSMT");
       case "fp.min" :
         if (operands.size() == 2) {
           return Objects.requireNonNull(fpmgr).min((FloatingPointFormula) operands.get(0),
@@ -1536,9 +1536,9 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         return Objects.requireNonNull(smgr).charAt((StringFormula) operands.get(0), (IntegerFormula) operands.get(1));
 
       case "str.<":
-        throw new ParserException("str.< is not supported in JavaSMT");
+        throw new UnsupportedOperationException("str.< is not supported in JavaSMT");
       case "str.<=":
-        throw new ParserException("str.<= is not supported in JavaSMT");
+        throw new UnsupportedOperationException("str.<= is not supported in JavaSMT");
       case "str.substr":
         if(operands.size()!=3){
           throw new ParserException("str.substr requires exactly 3 operands.");

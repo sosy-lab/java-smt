@@ -15,12 +15,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  protected Solvers solverToUse() {
-    return Solvers.Z3;
-  }
-
+public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();

@@ -36,11 +36,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import scala.Int;
 
-public class SMTLIB2StringTest extends SolverBasedTest0 {
-  @Override
-  protected Solvers solverToUse() {
-    return Solvers.Z3;
-  }
+public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testDeclareString() throws IOException, SolverException, InterruptedException,

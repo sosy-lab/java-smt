@@ -37,11 +37,8 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class StringSMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  protected Solvers solverToUse() {
-    return Solvers.Z3;
-  }
+public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
