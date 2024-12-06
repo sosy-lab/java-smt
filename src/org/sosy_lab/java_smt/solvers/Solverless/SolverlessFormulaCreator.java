@@ -19,70 +19,80 @@
  */
 
 package org.sosy_lab.java_smt.solvers.Solverless;
-
-
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class SolverlessFormulaCreator extends FormulaCreator<String, String, String,
-    String> {
-  protected SolverlessFormulaCreator(
-      String pS,
-      String boolType,
-      @Nullable String pIntegerType,
-      @Nullable String pRationalType,
-      @Nullable String stringType,
-      @Nullable String regexType) {
-    super(pS, boolType, pIntegerType, pRationalType, stringType, regexType);
+public class SolverLessFormulaCreator
+    extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+
+  public SolverLessFormulaCreator() {
+    super(new DummyEnv(), new DummyType(), new DummyType(), new DummyType(), new DummyType(), new DummyType());
   }
 
   @Override
-  public String getBitvectorType(int bitwidth) {
-    return "";
-  }
-
-  @Override
-  public String getFloatingPointType(FloatingPointType type) {
-    return "";
-  }
-
-  @Override
-  public String getArrayType(String indexType, String elementType) {
-    return "";
-  }
-
-  @Override
-  public String makeVariable(String pS, String varName) {
-    return "";
-  }
-
-  @Override
-  public FormulaType<?> getFormulaType(String formula) {
+  public DummyType getBitvectorType(int bitwidth) {
     return null;
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, String f) {
+  public DummyType getFloatingPointType(FloatingPointType type) {
     return null;
   }
 
   @Override
-  public String callFunctionImpl(String declaration, List<String> args) {
-    return "";
+  public DummyType getArrayType(DummyType indexType, DummyType elementType) {
+    return null;
   }
 
   @Override
-  public String declareUFImpl(String pName, String pReturnType, List<String> pArgTypes) {
-    return "";
+  public DummyFormula makeVariable(DummyType type, String name) {
+    return new DummyFormula("Variable(" + name + ")");
   }
 
   @Override
-  protected String getBooleanVarDeclarationImpl(String pS) {
-    return "";
+  public DummyFormula callFunction(DummyFunction declaration, java.util.List<DummyFormula> args) {
+    StringBuilder functionCall = new StringBuilder("FunctionCall(");
+    functionCall.append(declaration).append(", ");
+    functionCall.append(args.toString());
+    functionCall.append(")");
+    return new DummyFormula(functionCall.toString());
+  }
+
+  @Override
+  public DummyType getFormulaType(DummyFormula formula) {
+    return new DummyType();
+  }
+
+  @Override
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DummyFormula f) {
+    return null;
+  }
+
+  @Override
+  public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
+    return null;
+  }
+
+  @Override
+  public DummyFunction declareUFImpl(
+      String pName,
+      DummyType pReturnType,
+      List<DummyType> pArgTypes) {
+    return null;
+  }
+
+  @Override
+  protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
+    return null;
+  }
+  @Override
+  public DummyFormula extractInfo(Formula formula) {
+    if (formula instanceof DummyFormula) {
+      return (DummyFormula) formula;
+    }
+    throw new IllegalArgumentException("Unsupported formula type: " + formula.getClass());
   }
 }

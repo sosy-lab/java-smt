@@ -49,6 +49,7 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
+import org.sosy_lab.java_smt.solvers.Solverless.SolverLessBooleanFormulaManager;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**
@@ -228,7 +229,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
+  public SolverLessBooleanFormulaManager
       getBooleanFormulaManager() {
     return booleanManager;
   }

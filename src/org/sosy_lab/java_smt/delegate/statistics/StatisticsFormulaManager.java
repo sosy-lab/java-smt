@@ -20,7 +20,6 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -38,6 +37,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.solvers.Solverless.SolverLessBooleanFormulaManager;
 
 class StatisticsFormulaManager implements FormulaManager {
 
@@ -60,7 +60,7 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormulaManager getBooleanFormulaManager() {
+  public SolverLessBooleanFormulaManager getBooleanFormulaManager() {
     return new StatisticsBooleanFormulaManager(delegate.getBooleanFormulaManager(), stats);
   }
 

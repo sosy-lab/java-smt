@@ -18,6 +18,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.solvers.Solverless.SolverLessBooleanFormulaManager;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
@@ -59,8 +60,10 @@ public interface FormulaManager {
    */
   RationalFormulaManager getRationalFormulaManager();
 
-  /** Returns the Boolean-Theory. */
-  BooleanFormulaManager getBooleanFormulaManager();
+  /**
+   * Returns the Boolean-Theory.
+   */
+  SolverLessBooleanFormulaManager getBooleanFormulaManager();
 
   /**
    * Returns the Array-Theory.

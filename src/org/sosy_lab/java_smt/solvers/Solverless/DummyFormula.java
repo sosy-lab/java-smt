@@ -20,28 +20,16 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
-import org.sosy_lab.java_smt.api.Formula;
-
-public class SolverlessFormula implements Formula {
-
+public class DummyFormula {
   private final String representation;
 
-  public SolverlessFormula(String pRepresentation) {
-    this.representation = pRepresentation;
+  public DummyFormula(String representation) {
+    this.representation = representation;
   }
 
   @Override
   public String toString() {
     return representation;
   }
-
-  @Override
-  public boolean equals(Object other) {
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return 0;
-  }
 }
+
