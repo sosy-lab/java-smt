@@ -20,200 +20,217 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.util.List;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class SolverLessFloatingPointFormulaManager extends
-                                                   AbstractFloatingPointFormulaManager<String, String, String, String> {
+                                                    AbstractFloatingPointFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
-  protected SolverLessFloatingPointFormulaManager(FormulaCreator<String, String, String, String> pCreator) {
-    super(pCreator);
+  protected SolverLessFloatingPointFormulaManager() {
+    super(new SolverLessFormulaCreator());
+  }
+  @Override
+  protected DummyFormula getDefaultRoundingMode() {
+    return null;
   }
 
   @Override
-  protected String getDefaultRoundingMode() {
-    return "";
+  protected DummyFormula getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    return "";
-  }
-
-  @Override
-  protected String makeNumberImpl(
+  protected DummyFormula makeNumberImpl(
       double n,
       FloatingPointType type,
-      String pFloatingPointRoundingMode) {
-    return "";
+      DummyFormula pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String makeNumberAndRound(
+  protected DummyFormula makeNumberAndRound(
       String pN,
       FloatingPointType pType,
-      String pFloatingPointRoundingMode) {
-    return "";
+      DummyFormula pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String makeVariableImpl(String pVar, FloatingPointType pType) {
-    return "";
+  protected DummyFormula makeVariableImpl(String pVar, FloatingPointType pType) {
+    return null;
   }
 
   @Override
-  protected String makePlusInfinityImpl(FloatingPointType pType) {
-    return "";
+  protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
+    return null;
   }
 
   @Override
-  protected String makeMinusInfinityImpl(FloatingPointType pType) {
-    return "";
+  protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
+    return null;
   }
 
   @Override
-  protected String makeNaNImpl(FloatingPointType pType) {
-    return "";
+  protected DummyFormula makeNaNImpl(FloatingPointType pType) {
+    return null;
   }
 
   @Override
-  protected String castToImpl(
-      String pNumber,
+  protected DummyFormula castToImpl(
+      DummyFormula pNumber,
       boolean pSigned,
       FormulaType<?> pTargetType,
-      String pRoundingMode) {
-    return "";
+      DummyFormula pRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String castFromImpl(
-      String pNumber,
+  protected DummyFormula castFromImpl(
+      DummyFormula pNumber,
       boolean pSigned,
       FloatingPointType pTargetType,
-      String pRoundingMode) {
-    return "";
+      DummyFormula pRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String fromIeeeBitvectorImpl(String pNumber, FloatingPointType pTargetType) {
-    return "";
+  protected DummyFormula fromIeeeBitvectorImpl(
+      DummyFormula pNumber,
+      FloatingPointType pTargetType) {
+    return null;
   }
 
   @Override
-  protected String toIeeeBitvectorImpl(String pNumber) {
-    return "";
+  protected DummyFormula toIeeeBitvectorImpl(DummyFormula pNumber) {
+    return null;
   }
 
   @Override
-  protected String negate(String pParam1) {
-    return "";
+  protected DummyFormula negate(DummyFormula pParam1) {
+    return null;
   }
 
   @Override
-  protected String abs(String pParam1) {
-    return "";
+  protected DummyFormula abs(DummyFormula pParam1) {
+    return null;
   }
 
   @Override
-  protected String max(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula max(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String min(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula min(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String sqrt(String pNumber, String pRoundingMode) {
-    return "";
+  protected DummyFormula sqrt(DummyFormula pNumber, DummyFormula pRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String add(String pParam1, String pParam2, String pRoundingMode) {
-    return "";
+  protected DummyFormula add(
+      DummyFormula pParam1,
+      DummyFormula pParam2,
+      DummyFormula pRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String subtract(String pParam1, String pParam2, String pFloatingPointRoundingMode) {
-    return "";
+  protected DummyFormula subtract(
+      DummyFormula pParam1,
+      DummyFormula pParam2,
+      DummyFormula pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String divide(String pParam1, String pParam2, String pFloatingPointRoundingMode) {
-    return "";
+  protected DummyFormula divide(
+      DummyFormula pParam1,
+      DummyFormula pParam2,
+      DummyFormula pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String multiply(String pParam1, String pParam2, String pFloatingPointRoundingMode) {
-    return "";
+  protected DummyFormula multiply(
+      DummyFormula pParam1,
+      DummyFormula pParam2,
+      DummyFormula pFloatingPointRoundingMode) {
+    return null;
   }
 
   @Override
-  protected String assignment(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula assignment(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String equalWithFPSemantics(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula equalWithFPSemantics(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String greaterThan(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String greaterOrEquals(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String lessThan(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String lessOrEquals(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String isNaN(String pParam) {
-    return "";
+  protected DummyFormula isNaN(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String isInfinity(String pParam) {
-    return "";
+  protected DummyFormula isInfinity(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String isZero(String pParam) {
-    return "";
+  protected DummyFormula isZero(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String isSubnormal(String pParam) {
-    return "";
+  protected DummyFormula isSubnormal(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String isNormal(String pParam) {
-    return "";
+  protected DummyFormula isNormal(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String isNegative(String pParam) {
-    return "";
+  protected DummyFormula isNegative(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String round(String pFormula, FloatingPointRoundingMode pRoundingMode) {
-    return "";
+  protected DummyFormula round(DummyFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
+    return null;
   }
 }
+

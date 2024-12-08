@@ -25,132 +25,134 @@ import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<String,
-    String, String, String> {
+public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
+    DummyType, DummyEnv, DummyFunction> {
 
-  protected SolverLessBitvectorFormulaManager(
-      FormulaCreator<String, String, String, String> pCreator,
-      AbstractBooleanFormulaManager<String, String, String, String> pBmgr) {
-    super(pCreator, pBmgr);
+
+  protected SolverLessBitvectorFormulaManager() {
+    super(new SolverLessFormulaCreator(), new SolverLessBooleanFormulaManager());
   }
 
   @Override
-  protected String makeBitvectorImpl(int length, String pParam1) {
-    return "";
+  protected DummyFormula makeBitvectorImpl(int length, DummyFormula pParam1) {
+    return null;
   }
 
   @Override
-  protected String toIntegerFormulaImpl(String pI, boolean signed) {
-    return "";
+  protected DummyFormula toIntegerFormulaImpl(DummyFormula pI, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String negate(String pParam1) {
-    return "";
+  protected DummyFormula negate(DummyFormula pParam1) {
+    return null;
   }
 
   @Override
-  protected String add(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String subtract(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String divide(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula divide(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String modulo(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula modulo(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String multiply(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula multiply(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String equal(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String greaterThan(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String greaterOrEquals(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula greaterOrEquals(
+      DummyFormula pParam1,
+      DummyFormula pParam2,
+      boolean signed) {
+    return null;
   }
 
   @Override
-  protected String lessThan(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String lessOrEquals(String pParam1, String pParam2, boolean signed) {
-    return "";
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String not(String pParam1) {
-    return "";
+  protected DummyFormula not(DummyFormula pParam1) {
+    return null;
   }
 
   @Override
-  protected String and(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String or(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String xor(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String makeBitvectorImpl(int pLength, BigInteger pI) {
-    return "";
+  protected DummyFormula makeBitvectorImpl(int pLength, BigInteger pI) {
+    return null;
   }
 
   @Override
-  protected String makeVariableImpl(int pLength, String pVar) {
-    return "";
+  protected DummyFormula makeVariableImpl(int pLength, String pVar) {
+    return null;
   }
 
   @Override
-  protected String shiftRight(String pNumber, String toShift, boolean signed) {
-    return "";
+  protected DummyFormula shiftRight(DummyFormula pNumber, DummyFormula toShift, boolean signed) {
+    return null;
   }
 
   @Override
-  protected String shiftLeft(String pExtract, String pExtract2) {
-    return "";
+  protected DummyFormula shiftLeft(DummyFormula pExtract, DummyFormula pExtract2) {
+    return null;
   }
 
   @Override
-  protected String concat(String number, String pAppend) {
-    return "";
+  protected DummyFormula concat(DummyFormula number, DummyFormula pAppend) {
+    return null;
   }
 
   @Override
-  protected String extract(String pNumber, int pMsb, int pLsb) {
-    return "";
+  protected DummyFormula extract(DummyFormula pNumber, int pMsb, int pLsb) {
+    return null;
   }
 
   @Override
-  protected String extend(String pNumber, int pExtensionBits, boolean pSigned) {
-    return "";
+  protected DummyFormula extend(DummyFormula pNumber, int pExtensionBits, boolean pSigned) {
+    return null;
   }
 }

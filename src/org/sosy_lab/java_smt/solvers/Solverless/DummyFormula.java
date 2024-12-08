@@ -20,7 +20,9 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
-public class DummyFormula {
+import org.sosy_lab.java_smt.api.Formula;
+
+public class DummyFormula implements Formula {
   private final String representation;
 
   public DummyFormula(String representation) {

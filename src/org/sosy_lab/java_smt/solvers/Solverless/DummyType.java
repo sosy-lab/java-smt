@@ -20,4 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
-public class DummyType {}
+import org.sosy_lab.java_smt.api.NumeralFormula;
+
+public class DummyType implements NumeralFormula {}

@@ -21,6 +21,7 @@
 package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -29,7 +30,9 @@ public class SolverLessFormulaCreator
     extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   public SolverLessFormulaCreator() {
-    super(new DummyEnv(), new DummyType(), new DummyType(), new DummyType(), new DummyType(), new DummyType());
+    super(new DummyEnv(), new DummyType(), new DummyType(), new DummyType(),
+        new DummyType(),
+        new DummyType());
   }
 
   @Override
@@ -48,22 +51,13 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public DummyFormula makeVariable(DummyType type, String name) {
-    return new DummyFormula("Variable(" + name + ")");
+  public DummyFormula makeVariable(DummyType pDummyType, String varName) {
+    return null;
   }
 
   @Override
-  public DummyFormula callFunction(DummyFunction declaration, java.util.List<DummyFormula> args) {
-    StringBuilder functionCall = new StringBuilder("FunctionCall(");
-    functionCall.append(declaration).append(", ");
-    functionCall.append(args.toString());
-    functionCall.append(")");
-    return new DummyFormula(functionCall.toString());
-  }
-
-  @Override
-  public DummyType getFormulaType(DummyFormula formula) {
-    return new DummyType();
+  public FormulaType<?> getFormulaType(DummyFormula formula) {
+    return null;
   }
 
   @Override
@@ -87,12 +81,5 @@ public class SolverLessFormulaCreator
   @Override
   protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
     return null;
-  }
-  @Override
-  public DummyFormula extractInfo(Formula formula) {
-    if (formula instanceof DummyFormula) {
-      return (DummyFormula) formula;
-    }
-    throw new IllegalArgumentException("Unsupported formula type: " + formula.getClass());
   }
 }

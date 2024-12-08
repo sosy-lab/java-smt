@@ -20,9 +20,102 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import io.github.cvc5.Solver;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+
+public class SolverLessNumeralFormulaManager extends AbstractNumeralFormulaManager<DummyFormula,
+    DummyType, DummyEnv, DummyType, DummyType, DummyFunction> {
+  public SolverLessNumeralFormulaManager() {
+    super(new SolverLessFormulaCreator(), NonLinearArithmetic.APPROXIMATE_ALWAYS);
+  }
+
+  @Override
+  protected boolean isNumeral(DummyFormula val) {
+    return false;
+  }
+
+  @Override
+  protected DummyFormula makeNumberImpl(long i) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula makeNumberImpl(BigInteger i) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula makeNumberImpl(String i) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula makeNumberImpl(double pNumber) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula makeVariableImpl(String i) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula negate(DummyFormula pParam1) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
+  }
+
+  @Override
+  public FormulaType<DummyType> getFormulaType() {
+    return null;
+  }
+}

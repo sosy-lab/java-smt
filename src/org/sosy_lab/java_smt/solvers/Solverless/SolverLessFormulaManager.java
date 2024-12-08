@@ -30,23 +30,23 @@ public class SolverLessFormulaManager
   protected SolverLessFormulaManager() {
     super(
         new SolverLessFormulaCreator(),
-        null,
+        new SolverLessUFManager(),
         new SolverLessBooleanFormulaManager(),
-        new SolverLessIntegerFormulaManager(),
-        new SolverLessRationalFormulaManager(),
         null,
         null,
+        new SolverLessBitvectorFormulaManager(),
+        new SolverLessFloatingPointFormulaManager(),
+        null,
+        new SolverLessArrayFormulaManager(),
         null,
         null,
-        null,
-        null,
-        null// String Manager (not supported)
+        null
     );
   }
 
   @Override
   public Appender dumpFormula(DummyFormula formula) {
-    return Appender.of(() -> "Formula: " + formula.toString());
+    return null;
   }
 
   @Override

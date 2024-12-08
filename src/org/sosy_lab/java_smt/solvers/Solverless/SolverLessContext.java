@@ -8,14 +8,14 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverlessFormulaCreator;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverlessFormulaManager;
+import org.sosy_lab.java_smt.solvers.Solverless.SolverLessFormulaCreator;
+import org.sosy_lab.java_smt.solvers.Solverless.SolverLessFormulaManager;
 
 public final class SolverLessContext extends AbstractSolverContext {
 
-  private final SolverlessFormulaManager manager;
+  private final SolverLessFormulaManager manager;
 
-  private SolverLessContext(SolverlessFormulaManager pManager) {
+  private SolverLessContext(SolverLessFormulaManager pManager) {
     super(pManager);
     this.manager = pManager;
   }
@@ -24,8 +24,8 @@ public final class SolverLessContext extends AbstractSolverContext {
       Consumer<String> pLoader,
       ShutdownNotifier pShutdownNotifier) {
     pLoader.accept("SolverLess");
-    SolverlessFormulaCreator creator = new SolverlessFormulaCreator();
-    SolverlessFormulaManager manager = new SolverlessFormulaManager(creator);
+    SolverLessFormulaCreator creator = new SolverLessFormulaCreator();
+    SolverLessFormulaManager manager = new SolverLessFormulaManager();
     return new SolverLessContext(manager);
   }
 

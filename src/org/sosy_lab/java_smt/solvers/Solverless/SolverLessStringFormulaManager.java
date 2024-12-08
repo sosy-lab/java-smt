@@ -24,160 +24,167 @@ import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class SolverLessStringFormulaManager extends AbstractStringFormulaManager<String, String,
-    String, String> {
+public class SolverLessStringFormulaManager extends AbstractStringFormulaManager<DummyFormula,
+    DummyType,
+    DummyEnv, DummyFunction> {
 
-  protected SolverLessStringFormulaManager(FormulaCreator<String, String, String, String> pCreator) {
-    super(pCreator);
+  protected SolverLessStringFormulaManager() {
+    super(new SolverLessFormulaCreator());
   }
 
   @Override
-  protected String makeStringImpl(String value) {
-    return "";
+  protected DummyFormula makeStringImpl(String value) {
+    return null;
   }
 
   @Override
-  protected String makeVariableImpl(String pVar) {
-    return "";
+  protected DummyFormula makeVariableImpl(String pVar) {
+    return null;
   }
 
   @Override
-  protected String equal(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String greaterThan(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String greaterOrEquals(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String lessThan(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String lessOrEquals(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String length(String pParam) {
-    return "";
+  protected DummyFormula length(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String concatImpl(List<String> parts) {
-    return "";
+  protected DummyFormula concatImpl(List<DummyFormula> parts) {
+    return null;
   }
 
   @Override
-  protected String prefix(String prefix, String str) {
-    return "";
+  protected DummyFormula prefix(DummyFormula prefix, DummyFormula str) {
+    return null;
   }
 
   @Override
-  protected String suffix(String suffix, String str) {
-    return "";
+  protected DummyFormula suffix(DummyFormula suffix, DummyFormula str) {
+    return null;
   }
 
   @Override
-  protected String in(String str, String regex) {
-    return "";
+  protected DummyFormula in(DummyFormula str, DummyFormula regex) {
+    return null;
   }
 
   @Override
-  protected String contains(String str, String part) {
-    return "";
+  protected DummyFormula contains(DummyFormula str, DummyFormula part) {
+    return null;
   }
 
   @Override
-  protected String indexOf(String str, String part, String startIndex) {
-    return "";
+  protected DummyFormula indexOf(DummyFormula str, DummyFormula part, DummyFormula startIndex) {
+    return null;
   }
 
   @Override
-  protected String charAt(String str, String index) {
-    return "";
+  protected DummyFormula charAt(DummyFormula str, DummyFormula index) {
+    return null;
   }
 
   @Override
-  protected String substring(String str, String index, String length) {
-    return "";
+  protected DummyFormula substring(DummyFormula str, DummyFormula index, DummyFormula length) {
+    return null;
   }
 
   @Override
-  protected String replace(String fullStr, String target, String replacement) {
-    return "";
+  protected DummyFormula replace(
+      DummyFormula fullStr,
+      DummyFormula target,
+      DummyFormula replacement) {
+    return null;
   }
 
   @Override
-  protected String replaceAll(String fullStr, String target, String replacement) {
-    return "";
+  protected DummyFormula replaceAll(
+      DummyFormula fullStr,
+      DummyFormula target,
+      DummyFormula replacement) {
+    return null;
   }
 
   @Override
-  protected String makeRegexImpl(String value) {
-    return "";
+  protected DummyFormula makeRegexImpl(String value) {
+    return null;
   }
 
   @Override
-  protected String noneImpl() {
-    return "";
+  protected DummyFormula noneImpl() {
+    return null;
   }
 
   @Override
-  protected String allImpl() {
-    return "";
+  protected DummyFormula allImpl() {
+    return null;
   }
 
   @Override
-  protected String allCharImpl() {
-    return "";
+  protected DummyFormula allCharImpl() {
+    return null;
   }
 
   @Override
-  protected String range(String start, String end) {
-    return "";
+  protected DummyFormula range(DummyFormula start, DummyFormula end) {
+    return null;
   }
 
   @Override
-  protected String concatRegexImpl(List<String> parts) {
-    return "";
+  protected DummyFormula concatRegexImpl(List<DummyFormula> parts) {
+    return null;
   }
 
   @Override
-  protected String union(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula union(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String intersection(String pParam1, String pParam2) {
-    return "";
+  protected DummyFormula intersection(DummyFormula pParam1, DummyFormula pParam2) {
+    return null;
   }
 
   @Override
-  protected String closure(String pParam) {
-    return "";
+  protected DummyFormula closure(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String complement(String pParam) {
-    return "";
+  protected DummyFormula complement(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String toIntegerFormula(String pParam) {
-    return "";
+  protected DummyFormula toIntegerFormula(DummyFormula pParam) {
+    return null;
   }
 
   @Override
-  protected String toStringFormula(String pParam) {
-    return "";
+  protected DummyFormula toStringFormula(DummyFormula pParam) {
+    return null;
   }
 }

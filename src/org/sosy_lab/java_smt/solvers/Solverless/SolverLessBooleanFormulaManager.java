@@ -21,79 +21,64 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.Solverless.SolverlessFormula;
 
-public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManager<SolverlessFormula,
-    SolverlessFormula, SolverlessFormula, SolverlessFormula> {
+public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManager<DummyFormula,
+    DummyType, DummyEnv, DummyFunction> {
 
-  @Override
-  protected SolverLessFormula makeVariableImpl(String pVarName) {
-    return new SolverLessFormula("BoolVar: " + pVarName);
+  public SolverLessBooleanFormulaManager() {
+    super(new SolverLessFormulaCreator());
   }
 
   @Override
-  protected SolverLessFormula makeBooleanImpl(boolean value) {
-    return new SolverLessFormula("BoolValue: " + value);
-  }
-
-  @Override
-  protected SolverlessFormula equivalence(Object bits1, Object bits2) {
+  protected DummyFormula makeVariableImpl(String pVar) {
     return null;
   }
 
   @Override
-  protected SolverlessFormula or(Object pParam1, Object pParam2) {
+  protected DummyFormula makeBooleanImpl(boolean value) {
     return null;
   }
 
   @Override
-  protected SolverlessFormula and(Object pParam1, Object pParam2) {
+  protected DummyFormula not(DummyFormula pParam1) {
     return null;
   }
 
   @Override
-  protected SolverlessFormula not(Object pParam1) {
+  protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
     return null;
   }
 
   @Override
-  protected SolverLessFormula not(SolverLessFormula pParam) {
-    return new SolverLessFormula("NOT(" + pParam + ")");
-  }
-
-  @Override
-  protected SolverLessFormula and(SolverLessFormula pParam1, SolverLessFormula pParam2) {
-    return new SolverLessFormula("AND(" + pParam1 + ", " + pParam2 + ")");
-  }
-
-  @Override
-  protected SolverLessFormula or(SolverLessFormula pParam1, SolverLessFormula pParam2) {
-    return new SolverLessFormula("OR(" + pParam1 + ", " + pParam2 + ")");
-  }
-
-  @Override
-  protected SolverLessFormula xor(Object pParam1, Object pParam2) {
+  protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
     return null;
   }
 
   @Override
-  protected SolverLessFormula equivalence(SolverLessFormula pParam1, SolverLessFormula pParam2) {
-    return new SolverLessFormula("EQ(" + pParam1 + ", " + pParam2 + ")");
-  }
-
-  @Override
-  protected SolverLessFormula ifThenElse(Object cond, Object f1, Object f2) {
+  protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
     return null;
   }
 
   @Override
-  protected boolean isFalse(Object bits) {
+  protected DummyFormula equivalence(DummyFormula bits1, DummyFormula bits2) {
+    return null;
+  }
+
+  @Override
+  protected boolean isTrue(DummyFormula bits) {
     return false;
   }
 
   @Override
-  protected boolean isTrue(Object bits) {
+  protected boolean isFalse(DummyFormula bits) {
     return false;
+  }
+
+  @Override
+  protected DummyFormula ifThenElse(DummyFormula cond, DummyFormula f1, DummyFormula f2) {
+    return null;
   }
 
   @Override
