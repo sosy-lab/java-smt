@@ -24,13 +24,16 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
-    DummyType, DummyEnv, DummyFunction> {
+    FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
 
-  protected SolverLessBitvectorFormulaManager() {
-    super(new SolverLessFormulaCreator(), new SolverLessBooleanFormulaManager());
+  protected SolverLessBitvectorFormulaManager(SolverLessFormulaCreator pSolverLessFormulaCreator,
+                                              SolverLessBooleanFormulaManager pSolverLessBooleanFormulaManager)
+  {
+    super(pSolverLessFormulaCreator, pSolverLessBooleanFormulaManager);
   }
 
   @Override

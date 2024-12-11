@@ -27,11 +27,12 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessUFManager extends AbstractUFManager<DummyFormula, DummyFunction, DummyType,
+public class SolverLessUFManager extends AbstractUFManager<DummyFormula, DummyFunction, FormulaTypesForChecking,
     DummyEnv> {
-  protected SolverLessUFManager() {
-    super(new SolverLessFormulaCreator());
+  protected SolverLessUFManager(SolverLessFormulaCreator pCreator) {
+    super(pCreator);
   }
 
   @Override

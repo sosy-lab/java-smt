@@ -21,12 +21,20 @@
 package org.sosy_lab.java_smt.solvers.Solverless;
 
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class DummyFormula implements Formula {
   private final String representation;
+  private final FormulaTypesForChecking formulaTypesForChecking;
 
-  public DummyFormula(String representation) {
+  public DummyFormula(String representation, FormulaTypesForChecking pFormulaType) {
     this.representation = representation;
+    formulaTypesForChecking = pFormulaType;
+  }
+
+  public FormulaTypesForChecking getFormulaTypesForChecking() {
+    return formulaTypesForChecking;
   }
 
   @Override

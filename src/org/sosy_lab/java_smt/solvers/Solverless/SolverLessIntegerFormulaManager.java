@@ -18,17 +18,13 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
+package org.sosy_lab.java_smt.solvers.Solverless;
 
-import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public enum FormulaTypesForChecking {
-  REGEX,
-  STRING,
-  FLOATING_POINT,
-  INTEGER,
-  BITVECTOR,
-  ARRAY,
-  RATIONAL,
-  BOOLEAN
+public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula, IntegerFormula> {
+
 }

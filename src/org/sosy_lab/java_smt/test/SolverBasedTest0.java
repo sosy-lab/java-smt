@@ -133,6 +133,9 @@ public abstract class SolverBasedTest0 {
       newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
       newConfig.setOption("solver.useBinary", String.valueOf(true));
     }
+    if (solverToUse() == Solvers.SOLVERLESS){
+      newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+    }
     return newConfig;
   }
 

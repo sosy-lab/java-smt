@@ -20,44 +20,67 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessFormulaCreator
-    extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends FormulaCreator<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
-  public SolverLessFormulaCreator() {
-    super(new DummyEnv(), new DummyType(), new DummyType(), new DummyType(),
-        new DummyType(),
-        new DummyType());
+  protected SolverLessFormulaCreator(){
+    super(new DummyEnv(), FormulaTypesForChecking.BOOLEAN , FormulaTypesForChecking.INTEGER, FormulaTypesForChecking.RATIONAL,
+        FormulaTypesForChecking.STRING,
+        FormulaTypesForChecking.REGEX);
   }
 
   @Override
-  public DummyType getBitvectorType(int bitwidth) {
-    return null;
+  public FormulaTypesForChecking getBitvectorType(int bitwidth) {
+    return FormulaTypesForChecking.BITVECTOR;
   }
 
   @Override
-  public DummyType getFloatingPointType(FloatingPointType type) {
-    return null;
+  public FormulaTypesForChecking getFloatingPointType(FloatingPointType type) {
+    return FormulaTypesForChecking.FLOATING_POINT;
   }
 
   @Override
-  public DummyType getArrayType(DummyType indexType, DummyType elementType) {
-    return null;
+  public FormulaTypesForChecking getArrayType(
+      FormulaTypesForChecking indexType,
+      FormulaTypesForChecking elementType) {
+    return FormulaTypesForChecking.ARRAY;
   }
 
   @Override
-  public DummyFormula makeVariable(DummyType pDummyType, String varName) {
-    return null;
+  public DummyFormula makeVariable(
+      FormulaTypesForChecking pFormulaTypesForChecking,
+      String varName) {
+    return new DummyFormula("", pFormulaTypesForChecking);
   }
 
   @Override
   public FormulaType<?> getFormulaType(DummyFormula formula) {
-    return null;
+    switch (formula.getFormulaTypesForChecking()) {
+      case BITVECTOR:
+        return FormulaType.getBitvectorTypeWithSize(0);
+      case FLOATING_POINT:
+        return FormulaType.getFloatingPointType(8, 24);
+      case ARRAY:
+        return FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.BooleanType);
+      case RATIONAL:
+        return FormulaType.RationalType;
+      case STRING:
+        return FormulaType.StringType;
+      case REGEX:
+        return FormulaType.RegexType;
+      case INTEGER:
+        return FormulaType.IntegerType;
+      default:
+        return FormulaType.BooleanType;
+    }
   }
 
   @Override
@@ -67,19 +90,21 @@ public class SolverLessFormulaCreator
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    return null;
+    return new DummyFormula("", args.get(0).getFormulaTypesForChecking());
   }
 
   @Override
   public DummyFunction declareUFImpl(
       String pName,
-      DummyType pReturnType,
-      List<DummyType> pArgTypes) {
-    return null;
+      FormulaTypesForChecking pReturnType,
+      List<FormulaTypesForChecking> pArgTypes) {
+    return new DummyFunction();
   }
 
   @Override
   protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
-    return null;
+    return new DummyFunction();
   }
+
+
 }

@@ -23,11 +23,12 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
-    DummyType, DummyEnv, DummyFunction> {
-  public SolverLessArrayFormulaManager() {
-    super(new SolverLessFormulaCreator());
+    FormulaTypesForChecking, DummyEnv, DummyFunction> {
+  public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
+    super(pCreator);
   }
   @Override
   protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {

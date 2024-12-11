@@ -170,7 +170,6 @@ public class FloatingPointGenerator {
     );
   }
 
-  // FloatingPointGenerator - Ergänzung der fehlenden Funktionen
   protected static void logFPRound(
       FloatingPointFormula result, FloatingPointFormula n, String roundingMode) {
     logUnaryOpWithMode(result, "fp.round", roundingMode, n);

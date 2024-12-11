@@ -63,7 +63,7 @@ public interface FormulaManager {
   /**
    * Returns the Boolean-Theory.
    */
-  SolverLessBooleanFormulaManager getBooleanFormulaManager();
+  BooleanFormulaManager getBooleanFormulaManager();
 
   /**
    * Returns the Array-Theory.

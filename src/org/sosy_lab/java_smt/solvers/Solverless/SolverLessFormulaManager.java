@@ -23,23 +23,25 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.basicimpl.*;
 import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessFormulaManager
-    extends AbstractFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends AbstractFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
-  protected SolverLessFormulaManager() {
+  protected SolverLessFormulaManager(SolverLessFormulaCreator pCreator,
+                                     SolverLessBooleanFormulaManager bmgr) {
     super(
-        new SolverLessFormulaCreator(),
-        new SolverLessUFManager(),
-        new SolverLessBooleanFormulaManager(),
+        pCreator,
+        new SolverLessUFManager(pCreator),
+        bmgr,
         null,
         null,
-        new SolverLessBitvectorFormulaManager(),
-        new SolverLessFloatingPointFormulaManager(),
+        new SolverLessBitvectorFormulaManager(pCreator, bmgr),
+        new SolverLessFloatingPointFormulaManager(pCreator),
         null,
-        new SolverLessArrayFormulaManager(),
+        new SolverLessArrayFormulaManager(pCreator),
         null,
-        null,
+        new SolverLessStringFormulaManager(pCreator),
         null
     );
   }

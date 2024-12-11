@@ -15,7 +15,11 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
+  @Override
+  public Solvers solverToUse(){
+    return Solvers.SOLVERLESS;
+  }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -25,9 +29,9 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.Paramete
   @Test
   public void testMakeVariable() {
     requireFloats();
-    FloatingPointFormula a = Objects.requireNonNull(fpmgr).makeVariable("a",
+    FloatingPointFormula a = fpmgr.makeVariable("a",
         FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = Objects.requireNonNull(fpmgr).makeVariable("b",
+    FloatingPointFormula b = fpmgr.makeVariable("b",
         FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
 

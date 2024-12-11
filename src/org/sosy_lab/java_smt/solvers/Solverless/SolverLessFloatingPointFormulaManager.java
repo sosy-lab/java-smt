@@ -28,21 +28,22 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessFloatingPointFormulaManager extends
-                                                    AbstractFloatingPointFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+                                                    AbstractFloatingPointFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
-  protected SolverLessFloatingPointFormulaManager() {
-    super(new SolverLessFormulaCreator());
+  protected SolverLessFloatingPointFormulaManager(SolverLessFormulaCreator creator) {
+    super(creator);
   }
   @Override
   protected DummyFormula getDefaultRoundingMode() {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -50,7 +51,7 @@ public class SolverLessFloatingPointFormulaManager extends
       double n,
       FloatingPointType type,
       DummyFormula pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -58,27 +59,27 @@ public class SolverLessFloatingPointFormulaManager extends
       String pN,
       FloatingPointType pType,
       DummyFormula pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String pVar, FloatingPointType pType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula makeNaNImpl(FloatingPointType pType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -87,7 +88,7 @@ public class SolverLessFloatingPointFormulaManager extends
       boolean pSigned,
       FormulaType<?> pTargetType,
       DummyFormula pRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -96,44 +97,44 @@ public class SolverLessFloatingPointFormulaManager extends
       boolean pSigned,
       FloatingPointType pTargetType,
       DummyFormula pRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula fromIeeeBitvectorImpl(
       DummyFormula pNumber,
       FloatingPointType pTargetType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula toIeeeBitvectorImpl(DummyFormula pNumber) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula negate(DummyFormula pParam1) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula abs(DummyFormula pParam1) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula max(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula min(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula sqrt(DummyFormula pNumber, DummyFormula pRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -141,7 +142,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -149,7 +150,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -157,7 +158,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
@@ -165,72 +166,72 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula assignment(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 
   @Override
   protected DummyFormula equalWithFPSemantics(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isNaN(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isInfinity(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isZero(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isSubnormal(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isNormal(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula isNegative(DummyFormula pParam) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula round(DummyFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
   }
 }
 

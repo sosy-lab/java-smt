@@ -25,93 +25,97 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.NumeralType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessNumeralFormulaManager extends AbstractNumeralFormulaManager<DummyFormula,
-    DummyType, DummyEnv, DummyType, DummyType, DummyFunction> {
+public class SolverLessNumeralFormulaManager <T,
+    Y> extends AbstractNumeralFormulaManager<DummyFormula,
+    FormulaTypesForChecking, DummyEnv, DummyType, DummyType, DummyFunction> {
   public SolverLessNumeralFormulaManager() {
     super(new SolverLessFormulaCreator(), NonLinearArithmetic.APPROXIMATE_ALWAYS);
   }
 
   @Override
   protected boolean isNumeral(DummyFormula val) {
-    return false;
+    return val.getFormulaTypesForChecking() == FormulaTypesForChecking.INTEGER;
   }
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigInteger i) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(String i) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(double pNumber) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String i) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula negate(DummyFormula pParam1) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER);
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override

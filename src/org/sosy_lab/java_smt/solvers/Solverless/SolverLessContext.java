@@ -20,12 +20,10 @@ public final class SolverLessContext extends AbstractSolverContext {
     this.manager = pManager;
   }
 
-  public static SolverLessContext create(
-      Consumer<String> pLoader,
-      ShutdownNotifier pShutdownNotifier) {
-    pLoader.accept("SolverLess");
+  public static SolverLessContext create() {
     SolverLessFormulaCreator creator = new SolverLessFormulaCreator();
-    SolverLessFormulaManager manager = new SolverLessFormulaManager();
+    SolverLessBooleanFormulaManager bmgr = new SolverLessBooleanFormulaManager(creator);
+    SolverLessFormulaManager manager = new SolverLessFormulaManager(creator, bmgr);
     return new SolverLessContext(manager);
   }
 

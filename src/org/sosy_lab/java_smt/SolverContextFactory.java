@@ -223,6 +223,9 @@ public class SolverContextFactory {
                   + "supported in binary mode.",
               solverToCreate));
     }
+    if(solverToCreate.equals(Solvers.SOLVERLESS)){
+      return SolverLessContext.create();
+    }
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
@@ -311,7 +314,7 @@ public class SolverContextFactory {
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
       case SOLVERLESS:
-        return null;
+        return SolverLessContext.create();
 
       default:
         throw new AssertionError("no solver selected");
