@@ -90,9 +90,9 @@ public class IndependentInterpolation {
     // instead of 'named' formulas, we return a 'handle' (of generic type T)
 
     // A := (x = 0)
-    T ip0 = prover.addConstraint(imgr.equal(x, zero));
+    T ip0 = prover.push(imgr.equal(x, zero));
     // B := (y = x + 2) AND (y % 2 != 0)
-    T ip1 = prover.addConstraint(bmgr.and(imgr.equal(y, imgr.add(x, two)),
+    T ip1 = prover.push(bmgr.and(imgr.equal(y, imgr.add(x, two)),
         bmgr.not(imgr.equal(imgr.modulo(y, two), zero))));
 
     // check for satisfiability
