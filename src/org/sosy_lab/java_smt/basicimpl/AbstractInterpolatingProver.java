@@ -177,6 +177,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private BooleanFormula getForwardInterpolant(
       BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars) {
 
+    ImmutableList<Formula> boundVars = getBoundVars(varsOfA, sharedVars);
+
     return null;
   }
 
@@ -200,6 +202,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
     return varsOfA.stream()
         .filter(varsOfB::contains)
+        .collect(ImmutableList.toImmutableList());
+  }
+
+  private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
+    return vars.stream()
+        .filter(var -> !sharedVars.contains(var))
         .collect(ImmutableList.toImmutableList());
   }
 
