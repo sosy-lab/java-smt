@@ -115,8 +115,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
-    List<Formula> varsOfA = getFreeArithVars(formulasOfA);
-    List<Formula> varsOfB = getFreeArithVars(formulasOfB);
+    List<Formula> varsOfA = getVars(formulasOfA);
+    List<Formula> varsOfB = getVars(formulasOfB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
@@ -141,7 +141,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * @param pFormula The input Boolean formula from which to extract all free arithmetic variables.
    * @return A list of all free variables and uninterpreted functions of the input formula.
    */
-  private ImmutableList<Formula> getFreeArithVars(BooleanFormula pFormula) {
+  private ImmutableList<Formula> getVars(BooleanFormula pFormula) {
     return ImmutableList.copyOf(mgr.extractVariablesAndUFs(pFormula).values());
   }
 
