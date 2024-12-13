@@ -91,9 +91,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     clearStack();
 
+    BooleanFormula interpolant = computeModelBasedInterpolant(pFormulasOfA, pFormulasOfB);
+
     restoreStack(originalStack);
 
-    return null;
+    return interpolant;
   }
 
   /**
