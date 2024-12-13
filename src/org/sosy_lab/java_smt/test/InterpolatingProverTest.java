@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -48,6 +49,20 @@ public class InterpolatingProverTest
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
     requireInterpolation();
+
+    if (itpStrategies.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT)) {
+      return (InterpolatingProverEnvironment<T>)
+          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT);
+    }
+    else if (itpStrategies.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
+      return (InterpolatingProverEnvironment<T>)
+          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS);
+    }
+    else if (itpStrategies.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
+      return (InterpolatingProverEnvironment<T>)
+          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS);
+    }
+
     return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
   }
 
