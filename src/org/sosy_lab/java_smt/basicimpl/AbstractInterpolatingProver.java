@@ -174,6 +174,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return interpolant;
   }
 
+  private BooleanFormula getForwardInterpolant(
+      BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars) {
+
+    return null;
+  }
+
   /**
    * Extracts all free variables and uninterpreted functions from the input Boolean formula.
    *
