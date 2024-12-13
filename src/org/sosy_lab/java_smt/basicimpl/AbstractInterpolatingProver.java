@@ -170,7 +170,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = getForwardInterpolant(formulasOfA, varsOfA, sharedVars);
+    BooleanFormula interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars);
 
     return interpolant;
   }
@@ -187,6 +187,20 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     }
 
     return formulasOfA;
+  }
+
+  private BooleanFormula getBackwardInterpolant(
+      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
+      throws SolverException, InterruptedException {
+
+    ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
+
+    if (!boundVars.equals(sharedVars)) {
+      BooleanFormula backward = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
+      return qfmgr.eliminateQuantifiers(backward);
+    }
+
+    return formulasOfB;
   }
 
   /**
