@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import java.util.Collection;
@@ -143,13 +144,18 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
-    push(bmgr.and(left, right)); // solve left and right
+    // check the satisfiability of the constraints and generate a model if possible
+    push(bmgr.and(left, right));
 
-    if (isUnsat()) {
-      return bmgr.makeFalse(); // return false as the interpolant
+    if (!isUnsat()) {
+      BooleanFormula interpolant = getModel().eval(itp);
+      Preconditions.checkNotNull(interpolant);
+      pop(); // remove left and right from stack
+      return interpolant;
     }
 
-    return Objects.requireNonNull(getModel().eval(itp));
+    pop(); // remove left and right from stack
+    return bmgr.makeFalse();
   }
 
   /**
