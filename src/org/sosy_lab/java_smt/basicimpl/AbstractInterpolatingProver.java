@@ -89,7 +89,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     final ImmutableList<BooleanFormula> originalStack = ImmutableList.copyOf(getAssertedFormulas());
 
-
+    clearStack();
 
     return null;
   }
@@ -166,5 +166,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return varsOfA.stream()
         .filter(varsOfB::contains)
         .collect(ImmutableList.toImmutableList());
+  }
+
+  private void clearStack() {
+    for (int i = 0; i < size(); i++) {
+      pop();
+    }
   }
 }
