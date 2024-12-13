@@ -142,8 +142,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * @param pFormula The input Boolean formula from which to extract all free arithmetic variables.
    * @return A list of all free variables and uninterpreted functions of the input formula.
    */
-  private List<Formula> getFreeArithVars(BooleanFormula pFormula) {
-    return new ArrayList<>(mgr.extractVariablesAndUFs(pFormula).values());
+  private ImmutableList<Formula> getFreeArithVars(BooleanFormula pFormula) {
+    return ImmutableList.copyOf(mgr.extractVariablesAndUFs(pFormula).values());
   }
 
   /**
