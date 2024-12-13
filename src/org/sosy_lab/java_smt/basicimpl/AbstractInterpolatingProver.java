@@ -76,7 +76,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
             .filter(formula -> !formulasOfA.contains(formula))
             .collect(ImmutableList.toImmutableList());
 
-    return getModelBasedInterpolant(formulasOfA, formulasOfB);
+    return getQEBasedInterpolant(formulasOfA, formulasOfB);
   }
 
   @Override
@@ -159,7 +159,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   private BooleanFormula getQEBasedInterpolant(
-      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
+      throws SolverException, InterruptedException {
 
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
@@ -169,17 +170,22 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = null;
+    BooleanFormula interpolant = getForwardInterpolant(formulasOfA, varsOfA, sharedVars);
 
     return interpolant;
   }
 
   private BooleanFormula getForwardInterpolant(
-      BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars) {
+      BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars)
+      throws SolverException, InterruptedException {
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfA, sharedVars);
 
-    return null;
+    if (boundVars.isEmpty()) {
+      return formulasOfA;
+    }
+
+    return qfmgr.eliminateQuantifiers(qfmgr.exists(boundVars, formulasOfA));
   }
 
   /**
