@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -39,6 +40,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private final BooleanFormulaManager bmgr;
   private final UFManager ufmgr;
   private final QuantifiedFormulaManager qfmgr;
+
+  private static final UniqueIdGenerator UNIQUE_ID_GENERATOR = new UniqueIdGenerator();
+  private static final String PREFIX = "__internal_model_itp_generation_";
 
   protected AbstractInterpolatingProver(
           Set<ProverOptions> pOptions,
@@ -173,7 +177,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
-    return ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
+    return ufmgr.declareAndCallUF(
+        PREFIX + UNIQUE_ID_GENERATOR.getFreshId(),
+        FormulaType.BooleanType,
+        sharedVars);
   }
 
   private void clearStack() {
