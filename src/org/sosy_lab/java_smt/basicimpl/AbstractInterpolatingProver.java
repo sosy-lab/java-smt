@@ -64,6 +64,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     final ImmutableCollection<BooleanFormula> assertedFormulas =
         ImmutableList.copyOf(getAssertedFormulas());
+
     final Collection<BooleanFormula> formulasOfA =
         (Collection<BooleanFormula>) ImmutableList.copyOf(pFormulasOfA);
     final Collection<BooleanFormula> formulasOfB =
@@ -76,9 +77,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-          List<? extends Collection<TFormulaInfo>> partitionedFormulas,
-          int[] startOfSubTree) throws SolverException, InterruptedException {
-    return List.of();
+      List<? extends Collection<TFormulaInfo>> partitionedFormulas,
+      int[] startOfSubTree) throws SolverException, InterruptedException {
+    throw new UnsupportedOperationException(
+        "directly receiving tree interpolants is not supported. "
+            + "Use another strategy for interpolants.");
   }
 
   /**
