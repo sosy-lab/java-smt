@@ -12,6 +12,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
@@ -436,6 +437,38 @@ public abstract class SolverBasedTest0 {
     @Override
     protected Solvers solverToUse() {
       return solver;
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public abstract static class ParameterizedInterpolatingSolverBasedTest0 extends SolverBasedTest0 {
+
+    @Parameters(name = "{0}")
+    public static Object[] getAllSolvers() {
+      return Solvers.values();
+    }
+
+    @Parameter(0)
+    public Solvers solver;
+
+    @Override
+    protected Solvers solverToUse() {
+      return solver;
+    }
+
+    @Parameters(name = "{1}")
+    public static Object[] getAllInterpolationStrategies() {
+      return ImmutableSet.of(
+          ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT,
+          ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS,
+          ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS).toArray();
+    }
+
+    @Parameter(1)
+    public ProverOptions itpStrategies;
+
+    protected ProverOptions itpStrategiesToUse() {
+      return itpStrategies;
     }
   }
 }
