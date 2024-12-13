@@ -181,11 +181,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfA, sharedVars);
 
-    if (boundVars.isEmpty()) {
-      return formulasOfA;
+    if (!boundVars.equals(sharedVars)) {
+      BooleanFormula forward = qfmgr.exists(boundVars, formulasOfA);
+      return qfmgr.eliminateQuantifiers(forward);
     }
 
-    return qfmgr.eliminateQuantifiers(qfmgr.exists(boundVars, formulasOfA));
+    return formulasOfA;
   }
 
   /**
@@ -212,9 +213,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
-    return vars.stream()
+    ImmutableList<Formula> boundVars = vars.stream()
         .filter(var -> !sharedVars.contains(var))
         .collect(ImmutableList.toImmutableList());
+
+    return boundVars.isEmpty() ? ImmutableList.copyOf(vars) : boundVars;
   }
 
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
