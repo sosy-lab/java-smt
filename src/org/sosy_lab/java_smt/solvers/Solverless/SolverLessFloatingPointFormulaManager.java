@@ -20,22 +20,27 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import com.sun.jdi.IntegerType;
 import java.util.List;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessFloatingPointFormulaManager extends
-                                                    AbstractFloatingPointFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+                                                   AbstractFloatingPointFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
   protected SolverLessFloatingPointFormulaManager(SolverLessFormulaCreator creator) {
     super(creator);
   }
+
   @Override
   protected DummyFormula getDefaultRoundingMode() {
     return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
@@ -51,7 +56,7 @@ public class SolverLessFloatingPointFormulaManager extends
       double n,
       FloatingPointType type,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(type.getExponentSize(), type.getMantissaSize());
   }
 
   @Override
@@ -59,27 +64,29 @@ public class SolverLessFloatingPointFormulaManager extends
       String pN,
       FloatingPointType pType,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String pVar, FloatingPointType pType) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    formula.setName(pVar);
+    return formula;
   }
 
   @Override
   protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
   }
 
   @Override
   protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
   }
 
   @Override
   protected DummyFormula makeNaNImpl(FloatingPointType pType) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
   }
 
   @Override
@@ -88,7 +95,21 @@ public class SolverLessFloatingPointFormulaManager extends
       boolean pSigned,
       FormulaType<?> pTargetType,
       DummyFormula pRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    if (pTargetType.isFloatingPointType()) {
+      FloatingPointType targetType = (FloatingPointType) pTargetType;
+      return new DummyFormula(targetType.getExponentSize(), targetType.getMantissaSize());
+    }
+    if (pTargetType.isIntegerType()) {
+      return new DummyFormula("", FormulaTypesForChecking.INTEGER);
+    }
+    if (pTargetType.isBitvectorType()) {
+      BitvectorType targetType = (BitvectorType) pTargetType;
+      return new DummyFormula(targetType.getSize());
+    }
+    if (pTargetType.isRationalType()) {
+      return new DummyFormula("", FormulaTypesForChecking.RATIONAL);
+    }
+    return null;
   }
 
   @Override
@@ -97,44 +118,44 @@ public class SolverLessFloatingPointFormulaManager extends
       boolean pSigned,
       FloatingPointType pTargetType,
       DummyFormula pRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pTargetType.getExponentSize(), pTargetType.getMantissaSize());
   }
 
   @Override
   protected DummyFormula fromIeeeBitvectorImpl(
       DummyFormula pNumber,
       FloatingPointType pTargetType) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pTargetType.getExponentSize(), pTargetType.getMantissaSize());
   }
 
   @Override
   protected DummyFormula toIeeeBitvectorImpl(DummyFormula pNumber) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pNumber.getExponent(), pNumber.getMantissa());
   }
 
   @Override
   protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula abs(DummyFormula pParam1) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula max(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula min(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula sqrt(DummyFormula pNumber, DummyFormula pRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pNumber.getExponent(), pNumber.getMantissa());
   }
 
   @Override
@@ -142,7 +163,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
@@ -150,7 +171,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
@@ -158,7 +179,7 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
@@ -166,12 +187,12 @@ public class SolverLessFloatingPointFormulaManager extends
       DummyFormula pParam1,
       DummyFormula pParam2,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula assignment(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
@@ -231,7 +252,8 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula round(DummyFormula pFormula, FloatingPointRoundingMode pRoundingMode) {
-    return new DummyFormula("", FormulaTypesForChecking.FLOATING_POINT);
+    return new DummyFormula(pFormula.getExponent(), pFormula.getMantissa());
   }
 }
+
 

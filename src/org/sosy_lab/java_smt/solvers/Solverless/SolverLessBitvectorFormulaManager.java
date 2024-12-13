@@ -22,13 +22,11 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+
 
 public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
     FormulaTypesForChecking, DummyEnv, DummyFunction> {
-
 
   protected SolverLessBitvectorFormulaManager(SolverLessFormulaCreator pSolverLessFormulaCreator,
                                               SolverLessBooleanFormulaManager pSolverLessBooleanFormulaManager)
@@ -38,52 +36,52 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
 
   @Override
   protected DummyFormula makeBitvectorImpl(int length, DummyFormula pParam1) {
-    return null;
+    return new DummyFormula(length);
   }
 
   @Override
   protected DummyFormula toIntegerFormulaImpl(DummyFormula pI, boolean signed) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.INTEGER); // Integer formulas do not have a length.
   }
 
   @Override
   protected DummyFormula negate(DummyFormula pParam1) {
-    return null;
+    return new DummyFormula(pParam1.getBitvectorLength());
   }
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula divide(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula modulo(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula multiply(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
@@ -91,71 +89,76 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
       DummyFormula pParam1,
       DummyFormula pParam2,
       boolean signed) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula not(DummyFormula pParam1) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN); // Boolean formulas do not have a length.
   }
 
   @Override
   protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
-    return null;
+    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
   protected DummyFormula makeBitvectorImpl(int pLength, BigInteger pI) {
-    return null;
+    return new DummyFormula(pLength);
   }
 
   @Override
   protected DummyFormula makeVariableImpl(int pLength, String pVar) {
-    return null;
+    DummyFormula result = new DummyFormula(pLength);
+    result.setName(pVar);
+    return result;
   }
 
   @Override
   protected DummyFormula shiftRight(DummyFormula pNumber, DummyFormula toShift, boolean signed) {
-    return null;
+    return new DummyFormula(pNumber.getBitvectorLength());
   }
 
   @Override
   protected DummyFormula shiftLeft(DummyFormula pExtract, DummyFormula pExtract2) {
-    return null;
+    return new DummyFormula(pExtract.getBitvectorLength());
   }
 
   @Override
   protected DummyFormula concat(DummyFormula number, DummyFormula pAppend) {
-    return null;
+    int newLength = number.getBitvectorLength() + pAppend.getBitvectorLength();
+    return new DummyFormula(newLength);
   }
 
   @Override
   protected DummyFormula extract(DummyFormula pNumber, int pMsb, int pLsb) {
-    return null;
+    int newLength = pMsb - pLsb + 1;
+    return new DummyFormula(newLength);
   }
 
   @Override
   protected DummyFormula extend(DummyFormula pNumber, int pExtensionBits, boolean pSigned) {
-    return null;
+    return new DummyFormula(pNumber.getBitvectorLength() + pExtensionBits);
   }
 }
+

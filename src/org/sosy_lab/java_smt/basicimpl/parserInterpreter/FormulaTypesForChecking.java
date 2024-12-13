@@ -30,5 +30,6 @@ public enum FormulaTypesForChecking {
   BITVECTOR,
   ARRAY,
   RATIONAL,
-  BOOLEAN
+  BOOLEAN,
+  DUMMY
 }

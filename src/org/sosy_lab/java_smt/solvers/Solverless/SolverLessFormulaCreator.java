@@ -20,9 +20,10 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -62,25 +63,38 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public FormulaType<?> getFormulaType(DummyFormula formula) {
-    switch (formula.getFormulaTypesForChecking()) {
-      case BITVECTOR:
-        return FormulaType.getBitvectorTypeWithSize(0);
-      case FLOATING_POINT:
-        return FormulaType.getFloatingPointType(8, 24);
-      case ARRAY:
-        return FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.BooleanType);
-      case RATIONAL:
-        return FormulaType.RationalType;
-      case STRING:
-        return FormulaType.StringType;
-      case REGEX:
-        return FormulaType.RegexType;
-      case INTEGER:
-        return FormulaType.IntegerType;
-      default:
-        return FormulaType.BooleanType;
+  @SuppressWarnings("unchecked")
+  public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
+    if (formula instanceof DummyFormula) {
+      DummyFormula dummyFormula = (DummyFormula) formula;
+      switch (dummyFormula.getFormulaType()) {
+        case BITVECTOR:
+          return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(dummyFormula.getBitvectorLength());
+        case FLOATING_POINT:
+          return (FormulaType<T>) FormulaType.getFloatingPointType(dummyFormula.getExponent(),
+              dummyFormula.getMantissa());
+        case ARRAY:
+          return (FormulaType<T>) FormulaType.getArrayType(
+              dummyFormula.getFirstArrayParameter().getFormulaTypeForCreator(),
+              dummyFormula.getSecondArrayParameter().getFormulaTypeForCreator());
+        case RATIONAL:
+          return (FormulaType<T>) FormulaType.RationalType;
+        case STRING:
+          return (FormulaType<T>) FormulaType.StringType;
+        case REGEX:
+          return (FormulaType<T>) FormulaType.RegexType;
+        case INTEGER:
+          return (FormulaType<T>) FormulaType.IntegerType;
+        default:
+          return (FormulaType<T>) FormulaType.BooleanType;
+      }
     }
+    return super.getFormulaType(formula);
+  }
+
+  @Override
+  public FormulaType<?> getFormulaType(DummyFormula formula) {
+    return formula.getFormulaTypeForCreator();
   }
 
   @Override
@@ -90,7 +104,7 @@ public class SolverLessFormulaCreator
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    return new DummyFormula("", args.get(0).getFormulaTypesForChecking());
+    return new DummyFormula("", args.get(0).getFormulaType());
   }
 
   @Override

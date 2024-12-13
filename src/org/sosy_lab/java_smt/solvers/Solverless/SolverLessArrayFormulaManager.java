@@ -20,9 +20,14 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
@@ -30,14 +35,49 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
   public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
+
+  protected SolverLessArrayFormulaManager(FormulaCreator<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> pFormulaCreator) {
+    super(pFormulaCreator);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> TE select(
+      ArrayFormula<TI, TE> pArray,
+      TI pIndex) {
+    return super.select(pArray, pIndex);
+  }
+
   @Override
   protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
+      ArrayFormula<TI, TE> pArray,
+      TI pIndex,
+      TE pValue) {
+    return super.store(pArray, pIndex, pValue);
   }
 
   @Override
   protected DummyFormula store(DummyFormula pArray, DummyFormula pIndex, DummyFormula pValue) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
+      String pName,
+      ArrayFormulaType<TI, TE> type) throws GeneratorException {
+    return super.makeArray(pName, type);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>> ArrayFormula<TI, TE> makeArray(
+      String pName,
+      FTI pIndexType,
+      FTE pElementType) throws GeneratorException {
+    return super.makeArray(pName, pIndexType, pElementType);
   }
 
   @Override
@@ -45,11 +85,28 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
       String pName,
       FormulaType<TI> pIndexType,
       FormulaType<TE> pElementType) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
+  }
+
+  @Override
+  public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {
+    return super.getIndexType(pArray);
+  }
+
+  @Override
+  public <TE extends Formula> FormulaType<TE> getElementType(ArrayFormula<?, TE> pArray) {
+    return super.getElementType(pArray);
+  }
+
+  @Override
+  public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
+      ArrayFormula<TI, TE> pArray1,
+      ArrayFormula<TI, TE> pArray2) {
+    return super.equivalence(pArray1, pArray2);
   }
 
   @Override
   protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return null;
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 }

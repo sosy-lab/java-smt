@@ -20,11 +20,110 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.math.BigInteger;
+import java.util.List;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula,
+    IntegerFormula>
+    implements IntegerFormulaManager{
 
-public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula, IntegerFormula> {
+  public SolverLessIntegerFormulaManager(SolverLessFormulaCreator pCreator) {
+    super(pCreator);
+  }
 
+  BooleanFormula dummyBooleanFormula = new BooleanFormula() {
+  };
+  IntegerFormula dummyIntegerFormula = new IntegerFormula() {
+  };
+
+  @Override
+  public BooleanFormula modularCongruence(
+      IntegerFormula number1,
+      IntegerFormula number2,
+      BigInteger n) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula negate(IntegerFormula number) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula add(IntegerFormula number1, IntegerFormula number2) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula sum(List<IntegerFormula> operands) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula subtract(IntegerFormula number1, IntegerFormula number2) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula divide(IntegerFormula numerator, IntegerFormula denumerator) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public IntegerFormula multiply(IntegerFormula number1, IntegerFormula number2) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public BooleanFormula equal(IntegerFormula number1, IntegerFormula number2) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula distinct(List<IntegerFormula> pNumbers) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula greaterThan(IntegerFormula number1, IntegerFormula number2) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula greaterOrEquals(IntegerFormula number1, IntegerFormula number2) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula lessThan(IntegerFormula number1, IntegerFormula number2) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public BooleanFormula lessOrEquals(IntegerFormula number1, IntegerFormula number2) {
+    return dummyBooleanFormula;
+  }
+
+  @Override
+  public IntegerFormula floor(IntegerFormula formula) {
+    return dummyIntegerFormula;
+  }
+
+  @Override
+  public FormulaType<IntegerFormula> getFormulaType() {
+    return FormulaType.IntegerType;
+  }
 }

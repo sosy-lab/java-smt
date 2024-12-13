@@ -20,27 +20,24 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
-import io.github.cvc5.Solver;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.NumeralType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessNumeralFormulaManager <T,
-    Y> extends AbstractNumeralFormulaManager<DummyFormula,
-    FormulaTypesForChecking, DummyEnv, DummyType, DummyType, DummyFunction> {
-  public SolverLessNumeralFormulaManager() {
-    super(new SolverLessFormulaCreator(), NonLinearArithmetic.APPROXIMATE_ALWAYS);
+public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
+    Y extends NumeralFormula> extends AbstractNumeralFormulaManager<DummyFormula,
+    FormulaTypesForChecking, DummyEnv, T, Y, DummyFunction> {
+  public SolverLessNumeralFormulaManager(SolverLessFormulaCreator creator) {
+    super(creator, NonLinearArithmetic.APPROXIMATE_ALWAYS);
   }
 
   @Override
   protected boolean isNumeral(DummyFormula val) {
-    return val.getFormulaTypesForChecking() == FormulaTypesForChecking.INTEGER;
+    return val.getFormulaType() == FormulaTypesForChecking.INTEGER;
   }
 
   @Override
@@ -119,7 +116,6 @@ public class SolverLessNumeralFormulaManager <T,
   }
 
   @Override
-  public FormulaType<DummyType> getFormulaType() {
-    return null;
-  }
+  public abstract FormulaType<Y> getFormulaType();
 }
+

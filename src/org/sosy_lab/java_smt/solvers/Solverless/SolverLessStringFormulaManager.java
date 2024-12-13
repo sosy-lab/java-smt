@@ -80,17 +80,17 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
 
   @Override
   protected DummyFormula prefix(DummyFormula prefix, DummyFormula str) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula suffix(DummyFormula suffix, DummyFormula str) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula in(DummyFormula str, DummyFormula regex) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
@@ -131,52 +131,52 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
 
   @Override
   protected DummyFormula makeRegexImpl(String value) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula noneImpl() {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula allImpl() {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula allCharImpl() {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula range(DummyFormula start, DummyFormula end) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula concatRegexImpl(List<DummyFormula> parts) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula union(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula intersection(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula closure(DummyFormula pParam) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
   protected DummyFormula complement(DummyFormula pParam) {
-    return new DummyFormula("", FormulaTypesForChecking.STRING);
+    return new DummyFormula("", FormulaTypesForChecking.REGEX);
   }
 
   @Override
