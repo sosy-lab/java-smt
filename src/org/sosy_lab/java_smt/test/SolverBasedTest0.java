@@ -424,7 +424,7 @@ public abstract class SolverBasedTest0 {
   }
 
   @RunWith(Parameterized.class)
-  public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
+  public abstract static class ParameterizedInterpolatingSolverBasedTest0 extends SolverBasedTest0 {
 
     @Parameters(name = "{0}")
     public static Object[] getAllSolvers() {
