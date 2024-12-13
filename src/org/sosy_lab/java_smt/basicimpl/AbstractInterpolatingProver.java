@@ -86,6 +86,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
+
+    final ImmutableList<BooleanFormula> originalStack = ImmutableList.copyOf(getAssertedFormulas());
+
+
+
     return null;
   }
 
