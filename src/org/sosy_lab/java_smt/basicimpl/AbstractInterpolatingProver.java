@@ -83,6 +83,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
             + "Use another strategy for interpolants.");
   }
 
+  private BooleanFormula getModelBasedInterpolant(
+      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
+      throws InterruptedException, SolverException {
+    return null;
+  }
+
   /**
    * Computes Craig interpolants for a pair of formulas using a model-based approach.
    *
@@ -108,7 +114,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * @param pFormulasOfB A Collection of Boolean formulas of B.
    * @return the Craig interpolant Itp if it satisfies the conditions, otherwise returns false.
    */
-  private BooleanFormula getModelBasedInterpolant(
+  private BooleanFormula computeModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
 
@@ -132,7 +138,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     }
 
     return Objects.requireNonNull(getModel().eval(itp));
-
   }
 
   /**
