@@ -87,6 +87,13 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
             + "Use another strategy for interpolants.");
   }
 
+  /**
+   * Returns Craig interpolants for a pair of formulas using a model-based approach.
+   *
+   * @param pFormulasOfA A Collection of Boolean formulas of A.
+   * @param pFormulasOfB A Collection of Boolean formulas of B.
+   * @return A model-based Craig Interpolant.
+   */
   private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
@@ -157,6 +164,16 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return bmgr.makeFalse();
   }
 
+  /**
+   * Computes Craig interpolants for a pair of formulas using a quantifier-based with quantifier
+   * elimination approach.
+   *
+   * <p>The quantifier-elimination-based approach ...
+   *
+   * @param pFormulasOfA A Collection of Boolean formulas of A.
+   * @param pFormulasOfB A Collection of Boolean formulas of B.
+   * @return A quantifier-elimination-based Craig Interpolant.
+   */
   private BooleanFormula getQEBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws SolverException, InterruptedException {
@@ -225,6 +242,13 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
         .collect(ImmutableList.toImmutableList());
   }
 
+  /**
+   * Determines the bound variables in the provided formula.
+   *
+   * @param vars The list of all variables in a formula the bound variables are wanting from.
+   * @param sharedVars A list of the shared variables between the two formulas A and B.
+   * @return An immutable list of bound variables of the provided formula.
+   */
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
     ImmutableList<Formula> boundVars = vars.stream()
         .filter(var -> !sharedVars.contains(var))
@@ -240,12 +264,21 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
         sharedVars);
   }
 
+  /**
+   * Removes all formulas from the stack to reset it before performing a new operation.
+   */
   private void clearStack() {
     for (int i = 0; i < size(); i++) {
       pop();
     }
   }
 
+  /**
+   * Re-adds all formulas that were on the stack before it was cleared, ensuring that the stack
+   * is returned to its previous state.
+   *
+   * @param assertedFormulas The list of formulas to restore the stack.
+   */
   private void restoreStack(List<BooleanFormula> assertedFormulas) throws InterruptedException {
     for (BooleanFormula formula : assertedFormulas) {
       push(formula);
