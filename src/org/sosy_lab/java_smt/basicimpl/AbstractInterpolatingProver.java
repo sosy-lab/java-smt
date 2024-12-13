@@ -143,7 +143,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
-    pop(); // clear previous solver stack
     push(bmgr.and(left, right)); // solve left and right
 
     if (isUnsat()) {
