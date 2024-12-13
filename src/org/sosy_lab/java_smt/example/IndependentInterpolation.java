@@ -99,6 +99,7 @@ public class IndependentInterpolation {
     boolean unsat = prover.isUnsat();
     Preconditions.checkState(unsat, "The example for interpolation should be UNSAT");
 
+    assert ip0 != null;
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip0));
     logger.log(Level.INFO, "Interpolants are:", itp);
   }
