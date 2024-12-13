@@ -135,7 +135,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula itp = ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
+    BooleanFormula itp = getUniqueInterpolant(sharedVars);
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
@@ -170,6 +170,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return varsOfA.stream()
         .filter(varsOfB::contains)
         .collect(ImmutableList.toImmutableList());
+  }
+
+  private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
+    return ufmgr.declareAndCallUF("Func", FormulaType.BooleanType, sharedVars);
   }
 
   private void clearStack() {
