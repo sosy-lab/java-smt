@@ -158,6 +158,22 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return bmgr.makeFalse();
   }
 
+  private BooleanFormula getQEBasedInterpolant(
+      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+
+    BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
+    BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
+
+    ImmutableList<Formula> varsOfA = getVars(formulasOfA);
+    ImmutableList<Formula> varsOfB = getVars(formulasOfB);
+
+    ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
+
+    BooleanFormula interpolant = null;
+
+    return interpolant;
+  }
+
   /**
    * Extracts all free variables and uninterpreted functions from the input Boolean formula.
    *
