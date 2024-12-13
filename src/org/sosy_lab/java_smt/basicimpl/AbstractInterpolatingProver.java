@@ -91,6 +91,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     clearStack();
 
+    restoreStack(originalStack);
+
     return null;
   }
 
@@ -171,6 +173,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private void clearStack() {
     for (int i = 0; i < size(); i++) {
       pop();
+    }
+  }
+
+  private void restoreStack(List<BooleanFormula> assertedFormulas) throws InterruptedException {
+    for (BooleanFormula formula : assertedFormulas) {
+      push(formula);
     }
   }
 }
