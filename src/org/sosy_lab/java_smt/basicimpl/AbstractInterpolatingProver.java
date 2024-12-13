@@ -148,13 +148,13 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   /**
    * Identifies the shared variables between two formulas A and B.
    *
-   * @param pVarsOfA A list of free variables extracted from formula A.
-   * @param pVarsOfB A list of free variables extracted from formula B.
+   * @param varsOfA A list of free variables extracted from formula A.
+   * @param varsOfB A list of free variables extracted from formula B.
    * @return An immutable list of variables found in both formulas A and B.
    */
-  private ImmutableList<Formula> getSharedVars(List<Formula> pVarsOfA, List<Formula> pVarsOfB) {
-    return pVarsOfA.stream()
-        .filter(pVarsOfB::contains)
+  private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
+    return varsOfA.stream()
+        .filter(varsOfB::contains)
         .collect(ImmutableList.toImmutableList());
   }
 }
