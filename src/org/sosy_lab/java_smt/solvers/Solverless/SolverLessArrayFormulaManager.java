@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
     FormulaTypesForChecking, DummyEnv, DummyFunction> {
+
   public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
@@ -49,35 +50,16 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {
-    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
-  }
-
-  @Override
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
-      ArrayFormula<TI, TE> pArray,
-      TI pIndex,
-      TE pValue) {
-    return super.store(pArray, pIndex, pValue);
+    if (pArray.getSecondArrayParameter().getFormulaType() == FormulaTypesForChecking.ARRAY) {
+      return new DummyFormula(pArray.getSecondArrayParameter().getFirstArrayParameter(),
+          pArray.getSecondArrayParameter().getSecondArrayParameter());
+    }
+    return pArray.getSecondArrayParameter();
   }
 
   @Override
   protected DummyFormula store(DummyFormula pArray, DummyFormula pIndex, DummyFormula pValue) {
-    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
-  }
-
-  @Override
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName,
-      ArrayFormulaType<TI, TE> type) throws GeneratorException {
-    return super.makeArray(pName, type);
-  }
-
-  @Override
-  public <TI extends Formula, TE extends Formula, FTI extends FormulaType<TI>, FTE extends FormulaType<TE>> ArrayFormula<TI, TE> makeArray(
-      String pName,
-      FTI pIndexType,
-      FTE pElementType) throws GeneratorException {
-    return super.makeArray(pName, pIndexType, pElementType);
+    return pArray;
   }
 
   @Override
@@ -85,28 +67,14 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
       String pName,
       FormulaType<TI> pIndexType,
       FormulaType<TE> pElementType) {
-    return new DummyFormula("", FormulaTypesForChecking.ARRAY);
-  }
-
-  @Override
-  public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {
-    return super.getIndexType(pArray);
-  }
-
-  @Override
-  public <TE extends Formula> FormulaType<TE> getElementType(ArrayFormula<?, TE> pArray) {
-    return super.getElementType(pArray);
-  }
-
-  @Override
-  public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
-      ArrayFormula<TI, TE> pArray1,
-      ArrayFormula<TI, TE> pArray2) {
-    return super.equivalence(pArray1, pArray2);
+    DummyFormula result = new DummyFormula(DummyFormula.getDummyFormulaFromObject(pIndexType),
+        DummyFormula.getDummyFormulaFromObject(pElementType));
+    result.setName(pName);
+    return result;
   }
 
   @Override
   protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 }

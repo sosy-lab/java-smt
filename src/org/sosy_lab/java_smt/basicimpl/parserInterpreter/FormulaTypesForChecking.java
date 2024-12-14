@@ -31,5 +31,5 @@ public enum FormulaTypesForChecking {
   ARRAY,
   RATIONAL,
   BOOLEAN,
-  DUMMY
+  DUMMY,
 }

@@ -19,11 +19,11 @@
  */
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverlessFormula;
 
 public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManager<DummyFormula,
     FormulaTypesForChecking, DummyEnv, DummyFunction> {
@@ -34,37 +34,39 @@ public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManag
 
   @Override
   protected DummyFormula makeVariableImpl(String pVar) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    DummyFormula result = new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    result.setName(pVar);
+    return result;
   }
 
   @Override
   protected DummyFormula makeBooleanImpl(boolean value) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula not(DummyFormula pParam1) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
   protected DummyFormula equivalence(DummyFormula bits1, DummyFormula bits2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
@@ -79,7 +81,7 @@ public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManag
 
   @Override
   protected DummyFormula ifThenElse(DummyFormula cond, DummyFormula f1, DummyFormula f2) {
-    return new DummyFormula("", FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override

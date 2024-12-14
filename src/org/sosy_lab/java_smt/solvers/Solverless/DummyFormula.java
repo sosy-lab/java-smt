@@ -21,8 +21,10 @@
 package org.sosy_lab.java_smt.solvers.Solverless;
 
 import java.text.Normalizer.Form;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class DummyFormula implements Formula {
@@ -37,9 +39,8 @@ public class DummyFormula implements Formula {
   private final FormulaTypesForChecking formulaType;
 
 
-  public DummyFormula(String representation, FormulaTypesForChecking pFormulaType) { //all other
+  public DummyFormula(FormulaTypesForChecking pFormulaType) { //all other
     // sorts
-    this.representation = representation;
     formulaType = pFormulaType;
   }
 
@@ -68,10 +69,42 @@ public class DummyFormula implements Formula {
     formulaType = FormulaTypesForChecking.BITVECTOR;
   }
 
+  public static DummyFormula getDummyFormulaFromObject(FormulaType<?> pType) {
+    if (pType.isArrayType()) {
+      FormulaType.ArrayFormulaType<?, ?> arrayType = (FormulaType.ArrayFormulaType<?, ?>) pType;
+      FormulaType<?> indexType = arrayType.getIndexType();
+      FormulaType<?> elementType = arrayType.getElementType();
+      return new DummyFormula(getDummyFormulaFromObject(indexType),
+          getDummyFormulaFromObject(elementType));
+    } else if (pType.isBitvectorType()) {
+      FormulaType.BitvectorType bitvectorType = (FormulaType.BitvectorType) pType;
+      int size = bitvectorType.getSize();
+      return new DummyFormula(size);
+    } else if (pType.isBooleanType()) {
+      return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    } else if (pType.isFloatingPointType()) {
+      FormulaType.FloatingPointType floatingPointType = (FormulaType.FloatingPointType) pType;
+      int exponentSize = floatingPointType.getExponentSize();
+      int mantissaSize = floatingPointType.getMantissaSize();
+      return new DummyFormula(exponentSize, mantissaSize);
+    } else if (pType.isNumeralType()) {
+      if (pType.isIntegerType()) {
+        return new DummyFormula(FormulaTypesForChecking.INTEGER);
+      } else if (pType.isRationalType()) {
+        return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+      }
+    } else if (pType.isStringType()) {
+      return new DummyFormula(FormulaTypesForChecking.STRING);
+    } else if (pType.isRegexType()) {
+      return new DummyFormula(FormulaTypesForChecking.REGEX);
+    } else {
+      throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
+    }
+    return null;
+  }
 
 
-
-public FormulaTypesForChecking getFormulaType() {
+  public FormulaTypesForChecking getFormulaType() {
     return formulaType;
   }
 

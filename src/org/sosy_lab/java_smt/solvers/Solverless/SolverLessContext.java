@@ -29,7 +29,8 @@ public final class SolverLessContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return "SolverLess 1.0";
+    return "SolverLess 1.0. Please note, that this Solver has no solving capabilities. It is "
+        + "only used for SMTLIB2 parsing and formula creation.";
   }
 
   @Override

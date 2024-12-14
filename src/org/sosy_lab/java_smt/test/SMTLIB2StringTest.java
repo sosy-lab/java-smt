@@ -60,6 +60,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
+    assert smgr != null;
     StringFormula a = smgr.makeVariable("a");
     StringFormula b = smgr.makeVariable("b");
 

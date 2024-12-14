@@ -20,7 +20,9 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -59,7 +61,9 @@ public class SolverLessFormulaCreator
   public DummyFormula makeVariable(
       FormulaTypesForChecking pFormulaTypesForChecking,
       String varName) {
-    return new DummyFormula("", pFormulaTypesForChecking);
+    DummyFormula result = new DummyFormula(pFormulaTypesForChecking);
+    result.setName(varName);
+    return result;
   }
 
   @Override
@@ -104,7 +108,7 @@ public class SolverLessFormulaCreator
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    return new DummyFormula("", args.get(0).getFormulaType());
+    return new DummyFormula(args.get(0).getFormulaType());
   }
 
   @Override

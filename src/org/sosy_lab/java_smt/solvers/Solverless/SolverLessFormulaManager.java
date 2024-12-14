@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.io.IOException;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.basicimpl.*;
 import org.sosy_lab.java_smt.api.*;
@@ -48,12 +49,13 @@ public class SolverLessFormulaManager
 
   @Override
   public Appender dumpFormula(DummyFormula formula) {
-    return null;
+    return appendable -> appendable.append("DummyFormula");
   }
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    return null;
+    return new BooleanFormula() {
+    };
   }
 }
 
