@@ -23,7 +23,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
+  @Override
+  public Solvers solverToUse() {
+    return Solvers.SOLVERLESS;
+  }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();

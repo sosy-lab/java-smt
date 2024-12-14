@@ -37,83 +37,10 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
 
   @Override
   protected boolean isNumeral(DummyFormula val) {
-    return val.getFormulaType() == FormulaTypesForChecking.INTEGER;
+    return val.getFormulaType() == FormulaTypesForChecking.INTEGER || val.getFormulaType() == FormulaTypesForChecking.RATIONAL;
   }
 
-  @Override
-  protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
 
-  @Override
-  protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula makeVariableImpl(String i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
 
   @Override
   public abstract FormulaType<Y> getFormulaType();

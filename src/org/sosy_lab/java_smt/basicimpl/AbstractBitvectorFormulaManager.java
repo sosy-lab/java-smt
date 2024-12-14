@@ -41,6 +41,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return getFormulaCreator().encapsulateBitvector(pTerm);
   }
 
+
   private void checkSameSize(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, String operation) {
     final int len1 = getLength(pNumber1);

@@ -33,6 +33,20 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0{
   }
 
   @Test
+  public void easyBitVecDeclarationTest(){
+    requireBitvectors();
+    BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(32, "a");
+    BitvectorFormula b = Objects.requireNonNull(bvmgr).makeVariable(32, "b");
+    BooleanFormula constraint = bvmgr.equal(a,b);
+
+    Generator.assembleConstraint(constraint);
+
+    String expectedResult="(declare-const a (_ BitVec 32))\n"+
+        "(declare-const b (_ BitVec 32))\n"+
+        "(assert (= a b))";
+  }
+
+  @Test
   public void testMakeVariable() {
     requireBitvectors();
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(32, "a");

@@ -20,12 +20,15 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+
 public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula,
     IntegerFormula>
     implements IntegerFormulaManager{
@@ -34,92 +37,82 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
     super(pCreator);
   }
 
-  BooleanFormula dummyBooleanFormula = new BooleanFormula() {
-  };
-  IntegerFormula dummyIntegerFormula = new IntegerFormula() {
-  };
-
   @Override
-  public BooleanFormula modularCongruence(
-      IntegerFormula number1,
-      IntegerFormula number2,
-      BigInteger n) {
-    return dummyBooleanFormula;
+  protected DummyFormula makeNumberImpl(long i) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
   }
 
   @Override
-  public BooleanFormula modularCongruence(IntegerFormula number1, IntegerFormula number2, long n) {
-    return dummyBooleanFormula;
+  protected DummyFormula makeNumberImpl(BigInteger i) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
   }
 
   @Override
-  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
-    return dummyIntegerFormula;
+  protected DummyFormula makeNumberImpl(String i) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER,i);
   }
 
   @Override
-  public IntegerFormula negate(IntegerFormula number) {
-    return dummyIntegerFormula;
+  protected DummyFormula makeNumberImpl(double pNumber) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
   }
 
   @Override
-  public IntegerFormula add(IntegerFormula number1, IntegerFormula number2) {
-    return dummyIntegerFormula;
+  protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
   }
 
   @Override
-  public IntegerFormula sum(List<IntegerFormula> operands) {
-    return dummyIntegerFormula;
+  protected DummyFormula makeVariableImpl(String i) {
+
+    DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER);
+    result.setName(i);
+    return result;
   }
 
   @Override
-  public IntegerFormula subtract(IntegerFormula number1, IntegerFormula number2) {
-    return dummyIntegerFormula;
+  protected DummyFormula negate(DummyFormula pParam1) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
 
   @Override
-  public IntegerFormula divide(IntegerFormula numerator, IntegerFormula denumerator) {
-    return dummyIntegerFormula;
+  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
 
   @Override
-  public IntegerFormula multiply(IntegerFormula number1, IntegerFormula number2) {
-    return dummyIntegerFormula;
+  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
 
   @Override
-  public BooleanFormula equal(IntegerFormula number1, IntegerFormula number2) {
-    return dummyBooleanFormula;
+  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
-  public BooleanFormula distinct(List<IntegerFormula> pNumbers) {
-    return dummyBooleanFormula;
+  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
 
   @Override
-  public BooleanFormula greaterThan(IntegerFormula number1, IntegerFormula number2) {
-    return dummyBooleanFormula;
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
-  public BooleanFormula greaterOrEquals(IntegerFormula number1, IntegerFormula number2) {
-    return dummyBooleanFormula;
+  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
-  public BooleanFormula lessThan(IntegerFormula number1, IntegerFormula number2) {
-    return dummyBooleanFormula;
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override
-  public BooleanFormula lessOrEquals(IntegerFormula number1, IntegerFormula number2) {
-    return dummyBooleanFormula;
-  }
-
-  @Override
-  public IntegerFormula floor(IntegerFormula formula) {
-    return dummyIntegerFormula;
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override

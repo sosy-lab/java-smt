@@ -22,6 +22,7 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -93,6 +94,9 @@ public class SolverLessFormulaCreator
           return (FormulaType<T>) FormulaType.BooleanType;
       }
     }
+    if(formula instanceof BitvectorFormula) {
+      return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(extractInfo(formula).getBitvectorLength());
+    }
     return super.getFormulaType(formula);
   }
 
@@ -104,6 +108,60 @@ public class SolverLessFormulaCreator
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DummyFormula f) {
     return null;
+  }
+
+  @Override
+  protected DummyFormula extractInfo(Formula pT) {
+    if(pT instanceof DummyFormula) {
+      return (DummyFormula) pT;
+    }
+    if(pT instanceof BitvectorFormula){
+      return new DummyFormula(extractBitvectorLengthFromString(pT.toString()));
+    }
+    if(pT instanceof FloatingPointFormula){
+      return new DummyFormula(extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
+    }
+    return new DummyFormula(FormulaTypesForChecking.DUMMY);
+  }
+  public int extractBitvectorLengthFromString(String representation) {
+    if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
+      try {
+        String lengthStr = representation.substring(10, representation.length() - 1);
+        return Integer.parseInt(lengthStr);
+      } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Invalid Bitvector representation: " + representation, e);
+      }
+    }
+    throw new IllegalArgumentException("Invalid Bitvector representation: " + representation);
+  }
+  public int extractExponentFromString(String representation) {
+    if (representation.startsWith("FloatingPoint<") && representation.endsWith(">")) {
+      try {
+        String[] parts = representation.substring(14, representation.length() - 1).split(",");
+        if (parts.length != 2) {
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+        }
+        return Integer.parseInt(parts[0].trim());
+      } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+      }
+    }
+    throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+  }
+
+  public int extractMantissaFromString(String representation) {
+    if (representation.startsWith("FloatingPoint<") && representation.endsWith(">")) {
+      try {
+        String[] parts = representation.substring(14, representation.length() - 1).split(",");
+        if (parts.length != 2) {
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+        }
+        return Integer.parseInt(parts[1].trim());
+      } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+      }
+    }
+    throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
   }
 
   @Override

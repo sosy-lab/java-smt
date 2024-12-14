@@ -300,10 +300,12 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testCastFrom() {
     requireFloats();
-    FloatingPointFormula b = fpmgr.makeVariable("b", FormulaType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula castResult = fpmgr.castFrom(b, true, FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula b = bmgr.makeVariable("b");
+    FloatingPointFormula castResult = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
 
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(b, castResult));
+
+    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(castResult, fpmgr.castFrom(b, true,
+        FloatingPointType.getSinglePrecisionFloatingPointType())));
 
     String actualResult = String.valueOf(Generator.getLines());
 

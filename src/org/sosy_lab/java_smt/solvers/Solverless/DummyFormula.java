@@ -22,27 +22,46 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 
 import java.text.Normalizer.Form;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
+import org.sosy_lab.java_smt.api.NumeralFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class DummyFormula implements Formula {
+public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
+                                     ArrayFormula, NumeralFormula, BooleanFormula, IntegerFormula
+                                         , RationalFormula {
   private String name;
   private  int exponent = -1;
   private  int mantissa = -1;
   private  int bitvectorLength = -1;
   private  DummyFormula firstArrayParameter = null;
   private  DummyFormula secondArrayParameter = null;
-
   private  String representation ="";
   private final FormulaTypesForChecking formulaType;
+  private  String value ="";
 
 
-  public DummyFormula(FormulaTypesForChecking pFormulaType) { //all other
-    // sorts
+  public DummyFormula(FormulaTypesForChecking pFormulaType) {
     formulaType = pFormulaType;
+    updateRepresentation();
   }
+
+
+  public DummyFormula(FormulaTypesForChecking pFormulaType, String pRepresentation) {
+    formulaType = pFormulaType;
+    representation = pRepresentation;
+    if(pFormulaType == FormulaTypesForChecking.RATIONAL|| pFormulaType == FormulaTypesForChecking.INTEGER) {
+      value = pRepresentation;
+    }
+    updateRepresentation();
+  }
+
 
   public String getName() {
     return name;
@@ -58,15 +77,18 @@ public class DummyFormula implements Formula {
     formulaType = FormulaTypesForChecking.ARRAY;
     firstArrayParameter = pfirstArrayParameter;
     secondArrayParameter = psecondArrayParameter;
+    updateRepresentation();
   }
-  public DummyFormula ( int exponent, int mantissa){ //if it represents a FloatingPoint
+  public DummyFormula (int exponent, int mantissa){ //if it represents a FloatingPoint
     this.exponent = exponent;
     this.mantissa = mantissa;
     formulaType = FormulaTypesForChecking.FLOATING_POINT;
+    updateRepresentation();
   }
-  public DummyFormula ( int pBitvectorLength){
+  public DummyFormula (int pBitvectorLength){
     this.bitvectorLength = pBitvectorLength;
     formulaType = FormulaTypesForChecking.BITVECTOR;
+    updateRepresentation();
   }
 
   public static DummyFormula getDummyFormulaFromObject(FormulaType<?> pType) {
@@ -103,6 +125,35 @@ public class DummyFormula implements Formula {
     return null;
   }
 
+  private void updateRepresentation() {
+    switch (formulaType) {
+      case BITVECTOR:
+        this.representation = "Bitvector<" + bitvectorLength + ">";
+        break;
+      case FLOATING_POINT:
+        this.representation = "FloatingPoint<" + exponent + ", " + mantissa + ">";
+        break;
+      case ARRAY:
+        this.representation = "Array<" + firstArrayParameter + ", " + secondArrayParameter + ">";
+        break;
+      case BOOLEAN:
+        this.representation = "Boolean";
+        break;
+      case INTEGER:
+      case RATIONAL:
+        this.representation = value;
+        break;
+      case STRING:
+        this.representation = "String";
+        break;
+      case REGEX:
+        this.representation = "Regex";
+        break;
+      default:
+        this.representation = "Unknown";
+        break;
+    }
+  }
 
   public FormulaTypesForChecking getFormulaType() {
     return formulaType;
@@ -173,6 +224,10 @@ public class DummyFormula implements Formula {
   @Override
   public String toString() {
     return representation;
+  }
+
+  public void setRepresentation(String pS) {
+    representation = pS;
   }
 }
 
