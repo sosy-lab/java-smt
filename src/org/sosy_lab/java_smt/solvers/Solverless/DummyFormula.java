@@ -35,16 +35,17 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking
 
 public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
                                      ArrayFormula, NumeralFormula, BooleanFormula, IntegerFormula
-                                         , RationalFormula {
+    , RationalFormula {
   private String name;
-  private  int exponent = -1;
-  private  int mantissa = -1;
-  private  int bitvectorLength = -1;
-  private  DummyFormula firstArrayParameter = null;
-  private  DummyFormula secondArrayParameter = null;
-  private  String representation ="";
+  private int exponent = -1;
+  private int mantissa = -1;
+  private int bitvectorLength = -1;
+  private DummyFormula firstArrayParameter = null;
+  private DummyFormula secondArrayParameter = null;
+  private String representation = "";
   private final FormulaTypesForChecking formulaType;
-  private  String value ="";
+  private String value = "";
+  private boolean representationIsOnlyValue=false;
 
 
   public DummyFormula(FormulaTypesForChecking pFormulaType) {
@@ -52,11 +53,18 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     updateRepresentation();
   }
 
+  public DummyFormula(boolean value) {
+    formulaType = FormulaTypesForChecking.BOOLEAN;
+    this.value = String.valueOf(value);
+    updateRepresentation();
+  }
+
 
   public DummyFormula(FormulaTypesForChecking pFormulaType, String pRepresentation) {
     formulaType = pFormulaType;
     representation = pRepresentation;
-    if(pFormulaType == FormulaTypesForChecking.RATIONAL|| pFormulaType == FormulaTypesForChecking.INTEGER) {
+    if (pFormulaType == FormulaTypesForChecking.RATIONAL
+        || pFormulaType == FormulaTypesForChecking.INTEGER) {
       value = pRepresentation;
     }
     updateRepresentation();
@@ -71,21 +79,24 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     name = pName;
   }
 
-  public DummyFormula(DummyFormula pfirstArrayParameter,
-                      DummyFormula psecondArrayParameter) { //if it represents an array
+  public DummyFormula(
+      DummyFormula pfirstArrayParameter,
+      DummyFormula psecondArrayParameter) { //if it represents an array
     representation = "";
     formulaType = FormulaTypesForChecking.ARRAY;
     firstArrayParameter = pfirstArrayParameter;
     secondArrayParameter = psecondArrayParameter;
     updateRepresentation();
   }
-  public DummyFormula (int exponent, int mantissa){ //if it represents a FloatingPoint
+
+  public DummyFormula(int exponent, int mantissa) { //if it represents a FloatingPoint
     this.exponent = exponent;
     this.mantissa = mantissa;
     formulaType = FormulaTypesForChecking.FLOATING_POINT;
     updateRepresentation();
   }
-  public DummyFormula (int pBitvectorLength){
+
+  public DummyFormula(int pBitvectorLength) {
     this.bitvectorLength = pBitvectorLength;
     formulaType = FormulaTypesForChecking.BITVECTOR;
     updateRepresentation();
@@ -122,7 +133,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     } else {
       throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
     }
-    return null;
+    return new DummyFormula(FormulaTypesForChecking.DUMMY);
   }
 
   private void updateRepresentation() {
@@ -137,7 +148,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
         this.representation = "Array<" + firstArrayParameter + ", " + secondArrayParameter + ">";
         break;
       case BOOLEAN:
-        this.representation = "Boolean";
+        this.representation = "Boolean<" + value + ">";
         break;
       case INTEGER:
       case RATIONAL:
@@ -159,8 +170,8 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return formulaType;
   }
 
-  public FormulaType<?> getFormulaTypeForCreator(){
-    switch(formulaType){
+  public FormulaType<?> getFormulaTypeForCreator() {
+    switch (formulaType) {
       case BITVECTOR:
         return FormulaType.getBitvectorTypeWithSize(bitvectorLength);
       case FLOATING_POINT:
@@ -221,8 +232,29 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     secondArrayParameter = pSecondArrayParameter;
   }
 
+  public void activateRepresentationIsOnlyValue() {
+    representationIsOnlyValue = true;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String pValue) {
+    value = pValue;
+    updateRepresentation();
+  }
+
+  public void normalizeValue() {
+    updateRepresentation();
+    representation = value;
+  }
+
   @Override
   public String toString() {
+    if(representationIsOnlyValue) {
+      return value;
+    }
     return representation;
   }
 

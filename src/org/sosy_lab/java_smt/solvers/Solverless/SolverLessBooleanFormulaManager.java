@@ -21,6 +21,7 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 
 import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBooleanFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
@@ -41,52 +42,56 @@ public class SolverLessBooleanFormulaManager extends AbstractBooleanFormulaManag
 
   @Override
   protected DummyFormula makeBooleanImpl(boolean value) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(value);
   }
 
   @Override
   protected DummyFormula not(DummyFormula pParam1) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+
+    return new DummyFormula(!Boolean.parseBoolean(pParam1.getValue()));
   }
 
   @Override
   protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+
+    return new DummyFormula(Boolean.logicalAnd(Boolean.parseBoolean(pParam1.getValue()),
+        Boolean.parseBoolean(pParam2.getValue())));
   }
 
   @Override
   protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+
+    return new DummyFormula(Boolean.logicalOr(Boolean.parseBoolean(pParam1.getValue()),
+        Boolean.parseBoolean(pParam2.getValue())));
   }
 
   @Override
   protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+
+    return new DummyFormula(Boolean.logicalXor(Boolean.parseBoolean(pParam1.getValue()),
+        Boolean.parseBoolean(pParam2.getValue())));
   }
 
   @Override
   protected DummyFormula equivalence(DummyFormula bits1, DummyFormula bits2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+
+    return new DummyFormula(Boolean.parseBoolean(bits1.getValue())==
+        Boolean.parseBoolean(bits2.getValue()));
   }
 
   @Override
   protected boolean isTrue(DummyFormula bits) {
-    return true;
+    return Boolean.parseBoolean(bits.getValue());
   }
 
   @Override
   protected boolean isFalse(DummyFormula bits) {
-    return false;
+    return !Boolean.parseBoolean(bits.getValue());
   }
 
   @Override
   protected DummyFormula ifThenElse(DummyFormula cond, DummyFormula f1, DummyFormula f2) {
     return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  public BooleanFormula makeBoolean(boolean value) {
-    return super.makeBoolean(value);
   }
 }
 

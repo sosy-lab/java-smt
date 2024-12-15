@@ -520,7 +520,7 @@ public abstract class AbstractNumeralFormulaManager<
   protected TFormulaInfo floor(TFormulaInfo number) {
     // identity function for integers, method is overridden for rationals
     throw new AssertionError(
-        "method should only be called for RationalFormulae, but type is "
+        "method should only be called for RationalFormula, but type is "
             + getFormulaCreator().getFormulaType(number));
   }
 }

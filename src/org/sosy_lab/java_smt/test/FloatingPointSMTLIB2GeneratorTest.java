@@ -73,8 +73,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     Objects.requireNonNull(fpmgr);
     FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
     FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula result = fpmgr.subtract(a, b);
-    BooleanFormula constraint = fpmgr.equalWithFPSemantics(result, fpmgr.subtract(a, b));
+    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.subtract(a, b), result);
 
     Generator.assembleConstraint(constraint);
 
@@ -83,7 +83,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (= result (fp.sub RNE a b)))\n";
+        + "(assert (fp.eq (fp.sub RNE a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -125,7 +125,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (= result (fp.mul RNE a b)))\n";
+        + "(assert (fp.eq (fp.mul RNE a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -144,7 +144,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (= result (fp.sqrt RNE a)))\n";
+        + "(assert (fp.eq (fp.sqrt RNE a) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -196,8 +196,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (= result (fp.max a b)))\n";
+        + "(declare-const max (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq (fp.max a b) max))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -215,8 +215,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (= result (fp.min a b)))\n";
+        + "(declare-const min (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq (fp.min a b) min))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -262,7 +262,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testMakeNaN() {
     requireFloats();
-    FloatingPointFormula nan = fpmgr.makeNaN(FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula nan = fpmgr.makeVariable("nan", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(nan,
         fpmgr.makeNaN(FloatingPointType.getSinglePrecisionFloatingPointType()));
 
@@ -272,7 +272,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const nan (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq nan (_ NaN 8 23)\n";
+        + "(assert (fp.eq nan (_ NaN 8 23)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -319,18 +319,21 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testFromIeeeBitvector() {
     requireFloats();
-    BitvectorFormula bitvector = bvmgr.makeVariable(BitvectorType.getBitvectorTypeWithSize(32),
+    BitvectorFormula bv = bvmgr.makeVariable(BitvectorType.getBitvectorTypeWithSize(32),
         "bv");
-    FloatingPointFormula fpFromBV = fpmgr.makeVariable("fpFromBV", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result = fpmgr.makeVariable("result",
+        FloatingPointType.getSinglePrecisionFloatingPointType());
 
 
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(fpFromBV, fpmgr.fromIeeeBitvector(bitvector, FloatingPointType.getSinglePrecisionFloatingPointType())));
+    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(
+        fpmgr.fromIeeeBitvector(bv,
+        FloatingPointType.getSinglePrecisionFloatingPointType()), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const bv (_ BitVec 32))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert ((_ to_fp 8 23) bv))\n";
+        + "(assert (fp.eq (_ to_fp 8 23) bv))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -338,15 +341,14 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testRound() {
     requireFloats();
     FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula rounded = fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
 
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(a, rounded));
+
+    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(a, fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)));
 
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.round RNE a))\n";
+        + "(assert (fp.eq a (fp.round RNE a)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

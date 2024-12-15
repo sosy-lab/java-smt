@@ -23,7 +23,6 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -74,42 +73,47 @@ public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaMa
 
   @Override
   protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
   }
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
   }
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
   }
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(pParam1.getValue().equals(pParam2.getValue()));
   }
 
   @Override
   protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    return new DummyFormula(false);
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(false);
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(false);
+  }
+
+  @Override
+  public IntegerFormula floor(NumeralFormula number) {
+    return new DummyFormula(FormulaTypesForChecking.INTEGER, number.toString());
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN, String.valueOf(false));
   }
 
   @Override

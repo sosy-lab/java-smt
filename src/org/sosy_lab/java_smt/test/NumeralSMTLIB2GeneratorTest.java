@@ -28,6 +28,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public Solvers solverToUse() {
     return Solvers.SOLVERLESS;
   }
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -95,11 +96,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultZ3 = "(assert (= (- 1.0) (+ (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -136,11 +137,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultZ3 = "(assert (= (- 1.0) (- (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -182,11 +183,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
         "(assert (= (- (- 1.0)) (- (- (/ 17.0 5.0)) (- (/ 2147483647.0 1000.0)))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -211,8 +212,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultOthers = "(assert (= 2147483647 (+ 1 (- 5) 3 2147483647)))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -237,13 +238,15 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultCVC5 = "(assert (= (- 1.0) (+ (- 1.0) (/ 17 5) (/ 2147483647 1000))))\n";
     String expectedResultZ3 =
         "(assert (= (- 1.0) (+ (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
+    String expectedResultSolverless = "(assert (= -1 (+ -1 3.4 2147483.647)))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3)
+            || actualResult.equals(expectedResultSolverless))
         .isTrue();
   }
 
@@ -282,15 +285,17 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultZ3 = "(assert (= (- 1.0) (div (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
-  /** not available for Mathsat. */
+  /**
+   * not available for Mathsat.
+   */
   @Test
   public void testIntegerModulo() {
     requireIntegers();
@@ -310,7 +315,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultOthers = "(assert (= 1 (mod (- 5) (mod 3 2147483647))))\n";
     String expectedResultYices = "(assert (= 1 1))\n";
     assertThat(
-            actualResult.equals(expectedResultOthers) || actualResult.equals(expectedResultYices))
+        actualResult.equals(expectedResultOthers) || actualResult.equals(expectedResultYices))
         .isTrue();
   }
 
@@ -347,11 +352,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultZ3 = "(assert (= (- 1.0) (* (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -376,8 +381,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultOthers = "(assert (distinct 1 (- 5) 3 2147483647))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -401,13 +406,15 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultCVC4 = "(assert (distinct (- 1) (/ 17 5) (/ 2147483647 1000)))\n";
     String expectedResultCVC5 = "(assert (distinct (- 1.0) (/ 17 5) (/ 2147483647 1000)))\n";
     String expectedResultZ3 = "(assert (distinct (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0)))\n";
+    String expectedResultSolverless = "(assert (distinct -1 3.4 2147483.647))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3)
+        || actualResult.equals(expectedResultSolverless))
         .isTrue();
   }
 
@@ -426,8 +433,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultMathsat5 = "(assert (> 3 2147483647))\n";
     String expectedResultOthers = "(assert (and (> 1 (- 5)) (> 3 2147483647)))\n";
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -452,11 +459,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
         "(assert (and (> (- 1.0) (/ 17.0 5.0)) (> (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -475,8 +482,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultMathsat5 = "(assert (>= 3 2147483647))\n";
     String expectedResultOthers = "(assert (and (>= 1 (- 5)) (>= 3 2147483647)))\n";
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -501,11 +508,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
         "(assert (and (>= (- 1.0) (/ 17.0 5.0)) (>= (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -524,8 +531,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultMathsat5 = "(assert (< 1 (- 5)))\n";
     String expectedResultOthers = "(assert (and (< 1 (- 5)) (< 3 2147483647)))\n";
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -550,11 +557,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
         "(assert (and (< (- 1.0) (/ 17.0 5.0)) (< (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -573,8 +580,8 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String expectedResultMathsat5 = "(assert (<= 1 (- 5)))\n";
     String expectedResultOthers = "(assert (and (<= 1 (- 5)) (<= 3 2147483647)))\n";
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultOthers))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultOthers))
         .isTrue();
   }
 
@@ -599,11 +606,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
         "(assert (and (<= (- 1.0) (/ 17.0 5.0)) (<= (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 
@@ -651,11 +658,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
             + " 1000.0)))))\n";
 
     assertThat(
-            actualResult.equals(expectedResultMathsat5)
-                || actualResult.equals(expectedResultSMTInterpol)
-                || actualResult.equals(expectedResultCVC4)
-                || actualResult.equals(expectedResultCVC5)
-                || actualResult.equals(expectedResultZ3))
+        actualResult.equals(expectedResultMathsat5)
+            || actualResult.equals(expectedResultSMTInterpol)
+            || actualResult.equals(expectedResultCVC4)
+            || actualResult.equals(expectedResultCVC5)
+            || actualResult.equals(expectedResultZ3))
         .isTrue();
   }
 }

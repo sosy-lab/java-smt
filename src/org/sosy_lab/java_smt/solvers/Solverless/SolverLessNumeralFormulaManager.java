@@ -32,7 +32,7 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
     Y extends NumeralFormula> extends AbstractNumeralFormulaManager<DummyFormula,
     FormulaTypesForChecking, DummyEnv, T, Y, DummyFunction> {
   public SolverLessNumeralFormulaManager(SolverLessFormulaCreator creator) {
-    super(creator, NonLinearArithmetic.APPROXIMATE_ALWAYS);
+    super(creator, NonLinearArithmetic.APPROXIMATE_FALLBACK);
   }
 
   @Override

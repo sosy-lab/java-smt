@@ -92,7 +92,7 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
 
   @Override
   protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override

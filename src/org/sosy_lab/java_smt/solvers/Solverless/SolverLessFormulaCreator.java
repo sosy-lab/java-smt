@@ -23,11 +23,14 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
@@ -121,7 +124,21 @@ public class SolverLessFormulaCreator
     if(pT instanceof FloatingPointFormula){
       return new DummyFormula(extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
     }
-    return new DummyFormula(FormulaTypesForChecking.DUMMY);
+    if(pT instanceof RationalFormula){
+      DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL,
+          (pT.toString()));
+      return result;
+    }
+    if(pT instanceof IntegerFormula){
+      DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER,
+          pT.toString());
+      return result;
+    }
+    if(pT instanceof BooleanFormula){
+      DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
+      return result;
+    }
+    return super.extractInfo(pT);
   }
   public int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
@@ -163,6 +180,10 @@ public class SolverLessFormulaCreator
     }
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
   }
+
+
+
+
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
