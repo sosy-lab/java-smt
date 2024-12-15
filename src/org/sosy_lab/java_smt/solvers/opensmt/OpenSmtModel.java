@@ -50,8 +50,8 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
     model = generateModel(pCreator, pAssertedTerms);
   }
 
-  private ImmutableList<ValueAssignment> generateModel(OpenSmtFormulaCreator pCreator,
-                                                       Collection<PTRef> pAssertedTerms) {
+  private ImmutableList<ValueAssignment> generateModel(
+      OpenSmtFormulaCreator pCreator, Collection<PTRef> pAssertedTerms) {
     Map<String, PTRef> userDeclarations = new LinkedHashMap<>();
     for (PTRef asserted : pAssertedTerms) {
       userDeclarations.putAll(creator.extractVariablesAndUFs(asserted, true));

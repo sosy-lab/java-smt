@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -31,13 +30,12 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
   public String toString() {
     try {
       return Joiner.on('\n').join(asList());
-    } catch (InterruptedException pE) {
+    } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
-      sneakyThrow(pE);
-    } catch (SolverException pE) {
-      sneakyThrow(pE);
+      sneakyThrow(ex);
+    } catch (SolverException ex) {
+      sneakyThrow(ex);
     }
-    Preconditions.checkState(false, "unreachable code");
-    return null;
+    throw new AssertionError("unreachable code");
   }
 }
