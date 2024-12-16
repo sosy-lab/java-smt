@@ -33,8 +33,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
 public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, TType>
-        extends AbstractProverWithAllSat<TFormulaInfo>
-        implements InterpolatingProverEnvironment<TFormulaInfo> {
+    extends AbstractProverWithAllSat<TFormulaInfo>
+    implements InterpolatingProverEnvironment<TFormulaInfo> {
 
   private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
@@ -45,12 +45,12 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private static final String PREFIX = "__internal_model_itp_generation_";
 
   protected AbstractInterpolatingProver(
-          Set<ProverOptions> pOptions,
-          FormulaManager pMgr,
-          BooleanFormulaManager pBmgr,
-          UFManager pUfmgr,
-          QuantifiedFormulaManager pQfmgr,
-          ShutdownNotifier pShutdownNotifier) {
+      Set<ProverOptions> pOptions,
+      FormulaManager pMgr,
+      BooleanFormulaManager pBmgr,
+      UFManager pUfmgr,
+      QuantifiedFormulaManager pQfmgr,
+      ShutdownNotifier pShutdownNotifier) {
     super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
     mgr = pMgr;
     bmgr = pBmgr;
@@ -60,7 +60,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
-          throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException {
     checkState(!closed);
     checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -165,14 +165,29 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Computes Craig interpolants for a pair of formulas using a quantifier-based with quantifier
-   * elimination approach.
+   * Computes Uniform Interpolants for a {@link Collection} of {@link BooleanFormula}
+   * using the quantifier-based interpolation strategy with quantifier elimination (QE).
    *
-   * <p>The quantifier-elimination-based approach ...
+   * <p>This approach generates an interpolant Itp for two sets of constraints A and B,
+   * where the variables are categorized as follows:
+   * <ul>
+   *   <li>Variables that appear only in formula A.</li>
+   *   <li>Variables that appear only in formula B.</li>
+   *   <li>Shared variables that appear in both formulas A and B.</li>
+   * </ul>
    *
-   * @param pFormulasOfA A Collection of Boolean formulas of A.
-   * @param pFormulasOfB A Collection of Boolean formulas of B.
-   * @return A quantifier-elimination-based Craig Interpolant.
+   * <p>The resulting Uniform Interpolant is a stronger version of a Craig Interpolant
+   * and satisfies the definition of Craig Interpolation:
+   *
+   * <ol>
+   *   <li>(A -> Itp) is unsatisfiable,
+   *   <li>(Itp -> not B) is unsatisfiable, and
+   *   <li>Itp only contains symbols that appear in both formulas A and B.
+   * </ol>
+   *
+   * @param pFormulasOfA A collection of {@link BooleanFormula} representing formula A.
+   * @param pFormulasOfB A collection of {@link BooleanFormula} representing formula B.
+   * @return the Uniform Interpolant Itp if it satisfies the conditions, otherwise returns false.
    */
   private BooleanFormula getQEBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
@@ -186,11 +201,21 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars);
+    BooleanFormula interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars); // or fwd
 
     return interpolant;
   }
 
+  /**
+   * Computes the forward interpolant for a given formula A.
+   * In the forward direction, the variables specific to formula A are existentially quantified
+   * to describe the relationship between formulas A and B.
+   *
+   * @param formulasOfA The {@link BooleanFormula} representing the constraints in formula A.
+   * @param varsOfA The list of all variables in formula A.
+   * @param sharedVars The list of shared variables between formulas A and B.
+   * @return The forward interpolant.
+   */
   private BooleanFormula getForwardInterpolant(
       BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars)
       throws SolverException, InterruptedException {
@@ -205,6 +230,16 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return formulasOfA;
   }
 
+  /**
+   * Computes the backward interpolant for a given formula B.
+   * In the backward direction, the variables specific to formula B are universally quantified
+   * and formula B is negated to describe the relationship between formulas A and B.
+   *
+   * @param formulasOfB The {@link BooleanFormula} representing the constraints in formula B.
+   * @param varsOfB The list of all variables in formula B.
+   * @param sharedVars The list of shared variables between formulas A and B.
+   * @return The backward interpolant.
+   */
   private BooleanFormula getBackwardInterpolant(
       BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
       throws SolverException, InterruptedException {
@@ -220,10 +255,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Extracts all free variables and uninterpreted functions from the input Boolean formula.
+   * Extracts all variables from the given {@link BooleanFormula}.
    *
-   * @param formulas The input Boolean formula from which to extract all free arithmetic variables.
-   * @return A list of all free variables and uninterpreted functions of the input formula.
+   * @param formulas The formula from which to extract all variables.
+   * @return An immutable list of all variables in the formula.
    */
   private ImmutableList<Formula> getVars(BooleanFormula formulas) {
     return ImmutableList.copyOf(mgr.extractVariablesAndUFs(formulas).values());
@@ -232,8 +267,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   /**
    * Identifies the shared variables between two formulas A and B.
    *
-   * @param varsOfA A list of free variables extracted from formula A.
-   * @param varsOfB A list of free variables extracted from formula B.
+   * @param varsOfA The list of variables from formula A.
+   * @param varsOfB The list of variables from formula B.
    * @return An immutable list of variables found in both formulas A and B.
    */
   private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
@@ -243,11 +278,11 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Determines the bound variables in the provided formula.
+   * Identifies the bound variables in a formula.
    *
-   * @param vars The list of all variables in a formula the bound variables are wanting from.
-   * @param sharedVars A list of the shared variables between the two formulas A and B.
-   * @return An immutable list of bound variables of the provided formula.
+   * @param vars The list of all variables in the formula to identify the bound ones.
+   * @param sharedVars The shared variables between formulas A and B.
+   * @return An immutable list of bound variables from a formula.
    */
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
     ImmutableList<Formula> boundVars = vars.stream()
@@ -257,6 +292,15 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     return boundVars.isEmpty() ? ImmutableList.copyOf(vars) : boundVars;
   }
 
+  /**
+   * Creates an interpolant with a unique identifier that satisfies the third definition of a
+   * Craig Interpolant: its uninterpreted symbols are those shared between formulas A and B.
+   * This is used as part of the model-based interpolation strategy to generate the final
+   * Craig Interpolant.
+   *
+   * @param sharedVars The shared variables between formulas A and B.
+   * @return An interpolant whose uninterpreted symbols are those shared between formulas A and B.
+   */
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
     return ufmgr.declareAndCallUF(
         PREFIX + UNIQUE_ID_GENERATOR.getFreshId(),
@@ -265,7 +309,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Removes all formulas from the stack to reset it before performing a new operation.
+   * Removes all formulas currently asserted in the stack to reset it.
+   * This method is used, e.g., for a new check, such as verifying the satisfiability of a
+   * formula without considering previously asserted formulas.
    */
   private void clearStack() {
     for (int i = 0; i < size(); i++) {
@@ -274,10 +320,10 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Re-adds all formulas that were on the stack before it was cleared, ensuring that the stack
-   * is returned to its previous state.
+   * Restores the solver's stack to its previous state before it was cleared by re-adding the
+   * formulas that were removed, assuming the stack is currently empty.
    *
-   * @param assertedFormulas The list of formulas to restore the stack.
+   * @param assertedFormulas The list of {@link BooleanFormula} to push back onto the stack.
    */
   private void restoreStack(List<BooleanFormula> assertedFormulas) throws InterruptedException {
     for (BooleanFormula formula : assertedFormulas) {
