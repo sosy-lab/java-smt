@@ -186,19 +186,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    Preconditions.checkState(isUnsat());
     BooleanFormula interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars);
 
-    final ImmutableList<BooleanFormula> originalStack =
-        ImmutableList.copyOf(getAssertedFormulas());
-
-    clearStack();
-    if (satisfiesInterpolationCriteria(interpolant, formulasOfA, formulasOfB, varsOfA, varsOfB)) {
-      return interpolant;
-    }
-    restoreStack(originalStack);
-
-    return bmgr.makeFalse();
+    return interpolant;
   }
 
   private BooleanFormula getForwardInterpolant(
@@ -227,24 +217,6 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     }
 
     return formulasOfB;
-  }
-
-  private boolean satisfiesInterpolationCriteria(
-      BooleanFormula itp, BooleanFormula formulasOfA, BooleanFormula formulasOfB,
-      List<Formula> varsOfA, List<Formula> varsOfB) throws InterruptedException, SolverException {
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
-
-    // TODO: create separate prover to test satisfiability
-    push(bmgr.and(left, right));
-
-    if (!isUnsat()) {
-      pop();
-      return true;
-    }
-
-    pop();
-    return false;
   }
 
   /**
