@@ -466,7 +466,7 @@ public abstract class SolverBasedTest0 {
       return solver;
     }
 
-    protected ProverOptions itpStrategiesToUse() {
+    protected ProverOptions itpStrategyToUse() {
       return itpStrat;
     }
   }
