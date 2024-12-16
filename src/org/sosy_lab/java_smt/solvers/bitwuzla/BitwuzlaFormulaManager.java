@@ -137,12 +137,16 @@ public final class BitwuzlaFormulaManager
     // Process the symbols from the parser
     Map_TermTerm subst = new Map_TermTerm();
     for (Term term : declared) {
-      if (cache.containsRow(term.symbol())) {
+      String symbol = term.symbol();
+      if (symbol.startsWith("|") && symbol.endsWith("|")) {
+        symbol = symbol.substring(1, symbol.length() - 1);
+      }
+      if (cache.containsRow(symbol)) {
         // Symbol is from the context: add the original term to the substitution map
-        subst.put(term, cache.get(term.symbol(), term.sort()));
+        subst.put(term, cache.get(symbol, term.sort()));
       } else {
         // Symbol is new, add it to the context
-        cache.put(term.symbol(), term.sort(), term);
+        cache.put(symbol, term.sort(), term);
       }
     }
 
