@@ -15,7 +15,9 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -443,29 +445,27 @@ public abstract class SolverBasedTest0 {
   @RunWith(Parameterized.class)
   public abstract static class ParameterizedInterpolatingSolverBasedTest0 extends SolverBasedTest0 {
 
-    @Parameters(name = "{0}")
-    public static Object[] getAllSolvers() {
-      return Solvers.values();
+    @Parameters(name = "solver {0} with itp strategy {1}")
+    public static List<Object[]> getAllSolversAndItpStrategies() {
+      List<Object[]> lst = new ArrayList<>();
+      for (Solvers solver : Solvers.values()) {
+        for (ProverOptions itpStrat : ProverOptions.values()) {
+          lst.add(new Object[] {solver, itpStrat});
+        }
+      }
+      return lst;
     }
 
     @Parameter(0)
     public Solvers solver;
 
+    @Parameter(1)
+    public ProverOptions itpStrategies;
+
     @Override
     protected Solvers solverToUse() {
       return solver;
     }
-
-    @Parameters(name = "{1}")
-    public static Object[] getAllInterpolationStrategies() {
-      return ImmutableSet.of(
-          ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT,
-          ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS,
-          ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS).toArray();
-    }
-
-    @Parameter(1)
-    public ProverOptions itpStrategies;
 
     protected ProverOptions itpStrategiesToUse() {
       return itpStrategies;
