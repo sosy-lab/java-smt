@@ -52,14 +52,29 @@ public interface SolverContext extends AutoCloseable {
      */
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
-    /** Whether the solver should enable support for formulae build in SL theory. */
-    ENABLE_SEPARATION_LOGIC,
-
+    /**
+     * Whether the solver should generate a Craig Interpolant using the model-based interpolation
+     * strategy. This strategy constructs the interpolant based on the provided model and shared
+     * symbols between the asserted formulas.
+     */
     GENERATE_MODEL_BASED_INTERPOLANT,
 
+    /**
+     * Whether the solver should generate a Uniform Interpolant using the quantifier-based
+     * interpolation with Quantifier Elimination in the forward direction. In this version,
+     * variables specific to formula A are existentially quantified.
+     */
     GENERATE_QE_BASED_FORWARD_INTERPOLANTS,
 
-    GENERATE_QE_BASED_BACKWARD_INTERPOLANTS
+    /**
+     * Whether the solver should generate a Uniform Interpolant using the quantifier-based
+     * interpolation with Quantifier Elimination in the backward direction. In this version,
+     * variables specific to formula B are universally quantified with negation.
+     */
+    GENERATE_QE_BASED_BACKWARD_INTERPOLANTS,
+
+    /** Whether the solver should enable support for formulae build in SL theory. */
+    ENABLE_SEPARATION_LOGIC
   }
 
   /**
