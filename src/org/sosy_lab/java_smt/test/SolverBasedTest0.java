@@ -459,7 +459,7 @@ public abstract class SolverBasedTest0 {
     public Solvers solver;
 
     @Parameter(1)
-    public ProverOptions itpStrategies;
+    public ProverOptions itpStrat;
 
     @Override
     protected Solvers solverToUse() {
@@ -467,7 +467,7 @@ public abstract class SolverBasedTest0 {
     }
 
     protected ProverOptions itpStrategiesToUse() {
-      return itpStrategies;
+      return itpStrat;
     }
   }
 }

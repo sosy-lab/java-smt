@@ -50,15 +50,15 @@ public class InterpolatingProverTest
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
     requireInterpolation();
 
-    if (itpStrategies.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT)) {
+    if (itpStrat.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT)) {
       return (InterpolatingProverEnvironment<T>)
           context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT);
     }
-    else if (itpStrategies.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
+    else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
       return (InterpolatingProverEnvironment<T>)
           context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS);
     }
-    else if (itpStrategies.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
+    else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
       return (InterpolatingProverEnvironment<T>)
           context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS);
     }
