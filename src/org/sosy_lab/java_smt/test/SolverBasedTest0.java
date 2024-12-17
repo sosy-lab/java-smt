@@ -12,11 +12,13 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -290,9 +292,10 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected final void requireInterpolation() {
+  // TODO: extend all tests with solver-independent interpolation options
+  protected final void requireInterpolation(ProverOptions... options) {
     try {
-      context.newProverEnvironmentWithInterpolation().close();
+      context.newProverEnvironmentWithInterpolation(options).close();
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage("Solver %s does not support interpolation", solverToUse())
@@ -444,11 +447,20 @@ public abstract class SolverBasedTest0 {
   @RunWith(Parameterized.class)
   public abstract static class ParameterizedInterpolatingSolverBasedTest0 extends SolverBasedTest0 {
 
-    @Parameters(name = "solver {0} with itp strategy {1}")
+    private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
+        ImmutableSet.of(
+            null,
+            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+
+    @Parameters(name = "solver {0} with interpolation strategy {1}")
     public static List<Object[]> getAllSolversAndItpStrategies() {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
-        for (ProverOptions itpStrat : ProverOptions.values()) {
+        // No arg for no option (= solver based interpolation)
+        lst.add(new Object[] {solver, new Object[] {}});
+        for (ProverOptions itpStrat : ALL_INDEPENDENT_INTERPOLATION_STRATEGIES) {
           lst.add(new Object[] {solver, itpStrat});
         }
       }
@@ -459,7 +471,7 @@ public abstract class SolverBasedTest0 {
     public Solvers solver;
 
     @Parameter(1)
-    public ProverOptions itpStrat;
+    public ProverOptions interpolationStrategy;
 
     @Override
     protected Solvers solverToUse() {
@@ -467,7 +479,7 @@ public abstract class SolverBasedTest0 {
     }
 
     protected ProverOptions itpStrategyToUse() {
-      return itpStrat;
+      return interpolationStrategy;
     }
   }
 }

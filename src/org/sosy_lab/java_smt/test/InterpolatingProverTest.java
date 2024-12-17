@@ -29,7 +29,6 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -48,23 +47,10 @@ public class InterpolatingProverTest
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    requireInterpolation();
+    requireInterpolation(itpStrategyToUse());
 
-    if (itpStrat.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT)) {
-      return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(
-              ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT);
-    } else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
-      return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(
-              ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS);
-    } else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
-      return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(
-              ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS);
-    }
-
-    return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    return (InterpolatingProverEnvironment<T>)
+        context.newProverEnvironmentWithInterpolation(itpStrategyToUse());
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
@@ -271,7 +257,7 @@ public class InterpolatingProverTest
     requireInterpolation();
     assume()
         .withMessage("Solver does not support tree-interpolation.")
-        .that(solver)
+        .that(solverToUse())
         .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
