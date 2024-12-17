@@ -250,6 +250,7 @@ deploy-gh-pages:
   needs:
     - build:jdk-11
     - javadoc
+  environment: deploy/gh-pages
   only:
     variables:
       - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # only on default branch
