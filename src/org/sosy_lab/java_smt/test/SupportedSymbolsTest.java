@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.fail;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -97,12 +96,8 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
     // Works for all solvers!
     requireParser();
     for (String symbol : goodSymbols) {
-      try {
-        Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
-        assertThat(f.toString()).isEqualTo(symbol);
-      } catch (IllegalArgumentException ex) {
-        fail("Failed on test input \"" + symbol + "\"");
-      }
+      Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
+      assertThat(f.toString()).isEqualTo(symbol);
     }
   }
 
@@ -112,12 +107,8 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
     // Z3 fails for "-32" and the rest for the other inputs
     requireParser();
     for (String symbol : badSymbols) {
-      try {
-        Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
-        assertThat(f.toString()).isEqualTo(symbol);
-      } catch (IllegalArgumentException ex) {
-        fail("Failed on test input \"" + symbol + "\"");
-      }
+      Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
+      assertThat(f.toString()).isEqualTo(symbol);
     }
   }
 
@@ -131,10 +122,7 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
       assertThrows(
           "No IllegalArgumentException for \"" + symbol + "\"",
           IllegalArgumentException.class,
-          () -> {
-            Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
-            assertThat(f.toString()).isEqualTo(symbol);
-          });
+          () -> mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")"));
     }
   }
 
@@ -146,12 +134,8 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
     // name is illegal.
     requireParser();
     for (String symbol : validQuoted) {
-      try {
-        Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
-        assertThat(f.toString()).isEqualTo(symbol);
-      } catch (IllegalArgumentException ex) {
-        fail("Failed on test input \"" + symbol + "\"");
-      }
+      Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
+      assertThat(f.toString()).isEqualTo(symbol);
     }
   }
 
@@ -162,10 +146,7 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
     for (String symbol : invalidQuoted) {
       assertThrows(
           IllegalArgumentException.class,
-          () -> {
-            Formula f = mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")");
-            assertThat(f.toString()).isEqualTo(symbol);
-          });
+          () -> mgr.parse("(declare-const " + symbol + " Bool) (assert " + symbol + ")"));
     }
   }
 }
