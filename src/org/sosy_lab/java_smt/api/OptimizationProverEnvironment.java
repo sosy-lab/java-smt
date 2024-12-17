@@ -12,8 +12,7 @@ import java.util.Optional;
 import org.sosy_lab.common.rationals.Rational;
 
 /** Interface for optimization modulo SMT. */
-public interface OptimizationProverEnvironment
-    extends BasicProverEnvironment<Formula>, AutoCloseable {
+public interface OptimizationProverEnvironment extends BasicProverEnvironment<Void>, AutoCloseable {
 
   /**
    * Add the maximization <code>objective</code>.

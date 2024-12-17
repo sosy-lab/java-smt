@@ -9,13 +9,12 @@
 package org.sosy_lab.java_smt.delegate.statistics;
 
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
-class StatisticsProverEnvironment extends StatisticsBasicProverEnvironment<Formula>
+class StatisticsProverEnvironment extends StatisticsBasicProverEnvironment<Void>
     implements ProverEnvironment {
 
-  StatisticsProverEnvironment(BasicProverEnvironment<Formula> pDelegate, SolverStatistics pStats) {
+  StatisticsProverEnvironment(BasicProverEnvironment<Void> pDelegate, SolverStatistics pStats) {
     super(pDelegate, pStats);
   }
 }

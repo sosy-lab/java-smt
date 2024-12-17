@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.UserPropagator;
 
-class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
+class Z3TheoremProver extends Z3AbstractProver<Void> implements ProverEnvironment {
 
   private final long z3solver;
   private final ShutdownRequestListener interruptListener;

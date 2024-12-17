@@ -34,7 +34,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Formula> implements ProverEnvironment {
+class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
   private final Terminator terminator =
       new Terminator() {
         @Override

@@ -32,10 +32,10 @@ import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.*;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.basicimpl.AbstractInterpolatingProver;
+import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 
-abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula, FormulaType> {
+abstract class Z3AbstractProver<T2> extends AbstractProverWithAllSat<T2> {
 
   protected final Z3FormulaCreator creator;
   protected final long z3context;
@@ -120,7 +120,7 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula, For
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Formula addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected @Nullable T2 addConstraintImpl(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
@@ -135,7 +135,7 @@ abstract class Z3AbstractProver extends AbstractInterpolatingProver<Formula, For
     } catch (Z3Exception exception) {
       throw creator.handleZ3Exception(exception);
     }
-    return f;
+    return null;
   }
 
   protected void push0() {

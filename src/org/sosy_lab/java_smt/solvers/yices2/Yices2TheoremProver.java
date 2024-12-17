@@ -33,7 +33,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -55,7 +54,7 @@ import org.sosy_lab.java_smt.basicimpl.CachingModel;
  * incremental solving, but is more complex to implement. Let's keep this idea is future work for
  * optimization.
  */
-class Yices2TheoremProver extends AbstractProverWithAllSat<Formula> implements ProverEnvironment {
+class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
 
@@ -94,12 +93,12 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Formula> implements P
   }
 
   @Override
-  protected Formula addConstraintImpl(BooleanFormula pConstraint) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula pConstraint) throws InterruptedException {
     if (!generateUnsatCores) { // unsat core does not work with incremental mode
       int constraint = creator.extractInfo(pConstraint);
       yices_assert_formula(curEnv, constraint);
     }
-    return pConstraint;
+    return null;
   }
 
   @Override

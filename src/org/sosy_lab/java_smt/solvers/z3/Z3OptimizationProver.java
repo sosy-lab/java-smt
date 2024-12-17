@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProverEnvironment {
+class Z3OptimizationProver extends Z3AbstractProver<Void> implements OptimizationProverEnvironment {
 
   private final LogManager logger;
   private final long z3optSolver;

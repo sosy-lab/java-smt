@@ -9,11 +9,10 @@
 package org.sosy_lab.java_smt.delegate.logging;
 
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 
 /** Wraps a prover environment with a logging object. */
-class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Formula>
+class LoggingProverEnvironment extends LoggingBasicProverEnvironment<Void>
     implements ProverEnvironment {
 
   LoggingProverEnvironment(LogManager logger, ProverEnvironment pe) {
