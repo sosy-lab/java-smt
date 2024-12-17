@@ -20,19 +20,20 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
-  /** Valid symbol names. Taken from section 3.1 of the SMTLIB2 standard */
+  /** Valid symbol names. Taken from section 3.1 of the SMTLIB2 standard. */
   private final List<String> goodSymbols =
       ImmutableList.of(
           "~!@$%^&*_-+=<>.?/",
           "x", "plus", "**", "$", "sas", "<adf", "abc77", "$s", "&6", ".", "kkk", ".8", "+34");
 
   /**
-   * More valid symbol names from the SMTLIB standard. These names are already used for predefined
-   * symbols and won't work with most solvers
+   * More valid symbol names from the SMTLIB standard.
+   *
+   * <p>These names are already used for predefined symbols and won't work with most solvers.
    */
   private final List<String> badSymbols = ImmutableList.of("+", "<=", "<", ">", "*", "-32");
 
-  /** Examples for invalid symbol names, also take from the SMTLIB standard */
+  /** Examples for invalid symbol names, also take from the SMTLIB standard. */
   private final List<String> uglySymbols =
       ImmutableList.of(
           "_",
@@ -75,7 +76,11 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
           "set-logic",
           "set-option");
 
-  /** Examples of valid quoted symbols. Taken from the SMTLIB standard */
+  /**
+   * Examples of valid quoted symbols.
+   *
+   * <p>Taken from the SMTLIB standard.
+   */
   private final List<String> validQuoted =
       ImmutableList.of(
           "| this is a quoted symbol |",
@@ -85,7 +90,7 @@ public class SupportedSymbolsTest extends ParameterizedSolverBasedTest0 {
           "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
 
   /**
-   * Examples of invalid quoted symbols
+   * Examples of invalid quoted symbols.
    *
    * <p>Only backslash and tilde are invalid inside a quoted symbol name
    */
