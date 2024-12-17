@@ -29,9 +29,8 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-/**
- * Examples for using independent interpolation procedures.
- */
+/** Examples for using independent interpolation procedures. */
+@SuppressWarnings("unused")
 public class IndependentInterpolation {
 
   private IndependentInterpolation() {
@@ -51,9 +50,9 @@ public class IndependentInterpolation {
 
     // setup context
     try (SolverContext context =
-             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-         InterpolatingProverEnvironment<?> prover =
-             context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
+            SolverContextFactory.createSolverContext(config, logger, notifier, solver);
+        InterpolatingProverEnvironment<?> prover =
+            context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -76,8 +75,10 @@ public class IndependentInterpolation {
   }
 
   private static <T> void interpolateExample(
-      InterpolatingProverEnvironment<T> prover, BooleanFormulaManager bmgr,
-      IntegerFormulaManager imgr, LogManager logger)
+      InterpolatingProverEnvironment<T> prover,
+      BooleanFormulaManager bmgr,
+      IntegerFormulaManager imgr,
+      LogManager logger)
       throws InterruptedException, SolverException {
 
     // create some variables
@@ -92,8 +93,10 @@ public class IndependentInterpolation {
     // A := (x = 0)
     T ip0 = prover.push(imgr.equal(x, zero));
     // B := (y = x + 2) AND (y % 2 != 0)
-    T ip1 = prover.push(bmgr.and(imgr.equal(y, imgr.add(x, two)),
-        bmgr.not(imgr.equal(imgr.modulo(y, two), zero))));
+    T ip1 =
+        prover.push(
+            bmgr.and(
+                imgr.equal(y, imgr.add(x, two)), bmgr.not(imgr.equal(imgr.modulo(y, two), zero))));
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
