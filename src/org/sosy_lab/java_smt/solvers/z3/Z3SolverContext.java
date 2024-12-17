@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -16,6 +18,7 @@ import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -37,6 +40,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 
 public final class Z3SolverContext extends AbstractSolverContext {
 
@@ -216,18 +220,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder()
-            .put(":random-seed", extraOptions.randomSeed)
-            .put(
-                ":model",
-                options.contains(ProverOptions.GENERATE_MODELS)
-                    || options.contains(ProverOptions.GENERATE_ALL_SAT))
-            .put(
-                ":unsat_core",
-                options.contains(ProverOptions.GENERATE_UNSAT_CORE)
-                    || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
-            .buildOrThrow();
+    final Map<String, Object> solverOptions = buildSolverOptions(options);
     return new Z3TheoremProver(
         creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
@@ -236,10 +229,14 @@ public final class Z3SolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder().build();
-    return new Z3InterpolatingTheoremProverWithAllSat(
-        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
+    if (!hasIndependentInterpolationStrategy(options)) {
+      throw new UnsupportedOperationException(
+          "Z3 does not support interpolation natively. Try "
+              + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"
+              + " GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
+    }
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
   }
 
   @Override
@@ -286,5 +283,19 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  private Map<String, Object> buildSolverOptions(Set<ProverOptions> options) {
+    return ImmutableMap.<String, Object>builder()
+        .put(":random-seed", extraOptions.randomSeed)
+        .put(
+            ":model",
+            options.contains(ProverOptions.GENERATE_MODELS)
+                || options.contains(ProverOptions.GENERATE_ALL_SAT))
+        .put(
+            ":unsat_core",
+            options.contains(ProverOptions.GENERATE_UNSAT_CORE)
+                || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
+        .buildOrThrow();
   }
 }
