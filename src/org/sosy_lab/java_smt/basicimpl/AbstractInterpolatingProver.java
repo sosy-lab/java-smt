@@ -45,24 +45,20 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   private static final String PREFIX = "__internal_model_itp_generation_";
 
   protected AbstractInterpolatingProver(
-      Set<ProverOptions> pOptions,
-      FormulaManager pMgr,
-      BooleanFormulaManager pBmgr,
-      UFManager pUfmgr,
-      QuantifiedFormulaManager pQfmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
+      Set<ProverOptions> pOptions, FormulaManager pMgr, ShutdownNotifier pShutdownNotifier) {
+    super(pOptions, pMgr, pShutdownNotifier);
     mgr = pMgr;
-    bmgr = pBmgr;
-    ufmgr = pUfmgr;
-    qfmgr = pQfmgr;
+    bmgr = pMgr.getBooleanFormulaManager();
+    ufmgr = pMgr.getUFManager();
+    qfmgr = pMgr.getQuantifiedFormulaManager();
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    checkArgument(getAssertedConstraintIds().containsAll(pFormulasOfA),
+    checkArgument(
+        getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
     final ImmutableCollection<BooleanFormula> assertedFormulas =
@@ -80,8 +76,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<TFormulaInfo>> partitionedFormulas,
-      int[] startOfSubTree) throws SolverException, InterruptedException {
+      List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
+      throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported. "
             + "Use another strategy for interpolants.");
@@ -112,9 +108,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   /**
    * Computes Craig interpolants for a pair of formulas using a model-based approach.
    *
-   * <p>The model-based approach takes two groups of Boolean formulas, A and B, as input and
-   * returns an interpolant Itp. The interpolant Itp satisfies the definition of Craig
-   * interpolation, meaning:
+   * <p>The model-based approach takes two groups of Boolean formulas, A and B, as input and returns
+   * an interpolant Itp. The interpolant Itp satisfies the definition of Craig interpolation,
+   * meaning:
    *
    * <ol>
    *   <li>(A -> Itp) is unsatisfiable,
@@ -165,19 +161,20 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Computes Uniform Interpolants for a {@link Collection} of {@link BooleanFormula}
-   * using the quantifier-based interpolation strategy with quantifier elimination (QE).
+   * Computes Uniform Interpolants for a {@link Collection} of {@link BooleanFormula} using the
+   * quantifier-based interpolation strategy with quantifier elimination (QE).
    *
-   * <p>This approach generates an interpolant Itp for two sets of constraints A and B,
-   * where the variables are categorized as follows:
+   * <p>This approach generates an interpolant Itp for two sets of constraints A and B, where the
+   * variables are categorized as follows:
+   *
    * <ul>
-   *   <li>Variables that appear only in formula A.</li>
-   *   <li>Variables that appear only in formula B.</li>
-   *   <li>Shared variables that appear in both formulas A and B.</li>
+   *   <li>Variables that appear only in formula A.
+   *   <li>Variables that appear only in formula B.
+   *   <li>Shared variables that appear in both formulas A and B.
    * </ul>
    *
-   * <p>The resulting Uniform Interpolant is a stronger version of a Craig Interpolant
-   * and satisfies the definition of Craig Interpolation:
+   * <p>The resulting Uniform Interpolant is a stronger version of a Craig Interpolant and satisfies
+   * the definition of Craig Interpolation:
    *
    * <ol>
    *   <li>(A -> Itp) is unsatisfiable,
@@ -207,9 +204,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Computes the forward interpolant for a given formula A.
-   * In the forward direction, the variables specific to formula A are existentially quantified
-   * to describe the relationship between formulas A and B.
+   * Computes the forward interpolant for a given formula A. In the forward direction, the variables
+   * specific to formula A are existentially quantified to describe the relationship between
+   * formulas A and B.
    *
    * @param formulasOfA The {@link BooleanFormula} representing the constraints in formula A.
    * @param varsOfA The list of all variables in formula A.
@@ -231,9 +228,9 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Computes the backward interpolant for a given formula B.
-   * In the backward direction, the variables specific to formula B are universally quantified
-   * and formula B is negated to describe the relationship between formulas A and B.
+   * Computes the backward interpolant for a given formula B. In the backward direction, the
+   * variables specific to formula B are universally quantified and formula B is negated to describe
+   * the relationship between formulas A and B.
    *
    * @param formulasOfB The {@link BooleanFormula} representing the constraints in formula B.
    * @param varsOfB The list of all variables in formula B.
@@ -272,9 +269,7 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * @return An immutable list of variables found in both formulas A and B.
    */
   private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
-    return varsOfA.stream()
-        .filter(varsOfB::contains)
-        .collect(ImmutableList.toImmutableList());
+    return varsOfA.stream().filter(varsOfB::contains).collect(ImmutableList.toImmutableList());
   }
 
   /**
@@ -285,33 +280,31 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * @return An immutable list of bound variables from a formula.
    */
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
-    ImmutableList<Formula> boundVars = vars.stream()
-        .filter(var -> !sharedVars.contains(var))
-        .collect(ImmutableList.toImmutableList());
+    ImmutableList<Formula> boundVars =
+        vars.stream()
+            .filter(var -> !sharedVars.contains(var))
+            .collect(ImmutableList.toImmutableList());
 
     return boundVars.isEmpty() ? ImmutableList.copyOf(vars) : boundVars;
   }
 
   /**
-   * Creates an interpolant with a unique identifier that satisfies the third definition of a
-   * Craig Interpolant: its uninterpreted symbols are those shared between formulas A and B.
-   * This is used as part of the model-based interpolation strategy to generate the final
-   * Craig Interpolant.
+   * Creates an interpolant with a unique identifier that satisfies the third definition of a Craig
+   * Interpolant: its uninterpreted symbols are those shared between formulas A and B. This is used
+   * as part of the model-based interpolation strategy to generate the final Craig Interpolant.
    *
    * @param sharedVars The shared variables between formulas A and B.
    * @return An interpolant whose uninterpreted symbols are those shared between formulas A and B.
    */
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
     return ufmgr.declareAndCallUF(
-        PREFIX + UNIQUE_ID_GENERATOR.getFreshId(),
-        FormulaType.BooleanType,
-        sharedVars);
+        PREFIX + UNIQUE_ID_GENERATOR.getFreshId(), FormulaType.BooleanType, sharedVars);
   }
 
   /**
-   * Removes all formulas currently asserted in the stack to reset it.
-   * This method is used, e.g., for a new check, such as verifying the satisfiability of a
-   * formula without considering previously asserted formulas.
+   * Removes all formulas currently asserted in the stack to reset it. This method is used, e.g.,
+   * for a new check, such as verifying the satisfiability of a formula without considering
+   * previously asserted formulas.
    */
   private void clearStack() {
     for (int i = 0; i < size(); i++) {
