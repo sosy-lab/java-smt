@@ -33,12 +33,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -73,10 +71,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Formula> implements P
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
-      BooleanFormulaManager pBmgr,
-      QuantifiedFormulaManager pQfmgr,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr, pBmgr, pQfmgr, pShutdownNotifier);
+    super(pOptions, pMgr, pShutdownNotifier);
     this.creator = creator;
     curCfg = yices_new_config();
     yices_set_config(curCfg, "solver-type", "dpllt");
@@ -98,8 +94,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Formula> implements P
   }
 
   @Override
-  protected Formula addConstraintImpl(BooleanFormula pConstraint)
-      throws InterruptedException {
+  protected Formula addConstraintImpl(BooleanFormula pConstraint) throws InterruptedException {
     if (!generateUnsatCores) { // unsat core does not work with incremental mode
       int constraint = creator.extractInfo(pConstraint);
       yices_assert_formula(curEnv, constraint);

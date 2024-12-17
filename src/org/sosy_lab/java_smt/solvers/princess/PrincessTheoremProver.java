@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.api.SimpleAPI;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;

@@ -56,8 +56,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Formula> implements
       ShutdownNotifier pShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager, pManager.getBooleanFormulaManager(),
-        pManager.getQuantifiedFormulaManager(), pShutdownNotifier);
+    super(pOptions, pManager, pShutdownNotifier);
     manager = pManager;
     creator = pCreator;
 
@@ -93,7 +92,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Formula> implements
   }
 
   @Override
-  public @Nullable Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable Formula addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
     wasLastSatCheckSat = false;
     env.assert_formula(((BitwuzlaBooleanFormula) constraint).getTerm());
     return constraint;

@@ -237,8 +237,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
-        ImmutableMap.<String, Object>builder()
-            .build();
+        ImmutableMap.<String, Object>builder().build();
     return new Z3TheoremProver(
         creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }

@@ -130,13 +130,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     return new CVC4TheoremProver(
-        creator,
-        shutdownNotifier,
-        randomSeed,
-        pOptions,
-        getFormulaManager(),
-        getFormulaManager().getBooleanFormulaManager(),
-        getFormulaManager().getQuantifiedFormulaManager());
+        creator, shutdownNotifier, randomSeed, pOptions, getFormulaManager());
   }
 
   @Override
