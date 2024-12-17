@@ -11,14 +11,18 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -27,60 +31,110 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, TType>
-    extends AbstractProverWithAllSat<TFormulaInfo>
-    implements InterpolatingProverEnvironment<TFormulaInfo> {
+// The non-interpolating delegates usually return nothing useful as itp points, so we have to
+// track it here
+@SuppressWarnings("unused")
+public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
+    extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
 
+  // TODO: use context to create distinct provers to interpolate on (formulas needs to be
+  //  translated to and from that other instance!)
+  private final SolverContext solverContext;
+  private final ShutdownNotifier shutdownNotifier;
+  private final ProverEnvironment delegate;
+
+  private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
   private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
   private final UFManager ufmgr;
   private final QuantifiedFormulaManager qfmgr;
 
+  // null for native solver interpolation
+  private final @Nullable ProverOptions interpolationStrategy;
+
   private static final UniqueIdGenerator UNIQUE_ID_GENERATOR = new UniqueIdGenerator();
   private static final String PREFIX = "__internal_model_itp_generation_";
 
-  protected AbstractInterpolatingProver(
-      Set<ProverOptions> pOptions, FormulaManager pMgr, ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr, pShutdownNotifier);
-    mgr = pMgr;
-    bmgr = pMgr.getBooleanFormulaManager();
-    ufmgr = pMgr.getUFManager();
-    qfmgr = pMgr.getQuantifiedFormulaManager();
+  public IndependentInterpolatingProverEnvironment(
+      SolverContext sourceContext,
+      FormulaCreator<TFormulaInfo, TType, ?, ?> pCreator,
+      ProverEnvironment pDelegate,
+      Set<ProverOptions> pOptions,
+      ShutdownNotifier pShutdownNotifier) {
+    super(pOptions);
+    solverContext = checkNotNull(sourceContext);
+    delegate = checkNotNull(pDelegate);
+    creator = pCreator;
+    shutdownNotifier = pShutdownNotifier;
+    interpolationStrategy = getIndependentInterpolationStrategy(pOptions);
+    mgr = sourceContext.getFormulaManager();
+    bmgr = mgr.getBooleanFormulaManager();
+    ufmgr = mgr.getUFManager();
+    qfmgr = mgr.getQuantifiedFormulaManager();
+  }
+
+  private static @Nullable ProverOptions getIndependentInterpolationStrategy(
+      Set<ProverOptions> pOptions) {
+    List<ProverOptions> itpStrat = new ArrayList<>(pOptions);
+    final Set<ProverOptions> allIndependentInterpolationStrategies =
+        ImmutableSet.of(
+            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+    itpStrat.retainAll(allIndependentInterpolationStrategies);
+    if (itpStrat.isEmpty()) {
+      return null;
+    }
+    Preconditions.checkState(itpStrat.size() == 1);
+    return itpStrat.get(0);
+  }
+
+  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> pOptions) {
+    return getIndependentInterpolationStrategy(pOptions) != null;
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
     checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
+        super.getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
-    final ImmutableCollection<BooleanFormula> assertedFormulas =
-        ImmutableList.copyOf(getAssertedFormulas());
+    if (interpolationStrategy == null) {
+      if (delegate instanceof InterpolatingProverEnvironment) {
+        // TODO: this case
+        // Use native solver interpolation
+        // return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate).getInterpolant
+        // (pFormulasOfA);
+      } else {
+        throw new UnsupportedOperationException();
+      }
+    }
 
-    final Collection<BooleanFormula> formulasOfA =
-        (Collection<BooleanFormula>) ImmutableList.copyOf(pFormulasOfA);
-    final Collection<BooleanFormula> formulasOfB =
-        assertedFormulas.stream()
-            .filter(formula -> !formulasOfA.contains(formula))
-            .collect(ImmutableList.toImmutableList());
+    InterpolationFormulas formulasAAndB = super.getInterpolationGroups(pFormulasOfA);
+    Collection<BooleanFormula> formulasOfA = formulasAAndB.gotFormulasForA();
+    Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
-    return getQEBasedInterpolant(formulasOfA, formulasOfB);
+    if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
+      return getModelBasedInterpolant(formulasOfA, formulasOfB);
+    } else {
+      return getQuantifierEliminationBasedInterpolant(formulasOfA, formulasOfB);
+    }
   }
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "directly receiving tree interpolants is not supported. "
-            + "Use another strategy for interpolants.");
+    return List.of();
   }
 
   /**
@@ -94,7 +148,8 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
 
-    final ImmutableList<BooleanFormula> originalStack = ImmutableList.copyOf(getAssertedFormulas());
+    final ImmutableList<BooleanFormula> originalStack =
+        ImmutableList.copyOf(super.getAssertedFormulas());
 
     clearStack();
 
@@ -161,16 +216,16 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
   }
 
   /**
-   * Computes Uniform Interpolants for a {@link Collection} of {@link BooleanFormula} using the
+   * Computes uniform interpolants for a {@link Collection} of {@link BooleanFormula} using the
    * quantifier-based interpolation strategy with quantifier elimination (QE).
    *
    * <p>This approach generates an interpolant Itp for two sets of constraints A and B, where the
    * variables are categorized as follows:
    *
    * <ul>
-   *   <li>Variables that appear only in formula A.
-   *   <li>Variables that appear only in formula B.
-   *   <li>Shared variables that appear in both formulas A and B.
+   *   <li>Variables that appear only in formulas of A.
+   *   <li>Variables that appear only in formulas of B.
+   *   <li>Shared variables that appear in both sets of formulas A and B.
    * </ul>
    *
    * <p>The resulting Uniform Interpolant is a stronger version of a Craig Interpolant and satisfies
@@ -179,26 +234,33 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
    * <ol>
    *   <li>(A -> Itp) is unsatisfiable,
    *   <li>(Itp -> not B) is unsatisfiable, and
-   *   <li>Itp only contains symbols that appear in both formulas A and B.
+   *   <li>Itp only contains symbols that appear in both sets of formulas A and B.
    * </ol>
    *
-   * @param pFormulasOfA A collection of {@link BooleanFormula} representing formula A.
-   * @param pFormulasOfB A collection of {@link BooleanFormula} representing formula B.
-   * @return the Uniform Interpolant Itp if it satisfies the conditions, otherwise returns false.
+   * @param formulasOfA A collection of {@link BooleanFormula}s representing the set A.
+   * @param formulasOfB A collection of {@link BooleanFormula}s representing the set B.
+   * @return the uniform Craig-Interpolant, returns false in case an interpolant can not be found.
    */
-  private BooleanFormula getQEBasedInterpolant(
-      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
+  private BooleanFormula getQuantifierEliminationBasedInterpolant(
+      Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
       throws SolverException, InterruptedException {
 
-    BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
-    BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
+    BooleanFormula conjugatedA = bmgr.and(formulasOfA);
+    BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
-    ImmutableList<Formula> varsOfA = getVars(formulasOfA);
-    ImmutableList<Formula> varsOfB = getVars(formulasOfB);
+    ImmutableList<Formula> varsOfA = getVars(conjugatedA);
+    ImmutableList<Formula> varsOfB = getVars(conjugatedB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    BooleanFormula interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars); // or fwd
+    BooleanFormula interpolant;
+    if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
+      interpolant = getBackwardInterpolant(conjugatedB, varsOfB, sharedVars);
+    } else {
+      Preconditions.checkState(
+          interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS));
+      interpolant = getForwardInterpolant(conjugatedA, varsOfA, sharedVars);
+    }
 
     return interpolant;
   }
@@ -322,5 +384,67 @@ public abstract class AbstractInterpolatingProver<TFormulaInfo extends Formula, 
     for (BooleanFormula formula : assertedFormulas) {
       push(formula);
     }
+  }
+
+  @Override
+  protected void popImpl() {
+    delegate.pop();
+  }
+
+  @Override
+  protected @Nullable TFormulaInfo addConstraintImpl(BooleanFormula constraint)
+      throws InterruptedException {
+    checkState(!closed);
+    TFormulaInfo t = creator.extractInfo(constraint);
+    delegate.addConstraint(constraint);
+    return t;
+  }
+
+  @Override
+  protected void pushImpl() throws InterruptedException {
+    delegate.push();
+  }
+
+  @Override
+  public int size() {
+    return delegate.size();
+  }
+
+  @Override
+  public boolean isUnsat() throws SolverException, InterruptedException {
+    return delegate.isUnsat();
+  }
+
+  @Override
+  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    return delegate.isUnsatWithAssumptions(assumptions);
+  }
+
+  @Override
+  public Model getModel() throws SolverException {
+    return delegate.getModel();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    return delegate.getUnsatCore();
+  }
+
+  @Override
+  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    return delegate.unsatCoreOverAssumptions(assumptions);
+  }
+
+  @Override
+  public void close() {
+    delegate.close();
+  }
+
+  @Override
+  public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
+      throws InterruptedException, SolverException {
+    return delegate.allSat(callback, important);
   }
 }
