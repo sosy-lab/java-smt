@@ -12,21 +12,19 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -59,7 +57,31 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
+  /**
+   * Returns the symbol name without any SMTLIB quotes.
+   *
+   * <p>Will turn <code>| 1var\n|</code> into just <code> 1 var\n</code>. Symbols that are not
+   * quoted are unaffected.
+   */
+  private String removeQuotes(String symbol) {
+    return (symbol.startsWith("|") && symbol.endsWith("|"))
+        ? symbol.substring(1, symbol.length() - 1)
+        : symbol;
+  }
+
+  /**
+   * Stores Bitwuzla terms for all defined symbols.
+   *
+   * <p>The cache maps from <code>String x Sort</code> to <code>Term</code>. Here the first argument
+   * is the name of the symbol, and we allow polymorphic symbols where the same name can have more
+   * than one sort. If the symbol can be printed as a simple symbol or a quoted symbol (like <code>
+   * var1</code> and <code>|var1|</code>) in SMTLIB we identify both version as they refer to the
+   * same variable.
+   */
+  private final Table<String, Sort, Term> formulaCache =
+      TreeBasedTable.create(
+          (String symA, String symB) -> removeQuotes(symA).compareTo(removeQuotes(symB)),
+          Comparator.comparing(Sort::toString));
 
   /**
    * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
@@ -555,24 +577,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     return new BitwuzlaBooleanFormula(pTerm);
   }
 
-  protected Table<String, Sort, Term> getCache() {
+  Table<String, Sort, Term> getCache() {
     return formulaCache;
-  }
-
-  // True if the entered String has an existing variable in the cache.
-  protected boolean formulaCacheContains(String variable) {
-    // There is always only 1 type permitted per variable
-    return formulaCache.containsRow(variable);
-  }
-
-  // Optional that contains the variable to the entered String if there is one.
-  protected Optional<Term> getFormulaFromCache(String variable) {
-    Iterator<Entry<Sort, Term>> entrySetIter = formulaCache.row(variable).entrySet().iterator();
-    if (entrySetIter.hasNext()) {
-      // If there is a non-empty row for an entry, there is only one entry
-      return Optional.of(entrySetIter.next().getValue());
-    }
-    return Optional.empty();
   }
 
   @Override
