@@ -15,10 +15,12 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -130,6 +132,27 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   /**
+   * Returns a tuple, consisting of 2 sets, that combined form the set of all formulas on the stack.
+   * The set of formulas A is the formulas identified by the set of input interpolation points. The
+   * set of formulas B is the rest of the current asserted formulas.
+   */
+  protected InterpolationFormulas getInterpolationGroups(Collection<T> pFormulasOfA) {
+    ImmutableSet.Builder<BooleanFormula> formulasOfA = ImmutableSet.builder();
+    ImmutableSet.Builder<BooleanFormula> formulasOfB = ImmutableSet.builder();
+    for (Map<BooleanFormula, T> assertedFormulasPerLevel : assertedFormulas) {
+      for (Entry<BooleanFormula, T> assertedFormulaAndItpPoint :
+          assertedFormulasPerLevel.entrySet()) {
+        if (pFormulasOfA.contains(assertedFormulaAndItpPoint.getValue())) {
+          formulasOfA.add(assertedFormulaAndItpPoint.getKey());
+        } else {
+          formulasOfB.add(assertedFormulaAndItpPoint.getKey());
+        }
+      }
+    }
+    return InterpolationFormulas.of(formulasOfA.build(), formulasOfB.build());
+  }
+
+  /**
    * This method registers the Evaluator to be cleaned up before the next change on the prover
    * stack.
    */
@@ -152,5 +175,31 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.clear();
     closeAllEvaluators();
     closed = true;
+  }
+
+  public static class InterpolationFormulas {
+    private final Collection<BooleanFormula> formulasForA;
+    private final Collection<BooleanFormula> formulasForB;
+
+    private InterpolationFormulas(
+        Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+      Preconditions.checkNotNull(pFormulasOfA);
+      Preconditions.checkNotNull(pFormulasOfB);
+      formulasForA = pFormulasOfA;
+      formulasForB = pFormulasOfB;
+    }
+
+    protected static InterpolationFormulas of(
+        Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
+      return new InterpolationFormulas(pFormulasOfA, pFormulasOfB);
+    }
+
+    protected Collection<BooleanFormula> gotFormulasForA() {
+      return formulasForA;
+    }
+
+    protected Collection<BooleanFormula> gotFormulasForB() {
+      return formulasForB;
+    }
   }
 }
