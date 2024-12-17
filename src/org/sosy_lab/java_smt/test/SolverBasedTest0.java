@@ -447,20 +447,19 @@ public abstract class SolverBasedTest0 {
   @RunWith(Parameterized.class)
   public abstract static class ParameterizedInterpolatingSolverBasedTest0 extends SolverBasedTest0 {
 
-    private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
+    private static final Set<ProverOptions[]> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
         ImmutableSet.of(
-            null,
-            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+            new ProverOptions[] {ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS},
+                new ProverOptions[] {ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS},
+                    new ProverOptions[] {ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS});
 
     @Parameters(name = "solver {0} with interpolation strategy {1}")
     public static List<Object[]> getAllSolversAndItpStrategies() {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
         // No arg for no option (= solver based interpolation)
-        lst.add(new Object[] {solver, new Object[] {}});
-        for (ProverOptions itpStrat : ALL_INDEPENDENT_INTERPOLATION_STRATEGIES) {
+        lst.add(new Object[] {solver, new ProverOptions[] {}});
+        for (ProverOptions[] itpStrat : ALL_INDEPENDENT_INTERPOLATION_STRATEGIES) {
           lst.add(new Object[] {solver, itpStrat});
         }
       }
@@ -471,14 +470,14 @@ public abstract class SolverBasedTest0 {
     public Solvers solver;
 
     @Parameter(1)
-    public ProverOptions interpolationStrategy;
+    public ProverOptions[] interpolationStrategy;
 
     @Override
     protected Solvers solverToUse() {
       return solver;
     }
 
-    protected ProverOptions itpStrategyToUse() {
+    protected ProverOptions[] itpStrategyToUse() {
       return interpolationStrategy;
     }
   }
