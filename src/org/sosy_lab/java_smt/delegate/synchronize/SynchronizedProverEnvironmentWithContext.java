@@ -8,13 +8,12 @@
 
 package org.sosy_lab.java_smt.delegate.synchronize;
 
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 class SynchronizedProverEnvironmentWithContext
-    extends SynchronizedBasicProverEnvironmentWithContext<Formula> implements ProverEnvironment {
+    extends SynchronizedBasicProverEnvironmentWithContext<Void> implements ProverEnvironment {
 
   SynchronizedProverEnvironmentWithContext(
       ProverEnvironment pDelegate,

@@ -12,11 +12,10 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
-class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Formula>
+class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void>
     implements ProverEnvironment {
 
   SmtInterpolTheoremProver(
@@ -28,8 +27,8 @@ class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Formula>
   }
 
   @Override
-  protected Formula addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     addConstraint0(constraint);
-    return constraint;
+    return null;
   }
 }
