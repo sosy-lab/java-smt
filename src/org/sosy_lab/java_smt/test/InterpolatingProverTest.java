@@ -52,15 +52,16 @@ public class InterpolatingProverTest
 
     if (itpStrat.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT)) {
       return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT);
-    }
-    else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
+          context.newProverEnvironmentWithInterpolation(
+              ProverOptions.GENERATE_MODEL_BASED_INTERPOLANT);
+    } else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS)) {
       return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS);
-    }
-    else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
+          context.newProverEnvironmentWithInterpolation(
+              ProverOptions.GENERATE_QE_BASED_FORWARD_INTERPOLANTS);
+    } else if (itpStrat.equals(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS)) {
       return (InterpolatingProverEnvironment<T>)
-          context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS);
+          context.newProverEnvironmentWithInterpolation(
+              ProverOptions.GENERATE_QE_BASED_BACKWARD_INTERPOLANTS);
     }
 
     return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
