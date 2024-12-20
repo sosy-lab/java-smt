@@ -352,23 +352,14 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
     }
 
     if (logic.isVar(f)) {
-      String varName = logic.getSymName(logic.getSymRef(f));
-      return visitor.visitFreeVariable(formula, dequote(varName));
+      String varName = logic.protectName(logic.getSymRef(f));
+      return visitor.visitFreeVariable(formula, varName);
     }
 
-    String varName = logic.getSymName(logic.getSymRef(f));
+    String varName = logic.protectName(logic.getSymRef(f));
 
     ImmutableList.Builder<Formula> argTerms = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-
-    /* FIXME: Caused crashes in ModelEvaluationTest
-    VectorPTRef subterms = logic.getPterm(f).getArgs();
-
-    for (PTRef sub : subterms) {
-      argTerms.add(encapsulate(sub));
-      argTypes.add(getFormulaType(sub));
-    }
-    */
 
     Pterm pterm = logic.getPterm(f);
     for (int i = 0; i < pterm.size(); i++) {

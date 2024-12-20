@@ -69,7 +69,10 @@ final class PrincessFormulaManager
   public String dumpFormulaImpl(final IExpression formula) throws IOException {
     assert getFormulaCreator().getFormulaType(formula) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return getEnvironment().dumpFormula((IFormula) formula, creator);
+    // FIXME Princess tries to escape the |...| quotes in the symbol. This is not allowed by the
+    //  SMTLIB standard and should be report as a bug.
+    String r = getEnvironment().dumpFormula((IFormula) formula, creator);
+    return r.replaceAll("\\\\\\|", "");
   }
 
   @Override

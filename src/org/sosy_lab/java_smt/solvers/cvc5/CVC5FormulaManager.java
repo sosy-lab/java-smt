@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
-import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
@@ -81,11 +80,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
 
     // print all symbols
     for (Map.Entry<String, Term> entry : allVars.entrySet()) {
-      String name = entry.getKey();
       Term var = entry.getValue();
 
-      // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      // Print "declare-fun" and symbol name
+      out.append("(declare-fun ").append(var).append(" (");
 
       // add function parameters
       Iterable<Sort> childrenTypes;

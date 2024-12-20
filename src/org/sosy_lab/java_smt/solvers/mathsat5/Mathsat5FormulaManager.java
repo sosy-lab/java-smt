@@ -69,7 +69,10 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   public String dumpFormulaImpl(final Long f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return msat_to_smtlib2(getEnvironment(), f);
+    // FIXME Mathsat tries to escape the |...| quotes in the symbol. This is not allowed by the
+    //  SMTLIB standard and should be report as a bug.
+    String r = msat_to_smtlib2(getEnvironment(), f);
+    return r.replaceAll("\\\\\\|", "");
   }
 
   @Override

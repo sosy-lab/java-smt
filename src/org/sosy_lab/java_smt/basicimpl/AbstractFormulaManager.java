@@ -78,9 +78,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
+  // TODO Add missing reserved symbols, like "_" or "assert"
   @VisibleForTesting
   public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct", "let");
+      ImmutableSet.of(
+          "true", "false", "and", "or", "select", "store", "xor", "distinct", "let", "exit");
 
   /**
    * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
@@ -327,7 +329,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
-    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+    BooleanFormula f = formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+
+    // Most solvers drop |...| quotes while parsing. Run through the expression and reapply quotes
+    // where they are needed.
+    ImmutableMap.Builder<Formula, Formula> subst = ImmutableMap.builder();
+    for (Map.Entry<String, Formula> entry : extractVariables(f).entrySet()) {
+      String name = entry.getKey();
+      Formula term = entry.getValue();
+      if (name.isEmpty() || BASIC_OPERATORS.contains(name) || SMTLIB2_KEYWORDS.contains(name)) {
+        Formula replacement = makeVariable(getFormulaType(term), "|" + name + "|");
+        subst.put(term, replacement);
+      }
+    }
+    return substitute(f, subst.build());
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
@@ -624,6 +639,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
         variableName,
         help);
+    // TODO Rewrite this to allow quoted symbols
+    /*
     Preconditions.checkArgument(
         DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
         "Identifier '%s' can not be used, "
@@ -632,6 +649,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         DISALLOWED_CHARACTER_REPLACEMENT
             .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.
         help);
+    */
   }
 
   /* This escaping works for simple escape sequences only, i.e., keywords are unique enough. */

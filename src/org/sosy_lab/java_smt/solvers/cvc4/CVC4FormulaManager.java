@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
-import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Type;
@@ -81,11 +80,10 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
 
     // print all symbols
     for (Map.Entry<String, Expr> entry : allVars.entrySet()) {
-      String name = entry.getKey();
       Expr var = entry.getValue();
 
-      // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      // Print "declare-fun" and symbol name
+      out.append("(declare-fun ").append(var).append(" (");
 
       // add function parameters
       Iterable<Type> childrenTypes = Iterables.transform(var, Expr::getType);

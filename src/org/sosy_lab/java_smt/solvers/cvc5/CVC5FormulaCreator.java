@@ -369,6 +369,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
       // TODO what happens for function names containing whitepsace?
+      // FIXME This might be broken now
       String dequoted = dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
@@ -442,7 +443,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitQuantifier((BooleanFormula) formula, quant, freeVars, fBody);
 
       } else if (f.getKind() == Kind.CONSTANT) {
-        return visitor.visitFreeVariable(formula, dequote(f.toString()));
+        return visitor.visitFreeVariable(formula, f.toString());
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         Preconditions.checkState(

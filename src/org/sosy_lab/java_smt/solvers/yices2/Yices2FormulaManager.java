@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static com.google.common.base.CharMatcher.inRange;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_term;
@@ -21,9 +20,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_nu
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 
-import com.google.common.base.CharMatcher;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -32,12 +28,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Integer, Long, Integer> {
-
-  private static final CharMatcher LETTERS = inRange('a', 'z').or(inRange('A', 'Z'));
-  private static final CharMatcher DIGITS = inRange('0', '9');
-  private static final CharMatcher ADDITIONAL_CHARS = CharMatcher.anyOf("~!@$%^&*_-+=<>.?/");
-  private static final CharMatcher VALID_CHARS =
-      LETTERS.or(DIGITS).or(ADDITIONAL_CHARS).precomputed();
 
   protected Yices2FormulaManager(
       Yices2FormulaCreator pFormulaCreator,
@@ -105,7 +95,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       }
       if (types.length > 0) {
         out.append("(declare-fun ");
-        out.append(quote(entry.getKey()));
+        out.append(entry.getKey());
         out.append(" (");
         for (int i = 0; i < types.length - 1; i++) {
           out.append(getTypeRepr(types[i]));
@@ -122,25 +112,5 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
     out.append("(assert ").append(yices_term_to_string(formula)).append(")");
 
     return out.toString();
-  }
-
-  /**
-   * Quote symbols if required.
-   *
-   * <p>See http://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2017-07-18.pdf, Section 3.1.
-   * "Symbols"
-   */
-  private static String quote(String str) {
-    Preconditions.checkArgument(!Strings.isNullOrEmpty(str));
-    Preconditions.checkArgument(CharMatcher.anyOf("|\\").matchesNoneOf(str));
-    Preconditions.checkArgument(!SMTLIB2_KEYWORDS.contains(str));
-
-    if (VALID_CHARS.matchesAllOf(str) && !DIGITS.matches(str.charAt(0))) {
-      // simple symbol
-      return str;
-    } else {
-      // quoted symbol
-      return "|" + str + "|";
-    }
   }
 }
