@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
@@ -36,8 +35,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
       CVC5AbstractProver<?> pProver,
       FormulaManager pMgr,
       CVC5FormulaCreator pCreator,
-      Collection<Term> pAssertedExpressions)
-      throws InterruptedException, SolverException {
+      Collection<Term> pAssertedExpressions) {
     super(pProver, pCreator);
     solver = pProver.solver;
     mgr = pMgr;
@@ -55,8 +53,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     return solver.getValue(f);
   }
 
-  private ImmutableList<ValueAssignment> generateModel()
-      throws InterruptedException, SolverException {
+  private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
@@ -68,8 +65,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
   }
 
   // TODO this method is highly recursive and should be rewritten with a proper visitor
-  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr)
-      throws InterruptedException, SolverException {
+  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr) {
     try {
       Sort sort = expr.getSort();
       Kind kind = expr.getKind();
@@ -110,8 +106,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     }
   }
 
-  private ValueAssignment getAssignmentForUf(Term pKeyTerm)
-      throws InterruptedException, SolverException {
+  private ValueAssignment getAssignmentForUf(Term pKeyTerm) {
     // Ufs consist of arguments + 1 child, the first child is the function definition as a lambda
     // and the result, while the remaining children are the arguments. Note: we can't evaluate bound
     // variables!
@@ -171,8 +166,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
   }
 
-  private ValueAssignment getAssignment(Term pKeyTerm)
-      throws InterruptedException, SolverException {
+  private ValueAssignment getAssignment(Term pKeyTerm) {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
       try {

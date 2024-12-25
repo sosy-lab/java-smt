@@ -51,7 +51,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
   }
 
   @Test
-  public void testIsSatisfiableNo() throws InterruptedException, SolverException {
+  public void testIsSatisfiableNo() throws InterruptedException {
     requireUnsatCore();
     try (ProverEnvironment env =
         context.newProverEnvironment(
@@ -71,7 +71,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
   }
 
   @Test
-  public void testIsUnsatisfiableNo() throws InterruptedException, SolverException {
+  public void testIsUnsatisfiableNo() throws InterruptedException {
     requireModel();
     try (ProverEnvironment env = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       env.push(simpleFormula);

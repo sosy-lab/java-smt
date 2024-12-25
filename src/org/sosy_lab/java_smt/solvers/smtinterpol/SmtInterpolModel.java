@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -45,7 +44,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
+  public ImmutableList<ValueAssignment> asList() {
 
     Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
     for (Term assertedTerm : assertedTerms) {
@@ -96,8 +95,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
    * @param upperIndices indices for multi-dimensional arrays
    */
   private Collection<ValueAssignment> getArrayAssignment(
-      String symbol, Term key, Term array, List<Object> upperIndices)
-      throws InterruptedException, SolverException {
+      String symbol, Term key, Term array, List<Object> upperIndices) {
     assert array.getSort().isArraySort();
     Collection<ValueAssignment> assignments = new ArrayList<>();
     Term evaluation = model.evaluate(array);
@@ -139,8 +137,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   }
 
   /** Get all modeled assignments for the UF. */
-  private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol)
-      throws InterruptedException, SolverException {
+  private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol) {
     final Collection<ValueAssignment> assignments = new ArrayList<>();
     final String name = unescape(symbol.getApplicationString());
 
@@ -159,8 +156,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
     return assignments;
   }
 
-  private ValueAssignment getAssignment(String key, ApplicationTerm term)
-      throws InterruptedException, SolverException {
+  private ValueAssignment getAssignment(String key, ApplicationTerm term) {
     Term value = model.evaluate(term);
     List<Object> argumentInterpretation = new ArrayList<>();
     for (Term param : term.getParameters()) {
