@@ -146,7 +146,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test(timeout = 1000)
   @SuppressWarnings({"try", "CheckReturnValue"})
   public void testCVC5WithValidOptionsTimeLimit()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+      throws InvalidConfigurationException, InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
 
     //  tlimit-per is time limit in ms of wall clock time per query

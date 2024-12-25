@@ -52,15 +52,11 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
-    try {
-      return asList().iterator();
-    } catch (InterruptedException | SolverException e) {
-      throw new RuntimeException(e);
-    }
+    return asList().iterator();
   }
 
   /** Build a list of assignments that stays valid after closing the model. */
-  ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException;
+  ImmutableList<ValueAssignment> asList();
 
   /**
    * Pretty-printing of the model values.

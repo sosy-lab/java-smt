@@ -101,12 +101,12 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected void pushImpl() throws InterruptedException, SolverException {
+  protected void pushImpl() {
     push0();
     try {
       Native.optimizePush(z3context, z3optSolver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3Exception(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception);
     }
   }
 
@@ -197,11 +197,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected long getZ3Model() throws InterruptedException, SolverException {
+  protected long getZ3Model() {
     try {
       return Native.optimizeGetModel(z3context, z3optSolver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3ExceptionAsRuntimeException(e);
     }
   }
 

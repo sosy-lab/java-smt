@@ -39,15 +39,14 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint)
-      throws InterruptedException, SolverException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     synchronized (sync) {
       return delegate.addConstraint(pConstraint);
     }
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     synchronized (sync) {
       delegate.push();
     }
@@ -77,7 +76,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     synchronized (sync) {
       return new SynchronizedModel(delegate.getModel(), sync);
     }

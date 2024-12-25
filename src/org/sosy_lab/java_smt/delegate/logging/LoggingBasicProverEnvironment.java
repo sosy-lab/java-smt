@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -38,7 +39,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T push(BooleanFormula f) throws InterruptedException, SolverException {
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
     logger.log(Level.FINE, "up to level " + level++);
     logger.log(Level.FINE, "formula pushed:", f);
     return wrapped.push(f);
@@ -51,12 +52,12 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException {
+  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     return wrapped.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     logger.log(Level.FINE, "up to level " + level++);
     wrapped.push();
   }
@@ -86,15 +87,14 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     Model m = wrapped.getModel();
     logger.log(Level.FINE, "model", m);
     return m;
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments()
-      throws SolverException, InterruptedException {
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;

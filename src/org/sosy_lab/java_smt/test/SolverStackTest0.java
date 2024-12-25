@@ -194,7 +194,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest2() throws InterruptedException, SolverException {
+  public void stackTest2() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -203,7 +203,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest3() throws InterruptedException, SolverException {
+  public void stackTest3() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -216,7 +216,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest4() throws InterruptedException, SolverException {
+  public void stackTest4() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     stack.push();
@@ -262,7 +262,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest5() throws InterruptedException, SolverException {
+  public void stackTest5() throws InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     stack.pop();
@@ -509,7 +509,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
 
   @Test(expected = IllegalStateException.class)
   @SuppressWarnings("CheckReturnValue")
-  public void avoidDualStacksIfNotSupported() throws InterruptedException, SolverException {
+  public void avoidDualStacksIfNotSupported() throws InterruptedException {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)

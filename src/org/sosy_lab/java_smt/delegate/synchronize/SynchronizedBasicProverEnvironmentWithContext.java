@@ -58,8 +58,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint)
-      throws InterruptedException, SolverException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     BooleanFormula constraint;
     synchronized (sync) {
       constraint = otherManager.translateFrom(pConstraint, manager);
@@ -68,7 +67,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     delegate.push();
   }
 
@@ -92,7 +91,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     synchronized (sync) {
       return new SynchronizedModelWithContext(delegate.getModel(), sync, manager, otherManager);
     }

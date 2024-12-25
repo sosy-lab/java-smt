@@ -36,15 +36,14 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula constraint)
-      throws InterruptedException, SolverException {
+  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(constraint);
     return delegate.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     debugging.assertThreadLocal();
     delegate.push();
   }
@@ -73,7 +72,7 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     debugging.assertThreadLocal();
     return new DebuggingModel(delegate.getModel(), debugging);
   }

@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_ast_kind;
@@ -161,12 +162,37 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
    * Otherwise, the given exception is wrapped and thrown as a SolverException.
    */
+  @CanIgnoreReturnValue
   final SolverException handleZ3Exception(Z3Exception e)
       throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
       shutdownNotifier.shutdownIfNecessary();
     }
     throw new SolverException("Z3 has thrown an exception", e);
+  }
+
+  /**
+   * This method handles a Z3Exception, however it only throws a RuntimeException. This method is
+   * used in places where we cannot throw a checked exception in JavaSMT due to API restrictions.
+   *
+   * @param e the Z3Exception to handle
+   * @return nothing, always throw a RuntimeException
+   * @throws RuntimeException always thrown for the given Z3Exception
+   */
+  final RuntimeException handleZ3ExceptionAsRuntimeException(Z3Exception e) {
+    try {
+      throw handleZ3Exception(e);
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      throw sneakyThrow(e);
+    } catch (SolverException ex) {
+      throw sneakyThrow(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   @Override

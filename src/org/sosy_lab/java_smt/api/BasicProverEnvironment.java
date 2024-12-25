@@ -32,7 +32,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   @Nullable
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) throws InterruptedException, SolverException {
+  default T push(BooleanFormula f) throws InterruptedException {
     push();
     return addConstraint(f);
   }
@@ -46,7 +46,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
-  T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException;
+  T addConstraint(BooleanFormula constraint) throws InterruptedException;
 
   /**
    * Create a new backtracking point, i.e., a new level on the assertion stack. Each level can hold
@@ -55,7 +55,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>If formulas are added before creating the first backtracking point, they can not be removed
    * via a POP-operation.
    */
-  void push() throws InterruptedException, SolverException;
+  void push() throws InterruptedException;
 
   /**
    * Get the number of backtracking points/levels on the current stack.
@@ -87,7 +87,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
    * temporary symbols. There should be at least a value-assignment for each free symbol.
    */
-  Model getModel() throws SolverException, InterruptedException;
+  Model getModel() throws SolverException;
 
   /**
    * Get a temporary view on the current satisfying assignment. This should be called only
@@ -95,7 +95,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * should no longer be used as soon as any constraints are added to, pushed, or popped from the
    * prover stack.
    */
-  default Evaluator getEvaluator() throws InterruptedException, SolverException {
+  default Evaluator getEvaluator() throws SolverException {
     return getModel();
   }
 
@@ -107,8 +107,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  default ImmutableList<Model.ValueAssignment> getModelAssignments()
-      throws SolverException, InterruptedException {
+  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     try (Model model = getModel()) {
       return model.asList();
     }

@@ -43,13 +43,13 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException {
+  public T addConstraint(BooleanFormula constraint) throws InterruptedException {
     clearAssumptions();
     return delegate.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     clearAssumptions();
     delegate.push();
   }
@@ -80,13 +80,12 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   protected void registerPushedFormula(@SuppressWarnings("unused") T pPushResult) {}
 
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     return delegate.getModel();
   }
 
   @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments()
-      throws SolverException, InterruptedException {
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     return delegate.getModelAssignments();
   }
 

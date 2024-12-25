@@ -42,14 +42,13 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint)
-      throws InterruptedException, SolverException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
     stats.constraint.getAndIncrement();
     return delegate.addConstraint(pConstraint);
   }
 
   @Override
-  public void push() throws InterruptedException, SolverException {
+  public void push() throws InterruptedException {
     stats.push.getAndIncrement();
     delegate.push();
   }
@@ -82,7 +81,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException, InterruptedException {
+  public Model getModel() throws SolverException {
     stats.model.getAndIncrement();
     return new StatisticsModel(delegate.getModel(), stats);
   }
