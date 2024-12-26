@@ -178,4 +178,14 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   protected Long toStringFormula(Long pParam) {
     return Native.mkIntToStr(z3context, pParam);
   }
+
+  @Override
+  protected Long toCodePoint(Long pParam) {
+    return Native.mkStringToCode(z3context, pParam);
+  }
+
+  @Override
+  protected Long fromCodePoint(Long pParam) {
+    return Native.mkStringFromCode(z3context, pParam);
+  }
 }

@@ -309,4 +309,14 @@ public class PrincessStringFormulaManager
   protected ITerm toStringFormula(IExpression pParam) {
     return new IFunApp(PrincessEnvironment.stringTheory.int_to_str(), toITermSeq(pParam));
   }
+
+  @Override
+  protected IExpression toCodePoint(IExpression pParam) {
+    return new IFunApp(PrincessEnvironment.stringTheory.str_to_code(), toITermSeq(pParam));
+  }
+
+  @Override
+  protected IExpression fromCodePoint(IExpression pParam) {
+    return new IFunApp(PrincessEnvironment.stringTheory.str_from_code(), toITermSeq(pParam));
+  }
 }

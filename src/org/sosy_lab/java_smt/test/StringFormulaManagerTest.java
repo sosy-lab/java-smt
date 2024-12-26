@@ -64,6 +64,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
           "abchurrdurr",
           "abcdefaaaaa");
 
+  private static final int MAX_SINGLE_CODE_POINT_IN_UTF16 = 0x2FFFF;
+
   private StringFormula a;
   private StringFormula b;
   private StringFormula ab;
@@ -734,6 +736,97 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertEqual(smgr.charAt(ab, imgr.makeNumber(1)), b);
     assertDistinct(smgr.charAt(ab, imgr.makeNumber(0)), b);
     assertDistinct(smgr.charAt(ab, imgr.makeNumber(1)), a);
+  }
+
+  @Test
+  public void testCharAtHasAlwaysLengthZeroOrOne() throws SolverException, InterruptedException {
+    StringFormula someString = smgr.makeVariable("someString");
+    IntegerFormula position = imgr.makeVariable("position");
+    IntegerFormula length = smgr.length(smgr.charAt(someString, position));
+
+    BooleanFormula lengthZero = imgr.equal(length, imgr.makeNumber(0));
+    BooleanFormula lengthOne = imgr.equal(length, imgr.makeNumber(1));
+
+    assertThatFormula(bmgr.or(lengthZero, lengthOne)).isTautological();
+  }
+
+  @Test
+  public void testStringToCodePoint() throws SolverException, InterruptedException {
+    // TODO report to developers
+    assume()
+        .withMessage("Solver %s crashes", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    assertThatFormula(imgr.equal(smgr.toCodePoint(a), imgr.makeNumber('a'))).isTautological();
+    assertThatFormula(imgr.equal(smgr.toCodePoint(b), imgr.makeNumber('b'))).isTautological();
+
+    // string of length != 1 are invalid and return -1
+    assertThatFormula(imgr.equal(smgr.toCodePoint(ab), imgr.makeNumber(-1))).isTautological();
+    assertThatFormula(imgr.equal(smgr.toCodePoint(empty), imgr.makeNumber(-1))).isTautological();
+  }
+
+  @Test
+  public void testToCodePointInRange() throws SolverException, InterruptedException {
+    // TODO report to developers
+    assume()
+        .withMessage("Solver %s crashes", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    StringFormula str = smgr.makeVariable("str");
+    IntegerFormula cp = smgr.toCodePoint(str);
+    BooleanFormula invalidStr = imgr.equal(cp, imgr.makeNumber(-1));
+    BooleanFormula cpInRange =
+        bmgr.and(
+            imgr.lessOrEquals(imgr.makeNumber(0), cp),
+            imgr.lessOrEquals(cp, imgr.makeNumber(MAX_SINGLE_CODE_POINT_IN_UTF16)));
+    assertThatFormula(bmgr.or(invalidStr, cpInRange)).isTautological();
+  }
+
+  @Test
+  public void testFromCodePointInRange() throws SolverException, InterruptedException {
+    // TODO report to developers
+    assume()
+        .withMessage("Solver %s crashes", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    IntegerFormula cp = imgr.makeVariable("cp");
+    StringFormula str = smgr.fromCodePoint(cp);
+    IntegerFormula len = smgr.length(str);
+
+    // all normal code points are in range, i.e., string length is 1.
+    BooleanFormula cpInRange =
+        bmgr.and(
+            imgr.lessOrEquals(imgr.makeNumber(0), cp),
+            imgr.lessOrEquals(cp, imgr.makeNumber(MAX_SINGLE_CODE_POINT_IN_UTF16)));
+    assertThatFormula(cpInRange).isEquivalentTo(imgr.equal(len, imgr.makeNumber(1)));
+
+    // all other code points are out of range, i.e., they match the empty string with length 0.
+    assertThatFormula(bmgr.not(cpInRange)).isEquivalentTo(smgr.equal(str, empty));
+  }
+
+  @Test
+  public void testStringFromCodePoint() throws SolverException, InterruptedException {
+    StringFormula cpA = smgr.fromCodePoint(imgr.makeNumber('a'));
+    StringFormula cpB = smgr.fromCodePoint(imgr.makeNumber('b'));
+    assertThatFormula(smgr.equal(cpA, a)).isTautological();
+    assertThatFormula(smgr.equal(cpB, b)).isTautological();
+    assertThatFormula(smgr.equal(cpA, smgr.makeString(Character.toString(97)))).isTautological();
+
+    StringFormula cpOne = smgr.fromCodePoint(imgr.makeNumber(1));
+    StringFormula cpTen = smgr.fromCodePoint(imgr.makeNumber(10));
+    assertThatFormula(smgr.equal(cpOne, smgr.makeString(Character.toString(1)))).isTautological();
+    assertThatFormula(smgr.equal(cpTen, smgr.makeString(Character.toString(10)))).isTautological();
+
+    // negative numbers are invalid and return empty string
+    StringFormula cpNegOne = smgr.fromCodePoint(imgr.makeNumber(-1));
+    StringFormula cpNegTen = smgr.fromCodePoint(imgr.makeNumber(-10));
+    StringFormula cpNeg256 = smgr.fromCodePoint(imgr.makeNumber(-100));
+    assertThatFormula(smgr.equal(cpNegOne, empty)).isTautological();
+    assertThatFormula(smgr.equal(cpNegTen, empty)).isTautological();
+    assertThatFormula(smgr.equal(cpNeg256, empty)).isTautological();
   }
 
   /**

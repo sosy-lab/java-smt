@@ -186,4 +186,14 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
         "CVC5 only supports INT to STRING conversion.");
     return solver.mkTerm(Kind.STRING_FROM_INT, pParam);
   }
+
+  @Override
+  protected Term toCodePoint(Term pParam) {
+    return solver.mkTerm(Kind.STRING_TO_CODE, pParam);
+  }
+
+  @Override
+  protected Term fromCodePoint(Term pParam) {
+    return solver.mkTerm(Kind.STRING_FROM_CODE, pParam);
+  }
 }

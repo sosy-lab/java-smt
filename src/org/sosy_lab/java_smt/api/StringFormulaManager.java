@@ -71,9 +71,8 @@ public interface StringFormulaManager {
   IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex);
 
   /**
-   * Get a substring of length 1 from the given String.
-   *
-   * <p>The result is underspecified, if the index is out of bounds for the given String.
+   * Get a substring of length 1 from the given String if the given index is within bounds.
+   * Otherwise, returns an empty string.
    */
   StringFormula charAt(StringFormula str, IntegerFormula index);
 
@@ -231,4 +230,17 @@ public interface StringFormulaManager {
    * It returns the empty string <code>""</code> for negative numbers.
    */
   StringFormula toStringFormula(IntegerFormula number);
+
+  /**
+   * Returns an Integer formula representing the code point of the only character of the given
+   * String formula, if s is a singleton string. Otherwise, returns -1.
+   */
+  IntegerFormula toCodePoint(StringFormula str);
+
+  /**
+   * Returns the singleton string whose only character is the given code point if it is represented
+   * as a single char in UTF16, i.e., it is in the range [0, 196607]. Otherwise, returns the empty
+   * string.
+   */
+  StringFormula fromCodePoint(IntegerFormula codePoint);
 }

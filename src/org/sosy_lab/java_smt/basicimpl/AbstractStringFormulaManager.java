@@ -40,6 +40,10 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
     return getFormulaCreator().encapsulateRegex(formulaInfo);
   }
 
+  protected IntegerFormula wrapInteger(TFormulaInfo formulaInfo) {
+    return getFormulaCreator().encapsulate(FormulaType.IntegerType, formulaInfo);
+  }
+
   @Override
   public StringFormula makeString(String value) {
     return wrapString(makeStringImpl(value));
@@ -141,10 +145,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    return getFormulaCreator()
-        .encapsulate(
-            FormulaType.IntegerType,
-            indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
+    return wrapInteger(indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
   }
 
   protected abstract TFormulaInfo indexOf(
@@ -287,8 +288,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula toIntegerFormula(StringFormula str) {
-    return getFormulaCreator()
-        .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
+    return wrapInteger(toIntegerFormula(extractInfo(str)));
   }
 
   protected abstract TFormulaInfo toIntegerFormula(TFormulaInfo pParam);
@@ -299,4 +299,18 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   }
 
   protected abstract TFormulaInfo toStringFormula(TFormulaInfo pParam);
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula number) {
+    return wrapInteger(toCodePoint(extractInfo(number)));
+  }
+
+  protected abstract TFormulaInfo toCodePoint(TFormulaInfo pParam);
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula number) {
+    return wrapString(fromCodePoint(extractInfo(number)));
+  }
+
+  protected abstract TFormulaInfo fromCodePoint(TFormulaInfo pParam);
 }

@@ -190,4 +190,14 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   protected Expr toStringFormula(Expr pParam) {
     return exprManager.mkExpr(Kind.STRING_ITOS, pParam);
   }
+
+  @Override
+  protected Expr toCodePoint(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_TO_CODE, pParam);
+  }
+
+  @Override
+  protected Expr fromCodePoint(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_FROM_CODE, pParam);
+  }
 }
