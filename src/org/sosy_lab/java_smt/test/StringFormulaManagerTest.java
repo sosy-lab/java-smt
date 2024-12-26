@@ -64,12 +64,20 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
           "abchurrdurr",
           "abcdefaaaaa");
 
+  private StringFormula a;
+  private StringFormula b;
+  private StringFormula ab;
+  private StringFormula empty;
   private StringFormula hello;
   private RegexFormula a2z;
 
   @Before
   public void setup() {
     requireStrings();
+    a = smgr.makeString("a");
+    b = smgr.makeString("b");
+    ab = smgr.makeString("ab");
+    empty = smgr.makeString("");
     hello = smgr.makeString("hello");
     a2z = smgr.range('a', 'z');
   }
@@ -129,16 +137,16 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     RegexFormula regexAllChar = smgr.allChar();
 
-    assertThatFormula(smgr.in(smgr.makeString("a"), regexAllChar)).isSatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString(""), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("ab"), smgr.times(regexAllChar, 2))).isSatisfiable();
+    assertThatFormula(smgr.in(a, regexAllChar)).isSatisfiable();
+    assertThatFormula(smgr.in(ab, regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(empty, regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(ab, smgr.times(regexAllChar, 2))).isSatisfiable();
     assertThatFormula(
             smgr.in(smgr.makeVariable("x"), smgr.intersection(smgr.range('9', 'a'), regexAllChar)))
         .isSatisfiable();
 
     RegexFormula regexDot = smgr.makeRegex(".");
-    assertThatFormula(smgr.in(smgr.makeString("a"), regexDot)).isUnsatisfiable();
+    assertThatFormula(smgr.in(a, regexDot)).isUnsatisfiable();
   }
 
   @Test
@@ -169,7 +177,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
               smgr.in(smgr.makeVariable("x"), smgr.union(smgr.range('a', 'Δ'), regexAllChar)))
           .isSatisfiable();
       // Combining characters are not matched as one character.
-      // Non-ascii non-printable characters should use the codepoint representation
+      // Non-ascii non-printable characters should use the codePoint representation
       assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isUnsatisfiable();
     }
   }
@@ -197,8 +205,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testRegexUnion() throws SolverException, InterruptedException {
     RegexFormula regex = smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b"));
-    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
+    assertThatFormula(smgr.in(a, regex)).isSatisfiable();
+    assertThatFormula(smgr.in(b, regex)).isSatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("c"), regex)).isUnsatisfiable();
   }
 
@@ -212,16 +220,16 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         smgr.intersection(
             smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")),
             smgr.union(smgr.makeRegex("b"), smgr.makeRegex("c")));
-    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isSatisfiable();
+    assertThatFormula(smgr.in(a, regex)).isUnsatisfiable();
+    assertThatFormula(smgr.in(b, regex)).isSatisfiable();
   }
 
   @Test
   public void testRegexDifference() throws SolverException, InterruptedException {
     RegexFormula regex =
         smgr.difference(smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b")), smgr.makeRegex("b"));
-    assertThatFormula(smgr.in(smgr.makeString("a"), regex)).isSatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("b"), regex)).isUnsatisfiable();
+    assertThatFormula(smgr.in(a, regex)).isSatisfiable();
+    assertThatFormula(smgr.in(b, regex)).isUnsatisfiable();
   }
 
   @Test
@@ -236,8 +244,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringConcatEmpty() throws SolverException, InterruptedException {
-    StringFormula empty = smgr.makeString("");
-
     assertEqual(empty, smgr.concat(ImmutableList.of()));
     assertEqual(empty, smgr.concat(empty));
     assertEqual(empty, smgr.concat(empty, empty));
@@ -317,13 +323,13 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-123")));
     assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("-1234")));
 
-    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("")));
-    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("a")));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(empty));
+    assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(a));
     assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("1a")));
     assertEqual(imgr.makeNumber(-1), smgr.toIntegerFormula(smgr.makeString("a1")));
 
-    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("")));
-    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("a")));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(empty));
+    assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(a));
     assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("1a")));
     assertDistinct(imgr.makeNumber(-12), smgr.toIntegerFormula(smgr.makeString("a1")));
   }
@@ -333,21 +339,21 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertEqual(smgr.makeString("123"), smgr.toStringFormula(imgr.makeNumber(123)));
     assertEqual(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(1)));
     assertEqual(smgr.makeString("0"), smgr.toStringFormula(imgr.makeNumber(0)));
-    assertEqual(smgr.makeString(""), smgr.toStringFormula(imgr.makeNumber(-1)));
-    assertEqual(smgr.makeString(""), smgr.toStringFormula(imgr.makeNumber(-123)));
+    assertEqual(empty, smgr.toStringFormula(imgr.makeNumber(-1)));
+    assertEqual(empty, smgr.toStringFormula(imgr.makeNumber(-123)));
 
     assertDistinct(smgr.makeString("1"), smgr.toStringFormula(imgr.makeNumber(-1)));
   }
 
   @Test
   public void testStringLength() throws SolverException, InterruptedException {
-    assertEqual(imgr.makeNumber(0), smgr.length(smgr.makeString("")));
-    assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("a")));
+    assertEqual(imgr.makeNumber(0), smgr.length(empty));
+    assertEqual(imgr.makeNumber(1), smgr.length(a));
     assertEqual(imgr.makeNumber(2), smgr.length(smgr.makeString("aa")));
     assertEqual(imgr.makeNumber(9), smgr.length(smgr.makeString("aaabbbccc")));
 
-    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("")));
-    assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("a")));
+    assertDistinct(imgr.makeNumber(5), smgr.length(empty));
+    assertDistinct(imgr.makeNumber(5), smgr.length(a));
     assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("aa")));
     assertDistinct(imgr.makeNumber(5), smgr.length(smgr.makeString("aaabbbcc")));
   }
@@ -357,7 +363,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula var = smgr.makeVariable("var");
 
     assertThatFormula(imgr.equal(imgr.makeNumber(0), smgr.length(var)))
-        .implies(smgr.equal(var, smgr.makeString("")));
+        .implies(smgr.equal(var, empty));
 
     assertThatFormula(
             bmgr.and(
@@ -376,7 +382,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(
             bmgr.and(
                 imgr.equal(imgr.makeNumber(4), smgr.length(var)),
-                smgr.prefix(smgr.makeString("ab"), var),
+                smgr.prefix(ab, var),
                 smgr.suffix(smgr.makeString("ba"), var),
                 smgr.equal(smgr.makeString("c"), smgr.charAt(var, imgr.makeNumber(3)))))
         .isUnsatisfiable();
@@ -384,7 +390,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(
             bmgr.and(
                 imgr.equal(imgr.makeNumber(5), smgr.length(var)),
-                smgr.prefix(smgr.makeString("ab"), var),
+                smgr.prefix(ab, var),
                 smgr.suffix(smgr.makeString("ba"), var),
                 smgr.equal(smgr.makeString("c"), smgr.charAt(var, imgr.makeNumber(3)))))
         .implies(smgr.equal(smgr.makeVariable("var"), smgr.makeString("abcba")));
@@ -567,14 +573,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             bmgr.and(
                 imgr.lessOrEquals(minusTenThousand, stringVariableLength),
                 imgr.lessOrEquals(stringVariableLength, zero),
-                bmgr.not(smgr.equal(stringVariable, smgr.makeString("")))))
+                bmgr.not(smgr.equal(stringVariable, empty))))
         .isUnsatisfiable();
     // -10000 <= stringVariable length <= 0 -> SAT implies stringVariable = ""
     assertThatFormula(
             bmgr.and(
                 imgr.lessOrEquals(minusTenThousand, stringVariableLength),
                 imgr.lessOrEquals(stringVariableLength, zero)))
-        .implies(smgr.equal(stringVariable, smgr.makeString("")));
+        .implies(smgr.equal(stringVariable, empty));
   }
 
   /**
@@ -615,7 +621,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             bmgr.and(
                 imgr.lessOrEquals(zero, stringVariableLength),
                 imgr.lessThan(stringVariableLength, one)))
-        .implies(smgr.equal(stringVariable, smgr.makeString("")));
+        .implies(smgr.equal(stringVariable, empty));
     // 1 < stringVariable length < 3 -> SAT implies stringVariable length = 2
     assertThatFormula(
             bmgr.and(
@@ -649,9 +655,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testSimpleStringVariableLexicographicOrdering()
       throws SolverException, InterruptedException {
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
-    StringFormula ab = smgr.makeString("ab");
     StringFormula abc = smgr.makeString("abc");
     StringFormula abd = smgr.makeString("abd");
     StringFormula abe = smgr.makeString("abe");
@@ -665,14 +668,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
                 smgr.lessThan(a, stringVariable),
                 smgr.lessThan(stringVariable, b),
                 imgr.equal(imgr.makeNumber(0), smgr.length(stringVariable))))
-        .implies(smgr.equal(stringVariable, smgr.makeString("")));
+        .implies(smgr.equal(stringVariable, empty));
 
     assertThatFormula(
             bmgr.and(
                 smgr.lessOrEquals(a, stringVariable),
                 smgr.lessThan(stringVariable, b),
                 imgr.equal(imgr.makeNumber(1), smgr.length(stringVariable))))
-        .implies(smgr.equal(stringVariable, smgr.makeString("a")));
+        .implies(smgr.equal(stringVariable, a));
 
     assertThatFormula(
             bmgr.and(
@@ -715,11 +718,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   /** Takeaway: invalid positions always refer to the empty string! */
   @Test
   public void testCharAtWithConstString() throws SolverException, InterruptedException {
-    StringFormula empty = smgr.makeString("");
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
-    StringFormula ab = smgr.makeString("ab");
-
     assertEqual(smgr.charAt(empty, imgr.makeNumber(1)), empty);
     assertEqual(smgr.charAt(empty, imgr.makeNumber(0)), empty);
     assertEqual(smgr.charAt(empty, imgr.makeNumber(-1)), empty);
@@ -762,8 +760,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     String workaround = "au{1234}";
     StringFormula au1234WOEscapeCurly = smgr.makeString(workaround);
     StringFormula backSlash = smgr.makeString("\\");
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
     StringFormula u1234 = smgr.makeString("\\u{1234}");
     StringFormula au1234b = smgr.makeString("a\\u{1234}b");
     StringFormula stringVariable = smgr.makeVariable("stringVariable");
@@ -827,8 +823,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     String workaround = "au{7B}";
     StringFormula acurlyOpen2BUnicodeWOEscapeCurly = smgr.makeString(workaround);
     // StringFormula backSlash = smgr.makeString("\\");
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
     StringFormula stringVariable = smgr.makeVariable("stringVariable");
 
     // Curly braces unicode is treated as 1 char
@@ -870,9 +864,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testCharAtWithStringVariable() throws SolverException, InterruptedException {
-    StringFormula a = smgr.makeString("a");
-    StringFormula b = smgr.makeString("b");
-    StringFormula ab = smgr.makeString("ab");
     StringFormula aa = smgr.makeString("aa");
     StringFormula abc = smgr.makeString("abc");
     StringFormula aabc = smgr.makeString("aabc");
@@ -931,11 +922,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testConstStringContains() throws SolverException, InterruptedException {
-    StringFormula empty = smgr.makeString("");
-    StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
     StringFormula bUppercase = smgr.makeString("B");
-    StringFormula b = smgr.makeString("b");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
@@ -981,9 +969,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula var1 = smgr.makeVariable("var1");
     StringFormula var2 = smgr.makeVariable("var2");
 
-    StringFormula empty = smgr.makeString("");
     StringFormula bUppercase = smgr.makeString("B");
-    StringFormula ab = smgr.makeString("ab");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
     StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
@@ -1032,7 +1018,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula var2 = smgr.makeVariable("var2");
 
     StringFormula abUppercase = smgr.makeString("AB");
-    StringFormula ab = smgr.makeString("ab");
 
     assertThatFormula(
             bmgr.and(
@@ -1044,11 +1029,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testConstStringIndexOf() throws SolverException, InterruptedException {
-    StringFormula empty = smgr.makeString("");
-    StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
-    StringFormula b = smgr.makeString("b");
-    StringFormula ab = smgr.makeString("ab");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
@@ -1097,7 +1078,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar = imgr.makeVariable("intVar");
 
-    StringFormula empty = smgr.makeString("");
     StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
 
     IntegerFormula zero = imgr.makeNumber(0);
@@ -1166,7 +1146,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             bmgr.and(
                 smgr.contains(var1, smgr.makeString("abba")),
                 imgr.equal(imgr.makeNumber(1), smgr.indexOf(var1, smgr.makeString("bba"), zero)),
-                imgr.equal(imgr.makeNumber(1), smgr.indexOf(var1, smgr.makeString("b"), zero)),
+                imgr.equal(imgr.makeNumber(1), smgr.indexOf(var1, b, zero)),
                 imgr.equal(imgr.makeNumber(2), smgr.indexOf(var1, smgr.makeString("ba"), zero))));
   }
 
@@ -1198,8 +1178,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testConstStringSubStrings() throws SolverException, InterruptedException {
-    StringFormula empty = smgr.makeString("");
-    StringFormula a = smgr.makeString("a");
     StringFormula aUppercase = smgr.makeString("A");
     StringFormula bUppercase = smgr.makeString("B");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
@@ -1248,7 +1226,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testStringSubstringOutOfBounds() throws SolverException, InterruptedException {
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
-    StringFormula b = smgr.makeString("b");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
 
     StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
