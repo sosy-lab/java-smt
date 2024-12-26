@@ -818,6 +818,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.STR_IN_RE;
       case Z3_OP_STR_TO_INT:
         return FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_STR_TO_CODE:
+        return FunctionDeclarationKind.STR_TO_CODE;
+      case Z3_OP_STR_FROM_CODE:
+        return FunctionDeclarationKind.STR_FROM_CODE;
       case Z3_OP_INT_TO_STR:
         return FunctionDeclarationKind.INT_TO_STR;
       case Z3_OP_STRING_LT:

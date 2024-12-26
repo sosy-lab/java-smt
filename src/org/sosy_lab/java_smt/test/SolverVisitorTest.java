@@ -736,6 +736,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     StringFormula z = smgr.makeString("zAsString");
     IntegerFormula offset = imgr.makeVariable("offset");
     IntegerFormula len = imgr.makeVariable("len");
+    IntegerFormula cp = imgr.makeVariable("cp");
 
     ImmutableList.Builder<StringFormula> formulas =
         ImmutableList.<StringFormula>builder()
@@ -744,6 +745,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.charAt(x, offset))
             .add(smgr.toStringFormula(offset))
             .add(smgr.concat(x, y, z));
+    if (solverToUse() != Solvers.PRINCESS) {
+      formulas.add(smgr.fromCodePoint(cp));
+    }
     if (solverToUse() != Solvers.Z3) {
       formulas.add(smgr.replaceAll(x, y, z)); // unsupported in Z3
     }

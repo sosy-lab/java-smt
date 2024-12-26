@@ -136,6 +136,10 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(
         PrincessEnvironment.stringTheory.str_to_int(), FunctionDeclarationKind.STR_TO_INT);
     theoryFunctionKind.put(
+        PrincessEnvironment.stringTheory.str_to_code(), FunctionDeclarationKind.STR_TO_CODE);
+    theoryFunctionKind.put(
+        PrincessEnvironment.stringTheory.str_from_code(), FunctionDeclarationKind.STR_FROM_CODE);
+    theoryFunctionKind.put(
         PrincessEnvironment.stringTheory.re_range(), FunctionDeclarationKind.RE_RANGE);
     theoryFunctionKind.put(
         PrincessEnvironment.stringTheory.re_$plus$plus(), FunctionDeclarationKind.RE_CONCAT);
