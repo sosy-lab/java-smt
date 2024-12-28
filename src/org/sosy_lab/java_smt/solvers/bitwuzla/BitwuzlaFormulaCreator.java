@@ -12,14 +12,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -57,31 +56,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  /**
-   * Returns the symbol name without any SMTLIB quotes.
-   *
-   * <p>Will turn <code>| 1var\n|</code> into just <code> 1 var\n</code>. Symbols that are not
-   * quoted are unaffected.
-   */
-  private String removeQuotes(String symbol) {
-    return (symbol.startsWith("|") && symbol.endsWith("|"))
-        ? symbol.substring(1, symbol.length() - 1)
-        : symbol;
-  }
-
-  /**
-   * Stores Bitwuzla terms for all defined symbols.
-   *
-   * <p>The cache maps from <code>String x Sort</code> to <code>Term</code>. Here the first argument
-   * is the name of the symbol, and we allow polymorphic symbols where the same name can have more
-   * than one sort. If the symbol can be printed as a simple symbol or a quoted symbol (like <code>
-   * var1</code> and <code>|var1|</code>) in SMTLIB we identify both version as they refer to the
-   * same variable.
-   */
-  private final Table<String, Sort, Term> formulaCache =
-      TreeBasedTable.create(
-          (String symA, String symB) -> removeQuotes(symA).compareTo(removeQuotes(symB)),
-          Comparator.comparing(Sort::toString));
+  private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
   /**
    * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
