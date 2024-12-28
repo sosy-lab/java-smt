@@ -73,11 +73,7 @@ public final class BitwuzlaFormulaManager
         declParser.parse(token, true, false);
         Term parsed = declParser.get_declared_funs().get(0);
 
-        String symbol = parsed.symbol();
-        if (symbol.startsWith("|") && symbol.endsWith("|")) {
-          // Strip quotes from the name
-          symbol = symbol.substring(1, symbol.length() - 1);
-        }
+        String symbol = BitwuzlaFormulaCreator.removeQuotes(parsed.symbol());
         Sort sort = parsed.sort();
 
         // Check if the symbol is already defined in the variable cache
@@ -137,10 +133,7 @@ public final class BitwuzlaFormulaManager
     // Process the symbols from the parser
     Map_TermTerm subst = new Map_TermTerm();
     for (Term term : declared) {
-      String symbol = term.symbol();
-      if (symbol.startsWith("|") && symbol.endsWith("|")) {
-        symbol = symbol.substring(1, symbol.length() - 1);
-      }
+      String symbol = BitwuzlaFormulaCreator.removeQuotes(term.symbol());
       if (cache.containsRow(symbol)) {
         // Symbol is from the context: add the original term to the substitution map
         subst.put(term, cache.get(symbol, term.sort()));

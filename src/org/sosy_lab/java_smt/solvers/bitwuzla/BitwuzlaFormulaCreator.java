@@ -56,7 +56,31 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
+  /**
+   * Variable cache, contains terms for all declared symbols
+   *
+   * <p>Bitwuzla allows the variables to be declared multiple times. Each of these instances will be
+   * considered a separate variable, even if the names and types are the same. We fix this by
+   * keeping track of all declared variables in this cache. If a variable is already defined we
+   * return it from the cache, otherwise a new Term for the variable is created and added to the
+   * cache.
+   *
+   * <p>It is important to keep this cache synchronized with the variable declarations for the
+   * parser. This is handled in {@link BitwuzlaFormulaManager#parse(String)}.
+   */
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
+
+  /**
+   * Remove SMTLIB quotes from a symbol name.
+   *
+   * <p>If the symbol is not quoted, just return it as is .
+   */
+  static String removeQuotes(String pSymbol) {
+    if (pSymbol.startsWith("|") && pSymbol.endsWith("|")) {
+      return pSymbol.substring(1, pSymbol.length() - 1);
+    }
+    return pSymbol;
+  }
 
   /**
    * This mapping stores symbols and their constraints, such as from fp-to-bv casts with their
@@ -401,7 +425,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return visitor.visitFreeVariable(formula, name);
 
     } else if (f.is_variable()) {
-      String name = f.symbol();
+      String name = removeQuotes(f.symbol());
       Sort sort = f.sort();
       Term originalVar = formulaCache.get(name, sort);
       return visitor.visitBoundVariable(encapsulate(getFormulaType(originalVar), originalVar), 0);
@@ -419,7 +443,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       for (int i = 0; i < size - 1; i++) {
         Term boundVar = children.get(i);
         boundVars[i] = boundVar;
-        String name = boundVar.symbol();
+        String name = removeQuotes(boundVar.symbol());
         assert name != null;
         Sort sort = boundVar.sort();
         Term freeVar;
