@@ -8,7 +8,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-docker build -t registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu2204 - < ubuntu2204.Dockerfile
+podman build -t registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu2204 - < ubuntu2204.Dockerfile
 
 # For pushing to Gitlab registry, please create your personal access token:
 #   https://gitlab.com/-/user_settings/personal_access_tokens
