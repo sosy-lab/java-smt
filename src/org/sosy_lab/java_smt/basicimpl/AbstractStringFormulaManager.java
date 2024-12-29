@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -26,6 +29,16 @@ import org.sosy_lab.java_smt.api.StringFormulaManager;
 public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements StringFormulaManager {
+
+  private static final Pattern UNICODE_ESCAPE_PATTERN =
+      Pattern.compile(
+          // start with "\\u"
+          "\\\\u"
+              // either a plain Unicode letter like "\\u0061"
+              + "((?<codePoint>[0-9a-fA-F]{4})"
+              + "|"
+              // or curly brackets like "\\u{61}"
+              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})}))");
 
   protected AbstractStringFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -46,7 +59,47 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula makeString(String value) {
+    checkArgument(
+        isCodePointInRange(value),
+        "String constant is out of supported Unicode range (Plane 0-2).");
     return wrapString(makeStringImpl(value));
+  }
+
+  /** returns whether all Unicode characters in Planes 0-2. */
+  static boolean isCodePointInRange(String str) {
+    return str.codePoints().allMatch(codePoint -> 0x00000 <= codePoint && codePoint <= 0x2FFFF);
+  }
+
+  /** Replace Unicode letters in UTF16 representation with their escape sequences. */
+  protected static String escapeUnicodeForSmtlib(String input) {
+    StringBuilder sb = new StringBuilder();
+    for (int codePoint : input.codePoints().toArray()) {
+      if (0x20 <= codePoint && codePoint <= 0x7E) {
+        sb.appendCodePoint(codePoint); // normal printable chars
+      } else {
+        sb.append("\\u{").append(String.format("%05X", codePoint)).append("}");
+      }
+    }
+    return sb.toString();
+  }
+
+  /** Replace escaped Unicode letters in SMTLIB representation with their UTF16 pendant. */
+  public static String unescapeUnicodeForSmtlib(String input) {
+    Matcher matcher = UNICODE_ESCAPE_PATTERN.matcher(input);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String hexCodePoint = matcher.group("codePoint");
+      if (hexCodePoint == null) {
+        hexCodePoint = matcher.group("codePointInBrackets");
+      }
+      int codePoint = Integer.parseInt(hexCodePoint, 16);
+      checkArgument(
+          0x00000 <= codePoint && codePoint <= 0x2FFFF,
+          "SMTLIB does only specify Unicode letters from Planes 0-2");
+      matcher.appendReplacement(sb, Character.toString(codePoint));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   protected abstract TFormulaInfo makeStringImpl(String value);

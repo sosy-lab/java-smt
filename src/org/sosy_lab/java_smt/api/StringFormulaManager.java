@@ -20,7 +20,10 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 public interface StringFormulaManager {
 
   /**
-   * Returns a {@link StringFormula} representing the given constant.
+   * Returns a {@link StringFormula} representing the given constant String. The String value is
+   * expected to be UTF16, i.e., plain Java string with Unicode characters. JavaSMT handles escaping
+   * internally, as some solvers follow the SMTLIB standard and escape Unicode characters with curly
+   * braces. We hide this detail from the user and allow to use plain Java Strings.
    *
    * @param value the string value the returned <code>Formula</code> should represent
    * @return a Formula representing the given value
