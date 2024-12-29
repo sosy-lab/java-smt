@@ -1784,7 +1784,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             .put("\\u{abc}", "઼")
             .put("\\u{abcd}", "ꯍ")
             .put("X\\u{abcd}Y\\u0061z", "XꯍYaz")
-            .build()
+            .buildOrThrow()
             .entrySet()) {
       assertThat(unescapeUnicodeForSmtlib(code.getKey())).isEqualTo(code.getValue());
     }
