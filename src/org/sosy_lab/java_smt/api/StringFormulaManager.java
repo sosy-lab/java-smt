@@ -14,19 +14,23 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
- * Manager for dealing with string formulas. Functions come from
- * http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
+ * Manager for dealing with string formulas. Functions come from <a
+ * href="http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml">String theory in SMTLIB</a>.
  */
 public interface StringFormulaManager {
 
   /**
-   * Returns a {@link StringFormula} representing the given constant String. The String value is
-   * expected to be UTF16, i.e., plain Java string with Unicode characters. JavaSMT handles escaping
-   * internally, as some solvers follow the SMTLIB standard and escape Unicode characters with curly
-   * braces. We hide this detail from the user and allow to use plain Java Strings.
+   * Creates a {@link StringFormula} representing the given constant String.
    *
-   * @param value the string value the returned <code>Formula</code> should represent
-   * @return a Formula representing the given value
+   * <p>This method accepts plain Java Strings with Unicode characters from the Basic Multilingual
+   * Plane (BMP) (codepoints in range [0x00000, 0x2FFFF]). JavaSMT handles escaping internally, as
+   * some solvers follow the SMTLIB standard and escape Unicode characters with curly braces.
+   *
+   * <p>Additionally, you can use SMTLIB escaping like "\\u{1234}" to represent Unicode characters
+   * directly.
+   *
+   * @param value the string value the returned {@link StringFormula} should represent
+   * @return a {@link StringFormula} representing the given value
    */
   StringFormula makeString(String value);
 
@@ -236,14 +240,14 @@ public interface StringFormulaManager {
 
   /**
    * Returns an Integer formula representing the code point of the only character of the given
-   * String formula, if s is a singleton string. Otherwise, returns -1.
+   * String formula, if it represents a single character. Otherwise, returns -1.
    */
   IntegerFormula toCodePoint(StringFormula str);
 
   /**
-   * Returns the singleton string whose only character is the given code point if it is represented
-   * as a single char in UTF16, i.e., it is in the range [0, 196607]. Otherwise, returns the empty
-   * string.
+   * Returns a String formula representing the single character with the given code point, if it is
+   * a valid Unicode code point within the Basic Multilingual Plane (BMP) (codepoints in range
+   * [0x00000, 0x2FFFF]). Otherwise, returns the empty string.
    */
   StringFormula fromCodePoint(IntegerFormula codePoint);
 }
