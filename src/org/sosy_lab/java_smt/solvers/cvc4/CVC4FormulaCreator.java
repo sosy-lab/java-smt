@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -611,7 +612,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return convertFloatingPoint(value);
 
     } else if (valueType.isString()) {
-      return value.getConstString().toString();
+      return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
     } else {
       // String serialization for unknown terms.
