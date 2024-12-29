@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.ExprManagerMapCollection;
@@ -123,14 +124,23 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     setChanged();
-    Expr exp = creator.extractInfo(pF);
     if (incremental) {
-      smtEngine.assertFormula(importExpr(exp));
+      assertFormula(pF);
     }
     return null;
+  }
+
+  private void assertFormula(BooleanFormula pF) throws SolverException {
+    try {
+      smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
+    } catch (Exception cvc4Exception) {
+      throw new SolverException(
+          String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
+    }
   }
 
   @SuppressWarnings("resource")
@@ -188,7 +198,9 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedFormulas().forEach(f -> smtEngine.assertFormula(creator.extractInfo(f)));
+      for (BooleanFormula f : getAssertedFormulas()) {
+        assertFormula(f);
+      }
     }
 
     Result result;
