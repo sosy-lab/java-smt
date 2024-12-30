@@ -60,14 +60,18 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   @Override
   public StringFormula makeString(String value) {
     checkArgument(
-        isCodePointInRange(value),
+        areAllCodePointsInRange(value),
         "String constant is out of supported Unicode range (Plane 0-2).");
     return wrapString(makeStringImpl(value));
   }
 
   /** returns whether all Unicode characters in Planes 0-2. */
-  static boolean isCodePointInRange(String str) {
-    return str.codePoints().allMatch(codePoint -> 0x00000 <= codePoint && codePoint <= 0x2FFFF);
+  private static boolean areAllCodePointsInRange(String str) {
+    return str.codePoints().allMatch(AbstractStringFormulaManager::isCodePointInRange);
+  }
+
+  private static boolean isCodePointInRange(int codePoint) {
+    return 0x00000 <= codePoint && codePoint <= 0x2FFFF;
   }
 
   /** Replace Unicode letters in UTF16 representation with their escape sequences. */
@@ -94,7 +98,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       }
       int codePoint = Integer.parseInt(hexCodePoint, 16);
       checkArgument(
-          0x00000 <= codePoint && codePoint <= 0x2FFFF,
+          isCodePointInRange(codePoint),
           "SMTLIB does only specify Unicode letters from Planes 0-2");
       matcher.appendReplacement(sb, Character.toString(codePoint));
     }
