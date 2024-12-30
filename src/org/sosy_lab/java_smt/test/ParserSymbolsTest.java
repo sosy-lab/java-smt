@@ -244,7 +244,7 @@ public class ParserSymbolsTest extends SolverBasedTest0 {
   }
 
   @Test
-  @SuppressWarnings("CheckReturnValues")
+  @SuppressWarnings("CheckReturnValue")
   public void testParserValid() {
     forValidSymbols();
     parseSymbol(symbol);
