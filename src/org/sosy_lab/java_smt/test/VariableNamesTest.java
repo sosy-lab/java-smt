@@ -162,8 +162,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   protected List<String> getAllNames() {
     return ImmutableList.<String>builder()
         .addAll(NAMES)
-        .addAll(AbstractFormulaManager.BASIC_OPERATORS)
-        .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
+        .addAll(AbstractFormulaManager.RESERVED)
         .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
         .addAll(FURTHER_SMTLIB2_KEYWORDS)
         .addAll(UNSUPPORTED_NAMES)

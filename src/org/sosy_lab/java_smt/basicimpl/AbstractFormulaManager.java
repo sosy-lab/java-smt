@@ -15,8 +15,8 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.Arrays;
@@ -58,29 +58,135 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements FormulaManager {
 
-  /**
-   * Avoid using basic mathematical or logical operators of SMT-LIB2 as names for symbols.
-   *
-   * <p>We do not accept some names as identifiers for variables or UFs, because they easily
-   * misguide the user. Most solvers even would allow such identifiers directly, currently only
-   * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
-   * solvers.
-   */
   @VisibleForTesting
-  public static final ImmutableSet<String> BASIC_OPERATORS =
-      ImmutableSet.of("!", "+", "-", "*", "/", "%", "=", "<", ">", "<=", ">=");
+  public static final ImmutableList<String> RESERVED =
+      ImmutableList.of(
+          // Keywords
+          "_",
+          "!",
+          "as",
+          "let",
+          "exists",
+          "forall",
+          "match",
+          "par",
+
+          // Commands
+          "assert",
+          "check-sat",
+          "check-sat-assuming",
+          "declare-const",
+          "declare-datatype",
+          "declare-datatypes",
+          "declare-fun",
+          "declare-sort",
+          "define-fun",
+          "define-fun-rec",
+          "define-funs-rec",
+          "define-sort",
+          "echo",
+          "exit",
+          "get-assertions",
+          "get-assignment",
+          "get-info",
+          "get-model",
+          "get-option",
+          "get-proof",
+          "get-unsat-assumptions",
+          "get-unsat-core",
+          "get-value",
+          "pop",
+          "push",
+          "reset",
+          "reset-assertions",
+          "set-info",
+          "set-logic",
+          "set-option",
+
+          // Predefined symbols
+          // Arrays
+          "select",
+          "store",
+          "const",
+
+          // Bitvectors
+          "concat",
+          "extract",
+          // + any symbol starting with "bv"
+          "bvneg",
+
+          // Core
+          "true",
+          "false",
+          "not",
+          "=>",
+          "and",
+          "or",
+          "xor",
+          "=",
+          "distinct",
+          "ite",
+
+          // Floats
+          "roundNearestTiesToEven RoundingMode",
+          "roundNearestTiesToAway",
+          "roundTowardPositive",
+          "roundTowardNegative",
+          "roundTowardZero",
+          "RNE",
+          "RNA",
+          "RTP",
+          "RTN",
+          "RTZ",
+          "fp",
+          "+oo",
+          "-oo",
+          "+zero",
+          "-zero",
+          "NaN",
+          "to_fp",
+          "to_fp_unsigned",
+          // + any symbol starting with "fp."
+          "fp.neg",
+
+          // Integers and Reals
+          "-",
+          "+",
+          "*",
+          "div",
+          "mod",
+          "/",
+          "abs",
+          "<=",
+          "<",
+          ">=",
+          ">",
+          "divisible",
+          "to_real",
+          "to_int",
+          "is_int",
+
+          // Strings
+          // + any symbol starting with "str."
+          "str.concat",
+          // + any symbol starting with "re."
+          "re.opt");
 
   /**
-   * Avoid using basic keywords of SMT-LIB2 as names for symbols.
+   * Checks if the symbol name is a reserved keyword in SMTLIB2.
    *
    * <p>We do not accept some names as identifiers for variables or UFs, because they easily
    * misguide the user. Most solvers even would allow such identifiers directly, currently only
    * SMTInterpol has problems with some of them. For consistency, we disallow those names for all
    * solvers.
    */
-  @VisibleForTesting
-  public static final ImmutableSet<String> SMTLIB2_KEYWORDS =
-      ImmutableSet.of("true", "false", "and", "or", "select", "store", "xor", "distinct", "let");
+  public static boolean isReserved(String pVar) {
+    return pVar.startsWith("bv")
+        || pVar.startsWith("fp.*")
+        || pVar.startsWith("str.")
+        || pVar.startsWith("re.")
+        || RESERVED.contains(pVar);
+  }
 
   /**
    * Avoid using escape characters of SMT-LIB2 as part of names for symbols.
@@ -587,19 +693,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    */
   @Override
   public final boolean isValidName(String pVar) {
-    if (pVar.isEmpty()) {
-      return false;
-    }
-    if (BASIC_OPERATORS.contains(pVar)) {
-      return false;
-    }
-    if (SMTLIB2_KEYWORDS.contains(pVar)) {
-      return false;
-    }
-    if (DISALLOWED_CHARACTERS.matchesAnyOf(pVar)) {
-      return false;
-    }
-    return true;
+    return !pVar.isEmpty() && !DISALLOWED_CHARACTERS.matchesAnyOf(pVar) && !isReserved(pVar);
   }
 
   /**
@@ -613,24 +707,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public static void checkVariableName(final String variableName) {
     final String help = "Use FormulaManager#isValidName to check your identifier before using it.";
     Preconditions.checkArgument(
-        !variableName.isEmpty(), "Identifier for variable should not be empty.");
-    Preconditions.checkArgument(
-        !BASIC_OPERATORS.contains(variableName),
-        "Identifier '%s' can not be used, because it is a simple operator. %s",
-        variableName,
-        help);
-    Preconditions.checkArgument(
-        !SMTLIB2_KEYWORDS.contains(variableName),
-        "Identifier '%s' can not be used, because it is a keyword of SMT-LIB2. %s",
-        variableName,
-        help);
+        !variableName.isEmpty(), "Identifier for variable must not be empty.");
     Preconditions.checkArgument(
         DISALLOWED_CHARACTERS.matchesNoneOf(variableName),
         "Identifier '%s' can not be used, "
-            + "because it should not contain an escape character %s of SMT-LIB2. %s",
+            + "because it contains an escape character %s of SMT-LIB2. %s",
         variableName,
         DISALLOWED_CHARACTER_REPLACEMENT
             .keySet(), // toString prints UTF8-encoded escape sequence, better than nothing.
+        help);
+    Preconditions.checkArgument(
+        !isReserved(variableName),
+        "Identifier '%s' can not be used, because it is a reserved symbol in SMT-LIB2. " + "%s",
+        variableName,
         help);
   }
 
@@ -638,7 +727,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public final String escape(String pVar) {
     // as long as keywords stay simple, this simple escaping is sufficient
-    if (pVar.isEmpty() || BASIC_OPERATORS.contains(pVar) || SMTLIB2_KEYWORDS.contains(pVar)) {
+    if (pVar.isEmpty() || isReserved(pVar)) {
       return ESCAPE + pVar;
     }
     if (pVar.indexOf(ESCAPE) != -1) {
@@ -660,7 +749,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       // unescape BASIC_OPERATORS and SMTLIB2_KEYWORDS
       if (idx == 0) {
         String tmp = pVar.substring(1);
-        if (tmp.isEmpty() || BASIC_OPERATORS.contains(tmp) || SMTLIB2_KEYWORDS.contains(tmp)) {
+        if (tmp.isEmpty() || isReserved(tmp)) {
           return tmp;
         }
       }
