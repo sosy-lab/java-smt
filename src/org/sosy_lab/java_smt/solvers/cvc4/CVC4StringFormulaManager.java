@@ -30,7 +30,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   @Override
   protected Expr makeStringImpl(String pValue) {
     // The boolean enables escape characters!
-    return exprManager.mkConst(new CVC4String(pValue, true));
+    return exprManager.mkConst(new CVC4String(escapeUnicodeForSmtlib(pValue), true));
   }
 
   @Override
@@ -189,5 +189,15 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
   @Override
   protected Expr toStringFormula(Expr pParam) {
     return exprManager.mkExpr(Kind.STRING_ITOS, pParam);
+  }
+
+  @Override
+  protected Expr toCodePoint(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_TO_CODE, pParam);
+  }
+
+  @Override
+  protected Expr fromCodePoint(Expr pParam) {
+    return exprManager.mkExpr(Kind.STRING_FROM_CODE, pParam);
   }
 }

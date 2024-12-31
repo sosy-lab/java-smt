@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -818,6 +819,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.STR_IN_RE;
       case Z3_OP_STR_TO_INT:
         return FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_STR_TO_CODE:
+        return FunctionDeclarationKind.STR_TO_CODE;
+      case Z3_OP_STR_FROM_CODE:
+        return FunctionDeclarationKind.STR_FROM_CODE;
       case Z3_OP_INT_TO_STR:
         return FunctionDeclarationKind.INT_TO_STR;
       case Z3_OP_STRING_LT:
@@ -889,7 +894,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Rational ratValue = Rational.ofString(Native.getNumeralString(environment, value));
         return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
-        return Native.getString(environment, value);
+        return unescapeUnicodeForSmtlib(Native.getString(environment, value));
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {

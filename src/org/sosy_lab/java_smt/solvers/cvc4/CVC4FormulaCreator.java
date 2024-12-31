@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -511,6 +512,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
           .put(Kind.STRING_STOI, FunctionDeclarationKind.STR_TO_INT)
           .put(Kind.STRING_ITOS, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_TO_CODE, FunctionDeclarationKind.STR_TO_CODE)
+          .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
@@ -609,7 +612,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return convertFloatingPoint(value);
 
     } else if (valueType.isString()) {
-      return value.getConstString().toString();
+      return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
     } else {
       // String serialization for unknown terms.

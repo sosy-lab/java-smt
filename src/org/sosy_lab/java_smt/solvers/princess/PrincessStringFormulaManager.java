@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 
 import ap.parser.IAtom;
@@ -29,104 +30,17 @@ public class PrincessStringFormulaManager
     super(pCreator);
   }
 
-  /**
-   * Tries to parse an escaped Unicode character
-   *
-   * <p>Returns the original String if parsing is not possible.
-   */
-  private static String literalOrSkip(String pToken) {
-    String literal;
-    if (pToken.startsWith("\\u{")) {
-      if (pToken.length() > 9 || !pToken.endsWith("}")) {
-        // Abort if there is no closing bracket, or if there are too many digits for the literal
-        // The longest allowed literal is \\u{d5 d4 d3 d2 d1}
-        return pToken;
-      }
-      literal = pToken.substring(3, pToken.length() - 1);
-    } else {
-      if (pToken.length() != 6) {
-        // Abort if there are not exactly 4 digits
-        // The literal must have this form: \\u d3 d2 d1 d0
-        return pToken;
-      }
-      literal = pToken.substring(2);
-    }
-
-    // Try to parse the digits as a (hexadecimal) integer
-    // Abort if there is an error
-    int value;
-    try {
-      value = Integer.parseInt(literal, 16);
-    } catch (NumberFormatException e) {
-      return pToken;
-    }
-
-    // Return the Unicode letter if it fits into a single 16bit character
-    // Otherwise throw an exception as we don't support Unicode characters with more than 4 digits
-    char[] chars = Character.toChars(value);
-    if (chars.length != 1) {
-      throw new IllegalArgumentException();
-    } else {
-      return String.valueOf(chars[0]);
-    }
-  }
-
-  /** Replace escape sequences for Unicode letters with their UTF16 representation. */
-  static String unescapeString(String pInput) {
-    StringBuilder builder = new StringBuilder();
-    while (!pInput.isEmpty()) {
-      // Search for the next escape sequence
-      int start = pInput.indexOf("\\u");
-      if (start == -1) {
-        // Append the rest of the String to the output if there are no more escaped Unicode
-        // characters
-        builder.append(pInput);
-        pInput = "";
-      } else {
-        // Store the prefix up to the escape sequence
-        String prefix = pInput.substring(0, start);
-
-        // Skip ahead and get the escape sequence
-        pInput = pInput.substring(start);
-        String value;
-        if (pInput.charAt(2) == '{') {
-          // Sequence has the form \\u{d5 d4 d3 d2 d1 d0}
-          // Find the closing bracket for the literal:
-          int stop = pInput.indexOf('}');
-          if (stop == -1) {
-            // Use the index right after "\\u{" if there is no closing bracket
-            stop = 2;
-          }
-          value = pInput.substring(0, stop + 1);
-          pInput = pInput.substring(stop + 1);
-        } else {
-          // Sequence has the form \\u d3 d2 d1 d0
-          int stop = 2;
-          while (stop < pInput.length()) {
-            char c = pInput.charAt(stop);
-            if (Character.digit(c, 16) == -1) {
-              break;
-            }
-            stop++;
-          }
-          value = pInput.substring(0, stop);
-          pInput = pInput.substring(stop);
-        }
-
-        // Try to parse the escape sequence to replace it with its 16bit Unicode character
-        // If parsing fails just keep it in the String
-        String nextToken = literalOrSkip(value);
-
-        // Collect the prefix and the (possibly) translated escape sequence
-        builder.append(prefix).append(nextToken);
-      }
-    }
-    return builder.toString();
-  }
-
   @Override
   protected IExpression makeStringImpl(String value) {
-    return PrincessEnvironment.stringTheory.string2Term(unescapeString(value));
+    value = unescapeUnicodeForSmtlib(value);
+    checkArgument(!containsSurrogatePair(value), "Princess does not support surrogate pairs.");
+    IExpression strExpr = PrincessEnvironment.stringTheory.string2Term(value);
+    return getFormulaCreator().getEnv().simplify(strExpr); // simplify MOD in chars
+  }
+
+  /** returns whether any character of the string is part of a surrogate pair. */
+  private static boolean containsSurrogatePair(String str) {
+    return str.codePoints().anyMatch(Character::isSupplementaryCodePoint);
   }
 
   @Override
@@ -308,5 +222,15 @@ public class PrincessStringFormulaManager
   @Override
   protected ITerm toStringFormula(IExpression pParam) {
     return new IFunApp(PrincessEnvironment.stringTheory.int_to_str(), toITermSeq(pParam));
+  }
+
+  @Override
+  protected IExpression toCodePoint(IExpression pParam) {
+    return new IFunApp(PrincessEnvironment.stringTheory.str_to_code(), toITermSeq(pParam));
+  }
+
+  @Override
+  protected IExpression fromCodePoint(IExpression pParam) {
+    return new IFunApp(PrincessEnvironment.stringTheory.str_from_code(), toITermSeq(pParam));
   }
 }

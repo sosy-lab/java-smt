@@ -300,6 +300,8 @@ public enum FunctionDeclarationKind {
   STR_IN_RE,
   STR_TO_INT,
   INT_TO_STR,
+  STR_FROM_CODE,
+  STR_TO_CODE,
   STR_LT,
   STR_LE,
   RE_PLUS,

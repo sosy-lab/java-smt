@@ -268,4 +268,18 @@ class SynchronizedStringFormulaManager implements StringFormulaManager {
       return delegate.toStringFormula(number);
     }
   }
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula str) {
+    synchronized (sync) {
+      return delegate.toCodePoint(str);
+    }
+  }
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula codepoint) {
+    synchronized (sync) {
+      return delegate.fromCodePoint(codepoint);
+    }
+  }
 }

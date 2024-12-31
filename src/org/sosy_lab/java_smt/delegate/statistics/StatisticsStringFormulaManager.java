@@ -233,4 +233,16 @@ class StatisticsStringFormulaManager implements StringFormulaManager {
     stats.stringOperations.getAndIncrement();
     return delegate.toStringFormula(number);
   }
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula str) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.toCodePoint(str);
+  }
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula codepoint) {
+    stats.stringOperations.getAndIncrement();
+    return delegate.fromCodePoint(codepoint);
+  }
 }
