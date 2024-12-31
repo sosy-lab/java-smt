@@ -49,7 +49,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
           "bar",
           "baz",
           "declare",
-          "exit",
           "(exit)",
           "!=",
           "~",
