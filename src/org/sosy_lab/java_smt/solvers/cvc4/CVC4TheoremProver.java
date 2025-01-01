@@ -124,8 +124,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  protected @Nullable Void addConstraintImpl(BooleanFormula pF)
-      throws InterruptedException, SolverException {
+  protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
     if (incremental) {
@@ -134,11 +133,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return null;
   }
 
-  private void assertFormula(BooleanFormula pF) throws SolverException {
+  private void assertFormula(BooleanFormula pF) {
     try {
       smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
     } catch (Exception cvc4Exception) {
-      throw new SolverException(
+      throw new AssertionError(
           String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
     }
   }
