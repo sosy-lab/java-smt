@@ -133,7 +133,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   private static String quote(String str) {
     Preconditions.checkArgument(!Strings.isNullOrEmpty(str));
     Preconditions.checkArgument(CharMatcher.anyOf("|\\").matchesNoneOf(str));
-    Preconditions.checkArgument(!SMTLIB2_KEYWORDS.contains(str));
+    Preconditions.checkArgument(!isReserved(str));
 
     if (VALID_CHARS.matchesAllOf(str) && !DIGITS.matches(str.charAt(0))) {
       // simple symbol
