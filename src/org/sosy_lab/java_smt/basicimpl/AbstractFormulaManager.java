@@ -112,8 +112,34 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           // Bitvectors
           "concat",
           "extract",
-          // + any symbol starting with "bv"
+          "zero_extend",
+          "sign_extend",
+          "rotate_left",
+          "rotate_right",
+          "bv2int",
+          "int2bv",
+          "bvadd",
+          "bvsub",
           "bvneg",
+          "bvmul",
+          "bvurem",
+          "bvsrem",
+          "bvsmod",
+          "bvshl",
+          "bvlshr",
+          "bvashr",
+          "bvor",
+          "bvand",
+          "bvnot",
+          "bvxor",
+          "bvule",
+          "bvult",
+          "bvuge",
+          "bvugt",
+          "bvsle",
+          "bvslt",
+          "bvsge",
+          "bvsgt",
 
           // Core
           "true",
@@ -181,8 +207,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * solvers.
    */
   public static boolean isReserved(String pVar) {
-    return pVar.startsWith("bv")
-        || pVar.startsWith("fp.*")
+    return pVar.startsWith("fp.")
         || pVar.startsWith("str.")
         || pVar.startsWith("re.")
         || RESERVED.contains(pVar);
