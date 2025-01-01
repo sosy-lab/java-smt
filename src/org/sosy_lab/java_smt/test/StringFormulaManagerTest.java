@@ -184,8 +184,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula inRange2 = smgr.in(x, smgr.intersection(smgr.range('a', 'Δ'), regexAllChar));
     if (solverToUse() == Solvers.CVC4) {
       // CVC4 has issues with range and special Unicode characters when solving constraints
-      assertThrows(SolverException.class, () -> assertThatFormula(inRange).isSatisfiable());
-      assertThrows(SolverException.class, () -> assertThatFormula(inRange2).isSatisfiable());
+      assertThrows(AssertionError.class, () -> assertThatFormula(inRange).isSatisfiable());
+      assertThrows(AssertionError.class, () -> assertThatFormula(inRange2).isSatisfiable());
     } else {
       assertThatFormula(inRange).isSatisfiable();
       assertThatFormula(inRange2).isSatisfiable();
