@@ -39,9 +39,9 @@ SPDX-License-Identifier: Apache-2.0
         <echo message="Building OpenSMT in version '${opensmt.version}'"/>
 
         <!-- Create build directories -->
-        <property name="path.build"   value="${opensmt.path}/build"/>
+        <property name="path.build" value="${opensmt.path}/build"/>
         <property name="path.install" value="${opensmt.path}/install"/>
-        <property name="path.source"  value="${user.dir}/lib/native/source/opensmt"/>
+        <property name="path.source" value="${user.dir}/lib/native/source/opensmt"/>
 
         <mkdir dir="${path.build}"/>
         <mkdir dir="${path.install}"/>
@@ -71,12 +71,9 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Copy swig files to the install directory -->
-        <copy todir="${path.install}" >
-          <fileset dir="${path.source}" includes="**"/>
+        <copy todir="${path.install}">
+            <fileset dir="${path.source}" includes="swig/**/*"/>
         </copy>
-
-        <!-- Dump ${opensmt.version} to a file so that we can use it from swig -->
-        <echo file="${path.install}/Version.h">#define VERSION "${opensmt.version}"</echo>
 
         <!-- Run swig to generate java proxies and the jni wrapper -->
         <mkdir dir="${path.install}/java/opensmt"/>
@@ -137,14 +134,19 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Copy the lib to the root directory for later packaging-->
         <copy file="${path.install}/lib/libopensmt.so" toFile="libopensmt-${opensmt.version}.so"/>
 
-        <!-- Compile the wrapper and move the object file the source tree -->
-        <exec executable="gcc" dir="${path.install}" failonerror="true">
+        <!-- Dump ${opensmt.version} to a file so that we can use it for the swig wrapper -->
+        <echo file="${path.source}/version.h">#define VERSION "${opensmt.version}"</echo>
+
+        <!-- Copy the swig wrapper to the source tree and compile it-->
+        <copy file="${path.install}/opensmt-wrap.cpp" toFile="${path.source}/opensmt-wrap.cpp"/>
+        <exec executable="gcc" dir="${path.source}" failonerror="true">
             <arg value="-fPIC"/>
-            <arg value="-std=c++17"/>
+            <arg value="-std=c++20"/>
             <arg value="-o"/>
-            <arg value="${path.source}/opensmt-wrap.o"/>
+            <arg value="opensmt-wrap.o"/>
             <arg value="-c"/>
             <arg value="opensmt-wrap.cpp"/>
+            <arg value="-I${path.install}/include/opensmt/"/>
             <arg value="-I${java.home}/include/"/>
             <arg value="-I${java.home}/include/linux"/>
         </exec>
@@ -156,13 +158,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-o"/>
             <arg value="${user.dir}/libopensmtjava-${opensmt.version}.so"/>
             <arg value="opensmt-wrap.o"/>
-            <arg value="-L${user.dir}"/>
-            <arg value="-lopensmt"/>
-            <arg value="-lstdc++"/>
-            <arg value="-l:libgmp.a"/>
+            <arg value="-L${path.install}/lib"/>
+            <arg value="-l:libopensmt.a"/>
         </exec>
-        <delete file="libopensmt.so"/>
-        <delete file="lib/native/source/opensmt/opensmt-wrap.o"/>
+        <delete file="${path.source}/opensmt-wrap.o"/>
 
         <!-- Compile java proxies and create jar file -->
         <mkdir dir="${path.source}/bin"/>
@@ -171,12 +170,10 @@ SPDX-License-Identifier: Apache-2.0
         </javac>
         <jar destfile="opensmt-${opensmt.version}.jar" basedir="${path.source}/bin"/>
         <delete dir="${path.source}/bin"/>
-        <delete dir="lib/native/source/opensmt/src"/>
     </target>
 
-    <target name="publish-opensmt" depends="package-opensmt, load-ivy"
-        description="Publish OpenSMT binaries to Ivy repository.">
-        <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml" />
+    <target name="publish-opensmt" depends="package-opensmt, load-ivy" description="Publish OpenSMT binaries to Ivy repository.">
+        <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml"/>
         <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}"/>
     </target>
 </project>
