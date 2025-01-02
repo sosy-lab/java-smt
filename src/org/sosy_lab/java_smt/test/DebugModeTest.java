@@ -199,7 +199,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void noSharingBetweenSolversTest()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     Solvers otherSolver =
-        solverToUse() == Solvers.SMTINTERPOL ? Solvers.MATHSAT5 : Solvers.SMTINTERPOL;
+        solverToUse() == Solvers.SMTINTERPOL ? Solvers.PRINCESS : Solvers.SMTINTERPOL;
 
     try (SolverContext otherContext = debugFactory.generateContext(otherSolver)) {
       BooleanFormulaManager otherBmgr = otherContext.getFormulaManager().getBooleanFormulaManager();
