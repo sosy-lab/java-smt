@@ -40,9 +40,57 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
     return val.getFormulaType() == FormulaTypesForChecking.INTEGER || val.getFormulaType() == FormulaTypesForChecking.RATIONAL;
   }
 
-
+  @Override
+  protected DummyFormula negate(DummyFormula pParam1) {
+    return new DummyFormula(pParam1.getFormulaType());
+  }
 
   @Override
-  public abstract FormulaType<Y> getFormulaType();
+  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
+    if(pParam1.getFormulaType() == FormulaTypesForChecking.RATIONAL
+        || pParam2.getFormulaType() == FormulaTypesForChecking.RATIONAL) {
+      return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    }
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+  }
+
+  @Override
+  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
+    if(pParam1.getFormulaType() == FormulaTypesForChecking.RATIONAL
+        || pParam2.getFormulaType() == FormulaTypesForChecking.RATIONAL) {
+      return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    }
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+  }
+
+  @Override
+  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
+
+  @Override
+  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
+
+  @Override
+  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
+
+  @Override
+  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
+
+  @Override
+  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
+
+  @Override
+  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
+    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+  }
 }
 

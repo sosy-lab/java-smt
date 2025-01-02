@@ -36,7 +36,7 @@ public class SolverLessQuantifiedFormulaManager extends AbstractQuantifiedFormul
   @Override
   protected DummyFormula eliminateQuantifiers(DummyFormula pExtractInfo)
       throws SolverException, InterruptedException {
-    throw new SolverException("Quantifier not supported yet");
+    return null;
   }
 
   @Override

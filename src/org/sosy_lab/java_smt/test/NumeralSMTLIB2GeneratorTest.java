@@ -11,6 +11,8 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -46,6 +48,116 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String expectedResult =
         "(declare-const a Int)\n" + "(declare-const b Int)\n" + "(assert (= a b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberInteger() {
+    requireIntegers();
+    IntegerFormula a = imgr.makeNumber(10);
+    IntegerFormula b = imgr.makeVariable("b");
+    BooleanFormula constraint = imgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Int)\n"
+        + "(assert (= 10 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testMakeNumberIntegerWithBigInteger(){
+    requireIntegers();
+    IntegerFormula a = imgr.makeNumber(new BigInteger("10"));
+    IntegerFormula b = imgr.makeVariable("b");
+    BooleanFormula constraint = imgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Int)\n"
+        + "(assert (= 10 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberRationalWithPoint(){
+    requireRationals();
+    RationalFormula a = rmgr.makeNumber(10.0);
+    RationalFormula b = rmgr.makeVariable("b");
+    BooleanFormula constraint = rmgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Real)\n"
+        + "(assert (= 10 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testMakeNumberRationalWithBigInteger(){
+    requireRationals();
+    RationalFormula a = rmgr.makeNumber(new BigInteger("10"));
+    RationalFormula b = rmgr.makeVariable("b");
+    BooleanFormula constraint = rmgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Real)\n"
+        + "(assert (= 10 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void testMakeNumberRationalWithBigDecimal(){
+    requireRationals();
+    assert rmgr != null;
+    RationalFormula a = rmgr.makeNumber(new BigDecimal("10.3"));
+    RationalFormula b = rmgr.makeVariable("b");
+    BooleanFormula constraint = rmgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Real)\n"
+        + "(assert (= 10.3 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberRationalWithString(){
+    requireRationals();
+    RationalFormula a = rmgr.makeNumber("10");
+    RationalFormula b = rmgr.makeVariable("b");
+    BooleanFormula constraint = rmgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const b Real)\n"
+        + "(assert (= 10 b))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+
+  @Test
+  public void testRationalSimpleAdd(){
+    requireRationals();
+    RationalFormula a = rmgr.makeVariable("a");
+    RationalFormula b = rmgr.makeVariable("b");
+    RationalFormula c = rmgr.makeVariable("c");
+    BooleanFormula constraint = rmgr.equal(a, rmgr.add(b, c));
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const a Real)\n"
+        + "(declare-const b Real)\n"
+        + "(declare-const c Real)\n"
+        + "(assert (= a (+ b c)))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+
+  }
+
+  @Test
+  public void testRationalSimpleAddWithValues(){
+    requireRationals();
+    RationalFormula a = rmgr.makeNumber(10);
+    RationalFormula b = rmgr.makeNumber("10") ;
+    RationalFormula c = rmgr.makeNumber(20.0);
+    BooleanFormula constraint = rmgr.equal(a, c);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const a Real)\n"
+        + "(declare-const b Real)\n"
+        + "(declare-const c Real)\n"
+        + "(assert (= a (+ b c)))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 

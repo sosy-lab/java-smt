@@ -100,6 +100,9 @@ public class SolverLessFormulaCreator
     if(formula instanceof BitvectorFormula) {
       return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(extractInfo(formula).getBitvectorLength());
     }
+    if(formula instanceof ArrayFormula) {
+      return (FormulaType<T>) FormulaType.getArrayType(extractInfo(formula).getFirstArrayParameter().getFormulaTypeForCreator(), extractInfo(formula).getSecondArrayParameter().getFormulaTypeForCreator());
+    }
     return super.getFormulaType(formula);
   }
 
@@ -125,21 +128,73 @@ public class SolverLessFormulaCreator
       return new DummyFormula(extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
     }
     if(pT instanceof RationalFormula){
+      if(pT.toString().equals("")){
+        return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+      }
       DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL,
           (pT.toString()));
       return result;
     }
     if(pT instanceof IntegerFormula){
+      if(pT.toString().equals("")){
+        return new DummyFormula(FormulaTypesForChecking.INTEGER);
+      }
       DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER,
           pT.toString());
       return result;
     }
     if(pT instanceof BooleanFormula){
+      if(pT.toString().equals("")){
+        return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+      }
       DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
       return result;
     }
+    if(pT instanceof ArrayFormula){
+      if(pT.toString().equals("")){
+        return new DummyFormula(FormulaTypesForChecking.ARRAY);
+      }
+      DummyFormula firstSort =
+          new DummyFormula(FormulaTypesForChecking.valueOf(extractFirstArrayParameterFromString(pT.toString())));
+      DummyFormula secondSort = new DummyFormula(FormulaTypesForChecking.valueOf(extractSecondArrayParameterFromString(pT.toString())));
+      return new DummyFormula(firstSort, secondSort);
+    }
     return super.extractInfo(pT);
   }
+  public String extractFirstArrayParameterFromString(String representation) {
+    if (representation.startsWith("Array<") && representation.endsWith(">")) {
+      try {
+        String content = representation.substring(6, representation.length() - 1);
+        int commaIndex = content.indexOf(',');
+        if (commaIndex == -1) {
+          throw new IllegalArgumentException("Invalid Array representation: " + representation);
+        }
+        return content.substring(0, commaIndex).trim();
+      } catch (StringIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
+      }
+    }
+    throw new IllegalArgumentException("Invalid Array representation: " + representation);
+  }
+
+  public String extractSecondArrayParameterFromString(String representation) {
+    if (representation.startsWith("Array<") && representation.endsWith(">")) {
+      try {
+        String content = representation.substring(6, representation.length() - 1);
+        int commaIndex = content.indexOf(',');
+        if (commaIndex == -1) {
+          throw new IllegalArgumentException("Invalid Array representation: " + representation);
+        }
+        return content.substring(commaIndex + 1).trim();
+      } catch (StringIndexOutOfBoundsException e) {
+        throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
+      }
+    }
+    throw new IllegalArgumentException("Invalid Array representation: " + representation);
+  }
+
+
+
   public int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
       try {
@@ -187,7 +242,10 @@ public class SolverLessFormulaCreator
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    return new DummyFormula(args.get(0).getFormulaType());
+    if(args.isEmpty()){
+      return new DummyFormula(FormulaTypesForChecking.DUMMY);
+    }
+    return (args.get(0));
   }
 
   @Override

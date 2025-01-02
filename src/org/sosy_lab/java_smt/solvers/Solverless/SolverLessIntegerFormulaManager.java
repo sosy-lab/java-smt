@@ -22,8 +22,6 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -36,6 +34,7 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
   public SolverLessIntegerFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
+
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
@@ -71,11 +70,6 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
   }
 
   @Override
-  protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
     return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
@@ -83,36 +77,6 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
     return new DummyFormula(FormulaTypesForChecking.INTEGER);
-  }
-
-  @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
-  @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
   }
 
   @Override

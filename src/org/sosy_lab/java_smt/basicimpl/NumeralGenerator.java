@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class NumeralGenerator {

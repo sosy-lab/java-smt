@@ -53,6 +53,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     updateRepresentation();
   }
 
+
   public DummyFormula(boolean value) {
     formulaType = FormulaTypesForChecking.BOOLEAN;
     this.value = String.valueOf(value);

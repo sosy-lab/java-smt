@@ -30,7 +30,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaManager<NumeralFormula, RationalFormula>
+public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaManager<NumeralFormula,
+    RationalFormula>
     implements RationalFormulaManager {
 
   public SolverLessRationalFormulaManager(SolverLessFormulaCreator creator) {
@@ -40,87 +41,39 @@ public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaMa
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, String.valueOf(i));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, Long.toString(i));
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, String.valueOf(i));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, i.toString());
   }
 
   @Override
   protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL,i);
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, i);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, String.valueOf(pNumber));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, Double.toString(pNumber));
   }
-
   @Override
   protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, String.valueOf(pNumber));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pNumber.toPlainString());
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String i) {
-
     DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL);
     result.setName(i);
     return result;
-  }
 
-  @Override
-  protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
   }
-
-  @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
-  }
-
-  @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pParam1.getValue());
-  }
-
-  @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(pParam1.getValue().equals(pParam2.getValue()));
-  }
-
-  @Override
-  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(false);
-  }
-
-  @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(false);
-  }
-
-  @Override
-  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(false);
-  }
-
   @Override
   public IntegerFormula floor(NumeralFormula number) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, number.toString());
+    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
-
-  @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN, String.valueOf(false));
-  }
-
-  @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-  }
-
   @Override
   public FormulaType<RationalFormula> getFormulaType() {
     return FormulaType.RationalType;
