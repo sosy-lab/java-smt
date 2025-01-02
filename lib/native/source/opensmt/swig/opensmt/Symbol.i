@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore SymbolProperty;
 %ignore SymbolConfig;
 %ignore SymConf;
@@ -37,5 +38,6 @@
  }
 
 %ignore SymbolAllocator;
+}
 
-%include "include/opensmt/Symbol.h"
+%include "include/opensmt/symbols/Symbol.h"

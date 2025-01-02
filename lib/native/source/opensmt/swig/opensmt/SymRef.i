@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore SymRef::SymRef();
 %ignore SymRef::operator=(uint32_t v);
 
@@ -31,5 +32,6 @@
     return Long.hashCode(this.getX());
   }
 %}
+}
 
-%include "include/opensmt/SymRef.h"
+%include "include/opensmt/symbols/SymRef.h"

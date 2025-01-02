@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore ASTType;
 %ignore ASTNode;
 %ignore ConfType;
@@ -351,5 +352,6 @@
     }
   }
  }
+}
 
-%include "include/opensmt/SMTConfig.h"
+%include "include/opensmt/options/SMTConfig.h"

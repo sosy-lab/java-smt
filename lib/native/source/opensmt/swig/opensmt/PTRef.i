@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore PTRef::PTRef();
 
 %ignore operator==(PTRef, PTRef);
@@ -30,5 +31,6 @@
     return Long.hashCode(this.getX());
   }
 %}
+}
 
-%include "include/opensmt/PTRef.h"
+%include "include/opensmt/pterms/PTRef.h"

@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore PTLKey;
 %ignore PTLHash;
 %ignore PTId;
@@ -34,15 +35,6 @@
 %ignore Pterm::begin () const;
 %ignore Pterm::end () const;
 %extend Pterm {
-  // FIXME: Causes intermittent crashes in OpenSmtFormulaCreator.visit
-  %newobject getArgs;
-  std::vector<PTRef> getArgs() {
-    std::vector<PTRef> args;
-    for(auto i=0; i<$self->size(); i++)
-      args.emplace_back($self->operator[](i));
-    return args;
-  }
-
   PTRef at(int i) {
     return $self->operator[](i);
   }
@@ -54,5 +46,6 @@
 %ignore PtChild;
 %ignore PtChildHash;
 %ignore PtermAllocator;
+}
 
-%include "include/opensmt/Pterm.h"
+%include "include/opensmt/pterms/Pterm.h"
