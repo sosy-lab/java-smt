@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -17,6 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_ast_kind;
@@ -157,11 +159,41 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  final Z3Exception handleZ3Exception(Z3Exception e) throws Z3Exception, InterruptedException {
+  /**
+   * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
+   * Otherwise, the given exception is wrapped and thrown as a SolverException.
+   */
+  @CanIgnoreReturnValue
+  final SolverException handleZ3Exception(Z3Exception e)
+      throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
       shutdownNotifier.shutdownIfNecessary();
     }
-    throw e;
+    throw new SolverException("Z3 has thrown an exception", e);
+  }
+
+  /**
+   * This method handles a Z3Exception, however it only throws a RuntimeException. This method is
+   * used in places where we cannot throw a checked exception in JavaSMT due to API restrictions.
+   *
+   * @param e the Z3Exception to handle
+   * @return nothing, always throw a RuntimeException
+   * @throws RuntimeException always thrown for the given Z3Exception
+   */
+  final RuntimeException handleZ3ExceptionAsRuntimeException(Z3Exception e) {
+    try {
+      throw handleZ3Exception(e);
+    } catch (InterruptedException ex) {
+      Thread.currentThread().interrupt();
+      throw sneakyThrow(e);
+    } catch (SolverException ex) {
+      throw sneakyThrow(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   @Override
@@ -813,6 +845,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.STR_IN_RE;
       case Z3_OP_STR_TO_INT:
         return FunctionDeclarationKind.STR_TO_INT;
+      case Z3_OP_STR_TO_CODE:
+        return FunctionDeclarationKind.STR_TO_CODE;
+      case Z3_OP_STR_FROM_CODE:
+        return FunctionDeclarationKind.STR_FROM_CODE;
       case Z3_OP_INT_TO_STR:
         return FunctionDeclarationKind.INT_TO_STR;
       case Z3_OP_STRING_LT:
@@ -884,7 +920,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Rational ratValue = Rational.ofString(Native.getNumeralString(environment, value));
         return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
-        return Native.getString(environment, value);
+        return unescapeUnicodeForSmtlib(Native.getString(environment, value));
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
@@ -1015,7 +1051,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return Z3_ast
    * @throws InterruptedException If execution gets interrupted.
    */
-  public long applyTactic(long z3context, long pF, String tactic) throws InterruptedException {
+  public long applyTactic(long z3context, long pF, String tactic)
+      throws InterruptedException, SolverException {
     long tacticObject = Native.mkTactic(z3context, tactic);
     Native.tacticIncRef(z3context, tacticObject);
 

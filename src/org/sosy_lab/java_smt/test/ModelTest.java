@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -80,7 +81,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
+      ImmutableList.of(Solvers.Z3);
 
   @Before
   public void setup() {
@@ -184,7 +185,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Test that different names are no problem for Bools in the model. */
   @Test
   public void testGetBooleans() throws SolverException, InterruptedException {
-    // Some names are specificly chosen to test the Boolector model
+    // Some names are specifically chosen to test the Boolector model
     for (String name : VARIABLE_NAMES) {
       testModelGetters(bmgr.makeVariable(name), bmgr.makeBoolean(true), true, name);
     }
@@ -1207,12 +1208,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         ImmutableList.of(BigInteger.valueOf(5)));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void testGetArrays4invalid() throws SolverException, InterruptedException {
     requireParser();
     requireArrays();
     requireArrayModel();
+    requireIntegers();
 
     // create formula for "arr[5]==x && x==123"
     BooleanFormula f =
@@ -1229,7 +1230,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       assertThat(prover).isSatisfiable();
 
       try (Model m = prover.getModel()) {
-        m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> m.evaluate(amgr.makeArray("arr", ARRAY_TYPE_INT_INT)));
       }
     }
   }
@@ -2218,6 +2221,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireIntegers();
     requireBitvectors();
+
+    assume()
+        .withMessage("Solver runs out memory while generating the model")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);
   }
@@ -2306,22 +2315,19 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
   }
 
-  @SuppressWarnings("resource")
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModel();
-      assert_().fail();
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
     }
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      prover.getModelAssignments();
-      assert_().fail();
+      assertThrows(IllegalStateException.class, () -> prover.getModelAssignments());
     }
   }
 
@@ -2364,9 +2370,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetRationals1() throws SolverException, InterruptedException {
     requireRationals();
+    RationalFormula x = rmgr.makeVariable("x");
     evaluateInModel(
-        rmgr.equal(rmgr.makeVariable("x"), rmgr.makeNumber(Rational.ofString("1/3"))),
-        rmgr.divide(rmgr.makeVariable("x"), rmgr.makeNumber(2)),
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))), x, Rational.ofString("1/3"));
+    evaluateInModel(
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.multiply(x, rmgr.makeNumber(2)),
+        Rational.ofString("2/3"));
+    evaluateInModel(
+        rmgr.equal(x, rmgr.makeNumber(Rational.ofString("1/3"))),
+        rmgr.divide(x, rmgr.makeNumber(2)),
         Rational.ofString("1/6"));
   }
 

@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
@@ -146,22 +147,25 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "qe-light");
   }
 
   @Override
-  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "tseitin-cnf");
   }
 
   @Override
-  protected BooleanFormula applyNNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyNNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "nnf");
   }
 
   private BooleanFormula applyTacticImpl(BooleanFormula pF, String tacticName)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     long out =
         formulaCreator.applyTactic(getFormulaCreator().getEnv(), extractInfo(pF), tacticName);
     return formulaCreator.encapsulateBoolean(out);
@@ -183,7 +187,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  protected Long simplify(Long pF) throws InterruptedException {
+  protected Long simplify(Long pF) throws InterruptedException, SolverException {
     try {
       return Native.simplify(getFormulaCreator().getEnv(), pF);
     } catch (Z3Exception exp) {

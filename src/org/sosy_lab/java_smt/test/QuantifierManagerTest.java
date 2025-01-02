@@ -656,7 +656,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testQELight() throws InterruptedException {
+  public void testQELight() throws InterruptedException, SolverException {
     requireIntegers();
     assume().that(solverToUse()).isEqualTo(Solvers.Z3);
     // exists y : (y=4 && x=y+3) --> simplified: x=7

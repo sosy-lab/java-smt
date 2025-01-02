@@ -38,7 +38,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();
-    for (Solvers solver : Solvers.values()) {
+    for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
       junitParams.add(new Object[] {solver, "normal"});
       junitParams.add(new Object[] {solver, "itp"});
       junitParams.add(new Object[] {solver, "opt"});
@@ -217,6 +217,13 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     if ("itp".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a inconclusive sat-check when using interpolation")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
+    }
+
+    if ("normal".equals(proverEnv)) {
+      assume()
+          .withMessage("solver reports a partial model when using quantifiers")
           .that(solverToUse())
           .isNotEqualTo(Solvers.PRINCESS);
     }

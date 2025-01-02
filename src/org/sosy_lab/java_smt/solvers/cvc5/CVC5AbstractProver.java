@@ -142,7 +142,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModel() {
+  public CVC5Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();

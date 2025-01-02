@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -144,12 +145,12 @@ class StatisticsFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula pInput, Tactic pTactic)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     return delegate.applyTactic(pInput, pTactic);
   }
 
   @Override
-  public <T extends Formula> T simplify(T pInput) throws InterruptedException {
+  public <T extends Formula> T simplify(T pInput) throws InterruptedException, SolverException {
     return delegate.simplify(pInput);
   }
 

@@ -216,6 +216,13 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireRationalFloor() {
+    assume()
+        .withMessage("Solver %s does not support floor for rationals", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.OPENSMT);
+  }
+
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
@@ -426,7 +433,7 @@ public abstract class SolverBasedTest0 {
   public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
 
     @Parameters(name = "{0}")
-    public static Object[] getAllSolvers() {
+    public static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 
