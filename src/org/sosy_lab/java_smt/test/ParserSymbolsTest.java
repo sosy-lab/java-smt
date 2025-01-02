@@ -18,6 +18,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -302,8 +303,15 @@ public class ParserSymbolsTest extends SolverBasedTest0 {
       default:
         template = "(declare-fun %s () Bool)\n(assert %s)\n";
     }
-    assertThat(mgr.dumpFormula(f).toString())
-        .isEqualTo(String.format(template, canonical(symbol), canonical(symbol)));
+    String simple = canonical(symbol);
+    String quoted = addQuotes(removeQuotes(symbol));
+
+    List<String> expected =
+        (simple.equals(quoted))
+            ? ImmutableList.of(String.format(template, simple, simple))
+            : ImmutableList.of(
+                String.format(template, simple, simple), String.format(template, quoted, quoted));
+    assertThat(mgr.dumpFormula(f).toString()).isIn(expected);
   }
 
   @Test
