@@ -63,6 +63,11 @@ z3/                                 // <-- parent directory
  |-- z3-z3-4.13.3/                  // <-- sources directory used as 'z3.path'
 ```
 
+You can prepare the Z3 Java sources on an arbitrary system, as we only prepare 
+Java sources and JavaDoc for the bindings, but do no compile any native library.
+This only depends on a Python3 environment and Java 17 or later.
+For simple usage, we provide a Docker definition/environment under `/docker`, in which the following command can be run.
+
 In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
