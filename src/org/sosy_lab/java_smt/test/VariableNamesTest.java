@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
@@ -34,12 +35,12 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  private static final ImmutableList<String> NAMES =
+  public static final ImmutableList<String> NAMES =
       ImmutableList.of(
           "java-smt",
           "JavaSMT",
@@ -67,8 +68,9 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
           "\"",
           "\"\"",
           "\"\"\"",
-          // TODO next line is disabled because of a problem in MathSAT5 (version 5.6.3).
-          // "'", "''", "'''",
+          "'",
+          "''",
+          "'''",
           "\n",
           "\t",
           "\u0000",
@@ -139,10 +141,10 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   /**
    * Some special chars are not allowed to appear in symbol names. See {@link
-   * AbstractFormulaManager#DISALLOWED_CHARACTERS}.
+   * FormulaCreator#DISALLOWED_CHARACTERS}.
    */
   @SuppressWarnings("javadoc")
-  private static final ImmutableSet<String> UNSUPPORTED_NAMES =
+  public static final ImmutableSet<String> UNSUPPORTED_NAMES =
       ImmutableSet.of(
           "|",
           "||",
@@ -161,8 +163,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   protected List<String> getAllNames() {
     return ImmutableList.<String>builder()
         .addAll(NAMES)
-        .addAll(AbstractFormulaManager.RESERVED)
-        .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
+        .addAll(FormulaCreator.RESERVED)
+        .addAll(FormulaCreator.DISALLOWED_CHARACTER_REPLACEMENT.values())
         .addAll(FURTHER_SMTLIB2_KEYWORDS)
         .addAll(UNSUPPORTED_NAMES)
         .build();
@@ -626,10 +628,9 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     for (String name : getAllNames()) {
       if (mgr.isValidName(name)) {
         // should pass without exception
-        AbstractFormulaManager.checkVariableName(name);
+        checkArgument(FormulaCreator.isValidName(name));
       } else {
-        assertThrows(
-            IllegalArgumentException.class, () -> AbstractFormulaManager.checkVariableName(name));
+        assertThrows(IllegalArgumentException.class, () -> FormulaCreator.isValidName(name));
       }
     }
   }
