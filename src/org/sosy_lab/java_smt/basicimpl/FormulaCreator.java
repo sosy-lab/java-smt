@@ -783,7 +783,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   /** Variable names (symbols) can be wrapped with "|". This function removes those chars. */
-  protected static String dequote(String s) {
+  @VisibleForTesting
+  public static String dequote(String s) {
     int l = s.length();
     if (l >= 2 && s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
       return s.substring(1, l - 1);
