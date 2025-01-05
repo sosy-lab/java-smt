@@ -15,6 +15,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <import file="macros.xml"/>
 
+    <property name="z3.dist.dir" value="${ivy.solver.dist.dir}/z3"/>
     <property name="z3.project.name" value="Java Bindings for Z3"/>
     <property name="z3.javadoc.dir" value="Javadoc-z3"/>
 
@@ -48,19 +49,19 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="package-z3" depends="check-z3-path,get-z3-version, package-z3-sources, package-z3-javadoc">
         <!-- collect all files -->
-        <copy todir="./" flatten="true" verbose="true">
+        <copy todir="${z3.dist.dir}/" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
                 <include name="z3-*-x64-glibc-*/bin/com.microsoft.z3.jar"/>
             </fileset>
         </copy>
-        <copy todir="x64/" flatten="true" verbose="true">
+        <copy todir="${z3.dist.dir}/x64/" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
                 <include name="z3-*-x64-glibc-*/bin/libz3*.so"/>
                 <include name="z3-*-x64-osx-*/bin/libz3*.dylib"/>
                 <include name="z3-*-x64-win/bin/**/*z3*.dll"/>
             </fileset>
         </copy>
-        <copy todir="arm64/" flatten="true" verbose="true">
+        <copy todir="${z3.dist.dir}/arm64/" flatten="true" verbose="true">
             <fileset dir="${z3.path}/../">
                 <include name="z3-*-arm64-glibc-*/bin/libz3*.so"/>
                 <include name="z3-*-arm64-osx-*/bin/libz3*.dylib"/>
@@ -71,7 +72,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- check for properties of Z3 for Linux -->
         <exec executable="readelf" dir="./" outputproperty="z3.elf_details" logError="true" failonerror="true">
             <arg value="-d"/>
-            <arg value="x64/libz3.so"/>
+            <arg value="${z3.dist.dir}/x64/libz3.so"/>
         </exec>
         <fail>
             <condition>
@@ -82,22 +83,22 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <!-- Linux files -->
-        <move file="x64/libz3.so" tofile="x64/libz3-${z3.version}.so" verbose="true"/>
-        <move file="x64/libz3java.so" tofile="x64/libz3java-${z3.version}.so" verbose="true"/>
-        <move file="arm64/libz3.so" tofile="arm64/libz3-${z3.version}.so"/>
-        <move file="arm64/libz3java.so" tofile="arm64/libz3java-${z3.version}.so"/>
+        <move file="${z3.dist.dir}/x64/libz3.so" tofile="${z3.dist.dir}/x64/libz3-${z3.version}.so" verbose="true"/>
+        <move file="${z3.dist.dir}/x64/libz3java.so" tofile="${z3.dist.dir}/x64/libz3java-${z3.version}.so" verbose="true"/>
+        <move file="${z3.dist.dir}/arm64/libz3.so" tofile="${z3.dist.dir}/arm64/libz3-${z3.version}.so"/>
+        <move file="${z3.dist.dir}/arm64/libz3java.so" tofile="${z3.dist.dir}/arm64/libz3java-${z3.version}.so"/>
         <!-- Windows files -->
-        <move file="x64/libz3.dll" tofile="x64/libz3-${z3.version}.dll" verbose="true"/>
-        <move file="x64/libz3java.dll" tofile="x64/libz3java-${z3.version}.dll" verbose="true"/>
-        <move file="arm64/libz3.dll" tofile="arm64/libz3-${z3.version}.dll" verbose="true"/>
-        <move file="arm64/z3java.dll" tofile="arm64/libz3java-${z3.version}.dll" verbose="true"/>
+        <move file="${z3.dist.dir}/x64/libz3.dll" tofile="${z3.dist.dir}/x64/libz3-${z3.version}.dll" verbose="true"/>
+        <move file="${z3.dist.dir}/x64/libz3java.dll" tofile="${z3.dist.dir}/x64/libz3java-${z3.version}.dll" verbose="true"/>
+        <move file="${z3.dist.dir}/arm64/libz3.dll" tofile="${z3.dist.dir}/arm64/libz3-${z3.version}.dll" verbose="true"/>
+        <move file="${z3.dist.dir}/arm64/z3java.dll" tofile="${z3.dist.dir}/arm64/libz3java-${z3.version}.dll" verbose="true"/>
         <!-- MacOS files -->
-        <move file="x64/libz3.dylib" tofile="x64/libz3-${z3.version}.dylib" verbose="true"/>
-        <move file="x64/libz3java.dylib" tofile="x64/libz3java-${z3.version}.dylib" verbose="true"/>
-        <move file="arm64/libz3.dylib" tofile="arm64/libz3-${z3.version}.dylib" verbose="true"/>
-        <move file="arm64/libz3java.dylib" tofile="arm64/libz3java-${z3.version}.dylib" verbose="true"/>
+        <move file="${z3.dist.dir}/x64/libz3.dylib" tofile="${z3.dist.dir}/x64/libz3-${z3.version}.dylib" verbose="true"/>
+        <move file="${z3.dist.dir}/x64/libz3java.dylib" tofile="${z3.dist.dir}/x64/libz3java-${z3.version}.dylib" verbose="true"/>
+        <move file="${z3.dist.dir}/arm64/libz3.dylib" tofile="${z3.dist.dir}/arm64/libz3-${z3.version}.dylib" verbose="true"/>
+        <move file="${z3.dist.dir}/arm64/libz3java.dylib" tofile="${z3.dist.dir}/arm64/libz3java-${z3.version}.dylib" verbose="true"/>
         <!-- common Java file, Java is platform independent -->
-        <move file="com.microsoft.z3.jar" tofile="com.microsoft.z3-${z3.version}.jar"/>
+        <move file="${z3.dist.dir}/com.microsoft.z3.jar" tofile="${z3.dist.dir}/com.microsoft.z3-${z3.version}.jar"/>
     </target>
 
     <target name="get-z3-version" unless="z3.version" depends="check-z3-path">
@@ -110,7 +111,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="publish-z3" depends="package-z3, load-ivy"
         description="Publish Z3 binaries to Ivy repo.">
         <ivy:resolve conf="solver-z3,solver-z3-x64,solver-z3-arm64,sources,javadoc" file="solvers_ivy_conf/ivy_z3.xml"/>
-        <publishToRepository solverName="Z3" solverVersion="${z3.version}"/>
+        <publishToRepository solverName="Z3" solverVersion="${z3.version}" distDir="${z3.dist.dir}"/>
 
         <!--
           We additionally provide x64-files without arch-attribute for backwards compatibility,
@@ -140,7 +141,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="package-z3-sources" depends="get-z3-version, check-z3-sources">
-        <jar destfile="com.microsoft.z3-${z3.version}-sources.jar" whenmanifestonly="fail">
+        <jar destfile="${z3.dist.dir}/com.microsoft.z3-${z3.version}-sources.jar" whenmanifestonly="fail">
             <zipfileset dir="${z3.path}/src/api/java" includes="**/*.java" prefix="com/microsoft/z3"/>
             <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
             <manifest>
@@ -178,7 +179,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="package-z3-javadoc" depends="z3-javadoc">
-        <jar jarfile="com.microsoft.z3-${z3.version}-javadoc.jar" whenmanifestonly="fail">
+        <jar jarfile="${z3.dist.dir}/com.microsoft.z3-${z3.version}-javadoc.jar" whenmanifestonly="fail">
             <zipfileset dir="${z3.path}/" includes="LICENSE.txt" prefix="META-INF"/>
             <fileset dir="${z3.javadoc.dir}"/>
         </jar>

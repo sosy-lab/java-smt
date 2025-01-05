@@ -32,6 +32,7 @@ SPDX-License-Identifier: Apache-2.0
     <macrodef name="publishToRepository">
         <attribute name="solverName"/>
         <attribute name="solverVersion"/>
+        <attribute name="distDir" default="."/> <!-- backwards compatible default value -->
         <sequential>
             <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
             <fail unless="ivy.hasrepository"
@@ -39,7 +40,7 @@ SPDX-License-Identifier: Apache-2.0
             <ivy:publish
                     pubrevision="@{solverVersion}"
                     resolver="Sosy-Lab-Publish"
-                    artifactspattern="([arch]/)[artifact]-[revision](-[classifier]).[ext]"
+                    artifactspattern="@{distDir}/([arch]/)[artifact]-[revision](-[classifier]).[ext]"
                     status="release"
             />
             <echo>

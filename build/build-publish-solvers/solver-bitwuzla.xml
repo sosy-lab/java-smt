@@ -13,6 +13,7 @@ SPDX-License-Identifier: Apache-2.0
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-bitwuzla" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
 
+    <property name="bitwuzla.dist.dir" value="${ivy.solver.dist.dir}/bitwuzla"/>
     <property name="bitwuzla.buildForLinuxX64" value="true"/>
     <property name="bitwuzla.buildForLinuxArm64" value="true"/>
     <property name="bitwuzla.buildForWindowsX64" value="true"/>
@@ -188,15 +189,15 @@ SPDX-License-Identifier: Apache-2.0
         <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
         </javac>
-        <jar destfile="bitwuzla-${bitwuzla.version}.jar" basedir="${source.path}/build"/>
+        <jar destfile="${bitwuzla.dist.dir}/bitwuzla-${bitwuzla.version}.jar" basedir="${source.path}/build"/>
 
         <!-- generate and package javadoc documentation -->
         <mkdir dir="${source.path}/doc"/>
         <javadoc sourcepath="${source.path}/src" destdir="${source.path}/doc"/>
-        <jar destfile="bitwuzla-${bitwuzla.version}-javadoc.jar" basedir="${source.path}/doc"/>
+        <jar destfile="${bitwuzla.dist.dir}/bitwuzla-${bitwuzla.version}-javadoc.jar" basedir="${source.path}/doc"/>
 
         <!-- package swig generated source code -->
-        <jar destfile="bitwuzla-${bitwuzla.version}-sources.jar" basedir="${source.path}/src"/>
+        <jar destfile="${bitwuzla.dist.dir}/bitwuzla-${bitwuzla.version}-sources.jar" basedir="${source.path}/src"/>
     </target>
 
     <target name="build-bitwuzla-bindings-linux-x64" if="${bitwuzla.buildForLinuxX64}"
@@ -357,12 +358,12 @@ SPDX-License-Identifier: Apache-2.0
             depends="build-bitwuzla-linux-x64, build-bitwuzla-linux-arm64, build-bitwuzla-windows-x64, load-ivy"
             description="Publish Bitwuzla binaries to Ivy repository.">
         <!-- copy library files into directory to be published for Ivy -->
-        <copy file="${source.path}/libbitwuzlaj-x64.so" tofile="x64/libbitwuzlaj-${bitwuzla.version}.so" failonerror="true"/>
-        <copy file="${source.path}/libbitwuzlaj-arm64.so" tofile="arm64/libbitwuzlaj-${bitwuzla.version}.so" failonerror="true"/>
-        <copy file="${source.path}/libbitwuzlaj-x64.dll" tofile="x64/libbitwuzlaj-${bitwuzla.version}.dll" failonerror="true"/>
+        <copy file="${source.path}/libbitwuzlaj-x64.so" tofile="${bitwuzla.dist.dir}/x64/libbitwuzlaj-${bitwuzla.version}.so" failonerror="true"/>
+        <copy file="${source.path}/libbitwuzlaj-arm64.so" tofile="${bitwuzla.dist.dir}/arm64/libbitwuzlaj-${bitwuzla.version}.so" failonerror="true"/>
+        <copy file="${source.path}/libbitwuzlaj-x64.dll" tofile="${bitwuzla.dist.dir}/x64/libbitwuzlaj-${bitwuzla.version}.dll" failonerror="true"/>
 
         <ivy:resolve conf="solver-bitwuzla" file="solvers_ivy_conf/ivy_bitwuzla.xml"/>
-        <publishToRepository solverName="Bitwuzla" solverVersion="${bitwuzla.version}"/>
+        <publishToRepository solverName="Bitwuzla" solverVersion="${bitwuzla.version}" distDir="${bitwuzla.dist.dir}"/>
 
         <!--
           We additionally provide x64-files without arch-attribute for backwards compatibility,

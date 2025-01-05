@@ -15,6 +15,8 @@ SPDX-License-Identifier: Apache-2.0
 
     <import file="macros.xml"/>
 
+    <property name="mathsat.dist.dir" value="${ivy.solver.dist.dir}/mathsat5"/>
+
     <target name="compile-mathsat-bindings-linux-x64">
         <checkPathOption pathOption="mathsat-linux-x64.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 directory (Linux x64)"/>
         <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
@@ -65,17 +67,17 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
         </fail>
 
-        <mkdir dir="x64"/>
-        <mkdir dir="arm64"/>
-        <copy file="lib/native/source/libmathsat5j/libmathsat5j-x64.so" tofile="x64/libmathsat5j-${mathsat.version}.so"/>
-        <copy file="lib/native/source/libmathsat5j/libmathsat5j-arm64.so" tofile="arm64/libmathsat5j-${mathsat.version}.so"/>
-        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="x64/mathsat5j-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows-x64.path}/lib/mathsat.dll" tofile="x64/mathsat-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows-x64.path}/bin/mpir.dll" tofile="x64/mpir-${mathsat.version}.dll"/>
-        <copy file="${gmp-windows-x64.path}/.libs/libgmp-10.dll" tofile="x64/gmp-${mathsat.version}.dll"/>
+        <mkdir dir="${mathsat.dist.dir}/x64"/>
+        <mkdir dir="${mathsat.dist.dir}/arm64"/>
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j-x64.so" tofile="${mathsat.dist.dir}/x64/libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j-arm64.so" tofile="${mathsat.dist.dir}/arm64/libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="${mathsat.dist.dir}/x64/mathsat5j-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/lib/mathsat.dll" tofile="${mathsat.dist.dir}/x64/mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/bin/mpir.dll" tofile="${mathsat.dist.dir}/x64/mpir-${mathsat.version}.dll"/>
+        <copy file="${gmp-windows-x64.path}/.libs/libgmp-10.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
 
         <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml"/>
-        <publishToRepository solverName="MathSAT" solverVersion="${mathsat.version}"/>
+        <publishToRepository solverName="MathSAT" solverVersion="${mathsat.version}" distDir="${mathsat.dist.dir}"/>
 
         <!--
             We additionally provide x64-files without arch-attribute for backwards compatibility,
@@ -100,9 +102,9 @@ SPDX-License-Identifier: Apache-2.0
             Please specify the @{flag} version with the flag -Dmathsat.version=... .
         </fail>
 
-        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="liboptimathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="${mathsat.dist.dir}/liboptimathsat5j-${mathsat.version}.so"/>
 
         <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml"/>
-        <publishToRepository solverName="OptiMathSAT" solverVersion="${mathsat.version}"/>
+        <publishToRepository solverName="OptiMathSAT" solverVersion="${mathsat.version}" distDir="${mathsat.dist.dir}"/>
     </target>
 </project>
