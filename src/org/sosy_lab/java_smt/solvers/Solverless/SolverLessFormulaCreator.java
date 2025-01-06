@@ -22,12 +22,10 @@ package org.sosy_lab.java_smt.solvers.Solverless;
 import java.util.List;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -150,25 +148,28 @@ public class SolverLessFormulaCreator
       DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
       return result;
     }
-    if(pT instanceof ArrayFormula){
-      if(pT.toString().equals("")){
+    if (pT instanceof ArrayFormula) {
+      if (pT.toString().equals("") || pT.toString().equals("Array<, >")) {
         return new DummyFormula(FormulaTypesForChecking.ARRAY);
       }
-      DummyFormula firstSort =
-          new DummyFormula(FormulaTypesForChecking.valueOf(extractFirstArrayParameterFromString(pT.toString())));
-      DummyFormula secondSort = new DummyFormula(FormulaTypesForChecking.valueOf(extractSecondArrayParameterFromString(pT.toString())));
-      return new DummyFormula(firstSort, secondSort);
+      DummyFormula.createDummyFormulaArrayFromString(pT.toString());
     }
+
     return super.extractInfo(pT);
   }
   public String extractFirstArrayParameterFromString(String representation) {
     if (representation.startsWith("Array<") && representation.endsWith(">")) {
       try {
-        String content = representation.substring(6, representation.length() - 1);
-        int commaIndex = content.indexOf(',');
+
+        String content = representation.substring(6, representation.length() - 1).trim();
+
+
+        int commaIndex = findTopLevelCommaIndex(content);
         if (commaIndex == -1) {
           throw new IllegalArgumentException("Invalid Array representation: " + representation);
         }
+
+        // Parameter vor dem ersten Komma zurückgeben
         return content.substring(0, commaIndex).trim();
       } catch (StringIndexOutOfBoundsException e) {
         throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
@@ -177,14 +178,32 @@ public class SolverLessFormulaCreator
     throw new IllegalArgumentException("Invalid Array representation: " + representation);
   }
 
+  private int findTopLevelCommaIndex(String content) {
+    int depth = 0;
+    for (int i = 0; i < content.length(); i++) {
+      char c = content.charAt(i);
+      if (c == '<') {
+        depth++;
+      } else if (c == '>') {
+        depth--;
+      } else if (c == ',' && depth == 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   public String extractSecondArrayParameterFromString(String representation) {
     if (representation.startsWith("Array<") && representation.endsWith(">")) {
       try {
-        String content = representation.substring(6, representation.length() - 1);
-        int commaIndex = content.indexOf(',');
+
+        String content = representation.substring(6, representation.length() - 1).trim();
+
+        int commaIndex = findTopLevelCommaIndex(content);
         if (commaIndex == -1) {
           throw new IllegalArgumentException("Invalid Array representation: " + representation);
         }
+
         return content.substring(commaIndex + 1).trim();
       } catch (StringIndexOutOfBoundsException e) {
         throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
@@ -192,6 +211,8 @@ public class SolverLessFormulaCreator
     }
     throw new IllegalArgumentException("Invalid Array representation: " + representation);
   }
+
+
 
 
 

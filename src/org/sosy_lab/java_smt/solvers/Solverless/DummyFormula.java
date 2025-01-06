@@ -20,14 +20,12 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
-import java.text.Normalizer.Form;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -136,6 +134,89 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     }
     return new DummyFormula(FormulaTypesForChecking.DUMMY);
   }
+  private String getArrayRepresentation() {
+    StringBuilder representationBuilder = new StringBuilder("Array<");
+
+    if (firstArrayParameter.getFormulaType() == FormulaTypesForChecking.ARRAY) {
+      representationBuilder.append(firstArrayParameter.getArrayRepresentation());
+    } else {
+      representationBuilder.append(firstArrayParameter.getFormulaType());
+    }
+
+    representationBuilder.append(", ");
+
+    if (secondArrayParameter.getFormulaType() == FormulaTypesForChecking.ARRAY) {
+      representationBuilder.append(secondArrayParameter.getArrayRepresentation());
+    } else {
+      representationBuilder.append(secondArrayParameter.getFormulaType());
+    }
+
+    representationBuilder.append(">");
+    return representationBuilder.toString();
+  }
+
+  public static DummyFormula createDummyFormulaArrayFromString(String representation) {
+    representation = representation.trim();
+
+    if (representation.startsWith("Array<") && representation.endsWith(">")) {
+
+      String content = representation.substring(6, representation.length() - 1).trim();
+      int commaIndex = findTopLevelCommaIndex(content);
+      if (commaIndex == -1) {
+        throw new IllegalArgumentException("Invalid Array representation: " + representation);
+      }
+
+      String firstParameter = content.substring(0, commaIndex).trim();
+      String secondParameter = content.substring(commaIndex + 1).trim();
+
+      DummyFormula firstArrayParameter = createDummyFormulaArrayFromString(firstParameter);
+      DummyFormula secondArrayParameter = createDummyFormulaArrayFromString(secondParameter);
+
+
+      return new DummyFormula(firstArrayParameter, secondArrayParameter);
+    }
+
+
+    try {
+      FormulaTypesForChecking type = FormulaTypesForChecking.valueOf(representation.toUpperCase());
+      switch (type) {
+        case INTEGER:
+          return new DummyFormula(FormulaTypesForChecking.INTEGER);
+        case RATIONAL:
+          return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+        case BOOLEAN:
+          return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+        case STRING:
+          return new DummyFormula(FormulaTypesForChecking.STRING);
+        case REGEX:
+          return new DummyFormula(FormulaTypesForChecking.REGEX);
+        case BITVECTOR:
+          return new DummyFormula(FormulaTypesForChecking.BITVECTOR);
+        default:
+          throw new IllegalArgumentException("Unsupported type: " + representation);
+      }
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Invalid representation or unsupported type: " + representation, e);
+    }
+  }
+
+
+  private static int findTopLevelCommaIndex(String content) {
+    int depth = 0;
+    for (int i = 0; i < content.length(); i++) {
+      char c = content.charAt(i);
+      if (c == '<') {
+        depth++;
+      } else if (c == '>') {
+        depth--;
+      } else if (c == ',' && depth == 0) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+
 
   private void updateRepresentation() {
     switch (formulaType) {
@@ -146,7 +227,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
         this.representation = "FloatingPoint<" + exponent + ", " + mantissa + ">";
         break;
       case ARRAY:
-        this.representation = "Array<" + firstArrayParameter + ", " + secondArrayParameter + ">";
+        this.representation = getArrayRepresentation();
         break;
       case BOOLEAN:
         this.representation = "Boolean<" + value + ">";
@@ -166,6 +247,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
         break;
     }
   }
+
 
   public FormulaTypesForChecking getFormulaType() {
     return formulaType;

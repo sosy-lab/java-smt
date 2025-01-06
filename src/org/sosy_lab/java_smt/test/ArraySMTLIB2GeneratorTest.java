@@ -25,11 +25,33 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
-public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0 {
+  @Override
+  public Solvers solverToUse(){
+    return Solvers.SOLVERLESS;
+  }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
     return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
+
+  @Test
+  public void simpleTestDeclareIntArray(){
+    requireArrays();
+    requireIntegers();
+    ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr).makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
+    IntegerFormula numberToBeStored = imgr.makeNumber(3);
+    IntegerFormula index = imgr.makeNumber(0);
+    ArrayFormula<IntegerFormula, IntegerFormula> result = amgr.store(a1, index, numberToBeStored);
+    BooleanFormula constraint = amgr.equivalence(amgr.store(a1, index, numberToBeStored), result);
+
+    String expectedResult =
+        "(declare-const a1 (Array Int Int))\n"
+        + "(assert (= (store a1 0 3) (store a1 0 3)))\n";
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test(expected = GeneratorException.class)

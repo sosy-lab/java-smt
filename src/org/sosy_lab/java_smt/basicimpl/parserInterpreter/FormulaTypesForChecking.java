@@ -31,5 +31,9 @@ public enum FormulaTypesForChecking {
   ARRAY,
   RATIONAL,
   BOOLEAN,
-  DUMMY,
+  DUMMY;
+
+  public static FormulaTypesForChecking handleArray(){
+        return ARRAY;
+  }
 }
