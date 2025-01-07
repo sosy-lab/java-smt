@@ -90,8 +90,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="swig/opensmt.i"/>
         </exec>
 
-        <!-- Copy (only!) the required java files to the source tree. This should make sure that compilation fails
-             if the OpenSMT interface changed, but the swig header wasn't updated  -->
+        <!-- Copy the generated Java classes and the c++ wrapper to the source tree  -->
         <copy todir="${path.source}/src/org/sosy_lab/java_smt/solvers/opensmt/api">
             <fileset dir="${path.install}/java/opensmt">
                 <include name="ArithLogic.java"/>
@@ -121,6 +120,13 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="VectorVectorInt.java"/>
             </fileset>
         </copy>
+        <copy file="${path.install}/opensmt-wrap.cpp" toFile="${path.source}/opensmt-wrap.cpp"/>
+
+        <!-- Apply the patch to add the license headers -->
+        <exec executable="git" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${path.source}/swigWrapper.patch"/>
+        </exec>
 
         <!-- Package swig generated source code -->
         <jar destfile="opensmt-${opensmt.version}-sources.jar" basedir="${path.source}/src"/>
@@ -131,14 +137,10 @@ SPDX-License-Identifier: Apache-2.0
         <jar destfile="opensmt-${opensmt.version}-javadoc.jar" basedir="${path.source}/doc"/>
         <delete dir="${path.source}/doc"/>
 
-        <!-- Copy the lib to the root directory for later packaging-->
-        <copy file="${path.install}/lib/libopensmt.so" toFile="libopensmt-${opensmt.version}.so"/>
-
         <!-- Dump ${opensmt.version} to a file so that we can use it for the swig wrapper -->
         <echo file="${path.source}/version.h">#define VERSION "${opensmt.version}"</echo>
 
-        <!-- Copy the swig wrapper to the source tree and compile it-->
-        <copy file="${path.install}/opensmt-wrap.cpp" toFile="${path.source}/opensmt-wrap.cpp"/>
+        <!-- Compile the swig wrapper to create the library -->
         <exec executable="gcc" dir="${path.source}" failonerror="true">
             <arg value="-fPIC"/>
             <arg value="-std=c++20"/>
@@ -150,16 +152,22 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${java.home}/include/"/>
             <arg value="-I${java.home}/include/linux"/>
         </exec>
+        <delete file="${path.source}/version.h"/>
 
         <!-- Link the wrapper and create a new lib -->
-        <symlink link="libopensmt.so" resource="libopensmt-${opensmt.version}.so"/>
         <exec executable="gcc" dir="${path.source}" failonerror="true">
             <arg value="-shared"/>
             <arg value="-o"/>
             <arg value="${user.dir}/libopensmtjava-${opensmt.version}.so"/>
             <arg value="opensmt-wrap.o"/>
-            <arg value="-L${path.install}/lib"/>
-            <arg value="-l:libopensmt.a"/>
+            <arg value="-lstdc++"/>
+            <arg value="-Wl,--whole-archive"/>
+            <arg value="/dependencies/gmp-6.2.1/.libs/libgmp.a"/>
+            <arg value="/dependencies/gmp-6.2.1/.libs/libgmpxx.a"/>
+            <arg value="${path.install}/lib/libopensmt.a"/>
+            <arg value="-Wl,--no-whole-archive"/>
+            <arg value="-lm"/>
+            <arg value="-Wl,-z,defs"/>
         </exec>
         <delete file="${path.source}/opensmt-wrap.o"/>
 

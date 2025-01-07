@@ -264,6 +264,7 @@ namespace opensmt {
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
 %ignore Logic::printSym (SymRef sr) const;
+%ignore Logic::getSortSize(SRef s) const;
 %ignore Logic::termSort (vec< PTRef > &v) const;
 %ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const;
 %ignore Logic::collectStats (PTRef, int &n_of_conn, int &n_of_eq, int &n_of_uf, int &n_of_if);
