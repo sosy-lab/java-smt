@@ -483,15 +483,17 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   public final BooleanFormula distinct(List<BitvectorFormula> pBits) throws GeneratorException {
     // optimization
     if (pBits.size() <= 1) {
+      BooleanFormula nativeTrue = bmgr.makeTrue();
       if (Generator.isLoggingEnabled()) {
-        BooleanGenerator.logMakeTrue(bmgr.makeTrue(), "true");
+        BooleanGenerator.logMakeTrue(nativeTrue, "true");
       }
-      return bmgr.makeTrue();
+      return nativeTrue;
     } else if (pBits.size() > 1L << getLength(pBits.iterator().next())) {
+      BooleanFormula nativeFalse = bmgr.makeFalse();
       if (Generator.isLoggingEnabled()) {
-        BooleanGenerator.logMakeFalse(bmgr.makeFalse(), "false");
+        BooleanGenerator.logMakeFalse(nativeFalse, "false");
       }
-      return bmgr.makeFalse();
+      return nativeFalse;
     } else {
       BooleanFormula result = wrapBool(distinctImpl(Lists.transform(pBits, this::extractInfo)));
       if (Generator.isLoggingEnabled()) {

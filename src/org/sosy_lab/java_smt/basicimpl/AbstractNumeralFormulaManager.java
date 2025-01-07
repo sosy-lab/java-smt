@@ -141,7 +141,7 @@ public abstract class AbstractNumeralFormulaManager<
       // FIXME Broken when used in IntegerFormulaManager
       NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
     }
-    return wrap(makeNumberImpl(pNumber));
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(double pNumber);
@@ -152,7 +152,7 @@ public abstract class AbstractNumeralFormulaManager<
     if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logMakeNumber(result, String.valueOf(pNumber));
     }
-    return wrap(makeNumberImpl(pNumber));
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(BigDecimal pNumber);
@@ -213,7 +213,7 @@ public abstract class AbstractNumeralFormulaManager<
     if (Generator.isLoggingEnabled()) {
       NumeralGenerator.logNegate(result, pNumber);
     }
-    return wrap(negate(param1));
+    return result;
   }
 
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
@@ -284,10 +284,11 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    ResultFormulaType wrappedResult = wrap(result);
     if (Generator.isLoggingEnabled()) {
-      NumeralGenerator.logDivide(wrap(result), pNumber1, pNumber2);
+      NumeralGenerator.logDivide(wrappedResult, pNumber1, pNumber2);
     }
-    return wrap(result);
+    return wrappedResult;
   }
 
   /**
@@ -319,10 +320,11 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    ResultFormulaType wrappedResult = wrap(result);
     if (Generator.isLoggingEnabled()) {
-      NumeralGenerator.logModulo(wrap(result), pNumber1, pNumber2);
+      NumeralGenerator.logModulo(wrappedResult, pNumber1, pNumber2);
     }
-    return wrap(result);
+    return wrappedResult;
   }
 
   /**
@@ -406,10 +408,11 @@ public abstract class AbstractNumeralFormulaManager<
         }
       }
     }
+    ResultFormulaType wrappedResult = wrap(result);
     if (Generator.isLoggingEnabled()) {
-      NumeralGenerator.logMultiply(wrap(result), pNumber1, pNumber2);
+      NumeralGenerator.logMultiply(wrappedResult, pNumber1, pNumber2);
     }
-    return wrap(result);
+    return wrappedResult;
   }
 
   /**
