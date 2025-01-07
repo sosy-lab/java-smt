@@ -20,24 +20,26 @@ import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 public class NumeralGenerator {
   private NumeralGenerator() {}
 
-  protected static void logMakeNumber(Object result, String pVar) {
+  /**
+   * @param result solver returned object for the makeNumber() call.
+   * @param number the value of the number as String.
+   */
+  protected static void logMakeNumber(Object result, String number) {
     List<Object> inputParams = new ArrayList<>();
-    if (result instanceof IntegerFormula && new BigInteger(pVar).signum() == -1) {
-      BigInteger input = new BigInteger(pVar);
-      String absVar = String.valueOf(input.abs());
+    Function<List<Object>, String> functionToString;
+    if (result instanceof IntegerFormula && new BigInteger(number).signum() == -1) {
+      BigInteger numberValueBigInt = new BigInteger(number);
+      String absVar = String.valueOf(numberValueBigInt.abs());
       inputParams.add(absVar);
-      Function<List<Object>, String> functionToString =
-          inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
-      Generator.getExecutedAggregator()
-          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
-    } else if (result instanceof NumeralFormula) {
-      String checkedVar = String.valueOf(result);
-      inputParams.add(checkedVar);
+      functionToString = inPlaceInputParams -> "(- " + inPlaceInputParams.get(0) + ")";
+
+    } else {
+      inputParams.add(number);
+      functionToString = inPlaceInputParams -> (String) inPlaceInputParams.get(0);
     }
-    Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> (String) inPlaceInputParams.get(0);
+
     Generator.getExecutedAggregator()
-        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.DIRECT));
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
