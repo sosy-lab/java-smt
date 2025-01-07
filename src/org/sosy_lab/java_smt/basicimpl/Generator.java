@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
@@ -101,20 +102,25 @@ public class Generator {
    */
   protected static String evaluateRecursive(Object constraint) {
     if (constraint instanceof String) {
+      // Constants
       return (String) constraint;
     } else {
-      Optional<FunctionEnvironment> methodToEvaluate =
+      // Functions of any kind
+      Optional<FunctionEnvironment> maybeMethodToEvaluate =
           executedAggregator.stream().filter(x -> x.getResult().equals(constraint)).findFirst();
-      if (methodToEvaluate.isPresent()
-          && !methodToEvaluate.orElseThrow().expressionType.equals(Keyword.DIRECT)) {
-        registeredVariables.add(methodToEvaluate.orElseThrow());
+
+      Preconditions.checkState(maybeMethodToEvaluate.isPresent());
+      FunctionEnvironment methodToEvaluate = maybeMethodToEvaluate.orElseThrow();
+
+      if (!methodToEvaluate.expressionType.equals(Keyword.DIRECT)) {
+        registeredVariables.add(methodToEvaluate);
       }
       List<Object> evaluatedInputs = new ArrayList<>();
-      for (Object value : Objects.requireNonNull(methodToEvaluate).orElseThrow().getInputParams()) {
+      for (Object value : methodToEvaluate.getInputParams()) {
         String evaluatedInput = evaluateRecursive(value);
         evaluatedInputs.add(evaluatedInput);
       }
-      return methodToEvaluate.orElseThrow().getFunctionToString().apply(evaluatedInputs);
+      return methodToEvaluate.getFunctionToString().apply(evaluatedInputs);
     }
   }
 
