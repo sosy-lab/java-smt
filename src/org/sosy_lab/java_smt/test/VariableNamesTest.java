@@ -13,12 +13,11 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
@@ -35,137 +34,26 @@ import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-@SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
+// TODO Reduce the number of tests in this class.
+//  For variable name escaping we don't have to try every combination of Sort x Name. It should be
+//  enough to test the names once, and then check that escaping is applied for variables/ufs of all
+//  types.
+
 public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  public static final ImmutableList<String> NAMES =
-      ImmutableList.of(
-          "java-smt",
-          "JavaSMT",
-          "sosylab",
-          "test",
-          "foo",
-          "bar",
-          "baz",
-          "declare",
-          "(exit)",
-          "!=",
-          "~",
-          ",",
-          ".",
-          ":",
-          " ",
-          "  ",
-          "(",
-          ")",
-          "[",
-          "]",
-          "{",
-          "}",
-          "[]",
-          "\"",
-          "\"\"",
-          "\"\"\"",
-          "'",
-          "''",
-          "'''",
-          "\n",
-          "\t",
-          "\u0000",
-          "\u0001",
-          "\u1234",
-          "\u2e80",
-          " this is a quoted symbol ",
-          " so is \n  this one ",
-          " \" can occur too ",
-          " af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984");
-
-  private static final ImmutableSet<String> FURTHER_SMTLIB2_KEYWORDS =
-      ImmutableSet.of(
-          "let",
-          "forall",
-          "exists",
-          "match",
-          "Bool",
-          "continued-execution",
-          "error",
-          "immediate-exit",
-          "incomplete",
-          "logic",
-          "memout",
-          "sat",
-          "success",
-          "theory",
-          "unknown",
-          "unsupported",
-          "unsat",
-          "_",
-          "as",
-          "BINARY",
-          "DECIMAL",
-          "HEXADECIMAL",
-          "NUMERAL",
-          "par",
-          "STRING",
-          "assert",
-          "check-sat",
-          "check-sat-assuming",
-          "declare-const",
-          "declare-datatype",
-          "declare-datatypes",
-          "declare-fun",
-          "declare-sort",
-          "define-fun",
-          "define-fun-rec",
-          "define-sort",
-          "echo",
-          "exit",
-          "get-assertions",
-          "get-assignment",
-          "get-info",
-          "get-model",
-          "get-option",
-          "get-proof",
-          "get-unsat-assumptions",
-          "get-unsat-core",
-          "get-value",
-          "pop",
-          "push",
-          "reset",
-          "reset-assertions",
-          "set-info",
-          "set-logic",
-          "set-option");
-
-  /**
-   * Some special chars are not allowed to appear in symbol names. See {@link
-   * FormulaCreator#DISALLOWED_CHARACTERS}.
-   */
-  @SuppressWarnings("javadoc")
-  public static final ImmutableSet<String> UNSUPPORTED_NAMES =
-      ImmutableSet.of(
-          "|",
-          "||",
-          "|||",
-          "|test",
-          "|test|",
-          "t|e|s|t",
-          "\\",
-          "\\s",
-          "\\|\\|",
-          "| this is a quoted symbol |",
-          "| so is \n  this one |",
-          "| \" can occur too |",
-          "| af klj ^*0 asfe2 (&*)&(#^ $ > > >?\" ’]]984|");
-
-  protected List<String> getAllNames() {
-    return ImmutableList.<String>builder()
-        .addAll(NAMES)
-        .addAll(FormulaCreator.RESERVED)
-        .addAll(FormulaCreator.DISALLOWED_CHARACTER_REPLACEMENT.values())
-        .addAll(FURTHER_SMTLIB2_KEYWORDS)
-        .addAll(UNSUPPORTED_NAMES)
-        .build();
+  static Set<String> getAllNames() {
+    ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+    for (String symbol : ParserSymbolsEscapedTest.TEST_SYMBOLS) {
+      for (String variant :
+          ImmutableSet.of(
+              symbol,
+              ParserSymbolsEscapedTest.addQuotes(symbol),
+              FormulaCreator.escapeName(symbol),
+              ParserSymbolsEscapedTest.addQuotes(FormulaCreator.escapeName(symbol)))) {
+        builder.add(variant);
+      }
+    }
+    return builder.build();
   }
 
   @CanIgnoreReturnValue
@@ -211,7 +99,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
     // Adding SMTLIB quotes to the name should make it illegal
-    assertThat(mgr.isValidName("|" + name + "|")).isFalse();
+    assertThat(mgr.isValidName(ParserSymbolsEscapedTest.addQuotes(name))).isFalse();
   }
 
   @Test
@@ -277,7 +165,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name,
           s ->
@@ -293,7 +181,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUF1Bool() throws SolverException, InterruptedException {
     requireIntegers();
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name,
           s -> fmgr.declareAndCallUF(s, BooleanType, imgr.makeNumber(0)),
@@ -305,7 +193,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUF1Int() throws SolverException, InterruptedException {
     requireIntegers();
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name, s -> fmgr.declareAndCallUF(s, IntegerType, imgr.makeNumber(0)), imgr::equal, true);
     }
@@ -327,7 +215,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameUF2Bool() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(
           name, s -> fmgr.declareAndCallUF(s, BooleanType, zero, zero), bmgr::equivalence, true);
     }
@@ -337,7 +225,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameUF2Int() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula zero = imgr.makeNumber(0);
-    for (String name : NAMES) {
+    for (String name : getAllNames()) {
       testName0(name, s -> fmgr.declareAndCallUF(s, IntegerType, zero, zero), imgr::equal, true);
     }
   }

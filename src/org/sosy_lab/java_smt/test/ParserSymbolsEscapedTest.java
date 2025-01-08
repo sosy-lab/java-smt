@@ -120,7 +120,7 @@ public class ParserSymbolsEscapedTest extends SolverBasedTest0 {
    * <p>This function is stricter than {@link FormulaCreator#isValidName(String)} and won't allow
    * names such as <code>"a \nb"</code> without any SMTLIB quotes.
    */
-  private static boolean isValid(String pSymbol) {
+  static boolean isValid(String pSymbol) {
     if (pSymbol.length() >= 2 && pSymbol.startsWith("|") && pSymbol.endsWith("|")) {
       return FormulaCreator.isValidName(dequote(pSymbol));
     } else {
@@ -134,12 +134,12 @@ public class ParserSymbolsEscapedTest extends SolverBasedTest0 {
    *
    * <p>Assumes that the symbol is not already quoted.
    */
-  private static String addQuotes(String pSymbol) {
+  static String addQuotes(String pSymbol) {
     return "|" + pSymbol + "|";
   }
 
   /** Returns <code>True</code> if the symbol is quoted */
-  private static boolean hasQuotes(String pSymbol) {
+  static boolean hasQuotes(String pSymbol) {
     return pSymbol.length() >= 2 && pSymbol.startsWith("|") && pSymbol.endsWith("|");
   }
 
