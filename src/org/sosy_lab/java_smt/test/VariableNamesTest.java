@@ -8,10 +8,8 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -170,18 +168,9 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
         .build();
   }
 
-  boolean allowInvalidNames() {
-    return true;
-  }
-
   @CanIgnoreReturnValue
   private <T extends Formula> T createVariableWith(Function<String, T> creator, String name) {
-    if (allowInvalidNames() && !mgr.isValidName(name)) {
-      assertThrows(IllegalArgumentException.class, () -> creator.apply(name));
-      return null;
-    } else {
-      return creator.apply(name);
-    }
+    return creator.apply(name);
   }
 
   private <T extends Formula> void testName0(
@@ -191,9 +180,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // create a variable
     T var = createVariableWith(creator, name);
-    if (var == null) {
-      return;
-    }
 
     // check whether it exists with the given name
     Map<String, Formula> map = mgr.extractVariables(var);
@@ -206,9 +192,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // check whether we can create the same variable again
     T var2 = createVariableWith(creator, name);
-    if (var2 == null) {
-      return;
-    }
 
     // for simple formulas, we can expect a direct equality
     // (for complex formulas this is not satisfied)
@@ -227,10 +210,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     @SuppressWarnings("unused")
     String dump = mgr.dumpFormula(eq.apply(var, var)).toString();
 
-    if (allowInvalidNames()) {
-      // try to create a new (!) variable with a different name, the escaped previous name.
-      assertThat(createVariableWith(creator, "|" + name + "|")).isEqualTo(null);
-    }
+    // Adding SMTLIB quotes to the name should make it illegal
+    assertThat(mgr.isValidName("|" + name + "|")).isFalse();
   }
 
   @Test
@@ -296,8 +277,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : NAMES) {
       testName0(
           name,
@@ -335,8 +314,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       testName0(
           name,
@@ -371,11 +348,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
 
     for (String name : getAllNames()) {
-
       IntegerFormula var = createVariableWith(imgr::makeVariable, name);
-      if (var == null) {
-        continue;
-      }
       IntegerFormula zero = imgr.makeNumber(0);
       BooleanFormula eq = imgr.equal(var, zero);
       BooleanFormula exists = qmgr.exists(var, eq);
@@ -401,10 +374,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not (yet) return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -427,11 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
 
     for (String name : getAllNames()) {
-
       IntegerFormula var1 = createVariableWith(imgr::makeVariable, name + 1);
-      if (var1 == null) {
-        continue;
-      }
       IntegerFormula var2 = createVariableWith(imgr::makeVariable, name + 2);
       IntegerFormula var3 = createVariableWith(imgr::makeVariable, name + 3);
       IntegerFormula var4 = createVariableWith(imgr::makeVariable, name + 4);
@@ -487,10 +453,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -514,9 +478,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var == null) {
-        continue;
-      }
 
       bmgr.visit(
           var,
@@ -545,22 +506,17 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
     assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var != null) {
-        @SuppressWarnings("unused")
-        String dump = mgr.dumpFormula(var).toString();
-      }
+      @SuppressWarnings("unused")
+      String dump = mgr.dumpFormula(var).toString();
     }
   }
 
   @Test
   public void testEqBoolVariableDump() {
-    // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
-      if (var != null) {
-        @SuppressWarnings("unused")
-        String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
-      }
+      @SuppressWarnings("unused")
+      String dump = mgr.dumpFormula(bmgr.equivalence(var, var)).toString();
     }
   }
 
@@ -610,8 +566,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBvArrayVariable() {
     requireArrays();
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
           v ->
@@ -626,12 +580,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void sameBehaviorTest() {
     for (String name : getAllNames()) {
-      if (mgr.isValidName(name)) {
-        // should pass without exception
-        checkArgument(FormulaCreator.isValidName(name));
-      } else {
-        assertThrows(IllegalArgumentException.class, () -> FormulaCreator.isValidName(name));
-      }
+      assertThat(mgr.isValidName(name)).isEqualTo(FormulaCreator.isValidName(name));
     }
   }
 }

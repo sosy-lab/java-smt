@@ -18,11 +18,6 @@ import org.junit.Test;
 public class VariableNamesEscaperTest extends VariableNamesTest {
 
   @Override
-  boolean allowInvalidNames() {
-    return false;
-  }
-
-  @Override
   protected List<String> getAllNames() {
     return Lists.transform(super.getAllNames(), mgr::escape);
   }
