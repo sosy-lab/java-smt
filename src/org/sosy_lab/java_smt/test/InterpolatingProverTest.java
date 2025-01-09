@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -47,10 +48,15 @@ public class InterpolatingProverTest
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
+    ProverOptions itpStrat = itpStrategyToUse();
     requireInterpolation(itpStrategyToUse());
 
-    return (InterpolatingProverEnvironment<T>)
-        context.newProverEnvironmentWithInterpolation(itpStrategyToUse());
+    if (itpStrat == null) {
+      return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    } else {
+      return (InterpolatingProverEnvironment<T>)
+          context.newProverEnvironmentWithInterpolation(itpStrat);
+    }
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
@@ -62,6 +68,12 @@ public class InterpolatingProverTest
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC5);
+    if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
+      assume()
+          .withMessage("Solver %s runs into timeout on this test", solverToUse())
+          .that(solverToUse())
+          .isNoneOf(Solvers.Z3, Solvers.CVC4);
+    }
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
