@@ -124,7 +124,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
-      return getModelBasedInterpolant(formulasOfA, formulasOfB);
+      return computeModelBasedInterpolant(formulasOfA, formulasOfB);
     } else {
       return getQuantifierEliminationBasedInterpolant(formulasOfA, formulasOfB);
     }
@@ -135,25 +135,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     return List.of();
-  }
-
-  /**
-   * Returns Craig interpolants for a pair of formulas using a model-based approach.
-   *
-   * @param pFormulasOfA A Collection of Boolean formulas of A.
-   * @param pFormulasOfB A Collection of Boolean formulas of B.
-   * @return A model-based Craig Interpolant.
-   */
-  private BooleanFormula getModelBasedInterpolant(
-      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
-      throws InterruptedException, SolverException {
-
-    final ImmutableList<BooleanFormula> originalStack =
-        ImmutableList.copyOf(super.getAssertedFormulas());
-
-    BooleanFormula interpolant = computeModelBasedInterpolant(pFormulasOfA, pFormulasOfB);
-
-    return interpolant;
   }
 
   /**
@@ -202,15 +183,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     // check the satisfiability of the constraints and generate a model if possible
     itpProver.push(bmgr.and(left, right));
 
+    BooleanFormula interpolant = bmgr.makeFalse();
     if (!itpProver.isUnsat()) {
-      BooleanFormula interpolant = itpProver.getModel().eval(itp);
+      interpolant = itpProver.getModel().eval(itp);
       Preconditions.checkNotNull(interpolant);
-      itpProver.close();
-      return interpolant;
     }
 
     itpProver.close();
-    return bmgr.makeFalse();
+    return interpolant;
   }
 
   /**
