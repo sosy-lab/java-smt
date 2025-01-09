@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.BV_SOLVER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_MODEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_UNSAT_CORE;
@@ -67,6 +68,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.BitwuzlaNative;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
@@ -275,8 +277,16 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pF) {
-    throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
+      Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    if (!hasIndependentInterpolationStrategy(options)) {
+      throw new UnsupportedOperationException(
+          "Bitwuzla does not support interpolation natively. Try "
+              + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"
+              + " GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
+    }
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
   }
 
   @Override

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -42,6 +43,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 
 public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
@@ -235,21 +237,26 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    Script newScript = createNewScript(options);
-    final SmtInterpolInterpolatingProver prover;
-    if (settings.smtLogfile == null) {
-      prover = new SmtInterpolInterpolatingProver(manager, newScript, options, shutdownNotifier);
-    } else {
-      prover =
-          new LoggingSmtInterpolInterpolatingProver(
-              manager,
-              newScript,
-              options,
-              shutdownNotifier,
-              settings.optionsMap,
-              settings.smtLogfile.getFreshPath());
+    if (!hasIndependentInterpolationStrategy(options)) {
+      // TODO: change this case.
+      Script newScript = createNewScript(options);
+      final SmtInterpolInterpolatingProver prover;
+      if (settings.smtLogfile == null) {
+        prover = new SmtInterpolInterpolatingProver(manager, newScript, options, shutdownNotifier);
+      } else {
+        prover =
+            new LoggingSmtInterpolInterpolatingProver(
+                manager,
+                newScript,
+                options,
+                shutdownNotifier,
+                settings.optionsMap,
+                settings.smtLogfile.getFreshPath());
+      }
+      return prover;
     }
-    return prover;
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, null, newProverEnvironment0(options), options, shutdownNotifier);
   }
 
   @Override

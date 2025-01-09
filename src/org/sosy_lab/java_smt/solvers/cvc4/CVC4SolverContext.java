@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
+
 import edu.stanford.CVC4.CVC4JNI;
 import edu.stanford.CVC4.Configuration;
 import edu.stanford.CVC4.ExprManager;
@@ -26,6 +28,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 
 public final class CVC4SolverContext extends AbstractSolverContext {
 
@@ -140,8 +143,15 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException("CVC4 does not support interpolation");
+      Set<ProverOptions> options) {
+    if (!hasIndependentInterpolationStrategy(options)) {
+      throw new UnsupportedOperationException(
+          "CVC4 does not support interpolation natively. Try "
+              + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"
+              + " GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
+    }
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
   }
 
   @Override

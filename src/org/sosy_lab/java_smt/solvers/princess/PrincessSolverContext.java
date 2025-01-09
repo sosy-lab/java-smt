@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
+
 import ap.api.SimpleAPI;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -22,6 +24,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 
 public final class PrincessSolverContext extends AbstractSolverContext {
 
@@ -81,8 +84,13 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    return (PrincessInterpolatingProver)
-        creator.getEnv().getNewProver(true, manager, creator, options);
+    if (!hasIndependentInterpolationStrategy(options)) {
+      // TODO: change this case.
+      return (PrincessInterpolatingProver)
+          creator.getEnv().getNewProver(true, manager, creator, options);
+    }
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, creator, newProverEnvironment0(options), options, null);
   }
 
   @Override

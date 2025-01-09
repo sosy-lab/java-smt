@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.boolector;
 
+import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
+
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
@@ -29,6 +31,7 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
 
 public final class BoolectorSolverContext extends AbstractSolverContext {
 
@@ -206,8 +209,16 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException("Boolector does not support interpolation");
+      Set<ProverOptions> options) {
+    Preconditions.checkState(!closed, "solver context is already closed");
+    if (!hasIndependentInterpolationStrategy(options)) {
+      throw new UnsupportedOperationException(
+          "Boolector does not support interpolation natively. Try "
+              + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"
+              + " GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
+    }
+    return new IndependentInterpolatingProverEnvironment<>(
+        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
   }
 
   @Override
