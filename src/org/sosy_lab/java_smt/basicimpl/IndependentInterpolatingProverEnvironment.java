@@ -134,7 +134,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    return List.of();
+    throw new UnsupportedOperationException(
+        "TreeInterpolants are not supported for independent " + "interpolation currently.");
   }
 
   /**
