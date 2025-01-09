@@ -151,11 +151,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     final ImmutableList<BooleanFormula> originalStack =
         ImmutableList.copyOf(super.getAssertedFormulas());
 
-    clearStack();
-
     BooleanFormula interpolant = computeModelBasedInterpolant(pFormulasOfA, pFormulasOfB);
-
-    restoreStack(originalStack);
 
     return interpolant;
   }
@@ -189,6 +185,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
 
+    ProverEnvironment itpProver = getDistinctProver();
+
     BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
     BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
 
@@ -202,16 +200,16 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
     // check the satisfiability of the constraints and generate a model if possible
-    push(bmgr.and(left, right));
+    itpProver.push(bmgr.and(left, right));
 
-    if (!isUnsat()) {
-      BooleanFormula interpolant = getModel().eval(itp);
+    if (!itpProver.isUnsat()) {
+      BooleanFormula interpolant = itpProver.getModel().eval(itp);
       Preconditions.checkNotNull(interpolant);
-      pop(); // remove left and right from stack
+      itpProver.close();
       return interpolant;
     }
 
-    pop(); // remove left and right from stack
+    itpProver.close();
     return bmgr.makeFalse();
   }
 
@@ -244,6 +242,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private BooleanFormula getQuantifierEliminationBasedInterpolant(
       Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
       throws SolverException, InterruptedException {
+
+    ProverEnvironment itpProver = getDistinctProver();
 
     BooleanFormula conjugatedA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedB = bmgr.and(formulasOfB);
@@ -311,6 +311,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     }
 
     return formulasOfB;
+  }
+
+  private ProverEnvironment getDistinctProver() {
+    return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
   /**
