@@ -205,6 +205,14 @@ public class ParserSymbolsEscapedTest extends SolverBasedTest0 {
         assume().that(symbol).matches("^[~!@$%^&*_\\-+=<>.?\\/0-9a-zA-Z]+$");
       }
     }
+    if (solver == Solvers.SMTINTERPOL) {
+      // TODO Report as a bug
+      assume().that(dequote(symbol)).isNoneOf("true", "false", "ꯍ");
+    }
+    if (solver == Solvers.OPENSMT) {
+      // TODO Report as a bug
+      assume().that(dequote(symbol)).isNoneOf("true", "false");
+    }
     assertThrows(IllegalArgumentException.class, () -> parseSymbol(symbol, false));
   }
 
