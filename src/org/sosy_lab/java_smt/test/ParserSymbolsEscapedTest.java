@@ -78,7 +78,12 @@ public class ParserSymbolsEscapedTest extends SolverBasedTest0 {
           "define-fun-rec",
           "store",
           "concat",
-          "=");
+          "=",
+          "true",
+          "false",
+          "and",
+          "or",
+          "distinct");
 
   @Parameters(name = "{0},{1}")
   public static Collection<Object[]> data() {
