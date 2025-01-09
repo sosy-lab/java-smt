@@ -52,8 +52,8 @@ public class IndependentInterpolation {
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         InterpolatingProverEnvironment<?> prover =
-            context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_MODELS,
-                ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
+            context.newProverEnvironmentWithInterpolation(
+                ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
