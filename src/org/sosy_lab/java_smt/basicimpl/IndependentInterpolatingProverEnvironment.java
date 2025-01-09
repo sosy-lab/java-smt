@@ -224,8 +224,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
       throws SolverException, InterruptedException {
 
-    ProverEnvironment itpProver = getDistinctProver();
-
     BooleanFormula conjugatedA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
@@ -262,10 +260,15 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfA, sharedVars);
 
-    if (!boundVars.equals(sharedVars)) {
+    if (!boundVars.isEmpty()) {
       BooleanFormula forward = qfmgr.exists(boundVars, formulasOfA);
       return qfmgr.eliminateQuantifiers(forward);
     }
+
+    // TODO: catch possible exception and rethrow with additional information about the context
+
+    // TODO: check that the quantifier has been eliminated properly and return either false or an
+    //  error if its still present!
 
     return formulasOfA;
   }
@@ -286,10 +289,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
 
-    if (!boundVars.equals(sharedVars)) {
+    if (!boundVars.isEmpty()) {
       BooleanFormula backward = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
       return qfmgr.eliminateQuantifiers(backward);
     }
+    // TODO: catch possible exception and rethrow with additional information about the context
+
+    // TODO: check that the quantifier has been eliminated properly and return either false or an
+    //  error if its still present!
 
     return formulasOfB;
   }
@@ -320,7 +327,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Identifies the bound variables in a formula.
+   * Identifies the bound variables in a formula. Variables are bound for uniform interpolation in a
+   * quantified formula only if they are not shared between A and B.
    *
    * @param vars The list of all variables in the formula to identify the bound ones.
    * @param sharedVars The shared variables between formulas A and B.
@@ -332,7 +340,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
             .filter(var -> !sharedVars.contains(var))
             .collect(ImmutableList.toImmutableList());
 
-    return boundVars.isEmpty() ? ImmutableList.copyOf(vars) : boundVars;
+    return boundVars;
   }
 
   /**
