@@ -356,6 +356,24 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
+  public void simplifyBVTest() throws SolverException, InterruptedException {
+    requireBitvectors();
+    // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
+    BitvectorFormula num1 = bvmgr.makeBitvector(4, 1);
+    BitvectorFormula num2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
+    BitvectorFormula x = bvmgr.makeVariable(4, "x");
+    BitvectorFormula y = bvmgr.makeVariable(4, "y");
+    BitvectorFormula z = bvmgr.makeVariable(4, "z");
+    BooleanFormula f =
+        bmgr.and(
+            bvmgr.equal(x, num1),
+            bvmgr.equal(y, bvmgr.add(x, num2)),
+            bvmgr.equal(z, bvmgr.add(y, num3)));
+    assertThatFormula(mgr.simplify(f)).isEquisatisfiableTo(f);
+  }
+
+  @Test
   public void simplifyArrayTest() throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
