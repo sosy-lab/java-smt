@@ -41,11 +41,7 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
 @SuppressWarnings("checkstyle:linelength")
-public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0 {
-  @Override
-  public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
-  }
+public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();

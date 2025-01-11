@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.solvers.Solverless;
 
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -43,7 +44,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   private String representation = "";
   private final FormulaTypesForChecking formulaType;
   private String value = "";
-  private boolean representationIsOnlyValue=false;
+
 
 
   public DummyFormula(FormulaTypesForChecking pFormulaType) {
@@ -70,14 +71,6 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   }
 
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String pName) {
-    name = pName;
-  }
-
   public DummyFormula(
       DummyFormula pfirstArrayParameter,
       DummyFormula psecondArrayParameter) { //if it represents an array
@@ -99,6 +92,12 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     this.bitvectorLength = pBitvectorLength;
     formulaType = FormulaTypesForChecking.BITVECTOR;
     updateRepresentation();
+  }
+  public void setName(String name){
+    this.name = name;
+  }
+  public String getName(){
+    return name;
   }
 
   public static DummyFormula getDummyFormulaFromObject(FormulaType<?> pType) {
@@ -134,6 +133,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     }
     return new DummyFormula(FormulaTypesForChecking.DUMMY);
   }
+
   private String getArrayRepresentation() {
     StringBuilder representationBuilder = new StringBuilder("Array<");
 
@@ -196,7 +196,8 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
           throw new IllegalArgumentException("Unsupported type: " + representation);
       }
     } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException("Invalid representation or unsupported type: " + representation, e);
+      throw new IllegalArgumentException(
+          "Invalid representation or unsupported type: " + representation, e);
     }
   }
 
@@ -215,7 +216,6 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     }
     return -1;
   }
-
 
 
   private void updateRepresentation() {
@@ -243,7 +243,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
         this.representation = "Regex";
         break;
       default:
-        this.representation = "Unknown";
+        this.representation = formulaType.toString();
         break;
     }
   }
@@ -315,10 +315,6 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     secondArrayParameter = pSecondArrayParameter;
   }
 
-  public void activateRepresentationIsOnlyValue() {
-    representationIsOnlyValue = true;
-  }
-
   public String getValue() {
     return value;
   }
@@ -328,16 +324,41 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     updateRepresentation();
   }
 
-  public void normalizeValue() {
-    updateRepresentation();
-    representation = value;
+  public boolean equals(DummyFormula other) {
+    if (this.formulaType != other.formulaType) {
+      return false;
+    }
+    switch (formulaType) {
+      case BITVECTOR:
+        return bitvectorLength == other.bitvectorLength && representation.equals(
+            other.representation);
+      case FLOATING_POINT:
+        return exponent == other.exponent && mantissa == other.mantissa && Objects.equals(value,
+            other.value);
+      case ARRAY:
+        return firstArrayParameter.equals(other.firstArrayParameter) && secondArrayParameter.equals(
+            other.secondArrayParameter);
+      case RATIONAL:
+      case INTEGER:
+      case STRING:
+      case REGEX:
+      case BOOLEAN:
+      case DUMMY:
+        return Objects.equals(value, other.value);
+      default:
+        return exponent == other.exponent
+            && mantissa == other.mantissa
+            && Objects.equals(value, other.value)
+            && Objects.equals(firstArrayParameter, other.firstArrayParameter)
+            && Objects.equals(secondArrayParameter, other.secondArrayParameter)
+            && bitvectorLength == other.bitvectorLength;
+    }
+
   }
+
 
   @Override
   public String toString() {
-    if(representationIsOnlyValue) {
-      return value;
-    }
     return representation;
   }
 

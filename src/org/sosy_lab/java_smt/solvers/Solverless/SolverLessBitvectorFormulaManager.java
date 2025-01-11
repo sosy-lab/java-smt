@@ -37,14 +37,13 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking
 public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
     FormulaTypesForChecking, DummyEnv, DummyFunction> {
 
-  DummyFormula dummyIntegerFormula = new DummyFormula(FormulaTypesForChecking.INTEGER);
-  DummyFormula dummyBitvectorFormula = new DummyFormula(32);
 
   protected SolverLessBitvectorFormulaManager(SolverLessFormulaCreator pSolverLessFormulaCreator,
                                               SolverLessBooleanFormulaManager pSolverLessBooleanFormulaManager)
   {
     super(pSolverLessFormulaCreator, pSolverLessBooleanFormulaManager);
   }
+
 
   @Override
   protected DummyFormula makeBitvectorImpl(int length, DummyFormula pParam1) {

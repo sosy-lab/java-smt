@@ -65,6 +65,19 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
+  public void testMakeString(){
+    requireStrings();
+    StringFormula a = Objects.requireNonNull(smgr).makeString("a");
+    StringFormula b = Objects.requireNonNull(smgr).makeVariable("a");
+    BooleanFormula constraint = smgr.equal(a, b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult = "(declare-const a String)\n"
+        + "(assert (= \"a\" a))\n";
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
   public void testConcat() {
     requireStrings();
     StringFormula a = smgr.makeVariable("a");

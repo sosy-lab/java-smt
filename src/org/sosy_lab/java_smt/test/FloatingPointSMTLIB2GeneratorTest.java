@@ -2,6 +2,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
@@ -19,7 +20,7 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Override
   public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
+    return Solvers.Z3;
   }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -309,9 +310,9 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const b Bool)\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert ((_ cast_from Bool true) b))\n";
+    String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
+        + "(declare-const b Bool)\n"
+        + "(assert (fp.eq result ((_ from_generic RNE) b)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -319,8 +320,9 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testFromIeeeBitvector() {
     requireFloats();
-    BitvectorFormula bv = bvmgr.makeVariable(BitvectorType.getBitvectorTypeWithSize(32),
-        "bv");
+    requireBitvectors();
+    BitvectorFormula bv = bvmgr.makeBitvector(32, new BigInteger("00000000000000000000000000000000",
+        2));
     FloatingPointFormula result = fpmgr.makeVariable("result",
         FloatingPointType.getSinglePrecisionFloatingPointType());
 
@@ -331,9 +333,30 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String actualResult = String.valueOf(Generator.getLines());
 
+    String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq (((_ to_fp 8 23) #b00000000000000000000000000000000) result))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testFromIeeeBitvectorWithVariable() {
+    requireFloats();
+    requireBitvectors();
+    BitvectorFormula bv = bvmgr.makeVariable(32, "bv");
+    FloatingPointFormula result = fpmgr.makeVariable("result",
+        FloatingPointType.getSinglePrecisionFloatingPointType());
+
+
+    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(
+        fpmgr.fromIeeeBitvector(bv,
+            FloatingPointType.getSinglePrecisionFloatingPointType()), result));
+
+    String actualResult = String.valueOf(Generator.getLines());
+
     String expectedResult = "(declare-const bv (_ BitVec 32))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (_ to_fp 8 23) bv))\n";
+        + "(assert (fp.eq (((_ to_fp 8 23) bv) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

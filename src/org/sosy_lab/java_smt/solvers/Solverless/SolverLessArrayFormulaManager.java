@@ -59,7 +59,7 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected DummyFormula store(DummyFormula pArray, DummyFormula pIndex, DummyFormula pValue) {
-    return pArray;
+    return new DummyFormula(pIndex, pValue);
   }
 
   @Override

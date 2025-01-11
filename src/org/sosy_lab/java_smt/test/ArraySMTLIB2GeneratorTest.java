@@ -25,11 +25,8 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
-public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
-  }
+public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();

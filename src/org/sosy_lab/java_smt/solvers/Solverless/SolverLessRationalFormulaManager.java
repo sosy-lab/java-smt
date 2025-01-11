@@ -72,7 +72,9 @@ public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaMa
   }
   @Override
   public IntegerFormula floor(NumeralFormula number) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    result.setRepresentation(number.toString());
+    return result;
   }
   @Override
   public FormulaType<RationalFormula> getFormulaType() {

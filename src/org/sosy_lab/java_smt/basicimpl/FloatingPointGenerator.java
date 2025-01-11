@@ -205,7 +205,8 @@ public class FloatingPointGenerator {
 
   protected static void logFromIeeeBitvector(
       FloatingPointFormula result, BitvectorFormula number, FloatingPointType type) {
-    logSimple(result, "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ") " + number + ")");
+    logUnaryOp(result,
+        "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ")", number);
   }
 
   protected static void logToIeeeBitvector(BitvectorFormula result, FloatingPointFormula number) {
