@@ -52,9 +52,9 @@ public class OpenSmtNativeAPITest {
       return vars;
     } else {
       VectorPTRef vars = new VectorPTRef();
-      for (PTRef sub : logic.getPterm(term).getArgs()) {
-        VectorPTRef res = variables(logic, sub);
-        vars.addAll(res);
+      for (int i = 0; i < logic.getPterm(term).size(); i++) {
+        PTRef sub = logic.getPterm(term).at(i);
+        vars.addAll(variables(logic, sub));
       }
       return vars;
     }
@@ -435,6 +435,7 @@ public class OpenSmtNativeAPITest {
 
     SMTConfig config = new SMTConfig();
     config.setOption(":produce-unsat-cores", new SMTOption(true));
+    config.setOption(":print-cores-full", new SMTOption(true));
 
     MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
 

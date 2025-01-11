@@ -31,8 +31,7 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
     
     <publications defaultconf="solver-opensmt">
-        <!-- Linux native libraries -->
-        <artifact name="libopensmt" conf="solver-opensmt-linux" type="shared-object" ext="so"/>
+        <!-- Linux native library -->
         <artifact name="libopensmtjava" conf="solver-opensmt-linux" type="shared-object" ext="so"/>
         <!-- Java code, docs and source -->
         <artifact name="opensmt" conf="solver-opensmt-common" ext="jar"/>

@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore Arithmetic_t;
 
 %ignore ArithProperty;
@@ -23,17 +24,18 @@
 %ignore getLogicFromString(const std::string & name);
 %ignore getStringFromLogic(const Logic_t logic);
 
-%ignore opensmt::LogicFactory::LogicFactory();
+%ignore LogicFactory::LogicFactory();
 
-%newobject opensmt::LogicFactory::getInstance(Logic_t);
-%newobject opensmt::LogicFactory::getLAInstance(Logic_t);
-%newobject opensmt::LogicFactory::getLRAInstance();
-%newobject opensmt::LogicFactory::getLIAInstance();
+%newobject LogicFactory::getInstance(Logic_t);
+%newobject LogicFactory::getLAInstance(Logic_t);
+%newobject LogicFactory::getLRAInstance();
+%newobject LogicFactory::getLIAInstance();
 
-%extend opensmt::LogicFactory {
+%extend LogicFactory {
   static std::string getVersion() {
     return std::string(VERSION);
   }
  }
+}
 
-%include "include/opensmt/LogicFactory.h"
+%include "include/opensmt/logics/LogicFactory.h"

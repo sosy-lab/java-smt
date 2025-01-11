@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore InterpolationContext::InterpolationContext (SMTConfig &c, Theory &th, TermMapper &termMapper, ResolutionProof const &t, PartitionManager &pmanager);
 %ignore InterpolationContext::printProofDotty ();
 %ignore InterpolationContext::getInterpolants (const std::vector< vec< int > > &partitions, vec< PTRef > &interpolants);
@@ -39,5 +40,6 @@
     return result;
  }
 }
+}
 
-%include "include/opensmt/InterpolationContext.h"
+%include "include/opensmt/proof/InterpolationContext.h"

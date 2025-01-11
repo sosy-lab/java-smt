@@ -248,20 +248,13 @@ SPDX-License-Identifier: Apache-2.0
       <classifier>libyices2j</classifier>
     </dependency>
 
-    <!-- OpenSMT has three dependencies (on Linux) -->
+    <!-- OpenSMT has two dependencies (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-opensmt</artifactId>
       <version>${opensmt.version}</version>
       <type>jar</type>
       <classifier>opensmt</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-opensmt</artifactId>
-      <version>${opensmt.version}</version>
-      <type>so</type>
-      <classifier>libopensmt</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
@@ -497,13 +490,6 @@ SPDX-License-Identifier: Apache-2.0
                 <type>so</type>
                 <classifier>libopensmtjava</classifier>
                 <destFileName>libopensmtjava.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-opensmt</artifactId>
-                <type>so</type>
-                <classifier>libopensmt</classifier>
-                <destFileName>libopensmt.so</destFileName>
               </artifactItem>
             </artifactItems>
           </configuration>
