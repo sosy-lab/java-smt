@@ -88,10 +88,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="33.3.1-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="33.4.0-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="33.3.1-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="33.4.0-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -103,7 +103,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.11.0" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.48.1" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.48.4" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -134,7 +134,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.24.0" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.25.2" conf="format-source->default"/>
 
         <!-- SpotBugs -->
         <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.8.6" conf="spotbugs->default"/>
@@ -144,7 +144,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.19.0" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.21.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
