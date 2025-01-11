@@ -21,8 +21,10 @@
 
 %module OsmtNative
 %{
-#include "Version.h"
-#include "include/opensmt/Opensmt.h"
+#include "version.h"
+#include <api/Opensmt.h>
+
+using namespace opensmt;
 %}
 
 %include <stdint.i>
@@ -31,15 +33,15 @@
 %include <std_vector.i>
 
 %template(VectorInt)       std::vector<int>;
-%template(VectorPTRef)     std::vector<PTRef>;
-%template(VectorSRef)      std::vector<SRef>;
-%template(VectorSymRef)    std::vector<SymRef>;
+%template(VectorPTRef)     std::vector<opensmt::PTRef>;
+%template(VectorSRef)      std::vector<opensmt::SRef>;
+%template(VectorSymRef)    std::vector<opensmt::SymRef>;
 %template(VectorVectorInt) std::vector<std::vector<int>>;
 
 %include <std_unique_ptr.i>
 
-%unique_ptr(Model);
-%unique_ptr(InterpolationContext);
+%unique_ptr(opensmt::Model);
+%unique_ptr(opensmt::InterpolationContext);
 
 %exception {
   try { $action }
@@ -60,16 +62,16 @@
   }
 }
 
-%include "swig/opensmt/Logic.i"
-%include "swig/opensmt/ArithLogic.i"
-%include "swig/opensmt/FunctionTools.i"
-%include "swig/opensmt/InterpolationContext.i"
-%include "swig/opensmt/LogicFactory.i"
-%include "swig/opensmt/MainSolver.i"
-%include "swig/opensmt/Model.i"
-%include "swig/opensmt/Pterm.i"
 %include "swig/opensmt/PTRef.i"
-%include "swig/opensmt/SMTConfig.i"
 %include "swig/opensmt/SSort.i"
 %include "swig/opensmt/Symbol.i"
 %include "swig/opensmt/SymRef.i"
+%include "swig/opensmt/InterpolationContext.i"
+%include "swig/opensmt/LogicFactory.i"
+%include "swig/opensmt/SMTConfig.i"
+%include "swig/opensmt/FunctionTools.i"
+%include "swig/opensmt/Pterm.i"
+%include "swig/opensmt/Model.i"
+%include "swig/opensmt/MainSolver.i"
+%include "swig/opensmt/Logic.i"
+%include "swig/opensmt/ArithLogic.i"
