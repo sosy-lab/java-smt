@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBitvectorF
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaBooleanFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointFormula;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaFormula.BitwuzlaFloatingPointRoundingModeFormula;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
@@ -577,6 +578,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public Object convertValue(Term term) {
+    term = simplify(term); // simplify complex terms like "ITE(bv1,bv0,bv1)"
     Preconditions.checkArgument(term.is_value(), "Term \"%s\" is not a value.", term);
     Sort sort = term.sort();
     if (sort.is_bool()) {
@@ -625,5 +627,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     }
 
     return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
+  }
+
+  public Term simplify(Term t) {
+    return new Bitwuzla(getTermManager()).simplify(t);
   }
 }
