@@ -177,6 +177,6 @@ public final class BitwuzlaFormulaManager
 
   @Override
   public Term simplify(Term t) {
-    return creator.simplify(t);
+    return new Bitwuzla(creator.getTermManager()).simplify(t);
   }
 }
