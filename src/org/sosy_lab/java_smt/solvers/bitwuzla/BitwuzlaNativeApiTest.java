@@ -55,7 +55,6 @@ public class BitwuzlaNativeApiTest {
 
   private Options createOptions() {
     Options options = new Options();
-    options.set(Option.REWRITE_LEVEL, 0);
     options.set(Option.PRODUCE_MODELS, 2);
     return options;
   }

@@ -79,6 +79,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
             <arg value="--static"/>
             <arg value="--wipe"/>
+            <arg value="--fpexp"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.installPath}"/>
         </exec>
@@ -102,6 +103,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--win64"/>
             <arg value="--static"/>
             <arg value="--wipe"/>
+            <arg value="--fpexp"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.installPath}"/>
         </exec>

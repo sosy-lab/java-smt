@@ -1559,7 +1559,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -1861,7 +1861,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -2151,7 +2151,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -2441,7 +2441,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -2577,7 +2577,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -2760,7 +2760,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -2778,7 +2778,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Result)bitwuzla::Result::SAT;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2798,7 +2798,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Result)bitwuzla::Result::UNSAT;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2818,7 +2818,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Result)bitwuzla::Result::UNKNOWN;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2838,7 +2838,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla::RoundingMode::RNE;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2858,7 +2858,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla::RoundingMode::RNA;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2878,7 +2878,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla::RoundingMode::RTN;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2898,7 +2898,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla::RoundingMode::RTP;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2918,7 +2918,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla::RoundingMode::RTZ;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2938,7 +2938,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Kind)bitwuzla::Kind::CONSTANT;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2958,7 +2958,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)bitwuzla::copyright();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2978,7 +2978,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)bitwuzla::version();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -2998,7 +2998,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)bitwuzla::git_id();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3018,7 +3018,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Options *)new bitwuzla::Options();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3038,7 +3038,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3063,7 +3063,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Options *)new bitwuzla::Options((bitwuzla::Options const &)*arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3096,7 +3096,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Options const *)arg1)->is_valid((std::string const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3121,7 +3121,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Options const *)arg1)->is_bool(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3146,7 +3146,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Options const *)arg1)->is_numeric(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3171,7 +3171,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Options const *)arg1)->is_mode(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3196,7 +3196,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)((bitwuzla::Options const *)arg1)->shrt(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3221,7 +3221,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)((bitwuzla::Options const *)arg1)->lng(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3246,7 +3246,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (char *)((bitwuzla::Options const *)arg1)->description(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3271,7 +3271,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Options const *)arg1)->modes(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3300,7 +3300,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Option)((bitwuzla::Options const *)arg1)->option((char const *)arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3334,7 +3334,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->set(arg2,(std::string const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3373,7 +3373,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->set((std::string const &)*arg2,(std::string const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3399,7 +3399,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->set((std::vector< std::string > const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3422,7 +3422,7 @@ SWIGEXPORT jobject JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (uint64_t)((bitwuzla::Options const *)arg1)->get(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3464,7 +3464,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = (std::string *) &((bitwuzla::Options const *)arg1)->get_mode(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3489,7 +3489,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       bitwuzla_Options_set__SWIG_3(arg1,arg2,arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3507,7 +3507,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Term *)new bitwuzla::Term();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3527,7 +3527,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -3548,7 +3548,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_null();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3571,7 +3571,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Kind)((bitwuzla::Term const *)arg1)->kind();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3594,7 +3594,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->sort();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3617,7 +3617,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->num_children();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3640,7 +3640,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->children();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3665,7 +3665,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->operator [](arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3688,7 +3688,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->num_indices();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3711,7 +3711,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_const();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3734,7 +3734,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_variable();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3757,7 +3757,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_value();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3780,7 +3780,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_true();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3803,7 +3803,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_false();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3826,7 +3826,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_bv_value_zero();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3849,7 +3849,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_bv_value_one();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3872,7 +3872,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_bv_value_ones();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3895,7 +3895,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_bv_value_min_signed();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3918,7 +3918,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_bv_value_max_signed();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3941,7 +3941,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_fp_value_pos_zero();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3964,7 +3964,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_fp_value_neg_zero();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -3987,7 +3987,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_fp_value_pos_inf();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4010,7 +4010,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_fp_value_neg_inf();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4033,7 +4033,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_fp_value_nan();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4056,7 +4056,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_rm_value_rna();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4079,7 +4079,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_rm_value_rne();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4102,7 +4102,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_rm_value_rtn();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4125,7 +4125,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_rm_value_rtp();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4148,7 +4148,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Term const *)arg1)->is_rm_value_rtz();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4173,7 +4173,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->str(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4196,7 +4196,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = ((bitwuzla::Term const *)arg1)->str();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4219,7 +4219,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Term_id(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4242,7 +4242,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_Term_indices(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4286,7 +4286,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)bitwuzla_Term_to_bool(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4309,7 +4309,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::RoundingMode)bitwuzla_Term_to_rm(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4332,7 +4332,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = bitwuzla_Term_to_bv(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4355,7 +4355,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Term_hashCode(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4387,7 +4387,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)bitwuzla_Term_isEqual(arg1,SWIG_STD_MOVE(arg2));
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4407,7 +4407,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Sort *)new bitwuzla::Sort();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4427,7 +4427,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -4448,7 +4448,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_null();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4471,7 +4471,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Sort const *)arg1)->array_index();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4494,7 +4494,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Sort const *)arg1)->array_element();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4517,7 +4517,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Sort const *)arg1)->fun_domain();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4540,7 +4540,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::Sort const *)arg1)->fun_codomain();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4563,7 +4563,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_array();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4586,7 +4586,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_bool();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4609,7 +4609,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_bv();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4632,7 +4632,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_fp();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4655,7 +4655,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_fun();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4678,7 +4678,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)((bitwuzla::Sort const *)arg1)->is_rm();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4701,7 +4701,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = ((bitwuzla::Sort const *)arg1)->str();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4724,7 +4724,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_id(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4747,7 +4747,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_bv_size(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4770,7 +4770,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_fp_exp_size(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4793,7 +4793,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_fp_sig_size(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4816,7 +4816,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_fun_arity(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4839,7 +4839,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (int)bitwuzla_Sort_hashCode(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4871,7 +4871,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)bitwuzla_Sort_isEqual(arg1,SWIG_STD_MOVE(arg2));
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4891,7 +4891,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -4912,7 +4912,7 @@ SWIGEXPORT jboolean JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bi
   {
     try {
       result = (bool)(arg1)->terminate();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4932,7 +4932,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Terminator *)new SwigDirector_Terminator(jenv);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4970,7 +4970,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::TermManager *)new bitwuzla::TermManager();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -4990,7 +4990,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -5025,7 +5025,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_array_sort((bitwuzla::Sort const &)*arg2,(bitwuzla::Sort const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5048,7 +5048,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bool_sort();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5085,7 +5085,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fun_sort((std::vector< bitwuzla::Sort > const &)*arg2,(bitwuzla::Sort const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5108,7 +5108,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_true();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5131,7 +5131,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_false();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5161,7 +5161,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_zero((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5191,7 +5191,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_one((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5221,7 +5221,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_ones((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5251,7 +5251,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_min_signed((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5281,7 +5281,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_max_signed((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5323,7 +5323,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_value((bitwuzla::Sort const &)*arg2,(std::string const &)*arg3,arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5363,7 +5363,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_value((bitwuzla::Sort const &)*arg2,(std::string const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5420,7 +5420,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_value_uint64((bitwuzla::Sort const &)*arg2,arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5452,7 +5452,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_bv_value_int64((bitwuzla::Sort const &)*arg2,arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5482,7 +5482,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_pos_zero((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5512,7 +5512,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_neg_zero((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5542,7 +5542,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_pos_inf((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5572,7 +5572,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_neg_inf((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5602,7 +5602,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_nan((bitwuzla::Sort const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5646,7 +5646,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_value((bitwuzla::Term const &)*arg2,(bitwuzla::Term const &)*arg3,(bitwuzla::Term const &)*arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5693,7 +5693,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_value((bitwuzla::Sort const &)*arg2,(bitwuzla::Term const &)*arg3,(std::string const &)*arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5750,7 +5750,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_fp_value((bitwuzla::Sort const &)*arg2,(bitwuzla::Term const &)*arg3,(std::string const &)*arg4,(std::string const &)*arg5);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5787,7 +5787,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_const_array((bitwuzla::Sort const &)*arg2,(bitwuzla::Term const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5812,7 +5812,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->mk_rm_value(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5849,7 +5849,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->substitute_term((bitwuzla::Term const &)*arg2,(std::unordered_map< bitwuzla::Term,bitwuzla::Term > const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5884,7 +5884,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->substitute_terms(*arg2,(std::unordered_map< bitwuzla::Term,bitwuzla::Term > const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -5907,7 +5907,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_bv_sort(arg1,arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5934,7 +5934,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_fp_sort(arg1,arg2,arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -5966,7 +5966,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_0(arg1,arg2,(bitwuzla::Term const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6000,7 +6000,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_1(arg1,arg2,(bitwuzla::Term const &)*arg3,arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6036,7 +6036,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_2(arg1,arg2,(bitwuzla::Term const &)*arg3,arg4,arg5);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6075,7 +6075,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_3(arg1,arg2,(bitwuzla::Term const &)*arg3,(bitwuzla::Term const &)*arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6116,7 +6116,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_4(arg1,arg2,(bitwuzla::Term const &)*arg3,(bitwuzla::Term const &)*arg4,arg5);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6159,7 +6159,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_5(arg1,arg2,(bitwuzla::Term const &)*arg3,(bitwuzla::Term const &)*arg4,arg5,arg6);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6205,7 +6205,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_6(arg1,arg2,(bitwuzla::Term const &)*arg3,(bitwuzla::Term const &)*arg4,(bitwuzla::Term const &)*arg5);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6244,7 +6244,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_term__SWIG_7(arg1,arg2,(std::vector< bitwuzla::Term > const &)*arg3,(std::vector< int > const &)*arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6283,7 +6283,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_const(arg1,(bitwuzla::Sort const &)*arg2,SWIG_STD_MOVE(arg3));
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6322,7 +6322,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = bitwuzla_TermManager_mk_var(arg1,(bitwuzla::Sort const &)*arg2,SWIG_STD_MOVE(arg3));
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6356,7 +6356,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Bitwuzla *)new bitwuzla::Bitwuzla(*arg1,(bitwuzla::Options const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6385,7 +6385,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::Bitwuzla *)new bitwuzla::Bitwuzla(*arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6410,7 +6410,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (void)arg1; delete smartarg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6435,7 +6435,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->configure_terminator(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6459,7 +6459,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->push(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6483,7 +6483,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->pop(arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6512,7 +6512,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->assert_formula((bitwuzla::Term const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6536,7 +6536,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->get_assertions();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6562,7 +6562,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->get_unsat_assumptions();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6588,13 +6588,46 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->get_unsat_core();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
     }
   }
   *(std::vector< bitwuzla::Term > **)&jresult = new std::vector< bitwuzla::Term >(result); 
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_BitwuzlaNativeJNI_Bitwuzla_1simplify(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_, jlong jarg2, jobject jarg2_) {
+  jlong jresult = 0 ;
+  bitwuzla::Bitwuzla *arg1 = (bitwuzla::Bitwuzla *) 0 ;
+  bitwuzla::Term *arg2 = 0 ;
+  std::shared_ptr< bitwuzla::Bitwuzla > *smartarg1 = 0 ;
+  bitwuzla::Term result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  (void)jarg2_;
+  
+  smartarg1 = *(std::shared_ptr<  bitwuzla::Bitwuzla > **)&jarg1;
+  arg1 = (bitwuzla::Bitwuzla *)(smartarg1 ? smartarg1->get() : 0); 
+  arg2 = *(bitwuzla::Term **)&jarg2;
+  if (!arg2) {
+    SWIG_JavaThrowException(jenv, SWIG_JavaNullPointerException, "bitwuzla::Term const & is null");
+    return 0;
+  } 
+  {
+    try {
+      result = (arg1)->simplify((bitwuzla::Term const &)*arg2);
+    } catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+  }
+  *(bitwuzla::Term **)&jresult = new bitwuzla::Term(result); 
   return jresult;
 }
 
@@ -6621,7 +6654,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Result)(arg1)->check_sat((std::vector< bitwuzla::Term > const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6647,7 +6680,7 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       result = (bitwuzla::Result)(arg1)->check_sat();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6680,7 +6713,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->get_value((bitwuzla::Term const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6706,7 +6739,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::TermManager *) &(arg1)->term_mgr();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6732,7 +6765,7 @@ SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bit
   {
     try {
       result = bitwuzla_Bitwuzla_print_formula(arg1);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6776,7 +6809,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::parser::Parser *)new bitwuzla::parser::Parser(*arg1,*arg2,(std::string const &)*arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6810,7 +6843,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (bitwuzla::parser::Parser *)new bitwuzla::parser::Parser(*arg1,*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6830,7 +6863,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       delete arg1;
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6863,7 +6896,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->parse((std::string const &)*arg2,arg3,arg4);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6894,7 +6927,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->parse((std::string const &)*arg2,arg3);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6923,7 +6956,7 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwuz
   {
     try {
       (arg1)->parse((std::string const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return ;
@@ -6954,7 +6987,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->parse_term((std::string const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -6987,7 +7020,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->parse_sort((std::string const &)*arg2);
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -7010,7 +7043,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::parser::Parser const *)arg1)->get_declared_sorts();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -7033,7 +7066,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = ((bitwuzla::parser::Parser const *)arg1)->get_declared_funs();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
@@ -7056,7 +7089,7 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_bitwuzla_api_Bitwu
   {
     try {
       result = (arg1)->bitwuzla();
-    } catch(bitwuzla::Exception& e) {
+    } catch(std::exception& e) {
       jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
       jenv->ThrowNew(exceptionType, e.what());
       return 0;
