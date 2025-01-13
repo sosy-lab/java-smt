@@ -22,10 +22,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
-import ap.parser.IPlus;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
-import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -565,24 +562,8 @@ class PrincessEnvironment {
   }
 
   static FormulaType<?> getFormulaType(IExpression pFormula) {
-    // TODO: We could use Sort.sortof() here, but it sometimes returns `integer` even though the
-    //  term is rational. We should figure out why and then open a new issue for this.
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITimes) {
-      // coeff is always INT, lets check the subterm.
-      ITimes times = (ITimes) pFormula;
-      return getFormulaType(times.subterm());
-    } else if (pFormula instanceof IPlus) {
-      IPlus plus = (IPlus) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.t1());
-      FormulaType<?> t2 = getFormulaType(plus.t2());
-      return mergeFormulaTypes(t1, t2);
-    } else if (pFormula instanceof ITermITE) {
-      ITermITE plus = (ITermITE) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.left());
-      FormulaType<?> t2 = getFormulaType(plus.right());
-      return mergeFormulaTypes(t1, t2);
     } else {
       final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       try {
@@ -596,28 +577,6 @@ class PrincessEnvironment {
             e);
       }
     }
-  }
-
-  /**
-   * Merge INTEGER and RATIONAL type or INTEGER and BITVECTOR and return the more general type. The
-   * ordering is: RATIONAL > INTEGER > BITVECTOR.
-   *
-   * @throws IllegalArgumentException for any other type.
-   */
-  private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
-    if (type1.equals(type2)) {
-      return type1;
-    }
-    if ((type1.isIntegerType() || type1.isRationalType())
-        && (type2.isIntegerType() || type2.isRationalType())) {
-      return type1.isRationalType() ? type1 : type2;
-    }
-    if ((type1.isIntegerType() || type1.isBitvectorType())
-        && (type2.isIntegerType() || type2.isBitvectorType())) {
-      return type1.isIntegerType() ? type1 : type2;
-    }
-    throw new IllegalArgumentException(
-        String.format("Types %s and %s can not be merged.", type1, type2));
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
