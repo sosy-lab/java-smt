@@ -198,7 +198,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    // TODO: handle empty sets of variables, as they can not be quantified.
+    checkArgument(!varsOfA.isEmpty(),
+        "The set of variables for formulas of A is empty and cannot be quantified.");
+    checkArgument(!varsOfB.isEmpty(),
+        "The set of variables for formulas of B is empty and cannot be quantified.");
+    checkArgument(!sharedVars.isEmpty(),
+        "The set of the shared variables is empty and cannot be quantified.");
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(conjugatedA, itp));
