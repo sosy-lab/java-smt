@@ -285,6 +285,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       interpolant = getForwardInterpolant(conjugatedA, varsOfA, sharedVars);
     }
 
+    if (!satisfiesInterpolationCriteria(interpolant, conjugatedA, conjugatedB, varsOfA, varsOfB)) {
+      return bmgr.makeFalse();
+    }
+
     return interpolant;
   }
 
