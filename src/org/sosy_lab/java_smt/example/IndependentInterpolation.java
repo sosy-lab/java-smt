@@ -46,14 +46,14 @@ public class IndependentInterpolation {
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
     // choose solver
-    Solvers solver = Solvers.CVC5;
+    Solvers solver = Solvers.Z3;
 
     // setup context
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         InterpolatingProverEnvironment<?> prover =
             context.newProverEnvironmentWithInterpolation(
-                ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
+                ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
