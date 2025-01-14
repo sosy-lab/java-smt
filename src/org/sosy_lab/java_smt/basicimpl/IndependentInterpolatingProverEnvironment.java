@@ -122,7 +122,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         // return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate).getInterpolant
         // (pFormulasOfA);
       } else {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(
+            "Solver does not natively support interpolation in JavaSMT currently.");
       }
     }
 
