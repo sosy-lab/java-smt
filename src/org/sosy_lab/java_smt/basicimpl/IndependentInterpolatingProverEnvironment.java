@@ -117,7 +117,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
-        // TODO: this case
+        // TODO: this case throws a ClassCastException
         // Use native solver interpolation
         // return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate).getInterpolant
         // (pFormulasOfA);
