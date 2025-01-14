@@ -136,7 +136,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Preconditions.checkNotNull(interpolationStrategy);
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
-      return computeModelBasedInterpolant(formulasOfA, formulasOfB);
+      return getModelBasedInterpolant(formulasOfA, formulasOfB);
     } else {
       return getQuantifierEliminationBasedInterpolant(formulasOfA, formulasOfB);
     }
@@ -175,7 +175,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * @param pFormulasOfB A Collection of Boolean formulas of B.
    * @return the Craig interpolant Itp if it satisfies the conditions, otherwise returns false.
    */
-  private BooleanFormula computeModelBasedInterpolant(
+  private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
       throws InterruptedException, SolverException {
 
