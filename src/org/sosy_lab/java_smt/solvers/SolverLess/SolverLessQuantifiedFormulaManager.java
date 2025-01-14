@@ -18,13 +18,27 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessException extends SolverException {
-  public SolverLessException(@Nullable String msg) {
-    super(msg);
+public class SolverLessQuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+
+  protected SolverLessQuantifiedFormulaManager(SolverLessFormulaCreator pFormulaCreator) {
+    super(pFormulaCreator);
+  }
+
+  @Override
+  protected DummyFormula eliminateQuantifiers(DummyFormula pExtractInfo)
+      throws SolverException, InterruptedException {
+    return null;
+  }
+
+  @Override
+  public DummyFormula mkQuantifier(Quantifier q, List<DummyFormula> vars, DummyFormula body) {
+    return null;
   }
 }

@@ -18,9 +18,8 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import java.io.IOException;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.basicimpl.*;
 import org.sosy_lab.java_smt.api.*;

@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverLessBooleanFormulaManager;
 
 class StatisticsFormulaManager implements FormulaManager {
 

@@ -18,6 +18,6 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
-public class DummyFunction {}
+public class DummyEnv {}

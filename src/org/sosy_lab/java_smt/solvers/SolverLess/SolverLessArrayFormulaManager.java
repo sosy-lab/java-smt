@@ -18,16 +18,13 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,

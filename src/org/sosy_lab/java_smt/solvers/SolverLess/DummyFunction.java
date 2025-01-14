@@ -18,8 +18,6 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import org.sosy_lab.java_smt.api.NumeralFormula;
-
-public class DummyType implements NumeralFormula {}
+public class DummyFunction {}

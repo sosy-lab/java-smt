@@ -18,69 +18,65 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula,
-    IntegerFormula>
-    implements IntegerFormulaManager{
+public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaManager<NumeralFormula,
+    RationalFormula>
+    implements RationalFormulaManager {
 
-  public SolverLessIntegerFormulaManager(SolverLessFormulaCreator pCreator) {
-    super(pCreator);
+  public SolverLessRationalFormulaManager(SolverLessFormulaCreator creator) {
+    super(creator);
   }
 
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, Long.toString(i));
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, i.toString());
   }
 
   @Override
   protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER,i);
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, i);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, Double.toString(pNumber));
   }
-
   @Override
   protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
+    return new DummyFormula(FormulaTypesForChecking.RATIONAL, pNumber.toPlainString());
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String i) {
-
-    DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER);
+    DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL);
     result.setName(i);
     return result;
-  }
 
-  @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
   }
-
   @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+  public IntegerFormula floor(NumeralFormula number) {
+    DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    result.setRepresentation(number.toString());
+    return result;
   }
-
   @Override
-  public FormulaType<IntegerFormula> getFormulaType() {
-    return FormulaType.IntegerType;
+  public FormulaType<RationalFormula> getFormulaType() {
+    return FormulaType.RationalType;
   }
 }

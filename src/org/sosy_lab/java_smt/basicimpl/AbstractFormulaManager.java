@@ -50,7 +50,6 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverLessBooleanFormulaManager;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /**

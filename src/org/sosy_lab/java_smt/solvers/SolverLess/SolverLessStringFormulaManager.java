@@ -18,11 +18,10 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class SolverLessStringFormulaManager extends AbstractStringFormulaManager<DummyFormula,

@@ -18,30 +18,13 @@
  *  limitations under the License.
  */
 
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import org.sosy_lab.java_smt.api.Formula;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.java_smt.api.SolverException;
 
-public class SolverlessFormula implements Formula {
-
-  private final String representation;
-
-  public SolverlessFormula(String pRepresentation) {
-    this.representation = pRepresentation;
-  }
-
-  @Override
-  public String toString() {
-    return representation;
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    return 0;
+public class SolverLessException extends SolverException {
+  public SolverLessException(@Nullable String msg) {
+    super(msg);
   }
 }

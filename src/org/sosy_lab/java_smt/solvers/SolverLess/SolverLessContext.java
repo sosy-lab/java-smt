@@ -1,15 +1,11 @@
-package org.sosy_lab.java_smt.solvers.Solverless;
+package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.Set;
-import java.util.function.Consumer;
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverLessFormulaCreator;
-import org.sosy_lab.java_smt.solvers.Solverless.SolverLessFormulaManager;
 
 public final class SolverLessContext extends AbstractSolverContext {
 
