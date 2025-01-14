@@ -332,14 +332,15 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Computes the forward interpolant for a given formula A. In the forward direction, the variables
-   * specific to formula A are existentially quantified to describe the relationship between
-   * formulas A and B.
+   * Computes the uniform Craig interpolant, using the quantifier-based interpolation strategy
+   * utilizing quantifier-elimination in the forward direction.
    *
-   * @param formulasOfA The {@link BooleanFormula} representing the constraints in formula A.
-   * @param varsOfA The list of all variables in formula A.
-   * @param sharedVars The list of shared variables between formulas A and B.
-   * @return The forward interpolant.
+   * <p>Forward means, that the set of formulas A interpolates towards the set of formulas B.
+   *
+   * @param formulasOfA The set of formulas A, combined into one {@link BooleanFormula}.
+   * @param varsOfA A list of all variables in formulas of A.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
+   * @return a uniform Craig interpolant, using quantifier-elimination in the forward direction.
    */
   private BooleanFormula getForwardInterpolant(
       BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars) {
