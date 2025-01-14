@@ -392,12 +392,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Identifies the bound variables in a formula. Variables are bound for uniform interpolation in a
-   * quantified formula only if they are not shared between A and B.
+   * Determines the variables bound to a quantifier in a quantified set of formulas used for the
+   * quantifier-based interpolation strategy. These variables appear only in one set of formulas
+   * (either A or B) and can be safely removed by quantifier elimination.
    *
-   * @param vars The list of all variables in the formula to identify the bound ones.
-   * @param sharedVars The shared variables between formulas A and B.
-   * @return An immutable list of bound variables from a formula.
+   * @param vars A list of variables in the set of formulas to determine the bound variables.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
+   * @return An {@link ImmutableList} of bound variables, returns an empty list if these variables
+   *     appear in both sets of formulas A and B.
    */
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
     return vars.stream()
