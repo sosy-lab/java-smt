@@ -418,6 +418,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         PREFIX + UNIQUE_ID_GENERATOR.getFreshId(), FormulaType.BooleanType, sharedVars);
   }
 
+  /**
+   * Create a new, distinct prover to interpolate on. The set of formulas for interpolation will
+   * need to be translated to and from this new {@link ProverEnvironment} instance.
+   *
+   * @return A new {@link ProverEnvironment} enabled to generate models.
+   */
   private ProverEnvironment getDistinctProver() {
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
