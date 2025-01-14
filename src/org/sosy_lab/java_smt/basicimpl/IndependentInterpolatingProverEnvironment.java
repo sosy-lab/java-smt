@@ -370,10 +370,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Extracts all variables from the given {@link BooleanFormula}.
+   * Identifies all variables present in a set of formulas.
    *
-   * @param formulas The formula from which to extract all variables.
-   * @return An immutable list of all variables in the formula.
+   * @param formulas The set of formulas combined into one {@link BooleanFormula} from which all
+   *     variables will be identified.
+   * @return An {@link ImmutableList} containing all variables found in the given set of formulas.
    */
   private ImmutableList<Formula> getVars(BooleanFormula formulas) {
     return ImmutableList.copyOf(mgr.extractVariablesAndUFs(formulas).values());
