@@ -408,12 +408,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Creates an interpolant with a unique identifier that satisfies the third definition of a Craig
-   * Interpolant: its uninterpreted symbols are those shared between formulas A and B. This is used
-   * as part of the model-based interpolation strategy to generate the final Craig Interpolant.
+   * Declares and calls an uninterpreted function with a unique identifier to generate interpolants.
    *
-   * @param sharedVars The shared variables between formulas A and B.
-   * @return An interpolant whose uninterpreted symbols are those shared between formulas A and B.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
+   * @return An uninterpreted function with the {@code sharedVars} as symbols
    */
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
     return ufmgr.declareAndCallUF(
