@@ -306,18 +306,28 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
       throws SolverException, InterruptedException {
 
+    BooleanFormula itpBackward = formulasOfB;
+
     ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
-
     if (!boundVars.isEmpty()) {
-      BooleanFormula backward = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
-      return qfmgr.eliminateQuantifiers(backward);
+      try {
+        BooleanFormula itpBackwardQuantified = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
+        BooleanFormula itpBackwardQuantifierEliminated =
+            qfmgr.eliminateQuantifiers(itpBackwardQuantified);
+        // check that the quantifier has been eliminated properly
+        if (itpBackwardQuantifierEliminated.equals(itpBackwardQuantified)) {
+          throw new SolverException(
+              "Quantifier-elimination failed. "
+                  + "The resulting interpolant still contains quantifiers.");
+        }
+        itpBackward = itpBackwardQuantifierEliminated;
+      } catch (Exception e) {
+        throw new UnsupportedOperationException(
+            "Solver does not support quantifier-elimination (for this logic).", e);
+      }
     }
-    // TODO: catch possible exception and rethrow with additional information about the context
 
-    // TODO: check that the quantifier has been eliminated properly and return either false or an
-    //  error if its still present!
-
-    return formulasOfB;
+    return itpBackward;
   }
 
   /**
