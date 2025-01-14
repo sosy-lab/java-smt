@@ -400,6 +400,17 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
+  /**
+   * Checks, whether the returned interpolant indeed satisfies Craig interpolation.
+   *
+   * @param itp The given interpolant to check if it satisfies the definition of Craig interpolants.
+   * @param formulasOfA The set of formulas A, combined into one {@link BooleanFormula}.
+   * @param formulasOfB The set of formulas B, combined into one {@link BooleanFormula}.
+   * @param varsOfA A list of all variables in formulas of A.
+   * @param varsOfB A list of all variables in formulas of B.
+   * @return {@code true}, if the given interpolant is a valid Craig interpolant, returns {@code
+   *     false} otherwise.
+   */
   private boolean satisfiesInterpolationCriteria(
       BooleanFormula itp, BooleanFormula formulasOfA, BooleanFormula formulasOfB,
       List<Formula> varsOfA, List<Formula> varsOfB)
