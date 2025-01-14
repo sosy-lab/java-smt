@@ -20,31 +20,53 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
+
+import static com.google.common.truth.Truth.assertThat;
 
 import java.io.IOException;
+import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class ParseAndRegenerateTest extends SolverBasedTest0 {
+  @Override
+  public Solvers solverToUse() {
+    return Solvers.Z3;
+  }
 
-  public void tellSolver(){
+  public void tellSolver() {
     //query the smtlib outputs to the solver and see if it gets equivalent outputs
   }
-  public void testWithFloats()
+
+  @Test
+  public void evaluateWithInts()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    String file =
-        "(set_logic QF_FP)\n"
-        + "(declare-fun x () (_ FloatingPoint 11 23)\n"
-        + "(declare-fun y () (_ FloatingPoint 11 23)\n"
-        + "(assert (fp.eq (fp.add (x) (y)) 10)\n"
-        + "(check-sat)\n"
-        + "(get-model)";
-    BooleanFormula parsed = mgr.universalParseFromString(file);
+    String input =
+        "(set-logic QF_LIA)\n"
+            + "(declare-const x Int)\n"
+            + "(declare-const y Int)\n"
+            + "(assert (= (+ x y) 10))\n";
+    BooleanFormula parsed = mgr.universalParseFromString(input);
     Generator.assembleConstraint(parsed);
     String reparsed = String.valueOf(Generator.getLines());
-    assert(file.equals(reparsed));
+    assertThat(reparsed).isEqualTo(input);
+
+  }
+
+  @Test
+  public void evaluateWithReals()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    String input =
+        "(set-logic QF_LRA)\n"
+            + "(declare-const x Real)\n"
+            + "(declare-const y Real)\n"
+            + "(assert (= (+ x y) 10.0))\n";
+    BooleanFormula parsed = mgr.universalParseFromString(input);
+    Generator.assembleConstraint(parsed);
+    String reparsed = String.valueOf(Generator.getLines());
+    assertThat(reparsed).isEqualTo(input);
   }
 }
