@@ -400,12 +400,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * @return An immutable list of bound variables from a formula.
    */
   private ImmutableList<Formula> getBoundVars(List<Formula> vars, List<Formula> sharedVars) {
-    ImmutableList<Formula> boundVars =
-        vars.stream()
-            .filter(var -> !sharedVars.contains(var))
-            .collect(ImmutableList.toImmutableList());
-
-    return boundVars;
+    return vars.stream()
+        .filter(var -> !sharedVars.contains(var))
+        .collect(ImmutableList.toImmutableList());
   }
 
   /**
