@@ -81,6 +81,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     qfmgr = mgr.getQuantifiedFormulaManager();
   }
 
+  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> pOptions) {
+    return getIndependentInterpolationStrategy(pOptions) != null;
+  }
+
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> pOptions) {
     List<ProverOptions> itpStrat = new ArrayList<>(pOptions);
@@ -95,10 +99,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     }
     Preconditions.checkState(itpStrat.size() == 1);
     return itpStrat.get(0);
-  }
-
-  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> pOptions) {
-    return getIndependentInterpolationStrategy(pOptions) != null;
   }
 
   @Override
@@ -135,7 +135,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException(
-        "TreeInterpolants are not supported for independent " + "interpolation currently.");
+        "Tree interpolants are not supported for independent interpolation currently.");
   }
 
   /**
@@ -303,10 +303,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return formulasOfB;
   }
 
-  private ProverEnvironment getDistinctProver() {
-    return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-  }
-
   /**
    * Extracts all variables from the given {@link BooleanFormula}.
    *
@@ -356,6 +352,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private BooleanFormula getUniqueInterpolant(ImmutableList<Formula> sharedVars) {
     return ufmgr.declareAndCallUF(
         PREFIX + UNIQUE_ID_GENERATOR.getFreshId(), FormulaType.BooleanType, sharedVars);
+  }
+
+  private ProverEnvironment getDistinctProver() {
+    return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
   /**
