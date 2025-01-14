@@ -151,29 +151,38 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Computes Craig interpolants for a pair of formulas using a model-based approach.
+   * Computes Craig interpolants for a {@link Collection} of {@link BooleanFormula}s using the
+   * model-based solver independent interpolation strategy.
    *
-   * <p>The model-based approach takes two groups of Boolean formulas, A and B, as input and returns
-   * an interpolant Itp. The interpolant Itp satisfies the definition of Craig interpolation,
-   * meaning:
-   *
-   * <ol>
-   *   <li>(A -> Itp) is unsatisfiable,
-   *   <li>(Itp -> not B) is unsatisfiable, and
-   *   <li>Itp only contains symbols that appear in both formulas A and B.
-   * </ol>
-   *
-   * <p>The variables shared between A and B are used to define the interpolant Itp, ensuring Itp
-   * depends only on shared symbols. The constraints are created and checked for satisfiability:
+   * <p>This interpolation strategy takes two sets of {@link BooleanFormula}s, A and B, as input to
+   * generate Craig interpolants, based on the following definition of Craig interpolation:
    *
    * <ol>
-   *   <li>For all (a, c). (A(a, c) -> Itp(c)), and
-   *   <li>For all (b, c). (Itp(c) -> not (B(b, c))).
+   *   <li>The implication (A -> Itp) is unsatisfiable.
+   *   <li>The implication (Itp -> NOT B) is unsatisfiable.
+   *   <li>The interpolant Itp only contains symbols that appear in both sets of formulas A and B.
    * </ol>
    *
-   * @param formulasOfA A Collection of Boolean formulas of A.
-   * @param formulasOfB A Collection of Boolean formulas of B.
-   * @return the Craig interpolant Itp if it satisfies the conditions, otherwise returns false.
+   * <p>Additionally, the Craig interpolant is a satisfying assignment to the following Constrained
+   * Horn Clause:
+   *
+   * <ul>
+   *   <li>For all (a, c). (A(a, c) -> Itp(c))
+   *   <li>For all (b, c). (Itp(c) -> NOT (B(b, c)))
+   * </ul>
+   *
+   * <p>A solver checks, whether the definition of Craig interpolation is satisfied and generates a
+   * model accordingly.
+   *
+   * <p>Please note, that this interpolation strategy is only usable for solvers supporting
+   * quantified solving over the theories interpolated upon. The solver does not need to support
+   * interpolation itself.
+   *
+   * @param formulasOfA A {@link Collection} of {@link BooleanFormula}s representing the set of A.
+   * @param formulasOfB A {@link Collection} of {@link BooleanFormula}s representing the set of B.
+   * @return the Craig interpolant, otherwise {@code false} in case an interpolant can not be found.
+   * @see <a href="https://github.com/agurfinkel/spacer-on-jupyter/blob/master/Dagstuhl2019.ipynb">
+   *     Binary Craig Interpolation by reduction to CHC</a>
    */
   private BooleanFormula getModelBasedInterpolant(
       Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
