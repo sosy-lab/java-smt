@@ -81,6 +81,13 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     qfmgr = mgr.getQuantifiedFormulaManager();
   }
 
+  /**
+   * Checks, whether an independent interpolation strategy is enabled for the given prover.
+   *
+   * @param pOptions A set of all enabled options for the prover to check.
+   * @return {@code true} if an independent interpolation strategy is configured, {@code false}
+   *     otherwise.
+   */
   public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> pOptions) {
     return getIndependentInterpolationStrategy(pOptions) != null;
   }
