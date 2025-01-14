@@ -278,12 +278,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Preconditions.checkState(isUnsat());
     checkNotNull(interpolationStrategy);
 
-    BooleanFormula interpolant;
+    BooleanFormula interpolant = bmgr.makeFalse();
     if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       interpolant = getBackwardInterpolant(conjugatedB, varsOfB, sharedVars);
-    } else {
-      Preconditions.checkState(
-          interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS));
+    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
       interpolant = getForwardInterpolant(conjugatedA, varsOfA, sharedVars);
     }
 
