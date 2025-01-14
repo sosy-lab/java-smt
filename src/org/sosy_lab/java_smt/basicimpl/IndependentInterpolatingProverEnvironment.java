@@ -358,29 +358,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
-  /**
-   * Removes all formulas currently asserted in the stack to reset it. This method is used, e.g.,
-   * for a new check, such as verifying the satisfiability of a formula without considering
-   * previously asserted formulas.
-   */
-  private void clearStack() {
-    for (int i = 0; i < size(); i++) {
-      pop();
-    }
-  }
-
-  /**
-   * Restores the solver's stack to its previous state before it was cleared by re-adding the
-   * formulas that were removed, assuming the stack is currently empty.
-   *
-   * @param assertedFormulas The list of {@link BooleanFormula} to push back onto the stack.
-   */
-  private void restoreStack(List<BooleanFormula> assertedFormulas) throws InterruptedException {
-    for (BooleanFormula formula : assertedFormulas) {
-      push(formula);
-    }
-  }
-
   @Override
   protected void popImpl() {
     delegate.pop();
