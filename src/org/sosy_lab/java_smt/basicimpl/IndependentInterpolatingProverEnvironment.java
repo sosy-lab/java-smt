@@ -276,6 +276,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         "The set of the shared variables is empty and cannot be quantified.");
 
     Preconditions.checkState(isUnsat());
+    checkNotNull(interpolationStrategy);
 
     BooleanFormula interpolant;
     if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
