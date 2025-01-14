@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 @SuppressWarnings("unused")
 public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
-  
+
   private final SolverContext solverContext;
   private final ShutdownNotifier shutdownNotifier;
   private final ProverEnvironment delegate;
@@ -62,18 +62,18 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private static final String PREFIX = "__internal_model_itp_generation_";
 
   public IndependentInterpolatingProverEnvironment(
-      SolverContext sourceContext,
+      SolverContext pSourceContext,
       FormulaCreator<TFormulaInfo, TType, ?, ?> pCreator,
       ProverEnvironment pDelegate,
       Set<ProverOptions> pOptions,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
-    solverContext = checkNotNull(sourceContext);
+    solverContext = checkNotNull(pSourceContext);
     delegate = checkNotNull(pDelegate);
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     interpolationStrategy = getIndependentInterpolationStrategy(pOptions);
-    mgr = sourceContext.getFormulaManager();
+    mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
     ufmgr = mgr.getUFManager();
     qfmgr = mgr.getQuantifiedFormulaManager();
@@ -82,17 +82,17 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   /**
    * Checks, whether an independent interpolation strategy is enabled for the given prover.
    *
-   * @param pOptions A set of all enabled options for the prover to check.
+   * @param options A set of all enabled options for the prover to check.
    * @return {@code true} if an independent interpolation strategy is configured, {@code false}
    *     otherwise.
    */
-  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> pOptions) {
-    return getIndependentInterpolationStrategy(pOptions) != null;
+  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> options) {
+    return getIndependentInterpolationStrategy(options) != null;
   }
 
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
-      Set<ProverOptions> pOptions) {
-    List<ProverOptions> itpStrat = new ArrayList<>(pOptions);
+      Set<ProverOptions> options) {
+    List<ProverOptions> itpStrat = new ArrayList<>(options);
     final Set<ProverOptions> allIndependentInterpolationStrategies =
         ImmutableSet.of(
             ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
@@ -115,8 +115,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
-        // TODO: this case throws a ClassCastException
         // Use native solver interpolation
+        // TODO: this case throws a ClassCastException.
         // return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate).getInterpolant
         // (pFormulasOfA);
       } else {
@@ -186,8 +186,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
       throws InterruptedException, SolverException {
 
-    ProverEnvironment itpProver = getDistinctProver();
-
     BooleanFormula conjugatedA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
@@ -208,6 +206,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(conjugatedB)));
 
     // check the satisfiability of the constraints and generate a model if possible
+    ProverEnvironment itpProver = getDistinctProver();
+
     itpProver.push(bmgr.and(left, right));
 
     BooleanFormula interpolant = bmgr.makeFalse();
@@ -302,8 +302,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * @return a uniform Craig interpolant, using quantifier-elimination in the backward direction.
    */
   private BooleanFormula getBackwardInterpolant(
-      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
-      throws SolverException, InterruptedException {
+      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars) {
 
     BooleanFormula itpBackward = formulasOfB;
 
@@ -420,7 +419,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * Create a new, distinct prover to interpolate on. The set of formulas for interpolation will
    * need to be translated to and from this new {@link ProverEnvironment} instance.
    *
-   * @return A new {@link ProverEnvironment} enabled to generate models.
+   * @return A new {@link ProverEnvironment} configured to generate models.
    */
   private ProverEnvironment getDistinctProver() {
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
