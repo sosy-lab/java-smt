@@ -381,11 +381,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Identifies the shared variables between two formulas A and B.
+   * Identifies the shared variables between two sets of {@link BooleanFormula}s A and B.
    *
-   * @param varsOfA The list of variables from formula A.
-   * @param varsOfB The list of variables from formula B.
-   * @return An immutable list of variables found in both formulas A and B.
+   * @param varsOfA A list of all variables in formulas of A.
+   * @param varsOfB A list of all variables in formulas of B.
+   * @return An {@link ImmutableList} of all variables found in both sets of formulas A and B.
    */
   private ImmutableList<Formula> getSharedVars(List<Formula> varsOfA, List<Formula> varsOfB) {
     return varsOfA.stream().filter(varsOfB::contains).collect(ImmutableList.toImmutableList());
