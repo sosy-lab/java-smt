@@ -293,6 +293,34 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
+   * Computes the backward interpolant for a given formula B. In the backward direction, the
+   * variables specific to formula B are universally quantified and formula B is negated to describe
+   * the relationship between formulas A and B.
+   *
+   * @param formulasOfB The {@link BooleanFormula} representing the constraints in formula B.
+   * @param varsOfB The list of all variables in formula B.
+   * @param sharedVars The list of shared variables between formulas A and B.
+   * @return The backward interpolant.
+   */
+  private BooleanFormula getBackwardInterpolant(
+      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
+      throws SolverException, InterruptedException {
+
+    ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
+
+    if (!boundVars.isEmpty()) {
+      BooleanFormula backward = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
+      return qfmgr.eliminateQuantifiers(backward);
+    }
+    // TODO: catch possible exception and rethrow with additional information about the context
+
+    // TODO: check that the quantifier has been eliminated properly and return either false or an
+    //  error if its still present!
+
+    return formulasOfB;
+  }
+
+  /**
    * Computes the forward interpolant for a given formula A. In the forward direction, the variables
    * specific to formula A are existentially quantified to describe the relationship between
    * formulas A and B.
@@ -319,34 +347,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     //  error if its still present!
 
     return formulasOfA;
-  }
-
-  /**
-   * Computes the backward interpolant for a given formula B. In the backward direction, the
-   * variables specific to formula B are universally quantified and formula B is negated to describe
-   * the relationship between formulas A and B.
-   *
-   * @param formulasOfB The {@link BooleanFormula} representing the constraints in formula B.
-   * @param varsOfB The list of all variables in formula B.
-   * @param sharedVars The list of shared variables between formulas A and B.
-   * @return The backward interpolant.
-   */
-  private BooleanFormula getBackwardInterpolant(
-      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
-      throws SolverException, InterruptedException {
-
-    ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
-
-    if (!boundVars.isEmpty()) {
-      BooleanFormula backward = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
-      return qfmgr.eliminateQuantifiers(backward);
-    }
-    // TODO: catch possible exception and rethrow with additional information about the context
-
-    // TODO: check that the quantifier has been eliminated properly and return either false or an
-    //  error if its still present!
-
-    return formulasOfB;
   }
 
   /**
