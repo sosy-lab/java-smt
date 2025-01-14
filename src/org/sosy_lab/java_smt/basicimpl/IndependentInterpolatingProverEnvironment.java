@@ -223,30 +223,38 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Computes uniform interpolants for a {@link Collection} of {@link BooleanFormula} using the
-   * quantifier-based interpolation strategy with quantifier elimination (QE).
+   * Computes uniform Craig interpolants for a {@link Collection} of {@link BooleanFormula}s using
+   * the quantifier-based solver independent interpolation strategy with quantifier-elimination.
    *
-   * <p>This approach generates an interpolant Itp for two sets of constraints A and B, where the
-   * variables are categorized as follows:
+   * <p>This interpolation strategy takes two sets of {@link BooleanFormula}s, A and B, as input and
+   * their variables a, b, c, satisfying the following rules to generate uniform Craig interpolants,
+   * a stronger version of Craig interpolants:
    *
    * <ul>
-   *   <li>Variables that appear only in formulas of A.
-   *   <li>Variables that appear only in formulas of B.
-   *   <li>Shared variables that appear in both sets of formulas A and B.
+   *   <li>A set of variables a that appears in formulas of A, but not in formulas of B.
+   *   <li>A set of variables b that appears in formulas of B, but not in formulas of A.
+   *   <li>A set of variables c that appear in both sets of formulas A and B.
    * </ul>
    *
-   * <p>The resulting Uniform Interpolant is a stronger version of a Craig Interpolant and satisfies
-   * the definition of Craig Interpolation:
+   * <p>Quantifier-elimination can be performed in two directions, forward and backward, to generate
+   * uniform Craig interpolants:
    *
-   * <ol>
-   *   <li>(A -> Itp) is unsatisfiable,
-   *   <li>(Itp -> not B) is unsatisfiable, and
-   *   <li>Itp only contains symbols that appear in both sets of formulas A and B.
-   * </ol>
+   * <ul>
+   *   <li>Forward version: interpolation(A(a, c), B(b, c)) = exists a. A(a, c)
+   *   <li>Backward version: interpolation(A(a, c), B(b, c)) = for all b. NOT B(b, c)
+   * </ul>
    *
-   * @param formulasOfA A collection of {@link BooleanFormula}s representing the set A.
-   * @param formulasOfB A collection of {@link BooleanFormula}s representing the set B.
-   * @return the uniform Craig-Interpolant, returns false in case an interpolant can not be found.
+   * <p>A solver verifies, whether the definition of Craig interpolation is satisfied for the
+   * resulting uniform Craig interpolant.
+   *
+   * <p>Please note, that this interpolation strategy is only usable for solver supporting
+   * quantifier-elimination over theories interpolated upon. The solver does not need to support
+   * interpolation itself.
+   *
+   * @param formulasOfA A {@link Collection} of {@link BooleanFormula}s representing the set of A.
+   * @param formulasOfB A {@link Collection} of {@link BooleanFormula}s representing the set of B.
+   * @return the uniform Craig interpolant, otherwise {@code false} in case an interpolant can not
+   *     be found.
    */
   private BooleanFormula getQuantifierEliminationBasedInterpolant(
       Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
