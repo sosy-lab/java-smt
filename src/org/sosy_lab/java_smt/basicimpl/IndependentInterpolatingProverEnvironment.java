@@ -44,9 +44,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 @SuppressWarnings("unused")
 public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
-
-  // TODO: use context to create distinct provers to interpolate on (formulas needs to be
-  //  translated to and from that other instance!)
+  
   private final SolverContext solverContext;
   private final ShutdownNotifier shutdownNotifier;
   private final ProverEnvironment delegate;
