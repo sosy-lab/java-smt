@@ -171,29 +171,29 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *   <li>For all (b, c). (Itp(c) -> not (B(b, c))).
    * </ol>
    *
-   * @param pFormulasOfA A Collection of Boolean formulas of A.
-   * @param pFormulasOfB A Collection of Boolean formulas of B.
+   * @param formulasOfA A Collection of Boolean formulas of A.
+   * @param formulasOfB A Collection of Boolean formulas of B.
    * @return the Craig interpolant Itp if it satisfies the conditions, otherwise returns false.
    */
   private BooleanFormula getModelBasedInterpolant(
-      Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB)
+      Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
       throws InterruptedException, SolverException {
 
     ProverEnvironment itpProver = getDistinctProver();
 
-    BooleanFormula formulasOfA = bmgr.and(pFormulasOfA);
-    BooleanFormula formulasOfB = bmgr.and(pFormulasOfB);
+    BooleanFormula conjugatedA = bmgr.and(formulasOfA);
+    BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
-    List<Formula> varsOfA = getVars(formulasOfA);
-    List<Formula> varsOfB = getVars(formulasOfB);
+    List<Formula> varsOfA = getVars(conjugatedA);
+    List<Formula> varsOfB = getVars(conjugatedB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
     // TODO: handle empty sets of variables, as they can not be quantified.
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
+    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(conjugatedA, itp));
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(conjugatedB)));
 
     // check the satisfiability of the constraints and generate a model if possible
     itpProver.push(bmgr.and(left, right));
