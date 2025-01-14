@@ -400,6 +400,27 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
+  private boolean satisfiesInterpolationCriteria(
+      BooleanFormula itp, BooleanFormula formulasOfA, BooleanFormula formulasOfB,
+      List<Formula> varsOfA, List<Formula> varsOfB)
+      throws SolverException, InterruptedException {
+
+    boolean result = false;
+
+    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
+
+    ProverEnvironment itpProver = getDistinctProver();
+    itpProver.push(bmgr.and(left, right));
+
+    if (!itpProver.isUnsat()) {
+      result = true;
+    }
+
+    itpProver.close();
+    return result;
+  }
+
   @Override
   protected void popImpl() {
     delegate.pop();
