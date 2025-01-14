@@ -293,14 +293,15 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   }
 
   /**
-   * Computes the backward interpolant for a given formula B. In the backward direction, the
-   * variables specific to formula B are universally quantified and formula B is negated to describe
-   * the relationship between formulas A and B.
+   * Computes the uniform Craig interpolant, using the quantifier-based interpolation strategy
+   * utilizing quantifier-elimination in the backward direction.
    *
-   * @param formulasOfB The {@link BooleanFormula} representing the constraints in formula B.
-   * @param varsOfB The list of all variables in formula B.
-   * @param sharedVars The list of shared variables between formulas A and B.
-   * @return The backward interpolant.
+   * <p>Backward means, that the set of formulas B interpolates towards the set of formulas A.
+   *
+   * @param formulasOfB The set of formulas B, combined into one {@link BooleanFormula}.
+   * @param varsOfB A list of all variables in formulas of B.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
+   * @return a uniform Craig interpolant, using quantifier-elimination in the backward direction.
    */
   private BooleanFormula getBackwardInterpolant(
       BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
