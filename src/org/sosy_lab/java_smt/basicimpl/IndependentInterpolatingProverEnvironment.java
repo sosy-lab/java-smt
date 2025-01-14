@@ -129,8 +129,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfA = formulasAAndB.gotFormulasForA();
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
-    Preconditions.checkNotNull(formulasOfA);
-    Preconditions.checkNotNull(formulasOfB);
     Preconditions.checkNotNull(interpolationStrategy);
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
