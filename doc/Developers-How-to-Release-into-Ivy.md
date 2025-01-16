@@ -114,19 +114,23 @@ Finally, follow the instructions shown in the message at the end.
 
 ### Publishing OpenSMT
 
-We prefer/need to compile our own OpenSMT2 binaries and Java bindings on Ubuntu 22.04 or later.
+We prefer to use our own OpenSMT binaries and SWIG-based Java bindings.
+We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and GCC are sufficiently up-to-date.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git and
-checkout the required version, e.g., the tag "v2.8.0".
-The following command patches the OpenSMT2 API, generates Java bindings
-with SWIG, builds the library, and packages it.
+To publish OpenSMT, checkout the [OpenSMT repository](https://github.com/usi-verification-and-security/opensmt).
+Then execute the following command in the JavaSMT directory to patch the OpenSMT2 API,
+generate Java bindings with SWIG, build the library, and package it.
 
 ```
 ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.8.0
 ```
-Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
+Our build script will automatically append the git revision of OpenSMT.
+
+Finally, follow the instructions shown in the message at the end of the command.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
+but in the normal system environment, where some testing can be applied by the developer before the commit.
 
 
 ### Publishing Boolector
@@ -148,9 +152,9 @@ Example:
 ```
 ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.2.2
 ```
-Our build script will automatically append the git-revision of Boolector, if available.
+Our build script will automatically append the git revision of Boolector, if available.
 
-Finally, follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
 but in the normal system environment, where some testing can be applied by the developer before the commit.
 
@@ -172,14 +176,15 @@ ant publish-bitwuzla \
 Example:
 ```
 ant publish-bitwuzla \
-    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 \
+    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.7.0-13 \
     -Dbitwuzla.rebuildWrapper=false -Djdk-windows.path=/dependencies/jdk-11/
 ```
-The build-scripts Bitwuzla will download and build necessary dependencies like GMP automatically.
-Our build script will automatically append the git-revision of Bitwuzla, if available.
-The build-steps will produce a Linux and a Windows library and publish them.
+The build scripts will do the following:
+- download and build necessary dependencies like GMP automatically,
+- append the git revision of Bitwuzla, and
+- produce a Linux and a Windows library and publish them.
 
-Finally, follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
 but in the normal system environment, where some testing can be applied by the developer before the commit.
 

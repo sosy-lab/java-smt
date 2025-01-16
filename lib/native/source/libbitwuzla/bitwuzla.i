@@ -35,7 +35,7 @@
 %exception {
   try {
     $action
-  } catch(bitwuzla::Exception& e) {
+  } catch(std::exception& e) {
     jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
     jenv->ThrowNew(exceptionType, e.what());
     return $null;
@@ -51,9 +51,12 @@ namespace std {
 %include "include/bitwuzla/enums.h"
 %include "include/bitwuzla/option.h"
 
+%ignore bitwuzla::option::Exception;
+
 namespace bitwuzla {
 /** Output streams */
 %ignore set_bv_format;
+%ignore set_letify;
 %ignore operator<< (std::ostream &ostream, const set_bv_format &f);
 %ignore operator<< (std::ostream &out, Result result);
 %ignore operator<< (std::ostream &out, Kind kind);
@@ -311,16 +314,6 @@ namespace bitwuzla::parser {
 %ignore Parser::Parser(TermManager &tm, Options &options, std::ostream *out);
 %ignore Parser::configure_auto_print_model(bool value);
 %ignore Parser::parse(const std::string &infile_name, std::istream &input, bool parse_only=false);
-
-%exception {
-  try {
-    $action
-  } catch(Exception& e) {
-    jclass exceptionType = jenv->FindClass("java/lang/IllegalArgumentException");
-    jenv->ThrowNew(exceptionType, e.what());
-    return $null;
-  }
-}
 
 /** Exception */
 %ignore Exception;

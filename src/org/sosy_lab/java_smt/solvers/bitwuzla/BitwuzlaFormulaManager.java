@@ -174,4 +174,9 @@ public final class BitwuzlaFormulaManager
   static Term getBitwuzlaTerm(Formula pT) {
     return ((BitwuzlaFormula) pT).getTerm();
   }
+
+  @Override
+  public Term simplify(Term t) {
+    return new Bitwuzla(creator.getTermManager()).simplify(t);
+  }
 }
