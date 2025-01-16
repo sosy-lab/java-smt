@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking
 public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
                                      ArrayFormula, NumeralFormula, BooleanFormula, IntegerFormula
     , RationalFormula {
-  private String name;
+  private String name ="unnamed";
   private int exponent = -1;
   private int mantissa = -1;
   private int bitvectorLength = -1;
@@ -323,37 +323,78 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     value = pValue;
     updateRepresentation();
   }
+  public String parseMeToSMTLIB() {
+    StringBuilder sb = new StringBuilder();
+    if(Objects.equals(value, "")){ //formula is a variable
+      switch (formulaType){
+        case BOOLEAN:
+          sb.append("(declare-const ").append(name).append(" Bool)");
+          break;
+        case INTEGER:
+          sb.append("(declare-const ").append(name).append(" Int)");
+          break;
+        case RATIONAL:
+          sb.append("(declare-const ").append(name).append(" Real)");
+          break;
+        case BITVECTOR:
+          sb.append("(declare-const ").append(name).append(" (_ BitVec ").append(bitvectorLength).append("))");
+          break;
+        case FLOATING_POINT:
+          sb.append("(declare-const ").append(name).append(" (_ FloatingPoint ").append(exponent).append(" ").append(mantissa).append("))");
+          break;
+        case ARRAY:
+          sb.append("(declare-const ").append(name).append(" (Array ");
+          sb.append(firstArrayParameter != null ? firstArrayParameter.formulaType.parseToSMTLIBFormulaType() : "UNKNOWN");
+          sb.append(" ");
+          sb.append(secondArrayParameter != null ?
+                    secondArrayParameter.formulaType.parseToSMTLIBFormulaType() : "UNKNOWN");
+          sb.append(")");
+          break;
+        case STRING:
+          sb.append("(declare-const ").append(name).append(" String)");
+          break;
+        case REGEX:
+          sb.append("(declare-const ").append(name).append(" Regex)");
+          break;
+        default:
+          sb.append("unknown");
+      }
+    }else{
+      switch (formulaType) {
+        case BOOLEAN:
+        case INTEGER:
+        case RATIONAL:
+          sb.append(value);
+          break;
+        case BITVECTOR:
+          sb.append("#b").append(value);
+          break;
 
-  public boolean equals(DummyFormula other) {
-    if (this.formulaType != other.formulaType) {
-      return false;
-    }
-    switch (formulaType) {
-      case BITVECTOR:
-        return bitvectorLength == other.bitvectorLength && representation.equals(
-            other.representation);
-      case FLOATING_POINT:
-        return exponent == other.exponent && mantissa == other.mantissa && Objects.equals(value,
-            other.value);
-      case ARRAY:
-        return firstArrayParameter.equals(other.firstArrayParameter) && secondArrayParameter.equals(
-            other.secondArrayParameter);
-      case RATIONAL:
-      case INTEGER:
-      case STRING:
-      case REGEX:
-      case BOOLEAN:
-      case DUMMY:
-        return Objects.equals(value, other.value);
-      default:
-        return exponent == other.exponent
-            && mantissa == other.mantissa
-            && Objects.equals(value, other.value)
-            && Objects.equals(firstArrayParameter, other.firstArrayParameter)
-            && Objects.equals(secondArrayParameter, other.secondArrayParameter)
-            && bitvectorLength == other.bitvectorLength;
-    }
+        case FLOATING_POINT:
+          sb.append("(FloatingPoint ").append(exponent).append(" ").append(mantissa).append(")");
+          break;
 
+        case ARRAY:
+          sb.append("(Array ");
+          sb.append(firstArrayParameter != null ? firstArrayParameter.parseMeToSMTLIB() : "UNKNOWN");
+          sb.append(" ");
+          sb.append(secondArrayParameter != null ? secondArrayParameter.parseMeToSMTLIB() : "UNKNOWN");
+          sb.append(")");
+          break;
+
+        case STRING:
+          sb.append("\"").append(value).append("\"");
+          break;
+
+        case REGEX:
+          sb.append("Regex(\"").append(representation).append("\")");
+          break;
+
+        default:
+          sb.append("unknown");
+      }
+    }
+    return sb.toString();
   }
 
 

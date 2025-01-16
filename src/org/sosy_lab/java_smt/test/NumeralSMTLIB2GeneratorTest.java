@@ -595,7 +595,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0 {
     BooleanFormula constraint = bmgr.and(imgr.greaterOrEquals(a, b), imgr.greaterOrEquals(c, e));
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
-
+    System.out.println(actualResult);
     String expectedResultMathsat5 = "(assert (>= 3 2147483647))\n";
     String expectedResultOthers = "(assert (and (>= 1 (- 5)) (>= 3 2147483647)))\n";
     assertThat(

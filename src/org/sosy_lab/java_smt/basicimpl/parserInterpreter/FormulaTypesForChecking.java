@@ -33,7 +33,26 @@ public enum FormulaTypesForChecking {
   BOOLEAN,
   DUMMY;
 
-  public static FormulaTypesForChecking handleArray(){
-        return ARRAY;
+  public String parseToSMTLIBFormulaType(){
+    switch (this){
+        case REGEX:
+          return "Regex";
+        case STRING:
+          return "String";
+        case FLOATING_POINT:
+          return "(_ FloatingPoint ";
+        case INTEGER:
+          return "Int";
+        case BITVECTOR:
+          return "(_ BitVec ";
+        case ARRAY:
+          return "Array";
+        case RATIONAL:
+          return "Real";
+        case BOOLEAN:
+          return "Bool";
+        default:
+          throw new UnsupportedOperationException("Unsupported formula type");
+    }
   }
 }

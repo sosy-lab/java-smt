@@ -22,9 +22,11 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
@@ -33,12 +35,17 @@ public class FloatingPointGenerator {
 
   private FloatingPointGenerator() {}
 
-  protected static void logMakeFloatingPoint(Object result, int exponent, int mantissa) {
+  protected static void logMakeFloatingPoint(Object result, int exponent, int mantissa,
+                                             String RoundingMode,
+                                             String value) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(exponent);
     inputParams.add(mantissa);
+    inputParams.add(RoundingMode);
+    inputParams.add(value);
     Function<List<Object>, String> functionToString = createString ->
-        "(_ FloatingPoint " + createString.get(0) + " " + createString.get(1) + ")";
+        "((_to_fp " + createString.get(0) + " " + createString.get(1) + ")"
+        + " " + createString.get(2) + " " + createString.get(3)+")";
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
@@ -180,27 +187,48 @@ public class FloatingPointGenerator {
   }
 
   protected static void logFPCastTo(
-      Formula result, FloatingPointFormula number, String targetType, String roundingMode) {
+      Formula result, FloatingPointFormula number, String command, String roundingMode) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     inputParams.add(roundingMode);
+    inputParams.add(command);
     Function<List<Object>, String> functionToString = inPlaceInputParams ->
-        "((_ to_" + targetType + " " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+        "((" + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
   }
 
   protected static void logFPCastFrom(
-      FloatingPointFormula result, Formula number, String sourceType, String roundingMode) {
+      FloatingPointFormula result, Formula number, FloatingPointType type, String roundingMode) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     inputParams.add(roundingMode);
-    Function<List<Object>, String> functionToString = inPlaceInputParams ->
-        "((_ from_" + sourceType + " " + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+    inputParams.add(String.valueOf(type.getExponentSize()));
+    inputParams.add(String.valueOf(type.getMantissaSize()));
+    Function<List<Object>, String> functionToString =
+        getListStringFunctionForCast(number, inputParams);
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
+  }
+
+  @Nonnull
+  private static Function<List<Object>, String> getListStringFunctionForCast(
+      Formula number,
+      List<Object> inputParams) {
+    Function<List<Object>, String> functionToString;
+    if(number instanceof BitvectorFormula){
+      functionToString = inPlaceInputParams ->
+          "((_ to_fp " + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + ")" + " "
+              + inPlaceInputParams.get(0) + ")";
+    }else{
+      functionToString = inPlaceInputParams ->
+          "((_ to_fp " + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + ")" + " "
+              + inPlaceInputParams.get(1) +
+              ") " + inPlaceInputParams.get(0) + ")";
+    }
+    return functionToString;
   }
 
   protected static void logFromIeeeBitvector(

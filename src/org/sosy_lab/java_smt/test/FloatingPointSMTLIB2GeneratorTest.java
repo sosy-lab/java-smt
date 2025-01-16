@@ -47,6 +47,21 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+  @Test
+  public void testMakeFloatingPoint(){
+    requireFloats();
+    assert fpmgr != null;
+    FloatingPointFormula a = fpmgr.makeVariable("a",
+        FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0,
+        FloatingPointType.getSinglePrecisionFloatingPointType()));
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+        +"(assert (fp.eq a ((_to_fp 8 23) RNE 0.0)))\n";
+        Generator.assembleConstraint(constraint);
+        String actualResult = String.valueOf(Generator.getLines());
+        assertThat(actualResult).isEqualTo(expectedResult);
+  }
 
   @Test
   public void testFPAdd() {
@@ -292,8 +307,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const castResult Int)\n"
-        + "(assert ((_ cast_to BooleanType true) a))\n";
+        + "(declare-const castResult (_ BitVec 32))\n"
+        + "(assert (= ((_ to_bv RNE) a) castResult))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -312,7 +327,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
         + "(declare-const b Bool)\n"
-        + "(assert (fp.eq result ((_ from_generic RNE) b)))\n";
+        + "(assert (fp.eq result ((_ to_fp 8 23) RNE) b)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

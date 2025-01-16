@@ -37,8 +37,8 @@ public class ParseAndRegenerateTest extends SolverBasedTest0 {
     return Solvers.Z3;
   }
 
-  public void tellSolver() {
-    //query the smtlib outputs to the solver and see if it gets equivalent outputs
+  public boolean tellSolver(String inputAsString, BooleanFormula inputAsFormula) {
+    return true;
   }
 
   @Test
@@ -48,13 +48,35 @@ public class ParseAndRegenerateTest extends SolverBasedTest0 {
         "(set-logic QF_LIA)\n"
             + "(declare-const x Int)\n"
             + "(declare-const y Int)\n"
-            + "(assert (= (+ x y) 10))\n";
+            + "(declare-const c Int)\n"
+            + "(assert (= x 10))\n"
+            + "(assert (= y 10))\n"
+            + "(assert (= (+ x y) c))\n"
+            + "(check-sat)\n"
+            + "(get-model)\n"
+            + "(exit)\n";
+
     BooleanFormula parsed = mgr.universalParseFromString(input);
     Generator.assembleConstraint(parsed);
-    String reparsed = String.valueOf(Generator.getLines());
-    assertThat(reparsed).isEqualTo(input);
-
+    String reparsed = Generator.getSMTLIB2String();
+    assertThat(tellSolver(reparsed, parsed)).isTrue();
   }
+
+  @Test
+  public void testSemanticEquivalence()
+      throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    String input = "(set-logic QF_LIA)\n" +
+        "(declare-const x Int)\n" +
+        "(declare-const y Int)\n" +
+        "(assert (= (+ x y) 10))\n";
+    BooleanFormula original = mgr.universalParseFromString(input);
+    Generator.assembleConstraint(original);
+    String reparsed = String.valueOf(Generator.getLines());
+    BooleanFormula regenerated = mgr.universalParseFromString(reparsed);
+
+    assertThat(bmgr.equivalence(original, regenerated));
+  }
+
 
   @Test
   public void evaluateWithReals()

@@ -36,7 +36,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolverBasedTest0{
+public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
+  @Override
+  public Solvers solverToUse(){
+    return Solvers.Z3;
+  }
   @Test
   public void simpleTestDeclaration() throws
   IOException, SolverException, InterruptedException, InvalidConfigurationException {

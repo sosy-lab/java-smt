@@ -39,7 +39,7 @@ public class StringGenerator {
     String format = "\"%s\"";
     Function<List<Object>, String> functionToString = inputs -> String.format(format, inputs.toArray());
     FunctionEnvironment newEntry = new  FunctionEnvironment(result, params, functionToString,
-        Keyword.DIRECT);
+        Keyword.SKIP);
     Generator.getExecutedAggregator().add(
         newEntry
     );

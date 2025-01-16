@@ -65,7 +65,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(Rational n, FormulaType.FloatingPointType type) {
     FloatingPointFormula result = wrap(makeNumberImpl(n.toString(), type, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), n.toString(), "RNE");
     }
     return result;
   }
@@ -74,7 +75,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       Rational n, FloatingPointType type, FloatingPointRoundingMode roundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(n.toString(), type, getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), n.toString(), roundingMode.giveSMTLIBFormat());
     }
     return result;
   }
@@ -82,7 +84,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(double n, FormulaType.FloatingPointType type) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), String.valueOf(n), "RNE");
     }
     return result;
   }
@@ -92,7 +95,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       double n, FloatingPointType type, FloatingPointRoundingMode roundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), String.valueOf(n), roundingMode.giveSMTLIBFormat());
     }
     return result;
   }
@@ -104,7 +108,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(BigDecimal n, FormulaType.FloatingPointType type) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), String.valueOf(n), "RNE");
     }
     return result;
   }
@@ -114,7 +119,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       BigDecimal n, FloatingPointType type, FloatingPointRoundingMode roundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), String.valueOf(n), roundingMode.giveSMTLIBFormat());
     }
     return result;
   }
@@ -128,7 +134,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(String n, FormulaType.FloatingPointType type) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), n, "RNE");
     }
     return result;
   }
@@ -138,7 +145,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       String n, FloatingPointType type, FloatingPointRoundingMode roundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(n, type, getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(), type.getMantissaSize());
+      FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
+          type.getMantissaSize(), n, roundingMode.giveSMTLIBFormat());
     }
     return result;
   }
@@ -227,7 +235,21 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
             targetType,
             castToImpl(extractInfo(number), signed, targetType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastTo(result, number, targetType.toString(), "RNE");
+      String commandToAppend;
+      if (targetType.isBitvectorType()){
+        commandToAppend = "_ to_bv";
+      }
+      else if (targetType.isIntegerType()||targetType.isRationalType()){
+        if(signed){
+          commandToAppend = "fp.to_sbv";
+        }else{
+          commandToAppend = "fp.to_ubv";
+        }
+      }else{
+        throw new GeneratorException("Unsupported target type");
+      }
+      FloatingPointGenerator.logFPCastTo(result, number, commandToAppend,
+          "RNE");
     }
     return result;
   }
@@ -264,7 +286,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       Formula number, boolean signed, FloatingPointType targetType) {
     FloatingPointFormula result = wrap(castFromImpl(extractInfo(number), signed, targetType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastFrom(result, number, "generic", "RNE");
+      FloatingPointGenerator.logFPCastFrom(result, number, targetType, "RNE");
     }
     return result;
   }
@@ -279,7 +301,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
         castFromImpl(
             extractInfo(number), signed, targetType, getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastFrom(result, number, "generic", roundingMode.giveSMTLIBFormat());
+      FloatingPointGenerator.logFPCastFrom(result, number, targetType, roundingMode.giveSMTLIBFormat());
     }
     return result;
   }
