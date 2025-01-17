@@ -62,6 +62,12 @@ GMP_HEADER_DIR="$2"
 SRC_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.c"
 OBJ_FILES="org_sosy_1lab_java_1smt_solvers_mathsat5_Mathsat5NativeApi.o"
 
+if [ "$(uname)" = "Darwin" ]; then
+    IS_MACOS=true
+else
+    IS_MACOS=false
+fi
+
 # check requirements
 if [ ! -f "$MSAT_LIB_DIR/libmathsat.a" ]; then
     echo "You need to specify the directory with the downloaded MathSAT5 on the command line!"
@@ -73,6 +79,20 @@ if [ ! -f "$GMP_LIB_DIR/libgmp.a" ]; then
     exit 1
 fi
 
+if [ "$IS_MACOS" = true ]; then
+    if ! command -v clang &> /dev/null; then
+        echo "clang compiler not found."
+        echo "Please install Apple's clang through the Xcode developer tools:"
+        echo "    xcode-select --install"
+        exit 1
+    elif ! clang --version | grep -q "^Apple"; then
+        echo "WARNING: clang compiler found but it is not Apple clang."
+        echo "         This may cause problems with signing the library for use on macOS."
+        echo "         Please install Apple's clang through the Xcode developer tools:"
+        echo "             xcode-select --install"
+    fi
+fi
+
 # switch between MathSAT5 and OptiMathSAT
 if [ "$3" = "-optimathsat" ]; then
     echo "Compiling bindings to OptiMathSAT"
@@ -81,7 +101,11 @@ if [ "$3" = "-optimathsat" ]; then
     OUT_FILE="liboptimathsat5j.so"
     ADDITIONAL_FLAGS="-D INCLUDE_OPTIMATHSAT5_HEADER"
 else
-    OUT_FILE="libmathsat5j.so"
+    if [ "$IS_MACOS" = true ]; then
+        OUT_FILE="libmathsat5j.dylib"
+    else
+        OUT_FILE="libmathsat5j.so"
+    fi
     ADDITIONAL_FLAGS=""
 fi
 
@@ -96,11 +120,20 @@ echo "Linking libraries together into one file..."
 # This will link together the file produced above, the Mathsat library, the GMP library and the standard libraries.
 # Everything except the standard libraries is included statically.
 # The result is a single shared library containing all necessary components.
-if [ `uname -m` = "x86_64" ]; then
-    gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L. -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm
+if [ "$IS_MACOS" = true ]; then
+    # Next to some smaller macOS-specific changes compared to the Linux version,
+    # there is one important peculiarity: Apple's clang does not support the `-Bstatic` flag
+    # for an individual link. The Apple-specific counterpart `-static` has different behavior:
+    # If specified, it does not only link the next library statically, but all libraries.
+    # We do not want this, so we explicitly specify the path to the static libraries
+    # where we want this (without `-l`).
+    clang -Wall -g -o "${OUT_FILE}" -dynamiclib -Wl,-install_name,@rpath/libmathsat5j.dylib -L. -L"${MSAT_LIB_DIR}" -L"${GMP_LIB_DIR}" -I"${GMP_HEADER_DIR}" ${OBJ_FILES} "${MSAT_LIB_DIR}"/libmathsat.a -lgmpxx -lgmp -lstdc++ -lc -lm
+
+elif [ "$(uname -m)" = "x86_64" ]; then
+    gcc -Wall -g -o "${OUT_FILE}" -shared -Wl,-soname,libmathsat5j.so -L. -L"${MSAT_LIB_DIR}" -L"${GMP_LIB_DIR}" -I"${GMP_HEADER_DIR}" ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -static-libstdc++ -lstdc++ -Wl,-Bdynamic -lc -lm
 else
     # TODO compiling for/on a 32bit system was not done for quite a long time. We should drop it.
-    gcc -Wall -g -o ${OUT_FILE} -shared -Wl,-soname,libmathsat5j.so -L${MSAT_LIB_DIR} -L${GMP_LIB_DIR} -I${GMP_HEADER_DIR} ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
+    gcc -Wall -g -o "${OUT_FILE}" -shared -Wl,-soname,libmathsat5j.so -L"${MSAT_LIB_DIR}" -L"${GMP_LIB_DIR}" -I"${GMP_HEADER_DIR}" ${OBJ_FILES} -Wl,-Bstatic -lmathsat -lgmpxx -lgmp -Wl,-Bdynamic -lc -lm -lstdc++
 fi
 
 if [ $? -ne 0 ]; then
@@ -115,13 +148,26 @@ strip ${OUT_FILE}
 
 echo "Reduction Done"
 
-MISSING_SYMBOLS="$(readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND)"
-if [ ! -z "$MISSING_SYMBOLS" ]; then
-    echo "Warning: There are the following unresolved dependencies in libmathsat5j.so:"
-    readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND
-    exit 1
+if [ "$IS_MACOS" = true ]; then
+    # TODO: Be nice and also check for missing symbols
+    echo -n ""
+else
+    MISSING_SYMBOLS="$(readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND)"
+    if [ -n "$MISSING_SYMBOLS" ]; then
+        echo "Warning: There are the following unresolved dependencies in libmathsat5j.so:"
+        readelf -Ws ${OUT_FILE} | grep NOTYPE | grep GLOBAL | grep UND
+        exit 1
+    fi
 fi
-
 echo "All Done"
 echo "Please check the following dependencies that will be required at runtime by mathsat5j.so:"
 LANG=C objdump -p ${OUT_FILE} | grep -A50 "required from"
+
+if [ "$IS_MACOS" = true ]; then
+    echo "
+You've just built ${OUT_FILE} for macOS. Before you can use this library, you
+need to sign it with a certificate that your system trusts, or with an Apple
+Developer ID. Signing with a known, trusted certificate can be done with
+this command:
+    codesign -s \"Your Certificate Name\" --timestamp ${OUT_FILE}"
+fi
