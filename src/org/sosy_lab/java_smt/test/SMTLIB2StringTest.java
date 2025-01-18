@@ -51,6 +51,18 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void testMakeString()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n"
+        + "(assert (= a \"Hello\"))";
+
+    BooleanFormula parsed = mgr.universalParseFromString(x);
+    StringFormula a = smgr.makeVariable("a");
+    BooleanFormula constraint = smgr.equal(a, smgr.makeVariable("Hello"));
+    assertThat(parsed).isEqualTo(constraint);
+  }
+  @Test
   public void testStringEquality() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireStrings();
     String x =
