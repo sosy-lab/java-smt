@@ -21,6 +21,7 @@ lib/native/source/libz3j/org_sosy_lab_solver_z3_Z3NativeApi.c
 lib/native/source/libbitwuzla/build
 lib/native/source/libbitwuzla/doc
 lib/native/source/libbitwuzla/install*
+lib/native/source/opensmt/install*
 lib/native/source/*/*.so
 lib/native/source/*/*.o
 lib/native/source/**/*.java
