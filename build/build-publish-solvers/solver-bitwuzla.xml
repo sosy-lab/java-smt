@@ -147,8 +147,8 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <!-- Run swig to generate a new wrapper. Only executed if rebuildWrapper was specified. -->
-    <!-- Depends on build-bitwuzla for generating the API files. -->
-    <target name="build-wrapper" if="${bitwuzla.rebuildWrapper}"
+    <!-- Depends on compile-bitwuzla-* for generating the API files. -->
+    <target name="build-bitwuzla-wrapper" if="${bitwuzla.rebuildWrapper}"
             depends="compile-bitwuzla-linux-x64">
         <fail unless="bitwuzla.buildForLinuxX64">
             This ant-step uses the Linux x64 dependencies for building the SWIG-wrapper.
@@ -186,7 +186,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
     </target>
 
-    <target name="build-bitwuzla-bindings-jni" depends="build-wrapper">
+    <target name="build-bitwuzla-bindings-jni" depends="build-bitwuzla-wrapper">
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
         <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
@@ -346,15 +346,15 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="build-bitwuzla-linux-x64" if="${bitwuzla.buildForLinuxX64}"
-            depends="compile-bitwuzla-linux-x64, build-wrapper, build-bitwuzla-bindings-linux-x64">
+            depends="compile-bitwuzla-linux-x64, build-bitwuzla-wrapper, build-bitwuzla-bindings-linux-x64">
     </target>
 
     <target name="build-bitwuzla-linux-arm64" if="${bitwuzla.buildForLinuxX64}"
-            depends="compile-bitwuzla-linux-arm64, build-wrapper, build-bitwuzla-bindings-linux-arm64">
+            depends="compile-bitwuzla-linux-arm64, build-bitwuzla-wrapper, build-bitwuzla-bindings-linux-arm64">
     </target>
 
     <target name="build-bitwuzla-windows-x64" if="${bitwuzla.buildForWindowsX64}"
-            depends="compile-bitwuzla-windows-x64, build-wrapper, build-bitwuzla-bindings-windows-x64">
+            depends="compile-bitwuzla-windows-x64, build-bitwuzla-wrapper, build-bitwuzla-bindings-windows-x64">
     </target>
 
     <target name="publish-bitwuzla"
