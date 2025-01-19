@@ -144,8 +144,9 @@ public class SolverContextFactoryTest {
       case "z3":
         return new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "bitwuzlaj":
-      case "opensmtj":
         return new String[] {"GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "opensmtj":
+        return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
         return new String[] {"GLIBC_2.33"};
       default:
