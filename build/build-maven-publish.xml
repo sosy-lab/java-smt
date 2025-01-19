@@ -120,8 +120,8 @@ SPDX-License-Identifier: Apache-2.0
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="opensmt" fileending="jar"/>
-        <stage-solver-file filename="libopensmtjava" classifier="libopensmtjava-x64" filedirectory="${libDir.x64}" fileending="so"/>
-        <stage-solver-file filename="libopensmtjava" classifier="libopensmtjava-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
+        <stage-solver-file filename="libopensmtj" classifier="libopensmtj-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libopensmtj" classifier="libopensmtj-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="opensmt-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
         <stage-solver-file filename="opensmt-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
     </target>

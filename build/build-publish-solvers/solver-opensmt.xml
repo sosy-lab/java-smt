@@ -201,7 +201,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${gmp-linux-x64.path}"/>
         </exec>
 
-        <!-- link the wrapper to create libopensmtjava-x64.so -->
+        <!-- link the wrapper to create libopensmtj-x64.so -->
         <!-- Licensing:
              GMP is licensed under LGPL:
               - https://www.gnu.org/licenses/lgpl-3.0.html
@@ -213,7 +213,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="gcc" dir="${source.path}" failonerror="true">
             <arg value="-shared"/>
             <arg value="-o"/>
-            <arg value="libopensmtjava-x64.so"/>
+            <arg value="libopensmtj-x64.so"/>
             <arg value="opensmt-wrap.o"/>
             <arg value="-L${source.installPathLinuxX64}/lib"/>
             <arg value="-L${gmp-linux-x64.path}/.libs"/>
@@ -228,7 +228,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <exec executable="strip" dir="${source.path}" failonerror="true">
-            <arg value="libopensmtjava-x64.so"/>
+            <arg value="libopensmtj-x64.so"/>
         </exec>
     </target>
 
@@ -249,7 +249,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${gmp-linux-arm64.path}"/>
         </exec>
 
-        <!-- link the wrapper to create libopensmtjava-arm64.so -->
+        <!-- link the wrapper to create libopensmtj-arm64.so -->
         <!-- Licensing:
              GMP is licensed under LGPL:
               - https://www.gnu.org/licenses/lgpl-3.0.html
@@ -261,7 +261,7 @@ SPDX-License-Identifier: Apache-2.0
         <exec executable="aarch64-linux-gnu-g++" dir="${source.path}" failonerror="true">
             <arg value="-shared"/>
             <arg value="-o"/>
-            <arg value="libopensmtjava-arm64.so"/>
+            <arg value="libopensmtj-arm64.so"/>
             <arg value="opensmt-wrap.o"/>
             <arg value="-L${source.installPathLinuxArm64}/lib"/>
             <arg value="-L${gmp-linux-arm64.path}/.libs"/>
@@ -276,7 +276,7 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <exec executable="aarch64-linux-gnu-strip" dir="${source.path}" failonerror="true">
-            <arg value="libopensmtjava-arm64.so"/>
+            <arg value="libopensmtj-arm64.so"/>
         </exec>
     </target>
 
@@ -292,8 +292,8 @@ SPDX-License-Identifier: Apache-2.0
             depends="build-opensmt-linux-x64, build-opensmt-linux-arm64, load-ivy"
             description="Publish OpenSMT binaries to Ivy repository.">
         <!-- copy library files into directory to be published for Ivy -->
-        <copy file="${source.path}/libopensmtjava-x64.so" tofile="${opensmt.dist.dir}/x64/libopensmtjava-${opensmt.version}.so" failonerror="true"/>
-        <copy file="${source.path}/libopensmtjava-arm64.so" tofile="${opensmt.dist.dir}/arm64/libopensmtjava-${opensmt.version}.so" failonerror="true"/>
+        <copy file="${source.path}/libopensmtj-x64.so" tofile="${opensmt.dist.dir}/x64/libopensmtj-${opensmt.version}.so" failonerror="true"/>
+        <copy file="${source.path}/libopensmtj-arm64.so" tofile="${opensmt.dist.dir}/arm64/libopensmtj-${opensmt.version}.so" failonerror="true"/>
 
         <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml"/>
         <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}" distDir="${opensmt.dist.dir}"/>

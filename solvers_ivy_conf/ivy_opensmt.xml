@@ -42,8 +42,8 @@ SPDX-License-Identifier: Apache-2.0
     
     <publications defaultconf="solver-opensmt">
         <!-- Linux native library -->
-        <artifact name="libopensmtjava" conf="solver-opensmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
-        <artifact name="libopensmtjava" conf="solver-opensmt-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        <artifact name="libopensmtj" conf="solver-opensmt-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libopensmtj" conf="solver-opensmt-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
         <!-- Java code, docs and source -->
         <artifact name="opensmt" conf="solver-opensmt-common" ext="jar"/>
         <artifact name="opensmt" conf="sources" e:classifier="sources" type="source" ext="jar"/>

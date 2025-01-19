@@ -99,7 +99,7 @@ public class SolverContextFactoryTest {
         return;
       case OPENSMT:
         assume.that(IS_LINUX).isTrue();
-        assume.that(isSufficientVersionOfLibcxx("opensmtjava")).isTrue();
+        assume.that(isSufficientVersionOfLibcxx("opensmtj")).isTrue();
         return;
       case BITWUZLA:
         assume.that(IS_LINUX).isTrue();
@@ -144,7 +144,7 @@ public class SolverContextFactoryTest {
       case "z3":
         return new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "bitwuzlaj":
-      case "opensmtjava":
+      case "opensmtj":
         return new String[] {"GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
         return new String[] {"GLIBC_2.33"};
