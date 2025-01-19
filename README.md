@@ -63,7 +63,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
 | [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
 | [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  |
-| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: |  |  |  |  |  |  |
+| [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  |  |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  |  |  |  | based on MathSAT5, with support for optimization queries |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |

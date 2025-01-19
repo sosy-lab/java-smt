@@ -142,14 +142,48 @@ We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and GCC are suff
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-To publish OpenSMT, checkout the [OpenSMT repository](https://github.com/usi-verification-and-security/opensmt).
-Then execute the following command in the JavaSMT directory to patch the OpenSMT2 API,
-generate Java bindings with SWIG, build the library, and package it.
+Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
+- For linux-x64 in directory $GMP_DIR_LINUX_X64:
+  ```
+  ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat
+  make -j4
+  ```
+- For linux-arm64 in directory $GMP_DIR_LINUX_ARM64:
+  ```
+  ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat \
+  --host=aarch64-linux-gnu \
+  CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
+  make -j4
+  ```
 
+For linux-arm64, provide JNI headers in a reasonable LTS version.
+Download the zip archive from https://jdk.java.net/ and unpack it into $JDK_DIR_LINUX_ARM64
+(e.g., https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz).
+
+To publish OpenSMT, checkout the [OpenSMT repository](https://github.com/usi-verification-and-security/opensmt).
+Then execute the following command in the JavaSMT directory:
 ```
-ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.8.0
+ant publish-opensmt \
+    -Dopensmt.path=$OPENSMT_DIR \
+    -Dopensmt.customRev=$VERSION \
+    -Dgmp-linux-x64.path=$GMP_DIR_LINUX_X64 \
+    -Dgmp-linux-arm64.path=$GMP_DIR_LINUX_ARM64 \
+    -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
-Our build script will automatically append the git revision of OpenSMT.
+Example:
+```
+ant publish-opensmt \
+    -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
+    -Dopensmt.customRev=2.8.0-sosy0 \
+    -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+    -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
+    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2
+```
+The build scripts for OpenSMT ... :
+- run for about 20 minutes (we build everything from scratch, two times).
+- download Google-based test components (requires internet access).
+- append the git revision of Bitwuzla.
+- produce two Linux (x64 and arm64) libraries, and publish them.
 
 Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
@@ -212,7 +246,7 @@ The build scripts for Bitwuzla ... :
 - run for about 10 minutes (we build everything from scratch, three times).
 - download and build necessary dependencies like GMP automatically. 
 - append the git revision of Bitwuzla.
-- produce two Linux (x64 and arm64) and one Windows (x64) library and publish them.
+- produce two Linux (x64 and arm64) libraries and one Windows (x64) library, and publish them.
 
 Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,

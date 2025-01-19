@@ -25,8 +25,15 @@ SPDX-License-Identifier: Apache-2.0
             For linux-x64:
                 ./configure -?-enable-cxx -?-with-pic -?-disable-shared -?-enable-static -?-enable-fat
                 make -j4
+            For linux-arm64:
+                ./configure -?-enable-cxx -?-with-pic -?-disable-shared -?-enable-static -?-enable-fat \
+                     -?-host=aarch64-linux-gnu \
+                     CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
+                make -j4
         -->
         <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
+        <checkPathOption pathOption="gmp-linux-arm64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux arm64)"/>
+        <checkPathOption pathOption="jdk-linux-arm64.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Linux arm64 version)"/>
 
         <fail unless="opensmt.customRev">
             Please specify a custom revision with the flag -Dopensmt.customRev=XXX.
@@ -48,9 +55,11 @@ SPDX-License-Identifier: Apache-2.0
         <property name="opensmt.installPath" location="${opensmt.path}/install"/>
         <property name="source.path" location="lib/native/source/opensmt"/>
         <property name="source.installPathLinuxX64" location="${source.path}/install-linux-x64"/>
+        <property name="source.installPathLinuxArm64" location="${source.path}/install-linux-arm64"/>
 
         <!-- cleanup target directories, will be created and filled during the build-process -->
         <delete dir="${source.installPathLinuxX64}" quiet="true"/>
+        <delete dir="${source.installPathLinuxArm64}" quiet="true"/>
         <delete dir="${source.path}/build" quiet="true"/>
         <delete dir="${source.path}/doc" quiet="true"/>
         <delete dir="${source.path}/install" quiet="true"/>
@@ -66,7 +75,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="${source.path}/api.patch"/>
         </exec>
 
-        <!-- Build OpenSMT -->
+        <!-- Build OpenSMT,
+                     Make sure to remove the old 'build/' directory from OpenSMT!
+                     It keeps old build commands and previous cmake-flags. -->
+        <delete dir="${opensmt.path}/build" quiet="true"/>
         <exec executable="make" dir="${opensmt.path}" failonerror="true">
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <arg value="CMAKE_FLAGS=-DFORCE_STATIC_GMP=ON"/>
@@ -82,6 +94,40 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- copy OpenSMT include files to JavaSMT -->
         <copy todir="${source.installPathLinuxX64}">
+            <fileset dir="${opensmt.installPath}"/>
+        </copy>
+    </target>
+
+    <target name="compile-opensmt-linux-arm64" depends="set-properties-for-opensmt">
+        <delete dir="${opensmt.installPath}" quiet="true"/>
+        <echo message="Building OpenSMT in version '${opensmt.version}' for Linux arm64"/>
+
+        <!-- Patch OpenSMT to avoid swig errors and add some required features -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="${source.path}/api.patch"/>
+        </exec>
+
+        <!-- Build OpenSMT,
+             Make sure to remove the old 'build/' directory from OpenSMT!
+             It keeps old build commands and previous cmake-flags. -->
+        <delete dir="${opensmt.path}/build" quiet="true"/>
+        <exec executable="make" dir="${opensmt.path}" failonerror="true">
+            <arg value="INSTALL_DIR=${opensmt.installPath}"/>
+            <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
+            <arg value="CMAKE_FLAGS=-DFORCE_STATIC_GMP=ON -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ -DGMP_LIBRARY=${gmp-linux-arm64.path}/.libs/libgmp.a -DGMPXX_LIBRARY=${gmp-linux-arm64.path}/.libs/libgmpxx.a -DGMP_INCLUDE_DIR=${gmp-linux-arm64.path}"/>
+            <arg value="install"/>
+        </exec>
+
+        <!-- Revert the patch -->
+        <exec executable="git" dir="${opensmt.path}" failonerror="true">
+            <arg value="apply"/>
+            <arg value="-R"/>
+            <arg value="${source.path}/api.patch"/>
+        </exec>
+
+        <!-- copy OpenSMT include files to JavaSMT -->
+        <copy todir="${source.installPathLinuxArm64}">
             <fileset dir="${opensmt.installPath}"/>
         </copy>
     </target>
@@ -152,9 +198,10 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${source.installPathLinuxX64}/include/opensmt"/>
             <arg value="-I${java.home}/include"/>
             <arg value="-I${java.home}/include/linux"/>
+            <arg value="-I${gmp-linux-x64.path}"/>
         </exec>
 
-        <!-- link the wrapper to create libopensmtj-x64.so -->
+        <!-- link the wrapper to create libopensmtjava-x64.so -->
         <!-- Licensing:
              GMP is licensed under LGPL:
               - https://www.gnu.org/licenses/lgpl-3.0.html
@@ -185,18 +232,86 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
     </target>
 
+    <target name="build-opensmt-bindings-linux-arm64" depends="build-opensmt-bindings-jni">
+        <!-- Dump ${opensmt.version} to a file so that we can use it for the swig wrapper -->
+        <echo file="${source.path}/version.h">#define VERSION "${opensmt.version}"</echo>
+
+        <!-- compile the swig wrapper -->
+        <exec executable="aarch64-linux-gnu-gcc" dir="${source.path}" failonerror="true">
+            <arg value="-fPIC"/>
+            <arg value="-std=c++20"/>
+            <arg value="-c"/>
+            <arg value="opensmt-wrap.cpp"/>
+            <arg value="-I${source.installPathLinuxArm64}/include"/>
+            <arg value="-I${source.installPathLinuxArm64}/include/opensmt"/>
+            <arg value="-I${jdk-linux-arm64.path}/include"/>
+            <arg value="-I${jdk-linux-arm64.path}/include/linux"/>
+            <arg value="-I${gmp-linux-arm64.path}"/>
+        </exec>
+
+        <!-- link the wrapper to create libopensmtjava-arm64.so -->
+        <!-- Licensing:
+             GMP is licensed under LGPL:
+              - https://www.gnu.org/licenses/lgpl-3.0.html
+             OpenSMT is licensed under MIT license:
+              - https://github.com/opensmt/opensmt/blob/main/COPYING
+             Based on that information, we provide the whole library including its dependencies under the MIT license.
+        -->
+        <!-- Link the wrapper and create a new lib -->
+        <exec executable="aarch64-linux-gnu-g++" dir="${source.path}" failonerror="true">
+            <arg value="-shared"/>
+            <arg value="-o"/>
+            <arg value="libopensmtjava-arm64.so"/>
+            <arg value="opensmt-wrap.o"/>
+            <arg value="-L${source.installPathLinuxArm64}/lib"/>
+            <arg value="-L${gmp-linux-arm64.path}/.libs"/>
+            <arg value="-Wl,-Bstatic"/>
+            <arg value="-lopensmt"/>
+            <arg value="-lgmpxx"/>
+            <arg value="-lgmp"/>
+            <arg value="-lstdc++"/>
+            <arg value="-Wl,-Bdynamic"/>
+            <arg value="-lm"/>
+            <arg value="-Wl,-z,defs"/>
+        </exec>
+
+        <exec executable="aarch64-linux-gnu-strip" dir="${source.path}" failonerror="true">
+            <arg value="libopensmtjava-arm64.so"/>
+        </exec>
+    </target>
+
     <target name="build-opensmt-linux-x64"
             depends="compile-opensmt-linux-x64, build-opensmt-wrapper, build-opensmt-bindings-linux-x64">
     </target>
 
+    <target name="build-opensmt-linux-arm64"
+            depends="compile-opensmt-linux-arm64, build-opensmt-wrapper, build-opensmt-bindings-linux-arm64">
+    </target>
+
     <target name="publish-opensmt"
-            depends="build-opensmt-linux-x64, load-ivy"
+            depends="build-opensmt-linux-x64, build-opensmt-linux-arm64, load-ivy"
             description="Publish OpenSMT binaries to Ivy repository.">
         <!-- copy library files into directory to be published for Ivy -->
         <copy file="${source.path}/libopensmtjava-x64.so" tofile="${opensmt.dist.dir}/x64/libopensmtjava-${opensmt.version}.so" failonerror="true"/>
-        <copy file="${source.path}/libopensmtjava-x64.so" tofile="${opensmt.dist.dir}/libopensmtjava-${opensmt.version}.so" failonerror="true"/>
+        <copy file="${source.path}/libopensmtjava-arm64.so" tofile="${opensmt.dist.dir}/arm64/libopensmtjava-${opensmt.version}.so" failonerror="true"/>
 
         <ivy:resolve conf="solver-opensmt" file="solvers_ivy_conf/ivy_opensmt.xml"/>
         <publishToRepository solverName="OpenSMT" solverVersion="${opensmt.version}" distDir="${opensmt.dist.dir}"/>
+
+        <!--
+          We additionally provide x64-files without arch-attribute for backwards compatibility,
+          such that applications can load dependencies without changing their Ivy configuration.
+          Those files are not part of any direct configuration, but will be resolved if the
+          arch-attribute is not used.
+        -->
+        <echo>
+            Lets copy the files for architecture x64 into main directory, for backwards compatibility.
+            Afterward, please execute the SVN command from above.
+        </echo>
+        <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
+            <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                <include name="*-${opensmt.version}.*"/>
+            </fileset>
+        </copy>
     </target>
 </project>

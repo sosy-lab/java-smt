@@ -86,8 +86,8 @@ SPDX-License-Identifier: Apache-2.0
         <delete includeEmptyDirs="true">
             <fileset dir="." includes="${libraryFiles} ${jarFiles} Javadoc-z3/"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="lib/native/source/libbitwuzla" includes="include/"/>
-            <fileset dir="lib/native/source/libbitwuzla" includes="bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/libbitwuzla" includes="install-linux/ install-linux-x64/ install-linux-arm64/ install-windows/ install-windows-x64/ build/ doc/ *.so *.dll bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/opensmt" includes="install-linux-x64/ install-linux-arm64/ *.so"/>
         </delete>
     </target>
 
