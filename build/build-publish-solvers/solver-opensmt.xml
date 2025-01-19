@@ -19,6 +19,15 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="set-properties-for-opensmt">
         <checkPathOption pathOption="opensmt.path" defaultPath="/path/to/opensmt" targetName="OpenSMT source folder (git checkout from 'https://github.com/usi-verification-and-security/opensmt.git)"/>
+
+        <!--
+            Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
+            For linux-x64:
+                ./configure -?-enable-cxx -?-with-pic -?-disable-shared -?-enable-static -?-enable-fat
+                make -j4
+        -->
+        <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
+
         <fail unless="opensmt.customRev">
             Please specify a custom revision with the flag -Dopensmt.customRev=XXX.
             The custom revision has to be unique amongst the already known version
@@ -159,12 +168,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-o"/>
             <arg value="libopensmtjava-x64.so"/>
             <arg value="opensmt-wrap.o"/>
+            <arg value="-L${source.installPathLinuxX64}/lib"/>
+            <arg value="-L${gmp-linux-x64.path}/.libs"/>
+            <arg value="-Wl,-Bstatic"/>
+            <arg value="-lopensmt"/>
+            <arg value="-lgmpxx"/>
+            <arg value="-lgmp"/>
             <arg value="-lstdc++"/>
-            <arg value="-Wl,--whole-archive"/>
-            <arg value="${source.installPathLinuxX64}/lib/libopensmt.a"/>
-            <arg value="/dependencies/gmp-6.2.1/.libs/libgmp.a"/>
-            <arg value="/dependencies/gmp-6.2.1/.libs/libgmpxx.a"/>
-            <arg value="-Wl,--no-whole-archive"/>
+            <arg value="-Wl,-Bdynamic"/>
             <arg value="-lm"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
