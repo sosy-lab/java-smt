@@ -201,11 +201,23 @@ public class SolverFormulaIODeclarationsTest
   }
 
   @Test
-  public void parseDeclareConflictBeforeQueryTest() {
+  public void parseDeclareConflictBeforeQueryTest_IntBool() {
     requireIntegers();
     @SuppressWarnings("unused")
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Bool)(assert (= 0 x))";
+    if (Solvers.Z3 != solverToUse()) { // The Z3 parser converts Booleans to Int if required.
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
+    }
+  }
+
+  @Test
+  public void parseDeclareConflictBeforeQueryTest_IntBV() {
+    requireIntegers();
+    requireBitvectors();
+    @SuppressWarnings("unused")
+    IntegerFormula var = imgr.makeVariable("x");
+    String query = "(declare-fun x () Int)(assert (= (_ bv20 8) x))";
     assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
   }
 

@@ -23,18 +23,28 @@ SPDX-License-Identifier: Apache-2.0
     </info>
 
     <configurations>
-        <!-- TODO: Add windows support -->
-        <conf name="solver-bitwuzla" extends="solver-bitwuzla-linux, solver-bitwuzla-windows"/>
-        <conf name="solver-bitwuzla-linux" extends="solver-bitwuzla-common"/>
-        <conf name="solver-bitwuzla-windows" extends="solver-bitwuzla-common"/>
-        <conf name="solver-bitwuzla-common" visibility="private"/>
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-bitwuzla" extends="solver-bitwuzla-x64"/>
+
+        <!-- main configurations -->
+        <conf name="solver-bitwuzla-x64" extends="solver-bitwuzla-linux-x64, solver-bitwuzla-windows-x64"/>
+        <conf name="solver-bitwuzla-arm64" extends="solver-bitwuzla-linux-arm64"/>
+
         <conf name="sources"/>
         <conf name="javadoc"/>
+
+        <!-- basic configurations -->
+        <conf name="solver-bitwuzla-linux-x64" extends="solver-bitwuzla-common"/>
+        <conf name="solver-bitwuzla-linux-arm64" extends="solver-bitwuzla-common"/>
+        <conf name="solver-bitwuzla-windows-x64" extends="solver-bitwuzla-common"/>
+
+        <conf name="solver-bitwuzla-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="solver-bitwuzla">
-        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-linux" type="shared-object" ext="so"/>
-        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-windows" type="shared-object" ext="dll"/>
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        <artifact name="libbitwuzlaj" conf="solver-bitwuzla-windows-x64" e:arch="x64" type="shared-object" ext="dll"/>
         <!-- Java code, docs and source -->
         <artifact name="bitwuzla" conf="solver-bitwuzla-common" ext="jar"/>
         <artifact name="bitwuzla" conf="sources" e:classifier="sources" type="source" ext="jar"/>

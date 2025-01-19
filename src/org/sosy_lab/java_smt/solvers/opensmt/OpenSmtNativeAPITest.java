@@ -37,8 +37,7 @@ public class OpenSmtNativeAPITest {
   @BeforeClass
   public static void load() {
     try {
-      NativeLibraries.loadLibrary("opensmt");
-      NativeLibraries.loadLibrary("opensmtjava");
+      NativeLibraries.loadLibrary("opensmtj");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("OpenSMT is not available", e);
     }

@@ -12,7 +12,8 @@ SPDX-License-Identifier: Apache-2.0
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="macros" basedir="."
-         xmlns:ivy="antlib:org.apache.ivy.ant">
+         xmlns:ivy="antlib:org.apache.ivy.ant"
+         xmlns:e="http://ant.apache.org/ivy/extra">
 
     <macrodef name="checkPathOption">
         <attribute name="pathOption"/>
@@ -31,6 +32,7 @@ SPDX-License-Identifier: Apache-2.0
     <macrodef name="publishToRepository">
         <attribute name="solverName"/>
         <attribute name="solverVersion"/>
+        <attribute name="distDir" default="."/> <!-- backwards compatible default value -->
         <sequential>
             <available property="ivy.hasrepository" file="repository/${ivy.organisation}/${ivy.module}" />
             <fail unless="ivy.hasrepository"
@@ -38,12 +40,12 @@ SPDX-License-Identifier: Apache-2.0
             <ivy:publish
                     pubrevision="@{solverVersion}"
                     resolver="Sosy-Lab-Publish"
-                    artifactspattern="[artifact]-[revision](-[classifier]).[ext]"
+                    artifactspattern="@{distDir}/([arch]/)[artifact]-[revision](-[classifier]).[ext]"
                     status="release"
             />
             <echo>
                 You now want to run
-                svn add repository/${ivy.organisation}/${ivy.module}/*-@{solverVersion}*
+                svn add repository/${ivy.organisation}/${ivy.module}/*-@{solverVersion}* repository/${ivy.organisation}/${ivy.module}/*/*-@{solverVersion}*
                 svn ci repository/${ivy.organisation}/${ivy.module} -m"publish version @{solverVersion} of @{solverName} Solver"
                 to make the new version publicly available.</echo>
         </sequential>
