@@ -155,6 +155,21 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         "Tree interpolants are not supported for independent interpolation currently.");
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<TFormulaInfo>> pPartitionedFormulas)
+      throws SolverException, InterruptedException {
+    if (interpolationStrategy == null) {
+      if (delegate instanceof InterpolatingProverEnvironment) {
+        // Use native solver interpolation
+        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+            .getSeqInterpolants(pPartitionedFormulas);
+      }
+    }
+    throw new UnsupportedOperationException(
+        "Sequential interpolants are not supported for independent interpolation currently.");
+  }
+
   /**
    * Computes Craig interpolants for a {@link Collection} of {@link BooleanFormula}s using the
    * model-based solver independent interpolation strategy.
