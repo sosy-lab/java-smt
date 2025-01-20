@@ -493,13 +493,16 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     delegate.pop();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected @Nullable TFormulaInfo addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException {
     checkState(!closed);
-    TFormulaInfo t = creator.extractInfo(constraint);
-    delegate.addConstraint(constraint);
-    return t;
+    Object itpPoint = delegate.addConstraint(constraint);
+    if (itpPoint == null) {
+      return creator.extractInfo(constraint);
+    }
+    return (TFormulaInfo) itpPoint;
   }
 
   @Override
