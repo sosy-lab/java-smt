@@ -139,10 +139,18 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
+    if (interpolationStrategy == null) {
+      if (delegate instanceof InterpolatingProverEnvironment) {
+        // Use native solver interpolation
+        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+            .getTreeInterpolants(partitionedFormulas, startOfSubTree);
+      }
+    }
     throw new UnsupportedOperationException(
         "Tree interpolants are not supported for independent interpolation currently.");
   }
