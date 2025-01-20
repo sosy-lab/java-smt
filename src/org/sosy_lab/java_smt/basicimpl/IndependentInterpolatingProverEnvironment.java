@@ -157,7 +157,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<TFormulaInfo>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(
+      List<? extends Collection<TFormulaInfo>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {

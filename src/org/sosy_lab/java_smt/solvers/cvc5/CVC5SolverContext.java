@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import io.github.cvc5.Solver;

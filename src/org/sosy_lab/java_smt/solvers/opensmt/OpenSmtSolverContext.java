@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.function.Consumer;
