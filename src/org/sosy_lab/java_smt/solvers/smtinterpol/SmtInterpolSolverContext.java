@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -237,26 +236,24 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    if (!hasIndependentInterpolationStrategy(options)) {
-      // TODO: change this case.
-      Script newScript = createNewScript(options);
-      final SmtInterpolInterpolatingProver prover;
-      if (settings.smtLogfile == null) {
-        prover = new SmtInterpolInterpolatingProver(manager, newScript, options, shutdownNotifier);
-      } else {
-        prover =
-            new LoggingSmtInterpolInterpolatingProver(
-                manager,
-                newScript,
-                options,
-                shutdownNotifier,
-                settings.optionsMap,
-                settings.smtLogfile.getFreshPath());
-      }
-      return prover;
+
+    Script newScript = createNewScript(options);
+    final SmtInterpolInterpolatingProver prover;
+    if (settings.smtLogfile == null) {
+      prover = new SmtInterpolInterpolatingProver(manager, newScript, options, shutdownNotifier);
+    } else {
+      prover =
+          new LoggingSmtInterpolInterpolatingProver(
+              manager,
+              newScript,
+              options,
+              shutdownNotifier,
+              settings.optionsMap,
+              settings.smtLogfile.getFreshPath());
     }
+
     return new IndependentInterpolatingProverEnvironment<>(
-        this, null, newProverEnvironment0(options), options, shutdownNotifier);
+        this, prover.creator, prover, options, shutdownNotifier);
   }
 
   @Override

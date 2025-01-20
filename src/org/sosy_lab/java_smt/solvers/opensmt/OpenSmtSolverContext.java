@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 
 import com.google.common.base.Preconditions;
 import java.util.Set;
@@ -150,13 +149,12 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<SolverContext.ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    if (!hasIndependentInterpolationStrategy(options)) {
-      // TODO: change this case.
-      return new OpenSmtInterpolatingProver(
-          creator, manager, shutdownNotifier, options, solverOptions);
-    }
     return new IndependentInterpolatingProverEnvironment<>(
-        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
+        this,
+        creator,
+        new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, options, solverOptions),
+        options,
+        shutdownNotifier);
   }
 
   @Override

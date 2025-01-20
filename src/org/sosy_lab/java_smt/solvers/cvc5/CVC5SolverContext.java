@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -197,18 +196,18 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    if (!hasIndependentInterpolationStrategy(options)) {
-      // TODO: change this case
-      return new CVC5InterpolatingProver(
-          creator,
-          shutdownNotifier,
-          randomSeed,
-          options,
-          getFormulaManager(),
-          settings.validateInterpolants);
-    }
+
+    CVC5InterpolatingProver itpProver =
+        new CVC5InterpolatingProver(
+            creator,
+            shutdownNotifier,
+            randomSeed,
+            options,
+            getFormulaManager(),
+            settings.validateInterpolants);
+
     return new IndependentInterpolatingProverEnvironment<>(
-        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
+        this, creator, itpProver, options, shutdownNotifier);
   }
 
   @Override

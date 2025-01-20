@@ -25,6 +25,7 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -47,7 +48,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
   private final SolverContext solverContext;
   private final ShutdownNotifier shutdownNotifier;
-  private final ProverEnvironment delegate;
+  private final BasicProverEnvironment<?> delegate;
 
   private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
   private final FormulaManager mgr;
@@ -64,7 +65,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   public IndependentInterpolatingProverEnvironment(
       SolverContext pSourceContext,
       FormulaCreator<TFormulaInfo, TType, ?, ?> pCreator,
-      ProverEnvironment pDelegate,
+      BasicProverEnvironment<?> pDelegate,
       Set<ProverOptions> pOptions,
       ShutdownNotifier pShutdownNotifier) {
     super(pOptions);
@@ -106,6 +107,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return itpStrat.get(0);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
       throws SolverException, InterruptedException {
@@ -116,9 +118,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
         // Use native solver interpolation
-        // TODO: this case throws a ClassCastException.
-        // return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate).getInterpolant
-        // (pFormulasOfA);
+        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+            .getInterpolant(pFormulasOfA);
       } else {
         throw new UnsupportedOperationException(
             "Solver does not natively support interpolation in JavaSMT currently.");
@@ -192,11 +193,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    checkArgument(!varsOfA.isEmpty(),
+    checkArgument(
+        !varsOfA.isEmpty(),
         "The set of variables for formulas of A is empty and cannot be quantified.");
-    checkArgument(!varsOfB.isEmpty(),
+    checkArgument(
+        !varsOfB.isEmpty(),
         "The set of variables for formulas of B is empty and cannot be quantified.");
-    checkArgument(!sharedVars.isEmpty(),
+    checkArgument(
+        !sharedVars.isEmpty(),
         "The set of the shared variables is empty and cannot be quantified.");
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
@@ -264,11 +268,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    checkArgument(!varsOfA.isEmpty(),
+    checkArgument(
+        !varsOfA.isEmpty(),
         "The set of variables for formulas of A is empty and cannot be quantified.");
-    checkArgument(!varsOfB.isEmpty(),
+    checkArgument(
+        !varsOfB.isEmpty(),
         "The set of variables for formulas of B is empty and cannot be quantified.");
-    checkArgument(!sharedVars.isEmpty(),
+    checkArgument(
+        !sharedVars.isEmpty(),
         "The set of the shared variables is empty and cannot be quantified.");
 
     Preconditions.checkState(isUnsat());
@@ -435,8 +442,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     false} otherwise.
    */
   private boolean satisfiesInterpolationCriteria(
-      BooleanFormula itp, BooleanFormula formulasOfA, BooleanFormula formulasOfB,
-      List<Formula> varsOfA, List<Formula> varsOfB)
+      BooleanFormula itp,
+      BooleanFormula formulasOfA,
+      BooleanFormula formulasOfB,
+      List<Formula> varsOfA,
+      List<Formula> varsOfB)
       throws SolverException, InterruptedException {
 
     boolean result = false;

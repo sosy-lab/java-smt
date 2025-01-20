@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import static org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment.hasIndependentInterpolationStrategy;
 
 import ap.api.SimpleAPI;
 import java.util.Set;
@@ -84,13 +83,12 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    if (!hasIndependentInterpolationStrategy(options)) {
-      // TODO: change this case.
-      return (PrincessInterpolatingProver)
-          creator.getEnv().getNewProver(true, manager, creator, options);
-    }
-    return new IndependentInterpolatingProverEnvironment<>(
-        this, creator, newProverEnvironment0(options), options, null);
+
+    PrincessInterpolatingProver itpProver =
+        (PrincessInterpolatingProver)
+            creator.getEnv().getNewProver(true, manager, creator, options);
+
+    return new IndependentInterpolatingProverEnvironment<>(this, creator, itpProver, options, null);
   }
 
   @Override
