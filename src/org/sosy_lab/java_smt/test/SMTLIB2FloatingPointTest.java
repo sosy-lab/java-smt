@@ -53,6 +53,33 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
     assertThat(actualResult.equals(a));
   }
   @Test
+  public void testMakeFloatingPoint()
+      throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    String x = "(declare-const a (_ FloatingPoint 8 24))\n"
+        + "(declare-const b (_ FloatingPoint 8 24))\n"
+        + "(declare-const c (_ FloatingPoint 8 24))\n"
+        + "(assert (fp.eq a ((_ to_fp 8 24) RNE 10.0)))\n"
+        + "(assert (fp.eq b ((_ to_fp 8 24) RNE 10.0)))\n"
+        + "(assert (fp.eq (fp.add RNE a b) c))\n";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    FloatingPointFormula a = Objects.requireNonNull(fpmgr).makeVariable("a",
+        FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b = Objects.requireNonNull(fpmgr).makeVariable("b",
+        FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula c = Objects.requireNonNull(fpmgr).makeVariable("c",
+        FormulaType.getSinglePrecisionFloatingPointType());
+    BooleanFormula expectedResult = bmgr.and(
+        fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(20.0,
+            FormulaType.getSinglePrecisionFloatingPointType())),
+        fpmgr.equalWithFPSemantics(b,
+            fpmgr.makeNumber(10.0,FormulaType.getSinglePrecisionFloatingPointType())),
+        fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
+    assertThat(actualResult).isNotNull();
+    assertThat(actualResult.equals(expectedResult));
+    assertThat(expectedResult.equals(actualResult));
+  }
+  @Test
   public void testDeclareFloatingPoints()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
@@ -106,7 +133,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0{
 
     BooleanFormula expectedResult = constraint;
 
-    assertThat(expectedResult.equals(actualResult));;
+    assertThat(expectedResult.equals(actualResult));
   }
 
   @Test

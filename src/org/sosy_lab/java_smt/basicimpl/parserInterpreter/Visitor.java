@@ -576,10 +576,12 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       return variables.get(operand).javaSmt;
     }
     else if (beginningMatchesList(operand, getAllAllowedFPBeginnigs())) {
-     return createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand);
+      variables.put(operand, createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand));
+      return variables.get(operand).javaSmt;
     }
     else if (operand.startsWith("\"")){
-      return createParserFormulaForString(operand);
+      variables.put(operand, createParserFormulaForString(operand));
+      return variables.get(operand).javaSmt;
     }
     else if (operand.startsWith("#b")) {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
