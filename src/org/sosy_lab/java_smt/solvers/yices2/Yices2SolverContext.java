@@ -19,12 +19,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.IndependentInterpolatingProverEnvironment;
@@ -39,11 +37,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private boolean closed = false;
 
   public Yices2SolverContext(
-      FormulaManager pFmgr,
-      Yices2FormulaCreator creator,
-      BooleanFormulaManager pBfmgr,
-      QuantifiedFormulaManager pQfmgr,
-      ShutdownNotifier pShutdownManager) {
+      FormulaManager pFmgr, Yices2FormulaCreator creator, ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     fmgr = pFmgr;
     this.creator = creator;
@@ -78,11 +72,17 @@ public class Yices2SolverContext extends AbstractSolverContext {
         new Yices2RationalFormulaManager(creator, pNonLinearArithmetic);
     Yices2QuantifiedFormulaManager quantifiedFormulaManager =
         new Yices2QuantifiedFormulaManager(creator);
+
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
-    return new Yices2SolverContext(
-        manager, creator, booleanTheory, quantifiedFormulaManager, pShutdownManager);
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            bitvectorTheory,
+            quantifiedFormulaManager);
+    return new Yices2SolverContext(manager, creator, pShutdownManager);
   }
 
   @Override

@@ -48,7 +48,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       Yices2BooleanFormulaManager pBooleanManager,
       Yices2IntegerFormulaManager pIntegerManager,
       Yices2RationalFormulaManager pRationalManager,
-      Yices2BitvectorFormulaManager pBitvectorManager) {
+      Yices2BitvectorFormulaManager pBitvectorManager,
+      Yices2QuantifiedFormulaManager pQuantifiedManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -57,7 +58,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pRationalManager,
         pBitvectorManager,
         null,
-        null,
+        pQuantifiedManager,
         null,
         null,
         null,
