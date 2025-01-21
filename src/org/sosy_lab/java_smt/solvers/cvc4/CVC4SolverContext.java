@@ -141,6 +141,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
     return false;
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {

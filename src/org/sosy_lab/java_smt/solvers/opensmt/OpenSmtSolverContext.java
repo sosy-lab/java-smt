@@ -144,6 +144,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
         creator, manager, shutdownNotifier, pProverOptions, solverOptions);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<SolverContext.ProverOptions> options) {

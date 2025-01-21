@@ -114,6 +114,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     return new Yices2TheoremProver(creator, pOptions, fmgr, shutdownManager);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {

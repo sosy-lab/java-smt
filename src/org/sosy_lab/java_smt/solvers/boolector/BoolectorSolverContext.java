@@ -207,6 +207,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
         manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {

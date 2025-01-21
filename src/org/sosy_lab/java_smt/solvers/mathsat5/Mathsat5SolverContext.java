@@ -266,6 +266,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {

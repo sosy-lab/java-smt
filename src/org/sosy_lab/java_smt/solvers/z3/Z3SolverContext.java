@@ -225,6 +225,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {

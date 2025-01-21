@@ -275,6 +275,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
