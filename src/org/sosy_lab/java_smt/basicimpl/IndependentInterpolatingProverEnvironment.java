@@ -54,7 +54,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private final QuantifiedFormulaManager qfmgr;
 
   // null for native solver interpolation
-  private final Object interpolationStrategy;
+  private final @Nullable ProverOptions interpolationStrategy;
 
   private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
       ImmutableSet.of(
@@ -90,15 +90,15 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     otherwise.
    */
   public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> options) {
-    return getIndependentInterpolationStrategy(options) instanceof ProverOptions;
+    return getIndependentInterpolationStrategy(options) != null;
   }
 
-  private static Object getIndependentInterpolationStrategy(
+  private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
     itpStrat.retainAll(ALL_INDEPENDENT_INTERPOLATION_STRATEGIES);
     if (itpStrat.isEmpty()) {
-      return Optional.ofNullable(options);
+      return null;
     }
     Preconditions.checkState(itpStrat.size() == 1);
     return itpStrat.get(0);
