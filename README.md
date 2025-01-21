@@ -58,7 +58,7 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 
 | SMT Solver | Linux64 | Windows64 | MacOS | Description |
 | --- |:---:|:---:|:---:|:--- |
-| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic |
+| [Bitwuzla](https://bitwuzla.github.io/) | :heavy_check_mark: | :heavy_check_mark: |  | a fast solver for bitvector logic |
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |
 | [CVC5](https://cvc5.github.io/) | :heavy_check_mark: |  |  |  |
@@ -69,6 +69,12 @@ Currently JavaSMT supports several SMT solvers (see [Getting Started](doc/Gettin
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  |  |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
+
+We support a reasonable list of operating systems and versions.
+Our main target is Linux (64-bit, mainly Ubuntu 22.04 or newer,
+several solver libraries also work on Ubuntu 18.04, or comparable Linux distributions).
+Windows 10/11 and MacOS are supported for several SMT solvers (with limited hardware for testing).
+If a specific operating system is missing and required, please do not hesitate and open an issue!
 
 The following features are supported (depending on the used SMT solver):
 

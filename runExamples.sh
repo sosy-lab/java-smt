@@ -77,7 +77,7 @@ esac
 
 # build the classpath including all solvers
 CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/bin$SEP$PATH_TO_JAVASMT/lib/java/core/*"
-SOLVERS="boolector cvc4 cvc5 mathsat opensmt optimathsat princess smtinterpol yices2 z3"
+SOLVERS="bitwuzla boolector cvc4 cvc5 mathsat opensmt optimathsat princess smtinterpol yices2 z3"
 for solver in $SOLVERS ; do
   CLASSPATH="$CLASSPATH$SEP$PATH_TO_JAVASMT/lib/java/runtime-$solver/*"
 done

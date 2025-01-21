@@ -97,6 +97,7 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
+  @SuppressWarnings("ClassInitializationDeadlock")
   public static final FormulaType<RationalFormula> RationalType =
       new NumeralType<>() {
 
@@ -116,6 +117,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
+  @SuppressWarnings("ClassInitializationDeadlock")
   public static final FormulaType<IntegerFormula> IntegerType =
       new NumeralType<>() {
 

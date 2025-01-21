@@ -101,17 +101,15 @@ public class BitwuzlaFloatingPointManager
     }
 
     // Handle special cases
-    if (canonical.equals("-inf")) {
-      return termManager.mk_fp_neg_inf(mkFpaSort(pType));
-    }
-    if (canonical.equals("-0.0")) {
-      return termManager.mk_fp_neg_zero(mkFpaSort(pType));
-    }
-    if (canonical.equals("nan")) {
-      return termManager.mk_fp_nan(mkFpaSort(pType));
-    }
-    if (canonical.equals("inf")) {
-      return termManager.mk_fp_pos_inf(mkFpaSort(pType));
+    switch (canonical) {
+      case "-inf":
+        return termManager.mk_fp_neg_inf(mkFpaSort(pType));
+      case "-0.0":
+        return termManager.mk_fp_neg_zero(mkFpaSort(pType));
+      case "nan":
+        return termManager.mk_fp_nan(mkFpaSort(pType));
+      case "inf":
+        return termManager.mk_fp_pos_inf(mkFpaSort(pType));
     }
 
     String decimalString = new BigDecimal(canonical).toPlainString();

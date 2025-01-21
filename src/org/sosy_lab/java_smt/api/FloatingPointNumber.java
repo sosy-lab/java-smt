@@ -85,7 +85,7 @@ public abstract class FloatingPointNumber {
         "Can not represent floating point number %s as Java-based float value.",
         this);
     var bits = getBits();
-    return Float.intBitsToFloat(bits.length() == 0 ? 0 : (int) bits.toLongArray()[0]);
+    return Float.intBitsToFloat(bits.isEmpty() ? 0 : (int) bits.toLongArray()[0]);
   }
 
   /** compute a representation as Java-based double value, if possible. */
@@ -99,7 +99,7 @@ public abstract class FloatingPointNumber {
       return floatValue();
     }
     var bits = getBits();
-    return Double.longBitsToDouble(bits.length() == 0 ? 0 : getBits().toLongArray()[0]);
+    return Double.longBitsToDouble(bits.isEmpty() ? 0 : getBits().toLongArray()[0]);
   }
 
   private BitSet getBits() {

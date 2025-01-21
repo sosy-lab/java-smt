@@ -683,14 +683,19 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       case Z3_OP_BMUL:
         return FunctionDeclarationKind.BV_MUL;
       case Z3_OP_BUDIV:
+      case Z3_OP_BUDIV_I: // same as above, and divisor is non-zero
         return FunctionDeclarationKind.BV_UDIV;
       case Z3_OP_BSDIV:
+      case Z3_OP_BSDIV_I: // same as above, and divisor is non-zero
         return FunctionDeclarationKind.BV_SDIV;
       case Z3_OP_BUREM:
+      case Z3_OP_BUREM_I: // same as above, and divisor is non-zero
         return FunctionDeclarationKind.BV_UREM;
       case Z3_OP_BSREM:
+      case Z3_OP_BSREM_I: // same as above, and divisor is non-zero
         return FunctionDeclarationKind.BV_SREM;
       case Z3_OP_BSMOD:
+      case Z3_OP_BSMOD_I: // same as above, and divisor is non-zero
         return FunctionDeclarationKind.BV_SMOD;
       case Z3_OP_BSHL:
         return FunctionDeclarationKind.BV_SHL;
