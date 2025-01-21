@@ -152,8 +152,7 @@ public class OpenSmtSolverContext extends AbstractSolverContext {
         this,
         creator,
         new OpenSmtInterpolatingProver(creator, manager, shutdownNotifier, options, solverOptions),
-        options,
-        shutdownNotifier);
+        options);
   }
 
   @Override

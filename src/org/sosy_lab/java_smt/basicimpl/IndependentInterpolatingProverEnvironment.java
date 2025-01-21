@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -44,7 +43,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
 
   private final SolverContext solverContext;
-  private final ShutdownNotifier shutdownNotifier;
+
   private final BasicProverEnvironment<?> delegate;
 
   private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
@@ -68,13 +67,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       SolverContext pSourceContext,
       FormulaCreator<TFormulaInfo, TType, ?, ?> pCreator,
       BasicProverEnvironment<?> pDelegate,
-      Set<ProverOptions> pOptions,
-      ShutdownNotifier pShutdownNotifier) {
+      Set<ProverOptions> pOptions) {
     super(pOptions);
     solverContext = checkNotNull(pSourceContext);
     delegate = checkNotNull(pDelegate);
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
     interpolationStrategy = getIndependentInterpolationStrategy(pOptions);
     mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();

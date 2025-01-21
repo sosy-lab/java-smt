@@ -87,7 +87,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
         (PrincessInterpolatingProver)
             creator.getEnv().getNewProver(true, manager, creator, options);
 
-    return new IndependentInterpolatingProverEnvironment<>(this, creator, itpProver, options, null);
+    return new IndependentInterpolatingProverEnvironment<>(this, creator, itpProver, options);
   }
 
   @Override

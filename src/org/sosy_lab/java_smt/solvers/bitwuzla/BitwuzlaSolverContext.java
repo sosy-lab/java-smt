@@ -286,7 +286,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
               + " GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
     }
     return new IndependentInterpolatingProverEnvironment<>(
-        this, creator, newProverEnvironment0(options), options, shutdownNotifier);
+        this, creator, newProverEnvironment0(options), options);
   }
 
   @Override

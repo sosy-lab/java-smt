@@ -205,8 +205,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             getFormulaManager(),
             settings.validateInterpolants);
 
-    return new IndependentInterpolatingProverEnvironment<>(
-        this, creator, itpProver, options, shutdownNotifier);
+    return new IndependentInterpolatingProverEnvironment<>(this, creator, itpProver, options);
   }
 
   @Override

@@ -252,8 +252,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
               settings.smtLogfile.getFreshPath());
     }
 
-    return new IndependentInterpolatingProverEnvironment<>(
-        this, prover.creator, prover, options, shutdownNotifier);
+    return new IndependentInterpolatingProverEnvironment<>(this, prover.creator, prover, options);
   }
 
   @Override

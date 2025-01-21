@@ -274,8 +274,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         this,
         creator,
         new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options),
-        options,
-        shutdownNotifier);
+        options);
   }
 
   @Override
