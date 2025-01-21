@@ -177,9 +177,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     closed = true;
   }
 
-  /**
-   * Provides the set of formulas to interpolate on a distinct prover.
-   */
+  /** Provides the set of formulas to interpolate on a distinct prover. */
   public static class InterpolationFormulas {
     private final Collection<BooleanFormula> formulasForA;
     private final Collection<BooleanFormula> formulasForB;
