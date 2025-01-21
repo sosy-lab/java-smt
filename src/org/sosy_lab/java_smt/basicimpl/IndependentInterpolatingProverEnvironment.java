@@ -25,7 +25,6 @@ import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -57,7 +56,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   // null for native solver interpolation
   private final @Nullable ProverOptions interpolationStrategy;
 
-  private static final int MAX_NUMBER_OF_INDEPENDENT_INTERPOLATION_OPTIONS = 1;
   private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
       ImmutableSet.of(
           ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
@@ -91,24 +89,18 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * @return {@code true} if an independent interpolation strategy is configured, {@code false}
    *     otherwise.
    */
-  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> options)
-      throws InvalidConfigurationException {
+  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> options) {
     return getIndependentInterpolationStrategy(options) != null;
   }
 
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
-      Set<ProverOptions> options) throws InvalidConfigurationException {
+      Set<ProverOptions> options) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
     itpStrat.retainAll(ALL_INDEPENDENT_INTERPOLATION_STRATEGIES);
     if (itpStrat.isEmpty()) {
       return null;
     }
-    if (itpStrat.size() > MAX_NUMBER_OF_INDEPENDENT_INTERPOLATION_OPTIONS) {
-      throw new InvalidConfigurationException(
-          "Only exactly one solver independent interpolation option is allowed. "
-              + "Decide between the options GENERATE_MODEL_BASED_INTERPOLANTS, "
-              + "GENERATE_UNIFORM_BACKWARD_INTERPOLANTS, GENERATE_UNIFORM_FORWARD_INTERPOLANTS.");
-    }
+    Preconditions.checkState(itpStrat.size() == 1);
     return itpStrat.get(0);
   }
 
