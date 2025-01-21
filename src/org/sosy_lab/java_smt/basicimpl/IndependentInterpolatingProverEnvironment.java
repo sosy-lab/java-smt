@@ -56,6 +56,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   // null for native solver interpolation
   private final @Nullable ProverOptions interpolationStrategy;
 
+  private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
+      ImmutableSet.of(
+          ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
   private static final UniqueIdGenerator UNIQUE_ID_GENERATOR = new UniqueIdGenerator();
   private static final String PREFIX = "__internal_model_itp_generation_";
 
@@ -91,12 +96,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
-    final Set<ProverOptions> allIndependentInterpolationStrategies =
-        ImmutableSet.of(
-            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
-    itpStrat.retainAll(allIndependentInterpolationStrategies);
+    itpStrat.retainAll(ALL_INDEPENDENT_INTERPOLATION_STRATEGIES);
     if (itpStrat.isEmpty()) {
       return null;
     }
