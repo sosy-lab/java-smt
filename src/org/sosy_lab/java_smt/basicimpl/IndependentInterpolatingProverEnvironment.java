@@ -40,9 +40,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
-// The non-interpolating delegates usually return nothing useful as itp points, so we have to
-// track it here
-@SuppressWarnings("unused")
 public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
 
