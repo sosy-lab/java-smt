@@ -127,6 +127,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfA = formulasAAndB.gotFormulasForA();
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
+    if (formulasOfA.isEmpty() || formulasOfB.isEmpty()) {
+      throw new IllegalArgumentException(
+          "Independent interpolation cannot be done over empty interpolation groups.");
+    }
+
     Preconditions.checkNotNull(interpolationStrategy);
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
