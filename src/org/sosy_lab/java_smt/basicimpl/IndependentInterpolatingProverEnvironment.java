@@ -126,9 +126,13 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     // handle empty interpolation groups and trivial interpolants
     if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
+      // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 == 1) to
+      // TRUE, allowing such formulas to match as well
       return bmgr.makeTrue();
     }
     if (bmgr.isFalse(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB))) {
+      // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 != 1) to
+      // FALSE, allowing such formulas to match as well
       return bmgr.makeFalse();
     }
 
