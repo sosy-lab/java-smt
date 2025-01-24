@@ -230,8 +230,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
-      return bmgr.makeFalse();
+    if (varsOfA.isEmpty() || varsOfB.isEmpty()) {
+      return bmgr.makeTrue();
     }
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
