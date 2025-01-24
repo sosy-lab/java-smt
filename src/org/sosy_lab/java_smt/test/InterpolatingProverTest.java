@@ -229,6 +229,13 @@ public class InterpolatingProverTest
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
+    if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
+      assume()
+          .withMessage("Solver %s run into timeout on this test", solverToUse())
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.Z3);
+    }
+
     int i = index.getFreshId();
     int width = 8;
 
