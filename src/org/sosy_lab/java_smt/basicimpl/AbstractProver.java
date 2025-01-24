@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -28,7 +27,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import scala.collection.mutable.MultiMap;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
