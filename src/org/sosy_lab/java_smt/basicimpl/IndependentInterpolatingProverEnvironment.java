@@ -125,7 +125,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
     // handle empty interpolation groups and trivial interpolants
-    if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB))) {
+    if ((formulasOfA.isEmpty() && formulasOfB.isEmpty()) ||
+        (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB)))) {
       return null;
     }
     if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
@@ -137,10 +138,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 != 1) to
       // FALSE, allowing such formulas to match as well
       return bmgr.makeFalse();
-    }
-
-    if (formulasOfA.isEmpty() || formulasOfB.isEmpty()) {
-
     }
 
     Preconditions.checkNotNull(interpolationStrategy);
