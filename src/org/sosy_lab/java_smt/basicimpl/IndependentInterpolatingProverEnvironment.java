@@ -226,17 +226,16 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(conjugatedB)));
 
     // check the satisfiability of the constraints and generate a model if possible
-    ProverEnvironment itpProver = getDistinctProver();
-
-    itpProver.push(bmgr.and(left, right));
-
     BooleanFormula interpolant = bmgr.makeFalse();
-    if (!itpProver.isUnsat()) {
-      interpolant = itpProver.getModel().eval(itp);
-      Preconditions.checkNotNull(interpolant);
-    }
+    try (ProverEnvironment itpProver = getDistinctProver()) {
 
-    itpProver.close();
+      itpProver.push(bmgr.and(left, right));
+
+      if (!itpProver.isUnsat()) {
+        interpolant = itpProver.getModel().eval(itp);
+        Preconditions.checkNotNull(interpolant);
+      }
+    }
     return interpolant;
   }
 
@@ -467,14 +466,13 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
-    ProverEnvironment itpProver = getDistinctProver();
-    itpProver.push(bmgr.and(left, right));
+    try (ProverEnvironment itpProver = getDistinctProver()) {
+      itpProver.push(bmgr.and(left, right));
 
-    if (!itpProver.isUnsat()) {
-      result = true;
+      if (!itpProver.isUnsat()) {
+        result = true;
+      }
     }
-
-    itpProver.close();
     return result;
   }
 
