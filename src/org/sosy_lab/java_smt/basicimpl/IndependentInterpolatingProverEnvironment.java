@@ -125,8 +125,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
     // handle empty interpolation groups and trivial interpolants
-    // case 1:
-
+    if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
+      return bmgr.makeTrue();
+    }
 
     if (formulasOfA.isEmpty() || formulasOfB.isEmpty()) {
 
