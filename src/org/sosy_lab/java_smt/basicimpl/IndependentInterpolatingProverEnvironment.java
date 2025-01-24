@@ -124,9 +124,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfA = formulasAAndB.gotFormulasForA();
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
+    // handle empty interpolation groups and trivial interpolants
+    // case 1:
+
+
     if (formulasOfA.isEmpty() || formulasOfB.isEmpty()) {
-      throw new IllegalArgumentException(
-          "Independent interpolation cannot be done over empty interpolation groups.");
+
     }
 
     Preconditions.checkNotNull(interpolationStrategy);
@@ -217,8 +220,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
     if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
-      throw new IllegalArgumentException(
-          "Quantification cannot be done over an empty set of variables.");
+      return bmgr.makeFalse();
     }
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
@@ -286,8 +288,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
     if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
-      throw new IllegalArgumentException(
-          "Quantification cannot be done over an empty set of variables.");
+      return bmgr.makeFalse();
     }
 
     Preconditions.checkState(isUnsat());
