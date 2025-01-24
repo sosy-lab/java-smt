@@ -128,6 +128,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
       return bmgr.makeTrue();
     }
+    if (bmgr.isFalse(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB))) {
+      return bmgr.makeFalse();
+    }
 
     if (formulasOfA.isEmpty() || formulasOfB.isEmpty()) {
 
