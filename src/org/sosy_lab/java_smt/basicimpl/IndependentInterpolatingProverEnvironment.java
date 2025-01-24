@@ -124,21 +124,24 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Collection<BooleanFormula> formulasOfA = formulasAAndB.gotFormulasForA();
     Collection<BooleanFormula> formulasOfB = formulasAAndB.gotFormulasForB();
 
+    BooleanFormula conjugatedA = bmgr.and(formulasOfA);
+    BooleanFormula conjugatedB = bmgr.and(formulasOfB);
+
     // handle empty interpolation groups and trivial interpolants
     if ((formulasOfA.isEmpty() && formulasOfB.isEmpty()) ||
-        (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB)))) {
+        (bmgr.isTrue(conjugatedA) && bmgr.isTrue(conjugatedB))) {
       return null;
     }
-    if (bmgr.isFalse(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
+    if (bmgr.isFalse(conjugatedA) && bmgr.isFalse(conjugatedB)) {
       // true is manually chosen here, but false would also be correct since both satisfy UNSAT
       return bmgr.makeTrue();
     }
-    if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
+    if (bmgr.isTrue(conjugatedA) && bmgr.isFalse(conjugatedB)) {
       // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 == 1) to
       // TRUE, allowing such formulas to match as well
       return bmgr.makeTrue();
     }
-    if (bmgr.isFalse(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB))) {
+    if (bmgr.isFalse(conjugatedA) && bmgr.isTrue(conjugatedB)) {
       // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 != 1) to
       // FALSE, allowing such formulas to match as well
       return bmgr.makeFalse();
@@ -147,9 +150,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Preconditions.checkNotNull(interpolationStrategy);
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
-      return getModelBasedInterpolant(formulasOfA, formulasOfB);
+      return getModelBasedInterpolant(conjugatedA, conjugatedB);
     } else {
-      return getQuantifierEliminationBasedInterpolant(formulasOfA, formulasOfB);
+      return getQuantifierEliminationBasedInterpolant(conjugatedA, conjugatedB);
     }
   }
 
@@ -213,21 +216,18 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * quantified solving over the theories interpolated upon. The solver does not need to support
    * interpolation itself.
    *
-   * @param formulasOfA A {@link Collection} of {@link BooleanFormula}s representing the set of A.
-   * @param formulasOfB A {@link Collection} of {@link BooleanFormula}s representing the set of B.
+   * @param formulasOfA A {@link BooleanFormula} representing the set of A.
+   * @param formulasOfB A {@link BooleanFormula} representing the set of B.
    * @return the Craig interpolant, otherwise {@code false} in case an interpolant can not be found.
    * @see <a href="https://github.com/agurfinkel/spacer-on-jupyter/blob/master/Dagstuhl2019.ipynb">
    *     Binary Craig Interpolation by reduction to CHC</a>
    */
   private BooleanFormula getModelBasedInterpolant(
-      Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
+      BooleanFormula formulasOfA, BooleanFormula formulasOfB)
       throws InterruptedException, SolverException {
 
-    BooleanFormula conjugatedA = bmgr.and(formulasOfA);
-    BooleanFormula conjugatedB = bmgr.and(formulasOfB);
-
-    List<Formula> varsOfA = getVars(conjugatedA);
-    List<Formula> varsOfB = getVars(conjugatedB);
+    List<Formula> varsOfA = getVars(formulasOfA);
+    List<Formula> varsOfB = getVars(formulasOfB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
@@ -236,8 +236,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     }
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(conjugatedA, itp));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(conjugatedB)));
+    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
+    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
     // check the satisfiability of the constraints and generate a model if possible
     BooleanFormula interpolant = bmgr.makeFalse();
@@ -282,20 +282,17 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * quantifier-elimination over theories interpolated upon. The solver does not need to support
    * interpolation itself.
    *
-   * @param formulasOfA A {@link Collection} of {@link BooleanFormula}s representing the set of A.
-   * @param formulasOfB A {@link Collection} of {@link BooleanFormula}s representing the set of B.
+   * @param formulasOfA A {@link BooleanFormula} representing the set of A.
+   * @param formulasOfB A {@link BooleanFormula} representing the set of B.
    * @return the uniform Craig interpolant, otherwise {@code false} in case an interpolant can not
    *     be found.
    */
   private BooleanFormula getQuantifierEliminationBasedInterpolant(
-      Collection<BooleanFormula> formulasOfA, Collection<BooleanFormula> formulasOfB)
+      BooleanFormula formulasOfA, BooleanFormula formulasOfB)
       throws SolverException, InterruptedException {
 
-    BooleanFormula conjugatedA = bmgr.and(formulasOfA);
-    BooleanFormula conjugatedB = bmgr.and(formulasOfB);
-
-    ImmutableList<Formula> varsOfA = getVars(conjugatedA);
-    ImmutableList<Formula> varsOfB = getVars(conjugatedB);
+    ImmutableList<Formula> varsOfA = getVars(formulasOfA);
+    ImmutableList<Formula> varsOfB = getVars(formulasOfB);
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
@@ -308,12 +305,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     BooleanFormula interpolant = bmgr.makeFalse();
     if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
-      interpolant = getBackwardInterpolant(conjugatedB, varsOfB, sharedVars);
+      interpolant = getBackwardInterpolant(formulasOfB, varsOfB, sharedVars);
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
-      interpolant = getForwardInterpolant(conjugatedA, varsOfA, sharedVars);
+      interpolant = getForwardInterpolant(formulasOfA, varsOfA, sharedVars);
     }
 
-    if (!satisfiesInterpolationCriteria(interpolant, conjugatedA, conjugatedB, varsOfA, varsOfB)) {
+    if (!satisfiesInterpolationCriteria(interpolant, formulasOfA, formulasOfB, varsOfA, varsOfB)) {
       return bmgr.makeFalse();
     }
 
