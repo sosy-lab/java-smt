@@ -284,6 +284,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -340,6 +341,7 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireSequentialInterpolation();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -389,6 +391,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSequentialInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
@@ -403,6 +406,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -431,6 +435,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -463,6 +468,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
