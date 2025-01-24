@@ -326,6 +326,22 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  protected void requireTreeInterpolation(ProverOptions... options) {
+    try {
+      if (Arrays.stream(options).anyMatch(p -> p == null)) {
+        context.newProverEnvironmentWithInterpolation().close();
+      } else {
+        context.newProverEnvironmentWithInterpolation(options).close();
+      }
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withMessage(
+              "Tree interpolants are not supported for independent interpolation currently.")
+          .that(e)
+          .isNull();
+    }
+  }
+
   protected void requireParser() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", solverToUse())

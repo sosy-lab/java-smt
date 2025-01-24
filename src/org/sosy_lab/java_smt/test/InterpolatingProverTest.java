@@ -524,6 +524,7 @@ public class InterpolatingProverTest
   public void treeInterpolation() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     int i = index.getFreshId();
 
@@ -694,6 +695,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolation2() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -753,6 +755,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolation3() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -856,6 +859,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -881,6 +885,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationBranching() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -922,6 +927,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -1019,6 +1025,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
     requireTreeItp();
+    requireTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
