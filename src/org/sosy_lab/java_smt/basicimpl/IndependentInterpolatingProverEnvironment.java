@@ -129,6 +129,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isTrue(bmgr.and(formulasOfB)))) {
       return null;
     }
+    if (bmgr.isFalse(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
+      // true is manually chosen here, but false would also be correct since both satisfy UNSAT
+      return bmgr.makeTrue();
+    }
     if (bmgr.isTrue(bmgr.and(formulasOfA)) && bmgr.isFalse(bmgr.and(formulasOfB))) {
       // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 == 1) to
       // TRUE, allowing such formulas to match as well
