@@ -223,6 +223,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -287,12 +288,36 @@ public class InterpolatingProverTest
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+
+    assume()
+        .withMessage("Independent interpolation strategies do not support tree-interpolation.")
+        .that(interpolationStrategy)
+        .isAnyOf(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
+  }
+
+  private void requireSequentialInterpolation() {
+    requireInterpolation();
+    assume()
+        .withMessage("Solver does not support tree-interpolation.")
+        .that(solver)
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+
+    assume()
+        .withMessage(
+            "Independent interpolation strategies do not support sequential interpolation.")
+        .that(interpolationStrategy)
+        .isAnyOf(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
   }
 
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -349,6 +374,7 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireSequentialInterpolation();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -412,6 +438,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -440,6 +467,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -472,6 +500,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -591,6 +620,8 @@ public class InterpolatingProverTest
   private <T> void testTreeInterpolants0(
       BooleanFormula pA, BooleanFormula pB, BooleanFormula pC, BooleanFormula pD, BooleanFormula pE)
       throws SolverException, InterruptedException {
+
+    requireTreeItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1052,6 +1083,7 @@ public class InterpolatingProverTest
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+    requireSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -1218,6 +1250,8 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    requireSequentialInterpolation();
+
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
@@ -1248,6 +1282,8 @@ public class InterpolatingProverTest
         .withMessage("Solver %s does not support interpolation", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
+
+    requireSequentialInterpolation();
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
