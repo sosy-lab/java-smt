@@ -33,12 +33,11 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest
-    extends ParameterizedInterpolatingSolverBasedTest0 {
+    extends SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
@@ -181,8 +180,6 @@ public class InterpolatingProverTest
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    requireIndependentSeqItp();
-
     checkItpSequence(ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
     checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
@@ -280,8 +277,6 @@ public class InterpolatingProverTest
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
-    requireIndependentSeqItp();
-
     checkItpSequence(ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
     checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
@@ -305,23 +300,10 @@ public class InterpolatingProverTest
     }
   }
 
-  private void requireIndependentSeqItp() {
-    requireInterpolation();
-    assume()
-        .withMessage(
-            "Sequential interpolants are not supported for independent interpolation currently.")
-        .that(interpolationStrategy)
-        .isAnyOf(
-            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
-  }
-
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
-    requireIndependentSeqItp();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -350,32 +332,27 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
-      List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
-      List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
-      List<BooleanFormula> itps4 =
-          stack.getSeqInterpolants(
-              Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
-      List<BooleanFormula> itps5 =
-          stack.getSeqInterpolants(
-              Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
-      List<BooleanFormula> itps6 =
-          stack.getSeqInterpolants(
-              Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps4 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
+    List<BooleanFormula> itps5 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
+    List<BooleanFormula> itps6 =
+        stack.getSeqInterpolants(
+            Lists.transform(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD), ImmutableSet::of));
 
-      stack.close();
+    stack.close();
 
-      checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
-      checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
-      checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
-      checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
-      checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
-      checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD)));
-    }
+    checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
+    checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
+    checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
+    checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
+    checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
+    checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
   @Test
@@ -383,7 +360,6 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
-    requireIndependentSeqItp();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -402,13 +378,8 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    List<BooleanFormula> itpSeq = List.of();
-    if (interpolationStrategy == null) {
-      itpSeq = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC));
-    } else {
-      assertThrows(UnsupportedOperationException.class, () ->
-          stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC)));
-    }
+    List<BooleanFormula> itpSeq = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC));
+
     BooleanFormula itp1 = stack.getInterpolant(ImmutableList.of(TA));
     BooleanFormula itp2 = stack.getInterpolant(ImmutableList.of(TA, TB));
 
@@ -438,28 +409,20 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     requireIntegers();
-    requireIndependentSeqItp();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
-    if (interpolationStrategy == null) {
-      stack.getSeqInterpolants(ImmutableList.of());
-      assert_().fail();
-    } else {
-      assertThrows(UnsupportedOperationException.class, ()
-          -> stack.getSeqInterpolants(ImmutableList.of()));
-    }
+    stack.getSeqInterpolants(ImmutableList.of());
+    assert_().fail();
   }
 
   @Test
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     requireIntegers();
-    requireIndependentSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -479,13 +442,8 @@ public class InterpolatingProverTest
 
     // list of one partition
     List<T> partition = ImmutableList.of(TA, TB);
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
-      assertThat(itps).isEmpty();
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getSeqInterpolants(ImmutableList.of(partition)));
-    }
+    List<BooleanFormula> itps = stack.getSeqInterpolants(ImmutableList.of(partition));
+    assertThat(itps).isEmpty();
   }
 
   @SuppressWarnings("unchecked")
@@ -493,7 +451,6 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
-    requireIndependentSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -512,30 +469,20 @@ public class InterpolatingProverTest
     assertThat(stack).isUnsatisfiable();
 
     Set<T> partition = ImmutableSet.of(TA, TB);
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
-      List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
-      List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants(ImmutableList.of(partition));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TB, TA));
 
-      stack.close();
+    stack.close();
 
-      checkItpSequence(ImmutableList.of(bmgr.and(A, B)), itps1);
-      checkItpSequence(ImmutableList.of(A, B), itps2);
-      checkItpSequence(ImmutableList.of(B, A), itps3);
-    } else {
-    assertThrows(UnsupportedOperationException.class, () ->
-        stack.getSeqInterpolants(ImmutableList.of(partition)));
-    assertThrows(UnsupportedOperationException.class, () ->
-        stack.getSeqInterpolants0(ImmutableList.of(TA, TB)));
-    assertThrows(UnsupportedOperationException.class, () ->
-        stack.getSeqInterpolants0(ImmutableList.of(TB, TA)));
-    }
+    checkItpSequence(ImmutableList.of(bmgr.and(A, B)), itps1);
+    checkItpSequence(ImmutableList.of(A, B), itps2);
+    checkItpSequence(ImmutableList.of(B, A), itps3);
   }
 
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
-    requireIndependentSeqItp();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -567,29 +514,24 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
-      List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
-      List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
-      List<BooleanFormula> itps4 =
-          stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
-      List<BooleanFormula> itps5 =
-          stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
-      List<BooleanFormula> itps6 =
-          stack.getSeqInterpolants0(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
+    List<BooleanFormula> itps1 = stack.getSeqInterpolants0(ImmutableList.of(TA, TB, TC, TD));
+    List<BooleanFormula> itps2 = stack.getSeqInterpolants0(ImmutableList.of(TD, TC, TB, TA));
+    List<BooleanFormula> itps3 = stack.getSeqInterpolants0(ImmutableList.of(TA, TC, TB, TD));
+    List<BooleanFormula> itps4 =
+        stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD));
+    List<BooleanFormula> itps5 =
+        stack.getSeqInterpolants0(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD));
+    List<BooleanFormula> itps6 =
+        stack.getSeqInterpolants0(ImmutableList.of(TB, TC, TD, TA, TA, TA, TD));
 
-      stack.close();
+    stack.close();
 
-      checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
-      checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
-      checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
-      checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
-      checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
-      checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getSeqInterpolants0(ImmutableList.of()));
-    }
+    checkItpSequence(ImmutableList.of(A, B, C, D), itps1);
+    checkItpSequence(ImmutableList.of(D, C, B, A), itps2);
+    checkItpSequence(ImmutableList.of(A, C, B, D), itps3);
+    checkItpSequence(ImmutableList.of(A, A, A, B, C, D, D), itps4);
+    checkItpSequence(ImmutableList.of(A, A, B, C, D, A, D), itps5);
+    checkItpSequence(ImmutableList.of(B, C, D, A, A, A, D), itps6);
   }
 
   @Test
@@ -928,7 +870,6 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
 
     requireTreeItp();
-    requireIndependentSeqItp();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1122,7 +1063,6 @@ public class InterpolatingProverTest
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
-    requireIndependentSeqItp();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -1185,13 +1125,8 @@ public class InterpolatingProverTest
       T id1 = prover.push(f2);
       T id2 = prover.push(f1);
       assertThat(prover).isUnsatisfiable();
-      if (interpolationStrategy == null) {
-        @SuppressWarnings("unused")
-        List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
-      } else {
-        assertThrows(UnsupportedOperationException.class,
-            () -> prover.getSeqInterpolants0(ImmutableList.of(id1, id2)));
-      }
+      @SuppressWarnings("unused")
+      List<BooleanFormula> interpolants = prover.getSeqInterpolants0(ImmutableList.of(id1, id2));
     }
   }
 
@@ -1294,8 +1229,6 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
-    requireIndependentSeqItp();
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
