@@ -122,10 +122,17 @@ public class InterpolatingProverTest
       T id2 = prover.push(f2);
       assertThat(prover.isUnsat()).isTrue();
 
-      BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
-      assertThat(bmgr.isFalse(emptyB)).isTrue();
-      BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
-      assertThat(bmgr.isTrue(emptyA)).isTrue();
+      if (interpolationStrategy == null) {
+        BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
+        assertThat(bmgr.isFalse(emptyB)).isTrue();
+        BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
+        assertThat(bmgr.isTrue(emptyA)).isTrue();
+      } else {
+        BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
+        assertThat(emptyB).isEqualTo(bmgr.makeTrue());
+        BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
+        assertThat(emptyA).isEqualTo(bmgr.makeTrue());
+      }
     }
   }
 
