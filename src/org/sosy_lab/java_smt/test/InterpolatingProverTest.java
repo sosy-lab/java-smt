@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
@@ -76,7 +75,6 @@ public class InterpolatingProverTest
           .that(solverToUse())
           .isNoneOf(Solvers.Z3, Solvers.CVC4);
     }
-    requireIntegers();
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
@@ -106,8 +104,6 @@ public class InterpolatingProverTest
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
-    requireIntegers();
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -299,19 +295,6 @@ public class InterpolatingProverTest
               ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
               ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
               ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
-    }
-  }
-
-  private void requireIndependentItp(ProverOptions... options) {
-    try {
-      if (Arrays.stream(options).anyMatch(p -> p != null)) {
-        context.newProverEnvironmentWithInterpolation(options).close();
-      }
-    } catch (UnsupportedOperationException e) {
-      assume()
-          .withMessage("Solver %s does not support independent interpolation", solverToUse())
-          .that(e)
-          .isNotEqualTo(Solvers.BITWUZLA);
     }
   }
 
@@ -1123,14 +1106,9 @@ public class InterpolatingProverTest
 
     // list of one partition
     List<T> partition = ImmutableList.of(TA, TB);
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps =
-          stack.getTreeInterpolants(ImmutableList.of(partition), new int[]{0});
-      assertThat(itps).isEmpty();
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants(ImmutableList.of(partition), new int[]{0}));
-    }
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
+    assertThat(itps).isEmpty();
   }
 
   @Test
@@ -1213,7 +1191,6 @@ public class InterpolatingProverTest
   @Test
   public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
     requireInterpolation();
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -1343,12 +1320,6 @@ public class InterpolatingProverTest
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
 
-    assume()
-        .withMessage("Solver %s does not support independent interpolation currently",
-            solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.BITWUZLA);
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
@@ -1379,8 +1350,6 @@ public class InterpolatingProverTest
         .withMessage("Solver %s does not support interpolation", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.Z3);
-
-    requireIntegers();
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
