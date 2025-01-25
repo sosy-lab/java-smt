@@ -129,7 +129,7 @@ public class InterpolatingProverTest
         assertThat(bmgr.isTrue(emptyA)).isTrue();
       } else {
         BooleanFormula emptyB = prover.getInterpolant(ImmutableList.of(id1, id2));
-        assertThat(emptyB).isEqualTo(bmgr.makeTrue());
+        assertThat(emptyB).isEqualTo(bmgr.makeFalse());
         BooleanFormula emptyA = prover.getInterpolant(ImmutableList.of());
         assertThat(emptyA).isEqualTo(bmgr.makeTrue());
       }
