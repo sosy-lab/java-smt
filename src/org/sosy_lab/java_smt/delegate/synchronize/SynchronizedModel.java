@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -111,6 +112,13 @@ class SynchronizedModel implements Model {
   public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     synchronized (sync) {
       return delegate.asList();
+    }
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    synchronized (sync) {
+      return delegate.iterator();
     }
   }
 

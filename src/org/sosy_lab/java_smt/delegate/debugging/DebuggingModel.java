@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -120,6 +121,21 @@ public class DebuggingModel implements Model {
       debugging.addFormulaTerm(v.getAssignmentAsFormula());
     }
     return result;
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    debugging.assertThreadLocal();
+    Iterator<ValueAssignment> iterator = delegate.iterator();
+    while (iterator.hasNext()) {
+      // Both lines are needed as assignments like "a == false" may have been simplified to
+      // "not(a)" by the solver. This then leads to errors as the term "false" is not defined in
+      // the context.
+      ValueAssignment v = iterator.next();
+      debugging.addFormulaTerm(v.getValueAsFormula());
+      debugging.addFormulaTerm(v.getAssignmentAsFormula());
+    }
+    return iterator;
   }
 
   @Override

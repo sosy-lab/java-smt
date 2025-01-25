@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -101,6 +102,12 @@ class StatisticsModel implements Model {
   public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     stats.modelListings.getAndIncrement();
     return delegate.asList();
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    stats.modelListings.getAndIncrement();
+    return delegate.iterator();
   }
 
   @Override

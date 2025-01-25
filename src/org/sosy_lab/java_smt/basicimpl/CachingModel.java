@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -41,6 +42,15 @@ public class CachingModel implements Model {
       modelAssignments = delegate.asList();
     }
     return modelAssignments;
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    if (modelAssignments == null) {
+      // TODO: cache this
+      return delegate.iterator();
+    }
+    return modelAssignments.iterator();
   }
 
   @Override

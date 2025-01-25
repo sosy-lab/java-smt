@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import java.util.Iterator;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -118,6 +119,12 @@ class SynchronizedModelWithContext implements Model {
     // }
     // }
     // return builder.build();
+  }
+
+  @Override
+  public Iterator<ValueAssignment> iterator() {
+    // TODO: think about this more
+    throw new UnsupportedOperationException(UNSUPPORTED_OPERATION);
   }
 
   @Override
