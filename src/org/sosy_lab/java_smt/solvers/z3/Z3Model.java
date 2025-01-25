@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,6 +43,11 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     model = z3model;
     this.z3context = z3context;
     z3creator = pCreator;
+  }
+
+  @Override
+  protected ModelIterator getModelIterator() {
+    return new Z3ModelIterator();
   }
 
   @Override
@@ -400,6 +407,75 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     } else {
       Native.incRef(z3context, resultPtr.value);
       return resultPtr.value;
+    }
+  }
+
+  public class Z3ModelIterator implements ModelIterator {
+
+    private int funcIdx = 0;
+    private final int maxFuncIdx;
+    private int constIdx = 0;
+    private final int maxConstIdx;
+
+    private int nestedEvaluationCacheIndex = 0;
+    private Optional<List<ValueAssignment>> nestedEvaluationCache = Optional.empty();
+
+    private Z3ModelIterator() {
+      maxFuncIdx = Native.modelGetNumFuncs(z3context, model);
+      maxConstIdx = Native.modelGetNumConsts(z3context, model);
+    }
+
+    @Override
+    public boolean hasNext() {
+      return (nestedEvaluationCache.isPresent()
+              && nestedEvaluationCacheIndex < nestedEvaluationCache.orElseThrow().size())
+          || constIdx < maxConstIdx
+          || funcIdx < maxFuncIdx;
+    }
+
+    @Override
+    public ValueAssignment next() {
+      if (nestedEvaluationCache.isEmpty()
+          || nestedEvaluationCacheIndex >= nestedEvaluationCache.orElseThrow().size()) {
+        try {
+          try {
+            if (constIdx < maxConstIdx) {
+              // Iterate through constants.
+              long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
+              Native.incRef(z3context, keyDecl);
+              nestedEvaluationCache =
+                  Optional.of((List<ValueAssignment>) getConstAssignments(keyDecl));
+              nestedEvaluationCacheIndex = 0;
+              Native.decRef(z3context, keyDecl);
+              constIdx++;
+            } else if (funcIdx < maxFuncIdx) {
+              // Iterate through function applications.
+              long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+              Native.incRef(z3context, funcDecl);
+              if (!isInternalSymbol(funcDecl)) {
+                String functionName =
+                    z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+                nestedEvaluationCache =
+                    Optional.of(
+                        (List<ValueAssignment>)
+                            getFunctionAssignments(funcDecl, funcDecl, functionName));
+                nestedEvaluationCacheIndex = 0;
+              }
+              Native.decRef(z3context, funcDecl);
+              funcIdx++;
+            } else {
+              // No next
+              throw new NoSuchElementException();
+            }
+          } catch (Z3Exception e) {
+            throw z3creator.handleZ3Exception(e);
+          }
+        } catch (SolverException | InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+      }
+
+      return nestedEvaluationCache.orElseThrow().get(nestedEvaluationCacheIndex++);
     }
   }
 }
