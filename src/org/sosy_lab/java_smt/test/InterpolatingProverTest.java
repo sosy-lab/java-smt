@@ -131,6 +131,8 @@ public class InterpolatingProverTest
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
+    requireIntegers();
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
