@@ -59,7 +59,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula parsed = mgr.universalParseFromString(x);
     StringFormula a = smgr.makeVariable("a");
-    BooleanFormula constraint = smgr.equal(a, smgr.makeVariable("Hello"));
+    BooleanFormula constraint = smgr.equal(a, smgr.makeString("Hello"));
     assertThat(parsed).isEqualTo(constraint);
   }
   @Test
@@ -78,7 +78,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(a, b);
 
-    assertThat(actualResult.equals(constraint)).isTrue();
+    assertThat(actualResult).isEqualTo(constraint);
   }
 
   @Test
@@ -100,7 +100,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(c, concatenationResult);
 
-    assertThat(actualResult.equals(constraint)).isTrue();
+    assertThat(actualResult).isEqualTo(constraint);
   }
 
   @Test
@@ -118,7 +118,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     IntegerFormula lengthResult = smgr.length(a);
 
     BooleanFormula constraint = imgr.equal(len, lengthResult);
-        assertThat(expectedResult.equals(constraint));;
+        assertThat(expectedResult).isEqualTo(constraint);
   }
 
 
@@ -144,7 +144,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(sub, substringResult);
 
-    assertThat(actualResult.equals(constraint)).isTrue();
+    assertThat(actualResult).isEqualTo(constraint);
   }
 
   @Test
@@ -180,7 +180,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula prefixResult = smgr.prefix(prefix, a);
 
-    assertThat(actualResult.equals(prefixResult)).isTrue();
+    assertThat(actualResult).isEqualTo(prefixResult);
   }
 
   @Test
@@ -198,7 +198,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula suffixResult = smgr.suffix(suffix, a);
 
-    assertThat(actualResult.equals(suffixResult)).isTrue();
+    assertThat(actualResult).isEqualTo(suffixResult);
   }
 
 

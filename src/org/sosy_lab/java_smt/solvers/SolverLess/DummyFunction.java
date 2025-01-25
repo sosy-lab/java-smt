@@ -20,4 +20,62 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-public class DummyFunction {}
+import java.util.List;
+import java.util.Objects;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+
+public class DummyFunction {
+  private String name;
+  private FormulaTypesForChecking returnType;
+  private List<FormulaTypesForChecking> argumentTypes;
+  public DummyFunction() {}
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public FormulaTypesForChecking getReturnType() {
+    return returnType;
+  }
+
+  public void setReturnType(FormulaTypesForChecking returnType) {
+    this.returnType = returnType;
+  }
+
+  public List<FormulaTypesForChecking> getArgumentTypes() {
+    return argumentTypes;
+  }
+
+  public void setArgumentTypes(List<FormulaTypesForChecking> argumentTypes) {
+    this.argumentTypes = argumentTypes;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Function Name: ").append(name).append(", Return Type: ").append(returnType);
+    if (argumentTypes != null && !argumentTypes.isEmpty()) {
+      sb.append(", Argument Types: ").append(argumentTypes);
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    DummyFunction that = (DummyFunction) o;
+    return Objects.equals(name, that.name) &&
+        Objects.equals(returnType, that.returnType) &&
+        Objects.equals(argumentTypes, that.argumentTypes);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(name, returnType, argumentTypes);
+  }
+}

@@ -30,8 +30,7 @@ public enum FormulaTypesForChecking {
   BITVECTOR,
   ARRAY,
   RATIONAL,
-  BOOLEAN,
-  DUMMY;
+  BOOLEAN;
 
   public String parseToSMTLIBFormulaType(){
     switch (this){

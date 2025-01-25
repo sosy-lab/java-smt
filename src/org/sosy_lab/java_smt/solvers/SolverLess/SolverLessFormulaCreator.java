@@ -19,7 +19,9 @@
  */
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -35,6 +37,8 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking
 
 public class SolverLessFormulaCreator
     extends FormulaCreator<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+
+  private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
 
   protected SolverLessFormulaCreator(){
     super(new DummyEnv(), FormulaTypesForChecking.BOOLEAN , FormulaTypesForChecking.INTEGER, FormulaTypesForChecking.RATIONAL,
@@ -169,7 +173,7 @@ public class SolverLessFormulaCreator
           throw new IllegalArgumentException("Invalid Array representation: " + representation);
         }
 
-        // Parameter vor dem ersten Komma zurückgeben
+
         return content.substring(0, commaIndex).trim();
       } catch (StringIndexOutOfBoundsException e) {
         throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
@@ -262,25 +266,50 @@ public class SolverLessFormulaCreator
 
 
   @Override
-  public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    if(args.isEmpty()){
-      return new DummyFormula(FormulaTypesForChecking.DUMMY);
+  public DummyFunction declareUFImpl(String pName, FormulaTypesForChecking pReturnType, List<FormulaTypesForChecking> pArgTypes) {
+    if (pName.isEmpty()) {
+      throw new IllegalArgumentException("UF name cannot be null or empty");
     }
-    return (args.get(0));
+
+    return uninterpretedFunctions.computeIfAbsent(pName, key -> {
+      DummyFunction function = new DummyFunction();
+      function.setName(key);
+      function.setReturnType(pReturnType);
+      function.setArgumentTypes(pArgTypes);
+      return function;
+    });
   }
 
   @Override
-  public DummyFunction declareUFImpl(
-      String pName,
-      FormulaTypesForChecking pReturnType,
-      List<FormulaTypesForChecking> pArgTypes) {
-    return new DummyFunction();
+  public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
+    if (args.contains(null)) {
+      throw new IllegalArgumentException("Arguments cannot be null");
+    }
+
+    List<FormulaTypesForChecking> expectedTypes = declaration.getArgumentTypes();
+    if (args.size() != expectedTypes.size()) {
+      throw new IllegalArgumentException(
+          String.format("Expected %d arguments, but got %d", expectedTypes.size(), args.size()));
+    }
+    for (int i = 0; i < args.size(); i++) {
+      FormulaTypesForChecking expected = expectedTypes.get(i);
+      FormulaTypesForChecking actual = args.get(i).getFormulaType();
+      if (!expected.equals(actual)) {
+        throw new IllegalArgumentException(
+            String.format("Argument %d has type %s, but expected %s", i, actual, expected));
+      }
+    }
+
+    DummyFormula result = new DummyFormula(declaration.getReturnType());
+    result.setName(declaration.getName());
+    result.setRepresentation(declaration.getName() + "(" +
+        args.stream().map(DummyFormula::toString).reduce((arg1, arg2) -> arg1 + ", " + arg2).orElse("") +
+        ")");
+    return result;
   }
 
   @Override
   protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
     return new DummyFunction();
   }
-
-
 }

@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
@@ -131,7 +132,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     } else {
       throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
     }
-    return new DummyFormula(FormulaTypesForChecking.DUMMY);
+    throw new RuntimeException("Unsupported FormulaType: " + pType);
   }
 
   private String getArrayRepresentation() {
