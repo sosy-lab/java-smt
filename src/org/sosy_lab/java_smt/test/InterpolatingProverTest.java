@@ -172,6 +172,8 @@ public class InterpolatingProverTest
 
     // we check here the stricter properties for sequential interpolants,
     // but this simple example should work for all solvers
+    requireIndependentSeqItp();
+
     checkItpSequence(ImmutableList.of(A, B, C, D), ImmutableList.of(itpA, itpAB, itpABC));
     checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
