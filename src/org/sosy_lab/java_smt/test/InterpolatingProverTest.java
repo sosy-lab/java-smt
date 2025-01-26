@@ -608,52 +608,47 @@ public class InterpolatingProverTest
     BooleanFormula D = imgr.equal(c, d);
     BooleanFormula E = imgr.equal(d, zero);
 
-    if (interpolationStrategy == null) {
-      testTreeInterpolants0(A, B, C, D, E);
-      testTreeInterpolants0(A, B, C, E, D);
-      testTreeInterpolants0(A, B, D, C, E);
-      testTreeInterpolants0(A, B, D, E, C);
-      testTreeInterpolants0(A, B, E, C, D);
-      testTreeInterpolants0(A, B, E, D, C);
+    testTreeInterpolants0(A, B, C, D, E);
+    testTreeInterpolants0(A, B, C, E, D);
+    testTreeInterpolants0(A, B, D, C, E);
+    testTreeInterpolants0(A, B, D, E, C);
+    testTreeInterpolants0(A, B, E, C, D);
+    testTreeInterpolants0(A, B, E, D, C);
 
-      testTreeInterpolants0(bmgr.not(A), A, A, A, A);
-      testTreeInterpolants0(bmgr.not(A), A, A, A, B);
-      testTreeInterpolants0(bmgr.not(A), A, A, B, A);
-      testTreeInterpolants0(bmgr.not(A), A, B, A, A);
-      testTreeInterpolants0(bmgr.not(A), A, A, B, B);
-      testTreeInterpolants0(bmgr.not(A), A, B, B, B);
+    testTreeInterpolants0(bmgr.not(A), A, A, A, A);
+    testTreeInterpolants0(bmgr.not(A), A, A, A, B);
+    testTreeInterpolants0(bmgr.not(A), A, A, B, A);
+    testTreeInterpolants0(bmgr.not(A), A, B, A, A);
+    testTreeInterpolants0(bmgr.not(A), A, A, B, B);
+    testTreeInterpolants0(bmgr.not(A), A, B, B, B);
 
-      testTreeInterpolants1(A, B, C, D, E);
-      testTreeInterpolants1(A, B, C, E, D);
-      testTreeInterpolants1(A, B, D, C, E);
-      testTreeInterpolants1(A, B, D, E, C);
-      testTreeInterpolants1(A, B, E, C, D);
-      testTreeInterpolants1(A, B, E, D, C);
+    testTreeInterpolants1(A, B, C, D, E);
+    testTreeInterpolants1(A, B, C, E, D);
+    testTreeInterpolants1(A, B, D, C, E);
+    testTreeInterpolants1(A, B, D, E, C);
+    testTreeInterpolants1(A, B, E, C, D);
+    testTreeInterpolants1(A, B, E, D, C);
 
-      testTreeInterpolants1(bmgr.not(A), A, A, A, A);
-      testTreeInterpolants1(bmgr.not(A), A, A, A, B);
-      testTreeInterpolants1(bmgr.not(A), A, A, B, A);
-      testTreeInterpolants1(bmgr.not(A), A, B, A, A);
-      testTreeInterpolants1(bmgr.not(A), A, A, B, B);
-      testTreeInterpolants1(bmgr.not(A), A, B, B, B);
+    testTreeInterpolants1(bmgr.not(A), A, A, A, A);
+    testTreeInterpolants1(bmgr.not(A), A, A, A, B);
+    testTreeInterpolants1(bmgr.not(A), A, A, B, A);
+    testTreeInterpolants1(bmgr.not(A), A, B, A, A);
+    testTreeInterpolants1(bmgr.not(A), A, A, B, B);
+    testTreeInterpolants1(bmgr.not(A), A, B, B, B);
 
-      testTreeInterpolants2(A, B, C, D, E);
-      testTreeInterpolants2(A, B, C, E, D);
-      testTreeInterpolants2(A, B, D, C, E);
-      testTreeInterpolants2(A, B, D, E, C);
-      testTreeInterpolants2(A, B, E, C, D);
-      testTreeInterpolants2(A, B, E, D, C);
+    testTreeInterpolants2(A, B, C, D, E);
+    testTreeInterpolants2(A, B, C, E, D);
+    testTreeInterpolants2(A, B, D, C, E);
+    testTreeInterpolants2(A, B, D, E, C);
+    testTreeInterpolants2(A, B, E, C, D);
+    testTreeInterpolants2(A, B, E, D, C);
 
-      testTreeInterpolants2(bmgr.not(A), A, A, A, A);
-      testTreeInterpolants2(bmgr.not(A), A, A, A, B);
-      testTreeInterpolants2(bmgr.not(A), A, A, B, A);
-      testTreeInterpolants2(bmgr.not(A), A, B, A, A);
-      testTreeInterpolants2(bmgr.not(A), A, A, B, B);
-      testTreeInterpolants2(bmgr.not(A), A, B, B, B);
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> testTreeInterpolants2(A, B, C, D, E));
-    }
+    testTreeInterpolants2(bmgr.not(A), A, A, A, A);
+    testTreeInterpolants2(bmgr.not(A), A, A, A, B);
+    testTreeInterpolants2(bmgr.not(A), A, A, B, A);
+    testTreeInterpolants2(bmgr.not(A), A, B, A, A);
+    testTreeInterpolants2(bmgr.not(A), A, A, B, B);
+    testTreeInterpolants2(bmgr.not(A), A, B, B, B);
   }
 
   private <T> void testTreeInterpolants0(
@@ -804,27 +799,19 @@ public class InterpolatingProverTest
     // R1 D
     // | /
     // R2
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps =
-          stack.getTreeInterpolants0(
-              ImmutableList.of(TA, TB, TC, TR1, TD, TR2), // post-order
-              new int[]{0, 0, 2, 0, 4, 0}); // left-most node in current subtree
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants0(
+            ImmutableList.of(TA, TB, TC, TR1, TD, TR2), // post-order
+            new int[] {0, 0, 2, 0, 4, 0}); // left-most node in current subtree
 
-      stack.close();
+    stack.close();
 
-      assertThatFormula(A).implies(itps.get(0));
-      assertThatFormula(bmgr.and(itps.get(0), B)).implies(itps.get(1));
-      assertThatFormula(C).implies(itps.get(2));
-      assertThatFormula(bmgr.and(itps.get(1), itps.get(2), R1)).implies(itps.get(3));
-      assertThatFormula(D).implies(itps.get(4));
-      assertThatFormula(bmgr.and(itps.get(3), itps.get(4), R2)).implies(bmgr.makeBoolean(false));
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(
-              ImmutableList.of(TA, TB, TC, TR1, TD, TR2),
-              new int[]{0, 0, 2, 0, 4, 0})
-      );
-    }
+    assertThatFormula(A).implies(itps.get(0));
+    assertThatFormula(bmgr.and(itps.get(0), B)).implies(itps.get(1));
+    assertThatFormula(C).implies(itps.get(2));
+    assertThatFormula(bmgr.and(itps.get(1), itps.get(2), R1)).implies(itps.get(3));
+    assertThatFormula(D).implies(itps.get(4));
+    assertThatFormula(bmgr.and(itps.get(3), itps.get(4), R2)).implies(bmgr.makeBoolean(false));
   }
 
   @SuppressWarnings("unchecked")
@@ -868,30 +855,20 @@ public class InterpolatingProverTest
     //  R1 A+D
     //  | /
     //  R2
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps =
-          stack.getTreeInterpolants(
-              ImmutableList.of(TB, TC, TR1, TD, TR2), // post-order
-              new int[]{0, 1, 0, 3, 0}); // left-most node in current subtree
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(
+            ImmutableList.of(TB, TC, TR1, TD, TR2), // post-order
+            new int[] {0, 1, 0, 3, 0}); // left-most node in current subtree
 
-      assertThat(itps).hasSize(4);
+    assertThat(itps).hasSize(4);
 
-      stack.close();
+    stack.close();
 
-
-      assertThatFormula(bmgr.and(A, B)).implies(itps.get(0));
-      assertThatFormula(bmgr.and(A, C)).implies(itps.get(1));
-      assertThatFormula(bmgr.and(itps.get(0), itps.get(1), R1)).implies(itps.get(2));
-      assertThatFormula(bmgr.and(A, D)).implies(itps.get(3));
-      assertThatFormula(bmgr.and(itps.get(2), itps.get(3), R2)).implies(bmgr.makeBoolean(false));
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants(
-              ImmutableList.of(TB, TC, TR1, TD, TR2),
-              new int[]{0, 1, 0, 3, 0}
-          )
-      );
-    }
+    assertThatFormula(bmgr.and(A, B)).implies(itps.get(0));
+    assertThatFormula(bmgr.and(A, C)).implies(itps.get(1));
+    assertThatFormula(bmgr.and(itps.get(0), itps.get(1), R1)).implies(itps.get(2));
+    assertThatFormula(bmgr.and(A, D)).implies(itps.get(3));
+    assertThatFormula(bmgr.and(itps.get(2), itps.get(3), R2)).implies(bmgr.makeBoolean(false));
   }
 
   @Test
@@ -926,28 +903,19 @@ public class InterpolatingProverTest
     // b+c=a
     // |
     // a=9
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps =
-          stack.getTreeInterpolants0(
-              ImmutableList.of(TbEquals1, TcEquals2, TbPlusCEqualsA, TaEquals9), // post-order
-              new int[]{0, 1, 0, 0}); // left-most node in current subtree
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants0(
+            ImmutableList.of(TbEquals1, TcEquals2, TbPlusCEqualsA, TaEquals9), // post-order
+            new int[] {0, 1, 0, 0}); // left-most node in current subtree
 
-      assertThat(itps).hasSize(3);
+    assertThat(itps).hasSize(3);
 
-      stack.close();
+    stack.close();
 
-      assertThatFormula(bEquals1).implies(itps.get(0));
-      assertThatFormula(cEquals2).implies(itps.get(1));
-      assertThatFormula(bmgr.and(itps.get(0), itps.get(1), bPlusCEqualsA)).implies(itps.get(2));
-      assertThatFormula(bmgr.and(itps.get(2), aEquals9)).implies(bmgr.makeBoolean(false));
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(
-              ImmutableList.of(TbEquals1, TcEquals2, TbPlusCEqualsA, TaEquals9),
-              new int[]{0, 1, 0, 0}
-          )
-      );
-    }
+    assertThatFormula(bEquals1).implies(itps.get(0));
+    assertThatFormula(cEquals2).implies(itps.get(1));
+    assertThatFormula(bmgr.and(itps.get(0), itps.get(1), bPlusCEqualsA)).implies(itps.get(2));
+    assertThatFormula(bmgr.and(itps.get(2), aEquals9)).implies(bmgr.makeBoolean(false));
   }
 
   @Test
@@ -972,13 +940,8 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[]{0, 0});
-      assertThat(itp).hasSize(1);
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(formulas, new int[]{0, 0}));
-    }
+    List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[] {0, 0});
+    assertThat(itp).hasSize(1);
   }
 
   @Test
@@ -1017,13 +980,8 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[]{0, 1, 2, 3, 4, 0});
-      assertThat(itp).hasSize(5);
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(formulas, new int[]{0, 1, 2, 3, 4, 0}));
-    }
+    List<BooleanFormula> itp = stack.getTreeInterpolants0(formulas, new int[] {0, 1, 2, 3, 4, 0});
+    assertThat(itp).hasSize(5);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1037,12 +995,7 @@ public class InterpolatingProverTest
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      stack.getTreeInterpolants(ImmutableList.of(TA), new int[]{0, 0});
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants(ImmutableList.of(TA), new int[]{0, 0}));
-    }
+    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1084,12 +1037,7 @@ public class InterpolatingProverTest
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[]{0, 1, 1});
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[]{0, 1, 1}));
-    }
+    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1117,12 +1065,7 @@ public class InterpolatingProverTest
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    if (interpolationStrategy == null) {
-      stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[]{0, 2, 0});
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[]{0, 2, 0}));
-    }
+    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1136,13 +1079,8 @@ public class InterpolatingProverTest
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
-    if (interpolationStrategy == null) {
-      stack.getTreeInterpolants(ImmutableList.of(), new int[]{});
-      assert_().fail();
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants(ImmutableList.of(), new int[]{}));
-    }
+    stack.getTreeInterpolants(ImmutableList.of(), new int[] {});
+    assert_().fail();
   }
 
   @Test
@@ -1169,14 +1107,9 @@ public class InterpolatingProverTest
 
     // list of one partition
     List<T> partition = ImmutableList.of(TA, TB);
-    if (interpolationStrategy == null) {
-      List<BooleanFormula> itps =
-          stack.getTreeInterpolants(ImmutableList.of(partition), new int[]{0});
-      assertThat(itps).isEmpty();
-    } else {
-      assertThrows(UnsupportedOperationException.class,
-          () -> stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0}));
-    }
+    List<BooleanFormula> itps =
+        stack.getTreeInterpolants(ImmutableList.of(partition), new int[] {0});
+    assertThat(itps).isEmpty();
   }
 
   @Test
@@ -1371,13 +1304,8 @@ public class InterpolatingProverTest
       assertThat(ltT1).isNotEqualTo(ltT2);
       assertThat(prover.isUnsat()).isTrue();
 
-      if (interpolationStrategy == null) {
-        var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1));
-        assertThat(itps).isNotNull();
-      } else {
-        assertThrows(UnsupportedOperationException.class,
-            () -> prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1)));
-      }
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1));
+      assertThat(itps).isNotNull();
     }
   }
 
@@ -1402,13 +1330,8 @@ public class InterpolatingProverTest
       assertThat(ltT1).isNotEqualTo(ltT2);
       assertThat(prover.isUnsat()).isTrue();
 
-      if (interpolationStrategy == null) {
-        var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2));
-        assertThat(itps).isNotNull();
-      } else {
-        assertThrows(UnsupportedOperationException.class,
-            () -> prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2)));
-      }
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2));
+      assertThat(itps).isNotNull();
     }
   }
 
