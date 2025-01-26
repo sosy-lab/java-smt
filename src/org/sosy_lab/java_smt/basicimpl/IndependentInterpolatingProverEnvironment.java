@@ -134,12 +134,31 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula conjugatedA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
-    // handle empty interpolation groups and trivial interpolants
     if (formulasOfA.isEmpty()) {
       conjugatedA =  bmgr.makeTrue();
     }
     if (formulasOfB.isEmpty()) {
       conjugatedB = bmgr.makeTrue();
+    }
+
+    ProverEnvironment prover = getDistinctProver();
+    if (!formulasOfA.isEmpty()) {
+      prover.push(conjugatedA);
+      if (prover.isUnsat()) {
+        conjugatedA = bmgr.makeFalse();
+      } else {
+        conjugatedA = bmgr.makeTrue();
+      }
+      prover.pop();
+    }
+    if (!formulasOfB.isEmpty()) {
+      prover.push(conjugatedB);
+      if (prover.isUnsat()) {
+        conjugatedB = bmgr.makeFalse();
+      } else {
+        conjugatedB = bmgr.makeTrue();
+      }
+      prover.pop();
     }
 
     if ((bmgr.isTrue(conjugatedA) && bmgr.isTrue(conjugatedB))) {
