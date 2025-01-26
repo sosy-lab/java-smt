@@ -150,7 +150,7 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <T extends Formula> T simplify(T pInput) throws InterruptedException, SolverException {
+  public <T extends Formula> T simplify(T pInput) throws InterruptedException {
     return delegate.simplify(pInput);
   }
 

@@ -423,7 +423,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public <T extends Formula> T simplify(T f) throws InterruptedException, SolverException {
+  public <T extends Formula> T simplify(T f) throws InterruptedException {
     return formulaCreator.encapsulate(formulaCreator.getFormulaType(f), simplify(extractInfo(f)));
   }
 
@@ -433,9 +433,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This does not need to change something, but it might simplify the formula.
    *
    * @throws InterruptedException Can be thrown by the native code.
-   * @throws SolverException Can be thrown by the native code.
    */
-  protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException, SolverException {
+  protected TFormulaInfo simplify(TFormulaInfo f) throws InterruptedException {
     return f;
   }
 

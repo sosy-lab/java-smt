@@ -170,10 +170,13 @@ public interface FormulaManager {
    *
    * <p>For solvers that do not provide a simplification API, an original formula is returned.
    *
+   * <p>If the solver throws an error, we ignore the specific exception (except interrupts) and also
+   * return the original formula.
+   *
    * @param input The input formula
    * @return Simplified version of the formula
    */
-  <T extends Formula> T simplify(T input) throws InterruptedException, SolverException;
+  <T extends Formula> T simplify(T input) throws InterruptedException;
 
   /**
    * Visit the formula with a given visitor.

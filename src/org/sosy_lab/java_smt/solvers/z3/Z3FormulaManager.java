@@ -187,11 +187,16 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  protected Long simplify(Long pF) throws InterruptedException, SolverException {
+  protected Long simplify(Long pF) throws InterruptedException {
     try {
-      return Native.simplify(getFormulaCreator().getEnv(), pF);
-    } catch (Z3Exception exp) {
-      throw formulaCreator.handleZ3Exception(exp);
+      try {
+        return Native.simplify(getFormulaCreator().getEnv(), pF);
+      } catch (Z3Exception exp) {
+        throw formulaCreator.handleZ3Exception(exp);
+      }
+    } catch (SolverException e) {
+      // ignore exception and return original formula AS-IS.
+      return pF;
     }
   }
 

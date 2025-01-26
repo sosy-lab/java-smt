@@ -187,7 +187,7 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public <T extends Formula> T simplify(T input) throws InterruptedException, SolverException {
+  public <T extends Formula> T simplify(T input) throws InterruptedException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(input);
     T result = delegate.simplify(input);
