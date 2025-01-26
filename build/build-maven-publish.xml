@@ -84,8 +84,11 @@ SPDX-License-Identifier: Apache-2.0
     <!-- macro for pushing solvers into a Maven repository
          (push into the staging area, from there manual publication is required afterwards) -->
     <macrodef name="stage-solver-file">
+      <!-- 'filename' is only used for reading file from file-system, not used "in" Maven -->
       <attribute name="filename"/>
-      <attribute name="classifier" default="@{filename}"/>
+      <!-- the Maven 'classifier' should be empty for JAR files, otherwise use common classifiers
+           like 'sources' or 'javadoc, or (for binary files:) 'filename[-arch]'. -->
+      <attribute name="classifier" default=""/>
       <attribute name="fileending"/>
       <attribute name="filedirectory" default="lib/java/runtime-${stage.solver}"/>
       <attribute name="pomFile" default="solvers_maven_conf/maven_${stage.solver}_pom.xml"/>
@@ -104,36 +107,41 @@ SPDX-License-Identifier: Apache-2.0
         </artifact:mvn>
       </sequential>
     </macrodef>
-    
+
     <target name="stage-opensmt" depends="build-dependencies, install-contrib"
             description="deploy current version of OpenSMT to Maven staging repository">
         <!-- get revision from dependencies -->
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="opensmt"/>
         <property name="stage.revision" value="${opensmt.revision}"/>
+        <property name="libDir.x64" value="lib/java/runtime-opensmt/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-opensmt/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
-        <stage-solver-file filename="libopensmt" fileending="so"/>
-        <stage-solver-file filename="libopensmtjava" fileending="so"/>
         <stage-solver-file filename="opensmt" fileending="jar"/>
+        <stage-solver-file filename="libopensmtj" classifier="libopensmtj-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libopensmtj" classifier="libopensmtj-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="opensmt-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
         <stage-solver-file filename="opensmt-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
     </target>
     
-    <target name="stage-mathsat5" depends="build-dependencies"
+    <target name="stage-mathsat5" depends="build-dependencies, install-contrib"
             description="deploy current version of MathSAT to Maven staging repository">
         <!-- get revision from dependencies -->
-        <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
+        <ivy:artifactproperty name="[artifact].revision" value="[revision]" conf="runtime-mathsat"/>
         <property name="stage.solver" value="mathsat"/>
         <property name="stage.revision" value="${mathsat.revision}"/>
+        <property name="libDir.x64" value="lib/java/runtime-mathsat/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-mathsat/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
-        <stage-solver-file filename="libmathsat5j" fileending="so"/>
-        <stage-solver-file filename="mathsat" fileending="dll"/>
-        <stage-solver-file filename="mathsat5j" fileending="dll"/>
-        <stage-solver-file filename="mpir" fileending="dll"/>
+        <stage-solver-file filename="libmathsat5j" classifier="libmathsat5j-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libmathsat5j" classifier="libmathsat5j-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
+        <stage-solver-file filename="mathsat" classifier="mathsat-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="mathsat5j" classifier="mathsat5j-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="mpir" classifier="mpir-x64" filedirectory="${libDir.x64}" fileending="dll"/>
     </target>
 
     <target name="stage-z3" depends="build-dependencies, install-contrib"
@@ -142,16 +150,29 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="z3"/>
         <property name="stage.revision" value="${com.microsoft.z3.revision}"/>
+        <property name="libDir.x64" value="lib/java/runtime-z3/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-z3/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
+        <!-- common Java files -->
         <stage-solver-file filename="com.microsoft.z3" fileending="jar"/>
-        <stage-solver-file filename="libz3java" fileending="so"/>
-        <stage-solver-file filename="libz3java" fileending="dll"/>
-        <stage-solver-file filename="libz3java" fileending="dylib"/>
-        <stage-solver-file filename="libz3" fileending="so"/>
-        <stage-solver-file filename="libz3" fileending="dll"/>
-        <stage-solver-file filename="libz3" fileending="dylib"/>
+        <stage-solver-file filename="com.microsoft.z3-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
+        <stage-solver-file filename="com.microsoft.z3-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
+        <!-- for x64 arch -->
+        <stage-solver-file filename="libz3java" classifier="libz3java-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libz3java" classifier="libz3java-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="libz3java" classifier="libz3java-x64" filedirectory="${libDir.x64}" fileending="dylib"/>
+        <stage-solver-file filename="libz3" classifier="libz3-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libz3" classifier="libz3-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="libz3" classifier="libz3-x64" filedirectory="${libDir.x64}" fileending="dylib"/>
+        <!-- for arm64 arch -->
+        <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
+        <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="dll"/>
+        <stage-solver-file filename="libz3java" classifier="libz3java-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
+        <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
+        <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="dll"/>
+        <stage-solver-file filename="libz3" classifier="libz3-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
     </target>
 
     <target name="stage-bitwuzla" depends="build-dependencies, install-contrib"
@@ -160,12 +181,15 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:artifactproperty name="[artifact].revision" value="[revision]"/>
         <property name="stage.solver" value="bitwuzla"/>
         <property name="stage.revision" value="${bitwuzla.revision}"/>
+        <property name="libDir.x64" value="lib/java/runtime-bitwuzla/x64"/>
+        <property name="libDir.arm64" value="lib/java/runtime-bitwuzla/arm64"/>
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="bitwuzla" fileending="jar"/>
-        <stage-solver-file filename="libbitwuzlaj" fileending="so"/>
-        <stage-solver-file filename="libbitwuzlaj" fileending="dll"/>
+        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj-x64" filedirectory="${libDir.x64}" fileending="so"/>
+        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
+        <stage-solver-file filename="libbitwuzlaj" classifier="libbitwuzlaj-x64" filedirectory="${libDir.x64}" fileending="dll"/>
         <stage-solver-file filename="bitwuzla-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
         <stage-solver-file filename="bitwuzla-javadoc" fileending="jar" classifier="javadoc" filedirectory="lib/java-contrib"/>
     </target>
@@ -179,9 +203,9 @@ SPDX-License-Identifier: Apache-2.0
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
-        <stage-solver-file filename="libboolector" fileending="so"/>
-        <stage-solver-file filename="libminisat" fileending="so"/>
-        <stage-solver-file filename="libpicosat" fileending="so"/>
+        <stage-solver-file filename="libboolector" classifier="libboolector" fileending="so"/>
+        <stage-solver-file filename="libminisat" classifier="libminisat" fileending="so"/>
+        <stage-solver-file filename="libpicosat" classifier="libpicosat" fileending="so"/>
     </target>
 
     <target name="stage-cvc4" depends="build-dependencies"
@@ -194,9 +218,9 @@ SPDX-License-Identifier: Apache-2.0
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="CVC4" fileending="jar"/>
-        <stage-solver-file filename="libcvc4" fileending="so"/>
-        <stage-solver-file filename="libcvc4jni" fileending="so"/>
-        <stage-solver-file filename="libcvc4parser" fileending="so"/>
+        <stage-solver-file filename="libcvc4" classifier="libcvc4" fileending="so"/>
+        <stage-solver-file filename="libcvc4jni" classifier="libcvc4jni" fileending="so"/>
+        <stage-solver-file filename="libcvc4parser" classifier="libcvc4parser" fileending="so"/>
     </target>
 
     <target name="stage-cvc5" depends="build-dependencies"
@@ -209,11 +233,11 @@ SPDX-License-Identifier: Apache-2.0
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="cvc5" fileending="jar"/>
-        <stage-solver-file filename="libcvc5" fileending="so"/>
-        <stage-solver-file filename="libcvc5jni" fileending="so"/>
-        <stage-solver-file filename="libcvc5parser" fileending="so"/>
-        <stage-solver-file filename="libpoly" fileending="so"/>
-        <stage-solver-file filename="libpolyxx" fileending="so"/>
+        <stage-solver-file filename="libcvc5" classifier="libcvc5" fileending="so"/>
+        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni" fileending="so"/>
+        <stage-solver-file filename="libcvc5parser" classifier="libcvc5parser" fileending="so"/>
+        <stage-solver-file filename="libpoly" classifier="libpoly" fileending="so"/>
+        <stage-solver-file filename="libpolyxx" classifier="libpolyxx" fileending="so"/>
     </target>
 
     <!--
@@ -232,7 +256,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the files -->
-        <stage-solver-file filename="javasmt-yices2" fileending="jar" classifier="" filedirectory="lib/java/runtime-yices2"/>
+        <stage-solver-file filename="javasmt-yices2" fileending="jar" filedirectory="lib/java/runtime-yices2"/>
         <stage-solver-file filename="javasmt-yices2-sources" fileending="jar" classifier="sources" filedirectory="lib/java-contrib"/>
     </target>
     <target name="stage-yices2" depends="build-dependencies"
@@ -244,6 +268,6 @@ SPDX-License-Identifier: Apache-2.0
         <!-- prepare the pom-file -->
         <generate-solver-pom-file/>
         <!-- then publish the file -->
-        <stage-solver-file filename="libyices2j" fileending="so"/>
+        <stage-solver-file filename="libyices2j" classifier="libyices2j" fileending="so"/>
     </target>
 </project>

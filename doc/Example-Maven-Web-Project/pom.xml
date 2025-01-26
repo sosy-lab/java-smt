@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -16,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
 
   <groupId>org.sosy_lab.java_smt_web_example</groupId>
   <artifactId>java-smt-web-example</artifactId>
-  <version>1.10</version>
+  <version>1.12</version>
   <packaging>war</packaging>
   <name>java-smt-maven-web-example</name>
   <description>Example Maven project to show how to use JavaSMT with native solver libraries in a web project.</description>
@@ -70,16 +70,20 @@ SPDX-License-Identifier: Apache-2.0
     <project.dependency.relativepath>dependency</project.dependency.relativepath>
     <project.dependency.path>${project.build.directory}/${project.dependency.relativepath}</project.dependency.path>
 
+    <!-- Some solvers are provided for more than x64, e.g., also for arm64. -->
+    <system.arch>x64</system.arch>
+
+    <!-- versions of dependencies -->
     <javasmt.version>5.0.0</javasmt.version>
-    <bitwuzla.version>0.4.0-g4dbf3b1f</bitwuzla.version>
+    <bitwuzla.version>0.7.0-13.1-g595512ae</bitwuzla.version>
     <boolector.version>3.2.2-g1a89c229</boolector.version>
     <cvc4.version>1.8-prerelease-2020-06-24-g7825d8f28</cvc4.version>
     <cvc5.version>1.0.5-g4cb2ab9eb</cvc5.version>
-    <mathsat.version>5.6.10</mathsat.version>
-    <opensmt.version>2.6.0-g2f72cc0e</opensmt.version>
+    <mathsat.version>5.6.11-glibc2.27</mathsat.version>
+    <opensmt.version>2.8.0-sosy0-ge831bf23</opensmt.version>
     <javasmt-yices.version>4.1.1-734-g3732f7e08</javasmt-yices.version>
     <yices.version>2.6.2-396-g194350c1</yices.version>
-    <z3.version>4.12.5</z3.version>
+    <z3.version>4.13.4</z3.version>
   </properties>
 
   <dependencies>
@@ -94,7 +98,7 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-mathsat5</artifactId>
       <version>${mathsat.version}</version>
-      <classifier>libmathsat5j</classifier>
+      <classifier>libmathsat5j-${system.arch}</classifier>
       <type>so</type>
     </dependency>
 
@@ -103,22 +107,20 @@ SPDX-License-Identifier: Apache-2.0
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
-      <type>jar</type>
-      <classifier>com.microsoft.z3</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
       <type>so</type>
-      <classifier>libz3</classifier>
+      <classifier>libz3-${system.arch}</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-z3</artifactId>
       <version>${z3.version}</version>
       <type>so</type>
-      <classifier>libz3java</classifier>
+      <classifier>libz3java-${system.arch}</classifier>
     </dependency>
 
     <!-- Bitwuzla has two dependencies (on Linux) -->
@@ -127,14 +129,13 @@ SPDX-License-Identifier: Apache-2.0
       <artifactId>javasmt-solver-bitwuzla</artifactId>
       <version>${bitwuzla.version}</version>
       <type>jar</type>
-      <classifier>bitwuzla</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-bitwuzla</artifactId>
       <version>${bitwuzla.version}</version>
       <type>so</type>
-      <classifier>libbitwuzlaj</classifier>
+      <classifier>libbitwuzlaj-${system.arch}</classifier>
     </dependency>
 
     <!-- Boolector has three dependencies (on Linux) -->
@@ -255,14 +256,13 @@ SPDX-License-Identifier: Apache-2.0
       <artifactId>javasmt-solver-opensmt</artifactId>
       <version>${opensmt.version}</version>
       <type>jar</type>
-      <classifier>opensmt</classifier>
     </dependency>
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-opensmt</artifactId>
       <version>${opensmt.version}</version>
       <type>so</type>
-      <classifier>libopensmtjava</classifier>
+      <classifier>libopensmtj-${system.arch}</classifier>
     </dependency>
 
     <!-- JUnit for testing -->
@@ -327,7 +327,7 @@ SPDX-License-Identifier: Apache-2.0
                   <include>libpoly.so</include>
                   <include>libpolyxx.so</include>
                   <include>libyices2j.so</include>
-                  <include>libopensmtjava.so</include>
+                  <include>libopensmtj.so</include>
                 </includes>
                 <targetPath>WEB-INF/lib</targetPath>
               </resource>
@@ -404,7 +404,7 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-mathsat5</artifactId>
               <type>so</type>
-              <classifier>libmathsat5j</classifier>
+              <classifier>libmathsat5j-${system.arch}</classifier>
               <destFileName>libmathsat5j.so</destFileName>
             </artifactItem>
 
@@ -413,14 +413,14 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-z3</artifactId>
               <type>so</type>
-              <classifier>libz3java</classifier>
+              <classifier>libz3java-${system.arch}</classifier>
               <destFileName>libz3java.so</destFileName>
             </artifactItem>
             <artifactItem>
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-z3</artifactId>
               <type>so</type>
-              <classifier>libz3</classifier>
+              <classifier>libz3-${system.arch}</classifier>
               <destFileName>libz3.so</destFileName>
             </artifactItem>
 
@@ -429,7 +429,7 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-bitwuzla</artifactId>
               <type>so</type>
-              <classifier>libbitwuzlaj</classifier>
+              <classifier>libbitwuzlaj-${system.arch}</classifier>
               <destFileName>libbitwuzlaj.so</destFileName>
             </artifactItem>
 
@@ -534,8 +534,8 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-opensmt</artifactId>
               <type>so</type>
-              <classifier>libopensmtjava</classifier>
-              <destFileName>libopensmtjava.so</destFileName>
+              <classifier>libopensmtj-${system.arch}</classifier>
+              <destFileName>libopensmtj.so</destFileName>
             </artifactItem>
           </artifactItems>
         </configuration>

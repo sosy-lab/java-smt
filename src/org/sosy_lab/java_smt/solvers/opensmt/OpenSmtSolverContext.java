@@ -86,7 +86,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
 
     // Make sure the native libraries are loaded
-    pLoader.accept("opensmtjava");
+    pLoader.accept("opensmtj");
 
     OpenSMTOptions solverOptions = new OpenSMTOptions(config, (int) pRandom);
 
