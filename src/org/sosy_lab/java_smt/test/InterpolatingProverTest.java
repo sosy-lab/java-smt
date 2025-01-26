@@ -1315,11 +1315,6 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
-    assume()
-        .withMessage("Solver %s does not support interpolation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
@@ -1346,11 +1341,6 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
-    assume()
-        .withMessage("Solver %s does not support interpolation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
-
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
