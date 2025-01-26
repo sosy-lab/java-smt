@@ -161,7 +161,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     // handle trivial interpolants
     if ((bmgr.isTrue(conjugatedA) && bmgr.isTrue(conjugatedB))) {
-      throw new IllegalArgumentException("There exists no interpolant.");
+      return null;
     }
     if (bmgr.isFalse(conjugatedA) && bmgr.isFalse(conjugatedB)) {
       // true is manually chosen here, but false would also be correct since both satisfy UNSAT
