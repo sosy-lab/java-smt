@@ -17,6 +17,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
+@SuppressWarnings("unused")
 public class Yices2QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Integer, Integer, Long, Integer> {
 
@@ -28,7 +29,6 @@ public class Yices2QuantifiedFormulaManager
   @Override
   protected Integer eliminateQuantifiers(Integer pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Yices does not support eliminating Quantifiers.");
   }
 
