@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
-import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -305,22 +304,6 @@ public abstract class SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage("Solver %s does not support interpolation", solverToUse())
-          .that(e)
-          .isNull();
-    }
-  }
-
-  protected void requireSequentialInterpolation(ProverOptions... options) {
-    try {
-      if (Arrays.stream(options).anyMatch(p -> p == null)) {
-        context.newProverEnvironmentWithInterpolation().close();
-      } else {
-        context.newProverEnvironmentWithInterpolation(options).close();
-      }
-    } catch (UnsupportedOperationException e) {
-      assume()
-          .withMessage(
-              "Sequential interpolants are not supported for independent interpolation currently.")
           .that(e)
           .isNull();
     }
