@@ -282,21 +282,10 @@ public class InterpolatingProverTest
 
   private void requireTreeItp() {
     requireInterpolation();
-    if (interpolationStrategy == null) {
-      assume()
-          .withMessage("Solver does not support tree-interpolation.")
-          .that(solver)
-          .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
-    } else {
-      assume()
-          .withMessage(
-              "Tree interpolants are not supported for independent interpolation currently.")
-          .that(interpolationStrategy)
-          .isAnyOf(
-              ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
-              ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
-              ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
-    }
+    assume()
+        .withMessage("Solver does not support tree-interpolation.")
+        .that(solver)
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
   private void requireIndependentSeqItp() {
