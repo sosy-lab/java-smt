@@ -161,6 +161,9 @@ public interface FormulaManager {
   /**
    * Apply a tactic which performs formula transformation. The available tactics depend on the used
    * solver.
+   *
+   * @throws InterruptedException If the solver is interrupted.
+   * @throws SolverException If the solver fails to apply the tactic.
    */
   BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException, SolverException;
@@ -175,6 +178,7 @@ public interface FormulaManager {
    *
    * @param input The input formula
    * @return Simplified version of the formula
+   * @throws InterruptedException If the solver is interrupted.
    */
   <T extends Formula> T simplify(T input) throws InterruptedException;
 
