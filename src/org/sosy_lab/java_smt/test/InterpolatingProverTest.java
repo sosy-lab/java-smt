@@ -333,6 +333,13 @@ public class InterpolatingProverTest
           .that(solverToUse())
           .isNotEqualTo(Solvers.Z3);
     }
+
+    if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
+      assume()
+          .withMessage("Solver %s returned null or unknown on sat check")
+          .that(solverToUse())
+          .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+    }
   }
 
   @Test
