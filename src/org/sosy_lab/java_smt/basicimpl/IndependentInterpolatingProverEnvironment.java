@@ -100,7 +100,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     }
     Preconditions.checkState(itpStrat.size() == 1);
     try {
-      pFormulaManager.getQuantifiedFormulaManager();
+      QuantifiedFormulaManager dummy = pFormulaManager.getQuantifiedFormulaManager();
     } catch (UnsupportedOperationException e) {
       throw new UnsupportedOperationException(
           "Solver does not support independent interpolation based on the current strategy, as it"
