@@ -134,6 +134,15 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula conjugatedA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedB = bmgr.and(formulasOfB);
 
+    List<Formula> varsOfA = getVars(conjugatedA);
+    List<Formula> varsOfB = getVars(conjugatedB);
+
+    ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
+
+    if (varsOfA.isEmpty() || varsOfB.isEmpty()) {
+      return bmgr.makeTrue();
+    }
+
     // handle empty interpolation groups and trivial interpolants
     if (formulasOfA.isEmpty()) {
       conjugatedA =  bmgr.makeTrue();
@@ -163,9 +172,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     Preconditions.checkNotNull(interpolationStrategy);
 
     if (interpolationStrategy.equals(ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS)) {
-      return getModelBasedInterpolant(conjugatedA, conjugatedB);
+      return getModelBasedInterpolant(conjugatedA, conjugatedB, varsOfA, varsOfB, sharedVars);
     } else {
-      return getQuantifierEliminationBasedInterpolant(conjugatedA, conjugatedB);
+      return getQuantifierEliminationBasedInterpolant(
+          conjugatedA, conjugatedB, varsOfA, varsOfB, sharedVars);
     }
   }
 
@@ -236,17 +246,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     Binary Craig Interpolation by reduction to CHC</a>
    */
   private BooleanFormula getModelBasedInterpolant(
-      BooleanFormula formulasOfA, BooleanFormula formulasOfB)
+      BooleanFormula formulasOfA, BooleanFormula formulasOfB, List<Formula> varsOfA,
+      List<Formula> varsOfB, ImmutableList<Formula> sharedVars)
       throws InterruptedException, SolverException {
 
-    List<Formula> varsOfA = getVars(formulasOfA);
-    List<Formula> varsOfB = getVars(formulasOfB);
-
-    ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
-
-    if (varsOfA.isEmpty() || varsOfB.isEmpty()) {
-      return bmgr.makeTrue();
-    }
     QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
@@ -302,17 +305,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     be found.
    */
   private BooleanFormula getQuantifierEliminationBasedInterpolant(
-      BooleanFormula formulasOfA, BooleanFormula formulasOfB)
+      BooleanFormula formulasOfA, BooleanFormula formulasOfB, List<Formula> varsOfA,
+      List<Formula> varsOfB, ImmutableList<Formula> sharedVars)
       throws SolverException, InterruptedException {
-
-    ImmutableList<Formula> varsOfA = getVars(formulasOfA);
-    ImmutableList<Formula> varsOfB = getVars(formulasOfB);
-
-    ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
-
-    if (varsOfA.isEmpty() || varsOfB.isEmpty()) {
-      return bmgr.makeTrue();
-    }
 
     Preconditions.checkState(isUnsat());
     checkNotNull(interpolationStrategy);
