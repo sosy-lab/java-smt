@@ -230,6 +230,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *
    * @param formulasOfA A {@link BooleanFormula} representing the set of A.
    * @param formulasOfB A {@link BooleanFormula} representing the set of B.
+   * @param varsOfA A list of all variables in formulas of A.
+   * @param varsOfB A list of all variables in formulas of B.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
    * @return the Craig interpolant, otherwise {@code false} in case an interpolant can not be found.
    * @see <a href="https://github.com/agurfinkel/spacer-on-jupyter/blob/master/Dagstuhl2019.ipynb">
    *     Binary Craig Interpolation by reduction to CHC</a>
@@ -290,6 +293,9 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *
    * @param formulasOfA A {@link BooleanFormula} representing the set of A.
    * @param formulasOfB A {@link BooleanFormula} representing the set of B.
+   * @param varsOfA A list of all variables in formulas of A.
+   * @param varsOfB A list of all variables in formulas of B.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
    * @return the uniform Craig interpolant, otherwise {@code false} in case an interpolant can not
    *     be found.
    */
