@@ -90,6 +90,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return getIndependentInterpolationStrategy(options, pFormulaManager) != null;
   }
 
+  @SuppressWarnings("unused")
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options, FormulaManager pFormulaManager) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
