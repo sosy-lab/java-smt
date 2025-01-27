@@ -327,6 +327,14 @@ public class InterpolatingProverTest
     }
   }
 
+  private void requireIndependentInterpolationSolvingIssue381() {
+    if (interpolationStrategy != null) {
+      assume()
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.Z3);
+    }
+  }
+
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
