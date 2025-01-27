@@ -144,14 +144,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       return bmgr.makeTrue();
     }
 
-    // handle empty interpolation groups and trivial interpolants
-    if (formulasOfA.isEmpty()) {
-      conjugatedA =  bmgr.makeTrue();
-    }
-    if (formulasOfB.isEmpty()) {
-      conjugatedB = bmgr.makeTrue();
-    }
-
     if (formulasOfA.isEmpty()) {
       return bmgr.makeTrue();
     }
