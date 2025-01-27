@@ -321,17 +321,13 @@ public class InterpolatingProverTest
 
   private void requireIndependentInterpolationWithConstantFalse() {
     if (interpolationStrategy != null) {
-      assume()
-          .that(solverToUse())
-          .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+      assume().that(solverToUse()).isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
     }
   }
 
   private void requireIndependentInterpolationSolvingIssue381() {
     if (interpolationStrategy != null) {
-      assume()
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.Z3);
+      assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     }
 
     if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
