@@ -71,7 +71,8 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     solverContext = checkNotNull(pSourceContext);
     delegate = checkNotNull(pDelegate);
     creator = pCreator;
-    interpolationStrategy = getIndependentInterpolationStrategy(pOptions);
+    interpolationStrategy =
+        getIndependentInterpolationStrategy(pOptions, pSourceContext.getFormulaManager());
     mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
     ufmgr = mgr.getUFManager();
@@ -84,18 +85,26 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    * @return {@code true} if an independent interpolation strategy is configured, {@code false}
    *     otherwise.
    */
-  public static boolean hasIndependentInterpolationStrategy(Set<ProverOptions> options) {
-    return getIndependentInterpolationStrategy(options) != null;
+  public static boolean hasIndependentInterpolationStrategy(
+      Set<ProverOptions> options, FormulaManager pFormulaManager) {
+    return getIndependentInterpolationStrategy(options, pFormulaManager) != null;
   }
 
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
-      Set<ProverOptions> options) {
+      Set<ProverOptions> options, FormulaManager pFormulaManager) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
     itpStrat.retainAll(ALL_INDEPENDENT_INTERPOLATION_STRATEGIES);
     if (itpStrat.isEmpty()) {
       return null;
     }
     Preconditions.checkState(itpStrat.size() == 1);
+    try {
+      pFormulaManager.getQuantifiedFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException(
+          "Solver does not support independent interpolation based on the current strategy, as it"
+              + " is lacking quantifier support.");
+    }
     return itpStrat.get(0);
   }
 
@@ -116,14 +125,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         throw new UnsupportedOperationException(
             "Solver does not natively support interpolation in JavaSMT currently.");
       }
-    }
-
-    try {
-      mgr.getQuantifiedFormulaManager();
-    } catch (UnsupportedOperationException e) {
-      throw new UnsupportedOperationException(
-          "Solver does not support independent interpolation based on the current strategy, as it"
-              + " is lacking quantifier support.");
     }
 
     InterpolationFormulas formulasAAndB = super.getInterpolationGroups(pFormulasOfA);

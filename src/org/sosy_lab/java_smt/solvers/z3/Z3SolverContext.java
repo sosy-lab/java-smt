@@ -230,7 +230,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    if (!hasIndependentInterpolationStrategy(options)) {
+    if (!hasIndependentInterpolationStrategy(options, getFormulaManager())) {
       throw new UnsupportedOperationException(
           "Z3 does not support interpolation natively. Try "
               + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"

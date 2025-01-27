@@ -114,7 +114,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    if (!hasIndependentInterpolationStrategy(options)) {
+    if (!hasIndependentInterpolationStrategy(options, getFormulaManager())) {
       throw new UnsupportedOperationException(
           "Yices2 does not support interpolation natively. Try "
               + "using the independent interpolation options GENERATE_MODEL_BASED_INTERPOLANTS,"
