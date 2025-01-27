@@ -67,9 +67,9 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_let
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_qual_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_spec_constContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Var_bindingContext;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 import scala.Tuple2;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
-import scala.concurrent.impl.FutureConvertersImpl.P;
 
 /**
  * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
@@ -1814,11 +1814,11 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return visitChildren(ctx);
   }
 
-  public static boolean formulaMatchesRequestedType(FormulaTypesForChecking type, Formula formula){
+  public static boolean formulaMatchesRequestedType(DummyType type, Formula formula){
     return formula.getClass().getName().equals(parseToCorrectName(type));
   }
-  public static String parseToCorrectName(FormulaTypesForChecking type) {
-    switch (type){
+  public static String parseToCorrectName(DummyType type) {
+    switch (type.myType){
       case REGEX:
         return "RegexFormula";
       case STRING:

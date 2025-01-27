@@ -25,12 +25,12 @@ import static org.sosy_lab.java_smt.solvers.SolverLess.DummyFormula.createDummyF
 import java.io.IOException;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.*;
-import org.sosy_lab.java_smt.api.*;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessFormulaManager
-    extends AbstractFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+    extends AbstractFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessFormulaManager(SolverLessFormulaCreator pCreator,
                                      SolverLessBooleanFormulaManager bmgr) {
@@ -59,7 +59,7 @@ public class SolverLessFormulaManager
       }
 
       private void dumpFormulaInternal(DummyFormula formula, Appendable out) throws IOException {
-        switch (formula.getFormulaType()) {
+        switch (formula.getFormulaType().myType) {
           case BOOLEAN:
             out.append(formula.toString());
             break;
@@ -87,9 +87,9 @@ public class SolverLessFormulaManager
             out.append("(declare-fun ")
                 .append(formula.getName())
                 .append(" () (Array ")
-                .append(formula.getFirstArrayParameter().getFormulaType().name())
+                .append(formula.getFirstArrayParameter().getFormulaType().myType.name())
                 .append(" ")
-                .append(formula.getSecondArrayParameter().getFormulaType().name())
+                .append(formula.getSecondArrayParameter().getFormulaType().myType.name())
                 .append("))");
             break;
           default:
@@ -111,11 +111,11 @@ public class SolverLessFormulaManager
 
       switch (type) {
         case "Bool":
-          return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+          return new DummyFormula(new DummyType(Type.BOOLEAN));
         case "Int":
-          return new DummyFormula(FormulaTypesForChecking.INTEGER);
+          return new DummyFormula(new DummyType(Type.INTEGER));
         case "Real":
-          return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+          return new DummyFormula(new DummyType(Type.RATIONAL));
         default:
           if (type.startsWith("(_ BitVec")) {
             int bitwidth = Integer.parseInt(type.replaceAll("[^0-9]", ""));

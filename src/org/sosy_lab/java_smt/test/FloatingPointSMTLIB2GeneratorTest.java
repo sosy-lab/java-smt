@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Override
   public Solvers solverToUse(){
-    return Solvers.Z3;
+    return Solvers.SOLVERLESS;
   }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {

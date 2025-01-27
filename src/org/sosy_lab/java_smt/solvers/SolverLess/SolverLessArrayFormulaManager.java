@@ -25,16 +25,16 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
-    FormulaTypesForChecking, DummyEnv, DummyFunction> {
+    DummyType, DummyEnv, DummyFunction> {
 
   public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
 
-  protected SolverLessArrayFormulaManager(FormulaCreator<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> pFormulaCreator) {
+  protected SolverLessArrayFormulaManager(FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
@@ -47,7 +47,7 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {
-    if (pArray.getSecondArrayParameter().getFormulaType() == FormulaTypesForChecking.ARRAY) {
+    if (pArray.getSecondArrayParameter().getFormulaType().isArray()) {
       return new DummyFormula(pArray.getSecondArrayParameter().getFirstArrayParameter(),
           pArray.getSecondArrayParameter().getSecondArrayParameter());
     }
@@ -72,6 +72,6 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 }

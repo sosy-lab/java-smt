@@ -21,11 +21,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("checkstyle:linelength")
-public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0{
-  @Override
-  public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
-  }
+public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0{
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();

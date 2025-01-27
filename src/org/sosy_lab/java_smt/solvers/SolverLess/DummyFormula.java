@@ -20,6 +20,10 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractBitvectorLengthFromString;
+import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractExponentFromString;
+import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractMantissaFromString;
+
 import java.util.Objects;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -30,42 +34,47 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
                                      ArrayFormula, NumeralFormula, BooleanFormula, IntegerFormula
     , RationalFormula {
   private String name ="unnamed";
-  private int exponent = -1;
-  private int mantissa = -1;
-  private int bitvectorLength = -1;
   private DummyFormula firstArrayParameter = null;
   private DummyFormula secondArrayParameter = null;
   private String representation = "";
-  private final FormulaTypesForChecking formulaType;
+  private final DummyType formulaType;
   private String value = "";
 
 
 
-  public DummyFormula(FormulaTypesForChecking pFormulaType) {
-    formulaType = pFormulaType;
+  public DummyFormula(DummyType pFormulaType) {
+    if(pFormulaType.isArray()){
+      DummyFormula formula = createDummyFormulaArrayFromString(pFormulaType.toString());
+        firstArrayParameter = formula.getFirstArrayParameter();
+        secondArrayParameter = formula.getSecondArrayParameter();
+        representation = formula.representation;
+        formulaType = formula.formulaType;
+        value = formula.value;
+        name = formula.name;
+    }else{
+      formulaType = pFormulaType;
+    }
     updateRepresentation();
   }
 
 
   public DummyFormula(boolean value) {
-    formulaType = FormulaTypesForChecking.BOOLEAN;
+    formulaType = new DummyType(Type.BOOLEAN);
     this.value = String.valueOf(value);
     updateRepresentation();
   }
 
 
-  public DummyFormula(FormulaTypesForChecking pFormulaType, String pRepresentation) {
+  public DummyFormula(DummyType pFormulaType, String pRepresentation) {
     formulaType = pFormulaType;
     representation = pRepresentation;
-    if (pFormulaType == FormulaTypesForChecking.RATIONAL
-        || pFormulaType == FormulaTypesForChecking.INTEGER) {
+    if (pFormulaType.isInteger() || pFormulaType.isRational()) {
       value = pRepresentation;
     }
     updateRepresentation();
@@ -76,22 +85,19 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
       DummyFormula pfirstArrayParameter,
       DummyFormula psecondArrayParameter) { //if it represents an array
     representation = "";
-    formulaType = FormulaTypesForChecking.ARRAY;
+    formulaType = new DummyType(pfirstArrayParameter.getFormulaType().myType, psecondArrayParameter.getFormulaType().myType);
     firstArrayParameter = pfirstArrayParameter;
     secondArrayParameter = psecondArrayParameter;
     updateRepresentation();
   }
 
   public DummyFormula(int exponent, int mantissa) { //if it represents a FloatingPoint
-    this.exponent = exponent;
-    this.mantissa = mantissa;
-    formulaType = FormulaTypesForChecking.FLOATING_POINT;
+    formulaType = new DummyType(exponent, mantissa);
     updateRepresentation();
   }
 
   public DummyFormula(int pBitvectorLength) {
-    this.bitvectorLength = pBitvectorLength;
-    formulaType = FormulaTypesForChecking.BITVECTOR;
+    formulaType = new DummyType(pBitvectorLength);
     updateRepresentation();
   }
   public void setName(String name){
@@ -113,7 +119,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
       int size = bitvectorType.getSize();
       return new DummyFormula(size);
     } else if (pType.isBooleanType()) {
-      return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+      return new DummyFormula(new DummyType(Type.BOOLEAN));
     } else if (pType.isFloatingPointType()) {
       FormulaType.FloatingPointType floatingPointType = (FormulaType.FloatingPointType) pType;
       int exponentSize = floatingPointType.getExponentSize();
@@ -121,14 +127,14 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
       return new DummyFormula(exponentSize, mantissaSize);
     } else if (pType.isNumeralType()) {
       if (pType.isIntegerType()) {
-        return new DummyFormula(FormulaTypesForChecking.INTEGER);
+        return new DummyFormula(new DummyType(Type.INTEGER));
       } else if (pType.isRationalType()) {
-        return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+        return new DummyFormula(new DummyType(Type.RATIONAL));
       }
     } else if (pType.isStringType()) {
-      return new DummyFormula(FormulaTypesForChecking.STRING);
+      return new DummyFormula(new DummyType(Type.STRING));
     } else if (pType.isRegexType()) {
-      return new DummyFormula(FormulaTypesForChecking.REGEX);
+      return new DummyFormula(new DummyType(Type.REGEX));
     } else {
       throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
     }
@@ -138,7 +144,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   private String getArrayRepresentation() {
     StringBuilder representationBuilder = new StringBuilder("Array<");
 
-    if (firstArrayParameter.getFormulaType() == FormulaTypesForChecking.ARRAY) {
+    if (firstArrayParameter.getFormulaType().isArray()) {
       representationBuilder.append(firstArrayParameter.getArrayRepresentation());
     } else {
       representationBuilder.append(firstArrayParameter.getFormulaType());
@@ -146,7 +152,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
 
     representationBuilder.append(", ");
 
-    if (secondArrayParameter.getFormulaType() == FormulaTypesForChecking.ARRAY) {
+    if (secondArrayParameter.getFormulaType().isArray()) {
       representationBuilder.append(secondArrayParameter.getArrayRepresentation());
     } else {
       representationBuilder.append(secondArrayParameter.getFormulaType());
@@ -156,15 +162,15 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return representationBuilder.toString();
   }
 
-  public static DummyFormula createDummyFormulaArrayFromString(String representation) {
-    representation = representation.trim();
+  public static DummyFormula createDummyFormulaArrayFromString(String input) {
+    input = input.trim();
 
-    if (representation.startsWith("Array<") && representation.endsWith(">")) {
+    if (input.startsWith("Array<") && input.endsWith(">")) {
 
-      String content = representation.substring(6, representation.length() - 1).trim();
+      String content = input.substring(6, input.length() - 1).trim();
       int commaIndex = findTopLevelCommaIndex(content);
       if (commaIndex == -1) {
-        throw new IllegalArgumentException("Invalid Array representation: " + representation);
+        throw new IllegalArgumentException("Invalid Array representation: " + input);
       }
 
       String firstParameter = content.substring(0, commaIndex).trim();
@@ -179,26 +185,29 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
 
 
     try {
-      FormulaTypesForChecking type = FormulaTypesForChecking.valueOf(representation.toUpperCase());
-      switch (type) {
-        case INTEGER:
-          return new DummyFormula(FormulaTypesForChecking.INTEGER);
-        case RATIONAL:
-          return new DummyFormula(FormulaTypesForChecking.RATIONAL);
-        case BOOLEAN:
-          return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
-        case STRING:
-          return new DummyFormula(FormulaTypesForChecking.STRING);
-        case REGEX:
-          return new DummyFormula(FormulaTypesForChecking.REGEX);
-        case BITVECTOR:
-          return new DummyFormula(FormulaTypesForChecking.BITVECTOR);
+      String convertedType = input.toUpperCase();
+      switch (convertedType.substring(0,3)) {
+        case "INT":
+          return new DummyFormula(new DummyType(Type.INTEGER));
+        case "RAT":
+          return new DummyFormula(new DummyType(Type.RATIONAL));
+        case "BOO":
+          return new DummyFormula(new DummyType(Type.BOOLEAN));
+        case "STR":
+          return new DummyFormula(new DummyType(Type.STRING));
+        case "REG":
+          return new DummyFormula(new DummyType(Type.REGEX));
+        case "BIT":
+          return new DummyFormula(new DummyType(extractBitvectorLengthFromString(input)));
+        case "FLO":
+          return new DummyFormula(new DummyType(extractExponentFromString(input),
+              extractMantissaFromString(input)));
         default:
-          throw new IllegalArgumentException("Unsupported type: " + representation);
+          throw new IllegalArgumentException("Unsupported type: " + input);
       }
     } catch (IllegalArgumentException e) {
       throw new IllegalArgumentException(
-          "Invalid representation or unsupported type: " + representation, e);
+          "Invalid representation or unsupported type: " + input, e);
     }
   }
 
@@ -220,12 +229,12 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
 
 
   private void updateRepresentation() {
-    switch (formulaType) {
+    switch (formulaType.myType) {
       case BITVECTOR:
-        this.representation = "Bitvector<" + bitvectorLength + ">";
+        this.representation = "Bitvector<" + getBitvectorLength() + ">";
         break;
       case FLOATING_POINT:
-        this.representation = "FloatingPoint<" + exponent + ", " + mantissa + ">";
+        this.representation = "FloatingPoint<" + getExponent() + ", " + getMantissa() + ">";
         break;
       case ARRAY:
         this.representation = getArrayRepresentation();
@@ -250,16 +259,16 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   }
 
 
-  public FormulaTypesForChecking getFormulaType() {
+  public DummyType getFormulaType() {
     return formulaType;
   }
 
   public FormulaType<?> getFormulaTypeForCreator() {
-    switch (formulaType) {
+    switch (formulaType.myType) {
       case BITVECTOR:
-        return FormulaType.getBitvectorTypeWithSize(bitvectorLength);
+        return FormulaType.getBitvectorTypeWithSize(getBitvectorLength());
       case FLOATING_POINT:
-        return FormulaType.getFloatingPointType(exponent, mantissa);
+        return FormulaType.getFloatingPointType(getExponent(), getMantissa());
       case ARRAY:
         return FormulaType.getArrayType(firstArrayParameter.getFormulaTypeForCreator(),
             secondArrayParameter.getFormulaTypeForCreator());
@@ -277,28 +286,19 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   }
 
   public int getExponent() {
-    return exponent;
+    return formulaType.getExponent();
   }
 
-  public void setExponent(int pExponent) {
-    exponent = pExponent;
-  }
 
   public int getMantissa() {
-    return mantissa;
+    return formulaType.getMantissa();
   }
 
-  public void setMantissa(int pMantissa) {
-    mantissa = pMantissa;
-  }
 
   public int getBitvectorLength() {
-    return bitvectorLength;
+    return formulaType.getBitvectorLength();
   }
 
-  public void setBitvectorLength(int pBitvectorLength) {
-    bitvectorLength = pBitvectorLength;
-  }
 
   public DummyFormula getFirstArrayParameter() {
     return firstArrayParameter;
@@ -327,7 +327,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   public String parseMeToSMTLIB() {
     StringBuilder sb = new StringBuilder();
     if(Objects.equals(value, "")){ //formula is a variable
-      switch (formulaType){
+      switch (formulaType.myType){
         case BOOLEAN:
           sb.append("(declare-const ").append(name).append(" Bool)");
           break;
@@ -338,10 +338,10 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
           sb.append("(declare-const ").append(name).append(" Real)");
           break;
         case BITVECTOR:
-          sb.append("(declare-const ").append(name).append(" (_ BitVec ").append(bitvectorLength).append("))");
+          sb.append("(declare-const ").append(name).append(" (_ BitVec ").append(getBitvectorLength()).append("))");
           break;
         case FLOATING_POINT:
-          sb.append("(declare-const ").append(name).append(" (_ FloatingPoint ").append(exponent).append(" ").append(mantissa).append("))");
+          sb.append("(declare-const ").append(name).append(" (_ FloatingPoint ").append(getExponent()).append(" ").append(getMantissa()).append("))");
           break;
         case ARRAY:
           sb.append("(declare-const ").append(name).append(" (Array ");
@@ -361,7 +361,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
           sb.append("unknown");
       }
     }else{
-      switch (formulaType) {
+      switch (formulaType.myType) {
         case BOOLEAN:
         case INTEGER:
         case RATIONAL:
@@ -372,7 +372,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
           break;
 
         case FLOATING_POINT:
-          sb.append("(FloatingPoint ").append(exponent).append(" ").append(mantissa).append(")");
+          sb.append("(FloatingPoint ").append(getExponent()).append(" ").append(getMantissa()).append(")");
           break;
 
         case ARRAY:

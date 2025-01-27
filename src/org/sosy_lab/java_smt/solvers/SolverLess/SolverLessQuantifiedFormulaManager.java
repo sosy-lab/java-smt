@@ -23,9 +23,8 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
-public class SolverLessQuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+public class SolverLessQuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessQuantifiedFormulaManager(SolverLessFormulaCreator pFormulaCreator) {
     super(pFormulaCreator);

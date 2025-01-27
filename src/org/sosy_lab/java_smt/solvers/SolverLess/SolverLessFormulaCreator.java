@@ -34,42 +34,40 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessFormulaCreator
-    extends FormulaCreator<DummyFormula, FormulaTypesForChecking, DummyEnv, DummyFunction> {
+    extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
 
   protected SolverLessFormulaCreator() {
-    super(new DummyEnv(), FormulaTypesForChecking.BOOLEAN, FormulaTypesForChecking.INTEGER,
-        FormulaTypesForChecking.RATIONAL,
-        FormulaTypesForChecking.STRING,
-        FormulaTypesForChecking.REGEX);
+    super(new DummyEnv(), new DummyType(Type.BOOLEAN), new DummyType(Type.INTEGER),
+        new DummyType(Type.RATIONAL), new DummyType(Type.STRING), new DummyType(Type.REGEX));
   }
 
   @Override
-  public FormulaTypesForChecking getBitvectorType(int bitwidth) {
-    return FormulaTypesForChecking.BITVECTOR;
+  public DummyType getBitvectorType(int bitwidth) {
+    return new DummyType(bitwidth);
   }
 
   @Override
-  public FormulaTypesForChecking getFloatingPointType(FloatingPointType type) {
-    return FormulaTypesForChecking.FLOATING_POINT;
+  public DummyType getFloatingPointType(FloatingPointType type) {
+    return new DummyType(type.getExponentSize(), type.getMantissaSize());
   }
 
   @Override
-  public FormulaTypesForChecking getArrayType(
-      FormulaTypesForChecking indexType,
-      FormulaTypesForChecking elementType) {
-    return FormulaTypesForChecking.ARRAY;
+  public DummyType getArrayType(
+      DummyType indexType,
+      DummyType elementType) {
+    return new DummyType(indexType.myType, elementType.myType);
   }
 
   @Override
   public DummyFormula makeVariable(
-      FormulaTypesForChecking pFormulaTypesForChecking,
+      DummyType pDummyType,
       String varName) {
-    DummyFormula result = new DummyFormula(pFormulaTypesForChecking);
+    DummyFormula result = new DummyFormula(pDummyType);
     result.setName(varName);
     return result;
   }
@@ -79,7 +77,7 @@ public class SolverLessFormulaCreator
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
     if (formula instanceof DummyFormula) {
       DummyFormula dummyFormula = (DummyFormula) formula;
-      switch (dummyFormula.getFormulaType()) {
+      switch (dummyFormula.getFormulaType().myType) {
         case BITVECTOR:
           return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(
               dummyFormula.getBitvectorLength());
@@ -138,31 +136,28 @@ public class SolverLessFormulaCreator
     }
     if (pT instanceof RationalFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+        return new DummyFormula(new DummyType(Type.RATIONAL));
       }
-      DummyFormula result = new DummyFormula(FormulaTypesForChecking.RATIONAL,
+      DummyFormula result = new DummyFormula(new DummyType(Type.RATIONAL),
           (pT.toString()));
       return result;
     }
     if (pT instanceof IntegerFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(FormulaTypesForChecking.INTEGER);
+        return new DummyFormula(new DummyType(Type.INTEGER));
       }
-      DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER,
+      DummyFormula result = new DummyFormula(new DummyType(Type.INTEGER),
           pT.toString());
       return result;
     }
     if (pT instanceof BooleanFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+        return new DummyFormula(new DummyType(Type.BOOLEAN));
       }
       DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
       return result;
     }
     if (pT instanceof ArrayFormula) {
-      if (pT.toString().equals("") || pT.toString().equals("Array<, >")) {
-        return new DummyFormula(FormulaTypesForChecking.ARRAY);
-      }
       DummyFormula.createDummyFormulaArrayFromString(pT.toString());
     }
 
@@ -225,7 +220,7 @@ public class SolverLessFormulaCreator
   }
 
 
-  public int extractBitvectorLengthFromString(String representation) {
+  public static int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
       try {
         String lengthStr = representation.substring(10, representation.length() - 1);
@@ -238,7 +233,7 @@ public class SolverLessFormulaCreator
     throw new IllegalArgumentException("Invalid Bitvector representation: " + representation);
   }
 
-  public int extractExponentFromString(String representation) {
+  public static int extractExponentFromString(String representation) {
     if (representation.startsWith("FloatingPoint<") && representation.endsWith(">")) {
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
@@ -255,7 +250,7 @@ public class SolverLessFormulaCreator
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
   }
 
-  public int extractMantissaFromString(String representation) {
+  public static int extractMantissaFromString(String representation) {
     if (representation.startsWith("FloatingPoint<") && representation.endsWith(">")) {
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
@@ -276,8 +271,8 @@ public class SolverLessFormulaCreator
   @Override
   public DummyFunction declareUFImpl(
       String pName,
-      FormulaTypesForChecking pReturnType,
-      List<FormulaTypesForChecking> pArgTypes) {
+      DummyType pReturnType,
+      List<DummyType> pArgTypes) {
     if (pName.isEmpty()) {
       throw new IllegalArgumentException("UF name cannot be null or empty");
     }
@@ -297,37 +292,37 @@ public class SolverLessFormulaCreator
       throw new IllegalArgumentException("Arguments cannot be null");
     }
 
-    List<FormulaTypesForChecking> expectedTypes = declaration.getArgumentTypes();
+    List<DummyType> expectedTypes = declaration.getArgumentTypes();
     if (args.size() != expectedTypes.size()) {
       throw new IllegalArgumentException(
           String.format("Expected %d arguments, but got %d", expectedTypes.size(), args.size()));
     }
     for (int i = 0; i < args.size(); i++) {
-      FormulaTypesForChecking expected = expectedTypes.get(i);
-      FormulaTypesForChecking actual = args.get(i).getFormulaType();
+      DummyType expected = expectedTypes.get(i);
+      DummyType actual = args.get(i).getFormulaType();
       if (!expected.equals(actual)) {
         throw new IllegalArgumentException(
             String.format("Argument %d has type %s, but expected %s", i, actual, expected));
       }
     }
     DummyFormula result;
-    if (declaration.getReturnType().equals(FormulaTypesForChecking.BITVECTOR)) {
+    if (declaration.getReturnType().isBitvector()) {
       for (DummyFormula arg : args) {
-        if (arg.getFormulaType().equals(FormulaTypesForChecking.BITVECTOR)) {
+        if (arg.getFormulaType().isBitvector()) {
           result = new DummyFormula(arg.getBitvectorLength());
         }
       }
     }
-    if (declaration.getReturnType().equals(FormulaTypesForChecking.FLOATING_POINT)) {
+    if (declaration.getReturnType().isFloatingPoint()) {
       for (DummyFormula arg : args) {
-        if (arg.getFormulaType().equals(FormulaTypesForChecking.FLOATING_POINT)) {
+        if (arg.getFormulaType().isFloatingPoint()) {
           result = new DummyFormula(arg.getExponent(), arg.getMantissa());
         }
       }
     }
-    if (declaration.getReturnType().equals(FormulaTypesForChecking.ARRAY)) {
+    if (declaration.getReturnType().isArray()) {
       for (DummyFormula arg : args) {
-        if (arg.getFormulaType().equals(FormulaTypesForChecking.ARRAY)) {
+        if (arg.getFormulaType().isArray()) {
           result = new DummyFormula(arg.getFirstArrayParameter(),
               arg.getSecondArrayParameter());
         }

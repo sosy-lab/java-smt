@@ -22,12 +22,11 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.List;
 import java.util.Objects;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
 
 public class DummyFunction {
   private String name;
-  private FormulaTypesForChecking returnType;
-  private List<FormulaTypesForChecking> argumentTypes;
+  private DummyType returnType;
+  private List<DummyType> argumentTypes;
   public DummyFunction() {}
 
   public String getName() {
@@ -38,19 +37,19 @@ public class DummyFunction {
     this.name = name;
   }
 
-  public FormulaTypesForChecking getReturnType() {
+  public DummyType getReturnType() {
     return returnType;
   }
 
-  public void setReturnType(FormulaTypesForChecking returnType) {
+  public void setReturnType(DummyType returnType) {
     this.returnType = returnType;
   }
 
-  public List<FormulaTypesForChecking> getArgumentTypes() {
+  public List<DummyType> getArgumentTypes() {
     return argumentTypes;
   }
 
-  public void setArgumentTypes(List<FormulaTypesForChecking> argumentTypes) {
+  public void setArgumentTypes(List<DummyType> argumentTypes) {
     this.argumentTypes = argumentTypes;
   }
 

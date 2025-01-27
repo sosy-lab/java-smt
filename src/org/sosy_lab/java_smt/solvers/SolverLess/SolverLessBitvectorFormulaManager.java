@@ -24,11 +24,11 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 
 public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
-    FormulaTypesForChecking, DummyEnv, DummyFunction> {
+    DummyType, DummyEnv, DummyFunction> {
 
 
   protected SolverLessBitvectorFormulaManager(SolverLessFormulaCreator pSolverLessFormulaCreator,
@@ -45,7 +45,7 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
 
   @Override
   protected DummyFormula toIntegerFormulaImpl(DummyFormula pI, boolean signed) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
@@ -90,12 +90,12 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
@@ -103,17 +103,17 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
       DummyFormula pParam1,
       DummyFormula pParam2,
       boolean signed) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
@@ -176,7 +176,7 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
   }
 
   public FormulaType<?> getFormulaType(DummyFormula formula){
-    if(formula.getFormulaType()==FormulaTypesForChecking.BITVECTOR){
+    if(formula.getFormulaType().isBitvector()){
         return FormulaType.getBitvectorTypeWithSize(formula.getBitvectorLength());
     }
     return formula.getFormulaTypeForCreator();

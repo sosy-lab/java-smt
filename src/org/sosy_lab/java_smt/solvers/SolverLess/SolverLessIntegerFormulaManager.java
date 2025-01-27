@@ -25,7 +25,7 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula,
     IntegerFormula>
@@ -38,45 +38,45 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
+    return new DummyFormula(new DummyType(Type.INTEGER), String.valueOf(i));
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(i));
+    return new DummyFormula(new DummyType(Type.INTEGER), String.valueOf(i));
   }
 
   @Override
   protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER,i);
+    return new DummyFormula(new DummyType(Type.INTEGER),i);
   }
 
   @Override
   protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
+    return new DummyFormula(new DummyType(Type.INTEGER), String.valueOf(pNumber));
   }
 
   @Override
   protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER, String.valueOf(pNumber));
+    return new DummyFormula(new DummyType(Type.INTEGER), String.valueOf(pNumber));
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String i) {
 
-    DummyFormula result = new DummyFormula(FormulaTypesForChecking.INTEGER);
+    DummyFormula result = new DummyFormula(new DummyType(Type.INTEGER));
     result.setName(i);
     return result;
   }
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(new DummyType(Type.INTEGER));
   }
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(new DummyType(Type.INTEGER));
   }
 
   @Override

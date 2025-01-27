@@ -23,18 +23,18 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaTypesForChecking;
+import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
     Y extends NumeralFormula> extends AbstractNumeralFormulaManager<DummyFormula,
-    FormulaTypesForChecking, DummyEnv, T, Y, DummyFunction> {
+    DummyType, DummyEnv, T, Y, DummyFunction> {
   public SolverLessNumeralFormulaManager(SolverLessFormulaCreator creator) {
     super(creator, NonLinearArithmetic.APPROXIMATE_FALLBACK);
   }
 
   @Override
   protected boolean isNumeral(DummyFormula val) {
-    return val.getFormulaType() == FormulaTypesForChecking.INTEGER || val.getFormulaType() == FormulaTypesForChecking.RATIONAL;
+    return val.getFormulaType().isInteger() || val.getFormulaType().isRational();
   }
 
   @Override
@@ -44,50 +44,50 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    if(pParam1.getFormulaType() == FormulaTypesForChecking.RATIONAL
-        || pParam2.getFormulaType() == FormulaTypesForChecking.RATIONAL) {
-      return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    if(pParam1.getFormulaType().isRational()
+        || pParam2.getFormulaType().isRational()) {
+      return new DummyFormula(new DummyType(Type.RATIONAL));
     }
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(new DummyType(Type.INTEGER));
   }
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    if(pParam1.getFormulaType() == FormulaTypesForChecking.RATIONAL
-        || pParam2.getFormulaType() == FormulaTypesForChecking.RATIONAL) {
-      return new DummyFormula(FormulaTypesForChecking.RATIONAL);
+    if(pParam1.getFormulaType().isRational()
+        || pParam2.getFormulaType().isRational()) {
+      return new DummyFormula(new DummyType(Type.RATIONAL));
     }
-    return new DummyFormula(FormulaTypesForChecking.INTEGER);
+    return new DummyFormula(new DummyType(Type.INTEGER));
   }
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(FormulaTypesForChecking.BOOLEAN);
+    return new DummyFormula(new DummyType(Type.BOOLEAN));
   }
 }
 

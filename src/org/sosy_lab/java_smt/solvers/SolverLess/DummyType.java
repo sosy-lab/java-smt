@@ -20,6 +20,165 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import org.sosy_lab.java_smt.api.NumeralFormula;
+public class DummyType {
+  private int bitvectorLength;
+  private int exponent;
+  private int mantissa;
+  private Type arrayIndexType;
+  private Type arrayElementType;
+  public Type myType;
 
-public class DummyType implements NumeralFormula {}
+  public DummyType(int bitvectorLength) {
+    this.bitvectorLength = bitvectorLength;
+    this.myType = Type.BITVECTOR;
+  }
+
+  public DummyType(Type MyType) {
+    if (MyType == Type.FLOATING_POINT || MyType == Type.ARRAY || MyType == Type.BITVECTOR) {
+      throw new UnsupportedOperationException(
+          "Floating point, array types and Bitvectors need more "
+              + "information");
+    }
+    this.myType = MyType;
+  }
+
+  public DummyType(int exponent, int mantissa) {
+    this.exponent = exponent;
+    this.mantissa = mantissa;
+    this.myType = Type.FLOATING_POINT;
+  }
+
+  public DummyType(Type indexType, Type elementType) {
+    this.myType = Type.ARRAY;
+    this.arrayIndexType = indexType;
+    this.arrayElementType = elementType;
+  }
+
+
+  public enum Type {
+    REGEX,
+    STRING,
+    FLOATING_POINT,
+    INTEGER,
+    BITVECTOR,
+    ARRAY,
+    RATIONAL,
+    BOOLEAN
+  }
+
+  public String parseToSMTLIBFormulaType() {
+    switch (this.myType) {
+      case REGEX:
+        return "Regex";
+      case STRING:
+        return "String";
+      case FLOATING_POINT:
+        return "(_ FloatingPoint ";
+      case INTEGER:
+        return "Int";
+      case BITVECTOR:
+        return "(_ BitVec ";
+      case ARRAY:
+        return "Array";
+      case RATIONAL:
+        return "Real";
+      case BOOLEAN:
+        return "Bool";
+      default:
+        throw new UnsupportedOperationException("Unsupported formula type");
+    }
+  }
+
+  public boolean isFloatingPoint() {
+    return myType == Type.FLOATING_POINT;
+  }
+
+  public boolean isBitvector() {
+    return myType == Type.BITVECTOR;
+  }
+
+  public boolean isInteger() {
+    return myType == Type.INTEGER;
+  }
+
+  public boolean isRational() {
+    return myType == Type.RATIONAL;
+  }
+
+  public boolean isBoolean() {
+    return myType == Type.BOOLEAN;
+  }
+
+  public boolean isString() {
+    return myType == Type.STRING;
+  }
+
+  public boolean isRegex() {
+    return myType == Type.REGEX;
+  }
+
+  public boolean isArray() {
+    return myType == Type.ARRAY;
+  }
+
+  public int getBitvectorLength() {
+    if (myType != Type.BITVECTOR) {
+      throw new UnsupportedOperationException("Not a bitvector type");
+    }
+    return bitvectorLength;
+  }
+
+  public int getExponent() {
+    if (myType != Type.FLOATING_POINT) {
+      throw new UnsupportedOperationException("Not a floating point type");
+    }
+    return exponent;
+  }
+
+  public int getMantissa() {
+    if (myType != Type.FLOATING_POINT) {
+      throw new UnsupportedOperationException("Not a floating point type");
+    }
+    return mantissa;
+  }
+
+  public Type getArrayIndexType() {
+    if (myType != Type.ARRAY) {
+      throw new UnsupportedOperationException("Not an array type");
+    }
+    return arrayIndexType;
+  }
+
+  public Type getArrayElementType() {
+    if (myType != Type.ARRAY) {
+      throw new UnsupportedOperationException("Not an array type");
+    }
+    return arrayElementType;
+  }
+
+  @Override
+  public String toString() {
+    if (isFloatingPoint()) {
+      return "FloatingPoint<" + getExponent() + ", " + getMantissa() + ">";
+    }
+    if (isBitvector()) {
+      return "Bitvector<" + getBitvectorLength() + ">";
+    }
+    if (isArray()) {
+      return "Array<" + getArrayIndexType() + ", " + getArrayElementType() + ">";
+    }
+    return myType.toString();
+  }
+
+  @Override
+  public boolean equals(Object other) {
+    if (other == this) {
+      return true;
+    }
+    if (other instanceof DummyType) {
+      DummyType otherType = (DummyType) other;
+      return otherType.myType == this.myType;
+    }
+    return false;
+  }
+}
