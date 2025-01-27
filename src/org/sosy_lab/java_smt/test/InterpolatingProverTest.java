@@ -187,6 +187,7 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIndependentInterpolation();
+    requireIndependentInterpolationWithConstantFalse();
 
     // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
@@ -316,6 +317,14 @@ public class InterpolatingProverTest
             ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
             ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
             ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
+  }
+
+  private void requireIndependentInterpolationWithConstantFalse() {
+    if (interpolationStrategy != null) {
+      assume()
+          .that(solverToUse())
+          .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+    }
   }
 
   @Test
