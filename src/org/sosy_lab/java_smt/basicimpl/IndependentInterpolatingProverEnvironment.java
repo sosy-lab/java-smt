@@ -151,9 +151,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       conjugatedB = bmgr.makeTrue();
     }
 
-    if ((bmgr.isTrue(conjugatedA) && bmgr.isTrue(conjugatedB))) {
-      return null;
-    }
     if (bmgr.isFalse(conjugatedA) && bmgr.isFalse(conjugatedB)) {
       // true is manually chosen here, but false would also be correct since both satisfy UNSAT
       return bmgr.makeTrue();
