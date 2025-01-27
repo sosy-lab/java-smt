@@ -151,18 +151,10 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
       conjugatedB = bmgr.makeTrue();
     }
 
-    if (bmgr.isFalse(conjugatedA) && bmgr.isFalse(conjugatedB)) {
-      // true is manually chosen here, but false would also be correct since both satisfy UNSAT
+    if (formulasOfA.isEmpty()) {
       return bmgr.makeTrue();
     }
-    if (bmgr.isTrue(conjugatedA) && bmgr.isFalse(conjugatedB)) {
-      // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 == 1) to
-      // TRUE, allowing such formulas to match as well
-      return bmgr.makeTrue();
-    }
-    if (bmgr.isFalse(conjugatedA) && bmgr.isTrue(conjugatedB)) {
-      // Depending on the SMT solver, pre-processing might rewrite trivial cases (e.g., 1 != 1) to
-      // FALSE, allowing such formulas to match as well
+    if (formulasOfB.isEmpty()) {
       return bmgr.makeFalse();
     }
 
