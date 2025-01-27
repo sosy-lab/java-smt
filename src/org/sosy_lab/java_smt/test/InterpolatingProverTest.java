@@ -286,9 +286,7 @@ public class InterpolatingProverTest
   }
 
   private void requireIndependentInterpolation() {
-    assume()
-        .that(solver)
-        .isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
   }
 
   private void requireIndependentTreeInterpolation() {

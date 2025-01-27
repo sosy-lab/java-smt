@@ -230,8 +230,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     Binary Craig Interpolation by reduction to CHC</a>
    */
   private BooleanFormula getModelBasedInterpolant(
-      BooleanFormula formulasOfA, BooleanFormula formulasOfB, List<Formula> varsOfA,
-      List<Formula> varsOfB, ImmutableList<Formula> sharedVars)
+      BooleanFormula formulasOfA,
+      BooleanFormula formulasOfB,
+      List<Formula> varsOfA,
+      List<Formula> varsOfB,
+      ImmutableList<Formula> sharedVars)
       throws InterruptedException, SolverException {
 
     QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
@@ -292,8 +295,11 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
    *     be found.
    */
   private BooleanFormula getQuantifierEliminationBasedInterpolant(
-      BooleanFormula formulasOfA, BooleanFormula formulasOfB, List<Formula> varsOfA,
-      List<Formula> varsOfB, ImmutableList<Formula> sharedVars)
+      BooleanFormula formulasOfA,
+      BooleanFormula formulasOfB,
+      List<Formula> varsOfA,
+      List<Formula> varsOfB,
+      ImmutableList<Formula> sharedVars)
       throws SolverException, InterruptedException {
 
     Preconditions.checkState(isUnsat());
