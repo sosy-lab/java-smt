@@ -140,15 +140,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     ImmutableList<Formula> sharedVars = getSharedVars(varsOfA, varsOfB);
 
-    if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
-      return bmgr.makeTrue();
-    }
-
     if (formulasOfA.isEmpty()) {
       return bmgr.makeTrue();
     }
     if (formulasOfB.isEmpty()) {
       return bmgr.makeFalse();
+    }
+    if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
+      return bmgr.makeTrue();
     }
 
     Preconditions.checkNotNull(interpolationStrategy);
