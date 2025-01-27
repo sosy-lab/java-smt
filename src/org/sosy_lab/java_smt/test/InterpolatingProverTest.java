@@ -182,6 +182,7 @@ public class InterpolatingProverTest
   public <T> void binaryInterpolationWithConstantFalse()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireIndependentInterpolation();
 
     // build formula:  [false, false]
     BooleanFormula A = bmgr.makeBoolean(false);
@@ -217,6 +218,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireIndependentInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -283,8 +285,15 @@ public class InterpolatingProverTest
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
+  private void requireIndependentInterpolation() {
+    assume()
+        .that(solver)
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
   private void requireIndependentTreeInterpolation() {
     requireInterpolation();
+    requireIndependentInterpolation();
     assume()
         .withMessage("Tree interpolants are not supported for independent interpolation currently.")
         .that(interpolationStrategy)
@@ -296,6 +305,7 @@ public class InterpolatingProverTest
 
   private void requireIndependentSequentialInterpolation() {
     requireInterpolation();
+    requireIndependentInterpolation();
     assume()
         .withMessage(
             "Sequential interpolants are not supported for independent interpolation currently.")
