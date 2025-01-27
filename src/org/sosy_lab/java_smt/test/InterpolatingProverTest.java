@@ -218,7 +218,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
-    requireIndependentInterpolation();
+    requireIndependentSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
