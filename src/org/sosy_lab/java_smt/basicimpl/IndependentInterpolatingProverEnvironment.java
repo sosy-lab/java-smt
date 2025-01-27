@@ -50,7 +50,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
   private final UFManager ufmgr;
-  private final QuantifiedFormulaManager qfmgr;
 
   // null for native solver interpolation
   private final @Nullable ProverOptions interpolationStrategy;
@@ -76,7 +75,6 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
     ufmgr = mgr.getUFManager();
-    qfmgr = mgr.getQuantifiedFormulaManager();
   }
 
   /**
@@ -101,7 +99,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     return itpStrat.get(0);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "unused"})
   @Override
   public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
       throws SolverException, InterruptedException {
@@ -118,6 +116,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
         throw new UnsupportedOperationException(
             "Solver does not natively support interpolation in JavaSMT currently.");
       }
+    }
+
+    try {
+      mgr.getQuantifiedFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException(
+          "Solver does not support independent interpolation based on the current strategy, as it"
+              + " is lacking quantifier support.");
     }
 
     InterpolationFormulas formulasAAndB = super.getInterpolationGroups(pFormulasOfA);
@@ -258,6 +264,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     if (varsOfA.isEmpty() || varsOfB.isEmpty()) {
       return bmgr.makeTrue();
     }
+    QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
 
     BooleanFormula itp = getUniqueInterpolant(sharedVars);
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
@@ -358,6 +365,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula itpBackward = formulasOfB;
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfB, sharedVars);
+    QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
     if (!boundVars.isEmpty()) {
       try {
         BooleanFormula itpBackwardQuantified = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
@@ -396,6 +404,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     BooleanFormula itpForward = formulasOfA;
 
     ImmutableList<Formula> boundVars = getBoundVars(varsOfA, sharedVars);
+    QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
     if (!boundVars.isEmpty()) {
       try {
         BooleanFormula itpForwardQuantified = qfmgr.exists(boundVars, formulasOfA);
@@ -497,6 +506,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
     boolean result = false;
 
+    QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
     BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
     BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
 
