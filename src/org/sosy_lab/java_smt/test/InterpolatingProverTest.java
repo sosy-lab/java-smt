@@ -64,6 +64,7 @@ public class InterpolatingProverTest
   @Test
   @SuppressWarnings("CheckReturnValue")
   public <T> void simpleInterpolation() throws SolverException, InterruptedException {
+    requireInterpolation();
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
         .that(solverToUse())
@@ -103,6 +104,7 @@ public class InterpolatingProverTest
   @Test
   @SuppressWarnings("unchecked")
   public <T> void emptyInterpolationGroup() throws SolverException, InterruptedException {
+    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -130,6 +132,7 @@ public class InterpolatingProverTest
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
+    requireInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -1307,6 +1310,7 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
+    requireIntegers();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
