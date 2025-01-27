@@ -146,7 +146,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     if (formulasOfB.isEmpty()) {
       return bmgr.makeFalse();
     }
-    if (varsOfA.isEmpty() || varsOfB.isEmpty() || sharedVars.isEmpty()) {
+    if (sharedVars.isEmpty()) {
       return bmgr.makeTrue();
     }
 
