@@ -1347,6 +1347,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
     requireIntegers();
+    requireIndependentInterpolationSolvingIssue381();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
