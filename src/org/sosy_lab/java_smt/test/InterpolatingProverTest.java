@@ -1253,6 +1253,7 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    requireIndependentSequentialInterpolation();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
@@ -1279,6 +1280,7 @@ public class InterpolatingProverTest
    */
   @Test
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
+    requireIndependentSequentialInterpolation();
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
