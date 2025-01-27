@@ -132,7 +132,7 @@ public class InterpolatingProverTest
 
   @Test
   public <T> void binaryInterpolation() throws SolverException, InterruptedException {
-    requireInterpolation();
+    requireIndependentSequentialInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
