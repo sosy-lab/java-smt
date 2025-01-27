@@ -74,6 +74,10 @@ public class InterpolatingProverTest
           .withMessage("Solver %s runs into timeout on this test", solverToUse())
           .that(solverToUse())
           .isNoneOf(Solvers.Z3, Solvers.CVC4);
+      assume()
+          .withMessage("Solver %s checkSat call returned Inconclusive", solverToUse())
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.PRINCESS);
     }
 
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
