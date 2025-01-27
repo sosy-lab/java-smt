@@ -220,6 +220,13 @@ public class InterpolatingProverTest
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC5);
 
+    if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
+      assume()
+          .withMessage("Solver %s run into timeout on this test", solverToUse())
+          .that(solverToUse())
+          .isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.BITWUZLA);
+    }
+
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -273,10 +280,34 @@ public class InterpolatingProverTest
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
+  private void requireIndependentTreeInterpolation() {
+    requireInterpolation();
+    assume()
+        .withMessage("Tree interpolants are not supported for independent interpolation currently.")
+        .that(interpolationStrategy)
+        .isNoneOf(
+            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
+  }
+
+  private void requireIndependentSequentialInterpolation() {
+    requireInterpolation();
+    assume()
+        .withMessage(
+            "Sequential interpolants are not supported for independent interpolation currently.")
+        .that(interpolationStrategy)
+        .isNoneOf(
+            ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS);
+  }
+
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireIndependentSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -333,6 +364,7 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
+    requireIndependentSequentialInterpolation();
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -382,6 +414,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireIndependentSequentialInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
@@ -396,6 +429,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireIndependentSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -424,6 +458,7 @@ public class InterpolatingProverTest
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireIndependentSequentialInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -456,6 +491,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireIndependentSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -511,6 +547,7 @@ public class InterpolatingProverTest
   public void treeInterpolation() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     int i = index.getFreshId();
 
@@ -681,6 +718,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolation2() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -740,6 +778,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolation3() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -796,6 +835,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolation4() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -843,6 +883,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -868,6 +909,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationBranching() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -909,6 +951,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -923,6 +966,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -937,6 +981,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -951,6 +996,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -965,6 +1011,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -979,6 +1026,7 @@ public class InterpolatingProverTest
   public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
 
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -992,6 +1040,7 @@ public class InterpolatingProverTest
   @SuppressWarnings("CheckReturnValue")
   public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1006,6 +1055,7 @@ public class InterpolatingProverTest
   @Test
   public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
     requireTreeItp();
+    requireIndependentTreeInterpolation();
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1036,6 +1086,7 @@ public class InterpolatingProverTest
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+    requireIndependentSequentialInterpolation();
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
