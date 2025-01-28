@@ -1043,8 +1043,16 @@ public class FloatingPointFormulaManagerTest
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
-          final FloatingPointFormula fp = fpmgr.makeNumber(pFloat, singlePrecType);
-          return fpmgr.assignment(fpFromBv, fp);
+          final FloatingPointNumber fpNumber =
+              FloatingPointNumber.of(
+                  sign,
+                  BigInteger.valueOf(exponent),
+                  BigInteger.valueOf(mantissa),
+                  singlePrecType.getExponentSize(),
+                  singlePrecType.getMantissaSize());
+          final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
+          final FloatingPointFormula fp2 = fpmgr.makeNumber(pFloat, singlePrecType);
+          return bmgr.and(fpmgr.assignment(fpFromBv, fp1), fpmgr.assignment(fpFromBv, fp2));
         });
   }
 
@@ -1061,8 +1069,16 @@ public class FloatingPointFormulaManagerTest
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
-          final FloatingPointFormula fp = fpmgr.makeNumber(pDouble, doublePrecType);
-          return fpmgr.assignment(fpFromBv, fp);
+          final FloatingPointNumber fpNumber =
+              FloatingPointNumber.of(
+                  sign,
+                  BigInteger.valueOf(exponent),
+                  BigInteger.valueOf(mantissa),
+                  doublePrecType.getExponentSize(),
+                  doublePrecType.getMantissaSize());
+          final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
+          final FloatingPointFormula fp2 = fpmgr.makeNumber(pDouble, doublePrecType);
+          return bmgr.and(fpmgr.assignment(fpFromBv, fp1), fpmgr.assignment(fpFromBv, fp2));
         });
   }
 
