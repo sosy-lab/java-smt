@@ -82,6 +82,19 @@ public interface FloatingPointFormulaManager {
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   /**
+   * Creates a floating point formula from the given {@link FloatingPointNumber}.
+   *
+   * @param number the floating point number
+   */
+  default FloatingPointFormula makeNumber(FloatingPointNumber number) {
+    return makeNumber(
+        number.getExponent(),
+        number.getMantissa(),
+        number.getSign(),
+        FloatingPointType.getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+  }
+
+  /**
    * Creates a floating point formula from the given exponent, mantissa, and sign bit with the
    * specified type.
    *
