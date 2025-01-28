@@ -19,6 +19,7 @@ import io.github.cvc5.Term;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -69,9 +70,9 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     try {
-      final String signStr = signBit ? "1" : "0";
+      final String signStr = sign.isNegative() ? "1" : "0";
       final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
       final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
       final String bitvecForm = signStr + exponentStr + mantissaStr;

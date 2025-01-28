@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -1038,7 +1039,7 @@ public class FloatingPointFormulaManagerTest
           int bits = Float.floatToRawIntBits(pFloat);
           int exponent = (bits >>> 23) & 0xFF;
           int mantissa = bits & 0x7FFFFF;
-          boolean sign = bits < 0; // equal to: (bits >>> 31) & 0x1
+          Sign sign = Sign.of(bits < 0); // equal to: (bits >>> 31) & 0x1
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
@@ -1056,7 +1057,7 @@ public class FloatingPointFormulaManagerTest
           long bits = Double.doubleToRawLongBits(pDouble);
           long exponent = (bits >>> 52) & 0x7FF;
           long mantissa = bits & 0xFFFFFFFFFFFFFL;
-          boolean sign = bits < 0; // equal to: (doubleBits >>> 63) & 1;
+          Sign sign = Sign.of(bits < 0); // equal to: (doubleBits >>> 63) & 1;
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);

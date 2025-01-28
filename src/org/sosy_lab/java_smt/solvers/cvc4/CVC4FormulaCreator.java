@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -635,11 +636,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var exp = matcher.group("exp");
     final var mant = matcher.group("mant");
 
-    Preconditions.checkArgument(sign.length() == 1 && "01".contains(sign));
+    Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
     Preconditions.checkArgument(mant.length() == mantWidth);
 
     return FloatingPointNumber.of(
-        sign.equals("1"), new BigInteger(exp, 2), new BigInteger(mant, 2), expWidth, mantWidth);
+        Sign.of(sign.charAt(0) == '1'),
+        new BigInteger(exp, 2),
+        new BigInteger(mant, 2),
+        expWidth,
+        mantWidth);
   }
 }

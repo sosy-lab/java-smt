@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -88,8 +89,24 @@ public interface FloatingPointFormulaManager {
    * @param mantissa the mantissa part of the floating point number
    * @param signBit the sign bit of the floating point number, e.g., true for negative numbers
    */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  default FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    return makeNumber(exponent, mantissa, Sign.of(signBit), type);
+  }
+
+  /**
+   * Creates a floating point formula from the given exponent, mantissa, and sign with the specified
+   * type.
+   *
+   * @param exponent the exponent part of the floating point number
+   * @param mantissa the mantissa part of the floating point number
+   * @param sign the sign of the floating point number
+   */
   FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   /**
    * Creates a variable with exactly the given name.

@@ -46,6 +46,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -949,14 +950,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
       return FloatingPointNumber.of(
-          "1".equals(sign), expo, mant, pType.getExponentSize(), pType.getMantissaSize());
+          Sign.of(sign.charAt(0) == '1'),
+          expo,
+          mant,
+          pType.getExponentSize(),
+          pType.getMantissaSize());
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
       //  - an sign for posiive/negative infinity,
       //  - "11..11" as exponent,
       //  - "00..00" as mantissa.
-      String sign = getSign(pValue) ? "1" : "0";
+      String sign = getSign(pValue).isNegative() ? "1" : "0";
       return FloatingPointNumber.of(
           sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
           pType.getExponentSize(),
@@ -975,7 +980,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           pType.getMantissaSize());
 
     } else {
-      boolean sign = getSign(pValue);
+      Sign sign = getSign(pValue);
       var exponentBv = Native.fpaGetNumeralExponentBv(environment, pValue, true);
       var exponent = Native.getNumeralString(environment, exponentBv);
       var mantissaBv = Native.fpaGetNumeralSignificandBv(environment, pValue);
@@ -989,12 +994,12 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  private boolean getSign(Long pValue) {
+  private Sign getSign(Long pValue) {
     Native.IntPtr signPtr = new Native.IntPtr();
     Preconditions.checkState(
         Native.fpaGetNumeralSign(environment, pValue, signPtr), "Sign is not a Boolean value");
     var sign = signPtr.value != 0;
-    return sign;
+    return Sign.of(sign);
   }
 
   @Override

@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -136,12 +137,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
-    return wrap(makeNumberImpl(exponent, mantissa, signBit, type));
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
+    return wrap(makeNumberImpl(exponent, mantissa, sign, type));
   }
 
   protected abstract TFormulaInfo makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   protected static boolean isNegativeZero(Double pN) {
     Preconditions.checkNotNull(pN);

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -76,9 +77,9 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Term makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     Sort signSort = termManager.mk_bv_sort(1);
-    Term signTerm = termManager.mk_bv_value(signSort, signBit ? "1" : "0");
+    Term signTerm = termManager.mk_bv_value(signSort, sign.isNegative() ? "1" : "0");
 
     Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
     Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
