@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
@@ -59,12 +61,18 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Creates a floating point formula representing the given string value with the specified type.
+   *
+   * <p>The string can be any valid floating-point number, e.g., "1.0", "1.0e-3", but also special
+   * values like "NaN", "Infinity", or "-0.0", etc. A leading "+" sign or "-" sign is allowed.
    */
   FloatingPointFormula makeNumber(String n, FloatingPointType type);
 
   /**
    * Creates a floating point formula representing the given string value with the specified type
    * and rounding mode.
+   *
+   * <p>The string can be any valid floating-point number, e.g., "1.0", "1.0e-3", but also special
+   * values like "NaN", "Infinity", or "-0.0", etc. A leading "+" sign or "-" sign is allowed.
    */
   FloatingPointFormula makeNumber(
       String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
@@ -91,7 +99,7 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getSign(),
-        FloatingPointType.getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
   }
 
   /**

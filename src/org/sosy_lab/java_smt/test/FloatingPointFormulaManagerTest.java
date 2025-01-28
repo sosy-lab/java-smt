@@ -105,19 +105,58 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void parser() throws SolverException, InterruptedException {
-    for (String s : new String[] {"-1", "-Infinity", "-0", "-0.0", "-0.000"}) {
+    for (String s :
+        new String[] {
+          "-1",
+          "-Infinity",
+          "-0",
+          "-0.0",
+          "-0.000",
+          "-0e5",
+          "-0.00e-5",
+          "-12e34",
+          "-12e-34",
+          "-12.34E56",
+          "-12.34e-56"
+        }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isUnsatisfiable();
       assertEqualsAsFp(fpmgr.negate(formula), fpmgr.abs(formula));
     }
-    for (String s : new String[] {"1", "Infinity", "0", "0.0", "0.000"}) {
+    for (String s :
+        new String[] {
+          "1",
+          "Infinity",
+          "0",
+          "0.0",
+          "0.000",
+          "0e5",
+          "0.00e-5",
+          "12e34",
+          "12e-34",
+          "12.34E56",
+          "12.34e-56"
+        }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
       assertEqualsAsFp(formula, fpmgr.abs(formula));
     }
-    for (String s : new String[] {"+1", "+Infinity", "+0", "+0.0", "+0.000"}) {
+    for (String s :
+        new String[] {
+          "+1",
+          "+Infinity",
+          "+0",
+          "+0.0",
+          "+0.000",
+          "+0e5",
+          "+0.00e-5",
+          "+12e34",
+          "+12e-34",
+          "+12.34E56",
+          "+12.34e-56"
+        }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
       assertThatFormula(fpmgr.isNegative(fpmgr.negate(formula))).isTautological();
@@ -789,6 +828,26 @@ public class FloatingPointFormulaManagerTest
         assertThat(prover).isSatisfiable();
       }
     }
+  }
+
+  @Test
+  public void checkString2FpConversion32() throws SolverException, InterruptedException {
+    proveForAll(
+        getListOfFloats(),
+        pFloat ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pFloat, singlePrecType),
+                fpmgr.makeNumber(Float.toString(pFloat), singlePrecType)));
+  }
+
+  @Test
+  public void checkString2FpConversion64() throws SolverException, InterruptedException {
+    proveForAll(
+        getListOfDoubles(),
+        pDouble ->
+            fpmgr.equalWithFPSemantics(
+                fpmgr.makeNumber(pDouble, doublePrecType),
+                fpmgr.makeNumber(Double.toString(pDouble), doublePrecType)));
   }
 
   @Test

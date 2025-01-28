@@ -149,6 +149,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return Double.valueOf("-0.0").equals(pN);
   }
 
+  /**
+   * Parses the provided string and converts it into a floating-point formula.
+   *
+   * <p>The input string must represent a valid finite floating-point number. Values such as NaN,
+   * Infinity, or -Infinity are not allowed and should be handled before calling this method.
+   */
   protected abstract TFormulaInfo makeNumberAndRound(
       String pN, FloatingPointType pType, TFormulaInfo pFloatingPointRoundingMode);
 
