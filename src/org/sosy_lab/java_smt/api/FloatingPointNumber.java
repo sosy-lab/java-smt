@@ -27,13 +27,25 @@ public abstract class FloatingPointNumber {
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
   public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
 
-  /** Whether the number is positive (TRUE) or negative (FALSE). */
+  /**
+   * Whether the number is positive (FALSE) or negative (TRUE).
+   *
+   * <p>See IEEE 754 or <a href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB FP
+   * theory</a> for details on the sign bit.
+   */
   public abstract boolean getSign();
 
-  /** The exponent of the floating-point number, given as numeric value. */
+  /**
+   * The exponent of the floating-point number, given as numeric value from binary representation.
+   * The number is unsigned (not negative) and does not include the bias that is used in IEEE 754.
+   */
   public abstract BigInteger getExponent();
 
-  /** The mantissa (aka significand) of the floating-point number, given as numeric value. */
+  /**
+   * The mantissa (aka significand) of the floating-point number, given as numeric value from binary
+   * representation. The mantissa does not include the hidden bit that is used to denote normalized
+   * numbers in IEEE 754.
+   */
   public abstract BigInteger getMantissa();
 
   public abstract int getExponentSize();
