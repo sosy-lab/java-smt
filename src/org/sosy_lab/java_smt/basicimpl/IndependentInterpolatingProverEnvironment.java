@@ -39,14 +39,14 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
-    extends AbstractProver<TFormulaInfo> implements InterpolatingProverEnvironment<TFormulaInfo> {
+public class IndependentInterpolatingProverEnvironment<F, T>
+    extends AbstractProver<F> implements InterpolatingProverEnvironment<F> {
 
   private final SolverContext solverContext;
 
   private final BasicProverEnvironment<?> delegate;
 
-  private final FormulaCreator<TFormulaInfo, TType, ?, ?> creator;
+  private final FormulaCreator<F, T, ?, ?> creator;
   private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
   private final UFManager ufmgr;
@@ -64,7 +64,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
   public IndependentInterpolatingProverEnvironment(
       SolverContext pSourceContext,
-      FormulaCreator<TFormulaInfo, TType, ?, ?> pCreator,
+      FormulaCreator<F, T, ?, ?> pCreator,
       BasicProverEnvironment<?> pDelegate,
       Set<ProverOptions> pOptions) {
     super(pOptions);
@@ -111,7 +111,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
   @SuppressWarnings({"unchecked", "unused"})
   @Override
-  public BooleanFormula getInterpolant(Collection<TFormulaInfo> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<F> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkArgument(
         super.getAssertedConstraintIds().containsAll(pFormulasOfA),
@@ -120,7 +120,7 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
         // Use native solver interpolation
-        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+        return ((InterpolatingProverEnvironment<F>) delegate)
             .getInterpolant(pFormulasOfA);
       } else {
         throw new UnsupportedOperationException(
@@ -163,12 +163,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   @SuppressWarnings("unchecked")
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<TFormulaInfo>> partitionedFormulas, int[] startOfSubTree)
+      List<? extends Collection<F>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
         // Use native solver interpolation
-        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+        return ((InterpolatingProverEnvironment<F>) delegate)
             .getTreeInterpolants(partitionedFormulas, startOfSubTree);
       }
     }
@@ -179,12 +179,12 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
   @SuppressWarnings("unchecked")
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<TFormulaInfo>> pPartitionedFormulas)
+      List<? extends Collection<F>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
         // Use native solver interpolation
-        return ((InterpolatingProverEnvironment<TFormulaInfo>) delegate)
+        return ((InterpolatingProverEnvironment<F>) delegate)
             .getSeqInterpolants(pPartitionedFormulas);
       }
     }
@@ -498,14 +498,14 @@ public class IndependentInterpolatingProverEnvironment<TFormulaInfo, TType>
 
   @SuppressWarnings("unchecked")
   @Override
-  protected @Nullable TFormulaInfo addConstraintImpl(BooleanFormula constraint)
+  protected @Nullable F addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException {
     checkState(!closed);
     Object itpPoint = delegate.addConstraint(constraint);
     if (itpPoint == null) {
       return creator.extractInfo(constraint);
     }
-    return (TFormulaInfo) itpPoint;
+    return (F) itpPoint;
   }
 
   @Override
