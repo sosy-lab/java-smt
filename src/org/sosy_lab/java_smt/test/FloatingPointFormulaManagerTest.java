@@ -117,7 +117,7 @@ public class FloatingPointFormulaManagerTest
           "-12e34",
           "-12e-34",
           "-12.34E56",
-          "-12.34e-56"
+          "-12.34e-56",
         }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isTautological();
@@ -136,7 +136,7 @@ public class FloatingPointFormulaManagerTest
           "12e34",
           "12e-34",
           "12.34E56",
-          "12.34e-56"
+          "12.34e-56",
         }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
@@ -155,7 +155,7 @@ public class FloatingPointFormulaManagerTest
           "+12e34",
           "+12e-34",
           "+12.34E56",
-          "+12.34e-56"
+          "+12.34e-56",
         }) {
       FloatingPointFormula formula = fpmgr.makeNumber(s, singlePrecType);
       assertThatFormula(fpmgr.isNegative(formula)).isUnsatisfiable();
