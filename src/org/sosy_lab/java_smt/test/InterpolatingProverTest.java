@@ -332,7 +332,7 @@ public class InterpolatingProverTest
 
     if (interpolationStrategy == ProverOptions.GENERATE_MODEL_BASED_INTERPOLANTS) {
       assume()
-          .withMessage("Solver %s returned null or unknown on sat check")
+          .withMessage("Solver %s returned null or unknown on sat check", solverToUse())
           .that(solverToUse())
           .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
     }
