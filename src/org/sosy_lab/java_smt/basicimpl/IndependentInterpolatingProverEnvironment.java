@@ -17,6 +17,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -93,7 +94,7 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
     return getIndependentInterpolationStrategy(options, pFormulaManager) != null;
   }
 
-  @SuppressWarnings("unused")
+  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "unused")
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options, FormulaManager pFormulaManager) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
