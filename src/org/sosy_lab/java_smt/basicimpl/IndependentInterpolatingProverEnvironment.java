@@ -333,7 +333,8 @@ public class IndependentInterpolatingProverEnvironment<F, T>
    * @return a uniform Craig interpolant, using quantifier-elimination in the backward direction.
    */
   private BooleanFormula getBackwardInterpolant(
-      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars) {
+      BooleanFormula formulasOfB, List<Formula> varsOfB, List<Formula> sharedVars)
+      throws SolverException, InterruptedException {
 
     BooleanFormula itpBackward = formulasOfB;
 
@@ -351,9 +352,11 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         throw new SolverException(
             "Quantifier elimination failed. "
                 + "Resulting interpolant still contains quantifiers.");
-      } catch (Exception e) {
+      } catch (UnsupportedOperationException e) {
         throw new UnsupportedOperationException(
             "Solver does not support quantifier-elimination (for this logic).", e);
+      } catch (InterruptedException e) {
+        throw new InterruptedException();
       }
     }
 
@@ -372,7 +375,8 @@ public class IndependentInterpolatingProverEnvironment<F, T>
    * @return a uniform Craig interpolant, using quantifier-elimination in the forward direction.
    */
   private BooleanFormula getForwardInterpolant(
-      BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars) {
+      BooleanFormula formulasOfA, List<Formula> varsOfA, List<Formula> sharedVars)
+      throws SolverException, InterruptedException {
 
     BooleanFormula itpForward = formulasOfA;
 
@@ -390,9 +394,11 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         throw new SolverException(
             "Quantifier elimination failed. "
                 + "Resulting interpolant still contains quantifiers.");
-      } catch (Exception e) {
+      } catch (UnsupportedOperationException e) {
         throw new UnsupportedOperationException(
             "Solver does not support quantifier-elimination (for this logic).", e);
+      } catch (InterruptedException e) {
+        throw new InterruptedException();
       }
     }
 
