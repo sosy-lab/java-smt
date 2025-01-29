@@ -95,6 +95,7 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
   }
 
   @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "unused")
+  @SuppressWarnings("unused")
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options, FormulaManager pFormulaManager) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
