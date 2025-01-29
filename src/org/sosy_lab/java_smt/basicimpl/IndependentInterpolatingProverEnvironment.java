@@ -502,8 +502,7 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
 
     boolean result = false;
 
-    try {
-      ProverEnvironment validationProver = getDistinctProver();
+    try (ProverEnvironment validationProver = getDistinctProver()) {
       // the implication A -> Itp holds
       validationProver.push(bmgr.implication(formulasOfA, itp));
       if (validationProver.isUnsat()) {
