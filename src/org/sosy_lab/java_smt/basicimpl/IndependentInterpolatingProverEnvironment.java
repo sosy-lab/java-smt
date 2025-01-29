@@ -93,6 +93,7 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
     return getIndependentInterpolationStrategy(options, pFormulaManager) != null;
   }
 
+  @SuppressWarnings("unused")
   private static @Nullable ProverOptions getIndependentInterpolationStrategy(
       Set<ProverOptions> options, FormulaManager pFormulaManager) {
     List<ProverOptions> itpStrat = new ArrayList<>(options);
@@ -102,7 +103,6 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
     }
     Preconditions.checkState(itpStrat.size() == 1);
     try {
-      @SuppressWarnings("unused")
       QuantifiedFormulaManager dummy = pFormulaManager.getQuantifiedFormulaManager();
     } catch (UnsupportedOperationException e) {
       throw new UnsupportedOperationException(
@@ -251,7 +251,9 @@ public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractPro
       itpProver.push(bmgr.and(left, right));
 
       if (!itpProver.isUnsat()) {
-        interpolant = itpProver.getModel().eval(itp);
+        try (Model model = itpProver.getModel()) {
+          interpolant = model.eval(itp);
+        }
         Preconditions.checkNotNull(interpolant);
       }
     }
