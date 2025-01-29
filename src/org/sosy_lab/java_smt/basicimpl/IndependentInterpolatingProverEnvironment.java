@@ -362,7 +362,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
                 + "Resulting interpolant still contains quantifiers.");
       } catch (UnsupportedOperationException e) {
         throw new UnsupportedOperationException(
-            "Solver does not support quantifier-elimination (for this logic).", e);
+            "Solver does not support the complete theory of quantifiers.", e);
       } catch (InterruptedException e) {
         throw new InterruptedException();
       }
@@ -412,7 +412,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
                 + "Resulting interpolant still contains quantifiers.");
       } catch (UnsupportedOperationException e) {
         throw new UnsupportedOperationException(
-            "Solver does not support quantifier-elimination (for this logic).", e);
+            "Solver does not support the complete theory of quantifiers.", e);
       } catch (InterruptedException e) {
         throw new InterruptedException();
       }
