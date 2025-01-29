@@ -17,8 +17,10 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -314,7 +316,8 @@ public class IndependentInterpolatingProverEnvironment<F, T>
       interpolant = getForwardInterpolant(formulasOfA, varsOfA, sharedVars);
     }
 
-    if (!satisfiesInterpolationCriteria(interpolant, formulasOfA, formulasOfB, varsOfA, varsOfB)) {
+    if (!satisfiesInterpolationCriteria(
+        interpolant, formulasOfA, formulasOfB, sharedVars)) {
       return bmgr.makeFalse();
     }
 
@@ -486,8 +489,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
    * @param itp The given interpolant to check if it satisfies the definition of Craig interpolants.
    * @param formulasOfA The set of formulas A, combined into one {@link BooleanFormula}.
    * @param formulasOfB The set of formulas B, combined into one {@link BooleanFormula}.
-   * @param varsOfA A list of all variables in formulas of A.
-   * @param varsOfB A list of all variables in formulas of B.
+   * @param sharedVars A list of variables found in both sets of formulas A and B.
    * @return {@code true}, if the given interpolant is a valid Craig interpolant, returns {@code
    *     false} otherwise.
    */
@@ -495,23 +497,36 @@ public class IndependentInterpolatingProverEnvironment<F, T>
       BooleanFormula itp,
       BooleanFormula formulasOfA,
       BooleanFormula formulasOfB,
-      List<Formula> varsOfA,
-      List<Formula> varsOfB)
+      List<Formula> sharedVars)
       throws SolverException, InterruptedException {
 
     boolean result = false;
 
-    QuantifiedFormulaManager qfmgr = mgr.getQuantifiedFormulaManager();
-    BooleanFormula left = qfmgr.forall(varsOfA, bmgr.implication(formulasOfA, itp));
-    BooleanFormula right = qfmgr.forall(varsOfB, bmgr.implication(itp, bmgr.not(formulasOfB)));
-
-    try (ProverEnvironment itpProver = getDistinctProver()) {
-      itpProver.push(bmgr.and(left, right));
-
-      if (!itpProver.isUnsat()) {
-        result = true;
+    try {
+      ProverEnvironment validationProver = getDistinctProver();
+      // the implication A -> Itp holds
+      validationProver.push(bmgr.implication(formulasOfA, itp));
+      if (validationProver.isUnsat()) {
+        return false;
       }
+      pop();
+
+      // the conjunction Itp /\ B is unsatisfiable
+      validationProver.push(bmgr.and(itp, formulasOfB));
+      if (!validationProver.isUnsat()) {
+        return false;
+      }
+      pop();
+
+      // Itp only contains symbols that occur in both A and B
+      List<Formula> varsOfItp = getVars(itp);
+      if (new HashSet<>(sharedVars).containsAll(varsOfItp)) {
+        return true;
+      }
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Failure when validating interpolant.", e);
     }
+
     return result;
   }
 
