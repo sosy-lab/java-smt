@@ -345,12 +345,12 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpBackwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpBackwardQuantified);
         // check if the quantifier has been eliminated properly
-        if (itpBackwardQuantifierEliminated.toString().contains(SYMBOL_QUANTIFIER_FORALL)) {
-          throw new SolverException(
-              "Quantifier-elimination failed. "
-                  + "The resulting interpolant still contains quantifiers.");
+        if (!itpBackwardQuantifierEliminated.toString().contains(SYMBOL_QUANTIFIER_FORALL)) {
+          return itpBackwardQuantifierEliminated;
         }
-        itpBackward = itpBackwardQuantifierEliminated;
+        throw new SolverException(
+            "Quantifier elimination failed. "
+                + "Resulting interpolant still contains quantifiers.");
       } catch (Exception e) {
         throw new UnsupportedOperationException(
             "Solver does not support quantifier-elimination (for this logic).", e);
@@ -384,12 +384,12 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpForwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpForwardQuantified);
         // check if the quantifier has been eliminated properly
-        if (itpForwardQuantifierEliminated.toString().equals(SYMBOL_QUANTIFIER_EXISTS)) {
-          throw new SolverException(
-              "Quantifier-elimination failed. "
-                  + "The resulting interpolant still contains quantifiers.");
+        if (!itpForwardQuantifierEliminated.toString().equals(SYMBOL_QUANTIFIER_EXISTS)) {
+          return itpForwardQuantifierEliminated;
         }
-        itpForward = itpForwardQuantifierEliminated;
+        throw new SolverException(
+            "Quantifier elimination failed. "
+                + "Resulting interpolant still contains quantifiers.");
       } catch (Exception e) {
         throw new UnsupportedOperationException(
             "Solver does not support quantifier-elimination (for this logic).", e);
