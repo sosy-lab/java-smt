@@ -347,7 +347,15 @@ public class IndependentInterpolatingProverEnvironment<F, T>
             qfmgr.eliminateQuantifiers(itpBackwardQuantified);
         // check if the quantifier has been eliminated properly
         if (!itpBackwardQuantifierEliminated.toString().contains(SYMBOL_QUANTIFIER_FORALL)) {
-          return itpBackwardQuantifierEliminated;
+          // check if the shared variables still exist and are not eliminated during the process
+          if (sharedVars.stream().allMatch(
+              formula
+                  -> itpBackwardQuantifierEliminated.toString().contains(formula.toString()))) {
+            return itpBackwardQuantifierEliminated;
+          }
+          throw new SolverException(
+              "Quantifier elimination failed. "
+                  + "Shared variables were accidentally deleted during the process.");
         }
         throw new SolverException(
             "Quantifier elimination failed. "
@@ -389,7 +397,15 @@ public class IndependentInterpolatingProverEnvironment<F, T>
             qfmgr.eliminateQuantifiers(itpForwardQuantified);
         // check if the quantifier has been eliminated properly
         if (!itpForwardQuantifierEliminated.toString().equals(SYMBOL_QUANTIFIER_EXISTS)) {
-          return itpForwardQuantifierEliminated;
+          // check if the shared variables still exist and are not eliminated during the process
+          if (sharedVars.stream().allMatch(
+              formula
+                  -> itpForwardQuantifierEliminated.toString().contains(formula.toString()))) {
+            return itpForwardQuantifierEliminated;
+          }
+          throw new SolverException(
+              "Quantifier elimination failed. "
+                  + "Shared variables were accidentally deleted during the process.");
         }
         throw new SolverException(
             "Quantifier elimination failed. "
