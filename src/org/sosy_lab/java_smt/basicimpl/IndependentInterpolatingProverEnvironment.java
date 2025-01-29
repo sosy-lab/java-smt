@@ -61,6 +61,8 @@ public class IndependentInterpolatingProverEnvironment<F, T>
           ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
   private static final UniqueIdGenerator UNIQUE_ID_GENERATOR = new UniqueIdGenerator();
   private static final String PREFIX = "__internal_model_itp_generation_";
+  private static final String SYMBOL_QUANTIFIER_FORALL = "ALL";
+  private static final String SYMBOL_QUANTIFIER_EXISTS = "EX";
 
   public IndependentInterpolatingProverEnvironment(
       SolverContext pSourceContext,
@@ -343,7 +345,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpBackwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpBackwardQuantified);
         // check if the quantifier has been eliminated properly
-        if (itpBackwardQuantifierEliminated.toString().contains("ALL")) {
+        if (itpBackwardQuantifierEliminated.toString().contains(SYMBOL_QUANTIFIER_FORALL)) {
           throw new SolverException(
               "Quantifier-elimination failed. "
                   + "The resulting interpolant still contains quantifiers.");
@@ -382,7 +384,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpForwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpForwardQuantified);
         // check if the quantifier has been eliminated properly
-        if (itpForwardQuantifierEliminated.toString().equals("EX")) {
+        if (itpForwardQuantifierEliminated.toString().equals(SYMBOL_QUANTIFIER_EXISTS)) {
           throw new SolverException(
               "Quantifier-elimination failed. "
                   + "The resulting interpolant still contains quantifiers.");
