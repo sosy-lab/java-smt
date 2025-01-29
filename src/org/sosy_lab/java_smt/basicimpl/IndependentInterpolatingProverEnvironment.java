@@ -17,7 +17,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,8 +40,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UFManager;
 
-public class IndependentInterpolatingProverEnvironment<F, T>
-    extends AbstractProver<F> implements InterpolatingProverEnvironment<F> {
+public class IndependentInterpolatingProverEnvironment<F, T> extends AbstractProver<F>
+    implements InterpolatingProverEnvironment<F> {
 
   private final SolverContext solverContext;
 
@@ -124,8 +123,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
         // Use native solver interpolation
-        return ((InterpolatingProverEnvironment<F>) delegate)
-            .getInterpolant(pFormulasOfA);
+        return ((InterpolatingProverEnvironment<F>) delegate).getInterpolant(pFormulasOfA);
       } else {
         throw new UnsupportedOperationException(
             "Solver does not natively support interpolation in JavaSMT currently.");
@@ -182,8 +180,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
 
   @SuppressWarnings("unchecked")
   @Override
-  public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<F>> pPartitionedFormulas)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<F>> pPartitionedFormulas)
       throws SolverException, InterruptedException {
     if (interpolationStrategy == null) {
       if (delegate instanceof InterpolatingProverEnvironment) {
@@ -316,8 +313,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
       interpolant = getForwardInterpolant(formulasOfA, varsOfA, sharedVars);
     }
 
-    if (!satisfiesInterpolationCriteria(
-        interpolant, formulasOfA, formulasOfB, sharedVars)) {
+    if (!satisfiesInterpolationCriteria(interpolant, formulasOfA, formulasOfB, sharedVars)) {
       return bmgr.makeFalse();
     }
 
@@ -351,9 +347,10 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         // check if the quantifier has been eliminated properly
         if (!itpBackwardQuantifierEliminated.toString().contains(SYMBOL_QUANTIFIER_FORALL)) {
           // check if the shared variables still exist and are not eliminated during the process
-          if (sharedVars.stream().allMatch(
-              formula
-                  -> itpBackwardQuantifierEliminated.toString().contains(formula.toString()))) {
+          if (sharedVars.stream()
+              .allMatch(
+                  formula ->
+                      itpBackwardQuantifierEliminated.toString().contains(formula.toString()))) {
             return itpBackwardQuantifierEliminated;
           }
           throw new SolverException(
@@ -401,9 +398,10 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         // check if the quantifier has been eliminated properly
         if (!itpForwardQuantifierEliminated.toString().equals(SYMBOL_QUANTIFIER_EXISTS)) {
           // check if the shared variables still exist and are not eliminated during the process
-          if (sharedVars.stream().allMatch(
-              formula
-                  -> itpForwardQuantifierEliminated.toString().contains(formula.toString()))) {
+          if (sharedVars.stream()
+              .allMatch(
+                  formula ->
+                      itpForwardQuantifierEliminated.toString().contains(formula.toString()))) {
             return itpForwardQuantifierEliminated;
           }
           throw new SolverException(
@@ -537,8 +535,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
 
   @SuppressWarnings("unchecked")
   @Override
-  protected @Nullable F addConstraintImpl(BooleanFormula constraint)
-      throws InterruptedException {
+  protected @Nullable F addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
     Object itpPoint = delegate.addConstraint(constraint);
     if (itpPoint == null) {
