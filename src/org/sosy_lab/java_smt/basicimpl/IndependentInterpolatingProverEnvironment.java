@@ -342,7 +342,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpBackwardQuantified = qfmgr.forall(boundVars, bmgr.not(formulasOfB));
         BooleanFormula itpBackwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpBackwardQuantified);
-        // check that the quantifier has been eliminated properly
+        // check if the quantifier has been eliminated properly
         if (itpBackwardQuantifierEliminated.toString().contains("ALL")) {
           throw new SolverException(
               "Quantifier-elimination failed. "
@@ -381,7 +381,7 @@ public class IndependentInterpolatingProverEnvironment<F, T>
         BooleanFormula itpForwardQuantified = qfmgr.exists(boundVars, formulasOfA);
         BooleanFormula itpForwardQuantifierEliminated =
             qfmgr.eliminateQuantifiers(itpForwardQuantified);
-        // check, if the quantifier has been eliminated properly
+        // check if the quantifier has been eliminated properly
         if (itpForwardQuantifierEliminated.toString().equals("EX")) {
           throw new SolverException(
               "Quantifier-elimination failed. "
