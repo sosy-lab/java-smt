@@ -98,12 +98,12 @@ public interface FloatingPointFormulaManager {
     return makeNumber(
         number.getExponent(),
         number.getMantissa(),
-        number.getSign(),
+        number.getMathSign(),
         getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
   }
 
   /**
-   * Creates a floating point formula from the given exponent, mantissa, and sign bit with the
+   * Creates a floating point formula from the given exponent, mantissa, and sign-bit with the
    * specified type.
    *
    * @param exponent the exponent part of the floating point number

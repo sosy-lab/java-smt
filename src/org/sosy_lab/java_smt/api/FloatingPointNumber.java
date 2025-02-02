@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import java.math.BigInteger;
 import java.util.BitSet;
 
@@ -45,7 +46,23 @@ public abstract class FloatingPointNumber {
     }
   }
 
-  public abstract Sign getSign();
+  /**
+   * The sign of the floating-point number.
+   *
+   * @return whether the number is positive (FALSE) or negative (TRUE).
+   */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  @InlineMe(
+      replacement = "this.getMathSign() == Sign.NEGATIVE",
+      imports = "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign")
+  public final boolean getSign() {
+    return getMathSign() == Sign.NEGATIVE;
+  }
+
+  /** The sign of the floating-point number, i.e. whether it is positive or negative. */
+  public abstract Sign getMathSign();
 
   /**
    * The exponent of the floating-point number, given as numeric value from binary representation.
@@ -64,6 +81,34 @@ public abstract class FloatingPointNumber {
   public abstract int getExponentSize();
 
   public abstract int getMantissaSize();
+
+  /**
+   * Get a floating-point number with the given sign, exponent, and mantissa.
+   *
+   * @param sign the sign-bit of the floating-point number as specified by IEEE 754, aka FALSE for
+   *     positive and TRUE for negative
+   * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
+   *     number, including a bias of 2^(exponentSize-1)-1
+   * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
+   *     number without hidden bit
+   * @param exponentSize the (maximum) size of the exponent in bits
+   * @param mantissaSize the (maximum) size of the mantissa in bits
+   * @see #of(Sign, BigInteger, BigInteger, int, int)
+   */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  @InlineMe(
+      replacement =
+          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize)",
+      imports = {
+        "org.sosy_lab.java_smt.api.FloatingPointNumber",
+        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign"
+      })
+  public static FloatingPointNumber of(
+      boolean sign, BigInteger exponent, BigInteger mantissa, int exponentSize, int mantissaSize) {
+    return of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize);
+  }
 
   /**
    * Get a floating-point number with the given sign, exponent, and mantissa.
@@ -164,7 +209,7 @@ public abstract class FloatingPointNumber {
     var mantissa = getMantissa();
     var exponent = getExponent();
     var bits = new BitSet(1 + exponentSize + mantissaSize);
-    if (getSign().isNegative()) {
+    if (getMathSign().isNegative()) {
       bits.set(exponentSize + mantissaSize); // if negative, set first bit to 1
     }
     for (int i = 0; i < exponentSize; i++) {

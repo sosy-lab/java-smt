@@ -489,7 +489,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(visitor.found).containsExactly(fp);
 
     ConstantsVisitor visitor2 = new ConstantsVisitor();
-    mgr.visit(fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getSign(), prec), visitor2);
+    mgr.visit(
+        fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getMathSign(), prec), visitor2);
     assertThat(visitor2.found).containsExactly(fp);
   }
 
