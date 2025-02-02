@@ -49,7 +49,8 @@ public abstract class FloatingPointNumber {
 
   /**
    * The exponent of the floating-point number, given as numeric value from binary representation.
-   * The number is unsigned (not negative) and does not include the bias that is used in IEEE 754.
+   * The number is unsigned (not negative) and includes a bias of 2^(exponentSize-1)-1 that is used
+   * in IEEE 754.
    */
   public abstract BigInteger getExponent();
 
@@ -69,7 +70,7 @@ public abstract class FloatingPointNumber {
    *
    * @param sign the sign of the floating-point number
    * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
-   *     number without bias
+   *     number, including a bias of 2^(exponentSize-1)-1
    * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
    *     number without hidden bit
    * @param exponentSize the (maximum) size of the exponent in bits
