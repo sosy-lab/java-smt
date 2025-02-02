@@ -137,7 +137,9 @@ public interface BitvectorFormulaManager {
    * signed remainder() it follows the dividend). Unsigned remainder() is equivalent to unsigned
    * modulo().
    */
-  @Deprecated(forRemoval = true)
+  @Deprecated(
+      forRemoval = true,
+      since = "2024.08, because of inconsistent behavior at modulo and remainder operations")
   default BitvectorFormula modulo(
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     return remainder(dividend, divisor, signed);
@@ -361,6 +363,23 @@ public interface BitvectorFormulaManager {
 
   /** Concatenate two bitvectors. */
   BitvectorFormula concat(BitvectorFormula prefix, BitvectorFormula suffix);
+
+  /**
+   * Extract a range of bits from a bitvector. We require {@code 0 <= lsb <= msb < bitsize}.
+   *
+   * <p>If msb equals lsb, then a single bit will be returned, i.e., the bit from the given
+   * position. If lsb equals 0 and msb equals bitsize-1, then the complete bitvector will be
+   * returned.
+   *
+   * @param number from where the bits are extracted.
+   * @param msb Upper index for the most significant bit. Must be in interval from lsb to bitsize-1.
+   * @param lsb Lower index for the least significant bit. Must be in interval from 0 to msb.
+   * @param signed unused and will be removed in the future.
+   */
+  @Deprecated(forRemoval = true, since = "2022.04, because of unused flag for sign")
+  default BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed) {
+    return extract(number, msb, lsb);
+  }
 
   /**
    * Extract a range of bits from a bitvector. We require {@code 0 <= lsb <= msb < bitsize}.
