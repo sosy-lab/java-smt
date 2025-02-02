@@ -150,6 +150,51 @@ public interface FloatingPointFormulaManager {
    * Build a formula of compatible type from a {@link FloatingPointFormula}. This method uses the
    * default rounding mode.
    *
+   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
+   * cast a floating-point number into another floating-point type. We do not support casting from
+   * boolean or array types. We try to keep an exact representation, however fall back to rounding
+   * if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param targetType the type of the resulting formula
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
+  @Deprecated(
+      forRemoval = true,
+      since = "2022.06, because of missing sign-bit for bitvector conversion")
+  default <T extends Formula> T castTo(FloatingPointFormula source, FormulaType<T> targetType) {
+    return castTo(source, true, targetType);
+  }
+
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}.
+   *
+   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
+   * cast a floating-point number into another floating-point type. We do not support casting from
+   * boolean or array types. We try to keep an exact representation, however fall back to rounding
+   * if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param targetType the type of the resulting formula
+   * @param pFloatingPointRoundingMode if rounding is needed, we apply the rounding mode.
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
+  @Deprecated(
+      forRemoval = true,
+      since = "2022.06, because of missing sign-bit for bitvector conversion")
+  default <T extends Formula> T castTo(
+      FloatingPointFormula source,
+      FormulaType<T> targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return castTo(source, true, targetType, pFloatingPointRoundingMode);
+  }
+
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}. This method uses the
+   * default rounding mode.
+   *
    * <p>Compatible formula types are all numeral types and (signed/unsigned) bitvector types. It is
    * also possible to cast a floating-point number into another floating-point type. We do not
    * support casting from boolean or array types. We try to keep an exact representation, however
