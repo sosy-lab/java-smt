@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
@@ -18,6 +19,7 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.basicimpl.BitvectorGenerator;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("checkstyle:linelength")
@@ -41,6 +43,18 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
         "(declare-const b (_ BitVec 32))\n"+
         "(assert (= a b))\n";
 
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+  @Test
+  public void easyBitVecDeclarationTest2(){
+    requireBitvectors();
+    BitvectorFormula a = bvmgr.makeBitvector(32, new BigInteger("10",2));
+    BitvectorFormula b = bvmgr.makeVariable(32, "b");
+    BooleanFormula constraint = bvmgr.equal(a,b);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult="(declare-const b (_ BitVec 32))\n"+
+        "(assert (= b ))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 

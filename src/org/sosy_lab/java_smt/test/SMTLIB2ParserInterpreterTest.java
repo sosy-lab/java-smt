@@ -1603,6 +1603,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
+    System.out.println(Generator.getLines());
     BooleanFormula constraint = bmgr.and(constraint1, constraint3);
     BooleanFormula expectedResult = constraint;
 

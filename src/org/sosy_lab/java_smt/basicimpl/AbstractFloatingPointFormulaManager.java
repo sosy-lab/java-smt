@@ -87,6 +87,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
           type.getMantissaSize(), String.valueOf(n), "RNE");
     }
+    System.out.println(result);
     return result;
   }
 
@@ -235,21 +236,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
             targetType,
             castToImpl(extractInfo(number), signed, targetType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      String commandToAppend;
-      if (targetType.isBitvectorType()){
-        commandToAppend = "_ to_bv";
-      }
-      else if (targetType.isIntegerType()||targetType.isRationalType()){
-        if(signed){
-          commandToAppend = "fp.to_sbv";
-        }else{
-          commandToAppend = "fp.to_ubv";
-        }
-      }else{
-        throw new GeneratorException("Unsupported target type");
-      }
-      FloatingPointGenerator.logFPCastTo(result, number, commandToAppend,
-          "RNE");
+      FloatingPointGenerator.logFPCastTo(result, number,
+          "RNE", targetType, signed);
     }
     return result;
   }
@@ -269,7 +257,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
                 targetType,
                 getRoundingMode(roundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastTo(result, number, targetType.toString(), roundingMode.giveSMTLIBFormat());
+      FloatingPointGenerator.logFPCastTo(result, number,
+          roundingMode.giveSMTLIBFormat(), targetType, signed);
     }
     return result;
   }
@@ -330,7 +319,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public BitvectorFormula toIeeeBitvector(FloatingPointFormula number) {
     BitvectorFormula result = getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(number)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logToIeeeBitvector(result, number);
+      FloatingPointGenerator.logFPCastTo(result, number, "" ,
+          getFormulaCreator().getFormulaType(result), true);
     }
     return result;
   }
