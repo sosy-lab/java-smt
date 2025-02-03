@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
@@ -93,6 +94,12 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+    if (IS_WINDOWS) {
+      TruthJUnit.assume()
+          .withMessage(solverToUse() + " has a regression in this test on Windows")
+          .that(solverToUse())
+          .isNotEqualTo(Solvers.BITWUZLA);
+    }
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
