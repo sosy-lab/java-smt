@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
+import com.microsoft.z3.Native.IntPtr;
 import com.microsoft.z3.enumerations.Z3_ast_print_mode;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,6 +25,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.FileOption;
+import org.sosy_lab.common.configuration.FileOption.Type;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -62,7 +64,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         description =
             "Activate replayable logging in Z3."
                 + " The log can be given as an input to the solver and replayed.")
-    @FileOption(FileOption.Type.OUTPUT_FILE)
+    @FileOption(Type.OUTPUT_FILE)
     @Nullable Path log = null;
 
     /** Optimization settings. */
@@ -187,7 +189,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         new Z3BitvectorFormulaManager(creator, booleanTheory);
     Z3FloatingPointFormulaManager floatingPointTheory =
         new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
-    Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
+    Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator, logger);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
     Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
     Z3EnumerationFormulaManager enumTheory = new Z3EnumerationFormulaManager(creator);
@@ -210,6 +212,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             arrayManager,
             stringTheory,
             enumTheory);
+    quantifierManager.setFormulaManager(manager); //zum parsen
     return new Z3SolverContext(creator, pShutdownNotifier, logger, manager, extraOptions);
   }
 
@@ -254,10 +257,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    Native.IntPtr major = new Native.IntPtr();
-    Native.IntPtr minor = new Native.IntPtr();
-    Native.IntPtr build = new Native.IntPtr();
-    Native.IntPtr revision = new Native.IntPtr();
+    IntPtr major = new IntPtr();
+    IntPtr minor = new IntPtr();
+    IntPtr build = new IntPtr();
+    IntPtr revision = new IntPtr();
     Native.getVersion(major, minor, build, revision);
     return "Z3 " + major.value + "." + minor.value + "." + build.value + "." + revision.value;
   }

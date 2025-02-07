@@ -99,6 +99,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
   private FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     checkSymbol(fun);
     FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
+    Theory t = environment.getTheory();
 
     if (fsym == null) {
       environment.declareFun(fun, paramSorts, resultSort);
