@@ -43,22 +43,12 @@ public class FloatingPointGenerator {
       String value,
       String RoundingMode) {
     List<Object> inputParams = new ArrayList<>();
-    inputParams.add(value);
-    inputParams.add(exponent);
-    inputParams.add(mantissa);
-    /*
-    DEBUG:
-    System.out.println("Floating-Point Log: Exponent=" + exponent + ", Mantissa=" + mantissa +
-        ", RoundingMode=" + RoundingMode + ", Value=" + value);
-    System.out.println("Generierte Ausgabe: " + result);
-    System.out.println("Generierte Static-Ausgabe: " + SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
-        FormulaType.getFloatingPointType(exponent, mantissa)));
-     */
-
+    String output = SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
+        FormulaType.getFloatingPointType(exponent,
+            mantissa));
+    inputParams.add(output);
     Function<List<Object>, String> functionToString =
-        createString -> SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic((String) createString.get(0),
-            FormulaType.getFloatingPointType((int) createString.get(1),
-                (int) createString.get(2)));
+        createString -> (String) createString.get(0);
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
@@ -274,9 +264,6 @@ public class FloatingPointGenerator {
       Function<List<Object>, String> functionToString = inPlaceInputParams ->
           "((" + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + " "
               + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
-      System.out.println(
-          "((" + inputParams.get(2) + " " + inputParams.get(3) + " " + inputParams.get(1) + ") "
-              + inputParams.get(0) + ")");
       Generator.getExecutedAggregator().add(
           new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
       );
@@ -284,8 +271,6 @@ public class FloatingPointGenerator {
       Function<List<Object>, String> functionToString = inPlaceInputParams ->
           "((" + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(1) + ") "
               + inPlaceInputParams.get(0) + ")";
-      System.out.println(
-          "((" + inputParams.get(2) + " " + inputParams.get(1) + ") " + inputParams.get(0) + ")");
       Generator.getExecutedAggregator().add(
           new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
       );

@@ -40,11 +40,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class SMTLIB2FloatingPointTest extends SolverBasedTest0 {
-  @Override
-  public Solvers solverToUse() {
-    return Solvers.Z3;
-  }
+public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void simpleTestDeclaration() throws

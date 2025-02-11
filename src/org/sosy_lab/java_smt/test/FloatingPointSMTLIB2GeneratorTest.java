@@ -17,11 +17,8 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  public Solvers solverToUse(){
-    return Solvers.Z3;
-  }
+public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -47,8 +44,9 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @Test
-  public void testMakeFloatingPoint(){
+  public void testMakeFloatingPoint() {
     requireFloats();
     FloatingPointFormula a = fpmgr.makeVariable("a",
         FloatingPointType.getSinglePrecisionFloatingPointType());
@@ -57,29 +55,38 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
     FloatingPointFormula c = fpmgr.makeVariable("c",
         FormulaType.getSinglePrecisionFloatingPointType());
     BooleanFormula assign1 = fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0,
-        FloatingPointType.getSinglePrecisionFloatingPointType()));
+        FloatingPointType.getSinglePrecisionFloatingPointType(), FloatingPointRoundingMode.TOWARD_ZERO));
     BooleanFormula assign2 = fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(15.0,
         FormulaType.getSinglePrecisionFloatingPointType()));
     BooleanFormula assign3 = fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(25.0,
         FormulaType.getSinglePrecisionFloatingPointType()));
-    BooleanFormula constraint = bmgr.and(fpmgr.equalWithFPSemantics(fpmgr.add(a,b),c), assign1,
-        assign2, assign3);
-    String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 24))\n"
-        +"(assert (fp.eq a ((_to_fp 8 24) RNE 10.0)))\n";
-        Generator.assembleConstraint(constraint);
-        String actualResult = String.valueOf(Generator.getLines());
-        assertThat(actualResult).isEqualTo(expectedResult);
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.add(a, b), c);
+    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq a (fp #b0 #b10000010 #b01000000000000000000000)))\n"
+        + "(declare-const b (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq b (fp #b0 #b10000010 #b11100000000000000000000)))\n"
+        + "(declare-const c (_ FloatingPoint 8 23))\n"
+        + "(assert (fp.eq c (fp #b0 #b10000011 #b10010000000000000000000)))\n"
+        + "(assert (fp.eq (fp.add RNE a b) c))\n";
+    Generator.assembleConstraint(assign1);
+    Generator.assembleConstraint(assign2);
+    Generator.assembleConstraint(assign3);
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testFPAdd() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.add(a,b),result);
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.add(a, b), result);
 
     Generator.assembleConstraint(constraint);
 
@@ -92,13 +99,17 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @Test
   public void testFPSub() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.subtract(a, b), result);
 
     Generator.assembleConstraint(constraint);
@@ -117,9 +128,12 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testFPDiv() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.divide(a, b), result);
 
     Generator.assembleConstraint(constraint);
@@ -138,9 +152,12 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testFPMul() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.multiply(a, b), result);
 
     Generator.assembleConstraint(constraint);
@@ -159,8 +176,10 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testFPSqrt() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula result = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.sqrt(a), result);
 
     Generator.assembleConstraint(constraint);
@@ -178,7 +197,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testFPIsNaN() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula isNaN = fpmgr.isNaN(a);
 
     Generator.assembleConstraint(isNaN);
@@ -195,7 +215,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testFPIsZero() {
     requireFloats();
     Objects.requireNonNull(fpmgr);
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula isZero = fpmgr.isZero(a);
 
     Generator.assembleConstraint(isZero);
@@ -211,9 +232,12 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testFPMax() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula max = fpmgr.makeVariable("max", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula max =
+        fpmgr.makeVariable("max", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.max(a, b), max);
     Generator.assembleConstraint(constraint);
 
@@ -230,9 +254,12 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testFPMin() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula min = fpmgr.makeVariable("min", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula min =
+        fpmgr.makeVariable("min", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.min(a, b), min);
     Generator.assembleConstraint(constraint);
 
@@ -287,7 +314,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testMakeNaN() {
     requireFloats();
-    FloatingPointFormula nan = fpmgr.makeVariable("nan", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula nan =
+        fpmgr.makeVariable("nan", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(nan,
         fpmgr.makeNaN(FloatingPointType.getSinglePrecisionFloatingPointType()));
 
@@ -305,7 +333,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testCastTo() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
     BitvectorFormula castResult = bvmgr.makeVariable(32, "castResult");
     BooleanFormula constraint = bvmgr.equal(fpmgr.castTo(a, true,
             FormulaType.getBitvectorTypeWithSize(32)),
@@ -326,7 +355,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   public void testCastFrom() {
     requireFloats();
     BooleanFormula b = bmgr.makeVariable("b");
-    FloatingPointFormula castResult = fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula castResult =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
 
 
     Generator.assembleConstraint(fpmgr.equalWithFPSemantics(castResult, fpmgr.castFrom(b, true,
@@ -353,7 +383,7 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     Generator.assembleConstraint(fpmgr.equalWithFPSemantics(
         fpmgr.fromIeeeBitvector(bv,
-        FloatingPointType.getSinglePrecisionFloatingPointType()), result));
+            FloatingPointType.getSinglePrecisionFloatingPointType()), result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
@@ -384,13 +414,16 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @Test
   public void testRound() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
 
 
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(a, fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)));
+    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(a,
+        fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)));
 
     String actualResult = String.valueOf(Generator.getLines());
 
@@ -399,7 +432,6 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-
 
 
 }

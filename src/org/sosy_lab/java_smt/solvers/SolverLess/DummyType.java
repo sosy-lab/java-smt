@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+
 public class DummyType {
   private int bitvectorLength;
   private int exponent;
@@ -27,6 +29,7 @@ public class DummyType {
   private Type arrayIndexType;
   private Type arrayElementType;
   public Type myType;
+  public FloatingPointRoundingMode roundingMode;
 
   public DummyType(int bitvectorLength) {
     this.bitvectorLength = bitvectorLength;
@@ -34,17 +37,31 @@ public class DummyType {
   }
 
   public DummyType(Type MyType) {
-    if (MyType == Type.FLOATING_POINT || MyType == Type.ARRAY || MyType == Type.BITVECTOR) {
+    if (MyType == Type.FLOATING_POINT || MyType == Type.ARRAY || MyType == Type.BITVECTOR
+        || MyType == Type.FLOATINGPOINTROUNDINGMODE) {
       throw new UnsupportedOperationException(
-          "Floating point, array types and Bitvectors need more "
+          "Floating point, RoundModes, array types and Bitvectors need more "
               + "information");
     }
     this.myType = MyType;
   }
 
+  public DummyType(FloatingPointRoundingMode roundingMode) {
+    this.roundingMode = roundingMode;
+    this.myType = Type.FLOATINGPOINTROUNDINGMODE;
+  }
+
   public DummyType(int exponent, int mantissa) {
     this.exponent = exponent;
     this.mantissa = mantissa;
+    this.roundingMode = FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    this.myType = Type.FLOATING_POINT;
+  }
+
+  public DummyType(int exponent, int mantissa, FloatingPointRoundingMode roundingMode) {
+    this.exponent = exponent;
+    this.mantissa = mantissa;
+    this.roundingMode = roundingMode;
     this.myType = Type.FLOATING_POINT;
   }
 
@@ -63,7 +80,8 @@ public class DummyType {
     BITVECTOR,
     ARRAY,
     RATIONAL,
-    BOOLEAN
+    BOOLEAN,
+    FLOATINGPOINTROUNDINGMODE
   }
 
   public String parseToSMTLIBFormulaType() {
@@ -84,6 +102,8 @@ public class DummyType {
         return "Real";
       case BOOLEAN:
         return "Bool";
+      case FLOATINGPOINTROUNDINGMODE:
+        return roundingMode.giveSMTLIBFormat();
       default:
         throw new UnsupportedOperationException("Unsupported formula type");
     }
@@ -121,6 +141,10 @@ public class DummyType {
     return myType == Type.ARRAY;
   }
 
+  public boolean isFloatingPointRoundingMode() {
+    return myType == Type.FLOATINGPOINTROUNDINGMODE;
+  }
+
   public int getBitvectorLength() {
     if (myType != Type.BITVECTOR) {
       throw new UnsupportedOperationException("Not a bitvector type");
@@ -140,6 +164,13 @@ public class DummyType {
       throw new UnsupportedOperationException("Not a floating point type");
     }
     return mantissa;
+  }
+
+  public FloatingPointRoundingMode getRoundingMode() {
+    if (myType != Type.FLOATINGPOINTROUNDINGMODE && myType != Type.FLOATING_POINT) {
+      throw new UnsupportedOperationException("Not a floating point rounding mode type");
+    }
+    return roundingMode;
   }
 
   public Type getArrayIndexType() {
@@ -167,6 +198,10 @@ public class DummyType {
     if (isArray()) {
       return "Array<" + getArrayIndexType() + ", " + getArrayElementType() + ">";
     }
+    if (isFloatingPointRoundingMode()) {
+      return getRoundingMode().giveSMTLIBFormat();
+    }
+
     return myType.toString();
   }
 
@@ -177,15 +212,19 @@ public class DummyType {
     }
     if (other instanceof DummyType) {
       DummyType otherType = (DummyType) other;
-      if (otherType.myType == this.myType){
-        if (this.myType == Type.BITVECTOR){
+      if (otherType.myType == this.myType) {
+        if (this.myType == Type.BITVECTOR) {
           return otherType.bitvectorLength == this.bitvectorLength;
         }
-        if (this.myType == Type.FLOATING_POINT){
+        if (this.myType == Type.FLOATINGPOINTROUNDINGMODE) {
+          return otherType.roundingMode == this.roundingMode;
+        }
+        if (this.myType == Type.FLOATING_POINT) {
           return otherType.exponent == this.exponent && otherType.mantissa == this.mantissa;
         }
-        if (this.myType == Type.ARRAY){
-          return otherType.arrayIndexType == this.arrayIndexType && otherType.arrayElementType == this.arrayElementType;
+        if (this.myType == Type.ARRAY) {
+          return otherType.arrayIndexType == this.arrayIndexType
+              && otherType.arrayElementType == this.arrayElementType;
         }
         return true;
       }

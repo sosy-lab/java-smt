@@ -87,7 +87,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       FloatingPointGenerator.logMakeFloatingPoint(result, type.getExponentSize(),
           type.getMantissaSize(), String.valueOf(n), "RNE");
     }
-    System.out.println(result);
     return result;
   }
 

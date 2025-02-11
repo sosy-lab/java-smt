@@ -60,7 +60,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula parsed = mgr.universalParseFromString(x);
     StringFormula a = smgr.makeVariable("a");
     BooleanFormula constraint = smgr.equal(a, smgr.makeString("Hello"));
-    assertThat(parsed).isEqualTo(constraint);
+    assertThat(parsed.equals(constraint));
   }
   @Test
   public void testStringEquality() throws  IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -78,7 +78,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(a, b);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint));
   }
 
   @Test
@@ -100,7 +100,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(c, concatenationResult);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint));
   }
 
   @Test
@@ -118,7 +118,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     IntegerFormula lengthResult = smgr.length(a);
 
     BooleanFormula constraint = imgr.equal(len, lengthResult);
-        assertThat(expectedResult).isEqualTo(constraint);
+        assertThat(expectedResult.equals(constraint));
   }
 
 
@@ -144,7 +144,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula constraint = smgr.equal(sub, substringResult);
 
-    assertThat(actualResult).isEqualTo(constraint);
+    assertThat(actualResult.equals(constraint));
   }
 
   @Test
@@ -162,7 +162,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula containsResult = smgr.contains(a, b);
 
-    assertThat(actualResult).isEqualTo(containsResult);
+    assertThat(actualResult.equals(containsResult));
   }
 
   @Test
@@ -180,7 +180,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula prefixResult = smgr.prefix(prefix, a);
 
-    assertThat(actualResult).isEqualTo(prefixResult);
+    assertThat(actualResult.equals(prefixResult));
   }
 
   @Test
@@ -198,7 +198,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula suffixResult = smgr.suffix(suffix, a);
 
-    assertThat(actualResult).isEqualTo(suffixResult);
+    assertThat(actualResult.equals(suffixResult));
   }
 
 

@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import java.math.BigDecimal;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -36,12 +38,12 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula getDefaultRoundingMode() {
-    return new DummyFormula(new DummyType(8,24));
+    return new DummyFormula(new DummyType(FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN));
   }
 
   @Override
   protected DummyFormula getRoundingModeImpl(FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    return new DummyFormula(new DummyType(8,24));
+    return new DummyFormula(new DummyType(pFloatingPointRoundingMode));
   }
 
   @Override
@@ -50,28 +52,53 @@ public class SolverLessFloatingPointFormulaManager extends
       FloatingPointType type,
       DummyFormula pFloatingPointRoundingMode) {
     String binaryRepresentation = convertToSMTLibBinary(n, type);
-    DummyFormula formula = new DummyFormula(type.getExponentSize(), type.getMantissaSize());
+    DummyFormula formula = new DummyFormula(new DummyType(type.getExponentSize(),
+        type.getMantissaSize(), pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
     formula.setRepresentation(binaryRepresentation);
     return formula;
   }
 
   @Override
   protected DummyFormula makeNumberAndRound(
-      String pN,
-      FloatingPointType pType,
-      DummyFormula pFloatingPointRoundingMode) {
-    double value = Double.parseDouble(pN);
-    String binaryRepresentation = convertToSMTLibBinary(value, pType);
-    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-    formula.setRepresentation(binaryRepresentation);
-    return formula;
+      String pN, FloatingPointType pType, DummyFormula pFloatingPointRoundingMode) {
+    if (pN.matches("\\d+/\\d+")) {
+      String[] parts = pN.split("/");
+      BigDecimal numerator = new BigDecimal(parts[0]);
+      BigDecimal denominator = new BigDecimal(parts[1]);
+      double value = numerator.divide(denominator).doubleValue();
+      return makeNumberImpl(value, pType, pFloatingPointRoundingMode);
+    }
+    try {
+      double value = Double.parseDouble(pN);
+      return makeNumberImpl(value, pType, pFloatingPointRoundingMode);
+    } catch (NumberFormatException e) {
+      throw new IllegalArgumentException("Unsupported number format: " + pN, e);
+    }
   }
 
-  public static String makeNumberAndRoundStatic(
-      String pN,
-      FloatingPointType pType) {
-    double value = Double.parseDouble(pN);
-    return  convertToSMTLibBinary(value, pType);
+
+  public static <T> String makeNumberAndRoundStatic(T pN, FloatingPointType pType) {
+    if (pN instanceof Double) {
+      return convertToSMTLibBinary((Double) pN, pType);
+    } else if (pN instanceof Integer) {
+      return convertToSMTLibBinary(((Integer) pN).doubleValue(), pType);
+    } else if (pN instanceof BigDecimal) {
+      return convertToSMTLibBinary(((BigDecimal) pN).doubleValue(), pType);
+    } else if (pN instanceof Rational) {
+      return convertToSMTLibBinary(((Rational) pN).doubleValue(), pType);
+    } else if (pN instanceof String) {
+      String str = (String) pN;
+      if (str.matches("\\d+/\\d+")) {
+        return str;
+      }
+      try {
+        return convertToSMTLibBinary(new BigDecimal(str).doubleValue(), pType);
+      } catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Unsupported number format: " + pN, e);
+      }
+    } else {
+      throw new IllegalArgumentException("Unsupported number type: " + pN.getClass().getSimpleName());
+    }
   }
 
   @Override
