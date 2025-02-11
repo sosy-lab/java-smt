@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Override
   public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
+    return Solvers.Z3;
   }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -50,7 +50,6 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Test
   public void testMakeFloatingPoint(){
     requireFloats();
-    assert fpmgr != null;
     FloatingPointFormula a = fpmgr.makeVariable("a",
         FloatingPointType.getSinglePrecisionFloatingPointType());
     FloatingPointFormula b = fpmgr.makeVariable("b",
@@ -59,9 +58,9 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
         FormulaType.getSinglePrecisionFloatingPointType());
     BooleanFormula assign1 = fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0,
         FloatingPointType.getSinglePrecisionFloatingPointType()));
-    BooleanFormula assign2 = fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(10.0,
+    BooleanFormula assign2 = fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(15.0,
         FormulaType.getSinglePrecisionFloatingPointType()));
-    BooleanFormula assign3 = fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(20.0,
+    BooleanFormula assign3 = fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(25.0,
         FormulaType.getSinglePrecisionFloatingPointType()));
     BooleanFormula constraint = bmgr.and(fpmgr.equalWithFPSemantics(fpmgr.add(a,b),c), assign1,
         assign2, assign3);

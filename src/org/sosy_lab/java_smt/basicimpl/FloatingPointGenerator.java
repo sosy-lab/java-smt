@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
+import org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFloatingPointFormulaManager;
 
 public class FloatingPointGenerator {
 
@@ -42,15 +43,22 @@ public class FloatingPointGenerator {
       String value,
       String RoundingMode) {
     List<Object> inputParams = new ArrayList<>();
+    inputParams.add(value);
     inputParams.add(exponent);
     inputParams.add(mantissa);
-    inputParams.add(RoundingMode);
-    inputParams.add(value);
+    /*
+    DEBUG:
     System.out.println("Floating-Point Log: Exponent=" + exponent + ", Mantissa=" + mantissa +
         ", RoundingMode=" + RoundingMode + ", Value=" + value);
-    System.out.println("Generierte Ausgabe: ((_ to_fp " + RoundingMode + " " + exponent + " " + mantissa + ") " + value + ")");
-    Function<List<Object>, String> functionToString = createString -> "((_ to_fp " + createString.get(2) + " " + createString.get(0) + " " + createString.get(1) + ") "
-        + createString.get(3) + ")";
+    System.out.println("Generierte Ausgabe: " + result);
+    System.out.println("Generierte Static-Ausgabe: " + SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
+        FormulaType.getFloatingPointType(exponent, mantissa)));
+     */
+
+    Function<List<Object>, String> functionToString =
+        createString -> SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic((String) createString.get(0),
+            FormulaType.getFloatingPointType((int) createString.get(1),
+                (int) createString.get(2)));
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );

@@ -177,7 +177,18 @@ public class DummyType {
     }
     if (other instanceof DummyType) {
       DummyType otherType = (DummyType) other;
-      return otherType.myType == this.myType;
+      if (otherType.myType == this.myType){
+        if (this.myType == Type.BITVECTOR){
+          return otherType.bitvectorLength == this.bitvectorLength;
+        }
+        if (this.myType == Type.FLOATING_POINT){
+          return otherType.exponent == this.exponent && otherType.mantissa == this.mantissa;
+        }
+        if (this.myType == Type.ARRAY){
+          return otherType.arrayIndexType == this.arrayIndexType && otherType.arrayElementType == this.arrayElementType;
+        }
+        return true;
+      }
     }
     return false;
   }

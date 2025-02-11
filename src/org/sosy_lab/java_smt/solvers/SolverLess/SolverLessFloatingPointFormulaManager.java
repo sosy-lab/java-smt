@@ -49,7 +49,10 @@ public class SolverLessFloatingPointFormulaManager extends
       double n,
       FloatingPointType type,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula(type.getExponentSize(), type.getMantissaSize());
+    String binaryRepresentation = convertToSMTLibBinary(n, type);
+    DummyFormula formula = new DummyFormula(type.getExponentSize(), type.getMantissaSize());
+    formula.setRepresentation(binaryRepresentation);
+    return formula;
   }
 
   @Override
@@ -57,8 +60,79 @@ public class SolverLessFloatingPointFormulaManager extends
       String pN,
       FloatingPointType pType,
       DummyFormula pFloatingPointRoundingMode) {
-    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    double value = Double.parseDouble(pN);
+    String binaryRepresentation = convertToSMTLibBinary(value, pType);
+    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    formula.setRepresentation(binaryRepresentation);
+    return formula;
   }
+
+  public static String makeNumberAndRoundStatic(
+      String pN,
+      FloatingPointType pType) {
+    double value = Double.parseDouble(pN);
+    return  convertToSMTLibBinary(value, pType);
+  }
+
+  @Override
+  protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
+    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    formula.setRepresentation("(fp #b0 #b" + generateOnes(pType.getExponentSize()) + " #b" + generateZeros(pType.getMantissaSize() - 1) + ")");
+    return formula;
+  }
+
+  @Override
+  protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
+    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    formula.setRepresentation("(fp #b1 #b" + generateOnes(pType.getExponentSize()) + " #b" + generateZeros(pType.getMantissaSize() - 1) + ")");
+    return formula;
+  }
+
+  @Override
+  protected DummyFormula makeNaNImpl(FloatingPointType pType) {
+    DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
+    formula.setRepresentation("(fp #b0 #b" + generateOnes(pType.getExponentSize()) + " #b1" + generateZeros(pType.getMantissaSize() - 2) + ")");
+    return formula;
+  }
+
+  public static String convertToSMTLibBinary(double value, FloatingPointType type) {
+    int exponentSize = type.getExponentSize();
+    int mantissaSize = type.getMantissaSize();
+    int signBit;
+    int exponentBits;
+    int mantissaBits;
+
+    if (exponentSize == 8 && mantissaSize == 23) {
+      int bits = Float.floatToRawIntBits((float) value);
+      signBit = (bits >>> 31) & 1;
+      exponentBits = (bits >>> mantissaSize) & ((1 << exponentSize) - 1);
+      mantissaBits = bits & ((1 << mantissaSize) - 1);
+    } else if (exponentSize == 11 && mantissaSize == 52) {
+      long bits = Double.doubleToRawLongBits(value);
+      signBit = (int) ((bits >>> 63) & 1);
+      exponentBits = (int) ((bits >>> mantissaSize) & ((1L << exponentSize) - 1));
+      mantissaBits = (int) (bits & ((1L << mantissaSize) - 1));
+    } else {
+      throw new IllegalArgumentException("Unsupported FloatingPointType: " + exponentSize + ", " + mantissaSize);
+    }
+    String signStr = Integer.toBinaryString(signBit);
+    String exponentStr = String.format("%" + exponentSize + "s", Integer.toBinaryString(exponentBits)).replace(' ', '0');
+    String mantissaStr = String.format("%" + mantissaSize + "s", Integer.toBinaryString(mantissaBits)).replace(' ', '0');
+
+    return "(fp #b" + signStr + " #b" + exponentStr + " #b" + mantissaStr + ")";
+  }
+
+
+  public static String generateOnes(int count) {
+    return "1".repeat(count);
+  }
+
+  public static String generateZeros(int count) {
+    return "0".repeat(count);
+  }
+
+
+
 
   @Override
   protected DummyFormula makeVariableImpl(String pVar, FloatingPointType pType) {
@@ -67,20 +141,7 @@ public class SolverLessFloatingPointFormulaManager extends
     return formula;
   }
 
-  @Override
-  protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
-    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-  }
 
-  @Override
-  protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
-    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-  }
-
-  @Override
-  protected DummyFormula makeNaNImpl(FloatingPointType pType) {
-    return new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-  }
 
   @Override
   protected DummyFormula castToImpl(

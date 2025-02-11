@@ -26,11 +26,8 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
-public class UFSMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  public Solvers solverToUse(){
-    return Solvers.SOLVERLESS;
-  }
+public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -38,7 +35,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testdeclareUFBooleanWithInput() {
+  public void testDeclareUFBooleanWithInput() {
     requireBooleanUFs();
     FunctionDeclaration<BooleanFormula> a =
         fmgr.declareUF("a", FormulaType.BooleanType, FormulaType.BooleanType);
@@ -63,7 +60,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0 {
   }
 
   @Test
-  public void testdeclareUFBooleanEmptyInput() {
+  public void testDeclareUFBooleanEmptyInput() {
     requireBooleanUFs();
     requireNoArgumentsInUFs();
     FunctionDeclaration<BooleanFormula> a = fmgr.declareUF("a", FormulaType.BooleanType);
@@ -85,7 +82,7 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0 {
   }
 
   @Test(expected = GeneratorException.class)
-  public void testdeclareUFInputException() {
+  public void testDeclareUFInputException() {
     requireBooleanUFs();
     requireStrings();
     FunctionDeclaration<BooleanFormula> a =

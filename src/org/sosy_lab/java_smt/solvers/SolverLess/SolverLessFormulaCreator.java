@@ -238,13 +238,21 @@ public class SolverLessFormulaCreator
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
         if (parts.length != 2) {
-          throw new IllegalArgumentException(
-              "Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
         }
         return Integer.parseInt(parts[0].trim());
       } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException(
-            "Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+      }
+    } else if (representation.startsWith("(fp #b")) {
+      try {
+        String[] parts = representation.split(" ");
+        if (parts.length != 4) {
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+        }
+        return parts[2].length() - 2; // Remove #b prefix and count bits
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
       }
     }
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
@@ -255,17 +263,26 @@ public class SolverLessFormulaCreator
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
         if (parts.length != 2) {
-          throw new IllegalArgumentException(
-              "Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
         }
         return Integer.parseInt(parts[1].trim());
       } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException(
-            "Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+      }
+    } else if (representation.startsWith("(fp #b")) {
+      try {
+        String[] parts = representation.split(" ");
+        if (parts.length != 4) {
+          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+        }
+        return parts[3].length() - 2; // Remove #b prefix and count bits
+      } catch (Exception e) {
+        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
       }
     }
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
   }
+
 
 
   @Override

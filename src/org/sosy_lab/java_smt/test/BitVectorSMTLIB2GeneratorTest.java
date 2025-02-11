@@ -53,8 +53,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     BooleanFormula constraint = bvmgr.equal(a,b);
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
-    String expectedResult="(declare-const b (_ BitVec 32))\n"+
-        "(assert (= b ))\n";
+    String expectedResult="(declare-const b (_ BitVec 32))\n"
+        + "(assert (= #b00000000000000000000000000000010 b))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
