@@ -22,12 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
-
 
 public class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
@@ -36,13 +34,10 @@ public class CVC5QuantifiedFormulaManager
 
   private Optional<CVC5FormulaManager> fmgr;
 
-
-
-
   private final LogManager logger;
 
-  protected CVC5QuantifiedFormulaManager(FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator
-      , LogManager pLogger) {
+  protected CVC5QuantifiedFormulaManager(
+      FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator, LogManager pLogger) {
     super(pFormulaCreator);
 
     solver = pFormulaCreator.getEnv();
@@ -74,10 +69,13 @@ public class CVC5QuantifiedFormulaManager
       return input;
     }
   }
+
   @Override
-  protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo) throws UnsupportedOperationException{
+  protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
+      throws UnsupportedOperationException {
     IUltimateServiceProvider provider =
-        org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock.createUltimateServiceProviderMock();
+        org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
+            .createUltimateServiceProviderMock();
     UltimateEliminator ue;
     ILogger iLogger = provider.getLoggingService().getControllerLogger();
     Script interpol = new SMTInterpol();
@@ -86,8 +84,8 @@ public class CVC5QuantifiedFormulaManager
 
     CVC5FormulaManager formulaManager = fmgr.get();
     de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        UltimateEliminatorParser.parseImpl(formulaManager.dumpFormulaImpl(pExtractInfo), logger,
-            ue);
+        UltimateEliminatorParser.parseImpl(
+            formulaManager.dumpFormulaImpl(pExtractInfo), logger, ue);
     formula = ue.simplify(formula);
     Term result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());

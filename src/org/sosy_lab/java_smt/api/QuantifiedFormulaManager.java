@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
  * This interface contains methods for working with any theory with quantifiers.
@@ -24,9 +25,9 @@ public interface QuantifiedFormulaManager {
   }
 
   /**
-   * @return An existentially quantified formula.
    * @param pVariables The variables that will get bound (variables) by the quantification.
    * @param pBody The {@link BooleanFormula}} within that the binding will be performed.
+   * @return An existentially quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
@@ -34,9 +35,9 @@ public interface QuantifiedFormulaManager {
   }
 
   /**
-   * @return A universally quantified formula.
    * @param pVariables The variables that will get bound (variables) by the quantification.
    * @param pBody The {@link BooleanFormula}} within that the binding will be performed.
+   * @return A universally quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
@@ -54,10 +55,10 @@ public interface QuantifiedFormulaManager {
   }
 
   /**
-   * @return A quantified formula
    * @param q Quantifier type
    * @param pVariables The variables that will get bound (variables) by the quantification.
    * @param pBody The {@link BooleanFormula}} within that the binding will be performed.
+   * @return A quantified formula
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula mkQuantifier(
@@ -72,4 +73,8 @@ public interface QuantifiedFormulaManager {
    */
   BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException;
+
+  ProverOptions getOption();
+
+  void setOption(ProverOptions opt);
 }

@@ -53,7 +53,10 @@ public interface SolverContext extends AutoCloseable {
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
     /** Whether the solver should enable support for formulae build in SL theory. */
-    ENABLE_SEPARATION_LOGIC
+    ENABLE_SEPARATION_LOGIC,
+
+    /** Whether the solver should enable quantifier eliminiation via UltimateEliminator. */
+    SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION
   }
 
   /**

@@ -14,12 +14,14 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverStatistics stats;
+  ProverOptions option;
 
   StatisticsQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverStatistics pStats) {
     delegate = checkNotNull(pDelegate);
@@ -38,5 +40,15 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
       throws InterruptedException, SolverException {
     stats.quantifierOperations.getAndIncrement();
     return delegate.eliminateQuantifiers(pF);
+  }
+
+  @Override
+  public ProverOptions getOption() {
+    return option;
+  }
+
+  @Override
+  public void setOption(ProverOptions opt) {
+    option = opt;
   }
 }

@@ -18,6 +18,7 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/core/ultimate-core.jar" sourcepath="lib/java-contrib/ultimate-core-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-library-smtlib.jar" sourcepath="lib/java-contrib/ultimate-library-smtlib-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-library-smtlib-utils.jar" sourcepath="lib/java-contrib/ultimate-library-smtlib-utils-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/ultimate-util.jar" sourcepath="lib/java-contrib/ultimate-util-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-core-rcp.jar" sourcepath="lib/java-contrib/ultimate-core-rcp-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-model.jar" sourcepath="lib/java-contrib/ultimate-model-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/guava-testlib.jar" sourcepath="lib/java-contrib/guava-testlib-sources.jar"/>

@@ -14,11 +14,13 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
+  private ProverOptions option;
 
   public DebuggingQuantifiedFormulaManager(
       QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
@@ -47,5 +49,15 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
     BooleanFormula result = delegate.eliminateQuantifiers(pF);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public ProverOptions getOption() {
+    return option;
+  }
+
+  @Override
+  public void setOption(ProverOptions opt) {
+    option = opt;
   }
 }

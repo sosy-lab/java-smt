@@ -1120,4 +1120,20 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
             pBody);
     return qmgr.exists(pVariable, bmgr.and(constraintsAndBody));
   }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithUltimateEliminator()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+
+    // forall var (var = select(store(arr, 2, "bla"), 2)
+    // ∀a.select(a, k) = select(a, i)
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, IntegerFormula> var =
+        amgr.makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula query = qmgr.forall(var, imgr.equal(amgr.select(var, k), amgr.select(var, i)));
+
+    assertThatFormula(query).isEquivalentTo(imgr.equal(k, i));
+  }
 }

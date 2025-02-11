@@ -35,6 +35,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       Mathsat5RationalFormulaManager pRationalManager,
       Mathsat5BitvectorFormulaManager pBitpreciseManager,
       Mathsat5FloatingPointFormulaManager pFloatingPointManager,
+      Mathsat5QuantifiedFormulaManager pQuantifiedFormulaManager,
       Mathsat5ArrayFormulaManager pArrayManager,
       Mathsat5EnumerationFormulaManager pEnumerationManager) {
     super(
@@ -45,7 +46,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         pRationalManager,
         pBitpreciseManager,
         pFloatingPointManager,
-        null,
+        pQuantifiedFormulaManager,
         pArrayManager,
         null,
         null,

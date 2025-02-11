@@ -15,12 +15,14 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverContext sync;
+  private ProverOptions option;
 
   SynchronizedQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);
@@ -41,5 +43,15 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
     synchronized (sync) {
       return delegate.eliminateQuantifiers(pF);
     }
+  }
+
+  @Override
+  public ProverOptions getOption() {
+    return option;
+  }
+
+  @Override
+  public void setOption(ProverOptions opt) {
+    option = opt;
   }
 }

@@ -36,7 +36,6 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.log.LogManager;
 
-
 public class UltimateEliminatorParser {
 
   public static Appender dumpFormula(final Term formula) {
@@ -105,7 +104,8 @@ public class UltimateEliminatorParser {
     };
   }
 
-  public static Term parseImpl(String pS, LogManager pLogger, UltimateEliminator ue) throws IllegalArgumentException {
+  public static Term parseImpl(String pS, LogManager pLogger, UltimateEliminator ue)
+      throws IllegalArgumentException {
     FormulaCollectionScript parseScript =
         new FormulaCollectionScript(ue.getScriptIterator().next(), ue.getTheory());
     LogProxy logProxy = new LogProxyForwarder(pLogger.withComponentName("SMTInterpol"));

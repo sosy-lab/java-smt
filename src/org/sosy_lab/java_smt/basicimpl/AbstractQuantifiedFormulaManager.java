@@ -13,12 +13,14 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
+  private ProverOptions option;
 
   protected AbstractQuantifiedFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -31,9 +33,25 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, UnsupportedOperationException {
+    if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
+      try {
+        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF)));
+      } catch (UnsupportedOperationException e) {
+        System.out.println(
+            "Solver does not support parsing yet. Falling back to native "
+                + "quantifier elimination.");
+        return wrap(eliminateQuantifiers(extractInfo(pF)));
+      }
+    }
     return wrap(eliminateQuantifiers(extractInfo(pF)));
   }
+
+  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(TFormulaInfo pExtractInfo)
+      throws UnsupportedOperationException {
+    throw new UnsupportedOperationException();
+  }
+  ;
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
       throws SolverException, InterruptedException;
@@ -47,4 +65,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
+
+  public ProverOptions getOption() {
+    return option;
+  }
+
+  public void setOption(ProverOptions opt) {
+    option = opt;
+  }
 }
