@@ -164,61 +164,6 @@ public class SolverLessFormulaCreator
     return super.extractInfo(pT);
   }
 
-  public String extractFirstArrayParameterFromString(String representation) {
-    if (representation.startsWith("Array<") && representation.endsWith(">")) {
-      try {
-
-        String content = representation.substring(6, representation.length() - 1).trim();
-
-
-        int commaIndex = findTopLevelCommaIndex(content);
-        if (commaIndex == -1) {
-          throw new IllegalArgumentException("Invalid Array representation: " + representation);
-        }
-
-
-        return content.substring(0, commaIndex).trim();
-      } catch (StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
-      }
-    }
-    throw new IllegalArgumentException("Invalid Array representation: " + representation);
-  }
-
-  private int findTopLevelCommaIndex(String content) {
-    int depth = 0;
-    for (int i = 0; i < content.length(); i++) {
-      char c = content.charAt(i);
-      if (c == '<') {
-        depth++;
-      } else if (c == '>') {
-        depth--;
-      } else if (c == ',' && depth == 0) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  public String extractSecondArrayParameterFromString(String representation) {
-    if (representation.startsWith("Array<") && representation.endsWith(">")) {
-      try {
-
-        String content = representation.substring(6, representation.length() - 1).trim();
-
-        int commaIndex = findTopLevelCommaIndex(content);
-        if (commaIndex == -1) {
-          throw new IllegalArgumentException("Invalid Array representation: " + representation);
-        }
-
-        return content.substring(commaIndex + 1).trim();
-      } catch (StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Invalid Array representation: " + representation, e);
-      }
-    }
-    throw new IllegalArgumentException("Invalid Array representation: " + representation);
-  }
-
 
   public static int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
@@ -347,17 +292,12 @@ public class SolverLessFormulaCreator
     }
     result = new DummyFormula(declaration.getReturnType());
     result.setName(declaration.getName());
-    /*
-    result.setRepresentation(declaration.getName() + "(" +
-        args.stream().map(DummyFormula::toString).reduce((arg1, arg2) -> arg1 + ", " + arg2).orElse("") +
-        ")");
-     */
 
     return result;
   }
 
   @Override
   protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
-    return new DummyFunction();
+    return new DummyFunction(); //not supported
   }
 }

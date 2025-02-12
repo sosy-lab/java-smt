@@ -107,6 +107,11 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return name;
   }
 
+  /**
+   * Helper method which transforms any FormulaType Object into the matching DummyFormula
+   * @param pType FormulaType-Object
+   * @return DummyFormula with the correct Type.
+   */
   public static DummyFormula getDummyFormulaFromObject(FormulaType<?> pType) {
     if (pType.isArrayType()) {
       FormulaType.ArrayFormulaType<?, ?> arrayType = (FormulaType.ArrayFormulaType<?, ?>) pType;
@@ -141,6 +146,11 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     throw new RuntimeException("Unsupported FormulaType: " + pType);
   }
 
+  /**
+   * This method is an internal helper method which creates the internal representation of
+   * an ArrayFormula to be later extracted by the FormulaCreator
+   * @return The correct representation as a String
+   */
   private String getArrayRepresentation() {
     StringBuilder representationBuilder = new StringBuilder("Array<");
 
@@ -162,6 +172,12 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return representationBuilder.toString();
   }
 
+  /**
+   * This is the reverse Method to be used in the FormulaCreator. It extracts the indexElement
+   * and the Element types from the string to create a matching ArrayFormula
+   * @param input String in the from Array<IndexElement, Element>
+   * @return DummyFormula representing the Array without values.
+   */
   public static DummyFormula createDummyFormulaArrayFromString(String input) {
     input = input.trim();
 
@@ -211,7 +227,12 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     }
   }
 
-
+  /**
+   * Internal helper Method which is needed to determine at which index the "," is in order
+   * to correctly extract the index and the element types
+   * @param content String in the internal array represenation
+   * @return index of the "," otherwise -1
+   */
   private static int findTopLevelCommaIndex(String content) {
     int depth = 0;
     for (int i = 0; i < content.length(); i++) {
@@ -227,7 +248,14 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return -1;
   }
 
-
+  /**
+   * This method ensures that the DummyFormula has the format which the FormulaCreator needs
+   * to extract the information and create a matching DummyFormula from the representation-string
+   * This is necessary as the Bitvector, FloatingPoint and Array FormulaTypes need more information
+   * as just the FormulaType.
+   *
+   * The Values are represented too.
+   */
   private void updateRepresentation() {
     switch (formulaType.myType) {
       case BITVECTOR:
@@ -263,6 +291,10 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return formulaType;
   }
 
+  /**
+   * This method transforms this DummyFormula into the matching FormulaType Object
+   * @return matching Formula Type Object.
+   */
   public FormulaType<?> getFormulaTypeForCreator() {
     switch (formulaType.myType) {
       case BITVECTOR:
@@ -304,17 +336,11 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     return firstArrayParameter;
   }
 
-  public void setFirstArrayParameter(DummyFormula pFirstArrayParameter) {
-    firstArrayParameter = pFirstArrayParameter;
-  }
 
   public DummyFormula getSecondArrayParameter() {
     return secondArrayParameter;
   }
 
-  public void setSecondArrayParameter(DummyFormula pSecondArrayParameter) {
-    secondArrayParameter = pSecondArrayParameter;
-  }
 
   public String getValue() {
     return value;
@@ -324,80 +350,6 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
     value = pValue;
     updateRepresentation();
   }
-  public String parseMeToSMTLIB() {
-    StringBuilder sb = new StringBuilder();
-    if(Objects.equals(value, "")){ //formula is a variable
-      switch (formulaType.myType){
-        case BOOLEAN:
-          sb.append("(declare-const ").append(name).append(" Bool)");
-          break;
-        case INTEGER:
-          sb.append("(declare-const ").append(name).append(" Int)");
-          break;
-        case RATIONAL:
-          sb.append("(declare-const ").append(name).append(" Real)");
-          break;
-        case BITVECTOR:
-          sb.append("(declare-const ").append(name).append(" (_ BitVec ").append(getBitvectorLength()).append("))");
-          break;
-        case FLOATING_POINT:
-          sb.append("(declare-const ").append(name).append(" (_ FloatingPoint ").append(getExponent()).append(" ").append(getMantissa()).append("))");
-          break;
-        case ARRAY:
-          sb.append("(declare-const ").append(name).append(" (Array ");
-          sb.append(firstArrayParameter != null ? firstArrayParameter.formulaType.parseToSMTLIBFormulaType() : "UNKNOWN");
-          sb.append(" ");
-          sb.append(secondArrayParameter != null ?
-                    secondArrayParameter.formulaType.parseToSMTLIBFormulaType() : "UNKNOWN");
-          sb.append(")");
-          break;
-        case STRING:
-          sb.append("(declare-const ").append(name).append(" String)");
-          break;
-        case REGEX:
-          sb.append("(declare-const ").append(name).append(" Regex)");
-          break;
-        default:
-          sb.append("unknown");
-      }
-    }else{
-      switch (formulaType.myType) {
-        case BOOLEAN:
-        case INTEGER:
-        case RATIONAL:
-          sb.append(value);
-          break;
-        case BITVECTOR:
-          sb.append("#b").append(value);
-          break;
-
-        case FLOATING_POINT:
-          sb.append("(FloatingPoint ").append(getExponent()).append(" ").append(getMantissa()).append(")");
-          break;
-
-        case ARRAY:
-          sb.append("(Array ");
-          sb.append(firstArrayParameter != null ? firstArrayParameter.parseMeToSMTLIB() : "UNKNOWN");
-          sb.append(" ");
-          sb.append(secondArrayParameter != null ? secondArrayParameter.parseMeToSMTLIB() : "UNKNOWN");
-          sb.append(")");
-          break;
-
-        case STRING:
-          sb.append("\"").append(value).append("\"");
-          break;
-
-        case REGEX:
-          sb.append("Regex(\"").append(representation).append("\")");
-          break;
-
-        default:
-          sb.append("unknown");
-      }
-    }
-    return sb.toString();
-  }
-
 
   @Override
   public String toString() {

@@ -209,30 +209,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return beginnings;
   }
 
-  /**
-   * This method parses a bitvector or hexadecimal SMTLIB2-String to an integer.
-   * @param input String in  hexadecimal or bitvector format according to smtlibv2
-   * @return the parsed integer
-   */
-  public static int parseBitOrHexToInt(String input) {
-    if (input.startsWith("#b")) {
-      String binaryPart = input.substring(2);
-      try {
-        return Integer.parseInt(binaryPart, 2);
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("invalid bit format: " + input, e);
-      }
-    } else if (input.startsWith("#x")) {
-      String hexPart = input.substring(2);
-      try {
-        return Integer.parseInt(hexPart, 16);
-      } catch (NumberFormatException e) {
-        throw new IllegalArgumentException("invalid hex format: " + input, e);
-      }
-    } else {
-      throw new IllegalArgumentException("string could not be detected as bitv or hex: " + input);
-    }
-  }
 
   /**
    * Checks if the beginning of the String matches one from a list.
@@ -1812,30 +1788,6 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       assignments.add(assignment);
     }
     return visitChildren(ctx);
-  }
-
-  public static boolean formulaMatchesRequestedType(DummyType type, Formula formula){
-    return formula.getClass().getName().equals(parseToCorrectName(type));
-  }
-  public static String parseToCorrectName(DummyType type) {
-    switch (type.myType){
-      case REGEX:
-        return "RegexFormula";
-      case STRING:
-        return "StringFormula";
-      case FLOATING_POINT:
-        return "FloatingPointFormula";
-      case INTEGER:
-        return "IntegerFormula";
-      case BITVECTOR:
-        return "BitvectorFormula";
-      case ARRAY:
-        return "ArrayFormula";
-      case RATIONAL:
-        return "RationalFormula";
-      default:
-        return "UnknownFormulaType";
-    }
   }
 
   @Override

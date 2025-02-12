@@ -102,7 +102,6 @@ public class SolverLessFormulaManager
 
   @Override
   public DummyFormula parse(String smtLib) throws IllegalArgumentException {
-    // A basic parser for specific SMT-LIB constructs
     smtLib = smtLib.trim();
     if (smtLib.startsWith("(declare-fun ")) {
       String[] parts = smtLib.substring(12, smtLib.length() - 1).split(" ");

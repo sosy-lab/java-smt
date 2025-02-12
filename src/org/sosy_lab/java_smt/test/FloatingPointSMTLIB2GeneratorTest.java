@@ -17,7 +17,8 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class FloatingPointSMTLIB2GeneratorTest
+    extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -55,7 +56,8 @@ public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0.Paramete
     FloatingPointFormula c = fpmgr.makeVariable("c",
         FormulaType.getSinglePrecisionFloatingPointType());
     BooleanFormula assign1 = fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0,
-        FloatingPointType.getSinglePrecisionFloatingPointType(), FloatingPointRoundingMode.TOWARD_ZERO));
+        FloatingPointType.getSinglePrecisionFloatingPointType(),
+        FloatingPointRoundingMode.TOWARD_ZERO));
     BooleanFormula assign2 = fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(15.0,
         FormulaType.getSinglePrecisionFloatingPointType()));
     BooleanFormula assign3 = fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(25.0,

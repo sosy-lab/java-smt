@@ -128,10 +128,9 @@ public class SolverLessFloatingPointFormulaManager extends
     int signBit;
     int exponentBits;
     int mantissaBits;
-
     if (exponentSize == 8 && mantissaSize == 23) {
       int bits = Float.floatToRawIntBits((float) value);
-      signBit = (bits >>> 31) & 1;
+      signBit = (bits >>> 31) & 1; //fill it with zros from the left until only the 1 or 0 is left
       exponentBits = (bits >>> mantissaSize) & ((1 << exponentSize) - 1);
       mantissaBits = bits & ((1 << mantissaSize) - 1);
     } else if (exponentSize == 11 && mantissaSize == 52) {

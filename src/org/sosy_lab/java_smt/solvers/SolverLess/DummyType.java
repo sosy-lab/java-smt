@@ -23,6 +23,9 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 
 public class DummyType {
+  /**
+   * This class ensures Type-safety for DummyFormulas.
+   */
   private int bitvectorLength;
   private int exponent;
   private int mantissa;
@@ -82,31 +85,6 @@ public class DummyType {
     RATIONAL,
     BOOLEAN,
     FLOATINGPOINTROUNDINGMODE
-  }
-
-  public String parseToSMTLIBFormulaType() {
-    switch (this.myType) {
-      case REGEX:
-        return "Regex";
-      case STRING:
-        return "String";
-      case FLOATING_POINT:
-        return "(_ FloatingPoint ";
-      case INTEGER:
-        return "Int";
-      case BITVECTOR:
-        return "(_ BitVec ";
-      case ARRAY:
-        return "Array";
-      case RATIONAL:
-        return "Real";
-      case BOOLEAN:
-        return "Bool";
-      case FLOATINGPOINTROUNDINGMODE:
-        return roundingMode.giveSMTLIBFormat();
-      default:
-        throw new UnsupportedOperationException("Unsupported formula type");
-    }
   }
 
   public boolean isFloatingPoint() {

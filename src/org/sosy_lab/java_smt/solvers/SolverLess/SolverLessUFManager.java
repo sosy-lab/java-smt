@@ -7,8 +7,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractUFManager;
 public class SolverLessUFManager
     extends AbstractUFManager<DummyFormula, DummyFunction, DummyType, DummyEnv> {
 
-  private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
-
   protected SolverLessUFManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
