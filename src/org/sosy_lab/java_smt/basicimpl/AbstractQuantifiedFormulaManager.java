@@ -51,7 +51,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws UnsupportedOperationException {
     throw new UnsupportedOperationException();
   }
-  ;
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
       throws SolverException, InterruptedException;
