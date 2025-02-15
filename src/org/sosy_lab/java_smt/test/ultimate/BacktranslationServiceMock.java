@@ -44,6 +44,7 @@ final class BacktranslationServiceMock implements IBacktranslationService {
     // does nothing
   }
 
+  @SuppressWarnings("TypeParameterUnusedInFormals")
   @Override
   public <SE, TE> TE translateExpression(
       final SE expression, final Class<SE> sourceExpressionClass) {

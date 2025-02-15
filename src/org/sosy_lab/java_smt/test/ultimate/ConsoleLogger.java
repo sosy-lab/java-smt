@@ -49,21 +49,25 @@ public final class ConsoleLogger implements ILogger {
     setLevel(level);
   }
 
+  @SuppressWarnings("EnumOrdinal")
   @Override
   public void fatal(final Object msg, final Throwable t) {
     mLevelToFunction[LogLevel.FATAL.ordinal()].log(msg, t);
   }
 
+  @SuppressWarnings("EnumOrdinal")
   @Override
   public void error(final Object msg, final Throwable t) {
     mLevelToFunction[LogLevel.ERROR.ordinal()].log(msg, t);
   }
 
+  @SuppressWarnings("EnumOrdinal")
   @Override
   public void log(final LogLevel level, final String msg) {
     mLevelToFunction[level.ordinal()].log(msg);
   }
 
+  @SuppressWarnings("EnumOrdinal")
   @Override
   public void setLevel(final LogLevel level) {
     mLevel = level;

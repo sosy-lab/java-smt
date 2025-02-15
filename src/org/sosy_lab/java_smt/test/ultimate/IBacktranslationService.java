@@ -43,19 +43,20 @@ interface IBacktranslationService {
    * Add a new translator to the backtranslation service. It has to be type-compatible with the
    * existing ones!
    *
-   * @param translator
+   * @param translator translator
    */
   <STE, TTE, SE, TE, SVL, TVL> void addTranslator(
       ITranslator<STE, TTE, SE, TE, SVL, TVL> translator);
 
+  @SuppressWarnings("TypeParameterUnusedInFormals")
   <SE, TE> TE translateExpression(SE expression, Class<SE> sourceExpressionClass);
 
   /**
    * Translate an expression from the output type to a String.
    *
-   * @param expression
-   * @param clazz
-   * @return
+   * @param expression the expression
+   * @param clazz the class
+   * @return translated expression
    */
   <SE> String translateExpressionToString(SE expression, Class<SE> clazz);
 

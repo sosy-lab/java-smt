@@ -47,8 +47,8 @@ import java.util.Collections;
  * This class mocks {@link IProgramExecution}. It can be used in JUnit tests.
  *
  * @author Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
- * @param <TE>
- * @param <E>
+ * @param <TE> TraceElementClazz
+ * @param <E> ExprClazz
  */
 final class ProgramExecutionMock<TE, E> implements IProgramExecution<TE, E> {
 

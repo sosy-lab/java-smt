@@ -66,10 +66,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 
+  @Override
   public ProverOptions getOption() {
     return option;
   }
 
+  @Override
   public void setOption(ProverOptions opt) {
     option = opt;
   }
