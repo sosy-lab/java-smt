@@ -37,10 +37,12 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
+import org.sosy_lab.java_smt.ResolutionProofDAG;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -211,6 +213,26 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
     return builder.buildOrThrow();
+  }
+
+  @Override
+  public <R> ProofDAG<R> getProof() {
+    checkState(!closed);
+    checkGenerateProofs();
+    final Term proof;
+    try {
+      proof = env.getProof();
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException("Cannot get proof from satisfiable environment", e);
+      } else {
+        throw e;
+      }
+    }
+
+    ResolutionProofDAG<R> proofDag = new ResolutionProofDAG<>();
+    //convertToResolutionProof(proof, proofDag, creator);
+    return proofDag;
   }
 
   @Override

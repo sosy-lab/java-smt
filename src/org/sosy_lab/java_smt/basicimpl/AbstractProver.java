@@ -33,6 +33,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
+  private final boolean generateProofs;
   protected final boolean enableSL;
   protected boolean closed = false;
 
@@ -53,6 +54,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    generateProofs = pOptions.contains(ProverOptions.GENERATE_PROOFS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -75,6 +77,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+  }
+
+  protected final void checkGenerateProofs() {
+    Preconditions.checkState(generateProofs, TEMPLATE, ProverOptions.GENERATE_PROOFS);
   }
 
   protected final void checkEnableSeparationLogic() {
