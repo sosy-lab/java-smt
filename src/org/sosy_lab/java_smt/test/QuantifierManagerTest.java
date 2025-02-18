@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.Tactic;
@@ -1125,14 +1126,27 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void testSolverIndependentQuantifierEliminationWithUltimateEliminator()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireArrays();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     // forall var (var = select(store(arr, 2, "bla"), 2)
     // ∀a.select(a, k) = select(a, i)
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
+    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
     ArrayFormula<IntegerFormula, IntegerFormula> var =
         amgr.makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
     BooleanFormula query = qmgr.forall(var, imgr.equal(amgr.select(var, k), amgr.select(var, i)));
+    query = qmgr.eliminateQuantifiers(query);
 
     assertThatFormula(query).isEquivalentTo(imgr.equal(k, i));
   }

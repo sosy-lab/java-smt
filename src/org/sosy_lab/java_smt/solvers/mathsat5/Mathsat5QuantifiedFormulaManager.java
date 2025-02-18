@@ -11,9 +11,11 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_existentially_quantify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 
+import com.google.common.primitives.Longs;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.lib.modelcheckerutils.smt.UltimateEliminator;
@@ -21,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Logics;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
@@ -89,16 +92,23 @@ public class Mathsat5QuantifiedFormulaManager
 
     long quantifiedFormula;
 
+    List<Long> boundVars = new ArrayList<Long>();
+    Long substBody = pBody;
+
+    for (Long var : pVars) {
+      Long boundCopy = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
+      boundVars.add(boundCopy);
+
+      substBody =
+          msat_apply_substitution(solver, substBody, 1, new long[] {var}, new long[] {boundCopy});
+    }
+    // TODO create terms with bound variables
     if (pQ == Quantifier.EXISTS) {
-      // ue.getTheory().exists(msat_to_smtlib2(solver,pVars),msat_to_smtlib2(solver,pBody));
-      quantifiedFormula =
-          msat_existentially_quantify(
-              solver, pBody, pVars.stream().mapToLong(Long::longValue).toArray());
+      quantifiedFormula = msat_existentially_quantify(solver, substBody, Longs.toArray(boundVars));
     } else {
-      long negatedFormula = msat_make_not(solver, pBody);
+      long negatedFormula = msat_make_not(solver, substBody);
       long existentiallyQuantified =
-          msat_existentially_quantify(
-              solver, negatedFormula, pVars.stream().mapToLong(Long::longValue).toArray());
+          msat_existentially_quantify(solver, negatedFormula, Longs.toArray(boundVars));
       quantifiedFormula = msat_make_not(solver, existentiallyQuantified);
     }
     return quantifiedFormula;

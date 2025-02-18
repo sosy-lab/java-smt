@@ -710,6 +710,9 @@ final class Mathsat5NativeApi {
 
   public static native String msat_to_smtlib2(long e, long t);
 
+  // TODO: added but does not work due to java.lang.UnsatisfiedLinkError
+  public static native String msat_to_smtlib2_ext(long e, long t, String name, long u);
+
   public static native String msat_to_smtlib2_term(long e, long t);
 
   public static native String msat_named_list_to_smtlib2(long e, NamedTermsWrapper w);
