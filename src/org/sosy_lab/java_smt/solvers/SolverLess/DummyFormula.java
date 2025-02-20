@@ -20,10 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractBitvectorLengthFromString;
-import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractExponentFromString;
-import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractMantissaFromString;
-
 
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -36,7 +32,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
-public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
+
+@SuppressWarnings("rawtypes")
+public class DummyFormula implements Formula,
+                                                                           BitvectorFormula,
+                                                      FloatingPointFormula,
                                      ArrayFormula,
                                      NumeralFormula, BooleanFormula,
                                      IntegerFormula
@@ -216,10 +216,10 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
         case "REG":
           return new DummyFormula(new DummyType(Type.REGEX));
         case "BIT":
-          return new DummyFormula(new DummyType(extractBitvectorLengthFromString(input)));
+          return new DummyFormula(new DummyType(SolverLessFormulaCreator.extractBitvectorLengthFromString(input)));
         case "FLO":
-          return new DummyFormula(new DummyType(extractExponentFromString(input),
-              extractMantissaFromString(input)));
+          return new DummyFormula(new DummyType(SolverLessFormulaCreator.extractExponentFromString(input),
+              SolverLessFormulaCreator.extractMantissaFromString(input)));
         default:
           throw new IllegalArgumentException("Unsupported type: " + input);
       }

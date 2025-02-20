@@ -21,7 +21,7 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-
+@SuppressWarnings({"overrides"})
 public class DummyType {
   /**
    * This class ensures Type-safety for DummyFormulas.

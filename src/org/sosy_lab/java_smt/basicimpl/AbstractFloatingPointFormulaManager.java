@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
@@ -183,7 +182,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
-    checkVariableName(pVar);
+    AbstractFormulaManager.checkVariableName(pVar);
     FloatingPointFormula result = wrap(makeVariableImpl(pVar, pType));
     if(Generator.isLoggingEnabled()){
       FloatingPointGenerator.logMakeFloatingPointVariable(result, pType, pVar);
