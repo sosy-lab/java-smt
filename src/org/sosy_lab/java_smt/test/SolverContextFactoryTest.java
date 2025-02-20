@@ -41,7 +41,7 @@ public class SolverContextFactoryTest {
 
   private static final String OS =
       StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.getDefault()).replace(" ", "");
-  private static final boolean IS_WINDOWS = OS.startsWith("windows");
+  protected static final boolean IS_WINDOWS = OS.startsWith("windows");
   private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
 
