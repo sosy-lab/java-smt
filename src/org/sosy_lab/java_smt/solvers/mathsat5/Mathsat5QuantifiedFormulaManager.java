@@ -12,10 +12,10 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_existentially_quantify;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_and;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exists;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_forall;
 
-import com.google.common.primitives.Longs;
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
 import de.uni_freiburg.informatik.ultimate.lib.modelcheckerutils.smt.UltimateEliminator;
@@ -90,26 +90,37 @@ public class Mathsat5QuantifiedFormulaManager
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
     checkArgument(!pVars.isEmpty(), "List of quantified variables can not be empty");
 
-    long quantifiedFormula;
+    long quantifiedFormula = 0L;
 
-    List<Long> boundVars = new ArrayList<Long>();
-    Long substBody = pBody;
-
+    List<Long> boundVars = new ArrayList<>();
+    long substBody = pBody;
     for (Long var : pVars) {
-      Long boundCopy = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
+      long boundCopy = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
       boundVars.add(boundCopy);
+      // TODO substitution through FormulaManager not working due to problem with the datatypes
+      //Map<Long, Long> substitutionMap = new HashMap<>();
+      //substitutionMap.put(var, boundCopy);
+      //Long substituted = fmgr.get().substitute(pBody, substitutionMap);
 
       substBody =
           msat_apply_substitution(solver, substBody, 1, new long[] {var}, new long[] {boundCopy});
     }
-    // TODO create terms with bound variables
     if (pQ == Quantifier.EXISTS) {
-      quantifiedFormula = msat_existentially_quantify(solver, substBody, Longs.toArray(boundVars));
+      quantifiedFormula = msat_make_exists(solver, boundVars.get(0), substBody);
+      for (int i = 1; i < boundVars.size(); i++) {
+        quantifiedFormula =
+            msat_make_and(
+                solver, quantifiedFormula, msat_make_exists(solver, boundVars.get(i), substBody));
+      }
     } else {
-      long negatedFormula = msat_make_not(solver, substBody);
-      long existentiallyQuantified =
-          msat_existentially_quantify(solver, negatedFormula, Longs.toArray(boundVars));
-      quantifiedFormula = msat_make_not(solver, existentiallyQuantified);
+      for (Long var : boundVars) {
+        quantifiedFormula = msat_make_forall(solver, var, substBody);
+        for (int i = 1; i < boundVars.size(); i++) {
+          quantifiedFormula =
+              msat_make_and(
+                  solver, quantifiedFormula, msat_make_forall(solver, boundVars.get(i), substBody));
+        }
+      }
     }
     return quantifiedFormula;
   }
