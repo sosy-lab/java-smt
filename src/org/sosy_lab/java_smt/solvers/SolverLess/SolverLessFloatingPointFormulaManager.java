@@ -48,12 +48,12 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula makeNumberImpl(
-      double n,
-      FloatingPointType type,
+      double pN,
+      FloatingPointType pType,
       DummyFormula pFloatingPointRoundingMode) {
-    String binaryRepresentation = convertToSMTLibBinary(n, type);
-    DummyFormula formula = new DummyFormula(new DummyType(type.getExponentSize(),
-        type.getMantissaSize(), pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
+    String binaryRepresentation = convertToSMTLibBinary(pN, pType);
+    DummyFormula formula = new DummyFormula(new DummyType(pType.getExponentSize(),
+        pType.getMantissaSize(), pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
     formula.setRepresentation(binaryRepresentation);
     return formula;
   }

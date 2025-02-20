@@ -16,7 +16,7 @@ public enum FloatingPointRoundingMode {
   TOWARD_NEGATIVE,
   TOWARD_ZERO;
 
-  public String giveSMTLIBFormat() {
+  public String getSMTLIBFormat() {
     switch (this) {
       case NEAREST_TIES_TO_EVEN:
         return "RNE";

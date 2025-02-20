@@ -31,19 +31,20 @@ import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class StringGenerator {
 
-  private StringGenerator() {}
+  private StringGenerator() {
+  }
 
   protected static void logMakeString(Object result, String value) {
     List<Object> params = new ArrayList<>();
     params.add(value);
     String format = "\"%s\"";
-    Function<List<Object>, String> functionToString = inputs -> String.format(format, inputs.toArray());
-    FunctionEnvironment newEntry = new  FunctionEnvironment(result, params, functionToString,
+    Function<List<Object>, String> functionToString =
+        inputs -> String.format(format, inputs.toArray());
+    FunctionEnvironment newEntry = new FunctionEnvironment(result, params, functionToString,
         Keyword.SKIP);
     Generator.getExecutedAggregator().add(
         newEntry
     );
-
   }
 
   protected static void logMakeVariable(Object result, String pVar) {
@@ -69,11 +70,17 @@ public class StringGenerator {
     logBinaryOp(result, "=", str1, str2);
   }
 
-  protected static void logGreaterThan(BooleanFormula result, StringFormula str1, StringFormula str2) {
+  protected static void logGreaterThan(
+      BooleanFormula result,
+      StringFormula str1,
+      StringFormula str2) {
     logBinaryOp(result, "str.gt", str1, str2);
   }
 
-  protected static void logGreaterOrEquals(BooleanFormula result, StringFormula str1, StringFormula str2) {
+  protected static void logGreaterOrEquals(
+      BooleanFormula result,
+      StringFormula str1,
+      StringFormula str2) {
     logBinaryOp(result, "str.ge", str1, str2);
   }
 
@@ -81,7 +88,10 @@ public class StringGenerator {
     logBinaryOp(result, "str.lt", str1, str2);
   }
 
-  protected static void logLessOrEquals(BooleanFormula result, StringFormula str1, StringFormula str2) {
+  protected static void logLessOrEquals(
+      BooleanFormula result,
+      StringFormula str1,
+      StringFormula str2) {
     logBinaryOp(result, "str.le", str1, str2);
   }
 
@@ -102,12 +112,18 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.range %s %s)", Keyword.SKIP);
   }
 
-  protected static void logRegexUnion(RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
+  protected static void logRegexUnion(
+      RegexFormula result,
+      RegexFormula regex1,
+      RegexFormula regex2) {
     List<Object> inputParams = List.of(regex1, regex2);
     logOperation(result, inputParams, "(re.union %s %s)", Keyword.SKIP);
   }
 
-  protected static void logRegexIntersection(RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
+  protected static void logRegexIntersection(
+      RegexFormula result,
+      RegexFormula regex1,
+      RegexFormula regex2) {
     List<Object> inputParams = List.of(regex1, regex2);
     logOperation(result, inputParams, "(re.inter %s %s)", Keyword.SKIP);
   }
@@ -122,13 +138,20 @@ public class StringGenerator {
     logOperation(result, inputParams, "(re.complement %s)", Keyword.SKIP);
   }
 
-  protected static void logRegexDifference(RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
+  protected static void logRegexDifference(
+      RegexFormula result,
+      RegexFormula regex1,
+      RegexFormula regex2) {
     List<Object> inputParams = List.of(regex1, regex2);
     logOperation(result, inputParams, "(re.diff %s %s)", Keyword.SKIP);
   }
 
 
-  protected static void logIndexOf(IntegerFormula result, StringFormula str, StringFormula part, IntegerFormula startIndex) {
+  protected static void logIndexOf(
+      IntegerFormula result,
+      StringFormula str,
+      StringFormula part,
+      IntegerFormula startIndex) {
     List<Object> inputParams = List.of(str, part, startIndex);
     logOperation(result, inputParams, "(str.indexof %s %s %s)", Keyword.SKIP);
   }
@@ -138,21 +161,34 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.at %s %s)", Keyword.SKIP);
   }
 
-  protected static void logSubstring(Object result, StringFormula str, IntegerFormula index, IntegerFormula length) {
+  protected static void logSubstring(
+      Object result,
+      StringFormula str,
+      IntegerFormula index,
+      IntegerFormula length) {
     List<Object> inputParams = List.of(str, index, length);
     logOperation(result, inputParams, "(str.substr %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logReplace(Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
+  protected static void logReplace(
+      Object result,
+      StringFormula fullStr,
+      StringFormula target,
+      StringFormula replacement) {
     List<Object> inputParams = List.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replace %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logReplaceAll(Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
+  protected static void logReplaceAll(
+      Object result,
+      StringFormula fullStr,
+      StringFormula target,
+      StringFormula replacement) {
     List<Object> inputParams = List.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
 
   }
+
   protected static void logMakeRegex(RegexFormula result, String value) {
     List<Object> inputParams = List.of(value);
     logOperation(result, inputParams, "(re.from_str \"%s\")", Keyword.SKIP);
@@ -213,7 +249,11 @@ public class StringGenerator {
   }
 
 
-  private static void logOperation(Object result, List<Object> params, String format, Keyword keyword) {
+  private static void logOperation(
+      Object result,
+      List<Object> params,
+      String format,
+      Keyword keyword) {
     long placeholders = format.chars().filter(ch -> ch == '%').count();
     if (params.size() != placeholders) {
       throw new IllegalArgumentException(
@@ -221,7 +261,8 @@ public class StringGenerator {
               placeholders, params.size(), format));
     }
 
-    Function<List<Object>, String> functionToString = inputs -> String.format(format, inputs.toArray());
+    Function<List<Object>, String> functionToString =
+        inputs -> String.format(format, inputs.toArray());
     Generator.getExecutedAggregator().add(
         new FunctionEnvironment(result, params, functionToString, keyword)
     );

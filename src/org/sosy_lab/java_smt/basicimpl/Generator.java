@@ -14,10 +14,8 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.Key;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -177,9 +175,9 @@ public class Generator {
             "(declare-const "
             + variable.inputParams.get(0)
             + " (_ FloatingPoint "
-            + variable.exponent
+            + variable.floatingPointExponent
             + " "
-            + variable.mantissa
+            + variable.floatingPointMantissa
             + "))\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);

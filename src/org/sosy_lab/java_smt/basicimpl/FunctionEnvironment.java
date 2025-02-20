@@ -21,8 +21,8 @@ public class FunctionEnvironment {
   Function<List<Object>, String> functionToString;
   Keyword expressionType;
   int bitVecLength;
-  int mantissa;
-  int exponent;
+  int floatingPointMantissa;
+  int floatingPointExponent;
   String ufName = "";
   String ufInputType = "";
   String ufOutputType = "";

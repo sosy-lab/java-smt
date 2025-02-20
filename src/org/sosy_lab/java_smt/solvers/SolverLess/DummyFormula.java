@@ -24,7 +24,7 @@ import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.
 import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractExponentFromString;
 import static org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFormulaCreator.extractMantissaFromString;
 
-import java.util.Objects;
+
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,7 +37,9 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFormula,
-                                     ArrayFormula, NumeralFormula, BooleanFormula, IntegerFormula
+                                     ArrayFormula,
+                                     NumeralFormula, BooleanFormula,
+                                     IntegerFormula
     , RationalFormula {
   private String name ="unnamed";
   private DummyFormula firstArrayParameter = null;
@@ -82,12 +84,12 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
 
 
   public DummyFormula(
-      DummyFormula pfirstArrayParameter,
-      DummyFormula psecondArrayParameter) { //if it represents an array
+      DummyFormula pFirstArrayParameter,
+      DummyFormula pSecondArrayParameter) { //if it represents an array
     representation = "";
-    formulaType = new DummyType(pfirstArrayParameter.getFormulaType().myType, psecondArrayParameter.getFormulaType().myType);
-    firstArrayParameter = pfirstArrayParameter;
-    secondArrayParameter = psecondArrayParameter;
+    formulaType = new DummyType(pFirstArrayParameter.getFormulaType().myType, pSecondArrayParameter.getFormulaType().myType);
+    firstArrayParameter = pFirstArrayParameter;
+    secondArrayParameter = pSecondArrayParameter;
     updateRepresentation();
   }
 
@@ -175,7 +177,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   /**
    * This is the reverse Method to be used in the FormulaCreator. It extracts the indexElement
    * and the Element types from the string to create a matching ArrayFormula
-   * @param input String in the from Array<IndexElement, Element>
+   * @param input String in the Array<IndexElement, Element>
    * @return DummyFormula representing the Array without values.
    */
   public static DummyFormula createDummyFormulaArrayFromString(String input) {
@@ -230,7 +232,7 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
   /**
    * Internal helper Method which is needed to determine at which index the "," is in order
    * to correctly extract the index and the element types
-   * @param content String in the internal array represenation
+   * @param content String in the internal array representation
    * @return index of the "," otherwise -1
    */
   private static int findTopLevelCommaIndex(String content) {
@@ -253,7 +255,6 @@ public class DummyFormula implements Formula, BitvectorFormula, FloatingPointFor
    * to extract the information and create a matching DummyFormula from the representation-string
    * This is necessary as the Bitvector, FloatingPoint and Array FormulaTypes need more information
    * as just the FormulaType.
-   *
    * The Values are represented too.
    */
   private void updateRepresentation() {

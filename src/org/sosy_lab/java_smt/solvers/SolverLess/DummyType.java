@@ -177,7 +177,7 @@ public class DummyType {
       return "Array<" + getArrayIndexType() + ", " + getArrayElementType() + ">";
     }
     if (isFloatingPointRoundingMode()) {
-      return getRoundingMode().giveSMTLIBFormat();
+      return getRoundingMode().getSMTLIBFormat();
     }
 
     return myType.toString();
