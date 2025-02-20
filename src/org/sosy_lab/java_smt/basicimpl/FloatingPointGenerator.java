@@ -390,7 +390,7 @@ public class FloatingPointGenerator {
   private static Function<List<Object>, String> getListStringFunctionForCast(
       Formula number,
       List<Object> inputParams) {
-    if(inputParams.get(1) instanceof String){
+    if(inputParams.size() == 4) {
       Function<List<Object>, String> functionToString;
       if (number instanceof BitvectorFormula) {
         functionToString = inPlaceInputParams ->
@@ -411,7 +411,7 @@ public class FloatingPointGenerator {
                 + inPlaceInputParams.get(0) + ")";
       } else {
         functionToString = inPlaceInputParams ->
-            "((_ to_fp " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ")"
+            "((_ to_fp " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ") "
                 + inPlaceInputParams.get(0) + ")";
       }
       return functionToString;

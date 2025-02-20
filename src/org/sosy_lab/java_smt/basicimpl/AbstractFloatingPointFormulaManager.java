@@ -171,9 +171,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected static boolean isNegativeZero(Double pN) {
     Preconditions.checkNotNull(pN);
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("SMTLIB2 does not support isNegativeZero");
-    }
     return Double.valueOf("-0.0").equals(pN);
   }
 
