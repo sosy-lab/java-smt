@@ -21,7 +21,7 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-@SuppressWarnings({"overrides"})
+@SuppressWarnings({"all","overrides"})
 public class DummyType {
   /**
    * This class ensures Type-safety for DummyFormulas.
@@ -39,14 +39,14 @@ public class DummyType {
     this.myType = Type.BITVECTOR;
   }
 
-  public DummyType(Type MyType) {
-    if (MyType == Type.FLOATING_POINT || MyType == Type.ARRAY || MyType == Type.BITVECTOR
-        || MyType == Type.FLOATINGPOINTROUNDINGMODE) {
+  public DummyType(Type pType) {
+    if (pType == Type.FLOATING_POINT || pType == Type.ARRAY || pType == Type.BITVECTOR
+        || pType == Type.FLOATINGPOINTROUNDINGMODE) {
       throw new UnsupportedOperationException(
           "Floating point, RoundModes, array types and Bitvectors need more "
               + "information");
     }
-    this.myType = MyType;
+    this.myType = pType;
   }
 
   public DummyType(FloatingPointRoundingMode roundingMode) {

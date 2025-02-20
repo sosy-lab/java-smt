@@ -16,7 +16,7 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-
+@SuppressWarnings({"all"})
 public class FloatingPointSMTLIB2GeneratorTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 

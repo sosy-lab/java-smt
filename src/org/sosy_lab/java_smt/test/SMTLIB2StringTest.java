@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import scala.Int;
-
+@SuppressWarnings({"all"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test

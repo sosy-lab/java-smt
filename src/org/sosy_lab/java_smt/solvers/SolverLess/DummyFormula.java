@@ -33,7 +33,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({"all","rawtypes"})
+
 public class DummyFormula implements Formula,
                                                                            BitvectorFormula,
                                                       FloatingPointFormula,
@@ -67,7 +68,7 @@ public class DummyFormula implements Formula,
 
 
   public DummyFormula(boolean value) {
-    formulaType = new DummyType(Type.BOOLEAN);
+    formulaType = new DummyType(DummyType.Type.BOOLEAN);
     this.value = String.valueOf(value);
     updateRepresentation();
   }
