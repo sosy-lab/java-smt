@@ -23,18 +23,12 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import java.io.IOException;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.RegexFormula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -47,8 +41,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void testMakeStringVariable()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+  public void testMakeStringVariable(){
     requireStrings();
     StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
     StringFormula test = Objects.requireNonNull(smgr).makeVariable("test");

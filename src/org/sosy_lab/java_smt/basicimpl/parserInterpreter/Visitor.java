@@ -32,7 +32,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
@@ -67,8 +66,6 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_let
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_qual_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Term_spec_constContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser.Var_bindingContext;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 import scala.Tuple2;
 
 /**
@@ -285,11 +282,10 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * This method detects all allowed ways to declare a floating-point in smt2. It extracts the
    * exponent and mantissa (in case of bitvectors the significant too) and creates a
    * ParserFormula Object with the give information.
-   * @param fpmgr FloatingPointManager declared in the class
    * @param operand String from the tree branch (ANTLR)
    * @return ParserFormula Object containing the Floating-Point
    */
-  private ParserFormula createParserFormulaForFP(FloatingPointFormulaManager fpmgr,
+  private ParserFormula createParserFormulaForFP(
                                                  String operand) {
     if (beginningMatchesList(operand, getAllAllowedFPBeginningsWithInts())) {
       try {
@@ -297,7 +293,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         int exponent = Integer.parseInt(parts[2]);
         int mantissa = Integer.parseInt(parts[3].replace(")", ""));
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
-            FloatingPointType.getFloatingPointType(exponent, mantissa)));
+            FormulaType.getFloatingPointType(exponent, mantissa)));
       } catch (Exception e) {
         throw new ParserException("Invalid FloatingPoint format: " + operand, e);
       }
@@ -308,21 +304,21 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
         int exponent = 5;
         int mantissa = 11;
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
-            FloatingPointType.getFloatingPointType(exponent, mantissa)));
+            FormulaType.getFloatingPointType(exponent, mantissa)));
       }
       else if (operand.startsWith("(Float32")) {
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
-            FloatingPointType.getSinglePrecisionFloatingPointType()));
+            FormulaType.getSinglePrecisionFloatingPointType()));
       }
       else if (operand.startsWith("(Float64")) {
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
-            FloatingPointType.getDoublePrecisionFloatingPointType()));
+            FormulaType.getDoublePrecisionFloatingPointType()));
       }
       else if (operand.startsWith("(Float128")) {
         int exponent = 15;
         int mantissa = 113;
         return new ParserFormula(Objects.requireNonNull(fpmgr).makeNumber(operand,
-            FloatingPointType.getFloatingPointType(exponent, mantissa)));
+            FormulaType.getFloatingPointType(exponent, mantissa)));
       }
       else if (operand.startsWith("(fp")) {
         try {
@@ -343,7 +339,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
 
           FloatingPointFormula fpFormula = fpmgr.fromIeeeBitvector(
               bimgr.concat(signFormula, bimgr.concat(exponentFormula, mantissaFormula)),
-              FloatingPointType.getFloatingPointType(getBitVecSize(exponentPart), getBitVecSize(mantissaPart))
+              FormulaType.getFloatingPointType(getBitVecSize(exponentPart), getBitVecSize(mantissaPart))
           );
 
           return new ParserFormula(fpFormula);
@@ -369,7 +365,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
           int exponent = Integer.parseInt(exponentPart);
           BigDecimal finalValue = mantissa.multiply(BigDecimal.valueOf(Math.pow(2, exponent)));
 
-          FloatingPointFormula fpFormula = fpmgr.makeNumber(finalValue, FloatingPointType.getDoublePrecisionFloatingPointType());
+          FloatingPointFormula fpFormula = fpmgr.makeNumber(finalValue,
+              FormulaType.getDoublePrecisionFloatingPointType());
           return new ParserFormula(fpFormula);
 
         } catch (Exception e) {
@@ -552,7 +549,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
       return variables.get(operand).javaSmt;
     }
     else if (beginningMatchesList(operand, getAllAllowedFPBeginnigs())) {
-      variables.put(operand, createParserFormulaForFP(Objects.requireNonNull(fpmgr), operand));
+      variables.put(operand, createParserFormulaForFP( operand));
       return variables.get(operand).javaSmt;
     }
     else if (operand.startsWith("\"")){

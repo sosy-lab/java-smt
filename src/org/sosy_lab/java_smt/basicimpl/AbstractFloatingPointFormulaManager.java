@@ -75,7 +75,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     FloatingPointFormula result = wrap(makeNumberImpl(pN.toString(), pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN.toString(), pRoundingMode.getSMTLIBFormat());
+          pType.getMantissaSize(), pN.toString());
     }
     return result;
   }
@@ -95,7 +95,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN), pRoundingMode.getSMTLIBFormat());
+          pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -119,7 +119,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN), pRoundingMode.getSMTLIBFormat());
+          pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -145,7 +145,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN, pRoundingMode.getSMTLIBFormat());
+          pType.getMantissaSize(), pN);
     }
     return result;
   }
@@ -171,9 +171,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected static boolean isNegativeZero(Double pN) {
     Preconditions.checkNotNull(pN);
-    if(Generator.isLoggingEnabled()){
-      throw new GeneratorException("SMTLIB2 does not support isNegativeZero");
-    }
     return Double.valueOf("-0.0").equals(pN);
   }
 

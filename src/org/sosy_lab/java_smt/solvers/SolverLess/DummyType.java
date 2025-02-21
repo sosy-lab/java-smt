@@ -209,4 +209,28 @@ public class DummyType {
     }
     return false;
   }
+  @Override
+  public int hashCode() {
+    int result = myType.hashCode();
+    switch (myType) {
+      case BITVECTOR:
+        result = 31 * result + bitvectorLength;
+        break;
+      case FLOATINGPOINTROUNDINGMODE:
+        result = 31 * result + (roundingMode != null ? roundingMode.hashCode() : 0);
+        break;
+      case FLOATING_POINT:
+        result = 31 * result + exponent;
+        result = 31 * result + mantissa;
+        break;
+      case ARRAY:
+        result = 31 * result + (arrayIndexType != null ? arrayIndexType.hashCode() : 0);
+        result = 31 * result + (arrayElementType != null ? arrayElementType.hashCode() : 0);
+        break;
+      default:
+        break;
+    }
+    return result;
+  }
+
 }

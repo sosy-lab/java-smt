@@ -25,7 +25,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
     DummyType, DummyEnv, DummyFunction> {
@@ -72,6 +71,6 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 }

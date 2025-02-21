@@ -30,11 +30,10 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 
-@SuppressWarnings({"all","rawtypes"})
-
+@SuppressWarnings({"StringCaseLocaleUsage","rawtypes","Immutable"})
+//@Immutable
 public class DummyFormula implements Formula,
                                                                            BitvectorFormula,
                                                       FloatingPointFormula,
@@ -127,7 +126,7 @@ public class DummyFormula implements Formula,
       int size = bitvectorType.getSize();
       return new DummyFormula(size);
     } else if (pType.isBooleanType()) {
-      return new DummyFormula(new DummyType(Type.BOOLEAN));
+      return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
     } else if (pType.isFloatingPointType()) {
       FormulaType.FloatingPointType floatingPointType = (FormulaType.FloatingPointType) pType;
       int exponentSize = floatingPointType.getExponentSize();
@@ -135,14 +134,14 @@ public class DummyFormula implements Formula,
       return new DummyFormula(exponentSize, mantissaSize);
     } else if (pType.isNumeralType()) {
       if (pType.isIntegerType()) {
-        return new DummyFormula(new DummyType(Type.INTEGER));
+        return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
       } else if (pType.isRationalType()) {
-        return new DummyFormula(new DummyType(Type.RATIONAL));
+        return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
       }
     } else if (pType.isStringType()) {
-      return new DummyFormula(new DummyType(Type.STRING));
+      return new DummyFormula(new DummyType(DummyType.Type.STRING));
     } else if (pType.isRegexType()) {
-      return new DummyFormula(new DummyType(Type.REGEX));
+      return new DummyFormula(new DummyType(DummyType.Type.REGEX));
     } else {
       throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
     }
@@ -207,15 +206,15 @@ public class DummyFormula implements Formula,
       String convertedType = input.toUpperCase();
       switch (convertedType.substring(0,3)) {
         case "INT":
-          return new DummyFormula(new DummyType(Type.INTEGER));
+          return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
         case "RAT":
-          return new DummyFormula(new DummyType(Type.RATIONAL));
+          return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
         case "BOO":
-          return new DummyFormula(new DummyType(Type.BOOLEAN));
+          return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
         case "STR":
-          return new DummyFormula(new DummyType(Type.STRING));
+          return new DummyFormula(new DummyType(DummyType.Type.STRING));
         case "REG":
-          return new DummyFormula(new DummyType(Type.REGEX));
+          return new DummyFormula(new DummyType(DummyType.Type.REGEX));
         case "BIT":
           return new DummyFormula(new DummyType(SolverLessFormulaCreator.extractBitvectorLengthFromString(input)));
         case "FLO":

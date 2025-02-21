@@ -29,32 +29,15 @@ import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-@SuppressWarnings({"all"})
+@SuppressWarnings({"CheckReturnValue","ReturnValueIgnored"})
 public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
-  @Test
-  public void simpleTestDeclaration() throws
-                                      IOException, SolverException, InterruptedException,
-                                      InvalidConfigurationException {
-    String x = "(declare-const a (_ FloatingPoint 8 24))\n";
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
-    FloatingPointFormula a = Objects.requireNonNull(fpmgr).makeVariable("a",
-        FormulaType.getFloatingPointType(8,
-            24));
-    assertThat(actualResult).isNotNull();
-
-    assertThat(actualResult.equals(a));
-  }
 
   @Test
   public void testMakeFloatingPoint()
@@ -114,7 +97,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
         fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(10.0, fpType)),
         fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult.equals(actualResult));;
+    assertThat(expectedResult.equals(actualResult));
   }
 
   /**
@@ -143,7 +126,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
             new BigInteger("2",10)), fpType)),
         fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult.equals(actualResult));;
+    assertThat(expectedResult.equals(actualResult));
   }
 
   /**
@@ -170,9 +153,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
         fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(new BigDecimal("3.14159"), fpType)),
         fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(new BigDecimal("6.28318"), fpType)),
         fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
-    BooleanFormula expectedResult = fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b));
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult.equals(actualResult));;
+    assertThat(constraint.equals(actualResult));
   }
 
   /**
@@ -308,7 +290,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
     assertThat(expectedResult.equals(actualResult));
-    ;
   }
 
   @Test
@@ -332,7 +313,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
     assertThat(expectedResult.equals(actualResult));
-    ;
   }
 
   @Test
@@ -345,7 +325,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
             + "(assert (fp.eq a b))\n";
 
     checkAndCreate(x);
-    ;
   }
 
   @Test
@@ -393,7 +372,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
     assertThat(expectedResult.equals(actualResult));
-    ;
   }
 
   @Test

@@ -9,11 +9,9 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class SolverLessContext extends AbstractSolverContext {
 
-  private final SolverLessFormulaManager manager;
 
   private SolverLessContext(SolverLessFormulaManager pManager) {
     super(pManager);
-    this.manager = pManager;
   }
 
   public static SolverLessContext create() {

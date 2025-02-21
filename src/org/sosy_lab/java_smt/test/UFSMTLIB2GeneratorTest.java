@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;

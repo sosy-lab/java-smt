@@ -12,13 +12,15 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 @SuppressWarnings({"all"})
 public class FloatingPointSMTLIB2GeneratorTest
-    extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+    extends SolverBasedTest0 {
+  @Override
+  protected Solvers solverToUse() {
+    return Solvers.CVC5;
+  }
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -69,7 +71,7 @@ public class FloatingPointSMTLIB2GeneratorTest
         + "(assert (fp.eq b (fp #b0 #b10000010 #b11100000000000000000000)))\n"
         + "(declare-const c (_ FloatingPoint 8 23))\n"
         + "(assert (fp.eq c (fp #b0 #b10000011 #b10010000000000000000000)))\n"
-        + "(assert (fp.eq (fp.add RNE a b) c))\n";
+        + "(assert (fp.eq (fp.add a b) c))\n";
     Generator.assembleConstraint(assign1);
     Generator.assembleConstraint(assign2);
     Generator.assembleConstraint(assign3);
@@ -97,7 +99,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.add RNE a b) result))\n";
+        + "(assert (fp.eq (fp.add a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -121,7 +123,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.sub RNE a b) result))\n";
+        + "(assert (fp.eq (fp.sub a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -145,7 +147,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.div RNE a b) result))\n";
+        + "(assert (fp.eq (fp.div a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -169,7 +171,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const b (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.mul RNE a b) result))\n";
+        + "(assert (fp.eq (fp.mul a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -190,7 +192,7 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.sqrt RNE a) result))\n";
+        + "(assert (fp.eq (fp.sqrt a) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -348,7 +350,7 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
         + "(declare-const castResult (_ BitVec 32))\n"
-        + "(assert (= ((_ fp.to_sbv 32 RNE) a) castResult))\n";
+        + "(assert (= ((_ fp.to_sbv 32) a) castResult))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -368,7 +370,7 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
         + "(declare-const b Bool)\n"
-        + "(assert (fp.eq result ((_ to_fp 8 23) RNE) b)))\n";
+        + "(assert (fp.eq result ((_ to_fp 8 23) b)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -377,7 +379,8 @@ public class FloatingPointSMTLIB2GeneratorTest
   public void testFromIeeeBitvector() {
     requireFloats();
     requireBitvectors();
-    BitvectorFormula bv = bvmgr.makeBitvector(32, new BigInteger("00000000000000000000000000000000",
+    String bvs = "00000000000000000000000000000000";
+    BitvectorFormula bv = bvmgr.makeBitvector(32, new BigInteger(bvs,
         2));
     FloatingPointFormula result = fpmgr.makeVariable("result",
         FloatingPointType.getSinglePrecisionFloatingPointType());

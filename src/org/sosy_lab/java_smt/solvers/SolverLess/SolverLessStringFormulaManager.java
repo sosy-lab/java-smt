@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
 public class SolverLessStringFormulaManager extends AbstractStringFormulaManager<DummyFormula,
     DummyType,
@@ -34,84 +33,84 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
 
   @Override
   protected DummyFormula makeStringImpl(String value) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
   protected DummyFormula makeVariableImpl(String pVar) {
-    DummyFormula result = new DummyFormula(new DummyType(Type.STRING));
+    DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.STRING));
     result.setName(pVar);
     return result;
   }
 
   @Override
   protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula length(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.INTEGER));
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
   protected DummyFormula concatImpl(List<DummyFormula> parts) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
   protected DummyFormula prefix(DummyFormula prefix, DummyFormula str) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula suffix(DummyFormula suffix, DummyFormula str) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula in(DummyFormula str, DummyFormula regex) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula contains(DummyFormula str, DummyFormula part) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula indexOf(DummyFormula str, DummyFormula part, DummyFormula startIndex) {
-    return new DummyFormula(new DummyType(Type.INTEGER));
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
   protected DummyFormula charAt(DummyFormula str, DummyFormula index) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
   protected DummyFormula substring(DummyFormula str, DummyFormula index, DummyFormula length) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
@@ -119,7 +118,7 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
       DummyFormula fullStr,
       DummyFormula target,
       DummyFormula replacement) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
@@ -127,66 +126,66 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
       DummyFormula fullStr,
       DummyFormula target,
       DummyFormula replacement) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
   protected DummyFormula makeRegexImpl(String value) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula noneImpl() {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula allImpl() {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula allCharImpl() {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula range(DummyFormula start, DummyFormula end) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula concatRegexImpl(List<DummyFormula> parts) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula union(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula intersection(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula closure(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula complement(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.REGEX));
+    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
   protected DummyFormula toIntegerFormula(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.INTEGER));
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
   protected DummyFormula toStringFormula(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.STRING));
+    return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 }
