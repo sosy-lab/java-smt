@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -24,7 +25,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverFormulaIODeclarationsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Before
   public void checkThatSolverIsAvailable() {
     requireParser();

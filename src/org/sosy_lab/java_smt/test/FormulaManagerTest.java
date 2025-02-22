@@ -19,6 +19,7 @@ import com.google.common.testing.EqualsTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -30,7 +31,10 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();

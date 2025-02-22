@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> mgr;
   private final BooleanFormulaManager bmgr;
-  private final IntegerFormulaManager imgr;;
+  private final IntegerFormulaManager imgr;
   private final BitvectorFormulaManager bvmgr;
   private final ArrayFormulaManager amgr;
   private final UFManager umgr;

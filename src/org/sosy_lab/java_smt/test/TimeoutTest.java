@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.truth.TruthJUnit;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -29,7 +31,10 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 /** Check that timeout is handled gracefully. */
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final int TIMOUT_MILLISECONDS = 10000;
 
   private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};

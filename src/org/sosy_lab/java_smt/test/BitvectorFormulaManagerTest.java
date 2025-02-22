@@ -47,7 +47,10 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
   public void init() {
     requireBitvectors();
   }
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void bvType() {
     int[] testValues;

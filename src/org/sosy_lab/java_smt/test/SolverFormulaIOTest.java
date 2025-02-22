@@ -21,6 +21,7 @@ import com.google.common.collect.Multiset;
 import com.google.common.truth.TruthJUnit;
 import java.util.List;
 import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -32,6 +33,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"

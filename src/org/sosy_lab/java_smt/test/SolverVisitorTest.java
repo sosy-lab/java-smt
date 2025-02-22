@@ -51,7 +51,10 @@ import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
 

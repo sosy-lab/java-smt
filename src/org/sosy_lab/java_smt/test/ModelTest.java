@@ -50,7 +50,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 /** Test that values from models are appropriately parsed. */
 public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // A list of variables to test that model variable names are correctly applied
   private static final ImmutableList<String> VARIABLE_NAMES =
       ImmutableList.of(

@@ -16,7 +16,6 @@ import org.junit.Test;
 
 /** inherits many tests from {@link VariableNamesTest}. */
 public class VariableNamesEscaperTest extends VariableNamesTest {
-
   @Override
   boolean allowInvalidNames() {
     return false;

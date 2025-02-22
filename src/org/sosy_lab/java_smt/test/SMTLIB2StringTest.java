@@ -25,17 +25,12 @@ import java.io.IOException;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.Generator;
-import scala.Int;
-@SuppressWarnings({"all"})
+import org.sosy_lab.java_smt.api.StringFormula;
+
+@SuppressWarnings({"CheckReturnValue","ReturnValueIgnored"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
@@ -48,6 +43,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
 
     assertThat(actualResult).isNotNull();
+    assertThat(a).isNotNull();
   }
 
   @Test

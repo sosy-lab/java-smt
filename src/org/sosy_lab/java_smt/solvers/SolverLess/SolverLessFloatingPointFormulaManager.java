@@ -27,8 +27,8 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
 
+@SuppressWarnings("StringSplitter")
 public class SolverLessFloatingPointFormulaManager extends
                                                    AbstractFloatingPointFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
@@ -180,14 +180,14 @@ public class SolverLessFloatingPointFormulaManager extends
       return new DummyFormula(targetType.getExponentSize(), targetType.getMantissaSize());
     }
     if (pTargetType.isIntegerType()) {
-      return new DummyFormula(new DummyType(Type.INTEGER));
+      return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
     }
     if (pTargetType.isBitvectorType()) {
       BitvectorType targetType = (BitvectorType) pTargetType;
       return new DummyFormula(targetType.getSize());
     }
     if (pTargetType.isRationalType()) {
-      return new DummyFormula(new DummyType(Type.RATIONAL));
+      return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
     }
     return null;
   }
@@ -277,57 +277,57 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula equalWithFPSemantics(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isNaN(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isInfinity(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isZero(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isSubnormal(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isNormal(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected DummyFormula isNegative(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(Type.BOOLEAN));
+    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override

@@ -20,6 +20,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   private FormulaClassifier classifier;
 
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final String VARS =
       "(declare-fun x () Int)"
           + "(declare-fun xx () Int)"

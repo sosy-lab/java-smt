@@ -43,21 +43,6 @@ public class FloatingPointGenerator {
 
   protected static void logMakeFloatingPoint(
       Object result, int exponent, int mantissa,
-      String value,
-      String RoundingMode) {
-    List<Object> inputParams = new ArrayList<>();
-    String output = SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
-        FormulaType.getFloatingPointType(exponent,
-            mantissa));
-    inputParams.add(output);
-    Function<List<Object>, String> functionToString =
-        createString -> (String) createString.get(0);
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-    );
-  }
-  protected static void logMakeFloatingPoint(
-      Object result, int exponent, int mantissa,
       String value) {
     List<Object> inputParams = new ArrayList<>();
     String output = SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
@@ -70,7 +55,6 @@ public class FloatingPointGenerator {
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
     );
   }
-
   protected static void logMakeFloatingPointVariable(
       FloatingPointFormula result, FloatingPointType type, String var) {
     List<Object> inputParams = new ArrayList<>();
@@ -250,22 +234,6 @@ public class FloatingPointGenerator {
     logUnaryOp(result, "fp.isNormal", n);
   }
 
-  protected static void logFPCast(
-      FloatingPointFormula result,
-      Formula source,
-      String roundingMode,
-      FloatingPointType type) {
-    List<Object> inputParams = new ArrayList<>();
-    inputParams.add(source);
-    inputParams.add(roundingMode);
-    Function<List<Object>, String> functionToString =
-        inPlaceInputParams -> "((_ to_fp " + inPlaceInputParams.get(1) + ") "
-            + inPlaceInputParams.get(0) + ")";
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-    );
-  }
-
   protected static void logFPRound(
       FloatingPointFormula result, FloatingPointFormula n, String roundingMode) {
     logUnaryOpWithMode(result, "fp.round", roundingMode, n);
@@ -390,7 +358,7 @@ public class FloatingPointGenerator {
   private static Function<List<Object>, String> getListStringFunctionForCast(
       Formula number,
       List<Object> inputParams) {
-    if(inputParams.size() == 4) {
+    if(inputParams.size()==4){
       Function<List<Object>, String> functionToString;
       if (number instanceof BitvectorFormula) {
         functionToString = inPlaceInputParams ->

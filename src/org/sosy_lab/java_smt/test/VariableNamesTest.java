@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -43,7 +44,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 @RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesTest extends SolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
           "java-smt",

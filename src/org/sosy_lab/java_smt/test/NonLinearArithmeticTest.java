@@ -35,7 +35,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // Boolector, CVC4, SMTInterpol, MathSAT5 and OpenSMT do not fully support non-linear arithmetic
   // (though SMTInterpol and MathSAT5 support some parts)
 

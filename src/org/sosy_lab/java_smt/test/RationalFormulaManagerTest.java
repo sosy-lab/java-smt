@@ -16,6 +16,7 @@ import com.google.common.collect.Iterables;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
@@ -28,7 +29,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final double[] SOME_DOUBLES =
       new double[] {
         0, 0.1, 0.25, 0.5, 1, 1.5, 1.9, 2.1, 2.5, -0.1, -0.5, -1, -1.5, -1.9, -2.1, -2.5,

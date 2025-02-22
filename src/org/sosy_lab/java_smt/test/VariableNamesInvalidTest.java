@@ -8,14 +8,21 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // currently the only invalid String is the empty String
 
   @Test(expected = IllegalArgumentException.class)

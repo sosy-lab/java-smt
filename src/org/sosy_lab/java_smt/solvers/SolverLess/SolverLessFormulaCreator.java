@@ -34,16 +34,15 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.SolverLess.DummyType.Type;
-
+@SuppressWarnings("StringSplitter")
 public class SolverLessFormulaCreator
     extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
 
   protected SolverLessFormulaCreator() {
-    super(new DummyEnv(), new DummyType(Type.BOOLEAN), new DummyType(Type.INTEGER),
-        new DummyType(Type.RATIONAL), new DummyType(Type.STRING), new DummyType(Type.REGEX));
+    super(new DummyEnv(), new DummyType(DummyType.Type.BOOLEAN), new DummyType(DummyType.Type.INTEGER),
+        new DummyType(DummyType.Type.RATIONAL), new DummyType(DummyType.Type.STRING), new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
@@ -136,23 +135,22 @@ public class SolverLessFormulaCreator
     }
     if (pT instanceof RationalFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(new DummyType(Type.RATIONAL));
+        return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
       }
-      DummyFormula result = new DummyFormula(new DummyType(Type.RATIONAL),
-          (pT.toString()));
+      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL), pT.toString());
       return result;
     }
     if (pT instanceof IntegerFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(new DummyType(Type.INTEGER));
+        return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
       }
-      DummyFormula result = new DummyFormula(new DummyType(Type.INTEGER),
+      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER),
           pT.toString());
       return result;
     }
     if (pT instanceof BooleanFormula) {
       if (pT.toString().equals("")) {
-        return new DummyFormula(new DummyType(Type.BOOLEAN));
+        return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
       }
       DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
       return result;

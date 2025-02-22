@@ -19,7 +19,6 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.basicimpl.BitvectorGenerator;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("checkstyle:linelength")

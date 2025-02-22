@@ -22,6 +22,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -36,7 +37,10 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
   protected Logics logicToUse() {

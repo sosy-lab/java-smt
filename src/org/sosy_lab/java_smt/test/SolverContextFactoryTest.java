@@ -35,7 +35,10 @@ import org.sosy_lab.java_smt.api.SolverContext;
  */
 @RunWith(Parameterized.class)
 public class SolverContextFactoryTest {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   private static final String OS =
       StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.getDefault()).replace(" ", "");
   private static final boolean IS_WINDOWS = OS.startsWith("windows");

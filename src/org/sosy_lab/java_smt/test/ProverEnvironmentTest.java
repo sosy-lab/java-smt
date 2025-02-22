@@ -23,7 +23,9 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
+import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -32,7 +34,10 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
     BooleanFormula b = bmgr.makeVariable("b");

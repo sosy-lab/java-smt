@@ -161,7 +161,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(assert (ite a b c))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-
+  @SuppressWarnings("CheckReturnValue")
   @Test
   public void testNestedTerms() {
     BooleanFormula term1 = bmgr.and(bmgr.makeBoolean(true), bmgr.makeVariable("a"));
