@@ -377,6 +377,9 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testFromIeeeBitvector() {
+    if(solverToUse()==Solvers.CVC5){
+        return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
+    }
     requireFloats();
     requireBitvectors();
     String bvs = "00000000000000000000000000000000";
@@ -400,6 +403,9 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testFromIeeeBitvectorWithVariable() {
+    if(solverToUse()==Solvers.CVC5){
+        return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
+    }
     requireFloats();
     requireBitvectors();
     BitvectorFormula bv = bvmgr.makeVariable(32, "bv");

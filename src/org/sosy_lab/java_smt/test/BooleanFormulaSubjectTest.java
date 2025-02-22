@@ -33,6 +33,10 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   private BooleanFormula tautology;
 
   @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
+  @Before
   public void setupFormulas() {
     if (imgr != null) {
       simpleFormula = imgr.equal(imgr.makeVariable("a"), imgr.makeNumber(1));

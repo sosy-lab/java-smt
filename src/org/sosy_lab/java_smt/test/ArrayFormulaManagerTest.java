@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.FormulaType.RationalType;
 import static org.sosy_lab.java_smt.api.FormulaType.StringType;
@@ -16,6 +17,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPo
 
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -34,7 +36,10 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   public void init() {
     requireArrays();
   }
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void testIntIndexIntValue() throws SolverException, InterruptedException {
     requireIntegers();

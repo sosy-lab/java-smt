@@ -14,7 +14,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class InterpolatingProverWithAssumptionsWrapperTest
     extends SolverFormulaWithAssumptionsTest {
-
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
   protected Logics logicToUse() {

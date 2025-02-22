@@ -42,7 +42,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class FloatingPointFormulaManagerTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // numbers are small enough to be precise with single precision
   private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 

@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -30,7 +32,10 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 
 @RunWith(Parameterized.class)
 public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(

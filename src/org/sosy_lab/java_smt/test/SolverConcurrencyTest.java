@@ -64,7 +64,10 @@ public class SolverConcurrencyTest {
 
   private static final int NUMBER_OF_THREADS = 4;
   private static final int TIMEOUT_SECONDS = 30;
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   /**
    * As some Solvers are slower/faster, we choose an appropriate number of formulas to solve here.
    */

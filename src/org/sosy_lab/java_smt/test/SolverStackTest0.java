@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -36,7 +37,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("resource")
 public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   protected abstract BasicProverEnvironment<?> newEnvironmentForTest(
       SolverContext pContext, ProverOptions... options);
 

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -18,6 +19,7 @@ import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -33,7 +35,10 @@ import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 
 @SuppressWarnings("LocalVariableName")
 public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
     requireVisitor();

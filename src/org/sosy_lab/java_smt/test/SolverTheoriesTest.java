@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.junit.AssumptionViolatedException;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -39,7 +40,10 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings("LocalVariableName")
 public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void basicBoolTest() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("a");

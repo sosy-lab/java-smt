@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -29,7 +30,10 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 public class SolverFormulaWithAssumptionsTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
   protected Logics logicToUse() {

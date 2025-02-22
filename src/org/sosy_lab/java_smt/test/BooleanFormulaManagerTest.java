@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -26,6 +27,10 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Test
   public void testVariableNamedTrue() throws SolverException, InterruptedException {
     BooleanFormula var;

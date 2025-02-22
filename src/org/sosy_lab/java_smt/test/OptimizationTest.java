@@ -28,7 +28,10 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
+  @Before
+  public void checkNotSolverless() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     return super.createTestConfigBuilder().setOption("solver.mathsat5.loadOptimathsat5", "true");

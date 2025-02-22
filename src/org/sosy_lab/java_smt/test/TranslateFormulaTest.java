@@ -38,7 +38,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 /** Testing formula serialization. */
 @RunWith(Parameterized.class)
 public class TranslateFormulaTest {
-
   private final LogManager logger = LogManager.createTestLogManager();
 
   private SolverContext from;
