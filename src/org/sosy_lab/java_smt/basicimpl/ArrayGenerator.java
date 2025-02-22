@@ -16,6 +16,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class ArrayGenerator {
@@ -36,9 +37,16 @@ public class ArrayGenerator {
           + " "
           + checkArrayElementSort(((ArrayFormulaType<?, ?>) pElementType).getElementType())
           + ")";
-    } else {
+    } else if (pElementType.isFloatingPointType()) {
+      return "(_ Floating Point "+((FloatingPointType) pElementType).getExponentSize()
+          + " " + ((FloatingPointType) pElementType).getMantissaSize()+ ")";
+    }
+    else if (pElementType.isStringType()) {
+      return "String";
+    }
+    else {
       throw new GeneratorException(
-          pElementType + "is not available yet in ArrayGenerator as " + "index for Arrays");
+          pElementType + "is not available yet in ArrayGenerator as " + "element for Arrays");
     }
   }
 
@@ -57,7 +65,14 @@ public class ArrayGenerator {
           + " "
           + checkArrayElementSort(((ArrayFormulaType<?, ?>) pIndexType).getElementType())
           + ")";
-    } else {
+    } else if (pIndexType.isFloatingPointType()) {
+      return "(_ Floating Point "+((FloatingPointType) pIndexType).getExponentSize()
+          + " " + ((FloatingPointType) pIndexType).getMantissaSize()+ ")";
+    }
+    else if (pIndexType.isStringType()) {
+      return "String";
+    }
+    else {
       throw new GeneratorException(
           pIndexType + "is not available yet in ArrayGenerator as " + "index for Arrays");
     }
