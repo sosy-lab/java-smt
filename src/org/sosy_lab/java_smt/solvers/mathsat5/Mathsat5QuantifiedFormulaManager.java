@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock;
 public class Mathsat5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
   IUltimateServiceProvider provider =
-      org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
+      UltimateServiceProviderMock
           .createUltimateServiceProviderMock();
   UltimateEliminator ue;
   ILogger iLogger = provider.getLoggingService().getControllerLogger();
@@ -90,18 +90,14 @@ public class Mathsat5QuantifiedFormulaManager
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
     checkArgument(!pVars.isEmpty(), "List of quantified variables can not be empty");
 
-    long quantifiedFormula = 0L;
+    long quantifiedFormula;
 
     List<Long> boundVars = new ArrayList<>();
     long substBody = pBody;
+
     for (Long var : pVars) {
       long boundCopy = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
       boundVars.add(boundCopy);
-      // TODO substitution through FormulaManager not working due to problem with the datatypes
-      //Map<Long, Long> substitutionMap = new HashMap<>();
-      //substitutionMap.put(var, boundCopy);
-      //Long substituted = fmgr.get().substitute(pBody, substitutionMap);
-
       substBody =
           msat_apply_substitution(solver, substBody, 1, new long[] {var}, new long[] {boundCopy});
     }
@@ -113,14 +109,12 @@ public class Mathsat5QuantifiedFormulaManager
                 solver, quantifiedFormula, msat_make_exists(solver, boundVars.get(i), substBody));
       }
     } else {
-      for (Long var : boundVars) {
-        quantifiedFormula = msat_make_forall(solver, var, substBody);
+        quantifiedFormula = msat_make_forall(solver, boundVars.get(0), substBody);
         for (int i = 1; i < boundVars.size(); i++) {
           quantifiedFormula =
               msat_make_and(
                   solver, quantifiedFormula, msat_make_forall(solver, boundVars.get(i), substBody));
         }
-      }
     }
     return quantifiedFormula;
   }
