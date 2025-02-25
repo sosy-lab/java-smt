@@ -23,8 +23,9 @@ public interface StringFormulaManager {
    * Creates a {@link StringFormula} representing the given constant String.
    *
    * <p>This method accepts plain Java Strings with Unicode characters from the Basic Multilingual
-   * Plane (BMP) (codepoints in range [0x00000, 0x2FFFF]). JavaSMT handles escaping internally, as
-   * some solvers follow the SMTLIB standard and escape Unicode characters with curly braces.
+   * Plane (BMP) or planes 1 and 2 (codepoints in range [0x00000, 0x2FFFF]). JavaSMT handles
+   * escaping internally, as some solvers follow the SMTLIB standard and escape Unicode characters
+   * with curly braces.
    *
    * <p>Additionally, you can use SMTLIB escaping like "\\u{1234}" to represent Unicode characters
    * directly.
@@ -246,8 +247,8 @@ public interface StringFormulaManager {
 
   /**
    * Returns a String formula representing the single character with the given code point, if it is
-   * a valid Unicode code point within the Basic Multilingual Plane (BMP) (codepoints in range
-   * [0x00000, 0x2FFFF]). Otherwise, returns the empty string.
+   * a valid Unicode code point within the Basic Multilingual Plane (BMP) or planes 1 and 2
+   * (codepoints in range [0x00000, 0x2FFFF]). Otherwise, returns the empty string.
    */
   StringFormula fromCodePoint(IntegerFormula codePoint);
 }
