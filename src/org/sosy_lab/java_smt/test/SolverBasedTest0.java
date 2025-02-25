@@ -240,6 +240,13 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.YICES2);
   }
 
+  protected final void requireFPToBitvector() {
+    assume()
+        .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+  }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()

@@ -408,6 +408,8 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void specialValueFunctionsFrom32Bits2() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireFPToBitvector();
+
     FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
 
     assertThatFormula(fpmgr.isInfinity(x))
@@ -465,6 +467,8 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void specialValueFunctionsFrom64Bits2() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireFPToBitvector();
+
     FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
 
     assertThatFormula(fpmgr.isInfinity(x))
@@ -980,10 +984,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpIeeeConversionTypes() {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFPToBitvector();
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -992,10 +993,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFPToBitvector();
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -1006,10 +1004,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFPToBitvector();
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -1079,10 +1074,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion32() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFPToBitvector();
 
     proveForAll(
         // makeBV(value.bits) == fromFP(makeFP(value.float))
@@ -1095,10 +1087,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion64() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("FP-to-BV conversion not available for CVC4 and CVC5")
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFPToBitvector();
 
     proveForAll(
         // makeBV(value.bits) == fromFP(makeFP(value.float))
