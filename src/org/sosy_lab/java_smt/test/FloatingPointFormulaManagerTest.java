@@ -191,6 +191,25 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
+  public void nanOrdering() throws SolverException, InterruptedException {
+    for (FloatingPointFormula other : new FloatingPointFormula[] {zero, posInf, negInf}) {
+      assertThatFormula(fpmgr.greaterThan(nan, other)).isUnsatisfiable();
+      assertThatFormula(fpmgr.greaterOrEquals(nan, other)).isUnsatisfiable();
+      assertThatFormula(fpmgr.lessThan(nan, other)).isUnsatisfiable();
+      assertThatFormula(fpmgr.lessOrEquals(nan, other)).isUnsatisfiable();
+      assertEqualsAsFormula(fpmgr.max(nan, other), other);
+      assertEqualsAsFormula(fpmgr.min(nan, other), other);
+
+      assertThatFormula(fpmgr.greaterThan(other, nan)).isUnsatisfiable();
+      assertThatFormula(fpmgr.greaterOrEquals(other, nan)).isUnsatisfiable();
+      assertThatFormula(fpmgr.lessThan(other, nan)).isUnsatisfiable();
+      assertThatFormula(fpmgr.lessOrEquals(other, nan)).isUnsatisfiable();
+      assertEqualsAsFormula(fpmgr.max(other, nan), other);
+      assertEqualsAsFormula(fpmgr.min(other, nan), other);
+    }
+  }
+
+  @Test
   public void infinityOrdering() throws SolverException, InterruptedException {
     BooleanFormula order1 = fpmgr.greaterThan(posInf, zero);
     BooleanFormula order2 = fpmgr.greaterThan(zero, negInf);
@@ -318,6 +337,190 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isSubnormal(minPosNormalValue)).isUnsatisfiable();
     assertThatFormula(fpmgr.isNormal(minPosNormalValue)).isSatisfiable();
     assertThatFormula(fpmgr.isZero(minPosNormalValue)).isUnsatisfiable();
+  }
+
+  @Test
+  public void specialValueFunctionsFrom32Bits() throws SolverException, InterruptedException {
+    float posInfFromBits = Float.intBitsToFloat(0x7f80_0000);
+    assertThatFormula(fpmgr.isInfinity(fpmgr.makeNumber(posInfFromBits, singlePrecType)))
+        .isTautological();
+
+    float negInfFromBits = Float.intBitsToFloat(0xff80_0000);
+    assertThatFormula(fpmgr.isInfinity(fpmgr.makeNumber(negInfFromBits, singlePrecType)))
+        .isTautological();
+
+    float zeroFromBits = Float.intBitsToFloat(0x0000_0000);
+    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(zeroFromBits, singlePrecType)))
+        .isTautological();
+
+    float negZeroFromBits = Float.intBitsToFloat(0x8000_0000);
+    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(negZeroFromBits, singlePrecType)))
+        .isTautological();
+
+    for (float nanFromBits :
+        new float[] {
+          Float.intBitsToFloat(0x7fc0_0001),
+          Float.intBitsToFloat(0x7fc0_0002),
+          Float.intBitsToFloat(0x7fc0_0003),
+          Float.intBitsToFloat(0x7fc1_2345),
+          Float.intBitsToFloat(0x7fdf_5678),
+          Float.intBitsToFloat(0x7ff0_0001)
+          // there are some more combinations for NaN, too much for one small test.
+        }) {
+      assertThatFormula(fpmgr.isNaN(fpmgr.makeNumber(nanFromBits, singlePrecType)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void specialValueFunctionsFrom64Bits() throws SolverException, InterruptedException {
+    double posInfFromBits = Double.longBitsToDouble(0x7ff0_0000_0000_0000L);
+    assertThatFormula(fpmgr.isInfinity(fpmgr.makeNumber(posInfFromBits, doublePrecType)))
+        .isTautological();
+
+    double negInfFromBits = Double.longBitsToDouble(0xfff0_0000_0000_0000L);
+    assertThatFormula(fpmgr.isInfinity(fpmgr.makeNumber(negInfFromBits, doublePrecType)))
+        .isTautological();
+
+    double zeroFromBits = Double.longBitsToDouble(0x0000_0000_0000_0000L);
+    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(zeroFromBits, doublePrecType)))
+        .isTautological();
+
+    double negZeroFromBits = Double.longBitsToDouble(0x8000_0000_0000_0000L);
+    assertThatFormula(fpmgr.isZero(fpmgr.makeNumber(negZeroFromBits, doublePrecType)))
+        .isTautological();
+
+    for (double nanFromBits :
+        new double[] {
+          Double.longBitsToDouble(0x7ff8_0000_0000_0001L),
+          Double.longBitsToDouble(0x7ff8_0000_0000_0002L),
+          Double.longBitsToDouble(0x7ff8_0000_0000_0003L),
+          Double.longBitsToDouble(0x7ff8_1234_5678_9abcL),
+          Double.longBitsToDouble(0x7ffc_9876_5432_1001L),
+          Double.longBitsToDouble(0x7fff_ffff_ffff_fff2L),
+          // there are some more combinations for NaN, too much for one small test.
+        }) {
+      assertThatFormula(fpmgr.isNaN(fpmgr.makeNumber(nanFromBits, doublePrecType)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void specialValueFunctionsFrom32Bits2() throws SolverException, InterruptedException {
+    requireBitvectors();
+    FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
+
+    assertThatFormula(fpmgr.isInfinity(x))
+        .isEquivalentTo(
+            bmgr.or(
+                bvmgr.equal(fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(32, 0x7f80_0000L)),
+                bvmgr.equal(fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(32, 0xff80_0000L))));
+
+    assertThatFormula(fpmgr.isZero(x))
+        .isEquivalentTo(
+            bmgr.or(
+                bvmgr.equal(fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(32, 0x0000_0000)),
+                bvmgr.equal(fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(32, 0x8000_0000L))));
+
+    assertThatFormula(fpmgr.isNormal(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23),
+                        bvmgr.makeBitvector(8, 0))),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23),
+                        bvmgr.makeBitvector(8, -1)))));
+
+    assertThatFormula(fpmgr.isSubnormal(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23), bvmgr.makeBitvector(8, 0)),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 22, 0),
+                        bvmgr.makeBitvector(23, 0)))));
+
+    assertThatFormula(fpmgr.isNaN(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23), bvmgr.makeBitvector(8, -1)),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 22, 0),
+                        bvmgr.makeBitvector(23, 0)))));
+
+    assertThatFormula(fpmgr.isNegative(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bmgr.not(fpmgr.isNaN(x)),
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 31, 31), bvmgr.makeBitvector(1, 1))));
+  }
+
+  @Test
+  public void specialValueFunctionsFrom64Bits2() throws SolverException, InterruptedException {
+    requireBitvectors();
+    FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
+
+    assertThatFormula(fpmgr.isInfinity(x))
+        .isEquivalentTo(
+            bmgr.or(
+                bvmgr.equal(
+                    fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(64, 0x7ff0_0000_0000_0000L)),
+                bvmgr.equal(
+                    fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(64, 0xfff0_0000_0000_0000L))));
+
+    assertThatFormula(fpmgr.isZero(x))
+        .isEquivalentTo(
+            bmgr.or(
+                bvmgr.equal(
+                    fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(64, 0x0000_0000_0000_0000L)),
+                bvmgr.equal(
+                    fpmgr.toIeeeBitvector(x), bvmgr.makeBitvector(64, 0x8000_0000_0000_0000L))));
+
+    assertThatFormula(fpmgr.isNormal(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52),
+                        bvmgr.makeBitvector(11, 0))),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52),
+                        bvmgr.makeBitvector(11, -1)))));
+
+    assertThatFormula(fpmgr.isSubnormal(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52), bvmgr.makeBitvector(11, 0)),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 51, 0),
+                        bvmgr.makeBitvector(52, 0)))));
+
+    assertThatFormula(fpmgr.isNaN(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52), bvmgr.makeBitvector(11, -1)),
+                bmgr.not(
+                    bvmgr.equal(
+                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 51, 0),
+                        bvmgr.makeBitvector(52, 0)))));
+
+    assertThatFormula(fpmgr.isNegative(x))
+        .isEquivalentTo(
+            bmgr.and(
+                bmgr.not(fpmgr.isNaN(x)),
+                bvmgr.equal(
+                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 63, 63), bvmgr.makeBitvector(1, 1))));
   }
 
   @Test
