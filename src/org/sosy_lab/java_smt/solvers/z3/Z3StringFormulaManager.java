@@ -25,8 +25,7 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long makeStringImpl(String pValue) {
-    String str = escapeUnicodeForSmtlib(unescapeUnicodeForSmtlib(pValue));
-    return Native.mkString(z3context, str);
+    return Native.mkString(z3context, escapeUnicodeForSmtlib(pValue));
   }
 
   @Override
