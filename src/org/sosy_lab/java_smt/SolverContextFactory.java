@@ -111,7 +111,7 @@ public class SolverContextFactory {
   private NonLinearArithmetic nonLinearArithmetic = NonLinearArithmetic.USE;
 
   @Option(secure = true, description = "Enable SMTLIB2 script generation.")
-  private boolean generateSMTLIB2 = true;
+  private boolean generateSMTLIB2 = false;
 
   @Option(secure = true, description = "Run the solver binary instead of using the library.")
   private boolean useBinary = false;
