@@ -364,7 +364,7 @@ public class FloatingPointFormulaManagerTest
           Float.intBitsToFloat(0x7fc0_0003),
           Float.intBitsToFloat(0x7fc1_2345),
           Float.intBitsToFloat(0x7fdf_5678),
-          Float.intBitsToFloat(0x7ff0_0001)
+          Float.intBitsToFloat(0x7ff0_0001),
           // there are some more combinations for NaN, too much for one small test.
         }) {
       assertThatFormula(fpmgr.isNaN(fpmgr.makeNumber(nanFromBits, singlePrecType)))

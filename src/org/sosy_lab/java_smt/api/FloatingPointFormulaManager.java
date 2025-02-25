@@ -400,6 +400,7 @@ public interface FloatingPointFormulaManager {
    *   <li>sign=? (irrelevant for NaN)
    *   <li>exponent=11...11 (all bits are 1)
    *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
    */
   BooleanFormula isNaN(FloatingPointFormula number);
 
@@ -412,6 +413,7 @@ public interface FloatingPointFormulaManager {
    *   <li>sign=? (0 for +Inf, 1 for -Inf)
    *   <li>exponent=11...11 (all bits are 1)
    *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
    */
   BooleanFormula isInfinity(FloatingPointFormula number);
 
@@ -424,6 +426,7 @@ public interface FloatingPointFormulaManager {
    *   <li>sign=? (0 for +0, 1 for -0)
    *   <li>exponent=00...00 (all bits are 0)
    *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
    */
   BooleanFormula isZero(FloatingPointFormula number);
 
@@ -436,6 +439,7 @@ public interface FloatingPointFormulaManager {
    *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
    *   <li>exponent!=00...00 and exponent!=11...11 (exponent is not all 0 or all 1)
    *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
    */
   BooleanFormula isNormal(FloatingPointFormula number);
 
@@ -448,6 +452,7 @@ public interface FloatingPointFormulaManager {
    *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
    *   <li>exponent=00...00 (exponent is all 0)
    *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
    */
   BooleanFormula isSubnormal(FloatingPointFormula number);
 
@@ -459,6 +464,7 @@ public interface FloatingPointFormulaManager {
    * <ul>
    *   <li>sign=1 (1 for negative numbers)
    *   <li>number is not NaN, i.e., exponent=11...11 implies mantissa=00...00
+   * </ul>
    */
   BooleanFormula isNegative(FloatingPointFormula number);
 }
