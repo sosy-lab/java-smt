@@ -51,13 +51,14 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
+      boolean useUnicodeStrings,
       Consumer<String> pLoader) {
 
     pLoader.accept("cvc4jni");
 
     // ExprManager is the central class for creating expressions/terms/formulae.
     ExprManager exprManager = new ExprManager();
-    CVC4FormulaCreator creator = new CVC4FormulaCreator(exprManager);
+    CVC4FormulaCreator creator = new CVC4FormulaCreator(exprManager, useUnicodeStrings);
 
     // set common options.
     // temporary SmtEngine instance, until ExprManager.getOptions() works without SegFault.

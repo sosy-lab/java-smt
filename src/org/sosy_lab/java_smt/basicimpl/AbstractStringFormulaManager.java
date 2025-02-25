@@ -59,23 +59,28 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula makeString(String value) {
-    checkArgument(
-        areAllCodePointsInRange(value),
-        "String constant is out of supported Unicode range (Plane 0-2).");
+    if (formulaCreator.isUnicodeEnabled()) {
+      checkArgument(
+          areAllCodePointsInRange(value, 0, 0x2FFFF),
+          "String constants may only contain Unicode characters from the first three planes "
+              + "(codepoints 0x00000 to 0x2FFFF).");
+    } else {
+      checkArgument(
+          areAllCodePointsInRange(value, 0x20, 0xFE),
+          "String constants may only contain (printable) US-ASCII characters. You may either "
+              + "escape the Unicode characters as \\u{X} where X is the codepoint, or set the "
+              + "option solvers.useUnicodeStrings to enable Unicode support.");
+    }
     return wrapString(makeStringImpl(value));
   }
 
-  /** returns whether all Unicode characters in Planes 0-2. */
-  private static boolean areAllCodePointsInRange(String str) {
-    return str.codePoints().allMatch(AbstractStringFormulaManager::isCodePointInRange);
-  }
-
-  private static boolean isCodePointInRange(int codePoint) {
-    return 0x00000 <= codePoint && codePoint <= 0x2FFFF;
+  /** Check if the codepoints of all characters in the String are in range. */
+  private static boolean areAllCodePointsInRange(String str, int lower, int upper) {
+    return str.codePoints().allMatch(codePoint -> lower <= codePoint && codePoint <= upper);
   }
 
   /** Replace Unicode letters in UTF16 representation with their escape sequences. */
-  protected static String escapeUnicodeForSmtlib(String input) {
+  public static String escapeUnicodeForSmtlib(String input) {
     StringBuilder sb = new StringBuilder();
     for (int codePoint : input.codePoints().toArray()) {
       if (codePoint == 0x5c) {
@@ -102,7 +107,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       }
       int codePoint = Integer.parseInt(hexCodePoint, 16);
       checkArgument(
-          isCodePointInRange(codePoint),
+          0 <= codePoint && codePoint <= 0x2FFFF,
           "SMTLIB does only specify Unicode letters from Planes 0-2");
       String replacement = Character.toString(codePoint);
       if (replacement.equals("\\")) {

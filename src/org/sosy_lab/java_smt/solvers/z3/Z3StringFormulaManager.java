@@ -25,7 +25,7 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long makeStringImpl(String pValue) {
-    String str = escapeUnicodeForSmtlib(unescapeUnicodeForSmtlib(pValue));
+    String str = formulaCreator.isUnicodeEnabled() ? escapeUnicodeForSmtlib(pValue) : pValue;
     return Native.mkString(z3context, str);
   }
 

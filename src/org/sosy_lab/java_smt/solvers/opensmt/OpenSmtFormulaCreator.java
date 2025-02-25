@@ -47,7 +47,8 @@ public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Log
         (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_int() : null,
         (logic instanceof ArithLogic) ? ((ArithLogic) logic).getSort_real() : null,
         null,
-        null);
+        null,
+        false);
 
     logicToUse = logicType;
   }

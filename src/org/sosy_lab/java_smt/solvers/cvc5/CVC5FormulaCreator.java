@@ -81,14 +81,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
-  protected CVC5FormulaCreator(Solver pSolver) {
+  protected CVC5FormulaCreator(Solver pSolver, boolean pUseUnicodeStrings) {
     super(
         pSolver,
         pSolver.getBooleanSort(),
         pSolver.getIntegerSort(),
         pSolver.getRealSort(),
         pSolver.getStringSort(),
-        pSolver.getRegExpSort());
+        pSolver.getRegExpSort(),
+        pUseUnicodeStrings);
     solver = pSolver;
   }
 
@@ -832,10 +833,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         // TODO Report this to the CVC5 developers
         String str = value.toString();
         str = str.substring(1, str.length() - 1);
-        return AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str);
+        return isUnicodeEnabled()
+            ? AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str)
+            : str;
 
       } else {
-        // String serialization for Strings and unknown terms.
+        // String serialization for unknown terms.
         return value.toString();
       }
     } catch (CVC5ApiException e) {

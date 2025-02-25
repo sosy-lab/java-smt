@@ -67,6 +67,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBitvectorDeclaration;
@@ -184,14 +185,15 @@ class PrincessFormulaCreator
    */
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
-  PrincessFormulaCreator(PrincessEnvironment pEnv) {
+  PrincessFormulaCreator(PrincessEnvironment pEnv, boolean pUseUnicodeStrings) {
     super(
         pEnv,
         PrincessEnvironment.BOOL_SORT,
         PrincessEnvironment.INTEGER_SORT,
         PrincessEnvironment.FRACTION_SORT,
         PrincessEnvironment.STRING_SORT,
-        PrincessEnvironment.REGEX_SORT);
+        PrincessEnvironment.REGEX_SORT,
+        pUseUnicodeStrings);
   }
 
   @Override
@@ -236,7 +238,10 @@ class PrincessFormulaCreator
           break;
         case "str_empty":
         case "str_cons":
-          return strToString(fun);
+          String str = strToString(fun);
+          return isUnicodeEnabled()
+              ? str
+              : AbstractStringFormulaManager.escapeUnicodeForSmtlib(str);
         default:
       }
     }
@@ -249,7 +254,7 @@ class PrincessFormulaCreator
    * convert a recursive string term like "str_cons(97, str_cons(98, str_cons(99, str_empty)))" to a
    * real string "abc" for the user.
    */
-  private Object strToString(IFunApp fun) {
+  private String strToString(IFunApp fun) {
     final StringBuilder str = new StringBuilder();
     while ("str_cons".equals(fun.fun().name())) {
       checkArgument(fun.fun().arity() == 2);

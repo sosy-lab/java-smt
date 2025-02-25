@@ -39,11 +39,12 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      boolean pUseUnicodeStrings)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
         new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
-    PrincessFormulaCreator creator = new PrincessFormulaCreator(env);
+    PrincessFormulaCreator creator = new PrincessFormulaCreator(env, pUseUnicodeStrings);
 
     // Create managers
     PrincessUFManager functionTheory = new PrincessUFManager(creator);

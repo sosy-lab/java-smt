@@ -107,6 +107,18 @@ public class SolverContextFactory {
   @Option(
       secure = true,
       description =
+          "Enable support for Unicode characters in String formulas."
+              + " When this option is disabled String constants may only contain (printable) "
+              + "US-ASCII characters. It is still possible to include Unicode characters, but "
+              + "they must be escaped as \"\\u{X}\" where X is the codepoint of the character. "
+              + "When this option is enabled all Unicode Strings (with characters from the first "
+              + "three Unicode planes) are allowed and SMTLIB escape sequences like \"\\u{ABCD}\" "
+              + "are ignored and interpreted as regular characters.")
+  private boolean useUnicodeStrings = false;
+
+  @Option(
+      secure = true,
+      description =
           "Use non-linear arithmetic of the solver if supported and throw exception otherwise, "
               + "approximate non-linear arithmetic with UFs if unsupported, "
               + "or always approximate non-linear arithmetic. "
@@ -252,6 +264,7 @@ public class SolverContextFactory {
             (int) randomSeed,
             nonLinearArithmetic,
             floatingPointRoundingMode,
+            useUnicodeStrings,
             loader);
 
       case CVC5:
@@ -262,6 +275,7 @@ public class SolverContextFactory {
             (int) randomSeed,
             nonLinearArithmetic,
             floatingPointRoundingMode,
+            useUnicodeStrings,
             loader);
 
       case SMTINTERPOL:
@@ -288,11 +302,17 @@ public class SolverContextFactory {
             randomSeed,
             floatingPointRoundingMode,
             nonLinearArithmetic,
+            useUnicodeStrings,
             loader);
 
       case PRINCESS:
         return PrincessSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+            config,
+            shutdownNotifier,
+            logfile,
+            (int) randomSeed,
+            nonLinearArithmetic,
+            useUnicodeStrings);
 
       case YICES2:
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);

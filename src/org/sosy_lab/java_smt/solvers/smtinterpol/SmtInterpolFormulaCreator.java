@@ -47,7 +47,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         env.getTheory().getNumericSort(),
         env.getTheory().getRealSort(),
         null,
-        null);
+        null,
+        false);
   }
 
   @Override

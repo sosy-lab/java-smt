@@ -27,7 +27,7 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term makeStringImpl(String pValue) {
-    String str = escapeUnicodeForSmtlib(unescapeUnicodeForSmtlib(pValue));
+    String str = formulaCreator.isUnicodeEnabled() ? escapeUnicodeForSmtlib(pValue) : pValue;
     return solver.mkString(str, true);
   }
 
