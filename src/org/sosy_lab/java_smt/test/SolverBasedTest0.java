@@ -129,10 +129,6 @@ public abstract class SolverBasedTest0 {
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
-    if (solverToUse() == Solvers.PRINCESS) {
-      newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
-      newConfig.setOption("solver.useBinary", String.valueOf(true));
-    }
     if (solverToUse() == Solvers.SOLVERLESS){
       newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
     }
