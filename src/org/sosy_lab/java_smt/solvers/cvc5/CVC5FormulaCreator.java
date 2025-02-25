@@ -53,6 +53,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
@@ -826,7 +827,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return value.getBooleanValue();
 
       } else if (value.isStringValue()) {
-        return value.getStringValue();
+        // We need to use Term.toString() as a workaround as Term.getStringValue is broken for
+        // characters that are outside the BMP
+        // TODO Report this to the CVC5 developers
+        String str = value.toString();
+        str = str.substring(1, str.length() - 1);
+        return AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str);
 
       } else {
         // String serialization for Strings and unknown terms.
