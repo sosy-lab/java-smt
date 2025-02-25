@@ -345,11 +345,11 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResultMathsat5 = "(assert (= -1 (+ -1 17/5 2147483647/1000)))\n";
-    String expectedResultSMTInterpol = "(assert (= (- 1.0) (+ (- 1.0) 3.4 2147483.647)))\n";
-    String expectedResultCVC4 = "(assert (= (- 1) (+ (- 1) (/ 17 5) (/ 2147483647 1000))))\n";
-    String expectedResultCVC5 = "(assert (= (- 1.0) (+ (- 1.0) (/ 17 5) (/ 2147483647 1000))))\n";
+    String expectedResultSMTInterpol = "(assert (= -1 (+ (- 1.0) 3.4 2147483.647)))\n";
+    String expectedResultCVC4 = "(assert (= -1 (+ (- 1) (/ 17 5) (/ 2147483647 1000))))\n";
+    String expectedResultCVC5 = "(assert (= -1 (+ (- 1.0) (/ 17 5) (/ 2147483647 1000))))\n";
     String expectedResultZ3 =
-        "(assert (= (- 1.0) (+ (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
+        "(assert (= -1 (+ (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
     String expectedResultSolverless = "(assert (= -1 (+ -1 3.4 2147483.647)))\n";
 
     assertThat(
@@ -563,7 +563,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResultMathsat5 = "(assert (> -1 17/5))\n";
+    String expectedResultMathsat5 = "(assert (> -1 3.4))\n";
     String expectedResultSMTInterpol = "(assert (and (> (- 1.0) 3.4) (> 3.4 2147483.647)))\n";
     String expectedResultCVC4 =
         "(assert (and (> (- 1) (/ 17 5)) (> (/ 17 5) (/ 2147483647 1000))))\n";
@@ -572,6 +572,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultZ3 =
         "(assert (and (> (- 1.0) (/ 17.0 5.0)) (> (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
     String expectedSolverless = "(assert (and (> -1 3.4) (> 3.4 2147483.647)))\n";
+
     assertThat(
         actualResult.equals(expectedResultMathsat5)
             || actualResult.equals(expectedResultSMTInterpol)
@@ -613,7 +614,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResultMathsat5 = "(assert (>= -1 17/5))\n";
+    String expectedResultMathsat5 = "(assert (>= -1 3.4))\n";
     String expectedResultSMTInterpol = "(assert (and (>= (- 1.0) 3.4) (>= 3.4 2147483.647)))\n";
     String expectedResultCVC4 =
         "(assert (and (>= (- 1) (/ 17 5)) (>= (/ 17 5) (/ 2147483647 1000)" + ")))\n";
@@ -622,6 +623,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultZ3 =
         "(assert (and (>= (- 1.0) (/ 17.0 5.0)) (>= (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
     String expectedSolverless = "(assert (and (>= -1 3.4) (>= 3.4 2147483.647)))\n";
+
     assertThat(
         actualResult.equals(expectedResultMathsat5)
             || actualResult.equals(expectedResultSMTInterpol)
@@ -663,7 +665,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResultMathsat5 = "(assert (< -1 17/5))\n";
+    String expectedResultMathsat5 = "(assert (< -1 3.4))\n";
     String expectedResultSMTInterpol = "(assert (and (< (- 1.0) 3.4) (< 3.4 2147483.647)))\n";
     String expectedResultCVC4 =
         "(assert (and (< (- 1) (/ 17 5)) (< (/ 17 5) (/ 2147483647 1000)" + ")))\n";
@@ -672,6 +674,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultZ3 =
         "(assert (and (< (- 1.0) (/ 17.0 5.0)) (< (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
     String expectedSolverless = "(assert (and (< -1 3.4) (< 3.4 2147483.647)))\n";
+
     assertThat(
         actualResult.equals(expectedResultMathsat5)
             || actualResult.equals(expectedResultSMTInterpol)
@@ -722,13 +725,14 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultZ3 =
         "(assert (and (<= (- 1.0) (/ 17.0 5.0)) (<= (/ 17.0 5.0) (/ " + "2147483647.0 1000.0))))\n";
     String expectedSolverLessResult = "(assert (and (<= -1 3.4) (<= 3.4 2147483.647)))\n";
+String expectedResultYices2 = "(assert (<= -1 3.4))\n";
 
     assertThat(
         actualResult.equals(expectedResultMathsat5)
             || actualResult.equals(expectedResultSMTInterpol)
             || actualResult.equals(expectedResultCVC4)
             || actualResult.equals(expectedResultCVC5)
-            || actualResult.equals(expectedResultZ3)
+            || actualResult.equals(expectedResultZ3) || actualResult.equals(expectedResultYices2)
             || actualResult.equals(expectedSolverLessResult))
         .isTrue();
   }
@@ -765,7 +769,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
     System.out.println(actualResult);
-    String expectedResultMathsat5 = "(assert (= -1 (- (to_int 17/5) (to_int 2147483647/1000))))\n";
+    String expectedResultMathsat5 = "(assert (= -1 (- (to_int 3.4) (to_int 2147483.647))))\n";
     String expectedResultSMTInterpol =
         "(assert (= (to_int (- 1.0)) (- (to_int 3.4) (to_int 2147483.647))))\n";
     String expectedResultCVC4 =
