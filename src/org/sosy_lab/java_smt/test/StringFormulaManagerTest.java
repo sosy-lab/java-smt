@@ -127,8 +127,14 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testInputEscape() throws SolverException, InterruptedException {
     // Test if SMTLIB Unicode literals are recognized and converted to their Unicode characters.
-    assertEqual(smgr.length(smgr.makeString("Ξ")), imgr.makeNumber(1));
     assertEqual(smgr.length(smgr.makeString("\\u{39E}")), imgr.makeNumber(1));
+    assertEqual(smgr.length(smgr.makeString("Ξ")), imgr.makeNumber(1));
+
+    // Test with a character that is not in the BMP
+    if (solver != Solvers.PRINCESS) {
+      String str = Character.toString(0x200cb);
+      assertEqual(smgr.length(smgr.makeString(str)), imgr.makeNumber(1));
+    }
   }
 
   @Test
@@ -140,6 +146,12 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         assertThat(model.evaluate(smgr.makeString("\\u{39E}"))).isEqualTo("Ξ");
         assertThat(model.evaluate(smgr.concat(smgr.makeString("\\u{39E"), smgr.makeString("}"))))
             .isEqualTo("\\u{39E}");
+
+        // Test with a character that is not in the BMP
+        if (solver != Solvers.PRINCESS) {
+          String str = Character.toString(0x200cb);
+          assertThat(model.evaluate(smgr.makeString(str))).isEqualTo(str);
+        }
       }
     }
   }
