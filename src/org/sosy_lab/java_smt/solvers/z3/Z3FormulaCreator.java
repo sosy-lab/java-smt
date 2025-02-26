@@ -923,9 +923,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
         String str = Native.getString(environment, value);
-        return isUnicodeEnabled()
-            ? AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str)
-            : str;
+        // Calling `unescape` followed by ` escape` has the effect of escaping all backslashes
+        // that are not part of a valid escape sequence
+        String unicode = AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str);
+        String escaped = AbstractStringFormulaManager.escapeUnicodeForSmtlib(unicode);
+        return isUnicodeEnabled() ? unicode : escaped;
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
