@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 /**
  * Manager for dealing with string formulas. Functions come from <a
@@ -22,13 +23,15 @@ public interface StringFormulaManager {
   /**
    * Creates a {@link StringFormula} representing the given constant String.
    *
-   * <p>This method accepts plain Java Strings with Unicode characters from the Basic Multilingual
-   * Plane (BMP) or planes 1 and 2 (codepoints in range [0x00000, 0x2FFFF]). JavaSMT handles
-   * escaping internally, as some solvers follow the SMTLIB standard and escape Unicode characters
-   * with curly braces.
-   *
-   * <p>Additionally, you can use SMTLIB escaping like "\\u{1234}" to represent Unicode characters
-   * directly.
+   * <p>The String argument is expected to be a regular Java String and may contain Unicode
+   * characters from the first 3 planes (codepoints 0x00000-0x2FFFFF). Higher codepoints are not
+   * allowed due to limitations in SMTLIB. We do not support SMTLIB escape sequences in this method,
+   * and String like <code>"\\u{abc}"</code> are read verbatim and are not substituted with their
+   * Unicode character. If you still want to use SMTLIB Strings with this method, the function
+   * {@link AbstractStringFormulaManager#unescapeUnicodeForSmtlib(String)} can be used to handle the
+   * conversion before calling this method. Note that you may then also have to use {@link
+   * AbstractStringFormulaManager#escapeUnicodeForSmtlib(String)} to convert Strings from the model
+   * back to a format that is compatible with other SMTLIB based solvers.
    *
    * @param value the string value the returned {@link StringFormula} should represent
    * @return a {@link StringFormula} representing the given value
