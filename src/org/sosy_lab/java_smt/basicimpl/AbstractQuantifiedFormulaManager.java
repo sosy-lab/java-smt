@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.collect.Lists;
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -42,13 +43,18 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             "Solver does not support parsing yet. Falling back to native "
                 + "quantifier elimination.");
         return wrap(eliminateQuantifiers(extractInfo(pF)));
+      } catch (IOException e) {
+        System.out.println(
+            "Independent quantifier elimination via Ultimate failed. Falling back to native "
+                + "quantifier elimination.");
+        return wrap(eliminateQuantifiers(extractInfo(pF)));
       }
     }
     return wrap(eliminateQuantifiers(extractInfo(pF)));
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(TFormulaInfo pExtractInfo)
-      throws UnsupportedOperationException {
+      throws UnsupportedOperationException, IOException {
     throw new UnsupportedOperationException();
   }
 

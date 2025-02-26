@@ -79,6 +79,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -133,6 +134,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   private final BitwuzlaFormulaManager manager;
   private final BitwuzlaFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
+  private final LogManager logger;
 
   private final Options solverOptions;
 
@@ -142,12 +144,13 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
-      Options pOptions) {
+      Options pOptions, LogManager pLogger) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     solverOptions = pOptions;
+    logger = pLogger;
   }
 
   @SuppressWarnings("unused")
@@ -157,7 +160,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      Consumer<String> pLoader)
+      Consumer<String> pLoader, LogManager pLogger)
       throws InvalidConfigurationException {
     loadLibrary(pLoader);
 
@@ -170,7 +173,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     BitwuzlaBitvectorFormulaManager bitvectorTheory =
         new BitwuzlaBitvectorFormulaManager(creator, booleanTheory);
     BitwuzlaQuantifiedFormulaManager quantifierTheory =
-        new BitwuzlaQuantifiedFormulaManager(creator);
+        new BitwuzlaQuantifiedFormulaManager(creator, pLogger);
     BitwuzlaFloatingPointManager floatingPointTheory =
         new BitwuzlaFloatingPointManager(creator, pFloatingPointRoundingMode);
     BitwuzlaArrayFormulaManager arrayTheory = new BitwuzlaArrayFormulaManager(creator);
@@ -185,7 +188,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             arrayTheory,
             solverOptions);
 
-    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
+    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions, pLogger);
   }
 
   @VisibleForTesting

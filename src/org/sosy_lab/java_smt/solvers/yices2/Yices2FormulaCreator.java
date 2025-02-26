@@ -177,6 +177,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return yices_named_variable(pType, pVarName);
   }
 
+  public Integer makeVariable(Integer pTerm) {
+    return makeVariable(yices_type_of_term(pTerm), yices_get_term_name(pTerm));
+  }
+
   @Override
   public Integer extractInfo(Formula pT) {
     return Yices2FormulaManager.getYicesTerm(pT);

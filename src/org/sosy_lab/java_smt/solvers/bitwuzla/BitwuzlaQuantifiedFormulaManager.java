@@ -10,7 +10,15 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
+import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
+import de.uni_freiburg.informatik.ultimate.lib.modelcheckerutils.smt.UltimateEliminator;
+import de.uni_freiburg.informatik.ultimate.logic.Logics;
+import de.uni_freiburg.informatik.ultimate.logic.Script;
+import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
 import java.util.List;
+import java.util.Optional;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
@@ -20,20 +28,51 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
+import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
+
 
 public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
+  private Optional<BitwuzlaFormulaManager> fmgr;
+  private final LogManager logger;
+
+  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator, LogManager pLogger) {
     super(pCreator);
     termManager = pCreator.getTermManager();
+    fmgr = Optional.empty();
+    logger = pLogger;
   }
-
+  public void setFmgr(Optional<BitwuzlaFormulaManager> pFmgr) {
+    fmgr = pFmgr;
+  }
   @Override
   protected Term eliminateQuantifiers(Term pExtractInfo)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Bitwuzla does not support eliminating Quantifiers.");
+  }
+
+  @Override
+  protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
+      throws UnsupportedOperationException {
+    IUltimateServiceProvider provider =
+        org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
+            .createUltimateServiceProviderMock();
+    UltimateEliminator ue;
+    ILogger iLogger = provider.getLoggingService().getControllerLogger();
+    Script interpol = new SMTInterpol();
+    ue = new UltimateEliminator(provider, iLogger, interpol);
+    ue.setLogic(Logics.AUFNIRA);
+
+    BitwuzlaFormulaManager formulaManager = fmgr.get();
+    de.uni_freiburg.informatik.ultimate.logic.Term formula =
+        UltimateEliminatorParser.parseImpl(
+            formulaManager.dumpFormulaImpl(pExtractInfo), logger, ue);
+    formula = ue.simplify(formula);
+    Term result =
+        formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
+    return result;
   }
 
   @Override
