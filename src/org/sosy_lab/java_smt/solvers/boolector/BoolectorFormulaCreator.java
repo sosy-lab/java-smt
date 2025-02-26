@@ -54,7 +54,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Possibly we need to split this up into vars, ufs, and arrays
 
   BoolectorFormulaCreator(Long btor) {
-    super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null, null);
+    super(btor, BtorJNI.boolector_bool_sort(btor), null, null, null, null, false);
   }
 
   @SuppressWarnings("unchecked")

@@ -75,6 +75,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   private final @Nullable TType rationalType;
   private final @Nullable TType stringType;
   private final @Nullable TType regexType;
+  private final boolean useUnicodeStrings;
+
   protected final TEnv environment;
 
   protected FormulaCreator(
@@ -83,13 +85,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       @Nullable TType pIntegerType,
       @Nullable TType pRationalType,
       @Nullable TType stringType,
-      @Nullable TType regexType) {
+      @Nullable TType regexType,
+      boolean useUnicodeStrings) {
     this.environment = env;
     this.boolType = boolType;
     this.integerType = pIntegerType;
     this.rationalType = pRationalType;
     this.stringType = stringType;
     this.regexType = regexType;
+    this.useUnicodeStrings = useUnicodeStrings;
   }
 
   public final TEnv getEnv() {
@@ -132,6 +136,20 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       throw new UnsupportedOperationException("String theory is not supported by this solver.");
     }
     return regexType;
+  }
+
+  /**
+   * True if Unicode characters are allowed in String constants.
+   *
+   * <p>If this method returns <code>false</code>, only (printable) US-ASCII chracters are allowed
+   * and all Unicode characters must be escaped as <code>"\\u{X}"</code> where <code>X</code> is the
+   * codepoint of the character.
+   */
+  public final boolean isUnicodeEnabled() {
+    if (stringType == null) {
+      throw new UnsupportedOperationException("String theory is not supported by this solver.");
+    }
+    return useUnicodeStrings;
   }
 
   public abstract TFormulaInfo makeVariable(TType type, String varName);

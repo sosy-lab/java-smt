@@ -78,7 +78,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
-    super(null, pTermManager.mk_bool_sort(), null, null, null, null);
+    super(null, pTermManager.mk_bool_sort(), null, null, null, null, false);
     termManager = pTermManager;
   }
 

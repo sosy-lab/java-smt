@@ -116,6 +116,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       NonLinearArithmetic pNonLinearArithmetic,
+      boolean pUseUnicodeStrings,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions(config, solverLogfile, (int) randomSeed);
@@ -173,6 +174,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             realSort,
             stringSort,
             regexSort,
+            pUseUnicodeStrings,
             config,
             pShutdownNotifier);
 

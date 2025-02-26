@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -50,6 +49,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4Formula.CVC4ArrayFormula;
@@ -71,14 +71,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   private final Map<String, Expr> functionsCache = new HashMap<>();
   private final ExprManager exprManager;
 
-  protected CVC4FormulaCreator(ExprManager pExprManager) {
+  protected CVC4FormulaCreator(ExprManager pExprManager, boolean pUseUnicodeStrings) {
     super(
         pExprManager,
         pExprManager.booleanType(),
         pExprManager.integerType(),
         pExprManager.realType(),
         pExprManager.stringType(),
-        pExprManager.regExpType());
+        pExprManager.regExpType(),
+        pUseUnicodeStrings);
     exprManager = pExprManager;
   }
 
@@ -613,7 +614,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return convertFloatingPoint(value);
 
     } else if (valueType.isString()) {
-      return unescapeUnicodeForSmtlib(value.getConstString().toString());
+      String str = value.getConstString().toString();
+      return isUnicodeEnabled() ? AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str) : str;
 
     } else {
       // String serialization for unknown terms.

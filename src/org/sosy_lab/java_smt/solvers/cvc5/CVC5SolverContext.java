@@ -110,6 +110,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       int randomSeed,
       NonLinearArithmetic pNonLinearArithmetic,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
+      boolean pUseUnicodeStrings,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
 
@@ -127,7 +128,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(e.getMessage(), e);
     }
 
-    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
+    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver, pUseUnicodeStrings);
 
     // Create managers
     CVC5UFManager functionTheory = new CVC5UFManager(pCreator);

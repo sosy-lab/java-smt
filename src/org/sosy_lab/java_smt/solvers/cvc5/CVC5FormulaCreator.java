@@ -53,6 +53,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
@@ -80,14 +81,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   private final Map<String, Term> functionsCache = new HashMap<>();
   private final Solver solver;
 
-  protected CVC5FormulaCreator(Solver pSolver) {
+  protected CVC5FormulaCreator(Solver pSolver, boolean pUseUnicodeStrings) {
     super(
         pSolver,
         pSolver.getBooleanSort(),
         pSolver.getIntegerSort(),
         pSolver.getRealSort(),
         pSolver.getStringSort(),
-        pSolver.getRegExpSort());
+        pSolver.getRegExpSort(),
+        pUseUnicodeStrings);
     solver = pSolver;
   }
 
@@ -826,10 +828,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return value.getBooleanValue();
 
       } else if (value.isStringValue()) {
-        return value.getStringValue();
+        // We need to use Term.toString() as a workaround as Term.getStringValue is broken for
+        // characters that are outside the BMP
+        // TODO Report this to the CVC5 developers
+        String str = value.toString();
+        str = str.substring(1, str.length() - 1);
+        return isUnicodeEnabled()
+            ? AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str)
+            : str;
 
       } else {
-        // String serialization for Strings and unknown terms.
+        // String serialization for unknown terms.
         return value.toString();
       }
     } catch (CVC5ApiException e) {

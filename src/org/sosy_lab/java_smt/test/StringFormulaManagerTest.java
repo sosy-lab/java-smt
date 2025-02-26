@@ -21,17 +21,38 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 @SuppressWarnings("ConstantConditions")
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE", justification = "test code")
 public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    // Override to enable Unicode support
+    ConfigurationBuilder newConfig =
+        super.createTestConfigBuilder().setOption("solver.useUnicodeStrings", "true");
+    return newConfig;
+  }
 
   private static final ImmutableList<String> WORDS =
       ImmutableList.of(
@@ -108,6 +129,15 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(smgr.equal(str1, str2)).isUnsatisfiable();
   }
 
+  /**
+   * Resolve any SMTLIB escape sequences and create a new String constant.
+   *
+   * <p>The input String may still contain Unicode characters.
+   */
+  private StringFormula makeEscapedString(String pString) {
+    return smgr.makeString(AbstractStringFormulaManager.unescapeUnicodeForSmtlib(pString));
+  }
+
   private void requireVariableStringLiterals() {
     // FIXME: Remove once support for operations on non-singleton Strings has been added
     // See https://github.com/uuverifiers/ostrich/issues/88
@@ -120,6 +150,127 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   // Tests
+
+  @Test
+  public void testInputEscape() throws SolverException, InterruptedException {
+    // Check that escape sequences are not substituted
+    assertEqual(smgr.length(smgr.makeString("\\u{39E}")), imgr.makeNumber(7));
+    // ...unless we're doing so explicitly:
+    assertEqual(smgr.length(makeEscapedString("\\u{39E}")), imgr.makeNumber(1));
+
+    // Test that Unicode characters are working
+    assertEqual(smgr.length(smgr.makeString("Ξ")), imgr.makeNumber(1));
+    if (solver != Solvers.PRINCESS) {
+      // Test with a character that is not in the BMP
+      String str = Character.toString(0x200cb);
+      assertEqual(smgr.length(smgr.makeString(str)), imgr.makeNumber(1));
+    }
+  }
+
+  @Test
+  public void testOutputUnescape() throws SolverException, InterruptedException {
+    // Test if Unicode escape sequences get properly converted back when reading from the model.
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThat(!prover.isUnsat()).isTrue();
+      try (Model model = prover.getModel()) {
+        assertThat(model.evaluate(makeEscapedString("\\u{39E}"))).isEqualTo("Ξ");
+        assertThat(
+                model.evaluate(smgr.concat(makeEscapedString("\\u{39E"), makeEscapedString("}"))))
+            .isEqualTo("\\u{39E}");
+
+        // Test with a character that is not in the BMP
+        if (solver != Solvers.PRINCESS) {
+          String str = Character.toString(0x200cb);
+          assertThat(model.evaluate(smgr.makeString(str))).isEqualTo(str);
+        }
+      }
+    }
+  }
+
+  /**
+   * Test Unicode escaping when creating new String constants.
+   *
+   * <p>This version of the test uses <code>solver.useUnicodeStrings=false</code>. See {@link
+   * #testInputEscape()} for the same test with Unicode Strings enabled.
+   */
+  @Test
+  public void testSmtlibInputEscape()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    Configuration compatibleConfig = super.createTestConfigBuilder().build();
+    try (SolverContext compatibleContext =
+        SolverContextFactory.createSolverContext(
+            compatibleConfig,
+            LogManager.createTestLogManager(),
+            ShutdownNotifier.createDummy(),
+            solver)) {
+
+      StringFormulaManager compatibleSmgr =
+          compatibleContext.getFormulaManager().getStringFormulaManager();
+
+      IntegerFormulaManager compatibleImgr =
+          compatibleContext.getFormulaManager().getIntegerFormulaManager();
+
+      // Check that escape sequences are treated as single characters
+      assertEqual(
+          compatibleSmgr.length(compatibleSmgr.makeString("\\u{39E}")),
+          compatibleImgr.makeNumber(1));
+
+      // Check that Unicode characters are not allowed in String constants
+      assertThrows(IllegalArgumentException.class, () -> compatibleSmgr.makeString("Ξ"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> compatibleSmgr.makeString(Character.toString(0x200cb)));
+    }
+  }
+
+  /**
+   * Test Unicode unescaping when reading results from the model.
+   *
+   * <p>This version of the test uses <code>solver.useUnicodeStrings=false</code>. See {@link
+   * #testOutputUnescape()} for the same test with Unicode Strings enabled.
+   */
+  @Test
+  public void testSmtlibOutputUnescape()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    // Create a solver context where Unicode String literals have been disabled
+    Configuration compatibleConfig = super.createTestConfigBuilder().build();
+    try (SolverContext compatibleContext =
+        SolverContextFactory.createSolverContext(
+            compatibleConfig,
+            LogManager.createTestLogManager(),
+            ShutdownNotifier.createDummy(),
+            solver)) {
+
+      StringFormulaManager compatibleSmgr =
+          compatibleContext.getFormulaManager().getStringFormulaManager();
+
+      try (ProverEnvironment prover =
+          compatibleContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        assertThat(!prover.isUnsat()).isTrue();
+        try (Model model = prover.getModel()) {
+          // Check that escape sequences for Unicode characters are again converted to escape
+          // sequences in the model
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\u{39E}"))).isEqualTo("\\u{39e}");
+
+          // Now concatenate two parts of an escape sequence in the logic and check the resulting
+          // String. We expect the solver to escape the backslash in the first part and return a
+          // regular String of characters, not just the combined escape sequence for a single
+          // Unicode character.
+          assertThat(
+                  model.evaluate(
+                      compatibleSmgr.concat(
+                          compatibleSmgr.makeString("\\u{39E"), compatibleSmgr.makeString("}"))))
+              .isEqualTo("\\u{5c}u{39E}");
+
+          // Show that backslashes are just always substituted when they are not part of a valid
+          // escape sequence
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\"))).isEqualTo("\\u{5c}");
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\a"))).isEqualTo("\\u{5c}a");
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\u"))).isEqualTo("\\u{5c}u");
+        }
+      }
+    }
+  }
 
   @Test
   public void testRegexAll() throws SolverException, InterruptedException {
@@ -162,18 +313,18 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // special single characters.
 
     // Greek Capital Letter Delta
-    assertThatFormula(smgr.in(smgr.makeString("\\u0394"), regexAllChar)).isTautological();
-    assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(makeEscapedString("\\u0394"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(makeEscapedString("Δ"), regexAllChar)).isTautological();
     // CJK Compatibility Ideograph from Basic Multilingual Plane.
-    assertThatFormula(smgr.in(smgr.makeString("\\u{fa6a}"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(makeEscapedString("\\u{fa6a}"), regexAllChar)).isTautological();
     // Xiangqi Black Horse from Supplementary Multilingual Plane
-    assertThatFormula(smgr.in(smgr.makeString("\\u{1fa6a}"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(makeEscapedString("\\u{1fa6a}"), regexAllChar)).isTautological();
 
     // Combining characters are not matched as one character.
-    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("abcdefgh"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("a\\u0336"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(makeEscapedString("ab"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(makeEscapedString("abcdefgh"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(makeEscapedString("a\\u0336"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(makeEscapedString("\\n"), regexAllChar)).isUnsatisfiable();
 
     StringFormula x = smgr.makeVariable("x");
     assertThatFormula(smgr.in(x, smgr.range('a', 'z'))).isSatisfiable();
@@ -365,7 +516,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("\n")));
     assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("\t")));
 
-    assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("\\u{20AC}")));
+    assertEqual(imgr.makeNumber(1), smgr.length(makeEscapedString("\\u{20AC}")));
     assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("€")));
     assertEqual(imgr.makeNumber(1), smgr.length(smgr.makeString("Δ")));
 
@@ -870,8 +1021,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     String workaround = "au{1234}";
     StringFormula au1234WOEscapeCurly = smgr.makeString(workaround);
     StringFormula backSlash = smgr.makeString("\\");
-    StringFormula u1234 = smgr.makeString("\\u{1234}");
-    StringFormula au1234b = smgr.makeString("a\\u{1234}b");
+    StringFormula u1234 = makeEscapedString("\\u{1234}");
+    StringFormula au1234b = makeEscapedString("a\\u{1234}b");
 
     assertEqual(smgr.length(backSlash), imgr.makeNumber(1));
     assertEqual(smgr.charAt(au1234b, imgr.makeNumber(0)), a);
@@ -901,22 +1052,22 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testUnicodeEscaping() throws SolverException, InterruptedException {
     // SMTLIB has different representations for the same symbol
-    assertEqual(a, smgr.makeString("\u0061"));
-    assertEqual(a, smgr.makeString("\\u0061"));
-    assertEqual(a, smgr.makeString("\\u{61}"));
-    assertEqual(a, smgr.makeString("\\u{00061}"));
+    assertEqual(a, makeEscapedString("\u0061"));
+    assertEqual(a, makeEscapedString("\\u0061"));
+    assertEqual(a, makeEscapedString("\\u{61}"));
+    assertEqual(a, makeEscapedString("\\u{00061}"));
     assertEqual(smgr.length(a), imgr.makeNumber(1));
 
-    StringFormula u0 = smgr.makeString("\\u0000");
-    assertEqual(u0, smgr.makeString("\u0000"));
-    assertEqual(u0, smgr.makeString("\\u{0}"));
-    assertEqual(u0, smgr.makeString("\\u{00000}"));
+    StringFormula u0 = makeEscapedString("\\u0000");
+    assertEqual(u0, makeEscapedString("\u0000"));
+    assertEqual(u0, makeEscapedString("\\u{0}"));
+    assertEqual(u0, makeEscapedString("\\u{00000}"));
     assertEqual(smgr.length(u0), imgr.makeNumber(1));
 
-    StringFormula u1 = smgr.makeString("\\u1234");
-    assertEqual(u1, smgr.makeString("\u1234"));
-    assertEqual(u1, smgr.makeString("\\u{1234}"));
-    assertEqual(u1, smgr.makeString("\\u{01234}"));
+    StringFormula u1 = makeEscapedString("\\u1234");
+    assertEqual(u1, makeEscapedString("\u1234"));
+    assertEqual(u1, makeEscapedString("\\u{1234}"));
+    assertEqual(u1, makeEscapedString("\\u{01234}"));
     assertEqual(smgr.length(u1), imgr.makeNumber(1));
 
     if (solverToUse() == Solvers.PRINCESS) {
@@ -926,10 +1077,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
               Character.toString(0x10000),
               "\\u{2FFFF}",
               Character.toString(0x2FFFF))) {
-        assertThrows(IllegalArgumentException.class, () -> smgr.makeString(invalidStr));
+        assertThrows(IllegalArgumentException.class, () -> makeEscapedString(invalidStr));
       }
     } else {
-      StringFormula u2 = smgr.makeString("\\u{2FFFF}");
+      StringFormula u2 = makeEscapedString("\\u{2FFFF}");
       assertEqual(u2, smgr.makeString(Character.toString(0x2FFFF)));
       assertEqual(smgr.length(u2), imgr.makeNumber(1));
     }
@@ -943,10 +1094,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void testCharAtWithSpecialCharacters2Byte() throws SolverException, InterruptedException {
     StringFormula num7 = smgr.makeString("7");
     StringFormula u = smgr.makeString("u");
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
-    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
-    StringFormula acurlyClose2BUnicodeb = smgr.makeString("a\\u{7D}b");
-    StringFormula acurlyOpen2BUnicodeWOEscapeCurly = smgr.makeString("au{7B}");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = makeEscapedString("\\u{7D}");
+    StringFormula acurlyClose2BUnicodeb = makeEscapedString("a\\u{7D}b");
+    StringFormula acurlyOpen2BUnicodeWOEscapeCurly = makeEscapedString("au{7B}");
     StringFormula backSlash = smgr.makeString("\\");
 
     assertEqual(smgr.length(backSlash), imgr.makeNumber(1));
@@ -1035,10 +1186,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
     StringFormula aaaaaaaB = smgr.makeString("aaaaaaaB");
     StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
-    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
-    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
-    StringFormula curlyClose2BUnicodeEncased = smgr.makeString("blabla\\u{7D}bla");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = makeEscapedString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = makeEscapedString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula curlyClose2BUnicodeEncased = makeEscapedString("blabla\\u{7D}bla");
 
     assertThatFormula(smgr.contains(empty, empty)).isSatisfiable();
     assertThatFormula(smgr.contains(empty, a)).isUnsatisfiable();
@@ -1078,8 +1229,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula bUppercase = smgr.makeString("B");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
-    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = makeEscapedString("\\u{7D}");
 
     assertThatFormula(
             bmgr.and(smgr.contains(var1, empty), imgr.equal(imgr.makeNumber(0), smgr.length(var1))))
@@ -1140,10 +1291,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula bbbbbbb = smgr.makeString("bbbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
     StringFormula abcAndSoOn = smgr.makeString("abcdefghijklmnopqrstuVwxyz");
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
-    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
-    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
-    StringFormula curlys2BUnicodeWOEscape = smgr.makeString("\\u7B\\u7D");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = makeEscapedString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = makeEscapedString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula curlys2BUnicodeWOEscape = makeEscapedString("\\u7B\\u7D");
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -1178,7 +1329,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula var2 = smgr.makeVariable("var2");
     IntegerFormula intVar = imgr.makeVariable("intVar");
 
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
 
     IntegerFormula zero = imgr.makeNumber(0);
 
@@ -1281,9 +1432,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula aUppercase = smgr.makeString("A");
     StringFormula bUppercase = smgr.makeString("B");
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
-    StringFormula curlyOpen2BUnicode = smgr.makeString("\\u{7B}");
-    StringFormula curlyClose2BUnicode = smgr.makeString("\\u{7D}");
-    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula curlyOpen2BUnicode = makeEscapedString("\\u{7B}");
+    StringFormula curlyClose2BUnicode = makeEscapedString("\\u{7D}");
+    StringFormula multipleCurlys2BUnicode = makeEscapedString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
 
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -1328,8 +1479,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula bbbbbb = smgr.makeString("bbbbbb");
     StringFormula abbbbbb = smgr.makeString("abbbbbb");
 
-    StringFormula multipleCurlys2BUnicode = smgr.makeString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
-    StringFormula multipleCurlys2BUnicodeFromIndex1 = smgr.makeString("\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula multipleCurlys2BUnicode = makeEscapedString("\\u{7B}\\u{7D}\\u{7B}\\u{7B}");
+    StringFormula multipleCurlys2BUnicodeFromIndex1 = makeEscapedString("\\u{7D}\\u{7B}\\u{7B}");
 
     assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(0), imgr.makeNumber(10000)), abbbbbb);
     assertEqual(smgr.substring(abbbbbb, imgr.makeNumber(6), imgr.makeNumber(10000)), b);
@@ -1622,7 +1773,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         .isNotEqualTo(Solvers.Z3);
 
     for (int i = 0; i < WORDS.size(); i++) {
-      for (int j = 1; j < WORDS.size(); j++) {
+      for (int j = 0; j < WORDS.size(); j++) {
         String word1 = WORDS.get(i);
         String word2 = WORDS.get(j);
         String word3 = "replacement";
@@ -1630,7 +1781,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         StringFormula word2F = smgr.makeString(word2);
         StringFormula word3F = smgr.makeString(word3);
 
-        StringFormula result = smgr.makeString(word3.replaceAll(word2, word1));
+        StringFormula result =
+            smgr.makeString(word2.isEmpty() ? word3 : word3.replaceAll(word2, word1));
         assertEqual(smgr.replaceAll(word3F, word2F, word1F), result);
       }
     }
@@ -1724,11 +1876,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void testStringConcatWUnicode() throws SolverException, InterruptedException {
     StringFormula backslash = smgr.makeString("\\");
     StringFormula u = smgr.makeString("u");
-    StringFormula curlyOpen = smgr.makeString("\\u{7B}");
+    StringFormula curlyOpen = makeEscapedString("\\u{7B}");
     StringFormula sevenB = smgr.makeString("7B");
-    StringFormula curlyClose = smgr.makeString("\\u{7D}");
+    StringFormula curlyClose = makeEscapedString("\\u{7D}");
     StringFormula concat = smgr.concat(backslash, u, curlyOpen, sevenB, curlyClose);
-    StringFormula complete = smgr.makeString("\\u{7B}");
+    StringFormula complete = makeEscapedString("\\u{7B}");
 
     // Concatting parts of unicode does not result in the unicode char!
     assertDistinct(concat, complete);
