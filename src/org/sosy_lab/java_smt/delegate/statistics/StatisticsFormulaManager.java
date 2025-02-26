@@ -64,7 +64,6 @@ class StatisticsFormulaManager implements FormulaManager {
     return new StatisticsBooleanFormulaManager(delegate.getBooleanFormulaManager(), stats);
   }
 
-
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
     return new StatisticsArrayFormulaManager(delegate.getArrayFormulaManager(), stats);

@@ -34,6 +34,7 @@ public class SolverFormulaWithAssumptionsTest
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
   protected Logics logicToUse() {

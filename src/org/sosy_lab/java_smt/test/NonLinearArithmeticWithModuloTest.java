@@ -36,6 +36,7 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(

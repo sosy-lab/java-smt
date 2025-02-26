@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+
 @SuppressWarnings("StringSplitter")
 public class SolverLessFormulaCreator
     extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
@@ -41,8 +42,13 @@ public class SolverLessFormulaCreator
   private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
 
   protected SolverLessFormulaCreator() {
-    super(new DummyEnv(), new DummyType(DummyType.Type.BOOLEAN), new DummyType(DummyType.Type.INTEGER),
-        new DummyType(DummyType.Type.RATIONAL), new DummyType(DummyType.Type.STRING), new DummyType(DummyType.Type.REGEX));
+    super(
+        new DummyEnv(),
+        new DummyType(DummyType.Type.BOOLEAN),
+        new DummyType(DummyType.Type.INTEGER),
+        new DummyType(DummyType.Type.RATIONAL),
+        new DummyType(DummyType.Type.STRING),
+        new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
@@ -56,16 +62,12 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public DummyType getArrayType(
-      DummyType indexType,
-      DummyType elementType) {
+  public DummyType getArrayType(DummyType indexType, DummyType elementType) {
     return new DummyType(indexType.myType, elementType.myType);
   }
 
   @Override
-  public DummyFormula makeVariable(
-      DummyType pDummyType,
-      String varName) {
+  public DummyFormula makeVariable(DummyType pDummyType, String varName) {
     DummyFormula result = new DummyFormula(pDummyType);
     result.setName(varName);
     return result;
@@ -78,15 +80,17 @@ public class SolverLessFormulaCreator
       DummyFormula dummyFormula = (DummyFormula) formula;
       switch (dummyFormula.getFormulaType().myType) {
         case BITVECTOR:
-          return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(
-              dummyFormula.getBitvectorLength());
+          return (FormulaType<T>)
+              FormulaType.getBitvectorTypeWithSize(dummyFormula.getBitvectorLength());
         case FLOATING_POINT:
-          return (FormulaType<T>) FormulaType.getFloatingPointType(dummyFormula.getExponent(),
-              dummyFormula.getMantissa());
+          return (FormulaType<T>)
+              FormulaType.getFloatingPointType(
+                  dummyFormula.getExponent(), dummyFormula.getMantissa());
         case ARRAY:
-          return (FormulaType<T>) FormulaType.getArrayType(
-              dummyFormula.getFirstArrayParameter().getFormulaTypeForCreator(),
-              dummyFormula.getSecondArrayParameter().getFormulaTypeForCreator());
+          return (FormulaType<T>)
+              FormulaType.getArrayType(
+                  dummyFormula.getFirstArrayParameter().getFormulaTypeForCreator(),
+                  dummyFormula.getSecondArrayParameter().getFormulaTypeForCreator());
         case RATIONAL:
           return (FormulaType<T>) FormulaType.RationalType;
         case STRING:
@@ -100,13 +104,14 @@ public class SolverLessFormulaCreator
       }
     }
     if (formula instanceof BitvectorFormula) {
-      return (FormulaType<T>) FormulaType.getBitvectorTypeWithSize(
-          extractInfo(formula).getBitvectorLength());
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(extractInfo(formula).getBitvectorLength());
     }
     if (formula instanceof ArrayFormula) {
-      return (FormulaType<T>) FormulaType.getArrayType(
-          extractInfo(formula).getFirstArrayParameter().getFormulaTypeForCreator(),
-          extractInfo(formula).getSecondArrayParameter().getFormulaTypeForCreator());
+      return (FormulaType<T>)
+          FormulaType.getArrayType(
+              extractInfo(formula).getFirstArrayParameter().getFormulaTypeForCreator(),
+              extractInfo(formula).getSecondArrayParameter().getFormulaTypeForCreator());
     }
     return super.getFormulaType(formula);
   }
@@ -130,8 +135,8 @@ public class SolverLessFormulaCreator
       return new DummyFormula(extractBitvectorLengthFromString(pT.toString()));
     }
     if (pT instanceof FloatingPointFormula) {
-      return new DummyFormula(extractExponentFromString(pT.toString()),
-          extractMantissaFromString(pT.toString()));
+      return new DummyFormula(
+          extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
     }
     if (pT instanceof RationalFormula) {
       if (pT.toString().equals("")) {
@@ -144,8 +149,7 @@ public class SolverLessFormulaCreator
       if (pT.toString().equals("")) {
         return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
       }
-      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER),
-          pT.toString());
+      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER), pT.toString());
       return result;
     }
     if (pT instanceof BooleanFormula) {
@@ -162,15 +166,14 @@ public class SolverLessFormulaCreator
     return super.extractInfo(pT);
   }
 
-
   public static int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {
       try {
         String lengthStr = representation.substring(10, representation.length() - 1);
         return Integer.parseInt(lengthStr);
       } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Invalid Bitvector representation: " + representation,
-            e);
+        throw new IllegalArgumentException(
+            "Invalid Bitvector representation: " + representation, e);
       }
     }
     throw new IllegalArgumentException("Invalid Bitvector representation: " + representation);
@@ -181,21 +184,25 @@ public class SolverLessFormulaCreator
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
         if (parts.length != 2) {
-          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException(
+              "Invalid FloatingPoint representation: " + representation);
         }
         return Integer.parseInt(parts[0].trim());
       } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException(
+            "Invalid FloatingPoint representation: " + representation, e);
       }
     } else if (representation.startsWith("(fp #b")) {
       try {
         String[] parts = representation.split(" ");
         if (parts.length != 4) {
-          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException(
+              "Invalid FloatingPoint representation: " + representation);
         }
         return parts[2].length() - 2; // Remove #b prefix and count bits
       } catch (Exception e) {
-        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException(
+            "Invalid FloatingPoint representation: " + representation, e);
       }
     }
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
@@ -206,44 +213,46 @@ public class SolverLessFormulaCreator
       try {
         String[] parts = representation.substring(14, representation.length() - 1).split(",");
         if (parts.length != 2) {
-          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException(
+              "Invalid FloatingPoint representation: " + representation);
         }
         return Integer.parseInt(parts[1].trim());
       } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException(
+            "Invalid FloatingPoint representation: " + representation, e);
       }
     } else if (representation.startsWith("(fp #b")) {
       try {
         String[] parts = representation.split(" ");
         if (parts.length != 4) {
-          throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
+          throw new IllegalArgumentException(
+              "Invalid FloatingPoint representation: " + representation);
         }
         return parts[3].length() - 2; // Remove #b prefix and count bits
       } catch (Exception e) {
-        throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation, e);
+        throw new IllegalArgumentException(
+            "Invalid FloatingPoint representation: " + representation, e);
       }
     }
     throw new IllegalArgumentException("Invalid FloatingPoint representation: " + representation);
   }
 
-
-
   @Override
   public DummyFunction declareUFImpl(
-      String pName,
-      DummyType pReturnType,
-      List<DummyType> pArgTypes) {
+      String pName, DummyType pReturnType, List<DummyType> pArgTypes) {
     if (pName.isEmpty()) {
       throw new IllegalArgumentException("UF name cannot be null or empty");
     }
 
-    return uninterpretedFunctions.computeIfAbsent(pName, key -> {
-      DummyFunction function = new DummyFunction();
-      function.setName(key);
-      function.setReturnType(pReturnType);
-      function.setArgumentTypes(pArgTypes);
-      return function;
-    });
+    return uninterpretedFunctions.computeIfAbsent(
+        pName,
+        key -> {
+          DummyFunction function = new DummyFunction();
+          function.setName(key);
+          function.setReturnType(pReturnType);
+          function.setArgumentTypes(pArgTypes);
+          return function;
+        });
   }
 
   @Override
@@ -283,8 +292,7 @@ public class SolverLessFormulaCreator
     if (declaration.getReturnType().isArray()) {
       for (DummyFormula arg : args) {
         if (arg.getFormulaType().isArray()) {
-          result = new DummyFormula(arg.getFirstArrayParameter(),
-              arg.getSecondArrayParameter());
+          result = new DummyFormula(arg.getFirstArrayParameter(), arg.getSecondArrayParameter());
         }
       }
     }
@@ -296,6 +304,6 @@ public class SolverLessFormulaCreator
 
   @Override
   protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
-    return new DummyFunction(); //not supported
+    return new DummyFunction(); // not supported
   }
 }

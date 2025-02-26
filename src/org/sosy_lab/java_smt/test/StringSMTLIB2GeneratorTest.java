@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-
 import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Objects;
@@ -33,7 +32,6 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -41,7 +39,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
   }
 
   @Test
-  public void testMakeStringVariable(){
+  public void testMakeStringVariable() {
     requireStrings();
     StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
     StringFormula test = Objects.requireNonNull(smgr).makeVariable("test");
@@ -51,22 +49,20 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a String)\n"
-        + "(declare-const test String)\n"
-        + "(assert (= a test))\n";
+    String expectedResult =
+        "(declare-const a String)\n" + "(declare-const test String)\n" + "(assert (= a test))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
-  public void testMakeString(){
+  public void testMakeString() {
     requireStrings();
     StringFormula a = Objects.requireNonNull(smgr).makeString("a");
     StringFormula b = Objects.requireNonNull(smgr).makeVariable("a");
     BooleanFormula constraint = smgr.equal(a, b);
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
-    String expectedResult = "(declare-const a String)\n"
-        + "(assert (= \"a\" a))\n";
+    String expectedResult = "(declare-const a String)\n" + "(assert (= \"a\" a))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
@@ -82,10 +78,11 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a String)\n"
-        + "(declare-const b String)\n"
-        + "(declare-const result String)\n"
-        + "(assert (= (str.++ a b) result))\n";
+    String expectedResult =
+        "(declare-const a String)\n"
+            + "(declare-const b String)\n"
+            + "(declare-const result String)\n"
+            + "(assert (= (str.++ a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -101,8 +98,8 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(assert (str.contains str \"part\"))\n";
+    String expectedResult =
+        "(declare-const str String)\n" + "(assert (str.contains str \"part\"))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -117,10 +114,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
     Generator.assembleConstraint(imgr.equal(smgr.indexOf(str, part, startIndex), result));
     String actualResult = String.valueOf(Generator.getLines());
 
-
-    String expectedResult = "(declare-const str String)\n"
-        + "(declare-const result Int)\n"
-        + "(assert (= (str.indexof str \"find\" 0) result))\n";
+    String expectedResult =
+        "(declare-const str String)\n"
+            + "(declare-const result Int)\n"
+            + "(assert (= (str.indexof str \"find\" 0) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -138,9 +135,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(declare-const result String)\n"
-        + "(assert (= (str.substr str 2 4) result))\n";
+    String expectedResult =
+        "(declare-const str String)\n"
+            + "(declare-const result String)\n"
+            + "(assert (= (str.substr str 2 4) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -157,9 +155,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(declare-const result String)\n"
-        + "(assert (= (str.replace str \"target\" \"replace\") result))\n";
+    String expectedResult =
+        "(declare-const str String)\n"
+            + "(declare-const result String)\n"
+            + "(assert (= (str.replace str \"target\" \"replace\") result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -174,9 +173,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(declare-const result Int)\n"
-        + "(assert (= (str.len str) result))\n";
+    String expectedResult =
+        "(declare-const str String)\n"
+            + "(declare-const result Int)\n"
+            + "(assert (= (str.len str) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -191,8 +191,8 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(assert (str.in_re str (re.from_str \".*test.*\")))\n";
+    String expectedResult =
+        "(declare-const str String)\n" + "(assert (str.in_re str (re.from_str \".*test.*\")))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -207,9 +207,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(declare-const result Int)\n"
-        + "(assert (= (str.to_int str) result))\n";
+    String expectedResult =
+        "(declare-const str String)\n"
+            + "(declare-const result Int)\n"
+            + "(assert (= (str.to_int str) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -224,8 +225,8 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const result String)\n"
-        + "(assert (= (int.to_str 42) result))\n";
+    String expectedResult =
+        "(declare-const result String)\n" + "(assert (= (int.to_str 42) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

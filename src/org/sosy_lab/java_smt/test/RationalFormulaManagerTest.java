@@ -33,6 +33,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final double[] SOME_DOUBLES =
       new double[] {
         0, 0.1, 0.25, 0.5, 1, 1.5, 1.9, 2.1, 2.5, -0.1, -0.5, -1, -1.5, -1.9, -2.1, -2.5,

@@ -34,6 +34,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final ImmutableList<String> WORDS =
       ImmutableList.of(
           "",

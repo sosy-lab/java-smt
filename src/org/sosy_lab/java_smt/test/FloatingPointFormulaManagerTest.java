@@ -46,6 +46,7 @@ public class FloatingPointFormulaManagerTest
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   // numbers are small enough to be precise with single precision
   private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 

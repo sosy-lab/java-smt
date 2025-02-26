@@ -55,6 +55,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   /** visit a formula and fail on OTHER, i.e., unexpected function declaration type. */
   private final class FunctionDeclarationVisitorNoOther extends DefaultFormulaVisitor<Formula> {
 

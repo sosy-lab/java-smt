@@ -38,6 +38,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();

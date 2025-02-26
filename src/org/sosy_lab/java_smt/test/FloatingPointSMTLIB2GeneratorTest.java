@@ -14,9 +14,9 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
+
 @SuppressWarnings({"all"})
-public class FloatingPointSMTLIB2GeneratorTest
-    extends SolverBasedTest0 {
+public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return Solvers.CVC5;
@@ -31,19 +31,20 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testMakeVariable() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
 
     Generator.assembleConstraint(constraint);
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq a b))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq a b))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -51,27 +52,34 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testMakeFloatingPoint() {
     requireFloats();
-    FloatingPointFormula a = fpmgr.makeVariable("a",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula b = fpmgr.makeVariable("b",
-        FormulaType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula c = fpmgr.makeVariable("c",
-        FormulaType.getSinglePrecisionFloatingPointType());
-    BooleanFormula assign1 = fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0,
-        FloatingPointType.getSinglePrecisionFloatingPointType(),
-        FloatingPointRoundingMode.TOWARD_ZERO));
-    BooleanFormula assign2 = fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(15.0,
-        FormulaType.getSinglePrecisionFloatingPointType()));
-    BooleanFormula assign3 = fpmgr.equalWithFPSemantics(c, fpmgr.makeNumber(25.0,
-        FormulaType.getSinglePrecisionFloatingPointType()));
+    FloatingPointFormula a =
+        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeVariable("b", FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getSinglePrecisionFloatingPointType());
+    BooleanFormula assign1 =
+        fpmgr.equalWithFPSemantics(
+            a,
+            fpmgr.makeNumber(
+                10.0,
+                FloatingPointType.getSinglePrecisionFloatingPointType(),
+                FloatingPointRoundingMode.TOWARD_ZERO));
+    BooleanFormula assign2 =
+        fpmgr.equalWithFPSemantics(
+            b, fpmgr.makeNumber(15.0, FormulaType.getSinglePrecisionFloatingPointType()));
+    BooleanFormula assign3 =
+        fpmgr.equalWithFPSemantics(
+            c, fpmgr.makeNumber(25.0, FormulaType.getSinglePrecisionFloatingPointType()));
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.add(a, b), c);
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq a (fp #b0 #b10000010 #b01000000000000000000000)))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq b (fp #b0 #b10000010 #b11100000000000000000000)))\n"
-        + "(declare-const c (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq c (fp #b0 #b10000011 #b10010000000000000000000)))\n"
-        + "(assert (fp.eq (fp.add a b) c))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq a (fp #b0 #b10000010 #b01000000000000000000000)))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq b (fp #b0 #b10000010 #b11100000000000000000000)))\n"
+            + "(declare-const c (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq c (fp #b0 #b10000011 #b10010000000000000000000)))\n"
+            + "(assert (fp.eq (fp.add a b) c))\n";
     Generator.assembleConstraint(assign1);
     Generator.assembleConstraint(assign2);
     Generator.assembleConstraint(assign3);
@@ -96,10 +104,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.add a b) result))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.add a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -120,10 +129,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.sub a b) result))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.sub a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -144,10 +154,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.div a b) result))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.div a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -168,10 +179,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.mul a b) result))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.mul a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -190,9 +202,10 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.sqrt a) result))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.sqrt a) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -209,8 +222,8 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.isNaN a))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.isNaN a))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -227,8 +240,8 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.isZero a))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.isZero a))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -247,10 +260,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const max (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.max a b) max))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const max (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.max a b) max))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -269,10 +283,11 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const b (_ FloatingPoint 8 23))\n"
-        + "(declare-const min (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (fp.min a b) min))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const min (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (fp.min a b) min))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -280,18 +295,20 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testMakePlusInfinity() {
     requireFloats();
-    FloatingPointFormula plusInfinity = fpmgr.makeVariable("plusInfinity",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula plusInfinity =
+        fpmgr.makeVariable("plusInfinity", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint =
-        fpmgr.equalWithFPSemantics(plusInfinity,
+        fpmgr.equalWithFPSemantics(
+            plusInfinity,
             fpmgr.makePlusInfinity(FloatingPointType.getSinglePrecisionFloatingPointType()));
 
     Generator.assembleConstraint(constraint);
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const plusInfinity (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq plusInfinity (_ +oo 8 23)))\n";
+    String expectedResult =
+        "(declare-const plusInfinity (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq plusInfinity (_ +oo 8 23)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -299,18 +316,21 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testMakeMinusInfinity() {
     requireFloats();
-    FloatingPointFormula minusInfinity = fpmgr.makeVariable("minusInfinity",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula minusInfinity =
+        fpmgr.makeVariable(
+            "minusInfinity", FloatingPointType.getSinglePrecisionFloatingPointType());
     BooleanFormula constraint =
-        fpmgr.equalWithFPSemantics(minusInfinity,
+        fpmgr.equalWithFPSemantics(
+            minusInfinity,
             fpmgr.makeMinusInfinity(FloatingPointType.getSinglePrecisionFloatingPointType()));
 
     Generator.assembleConstraint(constraint);
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const minusInfinity (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq minusInfinity (_ -oo 8 23)))\n";
+    String expectedResult =
+        "(declare-const minusInfinity (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq minusInfinity (_ -oo 8 23)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -320,16 +340,16 @@ public class FloatingPointSMTLIB2GeneratorTest
     requireFloats();
     FloatingPointFormula nan =
         fpmgr.makeVariable("nan", FloatingPointType.getSinglePrecisionFloatingPointType());
-    BooleanFormula constraint = fpmgr.equalWithFPSemantics(nan,
-        fpmgr.makeNaN(FloatingPointType.getSinglePrecisionFloatingPointType()));
-
+    BooleanFormula constraint =
+        fpmgr.equalWithFPSemantics(
+            nan, fpmgr.makeNaN(FloatingPointType.getSinglePrecisionFloatingPointType()));
 
     Generator.assembleConstraint(constraint);
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const nan (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq nan (_ NaN 8 23)))\n";
+    String expectedResult =
+        "(declare-const nan (_ FloatingPoint 8 23))\n" + "(assert (fp.eq nan (_ NaN 8 23)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -340,17 +360,17 @@ public class FloatingPointSMTLIB2GeneratorTest
     FloatingPointFormula a =
         fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
     BitvectorFormula castResult = bvmgr.makeVariable(32, "castResult");
-    BooleanFormula constraint = bvmgr.equal(fpmgr.castTo(a, true,
-            FormulaType.getBitvectorTypeWithSize(32)),
-        castResult);
+    BooleanFormula constraint =
+        bvmgr.equal(fpmgr.castTo(a, true, FormulaType.getBitvectorTypeWithSize(32)), castResult);
 
     Generator.assembleConstraint(constraint);
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(declare-const castResult (_ BitVec 32))\n"
-        + "(assert (= ((_ fp.to_sbv 32) a) castResult))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n"
+            + "(declare-const castResult (_ BitVec 32))\n"
+            + "(assert (= ((_ fp.to_sbv 32) a) castResult))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -362,66 +382,69 @@ public class FloatingPointSMTLIB2GeneratorTest
     FloatingPointFormula castResult =
         fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
 
-
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(castResult, fpmgr.castFrom(b, true,
-        FloatingPointType.getSinglePrecisionFloatingPointType())));
+    Generator.assembleConstraint(
+        fpmgr.equalWithFPSemantics(
+            castResult,
+            fpmgr.castFrom(b, true, FloatingPointType.getSinglePrecisionFloatingPointType())));
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(declare-const b Bool)\n"
-        + "(assert (fp.eq result ((_ to_fp 8 23) b)))\n";
+    String expectedResult =
+        "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(declare-const b Bool)\n"
+            + "(assert (fp.eq result ((_ to_fp 8 23) b)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testFromIeeeBitvector() {
-    if(solverToUse()==Solvers.CVC5){
-        return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
+    if (solverToUse() == Solvers.CVC5) {
+      return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
     }
     requireFloats();
     requireBitvectors();
     String bvs = "00000000000000000000000000000000";
-    BitvectorFormula bv = bvmgr.makeBitvector(32, new BigInteger(bvs,
-        2));
-    FloatingPointFormula result = fpmgr.makeVariable("result",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
+    BitvectorFormula bv = bvmgr.makeBitvector(32, new BigInteger(bvs, 2));
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
 
-
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(
-        fpmgr.fromIeeeBitvector(bv,
-            FloatingPointType.getSinglePrecisionFloatingPointType()), result));
+    Generator.assembleConstraint(
+        fpmgr.equalWithFPSemantics(
+            fpmgr.fromIeeeBitvector(bv, FloatingPointType.getSinglePrecisionFloatingPointType()),
+            result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (((_ to_fp 8 23) #b00000000000000000000000000000000) result))\n";
+    String expectedResult =
+        "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (((_ to_fp 8 23) #b00000000000000000000000000000000) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testFromIeeeBitvectorWithVariable() {
-    if(solverToUse()==Solvers.CVC5){
-        return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
+    if (solverToUse() == Solvers.CVC5) {
+      return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
     }
     requireFloats();
     requireBitvectors();
     BitvectorFormula bv = bvmgr.makeVariable(32, "bv");
-    FloatingPointFormula result = fpmgr.makeVariable("result",
-        FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula result =
+        fpmgr.makeVariable("result", FloatingPointType.getSinglePrecisionFloatingPointType());
 
-
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(
-        fpmgr.fromIeeeBitvector(bv,
-            FloatingPointType.getSinglePrecisionFloatingPointType()), result));
+    Generator.assembleConstraint(
+        fpmgr.equalWithFPSemantics(
+            fpmgr.fromIeeeBitvector(bv, FloatingPointType.getSinglePrecisionFloatingPointType()),
+            result));
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const bv (_ BitVec 32))\n"
-        + "(declare-const result (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq (((_ to_fp 8 23) bv) result))\n";
+    String expectedResult =
+        "(declare-const bv (_ BitVec 32))\n"
+            + "(declare-const result (_ FloatingPoint 8 23))\n"
+            + "(assert (fp.eq (((_ to_fp 8 23) bv) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -432,17 +455,15 @@ public class FloatingPointSMTLIB2GeneratorTest
     FloatingPointFormula a =
         fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
 
-
-    Generator.assembleConstraint(fpmgr.equalWithFPSemantics(a,
-        fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)));
+    Generator.assembleConstraint(
+        fpmgr.equalWithFPSemantics(
+            a, fpmgr.round(a, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN)));
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const a (_ FloatingPoint 8 23))\n"
-        + "(assert (fp.eq a (fp.round RNE a)))\n";
+    String expectedResult =
+        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.eq a (fp.round RNE a)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-
-
 }

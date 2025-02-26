@@ -41,6 +41,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   protected abstract BasicProverEnvironment<?> newEnvironmentForTest(
       SolverContext pContext, ProverOptions... options);
 

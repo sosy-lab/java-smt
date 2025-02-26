@@ -30,6 +30,7 @@ public class ProverEnvironmentSubjectTest extends SolverBasedTest0.Parameterized
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private BooleanFormula simpleFormula;
   private BooleanFormula contradiction;
 

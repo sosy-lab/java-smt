@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-
 import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -60,31 +59,36 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
   }
+
   @Override
   public FloatingPointFormula makeNumber(Rational pN, FormulaType.FloatingPointType pType) {
-    FloatingPointFormula result = wrap(makeNumberImpl(pN.toString(), pType, getDefaultRoundingMode()));
+    FloatingPointFormula result =
+        wrap(makeNumberImpl(pN.toString(), pType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN.toString());
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), pN.toString());
     }
     return result;
   }
+
   @Override
   public FloatingPointFormula makeNumber(
       Rational pN, FloatingPointType pType, FloatingPointRoundingMode pRoundingMode) {
-    FloatingPointFormula result = wrap(makeNumberImpl(pN.toString(), pType, getRoundingMode(pRoundingMode)));
+    FloatingPointFormula result =
+        wrap(makeNumberImpl(pN.toString(), pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN.toString());
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), pN.toString());
     }
     return result;
   }
+
   @Override
   public FloatingPointFormula makeNumber(double pN, FormulaType.FloatingPointType pType) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN));
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -94,8 +98,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       double pN, FloatingPointType pType, FloatingPointRoundingMode pRoundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN));
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -107,8 +111,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(BigDecimal pN, FormulaType.FloatingPointType pType) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN));
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -118,8 +122,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       BigDecimal pN, FloatingPointType pType, FloatingPointRoundingMode pRoundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), String.valueOf(pN));
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), String.valueOf(pN));
     }
     return result;
   }
@@ -133,19 +137,19 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeNumber(String pN, FormulaType.FloatingPointType pType) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN);
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), pN);
     }
     return result;
   }
 
- @Override
+  @Override
   public FloatingPointFormula makeNumber(
       String pN, FloatingPointType pType, FloatingPointRoundingMode pRoundingMode) {
     FloatingPointFormula result = wrap(makeNumberImpl(pN, pType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logMakeFloatingPoint(result, pType.getExponentSize(),
-          pType.getMantissaSize(), pN);
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result, pType.getExponentSize(), pType.getMantissaSize(), pN);
     }
     return result;
   }
@@ -181,7 +185,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula makeVariable(String pVar, FormulaType.FloatingPointType pType) {
     AbstractFormulaManager.checkVariableName(pVar);
     FloatingPointFormula result = wrap(makeVariableImpl(pVar, pType));
-    if(Generator.isLoggingEnabled()){
+    if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logMakeFloatingPointVariable(result, pType, pVar);
     }
     return result;
@@ -226,10 +230,11 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public <T extends Formula> T castTo(
       FloatingPointFormula pNumber, boolean pSigned, FormulaType<T> pTargetType) {
-    T result = getFormulaCreator()
-        .encapsulate(
-            pTargetType,
-            castToImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
+    T result =
+        getFormulaCreator()
+            .encapsulate(
+                pTargetType,
+                castToImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logFPCastTo(result, pNumber, pTargetType, pSigned);
     }
@@ -242,21 +247,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       boolean signed,
       FormulaType<T> pTargetType,
       FloatingPointRoundingMode pRoundingMode) {
-    T result = getFormulaCreator()
-        .encapsulate(
-            pTargetType,
-            castToImpl(
-                extractInfo(pNumber),
-                signed,
+    T result =
+        getFormulaCreator()
+            .encapsulate(
                 pTargetType,
-                getRoundingMode(pRoundingMode)));
+                castToImpl(
+                    extractInfo(pNumber), signed, pTargetType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastTo(result, pNumber,
-          pRoundingMode.getSMTLIBFormat(), pTargetType, signed);
+      FloatingPointGenerator.logFPCastTo(
+          result, pNumber, pRoundingMode.getSMTLIBFormat(), pTargetType, signed);
     }
     return result;
   }
-
 
   protected abstract TFormulaInfo castToImpl(
       TFormulaInfo pNumber,
@@ -267,7 +269,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula castFrom(
       Formula pNumber, boolean pSigned, FloatingPointType pTargetType) {
-    FloatingPointFormula result = wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
+    FloatingPointFormula result =
+        wrap(castFromImpl(extractInfo(pNumber), pSigned, pTargetType, getDefaultRoundingMode()));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logFPCastFrom(result, pNumber, pTargetType);
     }
@@ -280,11 +283,13 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       boolean pSigned,
       FloatingPointType pTargetType,
       FloatingPointRoundingMode pRoundingMode) {
-    FloatingPointFormula result = wrap(
-        castFromImpl(
-            extractInfo(pNumber), pSigned, pTargetType, getRoundingMode(pRoundingMode)));
+    FloatingPointFormula result =
+        wrap(
+            castFromImpl(
+                extractInfo(pNumber), pSigned, pTargetType, getRoundingMode(pRoundingMode)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastFrom(result, pNumber, pTargetType, pRoundingMode.getSMTLIBFormat());
+      FloatingPointGenerator.logFPCastFrom(
+          result, pNumber, pTargetType, pRoundingMode.getSMTLIBFormat());
     }
     return result;
   }
@@ -294,7 +299,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       boolean pSigned,
       FormulaType.FloatingPointType pTargetType,
       TFormulaInfo pRoundingMode);
-
 
   @Override
   public FloatingPointFormula fromIeeeBitvector(
@@ -311,10 +315,11 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
-    BitvectorFormula result = getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
+    BitvectorFormula result =
+        getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
     if (Generator.isLoggingEnabled()) {
-      FloatingPointGenerator.logFPCastTo(result, pNumber,
-          getFormulaCreator().getFormulaType(result), true);
+      FloatingPointGenerator.logFPCastTo(
+          result, pNumber, getFormulaCreator().getFormulaType(result), true);
     }
     return result;
   }
@@ -400,7 +405,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   @Override
-  public FloatingPointFormula add(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2, FloatingPointRoundingMode pRoundingMode) {
+  public FloatingPointFormula add(
+      FloatingPointFormula pNumber1,
+      FloatingPointFormula pNumber2,
+      FloatingPointRoundingMode pRoundingMode) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(add(param1, param2, getRoundingMode(pRoundingMode)));
@@ -414,7 +422,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pRoundingMode);
 
   @Override
-  public FloatingPointFormula subtract(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public FloatingPointFormula subtract(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(subtract(param1, param2, getDefaultRoundingMode()));
@@ -426,7 +435,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula subtract(
-      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2, FloatingPointRoundingMode pRoundingMode) {
+      FloatingPointFormula pNumber1,
+      FloatingPointFormula pNumber2,
+      FloatingPointRoundingMode pRoundingMode) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(subtract(param1, param2, getRoundingMode(pRoundingMode)));
@@ -452,7 +463,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula divide(
-      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2, FloatingPointRoundingMode pRoundingMode) {
+      FloatingPointFormula pNumber1,
+      FloatingPointFormula pNumber2,
+      FloatingPointRoundingMode pRoundingMode) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(divide(param1, param2, getRoundingMode(pRoundingMode)));
@@ -466,7 +479,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       TFormulaInfo pParam1, TFormulaInfo pParam2, TFormulaInfo pFloatingPointRoundingMode);
 
   @Override
-  public FloatingPointFormula multiply(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public FloatingPointFormula multiply(
+      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(multiply(param1, param2, getDefaultRoundingMode()));
@@ -477,7 +491,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   @Override
-  public FloatingPointFormula multiply(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2, FloatingPointRoundingMode pRoundingMode) {
+  public FloatingPointFormula multiply(
+      FloatingPointFormula pNumber1,
+      FloatingPointFormula pNumber2,
+      FloatingPointRoundingMode pRoundingMode) {
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
     FloatingPointFormula result = wrap(multiply(param1, param2, getRoundingMode(pRoundingMode)));
@@ -504,7 +521,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public BooleanFormula equalWithFPSemantics(
       FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
-    BooleanFormula result = wrapBool(equalWithFPSemantics(extractInfo(pNumber1), extractInfo(pNumber2)));
+    BooleanFormula result =
+        wrapBool(equalWithFPSemantics(extractInfo(pNumber1), extractInfo(pNumber2)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logFPEqual(result, pNumber1, pNumber2);
     }
@@ -523,7 +541,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     }
     return result;
   }
-
 
   protected abstract TFormulaInfo greaterThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
@@ -553,8 +570,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected abstract TFormulaInfo lessThan(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
-  public BooleanFormula lessOrEquals(
-      FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
+  public BooleanFormula lessOrEquals(FloatingPointFormula pNumber1, FloatingPointFormula pNumber2) {
     BooleanFormula result = wrapBool(lessOrEquals(extractInfo(pNumber1), extractInfo(pNumber2)));
     if (Generator.isLoggingEnabled()) {
       FloatingPointGenerator.logFPLessOrEquals(result, pNumber1, pNumber2);
@@ -642,6 +658,4 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   protected abstract TFormulaInfo round(
       TFormulaInfo pFormula, FloatingPointRoundingMode pRoundingMode);
-
-
 }

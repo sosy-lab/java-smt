@@ -26,14 +26,13 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaManager<IntegerFormula,
-    IntegerFormula>
-    implements IntegerFormulaManager{
+public class SolverLessIntegerFormulaManager
+    extends SolverLessNumeralFormulaManager<IntegerFormula, IntegerFormula>
+    implements IntegerFormulaManager {
 
   public SolverLessIntegerFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
-
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
@@ -47,7 +46,7 @@ public class SolverLessIntegerFormulaManager extends SolverLessNumeralFormulaMan
 
   @Override
   protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER),i);
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), i);
   }
 
   @Override

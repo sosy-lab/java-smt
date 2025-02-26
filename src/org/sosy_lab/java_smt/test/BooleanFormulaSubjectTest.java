@@ -36,6 +36,7 @@ public class BooleanFormulaSubjectTest extends SolverBasedTest0.ParameterizedSol
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Before
   public void setupFormulas() {
     if (imgr != null) {

@@ -35,6 +35,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();

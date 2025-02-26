@@ -20,7 +20,6 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -31,47 +30,44 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
-
-@SuppressWarnings({"StringCaseLocaleUsage","rawtypes","Immutable"})
-//@Immutable
-public class DummyFormula implements Formula,
-                                                                           BitvectorFormula,
-                                                      FloatingPointFormula,
-                                     ArrayFormula,
-                                     NumeralFormula, BooleanFormula,
-                                     IntegerFormula
-    , RationalFormula {
-  private String name ="unnamed";
+@SuppressWarnings({"StringCaseLocaleUsage", "rawtypes", "Immutable"})
+// @Immutable
+public class DummyFormula
+    implements Formula,
+        BitvectorFormula,
+        FloatingPointFormula,
+        ArrayFormula,
+        NumeralFormula,
+        BooleanFormula,
+        IntegerFormula,
+        RationalFormula {
+  private String name = "unnamed";
   private DummyFormula firstArrayParameter = null;
   private DummyFormula secondArrayParameter = null;
   private String representation = "";
   private final DummyType formulaType;
   private String value = "";
 
-
-
   public DummyFormula(DummyType pFormulaType) {
-    if(pFormulaType.isArray()){
+    if (pFormulaType.isArray()) {
       DummyFormula formula = createDummyFormulaArrayFromString(pFormulaType.toString());
-        firstArrayParameter = formula.getFirstArrayParameter();
-        secondArrayParameter = formula.getSecondArrayParameter();
-        representation = formula.representation;
-        formulaType = formula.formulaType;
-        value = formula.value;
-        name = formula.name;
-    }else{
+      firstArrayParameter = formula.getFirstArrayParameter();
+      secondArrayParameter = formula.getSecondArrayParameter();
+      representation = formula.representation;
+      formulaType = formula.formulaType;
+      value = formula.value;
+      name = formula.name;
+    } else {
       formulaType = pFormulaType;
     }
     updateRepresentation();
   }
-
 
   public DummyFormula(boolean value) {
     formulaType = new DummyType(DummyType.Type.BOOLEAN);
     this.value = String.valueOf(value);
     updateRepresentation();
   }
-
 
   public DummyFormula(DummyType pFormulaType, String pRepresentation) {
     formulaType = pFormulaType;
@@ -82,18 +78,20 @@ public class DummyFormula implements Formula,
     updateRepresentation();
   }
 
-
   public DummyFormula(
       DummyFormula pFirstArrayParameter,
-      DummyFormula pSecondArrayParameter) { //if it represents an array
+      DummyFormula pSecondArrayParameter) { // if it represents an array
     representation = "";
-    formulaType = new DummyType(pFirstArrayParameter.getFormulaType().myType, pSecondArrayParameter.getFormulaType().myType);
+    formulaType =
+        new DummyType(
+            pFirstArrayParameter.getFormulaType().myType,
+            pSecondArrayParameter.getFormulaType().myType);
     firstArrayParameter = pFirstArrayParameter;
     secondArrayParameter = pSecondArrayParameter;
     updateRepresentation();
   }
 
-  public DummyFormula(int exponent, int mantissa) { //if it represents a FloatingPoint
+  public DummyFormula(int exponent, int mantissa) { // if it represents a FloatingPoint
     formulaType = new DummyType(exponent, mantissa);
     updateRepresentation();
   }
@@ -102,15 +100,18 @@ public class DummyFormula implements Formula,
     formulaType = new DummyType(pBitvectorLength);
     updateRepresentation();
   }
-  public void setName(String name){
+
+  public void setName(String name) {
     this.name = name;
   }
-  public String getName(){
+
+  public String getName() {
     return name;
   }
 
   /**
    * Helper method which transforms any FormulaType Object into the matching DummyFormula
+   *
    * @param pType FormulaType-Object
    * @return DummyFormula with the correct Type.
    */
@@ -119,8 +120,8 @@ public class DummyFormula implements Formula,
       FormulaType.ArrayFormulaType<?, ?> arrayType = (FormulaType.ArrayFormulaType<?, ?>) pType;
       FormulaType<?> indexType = arrayType.getIndexType();
       FormulaType<?> elementType = arrayType.getElementType();
-      return new DummyFormula(getDummyFormulaFromObject(indexType),
-          getDummyFormulaFromObject(elementType));
+      return new DummyFormula(
+          getDummyFormulaFromObject(indexType), getDummyFormulaFromObject(elementType));
     } else if (pType.isBitvectorType()) {
       FormulaType.BitvectorType bitvectorType = (FormulaType.BitvectorType) pType;
       int size = bitvectorType.getSize();
@@ -149,8 +150,9 @@ public class DummyFormula implements Formula,
   }
 
   /**
-   * This method is an internal helper method which creates the internal representation of
-   * an ArrayFormula to be later extracted by the FormulaCreator
+   * This method is an internal helper method which creates the internal representation of an
+   * ArrayFormula to be later extracted by the FormulaCreator
+   *
    * @return The correct representation as a String
    */
   private String getArrayRepresentation() {
@@ -175,8 +177,9 @@ public class DummyFormula implements Formula,
   }
 
   /**
-   * This is the reverse Method to be used in the FormulaCreator. It extracts the indexElement
-   * and the Element types from the string to create a matching ArrayFormula
+   * This is the reverse Method to be used in the FormulaCreator. It extracts the indexElement and
+   * the Element types from the string to create a matching ArrayFormula
+   *
    * @param input String in the Array<IndexElement, Element>
    * @return DummyFormula representing the Array without values.
    */
@@ -197,14 +200,12 @@ public class DummyFormula implements Formula,
       DummyFormula firstArrayParameter = createDummyFormulaArrayFromString(firstParameter);
       DummyFormula secondArrayParameter = createDummyFormulaArrayFromString(secondParameter);
 
-
       return new DummyFormula(firstArrayParameter, secondArrayParameter);
     }
 
-
     try {
       String convertedType = input.toUpperCase();
-      switch (convertedType.substring(0,3)) {
+      switch (convertedType.substring(0, 3)) {
         case "INT":
           return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
         case "RAT":
@@ -216,22 +217,25 @@ public class DummyFormula implements Formula,
         case "REG":
           return new DummyFormula(new DummyType(DummyType.Type.REGEX));
         case "BIT":
-          return new DummyFormula(new DummyType(SolverLessFormulaCreator.extractBitvectorLengthFromString(input)));
+          return new DummyFormula(
+              new DummyType(SolverLessFormulaCreator.extractBitvectorLengthFromString(input)));
         case "FLO":
-          return new DummyFormula(new DummyType(SolverLessFormulaCreator.extractExponentFromString(input),
-              SolverLessFormulaCreator.extractMantissaFromString(input)));
+          return new DummyFormula(
+              new DummyType(
+                  SolverLessFormulaCreator.extractExponentFromString(input),
+                  SolverLessFormulaCreator.extractMantissaFromString(input)));
         default:
           throw new IllegalArgumentException("Unsupported type: " + input);
       }
     } catch (IllegalArgumentException e) {
-      throw new IllegalArgumentException(
-          "Invalid representation or unsupported type: " + input, e);
+      throw new IllegalArgumentException("Invalid representation or unsupported type: " + input, e);
     }
   }
 
   /**
-   * Internal helper Method which is needed to determine at which index the "," is in order
-   * to correctly extract the index and the element types
+   * Internal helper Method which is needed to determine at which index the "," is in order to
+   * correctly extract the index and the element types
+   *
    * @param content String in the internal array representation
    * @return index of the "," otherwise -1
    */
@@ -251,11 +255,10 @@ public class DummyFormula implements Formula,
   }
 
   /**
-   * This method ensures that the DummyFormula has the format which the FormulaCreator needs
-   * to extract the information and create a matching DummyFormula from the representation-string
-   * This is necessary as the Bitvector, FloatingPoint and Array FormulaTypes need more information
-   * as just the FormulaType.
-   * The Values are represented too.
+   * This method ensures that the DummyFormula has the format which the FormulaCreator needs to
+   * extract the information and create a matching DummyFormula from the representation-string This
+   * is necessary as the Bitvector, FloatingPoint and Array FormulaTypes need more information as
+   * just the FormulaType. The Values are represented too.
    */
   private void updateRepresentation() {
     switch (formulaType.myType) {
@@ -287,13 +290,13 @@ public class DummyFormula implements Formula,
     }
   }
 
-
   public DummyType getFormulaType() {
     return formulaType;
   }
 
   /**
    * This method transforms this DummyFormula into the matching FormulaType Object
+   *
    * @return matching Formula Type Object.
    */
   public FormulaType<?> getFormulaTypeForCreator() {
@@ -303,7 +306,8 @@ public class DummyFormula implements Formula,
       case FLOATING_POINT:
         return FormulaType.getFloatingPointType(getExponent(), getMantissa());
       case ARRAY:
-        return FormulaType.getArrayType(firstArrayParameter.getFormulaTypeForCreator(),
+        return FormulaType.getArrayType(
+            firstArrayParameter.getFormulaTypeForCreator(),
             secondArrayParameter.getFormulaTypeForCreator());
       case RATIONAL:
         return FormulaType.RationalType;
@@ -322,26 +326,21 @@ public class DummyFormula implements Formula,
     return formulaType.getExponent();
   }
 
-
   public int getMantissa() {
     return formulaType.getMantissa();
   }
-
 
   public int getBitvectorLength() {
     return formulaType.getBitvectorLength();
   }
 
-
   public DummyFormula getFirstArrayParameter() {
     return firstArrayParameter;
   }
 
-
   public DummyFormula getSecondArrayParameter() {
     return secondArrayParameter;
   }
-
 
   public String getValue() {
     return value;
@@ -361,4 +360,3 @@ public class DummyFormula implements Formula,
     representation = pS;
   }
 }
-

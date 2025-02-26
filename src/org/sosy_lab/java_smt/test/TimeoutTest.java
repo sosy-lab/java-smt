@@ -35,6 +35,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final int TIMOUT_MILLISECONDS = 10000;
 
   private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};

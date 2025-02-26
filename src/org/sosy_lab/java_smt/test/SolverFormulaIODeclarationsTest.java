@@ -29,6 +29,7 @@ public class SolverFormulaIODeclarationsTest
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Before
   public void checkThatSolverIsAvailable() {
     requireParser();

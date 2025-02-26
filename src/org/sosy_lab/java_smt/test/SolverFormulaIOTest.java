@@ -37,6 +37,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"

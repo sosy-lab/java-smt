@@ -36,10 +36,12 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   public void init() {
     requireArrays();
   }
+
   @Before
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void testIntIndexIntValue() throws SolverException, InterruptedException {
     requireIntegers();

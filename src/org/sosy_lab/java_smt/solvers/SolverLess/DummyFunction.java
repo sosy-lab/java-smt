@@ -27,6 +27,7 @@ public class DummyFunction {
   private String name;
   private DummyType returnType;
   private List<DummyType> argumentTypes;
+
   public DummyFunction() {}
 
   public String getName() {
@@ -68,9 +69,9 @@ public class DummyFunction {
     if (this == o) return true;
     if (!(o instanceof DummyFunction)) return false;
     DummyFunction that = (DummyFunction) o;
-    return Objects.equals(name, that.name) &&
-        Objects.equals(returnType, that.returnType) &&
-        Objects.equals(argumentTypes, that.argumentTypes);
+    return Objects.equals(name, that.name)
+        && Objects.equals(returnType, that.returnType)
+        && Objects.equals(argumentTypes, that.argumentTypes);
   }
 
   @Override

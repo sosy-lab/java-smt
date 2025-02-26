@@ -48,6 +48,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
           "java-smt",

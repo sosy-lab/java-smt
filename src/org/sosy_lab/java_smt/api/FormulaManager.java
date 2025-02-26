@@ -59,9 +59,7 @@ public interface FormulaManager {
    */
   RationalFormulaManager getRationalFormulaManager();
 
-  /**
-   * Returns the Boolean-Theory.
-   */
+  /** Returns the Boolean-Theory. */
   BooleanFormulaManager getBooleanFormulaManager();
 
   /**

@@ -26,28 +26,29 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<DummyFormula,
-    DummyType, DummyEnv, DummyFunction> {
+public class SolverLessArrayFormulaManager
+    extends AbstractArrayFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
 
-  protected SolverLessArrayFormulaManager(FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> pFormulaCreator) {
+  protected SolverLessArrayFormulaManager(
+      FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
   @Override
   public <TI extends Formula, TE extends Formula> TE select(
-      ArrayFormula<TI, TE> pArray,
-      TI pIndex) {
+      ArrayFormula<TI, TE> pArray, TI pIndex) {
     return super.select(pArray, pIndex);
   }
 
   @Override
   protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {
     if (pArray.getSecondArrayParameter().getFormulaType().isArray()) {
-      return new DummyFormula(pArray.getSecondArrayParameter().getFirstArrayParameter(),
+      return new DummyFormula(
+          pArray.getSecondArrayParameter().getFirstArrayParameter(),
           pArray.getSecondArrayParameter().getSecondArrayParameter());
     }
     return pArray.getSecondArrayParameter();
@@ -60,11 +61,11 @@ public class SolverLessArrayFormulaManager extends AbstractArrayFormulaManager<D
 
   @Override
   protected <TI extends Formula, TE extends Formula> DummyFormula internalMakeArray(
-      String pName,
-      FormulaType<TI> pIndexType,
-      FormulaType<TE> pElementType) {
-    DummyFormula result = new DummyFormula(DummyFormula.getDummyFormulaFromObject(pIndexType),
-        DummyFormula.getDummyFormulaFromObject(pElementType));
+      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    DummyFormula result =
+        new DummyFormula(
+            DummyFormula.getDummyFormulaFromObject(pIndexType),
+            DummyFormula.getDummyFormulaFromObject(pElementType));
     result.setName(pName);
     return result;
   }

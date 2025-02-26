@@ -44,6 +44,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void basicBoolTest() throws SolverException, InterruptedException {
     BooleanFormula a = bmgr.makeVariable("a");

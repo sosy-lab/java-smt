@@ -31,6 +31,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void testVariableNamedTrue() throws SolverException, InterruptedException {
     BooleanFormula var;

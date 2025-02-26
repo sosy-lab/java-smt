@@ -39,6 +39,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void nnfTacticDefaultTest1() throws SolverException, InterruptedException {
     requireVisitor();

@@ -36,6 +36,7 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Before
   public void init() {
     requireEnumeration();

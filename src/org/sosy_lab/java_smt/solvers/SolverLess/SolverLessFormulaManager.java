@@ -30,8 +30,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 public class SolverLessFormulaManager
     extends AbstractFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
-  protected SolverLessFormulaManager(SolverLessFormulaCreator pCreator,
-                                     SolverLessBooleanFormulaManager bmgr) {
+  protected SolverLessFormulaManager(
+      SolverLessFormulaCreator pCreator, SolverLessBooleanFormulaManager bmgr) {
     super(
         pCreator,
         new SolverLessUFManager(pCreator),
@@ -44,8 +44,7 @@ public class SolverLessFormulaManager
         new SolverLessArrayFormulaManager(pCreator),
         null,
         new SolverLessStringFormulaManager(pCreator),
-        null
-    );
+        null);
   }
 
   @Override
@@ -91,7 +90,8 @@ public class SolverLessFormulaManager
                 .append("))");
             break;
           default:
-            throw new UnsupportedOperationException("Unsupported type: " + pFormula.getFormulaType());
+            throw new UnsupportedOperationException(
+                "Unsupported type: " + pFormula.getFormulaType());
         }
       }
     };
@@ -106,8 +106,7 @@ public class SolverLessFormulaManager
       String name = parts[0];
       String type = parts[parts.length - 1];
       return createDummyFormulaFromTypeString(type, name);
-    }
-    else if (smtLib.startsWith("(declare-const ")) {
+    } else if (smtLib.startsWith("(declare-const ")) {
       String[] parts = smtLib.substring(14, smtLib.length() - 1).split(" ");
       String name = parts[0];
       String type = parts[parts.length - 1];
@@ -115,8 +114,9 @@ public class SolverLessFormulaManager
     }
     throw new IllegalArgumentException("Unsupported SMT-LIB command: " + smtLib);
   }
+
   @SuppressWarnings("StringSplitter")
-  public static DummyFormula createDummyFormulaFromTypeString(String type, String name){
+  public static DummyFormula createDummyFormulaFromTypeString(String type, String name) {
     switch (type) {
       case "Bool":
         DummyFormula boolResult = new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
@@ -157,4 +157,3 @@ public class SolverLessFormulaManager
     }
   }
 }
-

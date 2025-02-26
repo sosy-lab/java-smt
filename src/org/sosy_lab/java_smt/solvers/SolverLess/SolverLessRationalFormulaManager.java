@@ -28,14 +28,13 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaManager<NumeralFormula,
-    RationalFormula>
+public class SolverLessRationalFormulaManager
+    extends SolverLessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
   public SolverLessRationalFormulaManager(SolverLessFormulaCreator creator) {
     super(creator);
   }
-
 
   @Override
   protected DummyFormula makeNumberImpl(long i) {
@@ -56,6 +55,7 @@ public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaMa
   protected DummyFormula makeNumberImpl(double pNumber) {
     return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), Double.toString(pNumber));
   }
+
   @Override
   protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
     return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), pNumber.toPlainString());
@@ -66,14 +66,17 @@ public class SolverLessRationalFormulaManager extends SolverLessNumeralFormulaMa
     DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
     result.setName(i);
     return result;
-
   }
+
   @Override
   public IntegerFormula floor(NumeralFormula number) {
-    DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER),
-        String.valueOf((int)Double.parseDouble(number.toString())));
+    DummyFormula result =
+        new DummyFormula(
+            new DummyType(DummyType.Type.INTEGER),
+            String.valueOf((int) Double.parseDouble(number.toString())));
     return result;
   }
+
   @Override
   public FormulaType<RationalFormula> getFormulaType() {
     return FormulaType.RationalType;

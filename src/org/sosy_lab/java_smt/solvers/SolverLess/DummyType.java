@@ -21,12 +21,12 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-@SuppressWarnings({"all","overrides"})
+
+@SuppressWarnings({"all", "overrides"})
 public class DummyType {
-  /**
-   * This class ensures Type-safety for DummyFormulas.
-   */
+  /** This class ensures Type-safety for DummyFormulas. */
   private int bitvectorLength;
+
   private int exponent;
   private int mantissa;
   private Type arrayIndexType;
@@ -40,11 +40,12 @@ public class DummyType {
   }
 
   public DummyType(Type pType) {
-    if (pType == Type.FLOATING_POINT || pType == Type.ARRAY || pType == Type.BITVECTOR
+    if (pType == Type.FLOATING_POINT
+        || pType == Type.ARRAY
+        || pType == Type.BITVECTOR
         || pType == Type.FLOATINGPOINTROUNDINGMODE) {
       throw new UnsupportedOperationException(
-          "Floating point, RoundModes, array types and Bitvectors need more "
-              + "information");
+          "Floating point, RoundModes, array types and Bitvectors need more " + "information");
     }
     this.myType = pType;
   }
@@ -73,7 +74,6 @@ public class DummyType {
     this.arrayIndexType = indexType;
     this.arrayElementType = elementType;
   }
-
 
   public enum Type {
     REGEX,
@@ -209,6 +209,7 @@ public class DummyType {
     }
     return false;
   }
+
   @Override
   public int hashCode() {
     int result = myType.hashCode();
@@ -232,5 +233,4 @@ public class DummyType {
     }
     return result;
   }
-
 }

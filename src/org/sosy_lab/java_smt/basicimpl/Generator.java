@@ -153,7 +153,7 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.expressionType.equals(Keyword.STRING)){
+      if (variable.expressionType.equals(Keyword.STRING)) {
         String newEntry = "(declare-const " + variable.inputParams.get(0) + " String)\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
@@ -170,15 +170,15 @@ public class Generator {
           lines.append(newEntry);
         }
       }
-      if (variable.expressionType.equals(Keyword.FLOATING_POINT)){
+      if (variable.expressionType.equals(Keyword.FLOATING_POINT)) {
         String newEntry =
             "(declare-const "
-            + variable.inputParams.get(0)
-            + " (_ FloatingPoint "
-            + variable.floatingPointExponent
-            + " "
-            + variable.floatingPointMantissa
-            + "))\n";
+                + variable.inputParams.get(0)
+                + " (_ FloatingPoint "
+                + variable.floatingPointExponent
+                + " "
+                + variable.floatingPointMantissa
+                + "))\n";
         if (lines.indexOf(newEntry) == -1) {
           lines.append(newEntry);
         }

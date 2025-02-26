@@ -414,8 +414,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-
-
   @Test
   public void testNot()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {

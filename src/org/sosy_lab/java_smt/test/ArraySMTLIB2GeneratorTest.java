@@ -34,18 +34,19 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void simpleTestDeclareIntArray(){
+  public void simpleTestDeclareIntArray() {
     requireArrays();
     requireIntegers();
-    ArrayFormula<IntegerFormula, IntegerFormula> a1 = Objects.requireNonNull(amgr).makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> a1 =
+        Objects.requireNonNull(amgr)
+            .makeArray("a1", FormulaType.IntegerType, FormulaType.IntegerType);
     IntegerFormula numberToBeStored = imgr.makeNumber(3);
     IntegerFormula index = imgr.makeNumber(0);
     ArrayFormula<IntegerFormula, IntegerFormula> result = amgr.store(a1, index, numberToBeStored);
     BooleanFormula constraint = amgr.equivalence(amgr.store(a1, index, numberToBeStored), result);
 
     String expectedResult =
-        "(declare-const a1 (Array Int Int))\n"
-        + "(assert (= (store a1 0 3) (store a1 0 3)))\n";
+        "(declare-const a1 (Array Int Int))\n" + "(assert (= (store a1 0 3) (store a1 0 3)))\n";
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
     assertThat(actualResult).isEqualTo(expectedResult);

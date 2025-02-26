@@ -33,55 +33,47 @@ import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 import org.sosy_lab.java_smt.solvers.SolverLess.SolverLessFloatingPointFormulaManager;
 
 /**
- * This class logs all variable declarations, makeFloatingPoints and operations on FloatingPoint
- * in order to later generate SMTLIB2 code.
+ * This class logs all variable declarations, makeFloatingPoints and operations on FloatingPoint in
+ * order to later generate SMTLIB2 code.
  */
 public class FloatingPointGenerator {
 
-  private FloatingPointGenerator() {
-  }
+  private FloatingPointGenerator() {}
 
   protected static void logMakeFloatingPoint(
-      Object result, int exponent, int mantissa,
-      String value) {
+      Object result, int exponent, int mantissa, String value) {
     List<Object> inputParams = new ArrayList<>();
-    String output = SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(value,
-        FormulaType.getFloatingPointType(exponent,
-            mantissa));
+    String output =
+        SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(
+            value, FormulaType.getFloatingPointType(exponent, mantissa));
     inputParams.add(output);
-    Function<List<Object>, String> functionToString =
-        createString -> (String) createString.get(0);
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-    );
+    Function<List<Object>, String> functionToString = createString -> (String) createString.get(0);
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
+
   protected static void logMakeFloatingPointVariable(
       FloatingPointFormula result, FloatingPointType type, String var) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(var);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> (String) inPlaceInputParams.get(0);
-    FunctionEnvironment newEntry = new FunctionEnvironment(result, inputParams, functionToString,
-        Keyword.FLOATING_POINT);
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, inputParams, functionToString, Keyword.FLOATING_POINT);
     newEntry.floatingPointExponent = type.getExponentSize();
     newEntry.floatingPointMantissa = type.getMantissaSize();
     Generator.getExecutedAggregator().add(newEntry);
   }
 
   protected static void logFPMax(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.max", num1, num2);
   }
 
   protected static void logFPMin(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.min", num1, num2);
   }
-
 
   protected static void logMakeNaN(FloatingPointFormula result, FloatingPointType type) {
     logSimple(result, "(_ NaN " + type.getExponentSize() + " " + type.getMantissaSize() + ")");
@@ -95,7 +87,6 @@ public class FloatingPointGenerator {
     logSimple(result, "(_ -oo " + type.getExponentSize() + " " + type.getMantissaSize() + ")");
   }
 
-
   protected static void logFPAdd(
       FloatingPointFormula result,
       FloatingPointFormula num1,
@@ -103,10 +94,9 @@ public class FloatingPointGenerator {
       String roundingMode) {
     logBinaryOpWithMode(result, "fp.add", roundingMode, num1, num2);
   }
+
   protected static void logFPAdd(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.add", num1, num2);
   }
 
@@ -117,10 +107,9 @@ public class FloatingPointGenerator {
       String roundingMode) {
     logBinaryOpWithMode(result, "fp.mul", roundingMode, num1, num2);
   }
+
   protected static void logFPMul(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.mul", num1, num2);
   }
 
@@ -131,10 +120,9 @@ public class FloatingPointGenerator {
       String roundingMode) {
     logBinaryOpWithMode(result, "fp.div", roundingMode, num1, num2);
   }
+
   protected static void logFPDiv(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.div", num1, num2);
   }
 
@@ -145,22 +133,18 @@ public class FloatingPointGenerator {
       String roundingMode) {
     logBinaryOpWithMode(result, "fp.sub", roundingMode, num1, num2);
   }
+
   protected static void logFPSub(
-      FloatingPointFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      FloatingPointFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.sub", num1, num2);
   }
 
   protected static void logFPSqrt(
-      FloatingPointFormula result,
-      FloatingPointFormula n,
-      String roundingMode) {
+      FloatingPointFormula result, FloatingPointFormula n, String roundingMode) {
     logUnaryOpWithMode(result, "fp.sqrt", roundingMode, n);
   }
-  protected static void logFPSqrt(
-      FloatingPointFormula result,
-      FloatingPointFormula n) {
+
+  protected static void logFPSqrt(FloatingPointFormula result, FloatingPointFormula n) {
     logUnaryOp(result, "fp.sqrt", n);
   }
 
@@ -172,42 +156,30 @@ public class FloatingPointGenerator {
     logUnaryOp(result, "fp.neg", n);
   }
 
-
   protected static void logFPGreaterThan(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.gt", num1, num2);
   }
 
   protected static void logFPGreaterOrEquals(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.geq", num1, num2);
   }
 
   protected static void logFPLessThan(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.lt", num1, num2);
   }
 
   protected static void logFPLessOrEquals(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.leq", num1, num2);
   }
 
   protected static void logFPEqual(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.eq", num1, num2);
   }
-
 
   protected static void logFPIsNaN(BooleanFormula result, FloatingPointFormula n) {
     logUnaryOp(result, "fp.isNaN", n);
@@ -216,7 +188,6 @@ public class FloatingPointGenerator {
   protected static void logFPIsZero(BooleanFormula result, FloatingPointFormula n) {
     logUnaryOp(result, "fp.isZero", n);
   }
-  
 
   protected static void logFPIsInfinite(BooleanFormula result, FloatingPointFormula n) {
     logUnaryOp(result, "fp.isInfinite", n);
@@ -240,15 +211,16 @@ public class FloatingPointGenerator {
   }
 
   protected static void logFPAssignment(
-      BooleanFormula result,
-      FloatingPointFormula num1,
-      FloatingPointFormula num2) {
+      BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
     logBinaryOp(result, "fp.assign", num1, num2);
   }
 
   protected static void logFPCastTo(
-      Formula result, FloatingPointFormula number, String roundingMode,
-      FormulaType<?> targetType, boolean signed) {
+      Formula result,
+      FloatingPointFormula number,
+      String roundingMode,
+      FormulaType<?> targetType,
+      boolean signed) {
     String command;
     if (targetType.isIntegerType() || targetType.isRationalType() || targetType.isBitvectorType()) {
       if (targetType.isBitvectorType()) {
@@ -272,25 +244,36 @@ public class FloatingPointGenerator {
       FormulaType.BitvectorType bitvectorFormulaFormulaType =
           (FormulaType.BitvectorType) targetType;
       inputParams.add(bitvectorFormulaFormulaType.getSize());
-      Function<List<Object>, String> functionToString = inPlaceInputParams ->
-          "((" + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + " "
-              + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
-      Generator.getExecutedAggregator().add(
-          new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-      );
+      Function<List<Object>, String> functionToString =
+          inPlaceInputParams ->
+              "(("
+                  + inPlaceInputParams.get(2)
+                  + " "
+                  + inPlaceInputParams.get(3)
+                  + " "
+                  + inPlaceInputParams.get(1)
+                  + ") "
+                  + inPlaceInputParams.get(0)
+                  + ")";
+      Generator.getExecutedAggregator()
+          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
     } else if (targetType.isRationalType()) {
-      Function<List<Object>, String> functionToString = inPlaceInputParams ->
-          "((" + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(1) + ") "
-              + inPlaceInputParams.get(0) + ")";
-      Generator.getExecutedAggregator().add(
-          new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-      );
+      Function<List<Object>, String> functionToString =
+          inPlaceInputParams ->
+              "(("
+                  + inPlaceInputParams.get(2)
+                  + " "
+                  + inPlaceInputParams.get(1)
+                  + ") "
+                  + inPlaceInputParams.get(0)
+                  + ")";
+      Generator.getExecutedAggregator()
+          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
     }
   }
 
   protected static void logFPCastTo(
-      Formula result, FloatingPointFormula number,
-      FormulaType<?> targetType, boolean signed) {
+      Formula result, FloatingPointFormula number, FormulaType<?> targetType, boolean signed) {
     String command;
     if (targetType.isIntegerType() || targetType.isRationalType() || targetType.isBitvectorType()) {
       if (targetType.isBitvectorType()) {
@@ -313,18 +296,23 @@ public class FloatingPointGenerator {
       FormulaType.BitvectorType bitvectorFormulaFormulaType =
           (FormulaType.BitvectorType) targetType;
       inputParams.add(bitvectorFormulaFormulaType.getSize());
-      Function<List<Object>, String> functionToString = inPlaceInputParams ->
-          "((" + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ") " + inPlaceInputParams.get(0) + ")";
-      Generator.getExecutedAggregator().add(
-          new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-      );
+      Function<List<Object>, String> functionToString =
+          inPlaceInputParams ->
+              "(("
+                  + inPlaceInputParams.get(1)
+                  + " "
+                  + inPlaceInputParams.get(2)
+                  + ") "
+                  + inPlaceInputParams.get(0)
+                  + ")";
+      Generator.getExecutedAggregator()
+          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
     } else if (targetType.isRationalType()) {
-      Function<List<Object>, String> functionToString = inPlaceInputParams ->
-          "((" + inPlaceInputParams.get(1) + ") "
-              + inPlaceInputParams.get(0) + ")";
-      Generator.getExecutedAggregator().add(
-          new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-      );
+      Function<List<Object>, String> functionToString =
+          inPlaceInputParams ->
+              "((" + inPlaceInputParams.get(1) + ") " + inPlaceInputParams.get(0) + ")";
+      Generator.getExecutedAggregator()
+          .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
     }
   }
 
@@ -337,10 +325,10 @@ public class FloatingPointGenerator {
     inputParams.add(String.valueOf(type.getMantissaSize()));
     Function<List<Object>, String> functionToString =
         getListStringFunctionForCast(number, inputParams);
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-    );
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
+
   protected static void logFPCastFrom(
       FloatingPointFormula result, Formula number, FloatingPointType type) {
     List<Object> inputParams = new ArrayList<>();
@@ -349,52 +337,72 @@ public class FloatingPointGenerator {
     inputParams.add(String.valueOf(type.getMantissaSize()));
     Function<List<Object>, String> functionToString =
         getListStringFunctionForCast(number, inputParams);
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP)
-    );
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
   @Nonnull
   private static Function<List<Object>, String> getListStringFunctionForCast(
-      Formula number,
-      List<Object> inputParams) {
-    if(inputParams.size()==4){
+      Formula number, List<Object> inputParams) {
+    if (inputParams.size() == 4) {
       Function<List<Object>, String> functionToString;
       if (number instanceof BitvectorFormula) {
-        functionToString = inPlaceInputParams ->
-            "((_ to_fp " + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + ")" + " "
-                + inPlaceInputParams.get(0) + ")";
+        functionToString =
+            inPlaceInputParams ->
+                "((_ to_fp "
+                    + inPlaceInputParams.get(2)
+                    + " "
+                    + inPlaceInputParams.get(3)
+                    + ")"
+                    + " "
+                    + inPlaceInputParams.get(0)
+                    + ")";
       } else {
-        functionToString = inPlaceInputParams ->
-            "((_ to_fp " + inPlaceInputParams.get(2) + " " + inPlaceInputParams.get(3) + ")" + " "
-                + inPlaceInputParams.get(1) +
-                ") " + inPlaceInputParams.get(0) + ")";
+        functionToString =
+            inPlaceInputParams ->
+                "((_ to_fp "
+                    + inPlaceInputParams.get(2)
+                    + " "
+                    + inPlaceInputParams.get(3)
+                    + ")"
+                    + " "
+                    + inPlaceInputParams.get(1)
+                    + ") "
+                    + inPlaceInputParams.get(0)
+                    + ")";
       }
       return functionToString;
-    }else{
+    } else {
       Function<List<Object>, String> functionToString;
       if (number instanceof BitvectorFormula) {
-        functionToString = inPlaceInputParams ->
-            "((_ to_fp " + inPlaceInputParams.get(1) + ")" + " "
-                + inPlaceInputParams.get(0) + ")";
+        functionToString =
+            inPlaceInputParams ->
+                "((_ to_fp "
+                    + inPlaceInputParams.get(1)
+                    + ")"
+                    + " "
+                    + inPlaceInputParams.get(0)
+                    + ")";
       } else {
-        functionToString = inPlaceInputParams ->
-            "((_ to_fp " + inPlaceInputParams.get(1) + " " + inPlaceInputParams.get(2) + ") "
-                + inPlaceInputParams.get(0) + ")";
+        functionToString =
+            inPlaceInputParams ->
+                "((_ to_fp "
+                    + inPlaceInputParams.get(1)
+                    + " "
+                    + inPlaceInputParams.get(2)
+                    + ") "
+                    + inPlaceInputParams.get(0)
+                    + ")";
       }
       return functionToString;
     }
-    }
-
-
+  }
 
   protected static void logFromIeeeBitvector(
       FloatingPointFormula result, BitvectorFormula number, FloatingPointType type) {
-    logUnaryOp(result,
-        "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ")",
-        number);
+    logUnaryOp(
+        result, "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ")", number);
   }
-
 
   private static void logUnaryOp(Object result, String op, Object n) {
     List<Object> inputParams = List.of(n);
@@ -412,11 +420,7 @@ public class FloatingPointGenerator {
   }
 
   private static void logBinaryOpWithMode(
-      Object result,
-      String op,
-      String mode,
-      Object num1,
-      Object num2) {
+      Object result, String op, String mode, Object num1, Object num2) {
     List<Object> inputParams = List.of(mode, num1, num2);
     logOperation(result, inputParams, "(" + op + " %s %s %s)", Keyword.SKIP);
   }
@@ -427,14 +431,10 @@ public class FloatingPointGenerator {
   }
 
   private static void logOperation(
-      Object result,
-      List<Object> params,
-      String format,
-      Keyword keyword) {
+      Object result, List<Object> params, String format, Keyword keyword) {
     Function<List<Object>, String> functionToString =
         inputs -> String.format(format, inputs.toArray());
-    Generator.getExecutedAggregator().add(
-        new FunctionEnvironment(result, params, functionToString, keyword)
-    );
+    Generator.getExecutedAggregator()
+        .add(new FunctionEnvironment(result, params, functionToString, keyword));
   }
 }

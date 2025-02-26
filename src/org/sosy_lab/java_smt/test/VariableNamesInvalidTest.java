@@ -23,6 +23,7 @@ public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolv
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   // currently the only invalid String is the empty String
 
   @Test(expected = IllegalArgumentException.class)

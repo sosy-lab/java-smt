@@ -40,6 +40,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private IntegerFormula x;
   private ArrayFormula<IntegerFormula, IntegerFormula> a;
 

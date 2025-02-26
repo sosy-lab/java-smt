@@ -34,6 +34,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   /**
    * This is the default boolean value for unknown model evaluations. For unknown model evaluation
    * for variables or formulas, the solver can return NULL or a default value.

@@ -31,6 +31,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 
   @Test

@@ -35,6 +35,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private UfElimination ackermannization;
 
   @Before

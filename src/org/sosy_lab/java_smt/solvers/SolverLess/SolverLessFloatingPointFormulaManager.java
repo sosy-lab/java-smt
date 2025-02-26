@@ -29,8 +29,8 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 
 @SuppressWarnings("StringSplitter")
-public class SolverLessFloatingPointFormulaManager extends
-                                                   AbstractFloatingPointFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+public class SolverLessFloatingPointFormulaManager
+    extends AbstractFloatingPointFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessFloatingPointFormulaManager(SolverLessFormulaCreator creator) {
     super(creator);
@@ -48,12 +48,14 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula makeNumberImpl(
-      double pN,
-      FloatingPointType pType,
-      DummyFormula pFloatingPointRoundingMode) {
+      double pN, FloatingPointType pType, DummyFormula pFloatingPointRoundingMode) {
     String binaryRepresentation = convertToSMTLibBinary(pN, pType);
-    DummyFormula formula = new DummyFormula(new DummyType(pType.getExponentSize(),
-        pType.getMantissaSize(), pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
+    DummyFormula formula =
+        new DummyFormula(
+            new DummyType(
+                pType.getExponentSize(),
+                pType.getMantissaSize(),
+                pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
     formula.setRepresentation(binaryRepresentation);
     return formula;
   }
@@ -76,7 +78,6 @@ public class SolverLessFloatingPointFormulaManager extends
     }
   }
 
-
   public static <T> String makeNumberAndRoundStatic(T pN, FloatingPointType pType) {
     if (pN instanceof Double) {
       return convertToSMTLibBinary((Double) pN, pType);
@@ -97,28 +98,44 @@ public class SolverLessFloatingPointFormulaManager extends
         throw new IllegalArgumentException("Unsupported number format: " + pN, e);
       }
     } else {
-      throw new IllegalArgumentException("Unsupported number type: " + pN.getClass().getSimpleName());
+      throw new IllegalArgumentException(
+          "Unsupported number type: " + pN.getClass().getSimpleName());
     }
   }
 
   @Override
   protected DummyFormula makePlusInfinityImpl(FloatingPointType pType) {
     DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-    formula.setRepresentation("(fp #b0 #b" + generateOnes(pType.getExponentSize()) + " #b" + generateZeros(pType.getMantissaSize() - 1) + ")");
+    formula.setRepresentation(
+        "(fp #b0 #b"
+            + generateOnes(pType.getExponentSize())
+            + " #b"
+            + generateZeros(pType.getMantissaSize() - 1)
+            + ")");
     return formula;
   }
 
   @Override
   protected DummyFormula makeMinusInfinityImpl(FloatingPointType pType) {
     DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-    formula.setRepresentation("(fp #b1 #b" + generateOnes(pType.getExponentSize()) + " #b" + generateZeros(pType.getMantissaSize() - 1) + ")");
+    formula.setRepresentation(
+        "(fp #b1 #b"
+            + generateOnes(pType.getExponentSize())
+            + " #b"
+            + generateZeros(pType.getMantissaSize() - 1)
+            + ")");
     return formula;
   }
 
   @Override
   protected DummyFormula makeNaNImpl(FloatingPointType pType) {
     DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
-    formula.setRepresentation("(fp #b0 #b" + generateOnes(pType.getExponentSize()) + " #b1" + generateZeros(pType.getMantissaSize() - 2) + ")");
+    formula.setRepresentation(
+        "(fp #b0 #b"
+            + generateOnes(pType.getExponentSize())
+            + " #b1"
+            + generateZeros(pType.getMantissaSize() - 2)
+            + ")");
     return formula;
   }
 
@@ -130,7 +147,7 @@ public class SolverLessFloatingPointFormulaManager extends
     int mantissaBits;
     if (exponentSize == 8 && mantissaSize == 23) {
       int bits = Float.floatToRawIntBits((float) value);
-      signBit = (bits >>> 31) & 1; //fill it with zros from the left until only the 1 or 0 is left
+      signBit = (bits >>> 31) & 1; // fill it with zros from the left until only the 1 or 0 is left
       exponentBits = (bits >>> mantissaSize) & ((1 << exponentSize) - 1);
       mantissaBits = bits & ((1 << mantissaSize) - 1);
     } else if (exponentSize == 11 && mantissaSize == 52) {
@@ -139,15 +156,19 @@ public class SolverLessFloatingPointFormulaManager extends
       exponentBits = (int) ((bits >>> mantissaSize) & ((1L << exponentSize) - 1));
       mantissaBits = (int) (bits & ((1L << mantissaSize) - 1));
     } else {
-      throw new IllegalArgumentException("Unsupported FloatingPointType: " + exponentSize + ", " + mantissaSize);
+      throw new IllegalArgumentException(
+          "Unsupported FloatingPointType: " + exponentSize + ", " + mantissaSize);
     }
     String signStr = Integer.toBinaryString(signBit);
-    String exponentStr = String.format("%" + exponentSize + "s", Integer.toBinaryString(exponentBits)).replace(' ', '0');
-    String mantissaStr = String.format("%" + mantissaSize + "s", Integer.toBinaryString(mantissaBits)).replace(' ', '0');
+    String exponentStr =
+        String.format("%" + exponentSize + "s", Integer.toBinaryString(exponentBits))
+            .replace(' ', '0');
+    String mantissaStr =
+        String.format("%" + mantissaSize + "s", Integer.toBinaryString(mantissaBits))
+            .replace(' ', '0');
 
     return "(fp #b" + signStr + " #b" + exponentStr + " #b" + mantissaStr + ")";
   }
-
 
   public static String generateOnes(int count) {
     return "1".repeat(count);
@@ -157,17 +178,12 @@ public class SolverLessFloatingPointFormulaManager extends
     return "0".repeat(count);
   }
 
-
-
-
   @Override
   protected DummyFormula makeVariableImpl(String pVar, FloatingPointType pType) {
     DummyFormula formula = new DummyFormula(pType.getExponentSize(), pType.getMantissaSize());
     formula.setName(pVar);
     return formula;
   }
-
-
 
   @Override
   protected DummyFormula castToImpl(
@@ -203,8 +219,7 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula fromIeeeBitvectorImpl(
-      DummyFormula pNumber,
-      FloatingPointType pTargetType) {
+      DummyFormula pNumber, FloatingPointType pTargetType) {
     return new DummyFormula(pTargetType.getExponentSize(), pTargetType.getMantissaSize());
   }
 
@@ -240,33 +255,25 @@ public class SolverLessFloatingPointFormulaManager extends
 
   @Override
   protected DummyFormula add(
-      DummyFormula pParam1,
-      DummyFormula pParam2,
-      DummyFormula pRoundingMode) {
+      DummyFormula pParam1, DummyFormula pParam2, DummyFormula pRoundingMode) {
     return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula subtract(
-      DummyFormula pParam1,
-      DummyFormula pParam2,
-      DummyFormula pFloatingPointRoundingMode) {
+      DummyFormula pParam1, DummyFormula pParam2, DummyFormula pFloatingPointRoundingMode) {
     return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula divide(
-      DummyFormula pParam1,
-      DummyFormula pParam2,
-      DummyFormula pFloatingPointRoundingMode) {
+      DummyFormula pParam1, DummyFormula pParam2, DummyFormula pFloatingPointRoundingMode) {
     return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
   @Override
   protected DummyFormula multiply(
-      DummyFormula pParam1,
-      DummyFormula pParam2,
-      DummyFormula pFloatingPointRoundingMode) {
+      DummyFormula pParam1, DummyFormula pParam2, DummyFormula pFloatingPointRoundingMode) {
     return new DummyFormula(pParam1.getExponent(), pParam1.getMantissa());
   }
 
@@ -335,5 +342,3 @@ public class SolverLessFloatingPointFormulaManager extends
     return new DummyFormula(pFormula.getExponent(), pFormula.getMantissa());
   }
 }
-
-

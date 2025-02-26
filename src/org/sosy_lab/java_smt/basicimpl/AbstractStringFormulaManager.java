@@ -120,7 +120,8 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public NumeralFormula.IntegerFormula length(StringFormula str) {
-    IntegerFormula result = getFormulaCreator().encapsulate(FormulaType.IntegerType, length(extractInfo(str)));
+    IntegerFormula result =
+        getFormulaCreator().encapsulate(FormulaType.IntegerType, length(extractInfo(str)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logLength(result, str);
     }
@@ -197,10 +198,11 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    IntegerFormula result = getFormulaCreator()
-        .encapsulate(
-            FormulaType.IntegerType,
-            indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
+    IntegerFormula result =
+        getFormulaCreator()
+            .encapsulate(
+                FormulaType.IntegerType,
+                indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logIndexOf(result, str, part, startIndex);
     }
@@ -223,20 +225,22 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public StringFormula substring(StringFormula str, IntegerFormula index, IntegerFormula length) {
-    StringFormula result = wrapString(substring(extractInfo(str), extractInfo(index), extractInfo(length)));
+    StringFormula result =
+        wrapString(substring(extractInfo(str), extractInfo(index), extractInfo(length)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logSubstring(result, str, index, length);
     }
     return result;
   }
 
-
   protected abstract TFormulaInfo substring(
       TFormulaInfo str, TFormulaInfo index, TFormulaInfo length);
 
   @Override
-  public StringFormula replace(StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    StringFormula result = wrapString(replace(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+  public StringFormula replace(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    StringFormula result =
+        wrapString(replace(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logReplace(result, fullStr, target, replacement);
     }
@@ -247,9 +251,10 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       TFormulaInfo fullStr, TFormulaInfo target, TFormulaInfo replacement);
 
   @Override
-  public StringFormula replaceAll(StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    StringFormula result = wrapString(
-        replaceAll(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
+  public StringFormula replaceAll(
+      StringFormula fullStr, StringFormula target, StringFormula replacement) {
+    StringFormula result =
+        wrapString(replaceAll(extractInfo(fullStr), extractInfo(target), extractInfo(replacement)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logReplaceAll(result, fullStr, target, replacement);
     }
@@ -410,6 +415,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
     }
     return result;
   }
+
   @Override
   public RegexFormula times(RegexFormula regex, int repetitions) {
     RegexFormula result = concatRegex(Collections.nCopies(repetitions, regex));
@@ -421,8 +427,9 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula toIntegerFormula(StringFormula str) {
-    IntegerFormula result = getFormulaCreator()
-        .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
+    IntegerFormula result =
+        getFormulaCreator()
+            .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
     if (Generator.isLoggingEnabled()) {
       StringGenerator.logToInteger(result, str);
     }

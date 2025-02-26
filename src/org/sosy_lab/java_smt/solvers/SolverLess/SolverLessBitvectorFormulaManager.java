@@ -25,17 +25,14 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
+public class SolverLessBitvectorFormulaManager
+    extends AbstractBitvectorFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
-public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaManager<DummyFormula,
-    DummyType, DummyEnv, DummyFunction> {
-
-
-  protected SolverLessBitvectorFormulaManager(SolverLessFormulaCreator pSolverLessFormulaCreator,
-                                              SolverLessBooleanFormulaManager pSolverLessBooleanFormulaManager)
-  {
+  protected SolverLessBitvectorFormulaManager(
+      SolverLessFormulaCreator pSolverLessFormulaCreator,
+      SolverLessBooleanFormulaManager pSolverLessBooleanFormulaManager) {
     super(pSolverLessFormulaCreator, pSolverLessBooleanFormulaManager);
   }
-
 
   @Override
   protected DummyFormula makeBitvectorImpl(int length, DummyFormula pParam1) {
@@ -99,9 +96,7 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
 
   @Override
   protected DummyFormula greaterOrEquals(
-      DummyFormula pParam1,
-      DummyFormula pParam2,
-      boolean signed) {
+      DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
     return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
@@ -127,7 +122,10 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
 
   @Override
   protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength())); // Boolean formulas do not have a length.
+    return new DummyFormula(
+        Math.max(
+            pParam1.getBitvectorLength(),
+            pParam2.getBitvectorLength())); // Boolean formulas do not have a length.
   }
 
   @Override
@@ -174,13 +172,10 @@ public class SolverLessBitvectorFormulaManager extends AbstractBitvectorFormulaM
     return new DummyFormula(pNumber.getBitvectorLength() + pExtensionBits);
   }
 
-  public FormulaType<?> getFormulaType(DummyFormula formula){
-    if(formula.getFormulaType().isBitvector()){
-        return FormulaType.getBitvectorTypeWithSize(formula.getBitvectorLength());
+  public FormulaType<?> getFormulaType(DummyFormula formula) {
+    if (formula.getFormulaType().isBitvector()) {
+      return FormulaType.getBitvectorTypeWithSize(formula.getBitvectorLength());
     }
     return formula.getFormulaTypeForCreator();
   }
-
-
 }
-

@@ -229,8 +229,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormulaManager
-      getBooleanFormulaManager() {
+  public BooleanFormulaManager getBooleanFormulaManager() {
     return booleanManager;
   }
 

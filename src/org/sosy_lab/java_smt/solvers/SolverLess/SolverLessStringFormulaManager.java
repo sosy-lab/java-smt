@@ -23,9 +23,8 @@ package org.sosy_lab.java_smt.solvers.SolverLess;
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
-public class SolverLessStringFormulaManager extends AbstractStringFormulaManager<DummyFormula,
-    DummyType,
-    DummyEnv, DummyFunction> {
+public class SolverLessStringFormulaManager
+    extends AbstractStringFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessStringFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
@@ -115,17 +114,13 @@ public class SolverLessStringFormulaManager extends AbstractStringFormulaManager
 
   @Override
   protected DummyFormula replace(
-      DummyFormula fullStr,
-      DummyFormula target,
-      DummyFormula replacement) {
+      DummyFormula fullStr, DummyFormula target, DummyFormula replacement) {
     return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
   protected DummyFormula replaceAll(
-      DummyFormula fullStr,
-      DummyFormula target,
-      DummyFormula replacement) {
+      DummyFormula fullStr, DummyFormula target, DummyFormula replacement) {
     return new DummyFormula(new DummyType(DummyType.Type.STRING));
   }
 

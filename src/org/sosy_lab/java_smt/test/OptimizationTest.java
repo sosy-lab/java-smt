@@ -32,6 +32,7 @@ public class OptimizationTest extends SolverBasedTest0.ParameterizedSolverBasedT
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     return super.createTestConfigBuilder().setOption("solver.mathsat5.loadOptimathsat5", "true");

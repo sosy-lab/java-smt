@@ -33,4 +33,3 @@ public enum FloatingPointRoundingMode {
     }
   }
 }
-

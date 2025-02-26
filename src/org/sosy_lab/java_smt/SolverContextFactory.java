@@ -223,7 +223,7 @@ public class SolverContextFactory {
                   + "supported in binary mode.",
               solverToCreate));
     }
-    if(solverToCreate.equals(Solvers.SOLVERLESS)){
+    if (solverToCreate.equals(Solvers.SOLVERLESS)) {
       return SolverLessContext.create();
     }
     SolverContext context;

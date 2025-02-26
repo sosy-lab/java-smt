@@ -32,6 +32,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void distinctTest() throws SolverException, InterruptedException {
     requireIntegers();

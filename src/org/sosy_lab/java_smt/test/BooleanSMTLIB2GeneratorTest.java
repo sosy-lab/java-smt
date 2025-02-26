@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
+
 @SuppressWarnings("checkstyle:linelength")
 public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
@@ -161,6 +162,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(assert (ite a b c))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @SuppressWarnings("CheckReturnValue")
   @Test
   public void testNestedTerms() {
@@ -185,7 +187,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const b Bool)\n"
             + "(declare-const f Bool)\n"
             + "(assert (ite (=> (and a e true) a) (xor c d) (= b (or b (and a e true) a f))))\n";
-    //Solverless does not support simplification yet. However, the expression is equivalent.
+    // Solverless does not support simplification yet. However, the expression is equivalent.
     String expectedResultSolverless =
         "(declare-const a Bool)\n"
             + "(declare-const e Bool)\n"
@@ -195,6 +197,7 @@ public class BooleanSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
             + "(declare-const f Bool)\n"
             + "(assert (ite (=> (and (and true a) e true) (and true a)) (xor c d) (= (or b false)"
             + " (or (or b false) (and (and true a) e true) (and true a) f))))\n";
-    assertThat(actualResult.equals(expectedResult)||actualResult.equals(expectedResultSolverless));
+    assertThat(
+        actualResult.equals(expectedResult) || actualResult.equals(expectedResultSolverless));
   }
 }

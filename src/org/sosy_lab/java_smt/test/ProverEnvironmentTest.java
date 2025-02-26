@@ -38,6 +38,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
     BooleanFormula b = bmgr.makeVariable("b");

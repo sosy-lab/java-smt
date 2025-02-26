@@ -22,6 +22,7 @@ public class PrettyPrinterTest extends SolverBasedTest0.ParameterizedSolverBased
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   private PrettyPrinter pp;
 
   private static final String VARS =

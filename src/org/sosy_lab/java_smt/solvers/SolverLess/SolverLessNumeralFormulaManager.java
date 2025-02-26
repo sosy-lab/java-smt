@@ -24,9 +24,9 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
-public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
-    Y extends NumeralFormula> extends AbstractNumeralFormulaManager<DummyFormula,
-    DummyType, DummyEnv, T, Y, DummyFunction> {
+public abstract class SolverLessNumeralFormulaManager<
+        T extends NumeralFormula, Y extends NumeralFormula>
+    extends AbstractNumeralFormulaManager<DummyFormula, DummyType, DummyEnv, T, Y, DummyFunction> {
   public SolverLessNumeralFormulaManager(SolverLessFormulaCreator creator) {
     super(creator, NonLinearArithmetic.APPROXIMATE_FALLBACK);
   }
@@ -43,8 +43,7 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
 
   @Override
   protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    if(pParam1.getFormulaType().isRational()
-        || pParam2.getFormulaType().isRational()) {
+    if (pParam1.getFormulaType().isRational() || pParam2.getFormulaType().isRational()) {
       return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
     }
     return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
@@ -52,8 +51,7 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
 
   @Override
   protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    if(pParam1.getFormulaType().isRational()
-        || pParam2.getFormulaType().isRational()) {
+    if (pParam1.getFormulaType().isRational() || pParam2.getFormulaType().isRational()) {
       return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
     }
     return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
@@ -89,4 +87,3 @@ public abstract class SolverLessNumeralFormulaManager <T extends NumeralFormula,
     return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
   }
 }
-

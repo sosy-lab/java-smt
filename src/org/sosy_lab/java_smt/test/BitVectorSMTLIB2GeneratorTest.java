@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings("checkstyle:linelength")
-public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0{
+public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
@@ -30,30 +30,32 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void easyBitVecDeclarationTest(){
+  public void easyBitVecDeclarationTest() {
     requireBitvectors();
     BitvectorFormula a = Objects.requireNonNull(bvmgr).makeVariable(32, "a");
     BitvectorFormula b = Objects.requireNonNull(bvmgr).makeVariable(32, "b");
-    BooleanFormula constraint = bvmgr.equal(a,b);
+    BooleanFormula constraint = bvmgr.equal(a, b);
 
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
-    String expectedResult="(declare-const a (_ BitVec 32))\n"+
-        "(declare-const b (_ BitVec 32))\n"+
-        "(assert (= a b))\n";
+    String expectedResult =
+        "(declare-const a (_ BitVec 32))\n"
+            + "(declare-const b (_ BitVec 32))\n"
+            + "(assert (= a b))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @Test
-  public void easyBitVecDeclarationTest2(){
+  public void easyBitVecDeclarationTest2() {
     requireBitvectors();
-    BitvectorFormula a = bvmgr.makeBitvector(32, new BigInteger("10",2));
+    BitvectorFormula a = bvmgr.makeBitvector(32, new BigInteger("10", 2));
     BitvectorFormula b = bvmgr.makeVariable(32, "b");
-    BooleanFormula constraint = bvmgr.equal(a,b);
+    BooleanFormula constraint = bvmgr.equal(a, b);
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
-    String expectedResult="(declare-const b (_ BitVec 32))\n"
-        + "(assert (= #b00000000000000000000000000000010 b))\n";
+    String expectedResult =
+        "(declare-const b (_ BitVec 32))\n" + "(assert (= #b00000000000000000000000000000010 b))\n";
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
