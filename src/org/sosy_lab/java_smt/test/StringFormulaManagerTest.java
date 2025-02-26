@@ -21,17 +21,25 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RegexFormula;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 @SuppressWarnings("ConstantConditions")
@@ -174,6 +182,91 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
         if (solver != Solvers.PRINCESS) {
           String str = Character.toString(0x200cb);
           assertThat(model.evaluate(smgr.makeString(str))).isEqualTo(str);
+        }
+      }
+    }
+  }
+
+  /**
+   * Test Unicode escaping when creating new String constants.
+   *
+   * <p>This version of the test uses <code>solver.useUnicodeStrings=false</code>. See {@link
+   * #testInputEscape()} for the same test with Unicode Strings enabled.
+   */
+  @Test
+  public void testSmtlibInputEscape()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    Configuration compatibleConfig = super.createTestConfigBuilder().build();
+    try (SolverContext compatibleContext =
+        SolverContextFactory.createSolverContext(
+            compatibleConfig,
+            LogManager.createTestLogManager(),
+            ShutdownNotifier.createDummy(),
+            solver)) {
+
+      StringFormulaManager compatibleSmgr =
+          compatibleContext.getFormulaManager().getStringFormulaManager();
+
+      IntegerFormulaManager compatibleImgr =
+          compatibleContext.getFormulaManager().getIntegerFormulaManager();
+
+      // Check that escape sequences are treated as single characters
+      assertEqual(
+          compatibleSmgr.length(compatibleSmgr.makeString("\\u{39E}")),
+          compatibleImgr.makeNumber(1));
+
+      // Check that Unicode characters are not allowed in String constants
+      assertThrows(IllegalArgumentException.class, () -> compatibleSmgr.makeString("Ξ"));
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> compatibleSmgr.makeString(Character.toString(0x200cb)));
+    }
+  }
+
+  /**
+   * Test Unicode unescaping when reading results from the model.
+   *
+   * <p>This version of the test uses <code>solver.useUnicodeStrings=false</code>. See {@link
+   * #testOutputUnescape()} for the same test with Unicode Strings enabled.
+   */
+  @Test
+  public void testSmtlibOutputUnescape()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    // Create a solver context where Unicode String literals have been disabled
+    Configuration compatibleConfig = super.createTestConfigBuilder().build();
+    try (SolverContext compatibleContext =
+        SolverContextFactory.createSolverContext(
+            compatibleConfig,
+            LogManager.createTestLogManager(),
+            ShutdownNotifier.createDummy(),
+            solver)) {
+
+      StringFormulaManager compatibleSmgr =
+          compatibleContext.getFormulaManager().getStringFormulaManager();
+
+      try (ProverEnvironment prover =
+          compatibleContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        assertThat(!prover.isUnsat()).isTrue();
+        try (Model model = prover.getModel()) {
+          // Check that escape sequences for Unicode characters are again converted to escape
+          // sequences in the model
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\u{39E}"))).isEqualTo("\\u{39e}");
+
+          // Now concatenate two parts of an escape sequence in the logic and check the resulting
+          // String. We expect the solver to escape the backslash in the first part and return a
+          // regular String of characters, not just the combined escape sequence for a single
+          // Unicode character.
+          assertThat(
+                  model.evaluate(
+                      compatibleSmgr.concat(
+                          compatibleSmgr.makeString("\\u{39E"), compatibleSmgr.makeString("}"))))
+              .isEqualTo("\\u{5c}u{39E}");
+
+          // Show that backslashes are just always substituted when they are not part of a valid
+          // escape sequence
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\"))).isEqualTo("\\u{5c}");
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\a"))).isEqualTo("\\u{5c}a");
+          assertThat(model.evaluate(compatibleSmgr.makeString("\\u"))).isEqualTo("\\u{5c}u");
         }
       }
     }
