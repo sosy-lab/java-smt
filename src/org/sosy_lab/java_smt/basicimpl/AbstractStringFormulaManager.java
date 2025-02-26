@@ -82,7 +82,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       } else if (0x20 <= codePoint && codePoint <= 0x7E) {
         sb.appendCodePoint(codePoint); // normal printable chars
       } else {
-        sb.append("\\u{").append(String.format("%05X", codePoint)).append("}");
+        sb.append("\\u{").append(String.format("%x", codePoint)).append("}");
       }
     }
     return sb.toString();
