@@ -173,8 +173,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
     return result;
   }
 
-  private static ArrayList<String> getAllAllowedFPBeginnigs() {
-    ArrayList<String> result = new ArrayList<>();
+  private static List<String> getAllAllowedFPBeginnigs() {
+    List<String> result = new ArrayList<>();
     result.addAll(getAllAllowedFPBeginningsWithInts());
     result.addAll(getAllAllowedFPBeginningsWithoutInts());
     return result;
@@ -186,8 +186,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    *
    * @return ArrayList with the fitting strings
    */
-  private static ArrayList<String> getAllAllowedFPBeginningsWithInts() {
-    ArrayList<String> beginnings = new ArrayList<>();
+  private static List<String> getAllAllowedFPBeginningsWithInts() {
+    List<String> beginnings = new ArrayList<>();
     beginnings.add("(_FloatingPoint");
     beginnings.add("(_+oo");
     beginnings.add("(_-oo");
@@ -203,8 +203,8 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    *
    * @return ArrayList with the fitting strings
    */
-  private static ArrayList<String> getAllAllowedFPBeginningsWithoutInts() {
-    ArrayList<String> beginnings = new ArrayList<>();
+  private static List<String> getAllAllowedFPBeginningsWithoutInts() {
+    List<String> beginnings = new ArrayList<>();
     beginnings.add("Float");
     beginnings.add("(fp #b");
     beginnings.add("#x");
@@ -219,7 +219,7 @@ public class Visitor extends smtlibv2BaseVisitor<Object> {
    * @return true if at least one item of the list matches the beginning of the String
    */
   public static boolean beginningMatchesList(
-      String checkedString, ArrayList<String> listWithBeginnings) {
+      String checkedString, List<String> listWithBeginnings) {
     for (String x : listWithBeginnings) {
       if (checkedString.startsWith(x)) {
         return true;
