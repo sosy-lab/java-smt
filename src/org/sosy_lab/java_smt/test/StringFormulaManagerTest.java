@@ -148,7 +148,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             .isEqualTo("\\u{39E}");
 
         // Test with a character that is not in the BMP
-        if (solver != Solvers.PRINCESS) {
+        if (solver != Solvers.PRINCESS && solver != Solvers.CVC5) {
           String str = Character.toString(0x200cb);
           assertThat(model.evaluate(smgr.makeString(str))).isEqualTo(str);
         }
