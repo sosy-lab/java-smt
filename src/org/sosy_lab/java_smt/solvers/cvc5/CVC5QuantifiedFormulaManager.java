@@ -8,12 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
-import de.uni_freiburg.informatik.ultimate.core.model.services.IUltimateServiceProvider;
-import de.uni_freiburg.informatik.ultimate.lib.modelcheckerutils.smt.UltimateEliminator;
-import de.uni_freiburg.informatik.ultimate.logic.Logics;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol;
+
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
@@ -22,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
+
 
 public class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
@@ -34,15 +31,13 @@ public class CVC5QuantifiedFormulaManager
 
   private Optional<CVC5FormulaManager> fmgr;
 
-  private final LogManager logger;
 
   protected CVC5QuantifiedFormulaManager(
       FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator, LogManager pLogger) {
-    super(pFormulaCreator);
+    super(pFormulaCreator, pLogger);
 
     solver = pFormulaCreator.getEnv();
     fmgr = Optional.empty();
-    logger = pLogger;
   }
 
   /*
@@ -73,20 +68,12 @@ public class CVC5QuantifiedFormulaManager
   @Override
   protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
       throws UnsupportedOperationException {
-    IUltimateServiceProvider provider =
-        org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
-            .createUltimateServiceProviderMock();
-    UltimateEliminator ue;
-    ILogger iLogger = provider.getLoggingService().getControllerLogger();
-    Script interpol = new SMTInterpol();
-    ue = new UltimateEliminator(provider, iLogger, interpol);
-    ue.setLogic(Logics.AUFNIRA);
 
     CVC5FormulaManager formulaManager = fmgr.get();
     de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        UltimateEliminatorParser.parseImpl(
-            formulaManager.dumpFormulaImpl(pExtractInfo), logger, ue);
-    formula = ue.simplify(formula);
+        getUltimateEliminatorWrapper().parse(
+            formulaManager.dumpFormulaImpl(pExtractInfo));
+    formula = getUltimateEliminatorWrapper().simplify(formula);
     Term result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
     return result;
@@ -117,6 +104,11 @@ public class CVC5QuantifiedFormulaManager
       Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
       return solver.mkTerm(quant, boundVarsList, substBody);
     }
+  }
+
+  @Override
+  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Term> pVariables, Term pBody) {
+    throw new UnsupportedOperationException();
   }
 
   public void setFormulaManager(CVC5FormulaManager pFmgr) {

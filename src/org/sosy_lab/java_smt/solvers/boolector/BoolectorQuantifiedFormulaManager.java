@@ -13,6 +13,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Longs;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -22,8 +24,9 @@ public class BoolectorQuantifiedFormulaManager
 
   private final long btor;
 
-  BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator) {
-    super(pCreator);
+  BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator,
+                                    LogManager pLogger) {
+    super(pCreator, pLogger);
     btor = getFormulaCreator().getEnv();
   }
 
@@ -56,6 +59,11 @@ public class BoolectorQuantifiedFormulaManager
       newQuantifier = BtorJNI.boolector_exists(btor, varsArray, varsArray.length, pBody);
     }
     return newQuantifier;
+  }
+
+  @Override
+  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Long> pVariables, Long pBody) {
+    throw new UnsupportedOperationException();
   }
 
   static class QuantifiedFormula {

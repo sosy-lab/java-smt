@@ -24,6 +24,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -115,7 +116,7 @@ public class BoolectorNativeApiTest {
               ShutdownNotifier.createDummy(),
               null,
               1,
-              NativeLibraries::loadLibrary)) {
+              NativeLibraries::loadLibrary,LogManager.createTestLogManager())) {
         BooleanFormulaManager bfmgr = context.getFormulaManager().getBooleanFormulaManager();
         BooleanFormula fa = bfmgr.makeVariable("a");
         BooleanFormula fb = bfmgr.makeVariable("b");
@@ -139,7 +140,7 @@ public class BoolectorNativeApiTest {
             ShutdownNotifier.createDummy(),
             null,
             1,
-            NativeLibraries::loadLibrary)) {
+            NativeLibraries::loadLibrary,LogManager.createTestLogManager())) {
       FormulaManager mgr = context.getFormulaManager();
       BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
       for (String name : ImmutableList.of("a", "a", "b", "abc", "ABC")) {
@@ -161,7 +162,7 @@ public class BoolectorNativeApiTest {
             ShutdownNotifier.createDummy(),
             null,
             1,
-            NativeLibraries::loadLibrary)) {
+            NativeLibraries::loadLibrary, LogManager.createTestLogManager())) {
       FormulaManager mgr = context.getFormulaManager();
       BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
       try (ProverEnvironment prover = context.newProverEnvironment()) {
@@ -190,7 +191,7 @@ public class BoolectorNativeApiTest {
             ShutdownNotifier.createDummy(),
             null,
             1,
-            NativeLibraries::loadLibrary)) {
+            NativeLibraries::loadLibrary, LogManager.createTestLogManager())) {
       FormulaManager mgr = context.getFormulaManager();
       BooleanFormulaManager bfmgr = mgr.getBooleanFormulaManager();
       BooleanFormula fa = bfmgr.makeVariable("a");

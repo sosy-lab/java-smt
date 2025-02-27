@@ -40,8 +40,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
       FormulaManager pFmgr,
       Yices2FormulaCreator creator,
       BooleanFormulaManager pBfmgr,
-      ShutdownNotifier pShutdownManager,
-      LogManager pLogger) {
+      ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     this.creator = creator;
     bfmgr = pBfmgr;
@@ -51,8 +50,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
-      Consumer<String> pLoader,
-      LogManager pLogger) {
+      Consumer<String> pLoader, LogManager pLogger) {
 
     pLoader.accept("yices2j");
 
@@ -86,7 +84,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             quantifierManager);
-    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager, pLogger);
+    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
   }
 
   @Override

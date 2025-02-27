@@ -209,7 +209,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
             arrayManager,
             stringTheory,
             enumTheory);
-    quantifierManager.setFormulaManager(manager); // zum parsen
+    quantifierManager.setFormulaManager(manager);
     return new Z3SolverContext(creator, pShutdownNotifier, logger, manager, extraOptions);
   }
 

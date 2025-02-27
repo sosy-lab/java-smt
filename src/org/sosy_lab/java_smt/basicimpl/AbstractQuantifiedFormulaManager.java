@@ -11,11 +11,13 @@ package org.sosy_lab.java_smt.basicimpl;
 import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -23,9 +25,15 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     implements QuantifiedFormulaManager {
   private ProverOptions option;
 
+
+  private final UltimateEliminatorWrapper ultimateEliminatorWrapper;
+
+
   protected AbstractQuantifiedFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
+      LogManager pLogger) {
     super(pCreator);
+    ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -37,7 +45,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws InterruptedException, SolverException, UnsupportedOperationException {
     if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
-        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF)));
+        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF), option));
       } catch (UnsupportedOperationException e) {
         System.out.println(
             "Solver does not support parsing yet. Falling back to native "
@@ -53,6 +61,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return wrap(eliminateQuantifiers(extractInfo(pF)));
   }
 
+  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(
+      TFormulaInfo pExtractInfo,
+      ProverOptions pOptions)
+      throws UnsupportedOperationException, IOException {
+    throw new UnsupportedOperationException();
+  }
+
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(TFormulaInfo pExtractInfo)
       throws UnsupportedOperationException, IOException {
     throw new UnsupportedOperationException();
@@ -64,12 +79,24 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
+    if (option != null && option.equals(ProverOptions
+        .SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
+      return mkWithoutQuantifier(q, Lists.transform(pVariables, this::extractInfo),
+          extractInfo(pBody));
+    }
     return wrap(
         mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }
 
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
+
+
+  public abstract BooleanFormula mkWithoutQuantifier(
+      Quantifier pQ,
+      List<TFormulaInfo> pVariables,
+      TFormulaInfo pBody);
+
 
   @Override
   public ProverOptions getOption() {
@@ -79,5 +106,9 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public void setOption(ProverOptions opt) {
     option = opt;
+  }
+
+  public UltimateEliminatorWrapper getUltimateEliminatorWrapper() {
+    return ultimateEliminatorWrapper;
   }
 }

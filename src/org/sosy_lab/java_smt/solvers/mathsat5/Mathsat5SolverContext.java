@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationCallback;
+import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 
