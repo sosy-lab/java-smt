@@ -24,9 +24,11 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -68,32 +70,32 @@ public class Mathsat5QuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier pQ, List<Long> pVars, Long pBody) {
+    // Note: Mathsat supports this only for printing SMTLib2, not solving!
     checkArgument(!pVars.isEmpty(), "List of quantified variables can not be empty");
 
     long quantifiedFormula;
 
-    List<Long> boundVars = new ArrayList<>();
-    long substBody = pBody;
-
+    long[] changeFrom = new long[pVars.size()];
+    long[] changeTo = new long[pVars.size()];
+    int idx = 0;
     for (Long var : pVars) {
-      long boundCopy = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
-      boundVars.add(boundCopy);
-      substBody =
-          msat_apply_substitution(solver, substBody, 1, new long[]{var}, new long[]{boundCopy});
+      changeFrom[idx] = var;
+      changeTo[idx] = ((Mathsat5FormulaCreator) formulaCreator).makeBoundCopy(solver, var);
+      idx++;
     }
+
+    long substBody =
+          msat_apply_substitution(solver, pBody, 1, changeFrom, changeTo);
+
     if (pQ == Quantifier.EXISTS) {
-      quantifiedFormula = msat_make_exists(solver, boundVars.get(0), substBody);
-      for (int i = 1; i < boundVars.size(); i++) {
-        quantifiedFormula =
-            msat_make_and(
-                solver, quantifiedFormula, msat_make_exists(solver, boundVars.get(i), substBody));
+      quantifiedFormula = msat_make_exists(solver, changeTo[0], substBody);
+      for (int i = 1; i < changeTo.length; i++) {
+        quantifiedFormula = msat_make_exists(solver, changeTo[i], substBody);
       }
     } else {
-      quantifiedFormula = msat_make_forall(solver, boundVars.get(0), substBody);
-      for (int i = 1; i < boundVars.size(); i++) {
-        quantifiedFormula =
-            msat_make_and(
-                solver, quantifiedFormula, msat_make_forall(solver, boundVars.get(i), substBody));
+      quantifiedFormula = msat_make_forall(solver, changeTo[0], substBody);
+      for (int i = 1; i < changeTo.length; i++) {
+        quantifiedFormula = msat_make_forall(solver, changeTo[i], substBody);
       }
     }
     return quantifiedFormula;
