@@ -438,7 +438,7 @@ public interface FloatingPointFormulaManager {
    * <ul>
    *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
    *   <li>exponent!=00...00 and exponent!=11...11 (exponent is not all 0 or all 1)
-   *   <li>mantissa!=00...00 (mantissa is not all 0)
+   *   <li>mantissa=? (mantissa is irrelevant)
    * </ul>
    */
   BooleanFormula isNormal(FloatingPointFormula number);

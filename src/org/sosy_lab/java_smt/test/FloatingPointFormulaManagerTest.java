@@ -410,7 +410,10 @@ public class FloatingPointFormulaManagerTest
     requireBitvectors();
     requireFPToBitvector();
 
-    FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
+    final FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
+    final BitvectorFormula signBit = bvmgr.extract(fpmgr.toIeeeBitvector(x), 31, 31);
+    final BitvectorFormula exponent = bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23);
+    final BitvectorFormula mantissa = bvmgr.extract(fpmgr.toIeeeBitvector(x), 22, 0);
 
     assertThatFormula(fpmgr.isInfinity(x))
         .isEquivalentTo(
@@ -427,41 +430,24 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNormal(x))
         .isEquivalentTo(
             bmgr.and(
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23),
-                        bvmgr.makeBitvector(8, 0))),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23),
-                        bvmgr.makeBitvector(8, -1)))));
+                bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(8, 0))),
+                bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(8, -1)))));
 
     assertThatFormula(fpmgr.isSubnormal(x))
         .isEquivalentTo(
             bmgr.and(
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23), bvmgr.makeBitvector(8, 0)),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 22, 0),
-                        bvmgr.makeBitvector(23, 0)))));
+                bvmgr.equal(exponent, bvmgr.makeBitvector(8, 0)),
+                bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(23, 0)))));
 
     assertThatFormula(fpmgr.isNaN(x))
         .isEquivalentTo(
             bmgr.and(
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 30, 23), bvmgr.makeBitvector(8, -1)),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 22, 0),
-                        bvmgr.makeBitvector(23, 0)))));
+                bvmgr.equal(exponent, bvmgr.makeBitvector(8, -1)),
+                bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(23, 0)))));
 
     assertThatFormula(fpmgr.isNegative(x))
         .isEquivalentTo(
-            bmgr.and(
-                bmgr.not(fpmgr.isNaN(x)),
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 31, 31), bvmgr.makeBitvector(1, 1))));
+            bmgr.and(bmgr.not(fpmgr.isNaN(x)), bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))));
   }
 
   @Test
@@ -469,7 +455,10 @@ public class FloatingPointFormulaManagerTest
     requireBitvectors();
     requireFPToBitvector();
 
-    FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
+    final FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
+    final BitvectorFormula signBit = bvmgr.extract(fpmgr.toIeeeBitvector(x), 63, 63);
+    final BitvectorFormula exponent = bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52);
+    final BitvectorFormula mantissa = bvmgr.extract(fpmgr.toIeeeBitvector(x), 51, 0);
 
     assertThatFormula(fpmgr.isInfinity(x))
         .isEquivalentTo(
@@ -490,41 +479,24 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNormal(x))
         .isEquivalentTo(
             bmgr.and(
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52),
-                        bvmgr.makeBitvector(11, 0))),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52),
-                        bvmgr.makeBitvector(11, -1)))));
+                bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(11, 0))),
+                bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(11, -1)))));
 
     assertThatFormula(fpmgr.isSubnormal(x))
         .isEquivalentTo(
             bmgr.and(
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52), bvmgr.makeBitvector(11, 0)),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 51, 0),
-                        bvmgr.makeBitvector(52, 0)))));
+                bvmgr.equal(exponent, bvmgr.makeBitvector(11, 0)),
+                bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(52, 0)))));
 
     assertThatFormula(fpmgr.isNaN(x))
         .isEquivalentTo(
             bmgr.and(
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 62, 52), bvmgr.makeBitvector(11, -1)),
-                bmgr.not(
-                    bvmgr.equal(
-                        bvmgr.extract(fpmgr.toIeeeBitvector(x), 51, 0),
-                        bvmgr.makeBitvector(52, 0)))));
+                bvmgr.equal(exponent, bvmgr.makeBitvector(11, -1)),
+                bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(52, 0)))));
 
     assertThatFormula(fpmgr.isNegative(x))
         .isEquivalentTo(
-            bmgr.and(
-                bmgr.not(fpmgr.isNaN(x)),
-                bvmgr.equal(
-                    bvmgr.extract(fpmgr.toIeeeBitvector(x), 63, 63), bvmgr.makeBitvector(1, 1))));
+            bmgr.and(bmgr.not(fpmgr.isNaN(x)), bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))));
   }
 
   @Test
