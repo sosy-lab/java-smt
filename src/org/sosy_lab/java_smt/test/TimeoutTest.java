@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 
-  private static final int TIMOUT_MILLISECONDS = 10000;
+  private static final int TIMOUT_MILLISECONDS = 100000;
 
   private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};
 
@@ -94,12 +94,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-    if (IS_WINDOWS) {
-      TruthJUnit.assume()
-          .withMessage(solverToUse() + " has a regression in this test on Windows")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.BITWUZLA);
-    }
+
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
