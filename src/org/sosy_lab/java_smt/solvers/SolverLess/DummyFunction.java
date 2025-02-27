@@ -66,8 +66,12 @@ public class DummyFunction {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (!(o instanceof DummyFunction)) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof DummyFunction)) {
+      return false;
+    }
     DummyFunction that = (DummyFunction) o;
     return Objects.equals(name, that.name)
         && Objects.equals(returnType, that.returnType)

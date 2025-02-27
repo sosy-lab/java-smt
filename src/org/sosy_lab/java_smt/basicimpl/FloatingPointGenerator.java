@@ -22,7 +22,6 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import javax.annotation.Nonnull;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -341,7 +340,6 @@ public class FloatingPointGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
-  @Nonnull
   private static Function<List<Object>, String> getListStringFunctionForCast(
       Formula number, List<Object> inputParams) {
     if (inputParams.size() == 4) {

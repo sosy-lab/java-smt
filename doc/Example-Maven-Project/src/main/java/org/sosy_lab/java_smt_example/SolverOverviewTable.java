@@ -32,7 +32,6 @@ public class SolverOverviewTable {
     for (Solvers s : Solvers.values()) {
       infos.add(infoProvider.getSolverInformation(s));
     }
-
     infos.sort(Comparator.comparing(SolverInfo::getName)); // alphabetical ordering
 
     RowBuilder rowBuilder = new RowBuilder();

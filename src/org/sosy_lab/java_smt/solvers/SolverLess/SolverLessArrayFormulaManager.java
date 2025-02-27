@@ -39,8 +39,8 @@ public class SolverLessArrayFormulaManager
   }
 
   @Override
-  public <TI extends Formula, TE extends Formula> TE select(
-      ArrayFormula<TI, TE> pArray, TI pIndex) {
+  public <T1 extends Formula, T2 extends Formula> T2 select(
+      ArrayFormula<T1, T2> pArray, T1 pIndex) {
     return super.select(pArray, pIndex);
   }
 
@@ -60,8 +60,8 @@ public class SolverLessArrayFormulaManager
   }
 
   @Override
-  protected <TI extends Formula, TE extends Formula> DummyFormula internalMakeArray(
-      String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+  protected <T1 extends Formula, T2 extends Formula> DummyFormula internalMakeArray(
+      String pName, FormulaType<T1> pIndexType, FormulaType<T2> pElementType) {
     DummyFormula result =
         new DummyFormula(
             DummyFormula.getDummyFormulaFromObject(pIndexType),

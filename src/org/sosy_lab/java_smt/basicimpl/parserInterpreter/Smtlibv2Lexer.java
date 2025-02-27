@@ -1,5 +1,6 @@
 // Generated from
-// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/
+// sosy_lab/javaSmt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import org.antlr.v4.runtime.CharStream;
@@ -22,7 +23,7 @@ import org.antlr.v4.runtime.dfa.DFA;
   "CheckReturnValue",
   "this-escape"
 })
-public class smtlibv2Lexer extends Lexer {
+public class Smtlibv2Lexer extends Lexer {
   static {
     RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION);
   }
@@ -592,7 +593,7 @@ public class smtlibv2Lexer extends Lexer {
     return VOCABULARY;
   }
 
-  public smtlibv2Lexer(CharStream input) {
+  public Smtlibv2Lexer(CharStream input) {
     super(input);
     _interp = new LexerATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
   }

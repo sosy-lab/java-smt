@@ -46,9 +46,10 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaManagersWrapper;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Lexer;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.tactics.NNFVisitor;
 import org.sosy_lab.java_smt.utils.SolverUtils;
 
@@ -184,19 +185,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula universalParseFromString(String pString) {
-    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(pString));
-    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor =
-        new Visitor(
-            this,
-            this.booleanManager,
-            this.integerManager,
-            this.rationalManager,
-            this.bitvectorManager,
-            this.arrayManager,
-            this.functionManager,
-            this.floatingPointManager,
-            this.strManager);
+    Smtlibv2Lexer lexer = new Smtlibv2Lexer(CharStreams.fromString(pString));
+    Smtlibv2Parser parser = new Smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(new FormulaManagersWrapper(this));
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();
 

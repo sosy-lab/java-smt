@@ -110,7 +110,7 @@ public class DummyFormula
   }
 
   /**
-   * Helper method which transforms any FormulaType Object into the matching DummyFormula
+   * Helper method which transforms any FormulaType Object into the matching DummyFormula.
    *
    * @param pType FormulaType-Object
    * @return DummyFormula with the correct Type.
@@ -151,7 +151,7 @@ public class DummyFormula
 
   /**
    * This method is an internal helper method which creates the internal representation of an
-   * ArrayFormula to be later extracted by the FormulaCreator
+   * ArrayFormula to be later extracted by the FormulaCreator.
    *
    * @return The correct representation as a String
    */
@@ -180,7 +180,7 @@ public class DummyFormula
    * This is the reverse Method to be used in the FormulaCreator. It extracts the indexElement and
    * the Element types from the string to create a matching ArrayFormula
    *
-   * @param input String in the Array<IndexElement, Element>
+   * @param input String in the Array Element, Element
    * @return DummyFormula representing the Array without values.
    */
   public static DummyFormula createDummyFormulaArrayFromString(String input) {
@@ -234,7 +234,7 @@ public class DummyFormula
 
   /**
    * Internal helper Method which is needed to determine at which index the "," is in order to
-   * correctly extract the index and the element types
+   * correctly extract the index and the element types.
    *
    * @param content String in the internal array representation
    * @return index of the "," otherwise -1
@@ -256,7 +256,7 @@ public class DummyFormula
 
   /**
    * This method ensures that the DummyFormula has the format which the FormulaCreator needs to
-   * extract the information and create a matching DummyFormula from the representation-string This
+   * extract the information and create a matching DummyFormula from the representation-string. This
    * is necessary as the Bitvector, FloatingPoint and Array FormulaTypes need more information as
    * just the FormulaType. The Values are represented too.
    */
@@ -295,7 +295,7 @@ public class DummyFormula
   }
 
   /**
-   * This method transforms this DummyFormula into the matching FormulaType Object
+   * This method transforms this DummyFormula into the matching FormulaType Object.
    *
    * @return matching Formula Type Object.
    */

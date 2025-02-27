@@ -1,5 +1,6 @@
 // Generated from
-// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/
+// sosy_lab/javaSmt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import java.util.List;
@@ -31,78 +32,78 @@ import org.antlr.v4.runtime.tree.TerminalNode;
   "CheckReturnValue",
   "this-escape"
 })
-public class smtlibv2Parser extends Parser {
+public class Smtlibv2Parser extends Parser {
   static {
     RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION);
   }
 
-  protected static final DFA[] _decisionToDFA;
-  protected static final PredictionContextCache _sharedContextCache = new PredictionContextCache();
+  protected static final DFA[] decisionToDFA;
+  protected static final PredictionContextCache sharedContextCache = new PredictionContextCache();
   public static final int Comment = 1,
       ParOpen = 2,
       ParClose = 3,
       Semicolon = 4,
       String = 5,
       QuotedSymbol = 6,
-      PS_Not = 7,
-      PS_Bool = 8,
-      PS_ContinuedExecution = 9,
-      PS_Error = 10,
-      PS_False = 11,
-      PS_ImmediateExit = 12,
-      PS_Incomplete = 13,
-      PS_Logic = 14,
-      PS_Memout = 15,
-      PS_Sat = 16,
-      PS_Success = 17,
-      PS_Theory = 18,
-      PS_True = 19,
-      PS_Unknown = 20,
-      PS_Unsupported = 21,
-      PS_Unsat = 22,
-      CMD_Assert = 23,
-      CMD_CheckSat = 24,
-      CMD_CheckSatAssuming = 25,
-      CMD_DeclareConst = 26,
-      CMD_DeclareDatatype = 27,
-      CMD_DeclareDatatypes = 28,
-      CMD_DeclareFun = 29,
-      CMD_DeclareSort = 30,
-      CMD_DefineFun = 31,
-      CMD_DefineFunRec = 32,
-      CMD_DefineFunsRec = 33,
-      CMD_DefineSort = 34,
-      CMD_Echo = 35,
-      CMD_Exit = 36,
-      CMD_GetAssertions = 37,
-      CMD_GetAssignment = 38,
-      CMD_GetInfo = 39,
-      CMD_GetModel = 40,
-      CMD_GetOption = 41,
-      CMD_GetProof = 42,
-      CMD_GetUnsatAssumptions = 43,
-      CMD_GetUnsatCore = 44,
-      CMD_GetValue = 45,
-      CMD_Pop = 46,
-      CMD_Push = 47,
-      CMD_Reset = 48,
-      CMD_ResetAssertions = 49,
-      CMD_SetInfo = 50,
-      CMD_SetLogic = 51,
-      CMD_SetOption = 52,
-      GRW_Exclamation = 53,
-      GRW_Underscore = 54,
-      GRW_As = 55,
-      GRW_Binary = 56,
-      GRW_Decimal = 57,
-      GRW_Exists = 58,
-      GRW_Hexadecimal = 59,
-      GRW_Forall = 60,
-      GRW_Let = 61,
-      GRW_Match = 62,
-      GRW_Numeral = 63,
-      GRW_Par = 64,
-      GRW_String = 65,
+      PSNot = 7,
+      PSBool = 8,
+      PSContinuedExecution = 9,
+      PSError = 10,
+      PSFalse = 11,
+      PSImmediateExit = 12,
+      PSIncomplete = 13,
+      PSLogic = 14,
+      PSMemout = 15,
+      PSSat = 16,
+      PSSuccess = 17,
+      PSTheory = 18,
+      PSTrue = 19,
+      PSUnknown = 20,
+      PSUnsupported = 21,
+      PSUnsat = 22,
+      CMDAssert = 23,
+      CMDCheckSat = 24,
+      CMDCheckSatAssuming = 25,
+      CMDDeclareConst = 26,
+      CMDDeclareDatatype = 27,
+      CMDDeclareDatatypes = 28,
+      CMDDeclareFun = 29,
+      CMDDeclareSort = 30,
+      CMDDefineFun = 31,
+      CMDDefineFunRec = 32,
+      CMDDefineFunsRec = 33,
+      CMDDefineSort = 34,
+      CMDEcho = 35,
+      CMDExit = 36,
+      CMDGetAssertions = 37,
+      CMDGetAssignment = 38,
+      CMDGetInfo = 39,
+      CMDGetModel = 40,
+      CMDGetOption = 41,
+      CMDGetProof = 42,
+      CMDGetUnsatAssumptions = 43,
+      CMDGetUnsatCore = 44,
+      CMDGetValue = 45,
+      CMDPop = 46,
+      CMDPush = 47,
+      CMDReset = 48,
+      CMDResetAssertions = 49,
+      CMDSetInfo = 50,
+      CMDSetLogic = 51,
+      CMDSetOption = 52,
+      GRWExclamation = 53,
+      GRWUnderscore = 54,
+      GRWAs = 55,
+      GRWBinary = 56,
+      GRWDecimal = 57,
+      GRWExists = 58,
+      GRWHexadecimal = 59,
+      GRWForall = 60,
+      GRWLet = 61,
+      GRWMatch = 62,
+      GRWNumeral = 63,
+      GRWPar = 64,
+      GRWString = 65,
       Numeral = 66,
       Binary = 67,
       HexDecimal = 68,
@@ -118,146 +119,146 @@ public class smtlibv2Parser extends Parser {
       NotANumberFloatingPoint = 78,
       FloatingPoint = 79,
       Colon = 80,
-      PK_AllStatistics = 81,
-      PK_AssertionStackLevels = 82,
-      PK_Authors = 83,
-      PK_Category = 84,
-      PK_Chainable = 85,
-      PK_Definition = 86,
-      PK_DiagnosticOutputChannel = 87,
-      PK_ErrorBehaviour = 88,
-      PK_Extension = 89,
-      PK_Funs = 90,
-      PK_FunsDescription = 91,
-      PK_GlobalDeclarations = 92,
-      PK_InteractiveMode = 93,
-      PK_Language = 94,
-      PK_LeftAssoc = 95,
-      PK_License = 96,
-      PK_Named = 97,
-      PK_Name = 98,
-      PK_Notes = 99,
-      PK_Pattern = 100,
-      PK_PrintSuccess = 101,
-      PK_ProduceAssertions = 102,
-      PK_ProduceAssignments = 103,
-      PK_ProduceModels = 104,
-      PK_ProduceProofs = 105,
-      PK_ProduceUnsatAssumptions = 106,
-      PK_ProduceUnsatCores = 107,
-      PK_RandomSeed = 108,
-      PK_ReasonUnknown = 109,
-      PK_RegularOutputChannel = 110,
-      PK_ReproducibleResourceLimit = 111,
-      PK_RightAssoc = 112,
-      PK_SmtLibVersion = 113,
-      PK_Sorts = 114,
-      PK_SortsDescription = 115,
-      PK_Source = 116,
-      PK_Status = 117,
-      PK_Theories = 118,
-      PK_Values = 119,
-      PK_Verbosity = 120,
-      PK_Version = 121,
-      RS_Model = 122,
+      PKAllStatistics = 81,
+      PKAssertionStackLevels = 82,
+      PKAuthors = 83,
+      PKCategory = 84,
+      PKChainable = 85,
+      PKDefinition = 86,
+      PKDiagnosticOutputChannel = 87,
+      PKErrorBehaviour = 88,
+      PKExtension = 89,
+      PKFuns = 90,
+      PKFunsDescription = 91,
+      PKGlobalDeclarations = 92,
+      PKInteractiveMode = 93,
+      PKLanguage = 94,
+      PKLeftAssoc = 95,
+      PKLicense = 96,
+      PKNamed = 97,
+      PKName = 98,
+      PKNotes = 99,
+      PKPattern = 100,
+      PKPrintSuccess = 101,
+      PKProduceAssertions = 102,
+      PKProduceAssignments = 103,
+      PKProduceModels = 104,
+      PKProduceProofs = 105,
+      PKProduceUnsatAssumptions = 106,
+      PKProduceUnsatCores = 107,
+      PKRandomSeed = 108,
+      PKReasonUnknown = 109,
+      PKRegularOutputChannel = 110,
+      PKReproducibleResourceLimit = 111,
+      PKRightAssoc = 112,
+      PKSmtLibVersion = 113,
+      PKSorts = 114,
+      PKSortsDescription = 115,
+      PKSource = 116,
+      PKStatus = 117,
+      PKTheories = 118,
+      PKValues = 119,
+      PKVerbosity = 120,
+      PKVersion = 121,
+      RSModel = 122,
       UndefinedSymbol = 123,
       WS = 124;
-  public static final int RULE_start = 0,
-      RULE_generalReservedWord = 1,
-      RULE_simpleSymbol = 2,
-      RULE_quotedSymbol = 3,
-      RULE_predefSymbol = 4,
-      RULE_predefKeyword = 5,
-      RULE_symbol = 6,
-      RULE_numeral = 7,
-      RULE_decimal = 8,
-      RULE_hexadecimal = 9,
-      RULE_binary = 10,
-      RULE_string = 11,
-      RULE_floatingpoint = 12,
-      RULE_keyword = 13,
-      RULE_spec_constant = 14,
-      RULE_s_expr = 15,
-      RULE_index = 16,
-      RULE_identifier = 17,
-      RULE_attribute_value = 18,
-      RULE_attribute = 19,
-      RULE_sort = 20,
-      RULE_qual_identifer = 21,
-      RULE_var_binding = 22,
-      RULE_sorted_var = 23,
-      RULE_pattern = 24,
-      RULE_match_case = 25,
-      RULE_term = 26,
-      RULE_sort_symbol_decl = 27,
-      RULE_meta_spec_constant = 28,
-      RULE_fun_symbol_decl = 29,
-      RULE_par_fun_symbol_decl = 30,
-      RULE_theory_attribute = 31,
-      RULE_theory_decl = 32,
-      RULE_logic_attribue = 33,
-      RULE_logic = 34,
-      RULE_sort_dec = 35,
-      RULE_selector_dec = 36,
-      RULE_constructor_dec = 37,
-      RULE_datatype_dec = 38,
-      RULE_function_dec = 39,
-      RULE_function_def = 40,
-      RULE_prop_literal = 41,
-      RULE_script = 42,
-      RULE_cmd_assert = 43,
-      RULE_cmd_checkSat = 44,
-      RULE_cmd_checkSatAssuming = 45,
-      RULE_cmd_declareConst = 46,
-      RULE_cmd_declareDatatype = 47,
-      RULE_cmd_declareDatatypes = 48,
-      RULE_cmd_declareFun = 49,
-      RULE_cmd_declareSort = 50,
-      RULE_cmd_defineFun = 51,
-      RULE_cmd_defineFunRec = 52,
-      RULE_cmd_defineFunsRec = 53,
-      RULE_cmd_defineSort = 54,
-      RULE_cmd_echo = 55,
-      RULE_cmd_exit = 56,
-      RULE_cmd_getAssertions = 57,
-      RULE_cmd_getAssignment = 58,
-      RULE_cmd_getInfo = 59,
-      RULE_cmd_getModel = 60,
-      RULE_cmd_getOption = 61,
-      RULE_cmd_getProof = 62,
-      RULE_cmd_getUnsatAssumptions = 63,
-      RULE_cmd_getUnsatCore = 64,
-      RULE_cmd_getValue = 65,
-      RULE_cmd_pop = 66,
-      RULE_cmd_push = 67,
-      RULE_cmd_reset = 68,
-      RULE_cmd_resetAssertions = 69,
-      RULE_cmd_setInfo = 70,
-      RULE_cmd_setLogic = 71,
-      RULE_cmd_setOption = 72,
-      RULE_command = 73,
-      RULE_b_value = 74,
-      RULE_option = 75,
-      RULE_info_flag = 76,
-      RULE_error_behaviour = 77,
-      RULE_reason_unknown = 78,
-      RULE_model_response = 79,
-      RULE_info_response = 80,
-      RULE_valuation_pair = 81,
-      RULE_t_valuation_pair = 82,
-      RULE_check_sat_response = 83,
-      RULE_echo_response = 84,
-      RULE_get_assertions_response = 85,
-      RULE_get_assignment_response = 86,
-      RULE_get_info_response = 87,
-      RULE_get_model_response = 88,
-      RULE_get_option_response = 89,
-      RULE_get_proof_response = 90,
-      RULE_get_unsat_assump_response = 91,
-      RULE_get_unsat_core_response = 92,
-      RULE_get_value_response = 93,
-      RULE_specific_success_response = 94,
-      RULE_general_response = 95;
+  public static final int RULEstart = 0,
+      RULEgeneralReservedWord = 1,
+      RULEsimpleSymbol = 2,
+      RULEquotedSymbol = 3,
+      RULEpredefSymbol = 4,
+      RULEpredefKeyword = 5,
+      RULEsymbol = 6,
+      RULEnumeral = 7,
+      RULEdecimal = 8,
+      RULEhexadecimal = 9,
+      RULEbinary = 10,
+      RULEstring = 11,
+      RULEfloatingpoint = 12,
+      RULEkeyword = 13,
+      RULEspecconstant = 14,
+      RULEsexpr = 15,
+      RULEindex = 16,
+      RULEidentifier = 17,
+      RULEattributevalue = 18,
+      RULEattribute = 19,
+      RULEsort = 20,
+      RULEqualidentifer = 21,
+      RULEvarbinding = 22,
+      RULEsortedvar = 23,
+      RULEpattern = 24,
+      RULEmatchcase = 25,
+      RULEterm = 26,
+      RULEsortsymboldecl = 27,
+      RULEmetaspecconstant = 28,
+      RULEfunsymboldecl = 29,
+      RULEparfunsymboldecl = 30,
+      RULEtheoryattribute = 31,
+      RULEtheorydecl = 32,
+      RULElogicattribue = 33,
+      RULElogic = 34,
+      RULEsortdec = 35,
+      RULEselectordec = 36,
+      RULEconstructordec = 37,
+      RULEdatatypedec = 38,
+      RULEfunctiondec = 39,
+      RULEfunctiondef = 40,
+      RULEpropliteral = 41,
+      RULEscript = 42,
+      RULEcmdassert = 43,
+      RULEcmdcheckSat = 44,
+      RULEcmdcheckSatAssuming = 45,
+      RULEcmddeclareConst = 46,
+      RULEcmddeclareDatatype = 47,
+      RULEcmddeclareDatatypes = 48,
+      RULEcmddeclareFun = 49,
+      RULEcmddeclareSort = 50,
+      RULEcmddefineFun = 51,
+      RULEcmddefineFunRec = 52,
+      RULEcmddefineFunsRec = 53,
+      RULEcmddefineSort = 54,
+      RULEcmdecho = 55,
+      RULEcmdexit = 56,
+      RULEcmdgetAssertions = 57,
+      RULEcmdgetAssignment = 58,
+      RULEcmdgetInfo = 59,
+      RULEcmdgetModel = 60,
+      RULEcmdgetOption = 61,
+      RULEcmdgetProof = 62,
+      RULEcmdgetUnsatAssumptions = 63,
+      RULEcmdgetUnsatCore = 64,
+      RULEcmdgetValue = 65,
+      RULEcmdpop = 66,
+      RULEcmdpush = 67,
+      RULEcmdreset = 68,
+      RULEcmdresetAssertions = 69,
+      RULEcmdsetInfo = 70,
+      RULEcmdsetLogic = 71,
+      RULEcmdsetOption = 72,
+      RULEcommand = 73,
+      RULEbvalue = 74,
+      RULEoption = 75,
+      RULEinfoflag = 76,
+      RULEerrorbehaviour = 77,
+      RULEreasonunknown = 78,
+      RULEmodelresponse = 79,
+      RULEinforesponse = 80,
+      RULEvaluationpair = 81,
+      RULEtvaluationpair = 82,
+      RULEchecksatresponse = 83,
+      RULEechoresponse = 84,
+      RULEgetassertionsresponse = 85,
+      RULEgetassignmentresponse = 86,
+      RULEgetinforesponse = 87,
+      RULEgetmodelresponse = 88,
+      RULEgetoptionresponse = 89,
+      RULEgetproofresponse = 90,
+      RULEgetunsatassumpresponse = 91,
+      RULEgetunsatcoreresponse = 92,
+      RULEgetvalueresponse = 93,
+      RULEspecificsuccessresponse = 94,
+      RULEgeneralresponse = 95;
 
   private static String[] makeRuleNames() {
     return new String[] {
@@ -275,88 +276,88 @@ public class smtlibv2Parser extends Parser {
       "string",
       "floatingpoint",
       "keyword",
-      "spec_constant",
-      "s_expr",
+      "specconstant",
+      "sexpr",
       "index",
       "identifier",
-      "attribute_value",
+      "attributevalue",
       "attribute",
       "sort",
-      "qual_identifer",
-      "var_binding",
-      "sorted_var",
+      "qualidentifer",
+      "varbinding",
+      "sortedvar",
       "pattern",
-      "match_case",
+      "matchcase",
       "term",
-      "sort_symbol_decl",
-      "meta_spec_constant",
-      "fun_symbol_decl",
-      "par_fun_symbol_decl",
-      "theory_attribute",
-      "theory_decl",
-      "logic_attribue",
+      "sortsymboldecl",
+      "metaspecconstant",
+      "funsymboldecl",
+      "parfunsymboldecl",
+      "theoryattribute",
+      "theorydecl",
+      "logicattribue",
       "logic",
-      "sort_dec",
-      "selector_dec",
-      "constructor_dec",
-      "datatype_dec",
-      "function_dec",
-      "function_def",
-      "prop_literal",
+      "sortdec",
+      "selectordec",
+      "constructordec",
+      "datatypedec",
+      "functiondec",
+      "functiondef",
+      "propliteral",
       "script",
-      "cmd_assert",
-      "cmd_checkSat",
-      "cmd_checkSatAssuming",
-      "cmd_declareConst",
-      "cmd_declareDatatype",
-      "cmd_declareDatatypes",
-      "cmd_declareFun",
-      "cmd_declareSort",
-      "cmd_defineFun",
-      "cmd_defineFunRec",
-      "cmd_defineFunsRec",
-      "cmd_defineSort",
-      "cmd_echo",
-      "cmd_exit",
-      "cmd_getAssertions",
-      "cmd_getAssignment",
-      "cmd_getInfo",
-      "cmd_getModel",
-      "cmd_getOption",
-      "cmd_getProof",
-      "cmd_getUnsatAssumptions",
-      "cmd_getUnsatCore",
-      "cmd_getValue",
-      "cmd_pop",
-      "cmd_push",
-      "cmd_reset",
-      "cmd_resetAssertions",
-      "cmd_setInfo",
-      "cmd_setLogic",
-      "cmd_setOption",
+      "cmdassert",
+      "cmdcheckSat",
+      "cmdcheckSatAssuming",
+      "cmddeclareConst",
+      "cmddeclareDatatype",
+      "cmddeclareDatatypes",
+      "cmddeclareFun",
+      "cmddeclareSort",
+      "cmddefineFun",
+      "cmddefineFunRec",
+      "cmddefineFunsRec",
+      "cmddefineSort",
+      "cmdecho",
+      "cmdexit",
+      "cmdgetAssertions",
+      "cmdgetAssignment",
+      "cmdgetInfo",
+      "cmdgetModel",
+      "cmdgetOption",
+      "cmdgetProof",
+      "cmdgetUnsatAssumptions",
+      "cmdgetUnsatCore",
+      "cmdgetValue",
+      "cmdpop",
+      "cmdpush",
+      "cmdreset",
+      "cmdresetAssertions",
+      "cmdsetInfo",
+      "cmdsetLogic",
+      "cmdsetOption",
       "command",
-      "b_value",
+      "bvalue",
       "option",
-      "info_flag",
-      "error_behaviour",
-      "reason_unknown",
-      "model_response",
-      "info_response",
-      "valuation_pair",
-      "t_valuation_pair",
-      "check_sat_response",
-      "echo_response",
-      "get_assertions_response",
-      "get_assignment_response",
-      "get_info_response",
-      "get_model_response",
-      "get_option_response",
-      "get_proof_response",
-      "get_unsat_assump_response",
-      "get_unsat_core_response",
-      "get_value_response",
-      "specific_success_response",
-      "general_response"
+      "infoflag",
+      "errorbehaviour",
+      "reasonunknown",
+      "modelresponse",
+      "inforesponse",
+      "valuationpair",
+      "tvaluationpair",
+      "checksatresponse",
+      "echoresponse",
+      "getassertionsresponse",
+      "getassignmentresponse",
+      "getinforesponse",
+      "getmodelresponse",
+      "getoptionresponse",
+      "getproofresponse",
+      "getunsatassumpresponse",
+      "getunsatcoreresponse",
+      "getvalueresponse",
+      "specificsuccessresponse",
+      "generalresponse"
     };
   }
 
@@ -418,7 +419,7 @@ public class smtlibv2Parser extends Parser {
       "'set-logic'",
       "'set-option'",
       "'!'",
-      "'_'",
+      "''",
       "'as'",
       "'BINARY'",
       "'DECIMAL'",
@@ -490,7 +491,7 @@ public class smtlibv2Parser extends Parser {
     };
   }
 
-  private static final String[] _LITERAL_NAMES = makeLiteralNames();
+  private static final String[] LITERALNAMES = makeLiteralNames();
 
   private static String[] makeSymbolicNames() {
     return new String[] {
@@ -501,65 +502,65 @@ public class smtlibv2Parser extends Parser {
       "Semicolon",
       "String",
       "QuotedSymbol",
-      "PS_Not",
-      "PS_Bool",
-      "PS_ContinuedExecution",
-      "PS_Error",
-      "PS_False",
-      "PS_ImmediateExit",
-      "PS_Incomplete",
-      "PS_Logic",
-      "PS_Memout",
-      "PS_Sat",
-      "PS_Success",
-      "PS_Theory",
-      "PS_True",
-      "PS_Unknown",
-      "PS_Unsupported",
-      "PS_Unsat",
-      "CMD_Assert",
-      "CMD_CheckSat",
-      "CMD_CheckSatAssuming",
-      "CMD_DeclareConst",
-      "CMD_DeclareDatatype",
-      "CMD_DeclareDatatypes",
-      "CMD_DeclareFun",
-      "CMD_DeclareSort",
-      "CMD_DefineFun",
-      "CMD_DefineFunRec",
-      "CMD_DefineFunsRec",
-      "CMD_DefineSort",
-      "CMD_Echo",
-      "CMD_Exit",
-      "CMD_GetAssertions",
-      "CMD_GetAssignment",
-      "CMD_GetInfo",
-      "CMD_GetModel",
-      "CMD_GetOption",
-      "CMD_GetProof",
-      "CMD_GetUnsatAssumptions",
-      "CMD_GetUnsatCore",
-      "CMD_GetValue",
-      "CMD_Pop",
-      "CMD_Push",
-      "CMD_Reset",
-      "CMD_ResetAssertions",
-      "CMD_SetInfo",
-      "CMD_SetLogic",
-      "CMD_SetOption",
-      "GRW_Exclamation",
-      "GRW_Underscore",
-      "GRW_As",
-      "GRW_Binary",
-      "GRW_Decimal",
-      "GRW_Exists",
-      "GRW_Hexadecimal",
-      "GRW_Forall",
-      "GRW_Let",
-      "GRW_Match",
-      "GRW_Numeral",
-      "GRW_Par",
-      "GRW_String",
+      "PSNot",
+      "PSBool",
+      "PSContinuedExecution",
+      "PSError",
+      "PSFalse",
+      "PSImmediateExit",
+      "PSIncomplete",
+      "PSLogic",
+      "PSMemout",
+      "PSSat",
+      "PSSuccess",
+      "PSTheory",
+      "PSTrue",
+      "PSUnknown",
+      "PSUnsupported",
+      "PSUnsat",
+      "CMDAssert",
+      "CMDCheckSat",
+      "CMDCheckSatAssuming",
+      "CMDDeclareConst",
+      "CMDDeclareDatatype",
+      "CMDDeclareDatatypes",
+      "CMDDeclareFun",
+      "CMDDeclareSort",
+      "CMDDefineFun",
+      "CMDDefineFunRec",
+      "CMDDefineFunsRec",
+      "CMDDefineSort",
+      "CMDEcho",
+      "CMDExit",
+      "CMDGetAssertions",
+      "CMDGetAssignment",
+      "CMDGetInfo",
+      "CMDGetModel",
+      "CMDGetOption",
+      "CMDGetProof",
+      "CMDGetUnsatAssumptions",
+      "CMDGetUnsatCore",
+      "CMDGetValue",
+      "CMDPop",
+      "CMDPush",
+      "CMDReset",
+      "CMDResetAssertions",
+      "CMDSetInfo",
+      "CMDSetLogic",
+      "CMDSetOption",
+      "GRWExclamation",
+      "GRWUnderscore",
+      "GRWAs",
+      "GRWBinary",
+      "GRWDecimal",
+      "GRWExists",
+      "GRWHexadecimal",
+      "GRWForall",
+      "GRWLet",
+      "GRWMatch",
+      "GRWNumeral",
+      "GRWPar",
+      "GRWString",
       "Numeral",
       "Binary",
       "HexDecimal",
@@ -575,55 +576,55 @@ public class smtlibv2Parser extends Parser {
       "NotANumberFloatingPoint",
       "FloatingPoint",
       "Colon",
-      "PK_AllStatistics",
-      "PK_AssertionStackLevels",
-      "PK_Authors",
-      "PK_Category",
-      "PK_Chainable",
-      "PK_Definition",
-      "PK_DiagnosticOutputChannel",
-      "PK_ErrorBehaviour",
-      "PK_Extension",
-      "PK_Funs",
-      "PK_FunsDescription",
-      "PK_GlobalDeclarations",
-      "PK_InteractiveMode",
-      "PK_Language",
-      "PK_LeftAssoc",
-      "PK_License",
-      "PK_Named",
-      "PK_Name",
-      "PK_Notes",
-      "PK_Pattern",
-      "PK_PrintSuccess",
-      "PK_ProduceAssertions",
-      "PK_ProduceAssignments",
-      "PK_ProduceModels",
-      "PK_ProduceProofs",
-      "PK_ProduceUnsatAssumptions",
-      "PK_ProduceUnsatCores",
-      "PK_RandomSeed",
-      "PK_ReasonUnknown",
-      "PK_RegularOutputChannel",
-      "PK_ReproducibleResourceLimit",
-      "PK_RightAssoc",
-      "PK_SmtLibVersion",
-      "PK_Sorts",
-      "PK_SortsDescription",
-      "PK_Source",
-      "PK_Status",
-      "PK_Theories",
-      "PK_Values",
-      "PK_Verbosity",
-      "PK_Version",
-      "RS_Model",
+      "PKAllStatistics",
+      "PKAssertionStackLevels",
+      "PKAuthors",
+      "PKCategory",
+      "PKChainable",
+      "PKDefinition",
+      "PKDiagnosticOutputChannel",
+      "PKErrorBehaviour",
+      "PKExtension",
+      "PKFuns",
+      "PKFunsDescription",
+      "PKGlobalDeclarations",
+      "PKInteractiveMode",
+      "PKLanguage",
+      "PKLeftAssoc",
+      "PKLicense",
+      "PKNamed",
+      "PKName",
+      "PKNotes",
+      "PKPattern",
+      "PKPrintSuccess",
+      "PKProduceAssertions",
+      "PKProduceAssignments",
+      "PKProduceModels",
+      "PKProduceProofs",
+      "PKProduceUnsatAssumptions",
+      "PKProduceUnsatCores",
+      "PKRandomSeed",
+      "PKReasonUnknown",
+      "PKRegularOutputChannel",
+      "PKReproducibleResourceLimit",
+      "PKRightAssoc",
+      "PKSmtLibVersion",
+      "PKSorts",
+      "PKSortsDescription",
+      "PKSource",
+      "PKStatus",
+      "PKTheories",
+      "PKValues",
+      "PKVerbosity",
+      "PKVersion",
+      "RSModel",
       "UndefinedSymbol",
       "WS"
     };
   }
 
-  private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
-  public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
+  private static final String[] SYMBOLICNAMES = makeSymbolicNames();
+  public static final Vocabulary VOCABULARY = new VocabularyImpl(LITERALNAMES, SYMBOLICNAMES);
 
   /**
    * @deprecated Use {@link #VOCABULARY} instead.
@@ -631,7 +632,7 @@ public class smtlibv2Parser extends Parser {
   @Deprecated public static final String[] tokenNames;
 
   static {
-    tokenNames = new String[_SYMBOLIC_NAMES.length];
+    tokenNames = new String[SYMBOLICNAMES.length];
     for (int i = 0; i < tokenNames.length; i++) {
       tokenNames[i] = VOCABULARY.getLiteralName(i);
       if (tokenNames[i] == null) {
@@ -667,17 +668,17 @@ public class smtlibv2Parser extends Parser {
 
   @Override
   public String getSerializedATN() {
-    return _serializedATN;
+    return serializedATN;
   }
 
   @Override
   public ATN getATN() {
-    return _ATN;
+    return ATN;
   }
 
-  public smtlibv2Parser(TokenStream input) {
-    super(input);
-    _interp = new ParserATNSimulator(this, _ATN, _decisionToDFA, _sharedContextCache);
+  public Smtlibv2Parser(TokenStream _input) {
+    super(_input);
+    _interp = new ParserATNSimulator(this, ATN, decisionToDFA, sharedContextCache);
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -688,161 +689,158 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_start;
+      return RULEstart;
     }
 
     public StartContext() {}
 
-    public void copyFrom(StartContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(StartContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Start_scriptContext extends StartContext {
+  public static class StartscriptContext extends StartContext {
     public ScriptContext script() {
       return getRuleContext(ScriptContext.class, 0);
     }
 
     public TerminalNode EOF() {
-      return getToken(smtlibv2Parser.EOF, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.EOF, 0);
     }
 
-    public Start_scriptContext(StartContext ctx) {
-      copyFrom(ctx);
+    public StartscriptContext(StartContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterStart_script(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterStartscript(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitStart_script(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitStartscript(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitStart_script(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitStartscript(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Start_gen_respContext extends StartContext {
-    public General_responseContext general_response() {
-      return getRuleContext(General_responseContext.class, 0);
+  public static class StartgenrespContext extends StartContext {
+    public GeneralresponseContext generalresponse() {
+      return getRuleContext(GeneralresponseContext.class, 0);
     }
 
     public TerminalNode EOF() {
-      return getToken(smtlibv2Parser.EOF, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.EOF, 0);
     }
 
-    public Start_gen_respContext(StartContext ctx) {
-      copyFrom(ctx);
+    public StartgenrespContext(StartContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterStart_gen_resp(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterStartgenresp(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitStart_gen_resp(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitStartgenresp(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitStart_gen_resp(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitStartgenresp(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Start_logicContext extends StartContext {
+  public static class StartlogicContext extends StartContext {
     public LogicContext logic() {
       return getRuleContext(LogicContext.class, 0);
     }
 
     public TerminalNode EOF() {
-      return getToken(smtlibv2Parser.EOF, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.EOF, 0);
     }
 
-    public Start_logicContext(StartContext ctx) {
-      copyFrom(ctx);
+    public StartlogicContext(StartContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterStart_logic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterStartlogic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitStart_logic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitStartlogic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitStart_logic(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitStartlogic(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Start_theoryContext extends StartContext {
-    public Theory_declContext theory_decl() {
-      return getRuleContext(Theory_declContext.class, 0);
+  public static class StarttheoryContext extends StartContext {
+    public TheorydeclContext theorydecl() {
+      return getRuleContext(TheorydeclContext.class, 0);
     }
 
     public TerminalNode EOF() {
-      return getToken(smtlibv2Parser.EOF, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.EOF, 0);
     }
 
-    public Start_theoryContext(StartContext ctx) {
-      copyFrom(ctx);
+    public StarttheoryContext(StartContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterStart_theory(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterStarttheory(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitStart_theory(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitStarttheory(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitStart_theory(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitStarttheory(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final StartContext start() throws RecognitionException {
-    StartContext _localctx = new StartContext(_ctx, getState());
-    enterRule(_localctx, 0, RULE_start);
+    StartContext local_ctx = new StartContext(_ctx, getState());
+    enterRule(local_ctx, 0, RULEstart);
     try {
       setState(204);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 0, _ctx)) {
         case 1:
-          _localctx = new Start_logicContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new StartlogicContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(192);
             logic();
@@ -851,18 +849,18 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 2:
-          _localctx = new Start_theoryContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new StarttheoryContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(195);
-            theory_decl();
+            theorydecl();
             setState(196);
             match(EOF);
           }
           break;
         case 3:
-          _localctx = new Start_scriptContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new StartscriptContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(198);
             script();
@@ -871,82 +869,91 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 4:
-          _localctx = new Start_gen_respContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new StartgenrespContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(201);
-            general_response();
+            generalresponse();
             setState(202);
             match(EOF);
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class GeneralReservedWordContext extends ParserRuleContext {
-    public TerminalNode GRW_Exclamation() {
-      return getToken(smtlibv2Parser.GRW_Exclamation, 0);
+    public TerminalNode GRWExclamation() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWExclamation, 0);
     }
 
-    public TerminalNode GRW_Underscore() {
-      return getToken(smtlibv2Parser.GRW_Underscore, 0);
+    public TerminalNode GRWUnderscore() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWUnderscore, 0);
     }
 
-    public TerminalNode GRW_As() {
-      return getToken(smtlibv2Parser.GRW_As, 0);
+    public TerminalNode GRWAs() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWAs, 0);
     }
 
-    public TerminalNode GRW_Binary() {
-      return getToken(smtlibv2Parser.GRW_Binary, 0);
+    public TerminalNode GRWBinary() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWBinary, 0);
     }
 
-    public TerminalNode GRW_Decimal() {
-      return getToken(smtlibv2Parser.GRW_Decimal, 0);
+    public TerminalNode GRWDecimal() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWDecimal, 0);
     }
 
-    public TerminalNode GRW_Exists() {
-      return getToken(smtlibv2Parser.GRW_Exists, 0);
+    public TerminalNode GRWExists() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWExists, 0);
     }
 
-    public TerminalNode GRW_Hexadecimal() {
-      return getToken(smtlibv2Parser.GRW_Hexadecimal, 0);
+    public TerminalNode GRWHexadecimal() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWHexadecimal, 0);
     }
 
-    public TerminalNode GRW_Forall() {
-      return getToken(smtlibv2Parser.GRW_Forall, 0);
+    public TerminalNode GRWForall() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWForall, 0);
     }
 
-    public TerminalNode GRW_Let() {
-      return getToken(smtlibv2Parser.GRW_Let, 0);
+    public TerminalNode GRWLet() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWLet, 0);
     }
 
-    public TerminalNode GRW_Match() {
-      return getToken(smtlibv2Parser.GRW_Match, 0);
+    public TerminalNode GRWMatch() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWMatch, 0);
     }
 
-    public TerminalNode GRW_Numeral() {
-      return getToken(smtlibv2Parser.GRW_Numeral, 0);
+    public TerminalNode GRWNumeral() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWNumeral, 0);
     }
 
-    public TerminalNode GRW_Par() {
-      return getToken(smtlibv2Parser.GRW_Par, 0);
+    public TerminalNode GRWPar() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWPar, 0);
     }
 
-    public TerminalNode GRW_String() {
-      return getToken(smtlibv2Parser.GRW_String, 0);
+    public TerminalNode GRWString() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWString, 0);
     }
 
-    public TerminalNode RS_Model() {
-      return getToken(smtlibv2Parser.RS_Model, 0);
+    public TerminalNode RSModel() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.RSModel, 0);
     }
 
     public GeneralReservedWordContext(ParserRuleContext parent, int invokingState) {
@@ -955,40 +962,40 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_generalReservedWord;
+      return RULEgeneralReservedWord;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGeneralReservedWord(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGeneralReservedWord(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGeneralReservedWord(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGeneralReservedWord(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGeneralReservedWord(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGeneralReservedWord(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final GeneralReservedWordContext generalReservedWord() throws RecognitionException {
-    GeneralReservedWordContext _localctx = new GeneralReservedWordContext(_ctx, getState());
-    enterRule(_localctx, 2, RULE_generalReservedWord);
-    int _la;
+    GeneralReservedWordContext local_ctx = new GeneralReservedWordContext(_ctx, getState());
+    enterRule(local_ctx, 2, RULEgeneralReservedWord);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(206);
-        _la = _input.LA(1);
-        if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & -9007199254740992L) != 0)
-            || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 288230376151711747L) != 0))) {
+        la = _input.LA(1);
+        if (!((((la) & ~0x3f) == 0 && ((1L << la) & -9007199254740992L) != 0)
+            || ((((la - 64)) & ~0x3f) == 0 && ((1L << (la - 64)) & 288230376151711747L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -997,13 +1004,13 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -1014,109 +1021,109 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_simpleSymbol;
+      return RULEsimpleSymbol;
     }
 
     public SimpleSymbolContext() {}
 
-    public void copyFrom(SimpleSymbolContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SimpleSymbolContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Simp_pre_symbContext extends SimpleSymbolContext {
+  public static class SimppresymbContext extends SimpleSymbolContext {
     public PredefSymbolContext predefSymbol() {
       return getRuleContext(PredefSymbolContext.class, 0);
     }
 
-    public Simp_pre_symbContext(SimpleSymbolContext ctx) {
-      copyFrom(ctx);
+    public SimppresymbContext(SimpleSymbolContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSimp_pre_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSimppresymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSimp_pre_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSimppresymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSimp_pre_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSimppresymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Simp_undef_symbContext extends SimpleSymbolContext {
+  public static class SimpundefsymbContext extends SimpleSymbolContext {
     public TerminalNode UndefinedSymbol() {
-      return getToken(smtlibv2Parser.UndefinedSymbol, 0);
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.UndefinedSymbol, 0);
     }
 
-    public Simp_undef_symbContext(SimpleSymbolContext ctx) {
-      copyFrom(ctx);
+    public SimpundefsymbContext(SimpleSymbolContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSimp_undef_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSimpundefsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSimp_undef_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSimpundefsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSimp_undef_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSimpundefsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final SimpleSymbolContext simpleSymbol() throws RecognitionException {
-    SimpleSymbolContext _localctx = new SimpleSymbolContext(_ctx, getState());
-    enterRule(_localctx, 4, RULE_simpleSymbol);
+    SimpleSymbolContext local_ctx = new SimpleSymbolContext(_ctx, getState());
+    enterRule(local_ctx, 4, RULEsimpleSymbol);
     try {
       setState(210);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
-          _localctx = new Simp_pre_symbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
+          local_ctx = new SimppresymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(208);
             predefSymbol();
           }
           break;
         case UndefinedSymbol:
-          _localctx = new Simp_undef_symbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new SimpundefsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(209);
             match(UndefinedSymbol);
@@ -1126,19 +1133,20 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class QuotedSymbolContext extends ParserRuleContext {
     public TerminalNode QuotedSymbol() {
-      return getToken(smtlibv2Parser.QuotedSymbol, 0);
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.QuotedSymbol, 0);
     }
 
     public QuotedSymbolContext(ParserRuleContext parent, int invokingState) {
@@ -1147,112 +1155,118 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_quotedSymbol;
+      return RULEquotedSymbol;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterQuotedSymbol(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterQuotedSymbol(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitQuotedSymbol(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitQuotedSymbol(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitQuotedSymbol(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitQuotedSymbol(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final QuotedSymbolContext quotedSymbol() throws RecognitionException {
-    QuotedSymbolContext _localctx = new QuotedSymbolContext(_ctx, getState());
-    enterRule(_localctx, 6, RULE_quotedSymbol);
+    QuotedSymbolContext local_ctx = new QuotedSymbolContext(_ctx, getState());
+    enterRule(local_ctx, 6, RULEquotedSymbol);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(212);
         match(QuotedSymbol);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class PredefSymbolContext extends ParserRuleContext {
-    public TerminalNode PS_Not() {
-      return getToken(smtlibv2Parser.PS_Not, 0);
+    public TerminalNode PSNot() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSNot, 0);
     }
 
-    public TerminalNode PS_Bool() {
-      return getToken(smtlibv2Parser.PS_Bool, 0);
+    public TerminalNode PSBool() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSBool, 0);
     }
 
-    public TerminalNode PS_ContinuedExecution() {
-      return getToken(smtlibv2Parser.PS_ContinuedExecution, 0);
+    public TerminalNode PSContinuedExecution() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSContinuedExecution, 0);
     }
 
-    public TerminalNode PS_Error() {
-      return getToken(smtlibv2Parser.PS_Error, 0);
+    public TerminalNode PSError() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSError, 0);
     }
 
-    public TerminalNode PS_False() {
-      return getToken(smtlibv2Parser.PS_False, 0);
+    public TerminalNode PSFalse() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSFalse, 0);
     }
 
-    public TerminalNode PS_ImmediateExit() {
-      return getToken(smtlibv2Parser.PS_ImmediateExit, 0);
+    public TerminalNode PSImmediateExit() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSImmediateExit, 0);
     }
 
-    public TerminalNode PS_Incomplete() {
-      return getToken(smtlibv2Parser.PS_Incomplete, 0);
+    public TerminalNode PSIncomplete() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSIncomplete, 0);
     }
 
-    public TerminalNode PS_Logic() {
-      return getToken(smtlibv2Parser.PS_Logic, 0);
+    public TerminalNode PSLogic() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSLogic, 0);
     }
 
-    public TerminalNode PS_Memout() {
-      return getToken(smtlibv2Parser.PS_Memout, 0);
+    public TerminalNode PSMemout() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSMemout, 0);
     }
 
-    public TerminalNode PS_Sat() {
-      return getToken(smtlibv2Parser.PS_Sat, 0);
+    public TerminalNode PSSat() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSSat, 0);
     }
 
-    public TerminalNode PS_Success() {
-      return getToken(smtlibv2Parser.PS_Success, 0);
+    public TerminalNode PSSuccess() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSSuccess, 0);
     }
 
-    public TerminalNode PS_Theory() {
-      return getToken(smtlibv2Parser.PS_Theory, 0);
+    public TerminalNode PSTheory() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSTheory, 0);
     }
 
-    public TerminalNode PS_True() {
-      return getToken(smtlibv2Parser.PS_True, 0);
+    public TerminalNode PSTrue() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSTrue, 0);
     }
 
-    public TerminalNode PS_Unknown() {
-      return getToken(smtlibv2Parser.PS_Unknown, 0);
+    public TerminalNode PSUnknown() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnknown, 0);
     }
 
-    public TerminalNode PS_Unsupported() {
-      return getToken(smtlibv2Parser.PS_Unsupported, 0);
+    public TerminalNode PSUnsupported() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnsupported, 0);
     }
 
-    public TerminalNode PS_Unsat() {
-      return getToken(smtlibv2Parser.PS_Unsat, 0);
+    public TerminalNode PSUnsat() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnsat, 0);
     }
 
     public PredefSymbolContext(ParserRuleContext parent, int invokingState) {
@@ -1261,39 +1275,39 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_predefSymbol;
+      return RULEpredefSymbol;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPredefSymbol(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterPredefSymbol(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPredefSymbol(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitPredefSymbol(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPredefSymbol(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPredefSymbol(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final PredefSymbolContext predefSymbol() throws RecognitionException {
-    PredefSymbolContext _localctx = new PredefSymbolContext(_ctx, getState());
-    enterRule(_localctx, 8, RULE_predefSymbol);
-    int _la;
+    PredefSymbolContext local_ctx = new PredefSymbolContext(_ctx, getState());
+    enterRule(local_ctx, 8, RULEpredefSymbol);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(214);
-        _la = _input.LA(1);
-        if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388480L) != 0))) {
+        la = _input.LA(1);
+        if (!((((la) & ~0x3f) == 0 && ((1L << la) & 8388480L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -1302,179 +1316,232 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class PredefKeywordContext extends ParserRuleContext {
-    public TerminalNode PK_AllStatistics() {
-      return getToken(smtlibv2Parser.PK_AllStatistics, 0);
+    public TerminalNode PKAllStatistics() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAllStatistics, 0);
     }
 
-    public TerminalNode PK_AssertionStackLevels() {
-      return getToken(smtlibv2Parser.PK_AssertionStackLevels, 0);
+    public TerminalNode PKAssertionStackLevels() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAssertionStackLevels,
+          0);
     }
 
-    public TerminalNode PK_Authors() {
-      return getToken(smtlibv2Parser.PK_Authors, 0);
+    public TerminalNode PKAuthors() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAuthors, 0);
     }
 
-    public TerminalNode PK_Category() {
-      return getToken(smtlibv2Parser.PK_Category, 0);
+    public TerminalNode PKCategory() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKCategory, 0);
     }
 
-    public TerminalNode PK_Chainable() {
-      return getToken(smtlibv2Parser.PK_Chainable, 0);
+    public TerminalNode PKChainable() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKChainable, 0);
     }
 
-    public TerminalNode PK_Definition() {
-      return getToken(smtlibv2Parser.PK_Definition, 0);
+    public TerminalNode PKDefinition() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKDefinition, 0);
     }
 
-    public TerminalNode PK_DiagnosticOutputChannel() {
-      return getToken(smtlibv2Parser.PK_DiagnosticOutputChannel, 0);
+    public TerminalNode PKDiagnosticOutputChannel() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKDiagnosticOutputChannel,
+          0);
     }
 
-    public TerminalNode PK_ErrorBehaviour() {
-      return getToken(smtlibv2Parser.PK_ErrorBehaviour, 0);
+    public TerminalNode PKErrorBehaviour() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKErrorBehaviour, 0);
     }
 
-    public TerminalNode PK_Extension() {
-      return getToken(smtlibv2Parser.PK_Extension, 0);
+    public TerminalNode PKExtension() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKExtension, 0);
     }
 
-    public TerminalNode PK_Funs() {
-      return getToken(smtlibv2Parser.PK_Funs, 0);
+    public TerminalNode PKFuns() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKFuns, 0);
     }
 
-    public TerminalNode PK_FunsDescription() {
-      return getToken(smtlibv2Parser.PK_FunsDescription, 0);
+    public TerminalNode PKFunsDescription() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKFunsDescription, 0);
     }
 
-    public TerminalNode PK_GlobalDeclarations() {
-      return getToken(smtlibv2Parser.PK_GlobalDeclarations, 0);
+    public TerminalNode PKGlobalDeclarations() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKGlobalDeclarations, 0);
     }
 
-    public TerminalNode PK_InteractiveMode() {
-      return getToken(smtlibv2Parser.PK_InteractiveMode, 0);
+    public TerminalNode PKInteractiveMode() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKInteractiveMode, 0);
     }
 
-    public TerminalNode PK_Language() {
-      return getToken(smtlibv2Parser.PK_Language, 0);
+    public TerminalNode PKLanguage() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKLanguage, 0);
     }
 
-    public TerminalNode PK_LeftAssoc() {
-      return getToken(smtlibv2Parser.PK_LeftAssoc, 0);
+    public TerminalNode PKLeftAssoc() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKLeftAssoc, 0);
     }
 
-    public TerminalNode PK_License() {
-      return getToken(smtlibv2Parser.PK_License, 0);
+    public TerminalNode PKLicense() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKLicense, 0);
     }
 
-    public TerminalNode PK_Named() {
-      return getToken(smtlibv2Parser.PK_Named, 0);
+    public TerminalNode PKNamed() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKNamed, 0);
     }
 
-    public TerminalNode PK_Name() {
-      return getToken(smtlibv2Parser.PK_Name, 0);
+    public TerminalNode PKName() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKName, 0);
     }
 
-    public TerminalNode PK_Notes() {
-      return getToken(smtlibv2Parser.PK_Notes, 0);
+    public TerminalNode PKNotes() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKNotes, 0);
     }
 
-    public TerminalNode PK_Pattern() {
-      return getToken(smtlibv2Parser.PK_Pattern, 0);
+    public TerminalNode PKPattern() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKPattern, 0);
     }
 
-    public TerminalNode PK_PrintSuccess() {
-      return getToken(smtlibv2Parser.PK_PrintSuccess, 0);
+    public TerminalNode PKPrintSuccess() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKPrintSuccess, 0);
     }
 
-    public TerminalNode PK_ProduceAssertions() {
-      return getToken(smtlibv2Parser.PK_ProduceAssertions, 0);
+    public TerminalNode PKProduceAssertions() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceAssertions, 0);
     }
 
-    public TerminalNode PK_ProduceAssignments() {
-      return getToken(smtlibv2Parser.PK_ProduceAssignments, 0);
+    public TerminalNode PKProduceAssignments() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceAssignments, 0);
     }
 
-    public TerminalNode PK_ProduceModels() {
-      return getToken(smtlibv2Parser.PK_ProduceModels, 0);
+    public TerminalNode PKProduceModels() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceModels, 0);
     }
 
-    public TerminalNode PK_ProduceProofs() {
-      return getToken(smtlibv2Parser.PK_ProduceProofs, 0);
+    public TerminalNode PKProduceProofs() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceProofs, 0);
     }
 
-    public TerminalNode PK_ProduceUnsatAssumptions() {
-      return getToken(smtlibv2Parser.PK_ProduceUnsatAssumptions, 0);
+    public TerminalNode PKProduceUnsatAssumptions() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKProduceUnsatAssumptions,
+          0);
     }
 
-    public TerminalNode PK_ProduceUnsatCores() {
-      return getToken(smtlibv2Parser.PK_ProduceUnsatCores, 0);
+    public TerminalNode PKProduceUnsatCores() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceUnsatCores, 0);
     }
 
-    public TerminalNode PK_RandomSeed() {
-      return getToken(smtlibv2Parser.PK_RandomSeed, 0);
+    public TerminalNode PKRandomSeed() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKRandomSeed, 0);
     }
 
-    public TerminalNode PK_ReasonUnknown() {
-      return getToken(smtlibv2Parser.PK_ReasonUnknown, 0);
+    public TerminalNode PKReasonUnknown() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKReasonUnknown, 0);
     }
 
-    public TerminalNode PK_RegularOutputChannel() {
-      return getToken(smtlibv2Parser.PK_RegularOutputChannel, 0);
+    public TerminalNode PKRegularOutputChannel() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKRegularOutputChannel,
+          0);
     }
 
-    public TerminalNode PK_ReproducibleResourceLimit() {
-      return getToken(smtlibv2Parser.PK_ReproducibleResourceLimit, 0);
+    public TerminalNode PKReproducibleResourceLimit() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKReproducibleResourceLimit,
+          0);
     }
 
-    public TerminalNode PK_RightAssoc() {
-      return getToken(smtlibv2Parser.PK_RightAssoc, 0);
+    public TerminalNode PKRightAssoc() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKRightAssoc, 0);
     }
 
-    public TerminalNode PK_SmtLibVersion() {
-      return getToken(smtlibv2Parser.PK_SmtLibVersion, 0);
+    public TerminalNode PKSmtLibVersion() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSmtLibVersion, 0);
     }
 
-    public TerminalNode PK_Sorts() {
-      return getToken(smtlibv2Parser.PK_Sorts, 0);
+    public TerminalNode PKSorts() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSorts, 0);
     }
 
-    public TerminalNode PK_SortsDescription() {
-      return getToken(smtlibv2Parser.PK_SortsDescription, 0);
+    public TerminalNode PKSortsDescription() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSortsDescription, 0);
     }
 
-    public TerminalNode PK_Source() {
-      return getToken(smtlibv2Parser.PK_Source, 0);
+    public TerminalNode PKSource() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSource, 0);
     }
 
-    public TerminalNode PK_Status() {
-      return getToken(smtlibv2Parser.PK_Status, 0);
+    public TerminalNode PKStatus() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKStatus, 0);
     }
 
-    public TerminalNode PK_Theories() {
-      return getToken(smtlibv2Parser.PK_Theories, 0);
+    public TerminalNode PKTheories() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKTheories, 0);
     }
 
-    public TerminalNode PK_Values() {
-      return getToken(smtlibv2Parser.PK_Values, 0);
+    public TerminalNode PKValues() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKValues, 0);
     }
 
-    public TerminalNode PK_Verbosity() {
-      return getToken(smtlibv2Parser.PK_Verbosity, 0);
+    public TerminalNode PKVerbosity() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKVerbosity, 0);
     }
 
-    public TerminalNode PK_Version() {
-      return getToken(smtlibv2Parser.PK_Version, 0);
+    public TerminalNode PKVersion() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKVersion, 0);
     }
 
     public PredefKeywordContext(ParserRuleContext parent, int invokingState) {
@@ -1483,39 +1550,39 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_predefKeyword;
+      return RULEpredefKeyword;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPredefKeyword(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterPredefKeyword(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPredefKeyword(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitPredefKeyword(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPredefKeyword(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPredefKeyword(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final PredefKeywordContext predefKeyword() throws RecognitionException {
-    PredefKeywordContext _localctx = new PredefKeywordContext(_ctx, getState());
-    enterRule(_localctx, 10, RULE_predefKeyword);
-    int _la;
+    PredefKeywordContext local_ctx = new PredefKeywordContext(_ctx, getState());
+    enterRule(local_ctx, 10, RULEpredefKeyword);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(216);
-        _la = _input.LA(1);
-        if (!(((((_la - 81)) & ~0x3f) == 0 && ((1L << (_la - 81)) & 2199023255551L) != 0))) {
+        la = _input.LA(1);
+        if (!(((((la - 81)) & ~0x3f) == 0 && ((1L << (la - 81)) & 2199023255551L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -1524,13 +1591,13 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -1541,13 +1608,13 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_symbol;
+      return RULEsymbol;
     }
 
     public SymbolContext() {}
 
-    public void copyFrom(SymbolContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SymbolContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
@@ -1557,24 +1624,24 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SimpleSymbolContext.class, 0);
     }
 
-    public SimpsymbContext(SymbolContext ctx) {
-      copyFrom(ctx);
+    public SimpsymbContext(SymbolContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSimpsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSimpsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSimpsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSimpsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSimpsymb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSimpsymb(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -1585,62 +1652,62 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(QuotedSymbolContext.class, 0);
     }
 
-    public QuotsymbContext(SymbolContext ctx) {
-      copyFrom(ctx);
+    public QuotsymbContext(SymbolContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterQuotsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterQuotsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitQuotsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitQuotsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitQuotsymb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitQuotsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final SymbolContext symbol() throws RecognitionException {
-    SymbolContext _localctx = new SymbolContext(_ctx, getState());
-    enterRule(_localctx, 12, RULE_symbol);
+    SymbolContext local_ctx = new SymbolContext(_ctx, getState());
+    enterRule(local_ctx, 12, RULEsymbol);
     try {
       setState(220);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new SimpsymbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new SimpsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(218);
             simpleSymbol();
           }
           break;
         case QuotedSymbol:
-          _localctx = new QuotsymbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new QuotsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(219);
             quotedSymbol();
@@ -1650,19 +1717,19 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class NumeralContext extends ParserRuleContext {
     public TerminalNode Numeral() {
-      return getToken(smtlibv2Parser.Numeral, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Numeral, 0);
     }
 
     public NumeralContext(ParserRuleContext parent, int invokingState) {
@@ -1671,50 +1738,50 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_numeral;
+      return RULEnumeral;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterNumeral(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterNumeral(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitNumeral(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitNumeral(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitNumeral(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitNumeral(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final NumeralContext numeral() throws RecognitionException {
-    NumeralContext _localctx = new NumeralContext(_ctx, getState());
-    enterRule(_localctx, 14, RULE_numeral);
+    NumeralContext local_ctx = new NumeralContext(_ctx, getState());
+    enterRule(local_ctx, 14, RULEnumeral);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(222);
         match(Numeral);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class DecimalContext extends ParserRuleContext {
     public TerminalNode Decimal() {
-      return getToken(smtlibv2Parser.Decimal, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Decimal, 0);
     }
 
     public DecimalContext(ParserRuleContext parent, int invokingState) {
@@ -1723,50 +1790,51 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_decimal;
+      return RULEdecimal;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecimal(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecimal(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecimal(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecimal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecimal(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDecimal(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final DecimalContext decimal() throws RecognitionException {
-    DecimalContext _localctx = new DecimalContext(_ctx, getState());
-    enterRule(_localctx, 16, RULE_decimal);
+    DecimalContext local_ctx = new DecimalContext(_ctx, getState());
+    enterRule(local_ctx, 16, RULEdecimal);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(224);
         match(Decimal);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class HexadecimalContext extends ParserRuleContext {
     public TerminalNode HexDecimal() {
-      return getToken(smtlibv2Parser.HexDecimal, 0);
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.HexDecimal, 0);
     }
 
     public HexadecimalContext(ParserRuleContext parent, int invokingState) {
@@ -1775,51 +1843,51 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_hexadecimal;
+      return RULEhexadecimal;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterHexadecimal(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterHexadecimal(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitHexadecimal(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitHexadecimal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitHexadecimal(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitHexadecimal(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final HexadecimalContext hexadecimal() throws RecognitionException {
-    HexadecimalContext _localctx = new HexadecimalContext(_ctx, getState());
-    enterRule(_localctx, 18, RULE_hexadecimal);
+    HexadecimalContext local_ctx = new HexadecimalContext(_ctx, getState());
+    enterRule(local_ctx, 18, RULEhexadecimal);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(226);
         match(HexDecimal);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class BinaryContext extends ParserRuleContext {
     public TerminalNode Binary() {
-      return getToken(smtlibv2Parser.Binary, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Binary, 0);
     }
 
     public BinaryContext(ParserRuleContext parent, int invokingState) {
@@ -1828,50 +1896,50 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_binary;
+      return RULEbinary;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterBinary(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterBinary(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitBinary(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitBinary(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitBinary(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitBinary(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final BinaryContext binary() throws RecognitionException {
-    BinaryContext _localctx = new BinaryContext(_ctx, getState());
-    enterRule(_localctx, 20, RULE_binary);
+    BinaryContext local_ctx = new BinaryContext(_ctx, getState());
+    enterRule(local_ctx, 20, RULEbinary);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(228);
         match(Binary);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class StringContext extends ParserRuleContext {
     public TerminalNode String() {
-      return getToken(smtlibv2Parser.String, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.String, 0);
     }
 
     public StringContext(ParserRuleContext parent, int invokingState) {
@@ -1880,50 +1948,51 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_string;
+      return RULEstring;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterString(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterString(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitString(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitString(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitString(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitString(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final StringContext string() throws RecognitionException {
-    StringContext _localctx = new StringContext(_ctx, getState());
-    enterRule(_localctx, 22, RULE_string);
+    StringContext local_ctx = new StringContext(_ctx, getState());
+    enterRule(local_ctx, 22, RULEstring);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(230);
         match(String);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class FloatingpointContext extends ParserRuleContext {
     public TerminalNode FloatingPoint() {
-      return getToken(smtlibv2Parser.FloatingPoint, 0);
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.FloatingPoint, 0);
     }
 
     public FloatingpointContext(ParserRuleContext parent, int invokingState) {
@@ -1932,46 +2001,46 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_floatingpoint;
+      return RULEfloatingpoint;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFloatingpoint(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterFloatingpoint(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitFloatingpoint(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitFloatingpoint(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFloatingpoint(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFloatingpoint(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final FloatingpointContext floatingpoint() throws RecognitionException {
-    FloatingpointContext _localctx = new FloatingpointContext(_ctx, getState());
-    enterRule(_localctx, 24, RULE_floatingpoint);
+    FloatingpointContext local_ctx = new FloatingpointContext(_ctx, getState());
+    enterRule(local_ctx, 24, RULEfloatingpoint);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(232);
         match(FloatingPoint);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -1982,135 +2051,134 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_keyword;
+      return RULEkeyword;
     }
 
     public KeywordContext() {}
 
-    public void copyFrom(KeywordContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(KeywordContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Key_simsymbContext extends KeywordContext {
+  public static class KeysimsymbContext extends KeywordContext {
     public TerminalNode Colon() {
-      return getToken(smtlibv2Parser.Colon, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Colon, 0);
     }
 
     public SimpleSymbolContext simpleSymbol() {
       return getRuleContext(SimpleSymbolContext.class, 0);
     }
 
-    public Key_simsymbContext(KeywordContext ctx) {
-      copyFrom(ctx);
+    public KeysimsymbContext(KeywordContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterKey_simsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterKeysimsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitKey_simsymb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitKeysimsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitKey_simsymb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitKeysimsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Pre_keyContext extends KeywordContext {
+  public static class PrekeyContext extends KeywordContext {
     public PredefKeywordContext predefKeyword() {
       return getRuleContext(PredefKeywordContext.class, 0);
     }
 
-    public Pre_keyContext(KeywordContext ctx) {
-      copyFrom(ctx);
+    public PrekeyContext(KeywordContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterPre_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPrekey(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitPre_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPrekey(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPre_key(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPrekey(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final KeywordContext keyword() throws RecognitionException {
-    KeywordContext _localctx = new KeywordContext(_ctx, getState());
-    enterRule(_localctx, 26, RULE_keyword);
+    KeywordContext local_ctx = new KeywordContext(_ctx, getState());
+    enterRule(local_ctx, 26, RULEkeyword);
     try {
       setState(237);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
-        case PK_AllStatistics:
-        case PK_AssertionStackLevels:
-        case PK_Authors:
-        case PK_Category:
-        case PK_Chainable:
-        case PK_Definition:
-        case PK_DiagnosticOutputChannel:
-        case PK_ErrorBehaviour:
-        case PK_Extension:
-        case PK_Funs:
-        case PK_FunsDescription:
-        case PK_GlobalDeclarations:
-        case PK_InteractiveMode:
-        case PK_Language:
-        case PK_LeftAssoc:
-        case PK_License:
-        case PK_Named:
-        case PK_Name:
-        case PK_Notes:
-        case PK_Pattern:
-        case PK_PrintSuccess:
-        case PK_ProduceAssertions:
-        case PK_ProduceAssignments:
-        case PK_ProduceModels:
-        case PK_ProduceProofs:
-        case PK_ProduceUnsatAssumptions:
-        case PK_ProduceUnsatCores:
-        case PK_RandomSeed:
-        case PK_ReasonUnknown:
-        case PK_RegularOutputChannel:
-        case PK_ReproducibleResourceLimit:
-        case PK_RightAssoc:
-        case PK_SmtLibVersion:
-        case PK_Sorts:
-        case PK_SortsDescription:
-        case PK_Source:
-        case PK_Status:
-        case PK_Theories:
-        case PK_Values:
-        case PK_Verbosity:
-        case PK_Version:
-          _localctx = new Pre_keyContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+        case PKAllStatistics:
+        case PKAssertionStackLevels:
+        case PKAuthors:
+        case PKCategory:
+        case PKChainable:
+        case PKDefinition:
+        case PKDiagnosticOutputChannel:
+        case PKErrorBehaviour:
+        case PKExtension:
+        case PKFuns:
+        case PKFunsDescription:
+        case PKGlobalDeclarations:
+        case PKInteractiveMode:
+        case PKLanguage:
+        case PKLeftAssoc:
+        case PKLicense:
+        case PKNamed:
+        case PKName:
+        case PKNotes:
+        case PKPattern:
+        case PKPrintSuccess:
+        case PKProduceAssertions:
+        case PKProduceAssignments:
+        case PKProduceModels:
+        case PKProduceProofs:
+        case PKProduceUnsatAssumptions:
+        case PKProduceUnsatCores:
+        case PKRandomSeed:
+        case PKReasonUnknown:
+        case PKRegularOutputChannel:
+        case PKReproducibleResourceLimit:
+        case PKRightAssoc:
+        case PKSmtLibVersion:
+        case PKSorts:
+        case PKSortsDescription:
+        case PKSource:
+        case PKStatus:
+        case PKTheories:
+        case PKValues:
+        case PKVerbosity:
+        case PKVersion:
+          local_ctx = new PrekeyContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(234);
             predefKeyword();
           }
           break;
         case Colon:
-          _localctx = new Key_simsymbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new KeysimsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(235);
             match(Colon);
@@ -2122,263 +2190,263 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constantContext extends ParserRuleContext {
-    public Spec_constantContext(ParserRuleContext parent, int invokingState) {
+  public static class SpecconstantContext extends ParserRuleContext {
+    public SpecconstantContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_spec_constant;
+      return RULEspecconstant;
     }
 
-    public Spec_constantContext() {}
+    public SpecconstantContext() {}
 
-    public void copyFrom(Spec_constantContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SpecconstantContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_hexContext extends Spec_constantContext {
+  public static class SpecconstanthexContext extends SpecconstantContext {
     public HexadecimalContext hexadecimal() {
       return getRuleContext(HexadecimalContext.class, 0);
     }
 
-    public Spec_constant_hexContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstanthexContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_hex(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstanthex(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_hex(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstanthex(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_hex(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstanthex(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_floating_pointContext extends Spec_constantContext {
+  public static class SpecconstantfloatingpointContext extends SpecconstantContext {
     public FloatingpointContext floatingpoint() {
       return getRuleContext(FloatingpointContext.class, 0);
     }
 
-    public Spec_constant_floating_pointContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstantfloatingpointContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_floating_point(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstantfloatingpoint(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_floating_point(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstantfloatingpoint(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_floating_point(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstantfloatingpoint(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_binContext extends Spec_constantContext {
+  public static class SpecconstantbinContext extends SpecconstantContext {
     public BinaryContext binary() {
       return getRuleContext(BinaryContext.class, 0);
     }
 
-    public Spec_constant_binContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstantbinContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_bin(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstantbin(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_bin(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstantbin(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_bin(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstantbin(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_numContext extends Spec_constantContext {
+  public static class SpecconstantnumContext extends SpecconstantContext {
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Spec_constant_numContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstantnumContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_num(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstantnum(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_num(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstantnum(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_num(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstantnum(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_decContext extends Spec_constantContext {
+  public static class SpecconstantdecContext extends SpecconstantContext {
     public DecimalContext decimal() {
       return getRuleContext(DecimalContext.class, 0);
     }
 
-    public Spec_constant_decContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstantdecContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstantdec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstantdec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_dec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstantdec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Spec_constant_stringContext extends Spec_constantContext {
+  public static class SpecconstantstringContext extends SpecconstantContext {
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Spec_constant_stringContext(Spec_constantContext ctx) {
-      copyFrom(ctx);
+    public SpecconstantstringContext(SpecconstantContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSpec_constant_string(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSpecconstantstring(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSpec_constant_string(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSpecconstantstring(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_string(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSpecconstantstring(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Spec_constantContext spec_constant() throws RecognitionException {
-    Spec_constantContext _localctx = new Spec_constantContext(_ctx, getState());
-    enterRule(_localctx, 28, RULE_spec_constant);
+  public final SpecconstantContext specconstant() throws RecognitionException {
+    SpecconstantContext local_ctx = new SpecconstantContext(_ctx, getState());
+    enterRule(local_ctx, 28, RULEspecconstant);
     try {
       setState(245);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
         case Numeral:
-          _localctx = new Spec_constant_numContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new SpecconstantnumContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(239);
             numeral();
           }
           break;
         case Decimal:
-          _localctx = new Spec_constant_decContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new SpecconstantdecContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(240);
             decimal();
           }
           break;
         case HexDecimal:
-          _localctx = new Spec_constant_hexContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new SpecconstanthexContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(241);
             hexadecimal();
           }
           break;
         case Binary:
-          _localctx = new Spec_constant_binContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new SpecconstantbinContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(242);
             binary();
           }
           break;
         case String:
-          _localctx = new Spec_constant_stringContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new SpecconstantstringContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(243);
             string();
           }
           break;
         case FloatingPoint:
-          _localctx = new Spec_constant_floating_pointContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new SpecconstantfloatingpointContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(244);
             floatingpoint();
@@ -2388,165 +2456,161 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class S_exprContext extends ParserRuleContext {
-    public S_exprContext(ParserRuleContext parent, int invokingState) {
+  public static class SexprContext extends ParserRuleContext {
+    public SexprContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_s_expr;
+      return RULEsexpr;
     }
 
-    public S_exprContext() {}
+    public SexprContext() {}
 
-    public void copyFrom(S_exprContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SexprContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class S_expr_specContext extends S_exprContext {
-    public Spec_constantContext spec_constant() {
-      return getRuleContext(Spec_constantContext.class, 0);
+  public static class SexprspecContext extends SexprContext {
+    public SpecconstantContext specconstant() {
+      return getRuleContext(SpecconstantContext.class, 0);
     }
 
-    public S_expr_specContext(S_exprContext ctx) {
-      copyFrom(ctx);
+    public SexprspecContext(SexprContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterS_expr_spec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSexprspec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitS_expr_spec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSexprspec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitS_expr_spec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSexprspec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class S_expr_symbContext extends S_exprContext {
+  public static class SexprsymbContext extends SexprContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public S_expr_symbContext(S_exprContext ctx) {
-      copyFrom(ctx);
+    public SexprsymbContext(SexprContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterS_expr_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSexprsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitS_expr_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSexprsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitS_expr_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSexprsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class S_expr_keyContext extends S_exprContext {
+  public static class SexprkeyContext extends SexprContext {
     public KeywordContext keyword() {
       return getRuleContext(KeywordContext.class, 0);
     }
 
-    public S_expr_keyContext(S_exprContext ctx) {
-      copyFrom(ctx);
+    public SexprkeyContext(SexprContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterS_expr_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSexprkey(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitS_expr_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSexprkey(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitS_expr_key(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSexprkey(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Multi_s_exprContext extends S_exprContext {
+  public static class MultisexprContext extends SexprContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<S_exprContext> s_expr() {
-      return getRuleContexts(S_exprContext.class);
+    public List<SexprContext> sexpr() {
+      return getRuleContexts(SexprContext.class);
     }
 
-    public S_exprContext s_expr(int i) {
-      return getRuleContext(S_exprContext.class, i);
+    public SexprContext sexpr(int i) {
+      return getRuleContext(SexprContext.class, i);
     }
 
-    public Multi_s_exprContext(S_exprContext ctx) {
-      copyFrom(ctx);
+    public MultisexprContext(SexprContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterMulti_s_expr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMultisexpr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitMulti_s_expr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMultisexpr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMulti_s_expr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMultisexpr(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final S_exprContext s_expr() throws RecognitionException {
-    S_exprContext _localctx = new S_exprContext(_ctx, getState());
-    enterRule(_localctx, 30, RULE_s_expr);
-    int _la;
+  public final SexprContext sexpr() throws RecognitionException {
+    SexprContext local_ctx = new SexprContext(_ctx, getState());
+    enterRule(local_ctx, 30, RULEsexpr);
+    int la;
     try {
       setState(258);
       _errHandler.sync(this);
@@ -2557,108 +2621,107 @@ public class smtlibv2Parser extends Parser {
         case HexDecimal:
         case Decimal:
         case FloatingPoint:
-          _localctx = new S_expr_specContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new SexprspecContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(247);
-            spec_constant();
+            specconstant();
           }
           break;
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new S_expr_symbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new SexprsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(248);
             symbol();
           }
           break;
         case Colon:
-        case PK_AllStatistics:
-        case PK_AssertionStackLevels:
-        case PK_Authors:
-        case PK_Category:
-        case PK_Chainable:
-        case PK_Definition:
-        case PK_DiagnosticOutputChannel:
-        case PK_ErrorBehaviour:
-        case PK_Extension:
-        case PK_Funs:
-        case PK_FunsDescription:
-        case PK_GlobalDeclarations:
-        case PK_InteractiveMode:
-        case PK_Language:
-        case PK_LeftAssoc:
-        case PK_License:
-        case PK_Named:
-        case PK_Name:
-        case PK_Notes:
-        case PK_Pattern:
-        case PK_PrintSuccess:
-        case PK_ProduceAssertions:
-        case PK_ProduceAssignments:
-        case PK_ProduceModels:
-        case PK_ProduceProofs:
-        case PK_ProduceUnsatAssumptions:
-        case PK_ProduceUnsatCores:
-        case PK_RandomSeed:
-        case PK_ReasonUnknown:
-        case PK_RegularOutputChannel:
-        case PK_ReproducibleResourceLimit:
-        case PK_RightAssoc:
-        case PK_SmtLibVersion:
-        case PK_Sorts:
-        case PK_SortsDescription:
-        case PK_Source:
-        case PK_Status:
-        case PK_Theories:
-        case PK_Values:
-        case PK_Verbosity:
-        case PK_Version:
-          _localctx = new S_expr_keyContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+        case PKAllStatistics:
+        case PKAssertionStackLevels:
+        case PKAuthors:
+        case PKCategory:
+        case PKChainable:
+        case PKDefinition:
+        case PKDiagnosticOutputChannel:
+        case PKErrorBehaviour:
+        case PKExtension:
+        case PKFuns:
+        case PKFunsDescription:
+        case PKGlobalDeclarations:
+        case PKInteractiveMode:
+        case PKLanguage:
+        case PKLeftAssoc:
+        case PKLicense:
+        case PKNamed:
+        case PKName:
+        case PKNotes:
+        case PKPattern:
+        case PKPrintSuccess:
+        case PKProduceAssertions:
+        case PKProduceAssignments:
+        case PKProduceModels:
+        case PKProduceProofs:
+        case PKProduceUnsatAssumptions:
+        case PKProduceUnsatCores:
+        case PKRandomSeed:
+        case PKReasonUnknown:
+        case PKRegularOutputChannel:
+        case PKReproducibleResourceLimit:
+        case PKRightAssoc:
+        case PKSmtLibVersion:
+        case PKSorts:
+        case PKSortsDescription:
+        case PKSource:
+        case PKStatus:
+        case PKTheories:
+        case PKValues:
+        case PKVerbosity:
+        case PKVersion:
+          local_ctx = new SexprkeyContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(249);
             keyword();
           }
           break;
         case ParOpen:
-          _localctx = new Multi_s_exprContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new MultisexprContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(250);
             match(ParOpen);
             setState(254);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-                || ((((_la - 66)) & ~0x3f) == 0
-                    && ((1L << (_la - 66)) & 216172782113775631L) != 0)) {
+            la = _input.LA(1);
+            while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+                || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 216172782113775631L) != 0)) {
               {
                 {
                   setState(251);
-                  s_expr();
+                  sexpr();
                 }
               }
               setState(256);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(257);
             match(ParClose);
@@ -2668,13 +2731,13 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -2685,107 +2748,107 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_index;
+      return RULEindex;
     }
 
     public IndexContext() {}
 
-    public void copyFrom(IndexContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(IndexContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Idx_symbContext extends IndexContext {
+  public static class IdxsymbContext extends IndexContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Idx_symbContext(IndexContext ctx) {
-      copyFrom(ctx);
+    public IdxsymbContext(IndexContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterIdx_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdxsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitIdx_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdxsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitIdx_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitIdxsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Idx_numContext extends IndexContext {
+  public static class IdxnumContext extends IndexContext {
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Idx_numContext(IndexContext ctx) {
-      copyFrom(ctx);
+    public IdxnumContext(IndexContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterIdx_num(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdxnum(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitIdx_num(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdxnum(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitIdx_num(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitIdxnum(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final IndexContext index() throws RecognitionException {
-    IndexContext _localctx = new IndexContext(_ctx, getState());
-    enterRule(_localctx, 32, RULE_index);
+    IndexContext local_ctx = new IndexContext(_ctx, getState());
+    enterRule(local_ctx, 32, RULEindex);
     try {
       setState(262);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
         case Numeral:
-          _localctx = new Idx_numContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new IdxnumContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(260);
             numeral();
           }
           break;
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new Idx_symbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new IdxsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(261);
             symbol();
@@ -2795,13 +2858,13 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -2812,24 +2875,25 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_identifier;
+      return RULEidentifier;
     }
 
     public IdentifierContext() {}
 
-    public void copyFrom(IdentifierContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(IdentifierContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Id_symb_idxContext extends IdentifierContext {
+  public static class IdsymbidxContext extends IdentifierContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode GRW_Underscore() {
-      return getToken(smtlibv2Parser.GRW_Underscore, 0);
+    public TerminalNode GRWUnderscore() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWUnderscore, 0);
     }
 
     public SymbolContext symbol() {
@@ -2837,7 +2901,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<IndexContext> index() {
@@ -2848,103 +2912,102 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(IndexContext.class, i);
     }
 
-    public Id_symb_idxContext(IdentifierContext ctx) {
-      copyFrom(ctx);
+    public IdsymbidxContext(IdentifierContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterId_symb_idx(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdsymbidx(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitId_symb_idx(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdsymbidx(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitId_symb_idx(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitIdsymbidx(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Id_symbContext extends IdentifierContext {
+  public static class IdsymbContext extends IdentifierContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Id_symbContext(IdentifierContext ctx) {
-      copyFrom(ctx);
+    public IdsymbContext(IdentifierContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterId_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitId_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitId_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitIdsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final IdentifierContext identifier() throws RecognitionException {
-    IdentifierContext _localctx = new IdentifierContext(_ctx, getState());
-    enterRule(_localctx, 34, RULE_identifier);
-    int _la;
+    IdentifierContext local_ctx = new IdentifierContext(_ctx, getState());
+    enterRule(local_ctx, 34, RULEidentifier);
+    int la;
     try {
       setState(275);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new Id_symbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new IdsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(264);
             symbol();
           }
           break;
         case ParOpen:
-          _localctx = new Id_symb_idxContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new IdsymbidxContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(265);
             match(ParOpen);
             setState(266);
-            match(GRW_Underscore);
+            match(GRWUnderscore);
             setState(267);
             symbol();
             setState(269);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -2954,10 +3017,10 @@ public class smtlibv2Parser extends Parser {
               }
               setState(271);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0)
-                || _la == Numeral
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0)
+                || la == Numeral
+                || la == UndefinedSymbol);
             setState(273);
             match(ParClose);
           }
@@ -2966,134 +3029,133 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attribute_valueContext extends ParserRuleContext {
-    public Attribute_valueContext(ParserRuleContext parent, int invokingState) {
+  public static class AttributevalueContext extends ParserRuleContext {
+    public AttributevalueContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_attribute_value;
+      return RULEattributevalue;
     }
 
-    public Attribute_valueContext() {}
+    public AttributevalueContext() {}
 
-    public void copyFrom(Attribute_valueContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(AttributevalueContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attr_s_exprContext extends Attribute_valueContext {
+  public static class AttrsexprContext extends AttributevalueContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<S_exprContext> s_expr() {
-      return getRuleContexts(S_exprContext.class);
+    public List<SexprContext> sexpr() {
+      return getRuleContexts(SexprContext.class);
     }
 
-    public S_exprContext s_expr(int i) {
-      return getRuleContext(S_exprContext.class, i);
+    public SexprContext sexpr(int i) {
+      return getRuleContext(SexprContext.class, i);
     }
 
-    public Attr_s_exprContext(Attribute_valueContext ctx) {
-      copyFrom(ctx);
+    public AttrsexprContext(AttributevalueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterAttr_s_expr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttrsexpr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAttr_s_expr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttrsexpr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAttr_s_expr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAttrsexpr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attr_specContext extends Attribute_valueContext {
-    public Spec_constantContext spec_constant() {
-      return getRuleContext(Spec_constantContext.class, 0);
+  public static class AttrspecContext extends AttributevalueContext {
+    public SpecconstantContext specconstant() {
+      return getRuleContext(SpecconstantContext.class, 0);
     }
 
-    public Attr_specContext(Attribute_valueContext ctx) {
-      copyFrom(ctx);
+    public AttrspecContext(AttributevalueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAttr_spec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttrspec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAttr_spec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttrspec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAttr_spec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAttrspec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attr_symbContext extends Attribute_valueContext {
+  public static class AttrsymbContext extends AttributevalueContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Attr_symbContext(Attribute_valueContext ctx) {
-      copyFrom(ctx);
+    public AttrsymbContext(AttributevalueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAttr_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttrsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAttr_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttrsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAttr_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAttrsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Attribute_valueContext attribute_value() throws RecognitionException {
-    Attribute_valueContext _localctx = new Attribute_valueContext(_ctx, getState());
-    enterRule(_localctx, 36, RULE_attribute_value);
-    int _la;
+  public final AttributevalueContext attributevalue() throws RecognitionException {
+    AttributevalueContext local_ctx = new AttributevalueContext(_ctx, getState());
+    enterRule(local_ctx, 36, RULEattributevalue);
+    int la;
     try {
       setState(287);
       _errHandler.sync(this);
@@ -3104,59 +3166,58 @@ public class smtlibv2Parser extends Parser {
         case HexDecimal:
         case Decimal:
         case FloatingPoint:
-          _localctx = new Attr_specContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new AttrspecContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(277);
-            spec_constant();
+            specconstant();
           }
           break;
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new Attr_symbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new AttrsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(278);
             symbol();
           }
           break;
         case ParOpen:
-          _localctx = new Attr_s_exprContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new AttrsexprContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(279);
             match(ParOpen);
             setState(283);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-                || ((((_la - 66)) & ~0x3f) == 0
-                    && ((1L << (_la - 66)) & 216172782113775631L) != 0)) {
+            la = _input.LA(1);
+            while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+                || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 216172782113775631L) != 0)) {
               {
                 {
                   setState(280);
-                  s_expr();
+                  sexpr();
                 }
               }
               setState(285);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(286);
             match(ParClose);
@@ -3166,13 +3227,13 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -3183,112 +3244,111 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_attribute;
+      return RULEattribute;
     }
 
     public AttributeContext() {}
 
-    public void copyFrom(AttributeContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(AttributeContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attr_key_attrContext extends AttributeContext {
+  public static class AttrkeyattrContext extends AttributeContext {
     public KeywordContext keyword() {
       return getRuleContext(KeywordContext.class, 0);
     }
 
-    public Attribute_valueContext attribute_value() {
-      return getRuleContext(Attribute_valueContext.class, 0);
+    public AttributevalueContext attributevalue() {
+      return getRuleContext(AttributevalueContext.class, 0);
     }
 
-    public Attr_key_attrContext(AttributeContext ctx) {
-      copyFrom(ctx);
+    public AttrkeyattrContext(AttributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterAttr_key_attr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterAttrkeyattr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitAttr_key_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttrkeyattr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAttr_key_attr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAttrkeyattr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Attr_keyContext extends AttributeContext {
+  public static class AttrkeyContext extends AttributeContext {
     public KeywordContext keyword() {
       return getRuleContext(KeywordContext.class, 0);
     }
 
-    public Attr_keyContext(AttributeContext ctx) {
-      copyFrom(ctx);
+    public AttrkeyContext(AttributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAttr_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttrkey(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAttr_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttrkey(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAttr_key(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAttrkey(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final AttributeContext attribute() throws RecognitionException {
-    AttributeContext _localctx = new AttributeContext(_ctx, getState());
-    enterRule(_localctx, 38, RULE_attribute);
+    AttributeContext local_ctx = new AttributeContext(_ctx, getState());
+    enterRule(local_ctx, 38, RULEattribute);
     try {
       setState(293);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 12, _ctx)) {
         case 1:
-          _localctx = new Attr_keyContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new AttrkeyContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(289);
             keyword();
           }
           break;
         case 2:
-          _localctx = new Attr_key_attrContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new AttrkeyattrContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(290);
             keyword();
             setState(291);
-            attribute_value();
+            attributevalue();
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -3299,20 +3359,20 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_sort;
+      return RULEsort;
     }
 
     public SortContext() {}
 
-    public void copyFrom(SortContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SortContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class MultisortContext extends SortContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public IdentifierContext identifier() {
@@ -3320,7 +3380,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SortContext> sort() {
@@ -3331,75 +3391,75 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SortContext.class, i);
     }
 
-    public MultisortContext(SortContext ctx) {
-      copyFrom(ctx);
+    public MultisortContext(SortContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterMultisort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMultisort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitMultisort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMultisort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMultisort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMultisort(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Sort_idContext extends SortContext {
+  public static class SortidContext extends SortContext {
     public IdentifierContext identifier() {
       return getRuleContext(IdentifierContext.class, 0);
     }
 
-    public Sort_idContext(SortContext ctx) {
-      copyFrom(ctx);
+    public SortidContext(SortContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSort_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSortid(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSort_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSortid(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSort_id(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSortid(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final SortContext sort() throws RecognitionException {
-    SortContext _localctx = new SortContext(_ctx, getState());
-    enterRule(_localctx, 40, RULE_sort);
-    int _la;
+    SortContext local_ctx = new SortContext(_ctx, getState());
+    enterRule(local_ctx, 40, RULEsort);
+    int la;
     try {
       setState(305);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 14, _ctx)) {
         case 1:
-          _localctx = new Sort_idContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new SortidContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(295);
             identifier();
           }
           break;
         case 2:
-          _localctx = new MultisortContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new MultisortContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(296);
             match(ParOpen);
@@ -3407,7 +3467,7 @@ public class smtlibv2Parser extends Parser {
             identifier();
             setState(299);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -3417,50 +3477,50 @@ public class smtlibv2Parser extends Parser {
               }
               setState(301);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388548L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388548L) != 0)
+                || la == UndefinedSymbol);
             setState(303);
             match(ParClose);
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Qual_identiferContext extends ParserRuleContext {
-    public Qual_identiferContext(ParserRuleContext parent, int invokingState) {
+  public static class QualidentiferContext extends ParserRuleContext {
+    public QualidentiferContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_qual_identifer;
+      return RULEqualidentifer;
     }
 
-    public Qual_identiferContext() {}
+    public QualidentiferContext() {}
 
-    public void copyFrom(Qual_identiferContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(QualidentiferContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Qual_id_sortContext extends Qual_identiferContext {
+  public static class QualidsortContext extends QualidentiferContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode GRW_As() {
-      return getToken(smtlibv2Parser.GRW_As, 0);
+    public TerminalNode GRWAs() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWAs, 0);
     }
 
     public IdentifierContext identifier() {
@@ -3472,84 +3532,82 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Qual_id_sortContext(Qual_identiferContext ctx) {
-      copyFrom(ctx);
+    public QualidsortContext(QualidentiferContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterQual_id_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterQualidsort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitQual_id_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitQualidsort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitQual_id_sort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitQualidsort(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Qual_idContext extends Qual_identiferContext {
+  public static class QualidContext extends QualidentiferContext {
     public IdentifierContext identifier() {
       return getRuleContext(IdentifierContext.class, 0);
     }
 
-    public Qual_idContext(Qual_identiferContext ctx) {
-      copyFrom(ctx);
+    public QualidContext(QualidentiferContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterQual_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterQualid(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitQual_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitQualid(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitQual_id(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitQualid(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Qual_identiferContext qual_identifer() throws RecognitionException {
-    Qual_identiferContext _localctx = new Qual_identiferContext(_ctx, getState());
-    enterRule(_localctx, 42, RULE_qual_identifer);
+  public final QualidentiferContext qualidentifer() throws RecognitionException {
+    QualidentiferContext local_ctx = new QualidentiferContext(_ctx, getState());
+    enterRule(local_ctx, 42, RULEqualidentifer);
     try {
       setState(314);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 15, _ctx)) {
         case 1:
-          _localctx = new Qual_idContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new QualidContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(307);
             identifier();
           }
           break;
         case 2:
-          _localctx = new Qual_id_sortContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new QualidsortContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(308);
             match(ParOpen);
             setState(309);
-            match(GRW_As);
+            match(GRWAs);
             setState(310);
             identifier();
             setState(311);
@@ -3560,19 +3618,19 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Var_bindingContext extends ParserRuleContext {
+  public static class VarbindingContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
@@ -3584,42 +3642,41 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Var_bindingContext(ParserRuleContext parent, int invokingState) {
+    public VarbindingContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_var_binding;
+      return RULEvarbinding;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterVar_binding(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterVarbinding(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitVar_binding(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVarbinding(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitVar_binding(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitVarbinding(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Var_bindingContext var_binding() throws RecognitionException {
-    Var_bindingContext _localctx = new Var_bindingContext(_ctx, getState());
-    enterRule(_localctx, 44, RULE_var_binding);
+  public final VarbindingContext varbinding() throws RecognitionException {
+    VarbindingContext local_ctx = new VarbindingContext(_ctx, getState());
+    enterRule(local_ctx, 44, RULEvarbinding);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(316);
         match(ParOpen);
@@ -3631,19 +3688,19 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Sorted_varContext extends ParserRuleContext {
+  public static class SortedvarContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
@@ -3655,41 +3712,41 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Sorted_varContext(ParserRuleContext parent, int invokingState) {
+    public SortedvarContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_sorted_var;
+      return RULEsortedvar;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSorted_var(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSortedvar(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSorted_var(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSortedvar(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSorted_var(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSortedvar(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Sorted_varContext sorted_var() throws RecognitionException {
-    Sorted_varContext _localctx = new Sorted_varContext(_ctx, getState());
-    enterRule(_localctx, 46, RULE_sorted_var);
+  public final SortedvarContext sortedvar() throws RecognitionException {
+    SortedvarContext local_ctx = new SortedvarContext(_ctx, getState());
+    enterRule(local_ctx, 46, RULEsortedvar);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(321);
         match(ParOpen);
@@ -3701,13 +3758,13 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -3718,50 +3775,49 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_pattern;
+      return RULEpattern;
     }
 
     public PatternContext() {}
 
-    public void copyFrom(PatternContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(PatternContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Pattern_symbContext extends PatternContext {
+  public static class PatternsymbContext extends PatternContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Pattern_symbContext(PatternContext ctx) {
-      copyFrom(ctx);
+    public PatternsymbContext(PatternContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPattern_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterPatternsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPattern_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPatternsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPattern_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPatternsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Pattern_multisymbContext extends PatternContext {
+  public static class PatternmultisymbContext extends PatternContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public List<SymbolContext> symbol() {
@@ -3773,69 +3829,69 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Pattern_multisymbContext(PatternContext ctx) {
-      copyFrom(ctx);
+    public PatternmultisymbContext(PatternContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPattern_multisymb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterPatternmultisymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPattern_multisymb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitPatternmultisymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPattern_multisymb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPatternmultisymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final PatternContext pattern() throws RecognitionException {
-    PatternContext _localctx = new PatternContext(_ctx, getState());
-    enterRule(_localctx, 48, RULE_pattern);
-    int _la;
+    PatternContext local_ctx = new PatternContext(_ctx, getState());
+    enterRule(local_ctx, 48, RULEpattern);
+    int la;
     try {
       setState(336);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new Pattern_symbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new PatternsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(326);
             symbol();
           }
           break;
         case ParOpen:
-          _localctx = new Pattern_multisymbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new PatternmultisymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(327);
             match(ParOpen);
@@ -3843,7 +3899,7 @@ public class smtlibv2Parser extends Parser {
             symbol();
             setState(330);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -3853,9 +3909,9 @@ public class smtlibv2Parser extends Parser {
               }
               setState(332);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0)
+                || la == UndefinedSymbol);
             setState(334);
             match(ParClose);
           }
@@ -3864,19 +3920,19 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Match_caseContext extends ParserRuleContext {
+  public static class MatchcaseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public PatternContext pattern() {
@@ -3888,41 +3944,41 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Match_caseContext(ParserRuleContext parent, int invokingState) {
+    public MatchcaseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_match_case;
+      return RULEmatchcase;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterMatch_case(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMatchcase(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitMatch_case(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMatchcase(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMatch_case(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMatchcase(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Match_caseContext match_case() throws RecognitionException {
-    Match_caseContext _localctx = new Match_caseContext(_ctx, getState());
-    enterRule(_localctx, 50, RULE_match_case);
+  public final MatchcaseContext matchcase() throws RecognitionException {
+    MatchcaseContext local_ctx = new MatchcaseContext(_ctx, getState());
+    enterRule(local_ctx, 50, RULEmatchcase);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(338);
         match(ParOpen);
@@ -3934,13 +3990,13 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -3951,69 +4007,69 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_term;
+      return RULEterm;
     }
 
     public TermContext() {}
 
-    public void copyFrom(TermContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(TermContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_existsContext extends TermContext {
+  public static class TermexistsContext extends TermContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Exists() {
-      return getToken(smtlibv2Parser.GRW_Exists, 0);
+    public TerminalNode GRWExists() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWExists, 0);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public TermContext term() {
       return getRuleContext(TermContext.class, 0);
     }
 
-    public List<Sorted_varContext> sorted_var() {
-      return getRuleContexts(Sorted_varContext.class);
+    public List<SortedvarContext> sortedvar() {
+      return getRuleContexts(SortedvarContext.class);
     }
 
-    public Sorted_varContext sorted_var(int i) {
-      return getRuleContext(Sorted_varContext.class, i);
+    public SortedvarContext sortedvar(int i) {
+      return getRuleContext(SortedvarContext.class, i);
     }
 
-    public Term_existsContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermexistsContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTerm_exists(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermexists(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTerm_exists(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermexists(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_exists(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermexists(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -4021,15 +4077,15 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class MultitermContext extends TermContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Qual_identiferContext qual_identifer() {
-      return getRuleContext(Qual_identiferContext.class, 0);
+    public QualidentiferContext qualidentifer() {
+      return getRuleContext(QualidentiferContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<TermContext> term() {
@@ -4040,213 +4096,211 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(TermContext.class, i);
     }
 
-    public MultitermContext(TermContext ctx) {
-      copyFrom(ctx);
+    public MultitermContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterMultiterm(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMultiterm(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitMultiterm(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMultiterm(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMultiterm(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMultiterm(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_forallContext extends TermContext {
+  public static class TermforallContext extends TermContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Forall() {
-      return getToken(smtlibv2Parser.GRW_Forall, 0);
+    public TerminalNode GRWForall() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWForall, 0);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public TermContext term() {
       return getRuleContext(TermContext.class, 0);
     }
 
-    public List<Sorted_varContext> sorted_var() {
-      return getRuleContexts(Sorted_varContext.class);
+    public List<SortedvarContext> sortedvar() {
+      return getRuleContexts(SortedvarContext.class);
     }
 
-    public Sorted_varContext sorted_var(int i) {
-      return getRuleContext(Sorted_varContext.class, i);
+    public SortedvarContext sortedvar(int i) {
+      return getRuleContext(SortedvarContext.class, i);
     }
 
-    public Term_forallContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermforallContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTerm_forall(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermforall(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTerm_forall(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermforall(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_forall(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermforall(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_qual_idContext extends TermContext {
-    public Qual_identiferContext qual_identifer() {
-      return getRuleContext(Qual_identiferContext.class, 0);
+  public static class TermqualidContext extends TermContext {
+    public QualidentiferContext qualidentifer() {
+      return getRuleContext(QualidentiferContext.class, 0);
     }
 
-    public Term_qual_idContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermqualidContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTerm_qual_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermqualid(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitTerm_qual_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermqualid(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_qual_id(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermqualid(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_spec_constContext extends TermContext {
-    public Spec_constantContext spec_constant() {
-      return getRuleContext(Spec_constantContext.class, 0);
+  public static class TermspecconstContext extends TermContext {
+    public SpecconstantContext specconstant() {
+      return getRuleContext(SpecconstantContext.class, 0);
     }
 
-    public Term_spec_constContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermspecconstContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTerm_spec_const(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterTermspecconst(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitTerm_spec_const(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitTermspecconst(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_spec_const(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermspecconst(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_letContext extends TermContext {
+  public static class TermletContext extends TermContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Let() {
-      return getToken(smtlibv2Parser.GRW_Let, 0);
+    public TerminalNode GRWLet() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWLet, 0);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public TermContext term() {
       return getRuleContext(TermContext.class, 0);
     }
 
-    public List<Var_bindingContext> var_binding() {
-      return getRuleContexts(Var_bindingContext.class);
+    public List<VarbindingContext> varbinding() {
+      return getRuleContexts(VarbindingContext.class);
     }
 
-    public Var_bindingContext var_binding(int i) {
-      return getRuleContext(Var_bindingContext.class, i);
+    public VarbindingContext varbinding(int i) {
+      return getRuleContext(VarbindingContext.class, i);
     }
 
-    public Term_letContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermletContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterTerm_let(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermlet(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTerm_let(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermlet(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_let(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermlet(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_matchContext extends TermContext {
+  public static class TermmatchContext extends TermContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Match() {
-      return getToken(smtlibv2Parser.GRW_Match, 0);
+    public TerminalNode GRWMatch() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWMatch, 0);
     }
 
     public TermContext term() {
@@ -4254,51 +4308,52 @@ public class smtlibv2Parser extends Parser {
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
-    public List<Match_caseContext> match_case() {
-      return getRuleContexts(Match_caseContext.class);
+    public List<MatchcaseContext> matchcase() {
+      return getRuleContexts(MatchcaseContext.class);
     }
 
-    public Match_caseContext match_case(int i) {
-      return getRuleContext(Match_caseContext.class, i);
+    public MatchcaseContext matchcase(int i) {
+      return getRuleContext(MatchcaseContext.class, i);
     }
 
-    public Term_matchContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermmatchContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterTerm_match(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermmatch(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTerm_match(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermmatch(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_match(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermmatch(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Term_exclamContext extends TermContext {
+  public static class TermexclamContext extends TermContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode GRW_Exclamation() {
-      return getToken(smtlibv2Parser.GRW_Exclamation, 0);
+    public TerminalNode GRWExclamation() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWExclamation, 0);
     }
 
     public TermContext term() {
@@ -4306,7 +4361,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<AttributeContext> attribute() {
@@ -4317,64 +4372,63 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Term_exclamContext(TermContext ctx) {
-      copyFrom(ctx);
+    public TermexclamContext(TermContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTerm_exclam(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTermexclam(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTerm_exclam(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTermexclam(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTerm_exclam(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTermexclam(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final TermContext term() throws RecognitionException {
-    TermContext _localctx = new TermContext(_ctx, getState());
-    enterRule(_localctx, 52, RULE_term);
-    int _la;
+    TermContext local_ctx = new TermContext(_ctx, getState());
+    enterRule(local_ctx, 52, RULEterm);
+    int la;
     try {
       setState(412);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 24, _ctx)) {
         case 1:
-          _localctx = new Term_spec_constContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new TermspecconstContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(343);
-            spec_constant();
+            specconstant();
           }
           break;
         case 2:
-          _localctx = new Term_qual_idContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new TermqualidContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(344);
-            qual_identifer();
+            qualidentifer();
           }
           break;
         case 3:
-          _localctx = new MultitermContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new MultitermContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(345);
             match(ParOpen);
             setState(346);
-            qual_identifer();
+            qualidentifer();
             setState(348);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -4384,38 +4438,37 @@ public class smtlibv2Parser extends Parser {
               }
               setState(350);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-                || ((((_la - 66)) & ~0x3f) == 0
-                    && ((1L << (_la - 66)) & 144115188075864079L) != 0));
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+                || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 144115188075864079L) != 0));
             setState(352);
             match(ParClose);
           }
           break;
         case 4:
-          _localctx = new Term_letContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new TermletContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(354);
             match(ParOpen);
             setState(355);
-            match(GRW_Let);
+            match(GRWLet);
             setState(356);
             match(ParOpen);
             setState(358);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(357);
-                  var_binding();
+                  varbinding();
                 }
               }
               setState(360);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(362);
             match(ParClose);
             setState(363);
@@ -4425,29 +4478,29 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 5:
-          _localctx = new Term_forallContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new TermforallContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(366);
             match(ParOpen);
             setState(367);
-            match(GRW_Forall);
+            match(GRWForall);
             setState(368);
             match(ParOpen);
             setState(370);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(369);
-                  sorted_var();
+                  sortedvar();
                 }
               }
               setState(372);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(374);
             match(ParClose);
             setState(375);
@@ -4457,29 +4510,29 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 6:
-          _localctx = new Term_existsContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new TermexistsContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(378);
             match(ParOpen);
             setState(379);
-            match(GRW_Exists);
+            match(GRWExists);
             setState(380);
             match(ParOpen);
             setState(382);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(381);
-                  sorted_var();
+                  sortedvar();
                 }
               }
               setState(384);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(386);
             match(ParClose);
             setState(387);
@@ -4489,31 +4542,31 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 7:
-          _localctx = new Term_matchContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new TermmatchContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(390);
             match(ParOpen);
             setState(391);
-            match(GRW_Match);
+            match(GRWMatch);
             setState(392);
             term();
             setState(393);
             match(ParOpen);
             setState(395);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(394);
-                  match_case();
+                  matchcase();
                 }
               }
               setState(397);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(399);
             match(ParClose);
             setState(400);
@@ -4521,18 +4574,18 @@ public class smtlibv2Parser extends Parser {
           }
           break;
         case 8:
-          _localctx = new Term_exclamContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new TermexclamContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(402);
             match(ParOpen);
             setState(403);
-            match(GRW_Exclamation);
+            match(GRWExclamation);
             setState(404);
             term();
             setState(406);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -4542,27 +4595,27 @@ public class smtlibv2Parser extends Parser {
               }
               setState(408);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0));
+              la = _input.LA(1);
+            } while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0));
             setState(410);
             match(ParClose);
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Sort_symbol_declContext extends ParserRuleContext {
+  public static class SortsymboldeclContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public IdentifierContext identifier() {
@@ -4574,7 +4627,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<AttributeContext> attribute() {
@@ -4585,41 +4638,41 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Sort_symbol_declContext(ParserRuleContext parent, int invokingState) {
+    public SortsymboldeclContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_sort_symbol_decl;
+      return RULEsortsymboldecl;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSort_symbol_decl(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSortsymboldecl(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSort_symbol_decl(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitSortsymboldecl(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSort_symbol_decl(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSortsymboldecl(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Sort_symbol_declContext sort_symbol_decl() throws RecognitionException {
-    Sort_symbol_declContext _localctx = new Sort_symbol_declContext(_ctx, getState());
-    enterRule(_localctx, 54, RULE_sort_symbol_decl);
-    int _la;
+  public final SortsymboldeclContext sortsymboldecl() throws RecognitionException {
+    SortsymboldeclContext local_ctx = new SortsymboldeclContext(_ctx, getState());
+    enterRule(local_ctx, 54, RULEsortsymboldecl);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(414);
         match(ParOpen);
@@ -4629,8 +4682,8 @@ public class smtlibv2Parser extends Parser {
         numeral();
         setState(420);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0)) {
+        la = _input.LA(1);
+        while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0)) {
           {
             {
               setState(417);
@@ -4639,74 +4692,77 @@ public class smtlibv2Parser extends Parser {
           }
           setState(422);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(423);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Meta_spec_constantContext extends ParserRuleContext {
-    public TerminalNode GRW_Numeral() {
-      return getToken(smtlibv2Parser.GRW_Numeral, 0);
+  public static class MetaspecconstantContext extends ParserRuleContext {
+    public TerminalNode GRWNumeral() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWNumeral, 0);
     }
 
-    public TerminalNode GRW_Decimal() {
-      return getToken(smtlibv2Parser.GRW_Decimal, 0);
+    public TerminalNode GRWDecimal() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWDecimal, 0);
     }
 
-    public TerminalNode GRW_String() {
-      return getToken(smtlibv2Parser.GRW_String, 0);
+    public TerminalNode GRWString() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWString, 0);
     }
 
-    public Meta_spec_constantContext(ParserRuleContext parent, int invokingState) {
+    public MetaspecconstantContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_meta_spec_constant;
+      return RULEmetaspecconstant;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterMeta_spec_constant(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterMetaspecconstant(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitMeta_spec_constant(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitMetaspecconstant(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMeta_spec_constant(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMetaspecconstant(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Meta_spec_constantContext meta_spec_constant() throws RecognitionException {
-    Meta_spec_constantContext _localctx = new Meta_spec_constantContext(_ctx, getState());
-    enterRule(_localctx, 56, RULE_meta_spec_constant);
-    int _la;
+  public final MetaspecconstantContext metaspecconstant() throws RecognitionException {
+    MetaspecconstantContext local_ctx = new MetaspecconstantContext(_ctx, getState());
+    enterRule(local_ctx, 56, RULEmetaspecconstant);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(425);
-        _la = _input.LA(1);
-        if (!(((((_la - 57)) & ~0x3f) == 0 && ((1L << (_la - 57)) & 321L) != 0))) {
+        la = _input.LA(1);
+        if (!(((((la - 57)) & ~0x3f) == 0 && ((1L << (la - 57)) & 321L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -4715,37 +4771,37 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Fun_symbol_declContext extends ParserRuleContext {
-    public Fun_symbol_declContext(ParserRuleContext parent, int invokingState) {
+  public static class FunsymboldeclContext extends ParserRuleContext {
+    public FunsymboldeclContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_fun_symbol_decl;
+      return RULEfunsymboldecl;
     }
 
-    public Fun_symbol_declContext() {}
+    public FunsymboldeclContext() {}
 
-    public void copyFrom(Fun_symbol_declContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(FunsymboldeclContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Fun_symb_idContext extends Fun_symbol_declContext {
+  public static class FunsymbidContext extends FunsymboldeclContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public IdentifierContext identifier() {
@@ -4753,7 +4809,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SortContext> sort() {
@@ -4772,37 +4828,36 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Fun_symb_idContext(Fun_symbol_declContext ctx) {
-      copyFrom(ctx);
+    public FunsymbidContext(FunsymboldeclContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFun_symb_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterFunsymbid(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitFun_symb_id(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFunsymbid(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFun_symb_id(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFunsymbid(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Fun_symb_specContext extends Fun_symbol_declContext {
+  public static class FunsymbspecContext extends FunsymboldeclContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Spec_constantContext spec_constant() {
-      return getRuleContext(Spec_constantContext.class, 0);
+    public SpecconstantContext specconstant() {
+      return getRuleContext(SpecconstantContext.class, 0);
     }
 
     public SortContext sort() {
@@ -4810,7 +4865,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<AttributeContext> attribute() {
@@ -4821,38 +4876,37 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Fun_symb_specContext(Fun_symbol_declContext ctx) {
-      copyFrom(ctx);
+    public FunsymbspecContext(FunsymboldeclContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFun_symb_spec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterFunsymbspec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitFun_symb_spec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFunsymbspec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFun_symb_spec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFunsymbspec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Fun_symb_metaContext extends Fun_symbol_declContext {
+  public static class FunsymbmetaContext extends FunsymboldeclContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Meta_spec_constantContext meta_spec_constant() {
-      return getRuleContext(Meta_spec_constantContext.class, 0);
+    public MetaspecconstantContext metaspecconstant() {
+      return getRuleContext(MetaspecconstantContext.class, 0);
     }
 
     public SortContext sort() {
@@ -4860,7 +4914,7 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<AttributeContext> attribute() {
@@ -4871,52 +4925,51 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Fun_symb_metaContext(Fun_symbol_declContext ctx) {
-      copyFrom(ctx);
+    public FunsymbmetaContext(FunsymboldeclContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFun_symb_meta(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterFunsymbmeta(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitFun_symb_meta(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFunsymbmeta(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFun_symb_meta(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFunsymbmeta(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Fun_symbol_declContext fun_symbol_decl() throws RecognitionException {
-    Fun_symbol_declContext _localctx = new Fun_symbol_declContext(_ctx, getState());
-    enterRule(_localctx, 58, RULE_fun_symbol_decl);
-    int _la;
+  public final FunsymboldeclContext funsymboldecl() throws RecognitionException {
+    FunsymboldeclContext local_ctx = new FunsymboldeclContext(_ctx, getState());
+    enterRule(local_ctx, 58, RULEfunsymboldecl);
+    int la;
     try {
       setState(464);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 30, _ctx)) {
         case 1:
-          _localctx = new Fun_symb_specContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new FunsymbspecContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(427);
             match(ParOpen);
             setState(428);
-            spec_constant();
+            specconstant();
             setState(429);
             sort();
             setState(433);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0)) {
+            la = _input.LA(1);
+            while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0)) {
               {
                 {
                   setState(430);
@@ -4925,26 +4978,26 @@ public class smtlibv2Parser extends Parser {
               }
               setState(435);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(436);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Fun_symb_metaContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new FunsymbmetaContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(438);
             match(ParOpen);
             setState(439);
-            meta_spec_constant();
+            metaspecconstant();
             setState(440);
             sort();
             setState(444);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0)) {
+            la = _input.LA(1);
+            while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0)) {
               {
                 {
                   setState(441);
@@ -4953,15 +5006,15 @@ public class smtlibv2Parser extends Parser {
               }
               setState(446);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(447);
             match(ParClose);
           }
           break;
         case 3:
-          _localctx = new Fun_symb_idContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new FunsymbidContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(449);
             match(ParOpen);
@@ -4969,7 +5022,7 @@ public class smtlibv2Parser extends Parser {
             identifier();
             setState(452);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -4979,13 +5032,13 @@ public class smtlibv2Parser extends Parser {
               }
               setState(454);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388548L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388548L) != 0)
+                || la == UndefinedSymbol);
             setState(459);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0)) {
+            la = _input.LA(1);
+            while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0)) {
               {
                 {
                   setState(456);
@@ -4994,7 +5047,7 @@ public class smtlibv2Parser extends Parser {
               }
               setState(461);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(462);
             match(ParClose);
@@ -5002,83 +5055,81 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Par_fun_symbol_declContext extends ParserRuleContext {
-    public Par_fun_symbol_declContext(ParserRuleContext parent, int invokingState) {
+  public static class ParfunsymboldeclContext extends ParserRuleContext {
+    public ParfunsymboldeclContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_par_fun_symbol_decl;
+      return RULEparfunsymboldecl;
     }
 
-    public Par_fun_symbol_declContext() {}
+    public ParfunsymboldeclContext() {}
 
-    public void copyFrom(Par_fun_symbol_declContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(ParfunsymboldeclContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Par_fun_symbContext extends Par_fun_symbol_declContext {
-    public Fun_symbol_declContext fun_symbol_decl() {
-      return getRuleContext(Fun_symbol_declContext.class, 0);
+  public static class ParfunsymbContext extends ParfunsymboldeclContext {
+    public FunsymboldeclContext funsymboldecl() {
+      return getRuleContext(FunsymboldeclContext.class, 0);
     }
 
-    public Par_fun_symbContext(Par_fun_symbol_declContext ctx) {
-      copyFrom(ctx);
+    public ParfunsymbContext(ParfunsymboldeclContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPar_fun_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterParfunsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPar_fun_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitParfunsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPar_fun_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitParfunsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Par_fun_multi_symbContext extends Par_fun_symbol_declContext {
+  public static class ParfunmultisymbContext extends ParfunsymboldeclContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Par() {
-      return getToken(smtlibv2Parser.GRW_Par, 0);
+    public TerminalNode GRWPar() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWPar, 0);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public IdentifierContext identifier() {
@@ -5109,59 +5160,59 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(AttributeContext.class, i);
     }
 
-    public Par_fun_multi_symbContext(Par_fun_symbol_declContext ctx) {
-      copyFrom(ctx);
+    public ParfunmultisymbContext(ParfunsymboldeclContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterPar_fun_multi_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterParfunmultisymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitPar_fun_multi_symb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitParfunmultisymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPar_fun_multi_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitParfunmultisymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Par_fun_symbol_declContext par_fun_symbol_decl() throws RecognitionException {
-    Par_fun_symbol_declContext _localctx = new Par_fun_symbol_declContext(_ctx, getState());
-    enterRule(_localctx, 60, RULE_par_fun_symbol_decl);
-    int _la;
+  public final ParfunsymboldeclContext parfunsymboldecl() throws RecognitionException {
+    ParfunsymboldeclContext local_ctx = new ParfunsymboldeclContext(_ctx, getState());
+    enterRule(local_ctx, 60, RULEparfunsymboldecl);
+    int la;
     try {
       setState(492);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 34, _ctx)) {
         case 1:
-          _localctx = new Par_fun_symbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new ParfunsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(466);
-            fun_symbol_decl();
+            funsymboldecl();
           }
           break;
         case 2:
-          _localctx = new Par_fun_multi_symbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new ParfunmultisymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(467);
             match(ParOpen);
             setState(468);
-            match(GRW_Par);
+            match(GRWPar);
             setState(469);
             match(ParOpen);
             setState(471);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -5171,9 +5222,9 @@ public class smtlibv2Parser extends Parser {
               }
               setState(473);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0)
+                || la == UndefinedSymbol);
             setState(475);
             match(ParClose);
             setState(476);
@@ -5182,7 +5233,7 @@ public class smtlibv2Parser extends Parser {
             identifier();
             setState(479);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -5192,13 +5243,13 @@ public class smtlibv2Parser extends Parser {
               }
               setState(481);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388548L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388548L) != 0)
+                || la == UndefinedSymbol);
             setState(486);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0)) {
+            la = _input.LA(1);
+            while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0)) {
               {
                 {
                   setState(483);
@@ -5207,7 +5258,7 @@ public class smtlibv2Parser extends Parser {
               }
               setState(488);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(489);
             match(ParClose);
@@ -5217,430 +5268,430 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_attributeContext extends ParserRuleContext {
-    public Theory_attributeContext(ParserRuleContext parent, int invokingState) {
+  public static class TheoryattributeContext extends ParserRuleContext {
+    public TheoryattributeContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_theory_attribute;
+      return RULEtheoryattribute;
     }
 
-    public Theory_attributeContext() {}
+    public TheoryattributeContext() {}
 
-    public void copyFrom(Theory_attributeContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(TheoryattributeContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_sortContext extends Theory_attributeContext {
-    public TerminalNode PK_Sorts() {
-      return getToken(smtlibv2Parser.PK_Sorts, 0);
+  public static class TheorysortContext extends TheoryattributeContext {
+    public TerminalNode PKSorts() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSorts, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Sort_symbol_declContext> sort_symbol_decl() {
-      return getRuleContexts(Sort_symbol_declContext.class);
+    public List<SortsymboldeclContext> sortsymboldecl() {
+      return getRuleContexts(SortsymboldeclContext.class);
     }
 
-    public Sort_symbol_declContext sort_symbol_decl(int i) {
-      return getRuleContext(Sort_symbol_declContext.class, i);
+    public SortsymboldeclContext sortsymboldecl(int i) {
+      return getRuleContext(SortsymboldeclContext.class, i);
     }
 
-    public Theory_sortContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheorysortContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheorysort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheorysort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_sort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheorysort(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_notesContext extends Theory_attributeContext {
-    public TerminalNode PK_Notes() {
-      return getToken(smtlibv2Parser.PK_Notes, 0);
+  public static class TheorynotesContext extends TheoryattributeContext {
+    public TerminalNode PKNotes() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKNotes, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Theory_notesContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheorynotesContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_notes(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterTheorynotes(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitTheory_notes(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheorynotes(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_notes(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheorynotes(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_defContext extends Theory_attributeContext {
-    public TerminalNode PK_Definition() {
-      return getToken(smtlibv2Parser.PK_Definition, 0);
+  public static class TheorydefContext extends TheoryattributeContext {
+    public TerminalNode PKDefinition() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKDefinition, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Theory_defContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheorydefContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterTheory_def(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheorydef(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_def(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheorydef(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_def(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheorydef(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_funContext extends Theory_attributeContext {
-    public TerminalNode PK_Funs() {
-      return getToken(smtlibv2Parser.PK_Funs, 0);
+  public static class TheoryfunContext extends TheoryattributeContext {
+    public TerminalNode PKFuns() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKFuns, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Par_fun_symbol_declContext> par_fun_symbol_decl() {
-      return getRuleContexts(Par_fun_symbol_declContext.class);
+    public List<ParfunsymboldeclContext> parfunsymboldecl() {
+      return getRuleContexts(ParfunsymboldeclContext.class);
     }
 
-    public Par_fun_symbol_declContext par_fun_symbol_decl(int i) {
-      return getRuleContext(Par_fun_symbol_declContext.class, i);
+    public ParfunsymboldeclContext parfunsymboldecl(int i) {
+      return getRuleContext(ParfunsymboldeclContext.class, i);
     }
 
-    public Theory_funContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheoryfunContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterTheory_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheoryfun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheoryfun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_fun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheoryfun(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_attrContext extends Theory_attributeContext {
+  public static class TheoryattrContext extends TheoryattributeContext {
     public AttributeContext attribute() {
       return getRuleContext(AttributeContext.class, 0);
     }
 
-    public Theory_attrContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheoryattrContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheoryattr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheoryattr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_attr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheoryattr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_valContext extends Theory_attributeContext {
-    public TerminalNode PK_Values() {
-      return getToken(smtlibv2Parser.PK_Values, 0);
+  public static class TheoryvalContext extends TheoryattributeContext {
+    public TerminalNode PKValues() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKValues, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Theory_valContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheoryvalContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterTheory_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheoryval(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheoryval(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_val(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheoryval(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_sort_descrContext extends Theory_attributeContext {
-    public TerminalNode PK_SortsDescription() {
-      return getToken(smtlibv2Parser.PK_SortsDescription, 0);
+  public static class TheorysortdescrContext extends TheoryattributeContext {
+    public TerminalNode PKSortsDescription() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKSortsDescription, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Theory_sort_descrContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheorysortdescrContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_sort_descr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterTheorysortdescr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitTheory_sort_descr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitTheorysortdescr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_sort_descr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheorysortdescr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_fun_descrContext extends Theory_attributeContext {
-    public TerminalNode PK_FunsDescription() {
-      return getToken(smtlibv2Parser.PK_FunsDescription, 0);
+  public static class TheoryfundescrContext extends TheoryattributeContext {
+    public TerminalNode PKFunsDescription() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKFunsDescription, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Theory_fun_descrContext(Theory_attributeContext ctx) {
-      copyFrom(ctx);
+    public TheoryfundescrContext(TheoryattributeContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_fun_descr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterTheoryfundescr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitTheory_fun_descr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitTheoryfundescr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_fun_descr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheoryfundescr(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Theory_attributeContext theory_attribute() throws RecognitionException {
-    Theory_attributeContext _localctx = new Theory_attributeContext(_ctx, getState());
-    enterRule(_localctx, 62, RULE_theory_attribute);
-    int _la;
+  public final TheoryattributeContext theoryattribute() throws RecognitionException {
+    TheoryattributeContext local_ctx = new TheoryattributeContext(_ctx, getState());
+    enterRule(local_ctx, 62, RULEtheoryattribute);
+    int la;
     try {
       setState(523);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 37, _ctx)) {
         case 1:
-          _localctx = new Theory_sortContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new TheorysortContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(494);
-            match(PK_Sorts);
+            match(PKSorts);
             setState(495);
             match(ParOpen);
             setState(497);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(496);
-                  sort_symbol_decl();
+                  sortsymboldecl();
                 }
               }
               setState(499);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(501);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Theory_funContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new TheoryfunContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(503);
-            match(PK_Funs);
+            match(PKFuns);
             setState(504);
             match(ParOpen);
             setState(506);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(505);
-                  par_fun_symbol_decl();
+                  parfunsymboldecl();
                 }
               }
               setState(508);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(510);
             match(ParClose);
           }
           break;
         case 3:
-          _localctx = new Theory_sort_descrContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new TheorysortdescrContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(512);
-            match(PK_SortsDescription);
+            match(PKSortsDescription);
             setState(513);
             string();
           }
           break;
         case 4:
-          _localctx = new Theory_fun_descrContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new TheoryfundescrContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(514);
-            match(PK_FunsDescription);
+            match(PKFunsDescription);
             setState(515);
             string();
           }
           break;
         case 5:
-          _localctx = new Theory_defContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new TheorydefContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(516);
-            match(PK_Definition);
+            match(PKDefinition);
             setState(517);
             string();
           }
           break;
         case 6:
-          _localctx = new Theory_valContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new TheoryvalContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(518);
-            match(PK_Values);
+            match(PKValues);
             setState(519);
             string();
           }
           break;
         case 7:
-          _localctx = new Theory_notesContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new TheorynotesContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(520);
-            match(PK_Notes);
+            match(PKNotes);
             setState(521);
             string();
           }
           break;
         case 8:
-          _localctx = new Theory_attrContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new TheoryattrContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(522);
             attribute();
@@ -5648,23 +5699,23 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Theory_declContext extends ParserRuleContext {
+  public static class TheorydeclContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode PS_Theory() {
-      return getToken(smtlibv2Parser.PS_Theory, 0);
+    public TerminalNode PSTheory() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSTheory, 0);
     }
 
     public SymbolContext symbol() {
@@ -5672,175 +5723,175 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Theory_attributeContext> theory_attribute() {
-      return getRuleContexts(Theory_attributeContext.class);
+    public List<TheoryattributeContext> theoryattribute() {
+      return getRuleContexts(TheoryattributeContext.class);
     }
 
-    public Theory_attributeContext theory_attribute(int i) {
-      return getRuleContext(Theory_attributeContext.class, i);
+    public TheoryattributeContext theoryattribute(int i) {
+      return getRuleContext(TheoryattributeContext.class, i);
     }
 
-    public Theory_declContext(ParserRuleContext parent, int invokingState) {
+    public TheorydeclContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_theory_decl;
+      return RULEtheorydecl;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterTheory_decl(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheorydecl(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitTheory_decl(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheorydecl(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitTheory_decl(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTheorydecl(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Theory_declContext theory_decl() throws RecognitionException {
-    Theory_declContext _localctx = new Theory_declContext(_ctx, getState());
-    enterRule(_localctx, 64, RULE_theory_decl);
-    int _la;
+  public final TheorydeclContext theorydecl() throws RecognitionException {
+    TheorydeclContext local_ctx = new TheorydeclContext(_ctx, getState());
+    enterRule(local_ctx, 64, RULEtheorydecl);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(525);
         match(ParOpen);
         setState(526);
-        match(PS_Theory);
+        match(PSTheory);
         setState(527);
         symbol();
         setState(529);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(528);
-              theory_attribute();
+              theoryattribute();
             }
           }
           setState(531);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0));
+          la = _input.LA(1);
+        } while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0));
         setState(533);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_attribueContext extends ParserRuleContext {
-    public Logic_attribueContext(ParserRuleContext parent, int invokingState) {
+  public static class LogicattribueContext extends ParserRuleContext {
+    public LogicattribueContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_logic_attribue;
+      return RULElogicattribue;
     }
 
-    public Logic_attribueContext() {}
+    public LogicattribueContext() {}
 
-    public void copyFrom(Logic_attribueContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(LogicattribueContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_valContext extends Logic_attribueContext {
-    public TerminalNode PK_Values() {
-      return getToken(smtlibv2Parser.PK_Values, 0);
+  public static class LogicvalContext extends LogicattribueContext {
+    public TerminalNode PKValues() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKValues, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Logic_valContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogicvalContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterLogic_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogicval(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitLogic_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogicval(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_val(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogicval(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_attrContext extends Logic_attribueContext {
+  public static class LogicattrContext extends LogicattribueContext {
     public AttributeContext attribute() {
       return getRuleContext(AttributeContext.class, 0);
     }
 
-    public Logic_attrContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogicattrContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterLogic_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogicattr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitLogic_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogicattr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_attr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogicattr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_theoryContext extends Logic_attribueContext {
-    public TerminalNode PK_Theories() {
-      return getToken(smtlibv2Parser.PK_Theories, 0);
+  public static class LogictheoryContext extends LogicattribueContext {
+    public TerminalNode PKTheories() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKTheories, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SymbolContext> symbol() {
@@ -5851,148 +5902,148 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SymbolContext.class, i);
     }
 
-    public Logic_theoryContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogictheoryContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterLogic_theory(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterLogictheory(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitLogic_theory(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogictheory(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_theory(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogictheory(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_languageContext extends Logic_attribueContext {
-    public TerminalNode PK_Language() {
-      return getToken(smtlibv2Parser.PK_Language, 0);
+  public static class LogiclanguageContext extends LogicattribueContext {
+    public TerminalNode PKLanguage() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKLanguage, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Logic_languageContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogiclanguageContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterLogic_language(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterLogiclanguage(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitLogic_language(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitLogiclanguage(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_language(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogiclanguage(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_extContext extends Logic_attribueContext {
-    public TerminalNode PK_Extension() {
-      return getToken(smtlibv2Parser.PK_Extension, 0);
+  public static class LogicextContext extends LogicattribueContext {
+    public TerminalNode PKExtension() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKExtension, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Logic_extContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogicextContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterLogic_ext(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogicext(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitLogic_ext(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogicext(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_ext(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogicext(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Logic_notesContext extends Logic_attribueContext {
-    public TerminalNode PK_Notes() {
-      return getToken(smtlibv2Parser.PK_Notes, 0);
+  public static class LogicnotesContext extends LogicattribueContext {
+    public TerminalNode PKNotes() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKNotes, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Logic_notesContext(Logic_attribueContext ctx) {
-      copyFrom(ctx);
+    public LogicnotesContext(LogicattribueContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterLogic_notes(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogicnotes(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitLogic_notes(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogicnotes(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic_notes(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogicnotes(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Logic_attribueContext logic_attribue() throws RecognitionException {
-    Logic_attribueContext _localctx = new Logic_attribueContext(_ctx, getState());
-    enterRule(_localctx, 66, RULE_logic_attribue);
-    int _la;
+  public final LogicattribueContext logicattribue() throws RecognitionException {
+    LogicattribueContext local_ctx = new LogicattribueContext(_ctx, getState());
+    enterRule(local_ctx, 66, RULElogicattribue);
+    int la;
     try {
       setState(553);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 40, _ctx)) {
         case 1:
-          _localctx = new Logic_theoryContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new LogictheoryContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(535);
-            match(PK_Theories);
+            match(PKTheories);
             setState(536);
             match(ParOpen);
             setState(538);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -6002,56 +6053,56 @@ public class smtlibv2Parser extends Parser {
               }
               setState(540);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0)
+                || la == UndefinedSymbol);
             setState(542);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Logic_languageContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new LogiclanguageContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(544);
-            match(PK_Language);
+            match(PKLanguage);
             setState(545);
             string();
           }
           break;
         case 3:
-          _localctx = new Logic_extContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new LogicextContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(546);
-            match(PK_Extension);
+            match(PKExtension);
             setState(547);
             string();
           }
           break;
         case 4:
-          _localctx = new Logic_valContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new LogicvalContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(548);
-            match(PK_Values);
+            match(PKValues);
             setState(549);
             string();
           }
           break;
         case 5:
-          _localctx = new Logic_notesContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new LogicnotesContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(550);
-            match(PK_Notes);
+            match(PKNotes);
             setState(551);
             string();
           }
           break;
         case 6:
-          _localctx = new Logic_attrContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new LogicattrContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(552);
             attribute();
@@ -6059,23 +6110,23 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class LogicContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode PS_Logic() {
-      return getToken(smtlibv2Parser.PS_Logic, 0);
+    public TerminalNode PSLogic() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSLogic, 0);
     }
 
     public SymbolContext symbol() {
@@ -6083,15 +6134,15 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Logic_attribueContext> logic_attribue() {
-      return getRuleContexts(Logic_attribueContext.class);
+    public List<LogicattribueContext> logicattribue() {
+      return getRuleContexts(LogicattribueContext.class);
     }
 
-    public Logic_attribueContext logic_attribue(int i) {
-      return getRuleContext(Logic_attribueContext.class, i);
+    public LogicattribueContext logicattribue(int i) {
+      return getRuleContext(LogicattribueContext.class, i);
     }
 
     public LogicContext(ParserRuleContext parent, int invokingState) {
@@ -6100,71 +6151,71 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_logic;
+      return RULElogic;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterLogic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitLogic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitLogic(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final LogicContext logic() throws RecognitionException {
-    LogicContext _localctx = new LogicContext(_ctx, getState());
-    enterRule(_localctx, 68, RULE_logic);
-    int _la;
+    LogicContext local_ctx = new LogicContext(_ctx, getState());
+    enterRule(local_ctx, 68, RULElogic);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(555);
         match(ParOpen);
         setState(556);
-        match(PS_Logic);
+        match(PSLogic);
         setState(557);
         symbol();
         setState(559);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(558);
-              logic_attribue();
+              logicattribue();
             }
           }
           setState(561);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0));
+          la = _input.LA(1);
+        } while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0));
         setState(563);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Sort_decContext extends ParserRuleContext {
+  public static class SortdecContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
@@ -6176,41 +6227,41 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Sort_decContext(ParserRuleContext parent, int invokingState) {
+    public SortdecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_sort_dec;
+      return RULEsortdec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSort_dec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSortdec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSort_dec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSortdec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSort_dec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSortdec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Sort_decContext sort_dec() throws RecognitionException {
-    Sort_decContext _localctx = new Sort_decContext(_ctx, getState());
-    enterRule(_localctx, 70, RULE_sort_dec);
+  public final SortdecContext sortdec() throws RecognitionException {
+    SortdecContext local_ctx = new SortdecContext(_ctx, getState());
+    enterRule(local_ctx, 70, RULEsortdec);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(565);
         match(ParOpen);
@@ -6222,19 +6273,19 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Selector_decContext extends ParserRuleContext {
+  public static class SelectordecContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
@@ -6246,43 +6297,42 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Selector_decContext(ParserRuleContext parent, int invokingState) {
+    public SelectordecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_selector_dec;
+      return RULEselectordec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterSelector_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterSelectordec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitSelector_dec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSelectordec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSelector_dec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSelectordec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Selector_decContext selector_dec() throws RecognitionException {
-    Selector_decContext _localctx = new Selector_decContext(_ctx, getState());
-    enterRule(_localctx, 72, RULE_selector_dec);
+  public final SelectordecContext selectordec() throws RecognitionException {
+    SelectordecContext local_ctx = new SelectordecContext(_ctx, getState());
+    enterRule(local_ctx, 72, RULEselectordec);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(570);
         match(ParOpen);
@@ -6294,19 +6344,19 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Constructor_decContext extends ParserRuleContext {
+  public static class ConstructordecContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
@@ -6314,52 +6364,52 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Selector_decContext> selector_dec() {
-      return getRuleContexts(Selector_decContext.class);
+    public List<SelectordecContext> selectordec() {
+      return getRuleContexts(SelectordecContext.class);
     }
 
-    public Selector_decContext selector_dec(int i) {
-      return getRuleContext(Selector_decContext.class, i);
+    public SelectordecContext selectordec(int i) {
+      return getRuleContext(SelectordecContext.class, i);
     }
 
-    public Constructor_decContext(ParserRuleContext parent, int invokingState) {
+    public ConstructordecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_constructor_dec;
+      return RULEconstructordec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterConstructor_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterConstructordec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitConstructor_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitConstructordec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitConstructor_dec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitConstructordec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Constructor_decContext constructor_dec() throws RecognitionException {
-    Constructor_decContext _localctx = new Constructor_decContext(_ctx, getState());
-    enterRule(_localctx, 74, RULE_constructor_dec);
-    int _la;
+  public final ConstructordecContext constructordec() throws RecognitionException {
+    ConstructordecContext local_ctx = new ConstructordecContext(_ctx, getState());
+    enterRule(local_ctx, 74, RULEconstructordec);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(575);
         match(ParOpen);
@@ -6367,69 +6417,69 @@ public class smtlibv2Parser extends Parser {
         symbol();
         setState(580);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (_la == ParOpen) {
+        la = _input.LA(1);
+        while (la == ParOpen) {
           {
             {
               setState(577);
-              selector_dec();
+              selectordec();
             }
           }
           setState(582);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(583);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Datatype_decContext extends ParserRuleContext {
-    public Datatype_decContext(ParserRuleContext parent, int invokingState) {
+  public static class DatatypedecContext extends ParserRuleContext {
+    public DatatypedecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_datatype_dec;
+      return RULEdatatypedec;
     }
 
-    public Datatype_decContext() {}
+    public DatatypedecContext() {}
 
-    public void copyFrom(Datatype_decContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(DatatypedecContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Data_multisymbContext extends Datatype_decContext {
+  public static class DatamultisymbContext extends DatatypedecContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
-    public TerminalNode GRW_Par() {
-      return getToken(smtlibv2Parser.GRW_Par, 0);
+    public TerminalNode GRWPar() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.GRWPar, 0);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public List<SymbolContext> symbol() {
@@ -6440,124 +6490,123 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SymbolContext.class, i);
     }
 
-    public List<Constructor_decContext> constructor_dec() {
-      return getRuleContexts(Constructor_decContext.class);
+    public List<ConstructordecContext> constructordec() {
+      return getRuleContexts(ConstructordecContext.class);
     }
 
-    public Constructor_decContext constructor_dec(int i) {
-      return getRuleContext(Constructor_decContext.class, i);
+    public ConstructordecContext constructordec(int i) {
+      return getRuleContext(ConstructordecContext.class, i);
     }
 
-    public Data_multisymbContext(Datatype_decContext ctx) {
-      copyFrom(ctx);
+    public DatamultisymbContext(DatatypedecContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterData_multisymb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterDatamultisymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitData_multisymb(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitDatamultisymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitData_multisymb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDatamultisymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Data_constrContext extends Datatype_decContext {
+  public static class DataconstrContext extends DatatypedecContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Constructor_decContext> constructor_dec() {
-      return getRuleContexts(Constructor_decContext.class);
+    public List<ConstructordecContext> constructordec() {
+      return getRuleContexts(ConstructordecContext.class);
     }
 
-    public Constructor_decContext constructor_dec(int i) {
-      return getRuleContext(Constructor_decContext.class, i);
+    public ConstructordecContext constructordec(int i) {
+      return getRuleContext(ConstructordecContext.class, i);
     }
 
-    public Data_constrContext(Datatype_decContext ctx) {
-      copyFrom(ctx);
+    public DataconstrContext(DatatypedecContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterData_constr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDataconstr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitData_constr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDataconstr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitData_constr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDataconstr(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Datatype_decContext datatype_dec() throws RecognitionException {
-    Datatype_decContext _localctx = new Datatype_decContext(_ctx, getState());
-    enterRule(_localctx, 76, RULE_datatype_dec);
-    int _la;
+  public final DatatypedecContext datatypedec() throws RecognitionException {
+    DatatypedecContext local_ctx = new DatatypedecContext(_ctx, getState());
+    enterRule(local_ctx, 76, RULEdatatypedec);
+    int la;
     try {
       setState(611);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 46, _ctx)) {
         case 1:
-          _localctx = new Data_constrContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new DataconstrContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(585);
             match(ParOpen);
             setState(587);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(586);
-                  constructor_dec();
+                  constructordec();
                 }
               }
               setState(589);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(591);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Data_multisymbContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new DatamultisymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(593);
             match(ParOpen);
             setState(594);
-            match(GRW_Par);
+            match(GRWPar);
             setState(595);
             match(ParOpen);
             setState(597);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
@@ -6567,27 +6616,27 @@ public class smtlibv2Parser extends Parser {
               }
               setState(599);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0)
-                || _la == UndefinedSymbol);
+              la = _input.LA(1);
+            } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0)
+                || la == UndefinedSymbol);
             setState(601);
             match(ParClose);
             setState(602);
             match(ParOpen);
             setState(604);
             _errHandler.sync(this);
-            _la = _input.LA(1);
+            la = _input.LA(1);
             do {
               {
                 {
                   setState(603);
-                  constructor_dec();
+                  constructordec();
                 }
               }
               setState(606);
               _errHandler.sync(this);
-              _la = _input.LA(1);
-            } while (_la == ParOpen);
+              la = _input.LA(1);
+            } while (la == ParOpen);
             setState(608);
             match(ParClose);
             setState(609);
@@ -6596,23 +6645,23 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Function_decContext extends ParserRuleContext {
+  public static class FunctiondecContext extends ParserRuleContext {
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
     public SymbolContext symbol() {
@@ -6620,60 +6669,59 @@ public class smtlibv2Parser extends Parser {
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
     public SortContext sort() {
       return getRuleContext(SortContext.class, 0);
     }
 
-    public List<Sorted_varContext> sorted_var() {
-      return getRuleContexts(Sorted_varContext.class);
+    public List<SortedvarContext> sortedvar() {
+      return getRuleContexts(SortedvarContext.class);
     }
 
-    public Sorted_varContext sorted_var(int i) {
-      return getRuleContext(Sorted_varContext.class, i);
+    public SortedvarContext sortedvar(int i) {
+      return getRuleContext(SortedvarContext.class, i);
     }
 
-    public Function_decContext(ParserRuleContext parent, int invokingState) {
+    public FunctiondecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_function_dec;
+      return RULEfunctiondec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFunction_dec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterFunctiondec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitFunction_dec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFunctiondec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFunction_dec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFunctiondec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Function_decContext function_dec() throws RecognitionException {
-    Function_decContext _localctx = new Function_decContext(_ctx, getState());
-    enterRule(_localctx, 78, RULE_function_dec);
-    int _la;
+  public final FunctiondecContext functiondec() throws RecognitionException {
+    FunctiondecContext local_ctx = new FunctiondecContext(_ctx, getState());
+    enterRule(local_ctx, 78, RULEfunctiondec);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(613);
         match(ParOpen);
@@ -6683,17 +6731,17 @@ public class smtlibv2Parser extends Parser {
         match(ParOpen);
         setState(619);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (_la == ParOpen) {
+        la = _input.LA(1);
+        while (la == ParOpen) {
           {
             {
               setState(616);
-              sorted_var();
+              sortedvar();
             }
           }
           setState(621);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(622);
         match(ParClose);
@@ -6703,27 +6751,27 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Function_defContext extends ParserRuleContext {
+  public static class FunctiondefContext extends ParserRuleContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public SortContext sort() {
@@ -6734,49 +6782,48 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(TermContext.class, 0);
     }
 
-    public List<Sorted_varContext> sorted_var() {
-      return getRuleContexts(Sorted_varContext.class);
+    public List<SortedvarContext> sortedvar() {
+      return getRuleContexts(SortedvarContext.class);
     }
 
-    public Sorted_varContext sorted_var(int i) {
-      return getRuleContext(Sorted_varContext.class, i);
+    public SortedvarContext sortedvar(int i) {
+      return getRuleContext(SortedvarContext.class, i);
     }
 
-    public Function_defContext(ParserRuleContext parent, int invokingState) {
+    public FunctiondefContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_function_def;
+      return RULEfunctiondef;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterFunction_def(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterFunctiondef(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitFunction_def(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFunctiondef(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitFunction_def(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitFunctiondef(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Function_defContext function_def() throws RecognitionException {
-    Function_defContext _localctx = new Function_defContext(_ctx, getState());
-    enterRule(_localctx, 80, RULE_function_def);
-    int _la;
+  public final FunctiondefContext functiondef() throws RecognitionException {
+    FunctiondefContext local_ctx = new FunctiondefContext(_ctx, getState());
+    enterRule(local_ctx, 80, RULEfunctiondef);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(626);
         symbol();
@@ -6784,17 +6831,17 @@ public class smtlibv2Parser extends Parser {
         match(ParOpen);
         setState(631);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (_la == ParOpen) {
+        la = _input.LA(1);
+        while (la == ParOpen) {
           {
             {
               setState(628);
-              sorted_var();
+              sortedvar();
             }
           }
           setState(633);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(634);
         match(ParClose);
@@ -6804,41 +6851,41 @@ public class smtlibv2Parser extends Parser {
         term();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prop_literalContext extends ParserRuleContext {
-    public Prop_literalContext(ParserRuleContext parent, int invokingState) {
+  public static class PropliteralContext extends ParserRuleContext {
+    public PropliteralContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_prop_literal;
+      return RULEpropliteral;
     }
 
-    public Prop_literalContext() {}
+    public PropliteralContext() {}
 
-    public void copyFrom(Prop_literalContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(PropliteralContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prop_notContext extends Prop_literalContext {
+  public static class PropnotContext extends PropliteralContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode PS_Not() {
-      return getToken(smtlibv2Parser.PS_Not, 0);
+    public TerminalNode PSNot() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSNot, 0);
     }
 
     public SymbolContext symbol() {
@@ -6846,99 +6893,99 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Prop_notContext(Prop_literalContext ctx) {
-      copyFrom(ctx);
+    public PropnotContext(PropliteralContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterProp_not(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPropnot(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProp_not(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPropnot(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProp_not(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPropnot(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prop_symbContext extends Prop_literalContext {
+  public static class PropsymbContext extends PropliteralContext {
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Prop_symbContext(Prop_literalContext ctx) {
-      copyFrom(ctx);
+    public PropsymbContext(PropliteralContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterProp_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPropsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProp_symb(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPropsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProp_symb(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPropsymb(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Prop_literalContext prop_literal() throws RecognitionException {
-    Prop_literalContext _localctx = new Prop_literalContext(_ctx, getState());
-    enterRule(_localctx, 82, RULE_prop_literal);
+  public final PropliteralContext propliteral() throws RecognitionException {
+    PropliteralContext local_ctx = new PropliteralContext(_ctx, getState());
+    enterRule(local_ctx, 82, RULEpropliteral);
     try {
       setState(644);
       _errHandler.sync(this);
       switch (_input.LA(1)) {
         case QuotedSymbol:
-        case PS_Not:
-        case PS_Bool:
-        case PS_ContinuedExecution:
-        case PS_Error:
-        case PS_False:
-        case PS_ImmediateExit:
-        case PS_Incomplete:
-        case PS_Logic:
-        case PS_Memout:
-        case PS_Sat:
-        case PS_Success:
-        case PS_Theory:
-        case PS_True:
-        case PS_Unknown:
-        case PS_Unsupported:
-        case PS_Unsat:
+        case PSNot:
+        case PSBool:
+        case PSContinuedExecution:
+        case PSError:
+        case PSFalse:
+        case PSImmediateExit:
+        case PSIncomplete:
+        case PSLogic:
+        case PSMemout:
+        case PSSat:
+        case PSSuccess:
+        case PSTheory:
+        case PSTrue:
+        case PSUnknown:
+        case PSUnsupported:
+        case PSUnsat:
         case UndefinedSymbol:
-          _localctx = new Prop_symbContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new PropsymbContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(638);
             symbol();
           }
           break;
         case ParOpen:
-          _localctx = new Prop_notContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new PropnotContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(639);
             match(ParOpen);
             setState(640);
-            match(PS_Not);
+            match(PSNot);
             setState(641);
             symbol();
             setState(642);
@@ -6949,13 +6996,13 @@ public class smtlibv2Parser extends Parser {
           throw new NoViableAltException(this);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -6974,38 +7021,38 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_script;
+      return RULEscript;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterScript(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterScript(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitScript(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitScript(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitScript(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitScript(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final ScriptContext script() throws RecognitionException {
-    ScriptContext _localctx = new ScriptContext(_ctx, getState());
-    enterRule(_localctx, 84, RULE_script);
-    int _la;
+    ScriptContext local_ctx = new ScriptContext(_ctx, getState());
+    enterRule(local_ctx, 84, RULEscript);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(649);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (_la == ParOpen) {
+        la = _input.LA(1);
+        while (la == ParOpen) {
           {
             {
               setState(646);
@@ -7014,224 +7061,227 @@ public class smtlibv2Parser extends Parser {
           }
           setState(651);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_assertContext extends ParserRuleContext {
-    public TerminalNode CMD_Assert() {
-      return getToken(smtlibv2Parser.CMD_Assert, 0);
+  public static class CmdassertContext extends ParserRuleContext {
+    public TerminalNode CMDAssert() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDAssert, 0);
     }
 
     public TermContext term() {
       return getRuleContext(TermContext.class, 0);
     }
 
-    public Cmd_assertContext(ParserRuleContext parent, int invokingState) {
+    public CmdassertContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_assert;
+      return RULEcmdassert;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdassert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdassert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_assert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdassert(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_assertContext cmd_assert() throws RecognitionException {
-    Cmd_assertContext _localctx = new Cmd_assertContext(_ctx, getState());
-    enterRule(_localctx, 86, RULE_cmd_assert);
+  public final CmdassertContext cmdassert() throws RecognitionException {
+    CmdassertContext local_ctx = new CmdassertContext(_ctx, getState());
+    enterRule(local_ctx, 86, RULEcmdassert);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(652);
-        match(CMD_Assert);
+        match(CMDAssert);
         setState(653);
         term();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_checkSatContext extends ParserRuleContext {
-    public TerminalNode CMD_CheckSat() {
-      return getToken(smtlibv2Parser.CMD_CheckSat, 0);
+  public static class CmdcheckSatContext extends ParserRuleContext {
+    public TerminalNode CMDCheckSat() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDCheckSat, 0);
     }
 
-    public Cmd_checkSatContext(ParserRuleContext parent, int invokingState) {
+    public CmdcheckSatContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_checkSat;
+      return RULEcmdcheckSat;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_checkSat(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdcheckSat(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_checkSat(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdcheckSat(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_checkSat(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdcheckSat(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_checkSatContext cmd_checkSat() throws RecognitionException {
-    Cmd_checkSatContext _localctx = new Cmd_checkSatContext(_ctx, getState());
-    enterRule(_localctx, 88, RULE_cmd_checkSat);
+  public final CmdcheckSatContext cmdcheckSat() throws RecognitionException {
+    CmdcheckSatContext local_ctx = new CmdcheckSatContext(_ctx, getState());
+    enterRule(local_ctx, 88, RULEcmdcheckSat);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(655);
-        match(CMD_CheckSat);
+        match(CMDCheckSat);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_checkSatAssumingContext extends ParserRuleContext {
-    public TerminalNode CMD_CheckSatAssuming() {
-      return getToken(smtlibv2Parser.CMD_CheckSatAssuming, 0);
+  public static class CmdcheckSatAssumingContext extends ParserRuleContext {
+    public TerminalNode CMDCheckSatAssuming() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDCheckSatAssuming, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Prop_literalContext> prop_literal() {
-      return getRuleContexts(Prop_literalContext.class);
+    public List<PropliteralContext> propliteral() {
+      return getRuleContexts(PropliteralContext.class);
     }
 
-    public Prop_literalContext prop_literal(int i) {
-      return getRuleContext(Prop_literalContext.class, i);
+    public PropliteralContext propliteral(int i) {
+      return getRuleContext(PropliteralContext.class, i);
     }
 
-    public Cmd_checkSatAssumingContext(ParserRuleContext parent, int invokingState) {
+    public CmdcheckSatAssumingContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_checkSatAssuming;
+      return RULEcmdcheckSatAssuming;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_checkSatAssuming(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdcheckSatAssuming(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_checkSatAssuming(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdcheckSatAssuming(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_checkSatAssuming(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdcheckSatAssuming(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_checkSatAssumingContext cmd_checkSatAssuming() throws RecognitionException {
-    Cmd_checkSatAssumingContext _localctx = new Cmd_checkSatAssumingContext(_ctx, getState());
-    enterRule(_localctx, 90, RULE_cmd_checkSatAssuming);
-    int _la;
+  public final CmdcheckSatAssumingContext cmdcheckSatAssuming() throws RecognitionException {
+    CmdcheckSatAssumingContext local_ctx = new CmdcheckSatAssumingContext(_ctx, getState());
+    enterRule(local_ctx, 90, RULEcmdcheckSatAssuming);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(657);
-        match(CMD_CheckSatAssuming);
+        match(CMDCheckSatAssuming);
         setState(658);
         match(ParOpen);
         setState(662);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388548L) != 0) || _la == UndefinedSymbol) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388548L) != 0) || la == UndefinedSymbol) {
           {
             {
               setState(659);
-              prop_literal();
+              propliteral();
             }
           }
           setState(664);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(665);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_declareConstContext extends ParserRuleContext {
-    public TerminalNode CMD_DeclareConst() {
-      return getToken(smtlibv2Parser.CMD_DeclareConst, 0);
+  public static class CmddeclareConstContext extends ParserRuleContext {
+    public TerminalNode CMDDeclareConst() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDeclareConst, 0);
     }
 
     public SymbolContext symbol() {
@@ -7242,251 +7292,254 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SortContext.class, 0);
     }
 
-    public Cmd_declareConstContext(ParserRuleContext parent, int invokingState) {
+    public CmddeclareConstContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_declareConst;
+      return RULEcmddeclareConst;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_declareConst(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddeclareConst(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_declareConst(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddeclareConst(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_declareConst(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddeclareConst(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_declareConstContext cmd_declareConst() throws RecognitionException {
-    Cmd_declareConstContext _localctx = new Cmd_declareConstContext(_ctx, getState());
-    enterRule(_localctx, 92, RULE_cmd_declareConst);
+  public final CmddeclareConstContext cmddeclareConst() throws RecognitionException {
+    CmddeclareConstContext local_ctx = new CmddeclareConstContext(_ctx, getState());
+    enterRule(local_ctx, 92, RULEcmddeclareConst);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(667);
-        match(CMD_DeclareConst);
+        match(CMDDeclareConst);
         setState(668);
         symbol();
         setState(669);
         sort();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_declareDatatypeContext extends ParserRuleContext {
-    public TerminalNode CMD_DeclareDatatype() {
-      return getToken(smtlibv2Parser.CMD_DeclareDatatype, 0);
+  public static class CmddeclareDatatypeContext extends ParserRuleContext {
+    public TerminalNode CMDDeclareDatatype() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDeclareDatatype, 0);
     }
 
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Datatype_decContext datatype_dec() {
-      return getRuleContext(Datatype_decContext.class, 0);
+    public DatatypedecContext datatypedec() {
+      return getRuleContext(DatatypedecContext.class, 0);
     }
 
-    public Cmd_declareDatatypeContext(ParserRuleContext parent, int invokingState) {
+    public CmddeclareDatatypeContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_declareDatatype;
+      return RULEcmddeclareDatatype;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_declareDatatype(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddeclareDatatype(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_declareDatatype(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddeclareDatatype(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_declareDatatype(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddeclareDatatype(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_declareDatatypeContext cmd_declareDatatype() throws RecognitionException {
-    Cmd_declareDatatypeContext _localctx = new Cmd_declareDatatypeContext(_ctx, getState());
-    enterRule(_localctx, 94, RULE_cmd_declareDatatype);
+  public final CmddeclareDatatypeContext cmddeclareDatatype() throws RecognitionException {
+    CmddeclareDatatypeContext local_ctx = new CmddeclareDatatypeContext(_ctx, getState());
+    enterRule(local_ctx, 94, RULEcmddeclareDatatype);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(671);
-        match(CMD_DeclareDatatype);
+        match(CMDDeclareDatatype);
         setState(672);
         symbol();
         setState(673);
-        datatype_dec();
+        datatypedec();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_declareDatatypesContext extends ParserRuleContext {
-    public TerminalNode CMD_DeclareDatatypes() {
-      return getToken(smtlibv2Parser.CMD_DeclareDatatypes, 0);
+  public static class CmddeclareDatatypesContext extends ParserRuleContext {
+    public TerminalNode CMDDeclareDatatypes() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDeclareDatatypes, 0);
     }
 
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
-    public List<Sort_decContext> sort_dec() {
-      return getRuleContexts(Sort_decContext.class);
+    public List<SortdecContext> sortdec() {
+      return getRuleContexts(SortdecContext.class);
     }
 
-    public Sort_decContext sort_dec(int i) {
-      return getRuleContext(Sort_decContext.class, i);
+    public SortdecContext sortdec(int i) {
+      return getRuleContext(SortdecContext.class, i);
     }
 
-    public List<Datatype_decContext> datatype_dec() {
-      return getRuleContexts(Datatype_decContext.class);
+    public List<DatatypedecContext> datatypedec() {
+      return getRuleContexts(DatatypedecContext.class);
     }
 
-    public Datatype_decContext datatype_dec(int i) {
-      return getRuleContext(Datatype_decContext.class, i);
+    public DatatypedecContext datatypedec(int i) {
+      return getRuleContext(DatatypedecContext.class, i);
     }
 
-    public Cmd_declareDatatypesContext(ParserRuleContext parent, int invokingState) {
+    public CmddeclareDatatypesContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_declareDatatypes;
+      return RULEcmddeclareDatatypes;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_declareDatatypes(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddeclareDatatypes(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_declareDatatypes(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddeclareDatatypes(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_declareDatatypes(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddeclareDatatypes(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_declareDatatypesContext cmd_declareDatatypes() throws RecognitionException {
-    Cmd_declareDatatypesContext _localctx = new Cmd_declareDatatypesContext(_ctx, getState());
-    enterRule(_localctx, 96, RULE_cmd_declareDatatypes);
-    int _la;
+  public final CmddeclareDatatypesContext cmddeclareDatatypes() throws RecognitionException {
+    CmddeclareDatatypesContext local_ctx = new CmddeclareDatatypesContext(_ctx, getState());
+    enterRule(local_ctx, 96, RULEcmddeclareDatatypes);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(675);
-        match(CMD_DeclareDatatypes);
+        match(CMDDeclareDatatypes);
         setState(676);
         match(ParOpen);
         setState(678);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(677);
-              sort_dec();
+              sortdec();
             }
           }
           setState(680);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (_la == ParOpen);
+          la = _input.LA(1);
+        } while (la == ParOpen);
         setState(682);
         match(ParClose);
         setState(683);
         match(ParOpen);
         setState(685);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(684);
-              datatype_dec();
+              datatypedec();
             }
           }
           setState(687);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (_la == ParOpen);
+          la = _input.LA(1);
+        } while (la == ParOpen);
         setState(689);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_declareFunContext extends ParserRuleContext {
-    public TerminalNode CMD_DeclareFun() {
-      return getToken(smtlibv2Parser.CMD_DeclareFun, 0);
+  public static class CmddeclareFunContext extends ParserRuleContext {
+    public TerminalNode CMDDeclareFun() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDeclareFun, 0);
     }
 
     public SymbolContext symbol() {
@@ -7494,11 +7547,11 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SortContext> sort() {
@@ -7509,52 +7562,52 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SortContext.class, i);
     }
 
-    public Cmd_declareFunContext(ParserRuleContext parent, int invokingState) {
+    public CmddeclareFunContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_declareFun;
+      return RULEcmddeclareFun;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_declareFun(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddeclareFun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_declareFun(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddeclareFun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_declareFun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddeclareFun(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_declareFunContext cmd_declareFun() throws RecognitionException {
-    Cmd_declareFunContext _localctx = new Cmd_declareFunContext(_ctx, getState());
-    enterRule(_localctx, 98, RULE_cmd_declareFun);
-    int _la;
+  public final CmddeclareFunContext cmddeclareFun() throws RecognitionException {
+    CmddeclareFunContext local_ctx = new CmddeclareFunContext(_ctx, getState());
+    enterRule(local_ctx, 98, RULEcmddeclareFun);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(691);
-        match(CMD_DeclareFun);
+        match(CMDDeclareFun);
         setState(692);
         symbol();
         setState(693);
         match(ParOpen);
         setState(697);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388548L) != 0) || _la == UndefinedSymbol) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388548L) != 0) || la == UndefinedSymbol) {
           {
             {
               setState(694);
@@ -7563,7 +7616,7 @@ public class smtlibv2Parser extends Parser {
           }
           setState(699);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(700);
         match(ParClose);
@@ -7571,19 +7624,20 @@ public class smtlibv2Parser extends Parser {
         sort();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_declareSortContext extends ParserRuleContext {
-    public TerminalNode CMD_DeclareSort() {
-      return getToken(smtlibv2Parser.CMD_DeclareSort, 0);
+  public static class CmddeclareSortContext extends ParserRuleContext {
+    public TerminalNode CMDDeclareSort() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDeclareSort, 0);
     }
 
     public SymbolContext symbol() {
@@ -7594,206 +7648,209 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Cmd_declareSortContext(ParserRuleContext parent, int invokingState) {
+    public CmddeclareSortContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_declareSort;
+      return RULEcmddeclareSort;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_declareSort(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddeclareSort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_declareSort(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddeclareSort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_declareSort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddeclareSort(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_declareSortContext cmd_declareSort() throws RecognitionException {
-    Cmd_declareSortContext _localctx = new Cmd_declareSortContext(_ctx, getState());
-    enterRule(_localctx, 100, RULE_cmd_declareSort);
+  public final CmddeclareSortContext cmddeclareSort() throws RecognitionException {
+    CmddeclareSortContext local_ctx = new CmddeclareSortContext(_ctx, getState());
+    enterRule(local_ctx, 100, RULEcmddeclareSort);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(703);
-        match(CMD_DeclareSort);
+        match(CMDDeclareSort);
         setState(704);
         symbol();
         setState(705);
         numeral();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_defineFunContext extends ParserRuleContext {
-    public TerminalNode CMD_DefineFun() {
-      return getToken(smtlibv2Parser.CMD_DefineFun, 0);
+  public static class CmddefineFunContext extends ParserRuleContext {
+    public TerminalNode CMDDefineFun() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDefineFun, 0);
     }
 
-    public Function_defContext function_def() {
-      return getRuleContext(Function_defContext.class, 0);
+    public FunctiondefContext functiondef() {
+      return getRuleContext(FunctiondefContext.class, 0);
     }
 
-    public Cmd_defineFunContext(ParserRuleContext parent, int invokingState) {
+    public CmddefineFunContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_defineFun;
+      return RULEcmddefineFun;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_defineFun(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddefineFun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_defineFun(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddefineFun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddefineFun(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_defineFunContext cmd_defineFun() throws RecognitionException {
-    Cmd_defineFunContext _localctx = new Cmd_defineFunContext(_ctx, getState());
-    enterRule(_localctx, 102, RULE_cmd_defineFun);
+  public final CmddefineFunContext cmddefineFun() throws RecognitionException {
+    CmddefineFunContext local_ctx = new CmddefineFunContext(_ctx, getState());
+    enterRule(local_ctx, 102, RULEcmddefineFun);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(707);
-        match(CMD_DefineFun);
+        match(CMDDefineFun);
         setState(708);
-        function_def();
+        functiondef();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_defineFunRecContext extends ParserRuleContext {
-    public TerminalNode CMD_DefineFunRec() {
-      return getToken(smtlibv2Parser.CMD_DefineFunRec, 0);
+  public static class CmddefineFunRecContext extends ParserRuleContext {
+    public TerminalNode CMDDefineFunRec() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDefineFunRec, 0);
     }
 
-    public Function_defContext function_def() {
-      return getRuleContext(Function_defContext.class, 0);
+    public FunctiondefContext functiondef() {
+      return getRuleContext(FunctiondefContext.class, 0);
     }
 
-    public Cmd_defineFunRecContext(ParserRuleContext parent, int invokingState) {
+    public CmddefineFunRecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_defineFunRec;
+      return RULEcmddefineFunRec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_defineFunRec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddefineFunRec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_defineFunRec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddefineFunRec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFunRec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddefineFunRec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_defineFunRecContext cmd_defineFunRec() throws RecognitionException {
-    Cmd_defineFunRecContext _localctx = new Cmd_defineFunRecContext(_ctx, getState());
-    enterRule(_localctx, 104, RULE_cmd_defineFunRec);
+  public final CmddefineFunRecContext cmddefineFunRec() throws RecognitionException {
+    CmddefineFunRecContext local_ctx = new CmddefineFunRecContext(_ctx, getState());
+    enterRule(local_ctx, 104, RULEcmddefineFunRec);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(710);
-        match(CMD_DefineFunRec);
+        match(CMDDefineFunRec);
         setState(711);
-        function_def();
+        functiondef();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_defineFunsRecContext extends ParserRuleContext {
-    public TerminalNode CMD_DefineFunsRec() {
-      return getToken(smtlibv2Parser.CMD_DefineFunsRec, 0);
+  public static class CmddefineFunsRecContext extends ParserRuleContext {
+    public TerminalNode CMDDefineFunsRec() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDefineFunsRec, 0);
     }
 
     public List<TerminalNode> ParOpen() {
-      return getTokens(smtlibv2Parser.ParOpen);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen);
     }
 
     public TerminalNode ParOpen(int i) {
-      return getToken(smtlibv2Parser.ParOpen, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, i);
     }
 
     public List<TerminalNode> ParClose() {
-      return getTokens(smtlibv2Parser.ParClose);
+      return getTokens(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose);
     }
 
     public TerminalNode ParClose(int i) {
-      return getToken(smtlibv2Parser.ParClose, i);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, i);
     }
 
-    public List<Function_decContext> function_dec() {
-      return getRuleContexts(Function_decContext.class);
+    public List<FunctiondecContext> functiondec() {
+      return getRuleContexts(FunctiondecContext.class);
     }
 
-    public Function_decContext function_dec(int i) {
-      return getRuleContext(Function_decContext.class, i);
+    public FunctiondecContext functiondec(int i) {
+      return getRuleContext(FunctiondecContext.class, i);
     }
 
     public List<TermContext> term() {
@@ -7804,67 +7861,67 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(TermContext.class, i);
     }
 
-    public Cmd_defineFunsRecContext(ParserRuleContext parent, int invokingState) {
+    public CmddefineFunsRecContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_defineFunsRec;
+      return RULEcmddefineFunsRec;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_defineFunsRec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddefineFunsRec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_defineFunsRec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddefineFunsRec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFunsRec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddefineFunsRec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_defineFunsRecContext cmd_defineFunsRec() throws RecognitionException {
-    Cmd_defineFunsRecContext _localctx = new Cmd_defineFunsRecContext(_ctx, getState());
-    enterRule(_localctx, 106, RULE_cmd_defineFunsRec);
-    int _la;
+  public final CmddefineFunsRecContext cmddefineFunsRec() throws RecognitionException {
+    CmddefineFunsRecContext local_ctx = new CmddefineFunsRecContext(_ctx, getState());
+    enterRule(local_ctx, 106, RULEcmddefineFunsRec);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(713);
-        match(CMD_DefineFunsRec);
+        match(CMDDefineFunsRec);
         setState(714);
         match(ParOpen);
         setState(716);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(715);
-              function_dec();
+              functiondec();
             }
           }
           setState(718);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (_la == ParOpen);
+          la = _input.LA(1);
+        } while (la == ParOpen);
         setState(720);
         match(ParClose);
         setState(721);
         match(ParOpen);
         setState(723);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
@@ -7874,26 +7931,27 @@ public class smtlibv2Parser extends Parser {
           }
           setState(725);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-            || ((((_la - 66)) & ~0x3f) == 0 && ((1L << (_la - 66)) & 144115188075864079L) != 0));
+          la = _input.LA(1);
+        } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+            || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 144115188075864079L) != 0));
         setState(727);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_defineSortContext extends ParserRuleContext {
-    public TerminalNode CMD_DefineSort() {
-      return getToken(smtlibv2Parser.CMD_DefineSort, 0);
+  public static class CmddefineSortContext extends ParserRuleContext {
+    public TerminalNode CMDDefineSort() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDDefineSort, 0);
     }
 
     public List<SymbolContext> symbol() {
@@ -7905,63 +7963,63 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public SortContext sort() {
       return getRuleContext(SortContext.class, 0);
     }
 
-    public Cmd_defineSortContext(ParserRuleContext parent, int invokingState) {
+    public CmddefineSortContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_defineSort;
+      return RULEcmddefineSort;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_defineSort(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmddefineSort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_defineSort(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmddefineSort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_defineSort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmddefineSort(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_defineSortContext cmd_defineSort() throws RecognitionException {
-    Cmd_defineSortContext _localctx = new Cmd_defineSortContext(_ctx, getState());
-    enterRule(_localctx, 108, RULE_cmd_defineSort);
-    int _la;
+  public final CmddefineSortContext cmddefineSort() throws RecognitionException {
+    CmddefineSortContext local_ctx = new CmddefineSortContext(_ctx, getState());
+    enterRule(local_ctx, 108, RULEcmddefineSort);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(729);
-        match(CMD_DefineSort);
+        match(CMDDefineSort);
         setState(730);
         symbol();
         setState(731);
         match(ParOpen);
         setState(735);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0) || _la == UndefinedSymbol) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0) || la == UndefinedSymbol) {
           {
             {
               setState(732);
@@ -7970,7 +8028,7 @@ public class smtlibv2Parser extends Parser {
           }
           setState(737);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(738);
         match(ParClose);
@@ -7978,581 +8036,587 @@ public class smtlibv2Parser extends Parser {
         sort();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_echoContext extends ParserRuleContext {
-    public TerminalNode CMD_Echo() {
-      return getToken(smtlibv2Parser.CMD_Echo, 0);
+  public static class CmdechoContext extends ParserRuleContext {
+    public TerminalNode CMDEcho() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDEcho, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Cmd_echoContext(ParserRuleContext parent, int invokingState) {
+    public CmdechoContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_echo;
+      return RULEcmdecho;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_echo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdecho(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_echo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdecho(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_echo(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdecho(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_echoContext cmd_echo() throws RecognitionException {
-    Cmd_echoContext _localctx = new Cmd_echoContext(_ctx, getState());
-    enterRule(_localctx, 110, RULE_cmd_echo);
+  public final CmdechoContext cmdecho() throws RecognitionException {
+    CmdechoContext local_ctx = new CmdechoContext(_ctx, getState());
+    enterRule(local_ctx, 110, RULEcmdecho);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(741);
-        match(CMD_Echo);
+        match(CMDEcho);
         setState(742);
         string();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_exitContext extends ParserRuleContext {
-    public TerminalNode CMD_Exit() {
-      return getToken(smtlibv2Parser.CMD_Exit, 0);
+  public static class CmdexitContext extends ParserRuleContext {
+    public TerminalNode CMDExit() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDExit, 0);
     }
 
-    public Cmd_exitContext(ParserRuleContext parent, int invokingState) {
+    public CmdexitContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_exit;
+      return RULEcmdexit;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_exit(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdexit(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_exit(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdexit(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_exit(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdexit(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_exitContext cmd_exit() throws RecognitionException {
-    Cmd_exitContext _localctx = new Cmd_exitContext(_ctx, getState());
-    enterRule(_localctx, 112, RULE_cmd_exit);
+  public final CmdexitContext cmdexit() throws RecognitionException {
+    CmdexitContext local_ctx = new CmdexitContext(_ctx, getState());
+    enterRule(local_ctx, 112, RULEcmdexit);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(744);
-        match(CMD_Exit);
+        match(CMDExit);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getAssertionsContext extends ParserRuleContext {
-    public TerminalNode CMD_GetAssertions() {
-      return getToken(smtlibv2Parser.CMD_GetAssertions, 0);
+  public static class CmdgetAssertionsContext extends ParserRuleContext {
+    public TerminalNode CMDGetAssertions() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetAssertions, 0);
     }
 
-    public Cmd_getAssertionsContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetAssertionsContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getAssertions;
+      return RULEcmdgetAssertions;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getAssertions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetAssertions(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getAssertions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdgetAssertions(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getAssertions(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetAssertions(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getAssertionsContext cmd_getAssertions() throws RecognitionException {
-    Cmd_getAssertionsContext _localctx = new Cmd_getAssertionsContext(_ctx, getState());
-    enterRule(_localctx, 114, RULE_cmd_getAssertions);
+  public final CmdgetAssertionsContext cmdgetAssertions() throws RecognitionException {
+    CmdgetAssertionsContext local_ctx = new CmdgetAssertionsContext(_ctx, getState());
+    enterRule(local_ctx, 114, RULEcmdgetAssertions);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(746);
-        match(CMD_GetAssertions);
+        match(CMDGetAssertions);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getAssignmentContext extends ParserRuleContext {
-    public TerminalNode CMD_GetAssignment() {
-      return getToken(smtlibv2Parser.CMD_GetAssignment, 0);
+  public static class CmdgetAssignmentContext extends ParserRuleContext {
+    public TerminalNode CMDGetAssignment() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetAssignment, 0);
     }
 
-    public Cmd_getAssignmentContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetAssignmentContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getAssignment;
+      return RULEcmdgetAssignment;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getAssignment(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetAssignment(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getAssignment(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdgetAssignment(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getAssignment(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetAssignment(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getAssignmentContext cmd_getAssignment() throws RecognitionException {
-    Cmd_getAssignmentContext _localctx = new Cmd_getAssignmentContext(_ctx, getState());
-    enterRule(_localctx, 116, RULE_cmd_getAssignment);
+  public final CmdgetAssignmentContext cmdgetAssignment() throws RecognitionException {
+    CmdgetAssignmentContext local_ctx = new CmdgetAssignmentContext(_ctx, getState());
+    enterRule(local_ctx, 116, RULEcmdgetAssignment);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(748);
-        match(CMD_GetAssignment);
+        match(CMDGetAssignment);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getInfoContext extends ParserRuleContext {
-    public TerminalNode CMD_GetInfo() {
-      return getToken(smtlibv2Parser.CMD_GetInfo, 0);
+  public static class CmdgetInfoContext extends ParserRuleContext {
+    public TerminalNode CMDGetInfo() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetInfo, 0);
     }
 
-    public Info_flagContext info_flag() {
-      return getRuleContext(Info_flagContext.class, 0);
+    public InfoflagContext infoflag() {
+      return getRuleContext(InfoflagContext.class, 0);
     }
 
-    public Cmd_getInfoContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetInfoContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getInfo;
+      return RULEcmdgetInfo;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdgetInfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_getInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdgetInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getInfo(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetInfo(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getInfoContext cmd_getInfo() throws RecognitionException {
-    Cmd_getInfoContext _localctx = new Cmd_getInfoContext(_ctx, getState());
-    enterRule(_localctx, 118, RULE_cmd_getInfo);
+  public final CmdgetInfoContext cmdgetInfo() throws RecognitionException {
+    CmdgetInfoContext local_ctx = new CmdgetInfoContext(_ctx, getState());
+    enterRule(local_ctx, 118, RULEcmdgetInfo);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(750);
-        match(CMD_GetInfo);
+        match(CMDGetInfo);
         setState(751);
-        info_flag();
+        infoflag();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getModelContext extends ParserRuleContext {
-    public TerminalNode CMD_GetModel() {
-      return getToken(smtlibv2Parser.CMD_GetModel, 0);
+  public static class CmdgetModelContext extends ParserRuleContext {
+    public TerminalNode CMDGetModel() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetModel, 0);
     }
 
-    public Cmd_getModelContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetModelContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getModel;
+      return RULEcmdgetModel;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getModel(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetModel(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getModel(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdgetModel(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getModel(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetModel(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getModelContext cmd_getModel() throws RecognitionException {
-    Cmd_getModelContext _localctx = new Cmd_getModelContext(_ctx, getState());
-    enterRule(_localctx, 120, RULE_cmd_getModel);
+  public final CmdgetModelContext cmdgetModel() throws RecognitionException {
+    CmdgetModelContext local_ctx = new CmdgetModelContext(_ctx, getState());
+    enterRule(local_ctx, 120, RULEcmdgetModel);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(753);
-        match(CMD_GetModel);
+        match(CMDGetModel);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getOptionContext extends ParserRuleContext {
-    public TerminalNode CMD_GetOption() {
-      return getToken(smtlibv2Parser.CMD_GetOption, 0);
+  public static class CmdgetOptionContext extends ParserRuleContext {
+    public TerminalNode CMDGetOption() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetOption, 0);
     }
 
     public KeywordContext keyword() {
       return getRuleContext(KeywordContext.class, 0);
     }
 
-    public Cmd_getOptionContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetOptionContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getOption;
+      return RULEcmdgetOption;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getOption(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetOption(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getOption(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdgetOption(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getOption(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetOption(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getOptionContext cmd_getOption() throws RecognitionException {
-    Cmd_getOptionContext _localctx = new Cmd_getOptionContext(_ctx, getState());
-    enterRule(_localctx, 122, RULE_cmd_getOption);
+  public final CmdgetOptionContext cmdgetOption() throws RecognitionException {
+    CmdgetOptionContext local_ctx = new CmdgetOptionContext(_ctx, getState());
+    enterRule(local_ctx, 122, RULEcmdgetOption);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(755);
-        match(CMD_GetOption);
+        match(CMDGetOption);
         setState(756);
         keyword();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getProofContext extends ParserRuleContext {
-    public TerminalNode CMD_GetProof() {
-      return getToken(smtlibv2Parser.CMD_GetProof, 0);
+  public static class CmdgetProofContext extends ParserRuleContext {
+    public TerminalNode CMDGetProof() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetProof, 0);
     }
 
-    public Cmd_getProofContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetProofContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getProof;
+      return RULEcmdgetProof;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getProof(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetProof(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getProof(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdgetProof(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getProof(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetProof(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getProofContext cmd_getProof() throws RecognitionException {
-    Cmd_getProofContext _localctx = new Cmd_getProofContext(_ctx, getState());
-    enterRule(_localctx, 124, RULE_cmd_getProof);
+  public final CmdgetProofContext cmdgetProof() throws RecognitionException {
+    CmdgetProofContext local_ctx = new CmdgetProofContext(_ctx, getState());
+    enterRule(local_ctx, 124, RULEcmdgetProof);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(758);
-        match(CMD_GetProof);
+        match(CMDGetProof);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getUnsatAssumptionsContext extends ParserRuleContext {
-    public TerminalNode CMD_GetUnsatAssumptions() {
-      return getToken(smtlibv2Parser.CMD_GetUnsatAssumptions, 0);
+  public static class CmdgetUnsatAssumptionsContext extends ParserRuleContext {
+    public TerminalNode CMDGetUnsatAssumptions() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetUnsatAssumptions,
+          0);
     }
 
-    public Cmd_getUnsatAssumptionsContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetUnsatAssumptionsContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getUnsatAssumptions;
+      return RULEcmdgetUnsatAssumptions;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getUnsatAssumptions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetUnsatAssumptions(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getUnsatAssumptions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdgetUnsatAssumptions(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getUnsatAssumptions(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetUnsatAssumptions(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getUnsatAssumptionsContext cmd_getUnsatAssumptions()
-      throws RecognitionException {
-    Cmd_getUnsatAssumptionsContext _localctx = new Cmd_getUnsatAssumptionsContext(_ctx, getState());
-    enterRule(_localctx, 126, RULE_cmd_getUnsatAssumptions);
+  public final CmdgetUnsatAssumptionsContext cmdgetUnsatAssumptions() throws RecognitionException {
+    CmdgetUnsatAssumptionsContext local_ctx = new CmdgetUnsatAssumptionsContext(_ctx, getState());
+    enterRule(local_ctx, 126, RULEcmdgetUnsatAssumptions);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(760);
-        match(CMD_GetUnsatAssumptions);
+        match(CMDGetUnsatAssumptions);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getUnsatCoreContext extends ParserRuleContext {
-    public TerminalNode CMD_GetUnsatCore() {
-      return getToken(smtlibv2Parser.CMD_GetUnsatCore, 0);
+  public static class CmdgetUnsatCoreContext extends ParserRuleContext {
+    public TerminalNode CMDGetUnsatCore() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetUnsatCore, 0);
     }
 
-    public Cmd_getUnsatCoreContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetUnsatCoreContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getUnsatCore;
+      return RULEcmdgetUnsatCore;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getUnsatCore(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetUnsatCore(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getUnsatCore(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdgetUnsatCore(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getUnsatCore(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetUnsatCore(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getUnsatCoreContext cmd_getUnsatCore() throws RecognitionException {
-    Cmd_getUnsatCoreContext _localctx = new Cmd_getUnsatCoreContext(_ctx, getState());
-    enterRule(_localctx, 128, RULE_cmd_getUnsatCore);
+  public final CmdgetUnsatCoreContext cmdgetUnsatCore() throws RecognitionException {
+    CmdgetUnsatCoreContext local_ctx = new CmdgetUnsatCoreContext(_ctx, getState());
+    enterRule(local_ctx, 128, RULEcmdgetUnsatCore);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(762);
-        match(CMD_GetUnsatCore);
+        match(CMDGetUnsatCore);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_getValueContext extends ParserRuleContext {
-    public TerminalNode CMD_GetValue() {
-      return getToken(smtlibv2Parser.CMD_GetValue, 0);
+  public static class CmdgetValueContext extends ParserRuleContext {
+    public TerminalNode CMDGetValue() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDGetValue, 0);
     }
 
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<TermContext> term() {
@@ -8563,49 +8627,48 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(TermContext.class, i);
     }
 
-    public Cmd_getValueContext(ParserRuleContext parent, int invokingState) {
+    public CmdgetValueContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_getValue;
+      return RULEcmdgetValue;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_getValue(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdgetValue(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_getValue(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdgetValue(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_getValue(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdgetValue(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_getValueContext cmd_getValue() throws RecognitionException {
-    Cmd_getValueContext _localctx = new Cmd_getValueContext(_ctx, getState());
-    enterRule(_localctx, 130, RULE_cmd_getValue);
-    int _la;
+  public final CmdgetValueContext cmdgetValue() throws RecognitionException {
+    CmdgetValueContext local_ctx = new CmdgetValueContext(_ctx, getState());
+    enterRule(local_ctx, 130, RULEcmdgetValue);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(764);
-        match(CMD_GetValue);
+        match(CMDGetValue);
         setState(765);
         match(ParOpen);
         setState(767);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
@@ -8615,421 +8678,423 @@ public class smtlibv2Parser extends Parser {
           }
           setState(769);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-            || ((((_la - 66)) & ~0x3f) == 0 && ((1L << (_la - 66)) & 144115188075864079L) != 0));
+          la = _input.LA(1);
+        } while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+            || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 144115188075864079L) != 0));
         setState(771);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_popContext extends ParserRuleContext {
-    public TerminalNode CMD_Pop() {
-      return getToken(smtlibv2Parser.CMD_Pop, 0);
+  public static class CmdpopContext extends ParserRuleContext {
+    public TerminalNode CMDPop() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDPop, 0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Cmd_popContext(ParserRuleContext parent, int invokingState) {
+    public CmdpopContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_pop;
+      return RULEcmdpop;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_pop(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdpop(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_pop(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdpop(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_pop(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdpop(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_popContext cmd_pop() throws RecognitionException {
-    Cmd_popContext _localctx = new Cmd_popContext(_ctx, getState());
-    enterRule(_localctx, 132, RULE_cmd_pop);
+  public final CmdpopContext cmdpop() throws RecognitionException {
+    CmdpopContext local_ctx = new CmdpopContext(_ctx, getState());
+    enterRule(local_ctx, 132, RULEcmdpop);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(773);
-        match(CMD_Pop);
+        match(CMDPop);
         setState(774);
         numeral();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_pushContext extends ParserRuleContext {
-    public TerminalNode CMD_Push() {
-      return getToken(smtlibv2Parser.CMD_Push, 0);
+  public static class CmdpushContext extends ParserRuleContext {
+    public TerminalNode CMDPush() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDPush, 0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Cmd_pushContext(ParserRuleContext parent, int invokingState) {
+    public CmdpushContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_push;
+      return RULEcmdpush;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_push(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdpush(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_push(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdpush(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_push(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdpush(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_pushContext cmd_push() throws RecognitionException {
-    Cmd_pushContext _localctx = new Cmd_pushContext(_ctx, getState());
-    enterRule(_localctx, 134, RULE_cmd_push);
+  public final CmdpushContext cmdpush() throws RecognitionException {
+    CmdpushContext local_ctx = new CmdpushContext(_ctx, getState());
+    enterRule(local_ctx, 134, RULEcmdpush);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(776);
-        match(CMD_Push);
+        match(CMDPush);
         setState(777);
         numeral();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_resetContext extends ParserRuleContext {
-    public TerminalNode CMD_Reset() {
-      return getToken(smtlibv2Parser.CMD_Reset, 0);
+  public static class CmdresetContext extends ParserRuleContext {
+    public TerminalNode CMDReset() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDReset, 0);
     }
 
-    public Cmd_resetContext(ParserRuleContext parent, int invokingState) {
+    public CmdresetContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_reset;
+      return RULEcmdreset;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCmd_reset(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdreset(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_reset(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdreset(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_reset(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdreset(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_resetContext cmd_reset() throws RecognitionException {
-    Cmd_resetContext _localctx = new Cmd_resetContext(_ctx, getState());
-    enterRule(_localctx, 136, RULE_cmd_reset);
+  public final CmdresetContext cmdreset() throws RecognitionException {
+    CmdresetContext local_ctx = new CmdresetContext(_ctx, getState());
+    enterRule(local_ctx, 136, RULEcmdreset);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(779);
-        match(CMD_Reset);
+        match(CMDReset);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_resetAssertionsContext extends ParserRuleContext {
-    public TerminalNode CMD_ResetAssertions() {
-      return getToken(smtlibv2Parser.CMD_ResetAssertions, 0);
+  public static class CmdresetAssertionsContext extends ParserRuleContext {
+    public TerminalNode CMDResetAssertions() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDResetAssertions, 0);
     }
 
-    public Cmd_resetAssertionsContext(ParserRuleContext parent, int invokingState) {
+    public CmdresetAssertionsContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_resetAssertions;
+      return RULEcmdresetAssertions;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_resetAssertions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdresetAssertions(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_resetAssertions(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdresetAssertions(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_resetAssertions(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdresetAssertions(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_resetAssertionsContext cmd_resetAssertions() throws RecognitionException {
-    Cmd_resetAssertionsContext _localctx = new Cmd_resetAssertionsContext(_ctx, getState());
-    enterRule(_localctx, 138, RULE_cmd_resetAssertions);
+  public final CmdresetAssertionsContext cmdresetAssertions() throws RecognitionException {
+    CmdresetAssertionsContext local_ctx = new CmdresetAssertionsContext(_ctx, getState());
+    enterRule(local_ctx, 138, RULEcmdresetAssertions);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(781);
-        match(CMD_ResetAssertions);
+        match(CMDResetAssertions);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_setInfoContext extends ParserRuleContext {
-    public TerminalNode CMD_SetInfo() {
-      return getToken(smtlibv2Parser.CMD_SetInfo, 0);
+  public static class CmdsetInfoContext extends ParserRuleContext {
+    public TerminalNode CMDSetInfo() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDSetInfo, 0);
     }
 
     public AttributeContext attribute() {
       return getRuleContext(AttributeContext.class, 0);
     }
 
-    public Cmd_setInfoContext(ParserRuleContext parent, int invokingState) {
+    public CmdsetInfoContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_setInfo;
+      return RULEcmdsetInfo;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_setInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmdsetInfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCmd_setInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdsetInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_setInfo(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdsetInfo(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_setInfoContext cmd_setInfo() throws RecognitionException {
-    Cmd_setInfoContext _localctx = new Cmd_setInfoContext(_ctx, getState());
-    enterRule(_localctx, 140, RULE_cmd_setInfo);
+  public final CmdsetInfoContext cmdsetInfo() throws RecognitionException {
+    CmdsetInfoContext local_ctx = new CmdsetInfoContext(_ctx, getState());
+    enterRule(local_ctx, 140, RULEcmdsetInfo);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(783);
-        match(CMD_SetInfo);
+        match(CMDSetInfo);
         setState(784);
         attribute();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_setLogicContext extends ParserRuleContext {
-    public TerminalNode CMD_SetLogic() {
-      return getToken(smtlibv2Parser.CMD_SetLogic, 0);
+  public static class CmdsetLogicContext extends ParserRuleContext {
+    public TerminalNode CMDSetLogic() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDSetLogic, 0);
     }
 
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public Cmd_setLogicContext(ParserRuleContext parent, int invokingState) {
+    public CmdsetLogicContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_setLogic;
+      return RULEcmdsetLogic;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_setLogic(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdsetLogic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_setLogic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmdsetLogic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_setLogic(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdsetLogic(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_setLogicContext cmd_setLogic() throws RecognitionException {
-    Cmd_setLogicContext _localctx = new Cmd_setLogicContext(_ctx, getState());
-    enterRule(_localctx, 142, RULE_cmd_setLogic);
+  public final CmdsetLogicContext cmdsetLogic() throws RecognitionException {
+    CmdsetLogicContext local_ctx = new CmdsetLogicContext(_ctx, getState());
+    enterRule(local_ctx, 142, RULEcmdsetLogic);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(786);
-        match(CMD_SetLogic);
+        match(CMDSetLogic);
         setState(787);
         symbol();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Cmd_setOptionContext extends ParserRuleContext {
-    public TerminalNode CMD_SetOption() {
-      return getToken(smtlibv2Parser.CMD_SetOption, 0);
+  public static class CmdsetOptionContext extends ParserRuleContext {
+    public TerminalNode CMDSetOption() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CMDSetOption, 0);
     }
 
     public OptionContext option() {
       return getRuleContext(OptionContext.class, 0);
     }
 
-    public Cmd_setOptionContext(ParserRuleContext parent, int invokingState) {
+    public CmdsetOptionContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_cmd_setOption;
+      return RULEcmdsetOption;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCmd_setOption(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCmdsetOption(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCmd_setOption(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitCmdsetOption(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCmd_setOption(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCmdsetOption(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Cmd_setOptionContext cmd_setOption() throws RecognitionException {
-    Cmd_setOptionContext _localctx = new Cmd_setOptionContext(_ctx, getState());
-    enterRule(_localctx, 144, RULE_cmd_setOption);
+  public final CmdsetOptionContext cmdsetOption() throws RecognitionException {
+    CmdsetOptionContext local_ctx = new CmdsetOptionContext(_ctx, getState());
+    enterRule(local_ctx, 144, RULEcmdsetOption);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(789);
-        match(CMD_SetOption);
+        match(CMDSetOption);
         setState(790);
         option();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -9040,120 +9105,120 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_command;
+      return RULEcommand;
     }
 
     public CommandContext() {}
 
-    public void copyFrom(CommandContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(CommandContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_modelContext extends CommandContext {
+  public static class GetmodelContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getModelContext cmd_getModel() {
-      return getRuleContext(Cmd_getModelContext.class, 0);
+    public CmdgetModelContext cmdgetModel() {
+      return getRuleContext(CmdgetModelContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_modelContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetmodelContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_model(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetmodel(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_model(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetmodel(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_model(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetmodel(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Decl_datasContext extends CommandContext {
+  public static class DecldatasContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_declareDatatypesContext cmd_declareDatatypes() {
-      return getRuleContext(Cmd_declareDatatypesContext.class, 0);
+    public CmddeclareDatatypesContext cmddeclareDatatypes() {
+      return getRuleContext(CmddeclareDatatypesContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Decl_datasContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DecldatasContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecl_datas(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecldatas(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecl_datas(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecldatas(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecl_datas(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDecldatas(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Decl_sortContext extends CommandContext {
+  public static class DeclsortContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_declareSortContext cmd_declareSort() {
-      return getRuleContext(Cmd_declareSortContext.class, 0);
+    public CmddeclareSortContext cmddeclareSort() {
+      return getRuleContext(CmddeclareSortContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Decl_sortContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeclsortContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecl_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeclsort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecl_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeclsort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecl_sort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeclsort(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9161,109 +9226,109 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class EchoContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_echoContext cmd_echo() {
-      return getRuleContext(Cmd_echoContext.class, 0);
+    public CmdechoContext cmdecho() {
+      return getRuleContext(CmdechoContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public EchoContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public EchoContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterEcho(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterEcho(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitEcho(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitEcho(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitEcho(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitEcho(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_unsat_assumeContext extends CommandContext {
+  public static class GetunsatassumeContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getUnsatAssumptionsContext cmd_getUnsatAssumptions() {
-      return getRuleContext(Cmd_getUnsatAssumptionsContext.class, 0);
+    public CmdgetUnsatAssumptionsContext cmdgetUnsatAssumptions() {
+      return getRuleContext(CmdgetUnsatAssumptionsContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_unsat_assumeContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetunsatassumeContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetunsatassume(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetunsatassume(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_assume(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetunsatassume(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Decl_dataContext extends CommandContext {
+  public static class DecldataContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_declareDatatypeContext cmd_declareDatatype() {
-      return getRuleContext(Cmd_declareDatatypeContext.class, 0);
+    public CmddeclareDatatypeContext cmddeclareDatatype() {
+      return getRuleContext(CmddeclareDatatypeContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Decl_dataContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DecldataContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecl_data(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecldata(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecl_data(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecldata(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecl_data(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDecldata(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9271,71 +9336,71 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class PopContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_popContext cmd_pop() {
-      return getRuleContext(Cmd_popContext.class, 0);
+    public CmdpopContext cmdpop() {
+      return getRuleContext(CmdpopContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public PopContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public PopContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterPop(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPop(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitPop(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPop(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPop(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPop(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Def_sortContext extends CommandContext {
+  public static class DefsortContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineSortContext cmd_defineSort() {
-      return getRuleContext(Cmd_defineSortContext.class, 0);
+    public CmddefineSortContext cmddefineSort() {
+      return getRuleContext(CmddefineSortContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Def_sortContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DefsortContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDef_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDefsort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDef_sort(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDefsort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDef_sort(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDefsort(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9343,292 +9408,289 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class AssertContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_assertContext cmd_assert() {
-      return getRuleContext(Cmd_assertContext.class, 0);
+    public CmdassertContext cmdassert() {
+      return getRuleContext(CmdassertContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public AssertContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public AssertContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAssert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAssert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAssert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAssert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAssert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAssert(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Def_fun_recContext extends CommandContext {
+  public static class DeffunrecContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunRecContext cmd_defineFunRec() {
-      return getRuleContext(Cmd_defineFunRecContext.class, 0);
+    public CmddefineFunRecContext cmddefineFunRec() {
+      return getRuleContext(CmddefineFunRecContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Def_fun_recContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeffunrecContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterDef_fun_rec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeffunrec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDef_fun_rec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeffunrec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDef_fun_rec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeffunrec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Def_funContext extends CommandContext {
+  public static class DeffunContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunContext cmd_defineFun() {
-      return getRuleContext(Cmd_defineFunContext.class, 0);
+    public CmddefineFunContext cmddefineFun() {
+      return getRuleContext(CmddefineFunContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Def_funContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeffunContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDef_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeffun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDef_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeffun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDef_fun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeffun(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_assertContext extends CommandContext {
+  public static class GetassertContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getAssertionsContext cmd_getAssertions() {
-      return getRuleContext(Cmd_getAssertionsContext.class, 0);
+    public CmdgetAssertionsContext cmdgetAssertions() {
+      return getRuleContext(CmdgetAssertionsContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_assertContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetassertContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetassert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetassert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_assert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetassert(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Decl_constContext extends CommandContext {
+  public static class DeclconstContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_declareConstContext cmd_declareConst() {
-      return getRuleContext(Cmd_declareConstContext.class, 0);
+    public CmddeclareConstContext cmddeclareConst() {
+      return getRuleContext(CmddeclareConstContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Decl_constContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeclconstContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecl_const(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeclconst(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecl_const(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeclconst(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecl_const(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeclconst(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Set_logicContext extends CommandContext {
+  public static class SetlogicContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_setLogicContext cmd_setLogic() {
-      return getRuleContext(Cmd_setLogicContext.class, 0);
+    public CmdsetLogicContext cmdsetLogic() {
+      return getRuleContext(CmdsetLogicContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Set_logicContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public SetlogicContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSet_logic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSetlogic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSet_logic(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSetlogic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSet_logic(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSetlogic(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Check_assumeContext extends CommandContext {
+  public static class CheckassumeContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_checkSatAssumingContext cmd_checkSatAssuming() {
-      return getRuleContext(Cmd_checkSatAssumingContext.class, 0);
+    public CmdcheckSatAssumingContext cmdcheckSatAssuming() {
+      return getRuleContext(CmdcheckSatAssumingContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Check_assumeContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public CheckassumeContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCheck_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterCheckassume(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCheck_assume(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCheckassume(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCheck_assume(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCheckassume(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Reset_assertContext extends CommandContext {
+  public static class ResetassertContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_resetAssertionsContext cmd_resetAssertions() {
-      return getRuleContext(Cmd_resetAssertionsContext.class, 0);
+    public CmdresetAssertionsContext cmdresetAssertions() {
+      return getRuleContext(CmdresetAssertionsContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Reset_assertContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public ResetassertContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterReset_assert(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterResetassert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitReset_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResetassert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitReset_assert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitResetassert(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9636,71 +9698,71 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class CheckContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_checkSatContext cmd_checkSat() {
-      return getRuleContext(Cmd_checkSatContext.class, 0);
+    public CmdcheckSatContext cmdcheckSat() {
+      return getRuleContext(CmdcheckSatContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public CheckContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public CheckContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterCheck(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCheck(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitCheck(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCheck(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCheck(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitCheck(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_assignContext extends CommandContext {
+  public static class GetassignContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getAssignmentContext cmd_getAssignment() {
-      return getRuleContext(Cmd_getAssignmentContext.class, 0);
+    public CmdgetAssignmentContext cmdgetAssignment() {
+      return getRuleContext(CmdgetAssignmentContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_assignContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetassignContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_assign(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetassign(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_assign(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetassign(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_assign(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetassign(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9708,73 +9770,71 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class PushContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_pushContext cmd_push() {
-      return getRuleContext(Cmd_pushContext.class, 0);
+    public CmdpushContext cmdpush() {
+      return getRuleContext(CmdpushContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public PushContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public PushContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterPush(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPush(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitPush(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPush(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPush(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPush(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Def_funs_recContext extends CommandContext {
+  public static class DeffunsrecContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunsRecContext cmd_defineFunsRec() {
-      return getRuleContext(Cmd_defineFunsRecContext.class, 0);
+    public CmddefineFunsRecContext cmddefineFunsRec() {
+      return getRuleContext(CmddefineFunsRecContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Def_funs_recContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeffunsrecContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterDef_funs_rec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeffunsrec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitDef_funs_rec(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeffunsrec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDef_funs_rec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeffunsrec(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -9782,253 +9842,253 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class ExitContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_exitContext cmd_exit() {
-      return getRuleContext(Cmd_exitContext.class, 0);
+    public CmdexitContext cmdexit() {
+      return getRuleContext(CmdexitContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public ExitContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public ExitContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterExit(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterExit(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitExit(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitExit(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitExit(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitExit(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_optionContext extends CommandContext {
+  public static class GetoptionContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getOptionContext cmd_getOption() {
-      return getRuleContext(Cmd_getOptionContext.class, 0);
+    public CmdgetOptionContext cmdgetOption() {
+      return getRuleContext(CmdgetOptionContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_optionContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetoptionContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetoption(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetoption(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_option(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetoption(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_valContext extends CommandContext {
+  public static class GetvalContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getValueContext cmd_getValue() {
-      return getRuleContext(Cmd_getValueContext.class, 0);
+    public CmdgetValueContext cmdgetValue() {
+      return getRuleContext(CmdgetValueContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_valContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetvalContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetval(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_val(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetval(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_val(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetval(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Set_optionContext extends CommandContext {
+  public static class SetoptionContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_setOptionContext cmd_setOption() {
-      return getRuleContext(Cmd_setOptionContext.class, 0);
+    public CmdsetOptionContext cmdsetOption() {
+      return getRuleContext(CmdsetOptionContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Set_optionContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public SetoptionContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSet_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSetoption(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSet_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSetoption(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSet_option(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSetoption(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Decl_funContext extends CommandContext {
+  public static class DeclfunContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_declareFunContext cmd_declareFun() {
-      return getRuleContext(Cmd_declareFunContext.class, 0);
+    public CmddeclareFunContext cmddeclareFun() {
+      return getRuleContext(CmddeclareFunContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Decl_funContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public DeclfunContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDecl_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDeclfun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDecl_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDeclfun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDecl_fun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDeclfun(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_proofContext extends CommandContext {
+  public static class GetproofContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getProofContext cmd_getProof() {
-      return getRuleContext(Cmd_getProofContext.class, 0);
+    public CmdgetProofContext cmdgetProof() {
+      return getRuleContext(CmdgetProofContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_proofContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetproofContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_proof(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetproof(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_proof(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetproof(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_proof(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetproof(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_unsat_coreContext extends CommandContext {
+  public static class GetunsatcoreContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getUnsatCoreContext cmd_getUnsatCore() {
-      return getRuleContext(Cmd_getUnsatCoreContext.class, 0);
+    public CmdgetUnsatCoreContext cmdgetUnsatCore() {
+      return getRuleContext(CmdgetUnsatCoreContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_unsat_coreContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetunsatcoreContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetunsatcore(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetunsatcore(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_core(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetunsatcore(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -10036,71 +10096,71 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class ResetContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_resetContext cmd_reset() {
-      return getRuleContext(Cmd_resetContext.class, 0);
+    public CmdresetContext cmdreset() {
+      return getRuleContext(CmdresetContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public ResetContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public ResetContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterReset(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterReset(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitReset(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitReset(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitReset(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitReset(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_infoContext extends CommandContext {
+  public static class GetinfoContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_getInfoContext cmd_getInfo() {
-      return getRuleContext(Cmd_getInfoContext.class, 0);
+    public CmdgetInfoContext cmdgetInfo() {
+      return getRuleContext(CmdgetInfoContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Get_infoContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public GetinfoContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGet_info(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGetinfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGet_info(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGetinfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_info(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetinfo(this);
       else return visitor.visitChildren(this);
     }
   }
@@ -10108,464 +10168,464 @@ public class smtlibv2Parser extends Parser {
   @SuppressWarnings("CheckReturnValue")
   public static class SetInfoContext extends CommandContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_setInfoContext cmd_setInfo() {
-      return getRuleContext(Cmd_setInfoContext.class, 0);
+    public CmdsetInfoContext cmdsetInfo() {
+      return getRuleContext(CmdsetInfoContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public SetInfoContext(CommandContext ctx) {
-      copyFrom(ctx);
+    public SetInfoContext(CommandContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterSetInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSetInfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitSetInfo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSetInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitSetInfo(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitSetInfo(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final CommandContext command() throws RecognitionException {
-    CommandContext _localctx = new CommandContext(_ctx, getState());
-    enterRule(_localctx, 146, RULE_command);
+    CommandContext local_ctx = new CommandContext(_ctx, getState());
+    enterRule(local_ctx, 146, RULEcommand);
     try {
       setState(912);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 59, _ctx)) {
         case 1:
-          _localctx = new AssertContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new AssertContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(792);
             match(ParOpen);
             setState(793);
-            cmd_assert();
+            cmdassert();
             setState(794);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new CheckContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new CheckContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(796);
             match(ParOpen);
             setState(797);
-            cmd_checkSat();
+            cmdcheckSat();
             setState(798);
             match(ParClose);
           }
           break;
         case 3:
-          _localctx = new Check_assumeContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new CheckassumeContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(800);
             match(ParOpen);
             setState(801);
-            cmd_checkSatAssuming();
+            cmdcheckSatAssuming();
             setState(802);
             match(ParClose);
           }
           break;
         case 4:
-          _localctx = new Decl_constContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new DeclconstContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(804);
             match(ParOpen);
             setState(805);
-            cmd_declareConst();
+            cmddeclareConst();
             setState(806);
             match(ParClose);
           }
           break;
         case 5:
-          _localctx = new Decl_dataContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new DecldataContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(808);
             match(ParOpen);
             setState(809);
-            cmd_declareDatatype();
+            cmddeclareDatatype();
             setState(810);
             match(ParClose);
           }
           break;
         case 6:
-          _localctx = new Decl_datasContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new DecldatasContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(812);
             match(ParOpen);
             setState(813);
-            cmd_declareDatatypes();
+            cmddeclareDatatypes();
             setState(814);
             match(ParClose);
           }
           break;
         case 7:
-          _localctx = new Decl_funContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new DeclfunContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(816);
             match(ParOpen);
             setState(817);
-            cmd_declareFun();
+            cmddeclareFun();
             setState(818);
             match(ParClose);
           }
           break;
         case 8:
-          _localctx = new Decl_sortContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new DeclsortContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(820);
             match(ParOpen);
             setState(821);
-            cmd_declareSort();
+            cmddeclareSort();
             setState(822);
             match(ParClose);
           }
           break;
         case 9:
-          _localctx = new Def_funContext(_localctx);
-          enterOuterAlt(_localctx, 9);
+          local_ctx = new DeffunContext(local_ctx);
+          enterOuterAlt(local_ctx, 9);
           {
             setState(824);
             match(ParOpen);
             setState(825);
-            cmd_defineFun();
+            cmddefineFun();
             setState(826);
             match(ParClose);
           }
           break;
         case 10:
-          _localctx = new Def_fun_recContext(_localctx);
-          enterOuterAlt(_localctx, 10);
+          local_ctx = new DeffunrecContext(local_ctx);
+          enterOuterAlt(local_ctx, 10);
           {
             setState(828);
             match(ParOpen);
             setState(829);
-            cmd_defineFunRec();
+            cmddefineFunRec();
             setState(830);
             match(ParClose);
           }
           break;
         case 11:
-          _localctx = new Def_funs_recContext(_localctx);
-          enterOuterAlt(_localctx, 11);
+          local_ctx = new DeffunsrecContext(local_ctx);
+          enterOuterAlt(local_ctx, 11);
           {
             setState(832);
             match(ParOpen);
             setState(833);
-            cmd_defineFunsRec();
+            cmddefineFunsRec();
             setState(834);
             match(ParClose);
           }
           break;
         case 12:
-          _localctx = new Def_sortContext(_localctx);
-          enterOuterAlt(_localctx, 12);
+          local_ctx = new DefsortContext(local_ctx);
+          enterOuterAlt(local_ctx, 12);
           {
             setState(836);
             match(ParOpen);
             setState(837);
-            cmd_defineSort();
+            cmddefineSort();
             setState(838);
             match(ParClose);
           }
           break;
         case 13:
-          _localctx = new EchoContext(_localctx);
-          enterOuterAlt(_localctx, 13);
+          local_ctx = new EchoContext(local_ctx);
+          enterOuterAlt(local_ctx, 13);
           {
             setState(840);
             match(ParOpen);
             setState(841);
-            cmd_echo();
+            cmdecho();
             setState(842);
             match(ParClose);
           }
           break;
         case 14:
-          _localctx = new ExitContext(_localctx);
-          enterOuterAlt(_localctx, 14);
+          local_ctx = new ExitContext(local_ctx);
+          enterOuterAlt(local_ctx, 14);
           {
             setState(844);
             match(ParOpen);
             setState(845);
-            cmd_exit();
+            cmdexit();
             setState(846);
             match(ParClose);
           }
           break;
         case 15:
-          _localctx = new Get_assertContext(_localctx);
-          enterOuterAlt(_localctx, 15);
+          local_ctx = new GetassertContext(local_ctx);
+          enterOuterAlt(local_ctx, 15);
           {
             setState(848);
             match(ParOpen);
             setState(849);
-            cmd_getAssertions();
+            cmdgetAssertions();
             setState(850);
             match(ParClose);
           }
           break;
         case 16:
-          _localctx = new Get_assignContext(_localctx);
-          enterOuterAlt(_localctx, 16);
+          local_ctx = new GetassignContext(local_ctx);
+          enterOuterAlt(local_ctx, 16);
           {
             setState(852);
             match(ParOpen);
             setState(853);
-            cmd_getAssignment();
+            cmdgetAssignment();
             setState(854);
             match(ParClose);
           }
           break;
         case 17:
-          _localctx = new Get_infoContext(_localctx);
-          enterOuterAlt(_localctx, 17);
+          local_ctx = new GetinfoContext(local_ctx);
+          enterOuterAlt(local_ctx, 17);
           {
             setState(856);
             match(ParOpen);
             setState(857);
-            cmd_getInfo();
+            cmdgetInfo();
             setState(858);
             match(ParClose);
           }
           break;
         case 18:
-          _localctx = new Get_modelContext(_localctx);
-          enterOuterAlt(_localctx, 18);
+          local_ctx = new GetmodelContext(local_ctx);
+          enterOuterAlt(local_ctx, 18);
           {
             setState(860);
             match(ParOpen);
             setState(861);
-            cmd_getModel();
+            cmdgetModel();
             setState(862);
             match(ParClose);
           }
           break;
         case 19:
-          _localctx = new Get_optionContext(_localctx);
-          enterOuterAlt(_localctx, 19);
+          local_ctx = new GetoptionContext(local_ctx);
+          enterOuterAlt(local_ctx, 19);
           {
             setState(864);
             match(ParOpen);
             setState(865);
-            cmd_getOption();
+            cmdgetOption();
             setState(866);
             match(ParClose);
           }
           break;
         case 20:
-          _localctx = new Get_proofContext(_localctx);
-          enterOuterAlt(_localctx, 20);
+          local_ctx = new GetproofContext(local_ctx);
+          enterOuterAlt(local_ctx, 20);
           {
             setState(868);
             match(ParOpen);
             setState(869);
-            cmd_getProof();
+            cmdgetProof();
             setState(870);
             match(ParClose);
           }
           break;
         case 21:
-          _localctx = new Get_unsat_assumeContext(_localctx);
-          enterOuterAlt(_localctx, 21);
+          local_ctx = new GetunsatassumeContext(local_ctx);
+          enterOuterAlt(local_ctx, 21);
           {
             setState(872);
             match(ParOpen);
             setState(873);
-            cmd_getUnsatAssumptions();
+            cmdgetUnsatAssumptions();
             setState(874);
             match(ParClose);
           }
           break;
         case 22:
-          _localctx = new Get_unsat_coreContext(_localctx);
-          enterOuterAlt(_localctx, 22);
+          local_ctx = new GetunsatcoreContext(local_ctx);
+          enterOuterAlt(local_ctx, 22);
           {
             setState(876);
             match(ParOpen);
             setState(877);
-            cmd_getUnsatCore();
+            cmdgetUnsatCore();
             setState(878);
             match(ParClose);
           }
           break;
         case 23:
-          _localctx = new Get_valContext(_localctx);
-          enterOuterAlt(_localctx, 23);
+          local_ctx = new GetvalContext(local_ctx);
+          enterOuterAlt(local_ctx, 23);
           {
             setState(880);
             match(ParOpen);
             setState(881);
-            cmd_getValue();
+            cmdgetValue();
             setState(882);
             match(ParClose);
           }
           break;
         case 24:
-          _localctx = new PopContext(_localctx);
-          enterOuterAlt(_localctx, 24);
+          local_ctx = new PopContext(local_ctx);
+          enterOuterAlt(local_ctx, 24);
           {
             setState(884);
             match(ParOpen);
             setState(885);
-            cmd_pop();
+            cmdpop();
             setState(886);
             match(ParClose);
           }
           break;
         case 25:
-          _localctx = new PushContext(_localctx);
-          enterOuterAlt(_localctx, 25);
+          local_ctx = new PushContext(local_ctx);
+          enterOuterAlt(local_ctx, 25);
           {
             setState(888);
             match(ParOpen);
             setState(889);
-            cmd_push();
+            cmdpush();
             setState(890);
             match(ParClose);
           }
           break;
         case 26:
-          _localctx = new ResetContext(_localctx);
-          enterOuterAlt(_localctx, 26);
+          local_ctx = new ResetContext(local_ctx);
+          enterOuterAlt(local_ctx, 26);
           {
             setState(892);
             match(ParOpen);
             setState(893);
-            cmd_reset();
+            cmdreset();
             setState(894);
             match(ParClose);
           }
           break;
         case 27:
-          _localctx = new Reset_assertContext(_localctx);
-          enterOuterAlt(_localctx, 27);
+          local_ctx = new ResetassertContext(local_ctx);
+          enterOuterAlt(local_ctx, 27);
           {
             setState(896);
             match(ParOpen);
             setState(897);
-            cmd_resetAssertions();
+            cmdresetAssertions();
             setState(898);
             match(ParClose);
           }
           break;
         case 28:
-          _localctx = new SetInfoContext(_localctx);
-          enterOuterAlt(_localctx, 28);
+          local_ctx = new SetInfoContext(local_ctx);
+          enterOuterAlt(local_ctx, 28);
           {
             setState(900);
             match(ParOpen);
             setState(901);
-            cmd_setInfo();
+            cmdsetInfo();
             setState(902);
             match(ParClose);
           }
           break;
         case 29:
-          _localctx = new Set_logicContext(_localctx);
-          enterOuterAlt(_localctx, 29);
+          local_ctx = new SetlogicContext(local_ctx);
+          enterOuterAlt(local_ctx, 29);
           {
             setState(904);
             match(ParOpen);
             setState(905);
-            cmd_setLogic();
+            cmdsetLogic();
             setState(906);
             match(ParClose);
           }
           break;
         case 30:
-          _localctx = new Set_optionContext(_localctx);
-          enterOuterAlt(_localctx, 30);
+          local_ctx = new SetoptionContext(local_ctx);
+          enterOuterAlt(local_ctx, 30);
           {
             setState(908);
             match(ParOpen);
             setState(909);
-            cmd_setOption();
+            cmdsetOption();
             setState(910);
             match(ParClose);
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class B_valueContext extends ParserRuleContext {
-    public TerminalNode PS_True() {
-      return getToken(smtlibv2Parser.PS_True, 0);
+  public static class BvalueContext extends ParserRuleContext {
+    public TerminalNode PSTrue() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSTrue, 0);
     }
 
-    public TerminalNode PS_False() {
-      return getToken(smtlibv2Parser.PS_False, 0);
+    public TerminalNode PSFalse() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSFalse, 0);
     }
 
-    public B_valueContext(ParserRuleContext parent, int invokingState) {
+    public BvalueContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_b_value;
+      return RULEbvalue;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterB_value(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterBvalue(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitB_value(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitBvalue(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitB_value(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitBvalue(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final B_valueContext b_value() throws RecognitionException {
-    B_valueContext _localctx = new B_valueContext(_ctx, getState());
-    enterRule(_localctx, 148, RULE_b_value);
-    int _la;
+  public final BvalueContext bvalue() throws RecognitionException {
+    BvalueContext local_ctx = new BvalueContext(_ctx, getState());
+    enterRule(local_ctx, 148, RULEbvalue);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(914);
-        _la = _input.LA(1);
-        if (!(_la == PS_False || _la == PS_True)) {
+        la = _input.LA(1);
+        if (!(la == PSFalse || la == PSTrue)) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -10574,13 +10634,13 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -10591,650 +10651,680 @@ public class smtlibv2Parser extends Parser {
 
     @Override
     public int getRuleIndex() {
-      return RULE_option;
+      return RULEoption;
     }
 
     public OptionContext() {}
 
-    public void copyFrom(OptionContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(OptionContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Rand_seedContext extends OptionContext {
-    public TerminalNode PK_RandomSeed() {
-      return getToken(smtlibv2Parser.PK_RandomSeed, 0);
+  public static class RandseedContext extends OptionContext {
+    public TerminalNode PKRandomSeed() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKRandomSeed, 0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Rand_seedContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public RandseedContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterRand_seed(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRandseed(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitRand_seed(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRandseed(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitRand_seed(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRandseed(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class InteractiveContext extends OptionContext {
-    public TerminalNode PK_InteractiveMode() {
-      return getToken(smtlibv2Parser.PK_InteractiveMode, 0);
+    public TerminalNode PKInteractiveMode() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKInteractiveMode, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public InteractiveContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public InteractiveContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterInteractive(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterInteractive(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitInteractive(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInteractive(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInteractive(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInteractive(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class GlobalContext extends OptionContext {
-    public TerminalNode PK_GlobalDeclarations() {
-      return getToken(smtlibv2Parser.PK_GlobalDeclarations, 0);
+    public TerminalNode PKGlobalDeclarations() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKGlobalDeclarations, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public GlobalContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public GlobalContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterGlobal(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGlobal(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitGlobal(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGlobal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGlobal(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGlobal(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_assertContext extends OptionContext {
-    public TerminalNode PK_ProduceAssertions() {
-      return getToken(smtlibv2Parser.PK_ProduceAssertions, 0);
+  public static class ProdassertContext extends OptionContext {
+    public TerminalNode PKProduceAssertions() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceAssertions, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_assertContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdassertContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterProd_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProdassert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProd_assert(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProdassert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_assert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdassert(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Opt_attrContext extends OptionContext {
+  public static class OptattrContext extends OptionContext {
     public AttributeContext attribute() {
       return getRuleContext(AttributeContext.class, 0);
     }
 
-    public Opt_attrContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public OptattrContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterOpt_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterOptattr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitOpt_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitOptattr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitOpt_attr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitOptattr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class ReproContext extends OptionContext {
-    public TerminalNode PK_ReproducibleResourceLimit() {
-      return getToken(smtlibv2Parser.PK_ReproducibleResourceLimit, 0);
+    public TerminalNode PKReproducibleResourceLimit() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKReproducibleResourceLimit,
+          0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public ReproContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ReproContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterRepro(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRepro(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitRepro(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRepro(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitRepro(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRepro(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class VerboseContext extends OptionContext {
-    public TerminalNode PK_Verbosity() {
-      return getToken(smtlibv2Parser.PK_Verbosity, 0);
+    public TerminalNode PKVerbosity() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKVerbosity, 0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public VerboseContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public VerboseContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterVerbose(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterVerbose(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitVerbose(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVerbose(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitVerbose(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitVerbose(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Print_succContext extends OptionContext {
-    public TerminalNode PK_PrintSuccess() {
-      return getToken(smtlibv2Parser.PK_PrintSuccess, 0);
+  public static class PrintsuccContext extends OptionContext {
+    public TerminalNode PKPrintSuccess() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKPrintSuccess, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Print_succContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public PrintsuccContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterPrint_succ(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPrintsucc(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitPrint_succ(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPrintsucc(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitPrint_succ(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitPrintsucc(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_assignContext extends OptionContext {
-    public TerminalNode PK_ProduceAssignments() {
-      return getToken(smtlibv2Parser.PK_ProduceAssignments, 0);
+  public static class ProdassignContext extends OptionContext {
+    public TerminalNode PKProduceAssignments() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceAssignments, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_assignContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdassignContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterProd_assign(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProdassign(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProd_assign(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProdassign(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_assign(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdassign(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_unsat_assumeContext extends OptionContext {
-    public TerminalNode PK_ProduceUnsatAssumptions() {
-      return getToken(smtlibv2Parser.PK_ProduceUnsatAssumptions, 0);
+  public static class ProdunsatassumeContext extends OptionContext {
+    public TerminalNode PKProduceUnsatAssumptions() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKProduceUnsatAssumptions,
+          0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_unsat_assumeContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdunsatassumeContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterProd_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterProdunsatassume(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitProd_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitProdunsatassume(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_unsat_assume(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdunsatassume(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_unsat_coreContext extends OptionContext {
-    public TerminalNode PK_ProduceUnsatCores() {
-      return getToken(smtlibv2Parser.PK_ProduceUnsatCores, 0);
+  public static class ProdunsatcoreContext extends OptionContext {
+    public TerminalNode PKProduceUnsatCores() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceUnsatCores, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_unsat_coreContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdunsatcoreContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterProd_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterProdunsatcore(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitProd_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitProdunsatcore(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_unsat_core(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdunsatcore(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
   public static class DiagnoseContext extends OptionContext {
-    public TerminalNode PK_DiagnosticOutputChannel() {
-      return getToken(smtlibv2Parser.PK_DiagnosticOutputChannel, 0);
+    public TerminalNode PKDiagnosticOutputChannel() {
+      return getToken(
+          org.sosy_lab
+              .java_smt
+              .basicimpl
+              .parserInterpreter
+              .Smtlibv2Parser
+              .PKDiagnosticOutputChannel,
+          0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public DiagnoseContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public DiagnoseContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterDiagnose(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDiagnose(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitDiagnose(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDiagnose(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitDiagnose(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitDiagnose(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_proofsContext extends OptionContext {
-    public TerminalNode PK_ProduceProofs() {
-      return getToken(smtlibv2Parser.PK_ProduceProofs, 0);
+  public static class ProdproofsContext extends OptionContext {
+    public TerminalNode PKProduceProofs() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceProofs, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_proofsContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdproofsContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterProd_proofs(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProdproofs(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProd_proofs(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProdproofs(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_proofs(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdproofs(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Prod_modContext extends OptionContext {
-    public TerminalNode PK_ProduceModels() {
-      return getToken(smtlibv2Parser.PK_ProduceModels, 0);
+  public static class ProdmodContext extends OptionContext {
+    public TerminalNode PKProduceModels() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKProduceModels, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
-    public Prod_modContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public ProdmodContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterProd_mod(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProdmod(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitProd_mod(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProdmod(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitProd_mod(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitProdmod(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Reg_outContext extends OptionContext {
-    public TerminalNode PK_RegularOutputChannel() {
-      return getToken(smtlibv2Parser.PK_RegularOutputChannel, 0);
+  public static class RegoutContext extends OptionContext {
+    public TerminalNode PKRegularOutputChannel() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKRegularOutputChannel,
+          0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Reg_outContext(OptionContext ctx) {
-      copyFrom(ctx);
+    public RegoutContext(OptionContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterReg_out(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRegout(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitReg_out(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRegout(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitReg_out(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRegout(this);
       else return visitor.visitChildren(this);
     }
   }
 
   public final OptionContext option() throws RecognitionException {
-    OptionContext _localctx = new OptionContext(_ctx, getState());
-    enterRule(_localctx, 150, RULE_option);
+    OptionContext local_ctx = new OptionContext(_ctx, getState());
+    enterRule(local_ctx, 150, RULEoption);
     try {
       setState(945);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 60, _ctx)) {
         case 1:
-          _localctx = new DiagnoseContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new DiagnoseContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(916);
-            match(PK_DiagnosticOutputChannel);
+            match(PKDiagnosticOutputChannel);
             setState(917);
             string();
           }
           break;
         case 2:
-          _localctx = new GlobalContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new GlobalContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(918);
-            match(PK_GlobalDeclarations);
+            match(PKGlobalDeclarations);
             setState(919);
-            b_value();
+            bvalue();
           }
           break;
         case 3:
-          _localctx = new InteractiveContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new InteractiveContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(920);
-            match(PK_InteractiveMode);
+            match(PKInteractiveMode);
             setState(921);
-            b_value();
+            bvalue();
           }
           break;
         case 4:
-          _localctx = new Print_succContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new PrintsuccContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(922);
-            match(PK_PrintSuccess);
+            match(PKPrintSuccess);
             setState(923);
-            b_value();
+            bvalue();
           }
           break;
         case 5:
-          _localctx = new Prod_assertContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new ProdassertContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(924);
-            match(PK_ProduceAssertions);
+            match(PKProduceAssertions);
             setState(925);
-            b_value();
+            bvalue();
           }
           break;
         case 6:
-          _localctx = new Prod_assignContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new ProdassignContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(926);
-            match(PK_ProduceAssignments);
+            match(PKProduceAssignments);
             setState(927);
-            b_value();
+            bvalue();
           }
           break;
         case 7:
-          _localctx = new Prod_modContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new ProdmodContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(928);
-            match(PK_ProduceModels);
+            match(PKProduceModels);
             setState(929);
-            b_value();
+            bvalue();
           }
           break;
         case 8:
-          _localctx = new Prod_proofsContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new ProdproofsContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(930);
-            match(PK_ProduceProofs);
+            match(PKProduceProofs);
             setState(931);
-            b_value();
+            bvalue();
           }
           break;
         case 9:
-          _localctx = new Prod_unsat_assumeContext(_localctx);
-          enterOuterAlt(_localctx, 9);
+          local_ctx = new ProdunsatassumeContext(local_ctx);
+          enterOuterAlt(local_ctx, 9);
           {
             setState(932);
-            match(PK_ProduceUnsatAssumptions);
+            match(PKProduceUnsatAssumptions);
             setState(933);
-            b_value();
+            bvalue();
           }
           break;
         case 10:
-          _localctx = new Prod_unsat_coreContext(_localctx);
-          enterOuterAlt(_localctx, 10);
+          local_ctx = new ProdunsatcoreContext(local_ctx);
+          enterOuterAlt(local_ctx, 10);
           {
             setState(934);
-            match(PK_ProduceUnsatCores);
+            match(PKProduceUnsatCores);
             setState(935);
-            b_value();
+            bvalue();
           }
           break;
         case 11:
-          _localctx = new Rand_seedContext(_localctx);
-          enterOuterAlt(_localctx, 11);
+          local_ctx = new RandseedContext(local_ctx);
+          enterOuterAlt(local_ctx, 11);
           {
             setState(936);
-            match(PK_RandomSeed);
+            match(PKRandomSeed);
             setState(937);
             numeral();
           }
           break;
         case 12:
-          _localctx = new Reg_outContext(_localctx);
-          enterOuterAlt(_localctx, 12);
+          local_ctx = new RegoutContext(local_ctx);
+          enterOuterAlt(local_ctx, 12);
           {
             setState(938);
-            match(PK_RegularOutputChannel);
+            match(PKRegularOutputChannel);
             setState(939);
             string();
           }
           break;
         case 13:
-          _localctx = new ReproContext(_localctx);
-          enterOuterAlt(_localctx, 13);
+          local_ctx = new ReproContext(local_ctx);
+          enterOuterAlt(local_ctx, 13);
           {
             setState(940);
-            match(PK_ReproducibleResourceLimit);
+            match(PKReproducibleResourceLimit);
             setState(941);
             numeral();
           }
           break;
         case 14:
-          _localctx = new VerboseContext(_localctx);
-          enterOuterAlt(_localctx, 14);
+          local_ctx = new VerboseContext(local_ctx);
+          enterOuterAlt(local_ctx, 14);
           {
             setState(942);
-            match(PK_Verbosity);
+            match(PKVerbosity);
             setState(943);
             numeral();
           }
           break;
         case 15:
-          _localctx = new Opt_attrContext(_localctx);
-          enterOuterAlt(_localctx, 15);
+          local_ctx = new OptattrContext(local_ctx);
+          enterOuterAlt(local_ctx, 15);
           {
             setState(944);
             attribute();
@@ -11242,325 +11332,331 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_flagContext extends ParserRuleContext {
-    public Info_flagContext(ParserRuleContext parent, int invokingState) {
+  public static class InfoflagContext extends ParserRuleContext {
+    public InfoflagContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_info_flag;
+      return RULEinfoflag;
     }
 
-    public Info_flagContext() {}
+    public InfoflagContext() {}
 
-    public void copyFrom(Info_flagContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(InfoflagContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class R_unknownContext extends Info_flagContext {
-    public TerminalNode PK_ReasonUnknown() {
-      return getToken(smtlibv2Parser.PK_ReasonUnknown, 0);
+  public static class RunknownContext extends InfoflagContext {
+    public TerminalNode PKReasonUnknown() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKReasonUnknown, 0);
     }
 
-    public R_unknownContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public RunknownContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterR_unknown(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRunknown(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitR_unknown(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRunknown(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitR_unknown(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRunknown(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Assert_stackContext extends Info_flagContext {
-    public TerminalNode PK_AssertionStackLevels() {
-      return getToken(smtlibv2Parser.PK_AssertionStackLevels, 0);
+  public static class AssertstackContext extends InfoflagContext {
+    public TerminalNode PKAssertionStackLevels() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAssertionStackLevels,
+          0);
     }
 
-    public Assert_stackContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public AssertstackContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterAssert_stack(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterAssertstack(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitAssert_stack(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAssertstack(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAssert_stack(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAssertstack(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class NameContext extends Info_flagContext {
-    public TerminalNode PK_Name() {
-      return getToken(smtlibv2Parser.PK_Name, 0);
+  public static class NameContext extends InfoflagContext {
+    public TerminalNode PKName() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKName, 0);
     }
 
-    public NameContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public NameContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterName(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterName(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitName(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitName(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitName(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitName(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class ErrorContext extends Info_flagContext {
-    public TerminalNode PK_ErrorBehaviour() {
-      return getToken(smtlibv2Parser.PK_ErrorBehaviour, 0);
+  public static class ErrorContext extends InfoflagContext {
+    public TerminalNode PKErrorBehaviour() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKErrorBehaviour, 0);
     }
 
-    public ErrorContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public ErrorContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterError(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterError(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitError(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitError(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitError(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitError(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class All_statContext extends Info_flagContext {
-    public TerminalNode PK_AllStatistics() {
-      return getToken(smtlibv2Parser.PK_AllStatistics, 0);
+  public static class AllstatContext extends InfoflagContext {
+    public TerminalNode PKAllStatistics() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAllStatistics, 0);
     }
 
-    public All_statContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public AllstatContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAll_stat(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAllstat(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAll_stat(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAllstat(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAll_stat(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAllstat(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class VersionContext extends Info_flagContext {
-    public TerminalNode PK_Version() {
-      return getToken(smtlibv2Parser.PK_Version, 0);
+  public static class VersionContext extends InfoflagContext {
+    public TerminalNode PKVersion() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKVersion, 0);
     }
 
-    public VersionContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public VersionContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterVersion(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterVersion(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitVersion(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVersion(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitVersion(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitVersion(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_keyContext extends Info_flagContext {
+  public static class InfokeyContext extends InfoflagContext {
     public KeywordContext keyword() {
       return getRuleContext(KeywordContext.class, 0);
     }
 
-    public Info_keyContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public InfokeyContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterInfo_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfokey(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitInfo_key(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfokey(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_key(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfokey(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class AuthorsContext extends Info_flagContext {
-    public TerminalNode PK_Authors() {
-      return getToken(smtlibv2Parser.PK_Authors, 0);
+  public static class AuthorsContext extends InfoflagContext {
+    public TerminalNode PKAuthors() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAuthors, 0);
     }
 
-    public AuthorsContext(Info_flagContext ctx) {
-      copyFrom(ctx);
+    public AuthorsContext(InfoflagContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterAuthors(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAuthors(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitAuthors(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAuthors(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitAuthors(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitAuthors(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Info_flagContext info_flag() throws RecognitionException {
-    Info_flagContext _localctx = new Info_flagContext(_ctx, getState());
-    enterRule(_localctx, 152, RULE_info_flag);
+  public final InfoflagContext infoflag() throws RecognitionException {
+    InfoflagContext local_ctx = new InfoflagContext(_ctx, getState());
+    enterRule(local_ctx, 152, RULEinfoflag);
     try {
       setState(955);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 61, _ctx)) {
         case 1:
-          _localctx = new All_statContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new AllstatContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(947);
-            match(PK_AllStatistics);
+            match(PKAllStatistics);
           }
           break;
         case 2:
-          _localctx = new Assert_stackContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new AssertstackContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(948);
-            match(PK_AssertionStackLevels);
+            match(PKAssertionStackLevels);
           }
           break;
         case 3:
-          _localctx = new AuthorsContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new AuthorsContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(949);
-            match(PK_Authors);
+            match(PKAuthors);
           }
           break;
         case 4:
-          _localctx = new ErrorContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new ErrorContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(950);
-            match(PK_ErrorBehaviour);
+            match(PKErrorBehaviour);
           }
           break;
         case 5:
-          _localctx = new NameContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new NameContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(951);
-            match(PK_Name);
+            match(PKName);
           }
           break;
         case 6:
-          _localctx = new R_unknownContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new RunknownContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(952);
-            match(PK_ReasonUnknown);
+            match(PKReasonUnknown);
           }
           break;
         case 7:
-          _localctx = new VersionContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new VersionContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(953);
-            match(PK_Version);
+            match(PKVersion);
           }
           break;
         case 8:
-          _localctx = new Info_keyContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new InfokeyContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(954);
             keyword();
@@ -11568,64 +11664,66 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Error_behaviourContext extends ParserRuleContext {
-    public TerminalNode PS_ImmediateExit() {
-      return getToken(smtlibv2Parser.PS_ImmediateExit, 0);
+  public static class ErrorbehaviourContext extends ParserRuleContext {
+    public TerminalNode PSImmediateExit() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSImmediateExit, 0);
     }
 
-    public TerminalNode PS_ContinuedExecution() {
-      return getToken(smtlibv2Parser.PS_ContinuedExecution, 0);
+    public TerminalNode PSContinuedExecution() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSContinuedExecution, 0);
     }
 
-    public Error_behaviourContext(ParserRuleContext parent, int invokingState) {
+    public ErrorbehaviourContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_error_behaviour;
+      return RULEerrorbehaviour;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterError_behaviour(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterErrorbehaviour(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitError_behaviour(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitErrorbehaviour(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitError_behaviour(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitErrorbehaviour(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Error_behaviourContext error_behaviour() throws RecognitionException {
-    Error_behaviourContext _localctx = new Error_behaviourContext(_ctx, getState());
-    enterRule(_localctx, 154, RULE_error_behaviour);
-    int _la;
+  public final ErrorbehaviourContext errorbehaviour() throws RecognitionException {
+    ErrorbehaviourContext local_ctx = new ErrorbehaviourContext(_ctx, getState());
+    enterRule(local_ctx, 154, RULEerrorbehaviour);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(957);
-        _la = _input.LA(1);
-        if (!(_la == PS_ContinuedExecution || _la == PS_ImmediateExit)) {
+        la = _input.LA(1);
+        if (!(la == PSContinuedExecution || la == PSImmediateExit)) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -11634,663 +11732,666 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Reason_unknownContext extends ParserRuleContext {
-    public Reason_unknownContext(ParserRuleContext parent, int invokingState) {
+  public static class ReasonunknownContext extends ParserRuleContext {
+    public ReasonunknownContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_reason_unknown;
+      return RULEreasonunknown;
     }
 
-    public Reason_unknownContext() {}
+    public ReasonunknownContext() {}
 
-    public void copyFrom(Reason_unknownContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(ReasonunknownContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class MemoutContext extends Reason_unknownContext {
-    public TerminalNode PS_Memout() {
-      return getToken(smtlibv2Parser.PS_Memout, 0);
+  public static class MemoutContext extends ReasonunknownContext {
+    public TerminalNode PSMemout() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSMemout, 0);
     }
 
-    public MemoutContext(Reason_unknownContext ctx) {
-      copyFrom(ctx);
+    public MemoutContext(ReasonunknownContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterMemout(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMemout(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitMemout(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMemout(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitMemout(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitMemout(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class IncompContext extends Reason_unknownContext {
-    public TerminalNode PS_Incomplete() {
-      return getToken(smtlibv2Parser.PS_Incomplete, 0);
+  public static class IncompContext extends ReasonunknownContext {
+    public TerminalNode PSIncomplete() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSIncomplete, 0);
     }
 
-    public IncompContext(Reason_unknownContext ctx) {
-      copyFrom(ctx);
+    public IncompContext(ReasonunknownContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterIncomp(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIncomp(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitIncomp(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIncomp(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitIncomp(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitIncomp(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class R_unnown_s_exprContext extends Reason_unknownContext {
-    public S_exprContext s_expr() {
-      return getRuleContext(S_exprContext.class, 0);
+  public static class RunnownsexprContext extends ReasonunknownContext {
+    public SexprContext sexpr() {
+      return getRuleContext(SexprContext.class, 0);
     }
 
-    public R_unnown_s_exprContext(Reason_unknownContext ctx) {
-      copyFrom(ctx);
+    public RunnownsexprContext(ReasonunknownContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterR_unnown_s_expr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRunnownsexpr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitR_unnown_s_expr(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRunnownsexpr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitR_unnown_s_expr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRunnownsexpr(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Reason_unknownContext reason_unknown() throws RecognitionException {
-    Reason_unknownContext _localctx = new Reason_unknownContext(_ctx, getState());
-    enterRule(_localctx, 156, RULE_reason_unknown);
+  public final ReasonunknownContext reasonunknown() throws RecognitionException {
+    ReasonunknownContext local_ctx = new ReasonunknownContext(_ctx, getState());
+    enterRule(local_ctx, 156, RULEreasonunknown);
     try {
       setState(962);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 62, _ctx)) {
         case 1:
-          _localctx = new MemoutContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new MemoutContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(959);
-            match(PS_Memout);
+            match(PSMemout);
           }
           break;
         case 2:
-          _localctx = new IncompContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new IncompContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(960);
-            match(PS_Incomplete);
+            match(PSIncomplete);
           }
           break;
         case 3:
-          _localctx = new R_unnown_s_exprContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new RunnownsexprContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(961);
-            s_expr();
+            sexpr();
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Model_responseContext extends ParserRuleContext {
-    public Model_responseContext(ParserRuleContext parent, int invokingState) {
+  public static class ModelresponseContext extends ParserRuleContext {
+    public ModelresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_model_response;
+      return RULEmodelresponse;
     }
 
-    public Model_responseContext() {}
+    public ModelresponseContext() {}
 
-    public void copyFrom(Model_responseContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(ModelresponseContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_def_funContext extends Model_responseContext {
+  public static class RespdeffunContext extends ModelresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunContext cmd_defineFun() {
-      return getRuleContext(Cmd_defineFunContext.class, 0);
+    public CmddefineFunContext cmddefineFun() {
+      return getRuleContext(CmddefineFunContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Resp_def_funContext(Model_responseContext ctx) {
-      copyFrom(ctx);
+    public RespdeffunContext(ModelresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_def_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRespdeffun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_def_fun(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespdeffun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_def_fun(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespdeffun(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_def_fun_recContext extends Model_responseContext {
+  public static class RespdeffunrecContext extends ModelresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunRecContext cmd_defineFunRec() {
-      return getRuleContext(Cmd_defineFunRecContext.class, 0);
+    public CmddefineFunRecContext cmddefineFunRec() {
+      return getRuleContext(CmddefineFunRecContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Resp_def_fun_recContext(Model_responseContext ctx) {
-      copyFrom(ctx);
+    public RespdeffunrecContext(ModelresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_def_fun_rec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespdeffunrec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_def_fun_rec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespdeffunrec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_def_fun_rec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespdeffunrec(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_def_funs_recContext extends Model_responseContext {
+  public static class RespdeffunsrecContext extends ModelresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public Cmd_defineFunsRecContext cmd_defineFunsRec() {
-      return getRuleContext(Cmd_defineFunsRecContext.class, 0);
+    public CmddefineFunsRecContext cmddefineFunsRec() {
+      return getRuleContext(CmddefineFunsRecContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Resp_def_funs_recContext(Model_responseContext ctx) {
-      copyFrom(ctx);
+    public RespdeffunsrecContext(ModelresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_def_funs_rec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespdeffunsrec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_def_funs_rec(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespdeffunsrec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_def_funs_rec(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespdeffunsrec(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Model_responseContext model_response() throws RecognitionException {
-    Model_responseContext _localctx = new Model_responseContext(_ctx, getState());
-    enterRule(_localctx, 158, RULE_model_response);
+  public final ModelresponseContext modelresponse() throws RecognitionException {
+    ModelresponseContext local_ctx = new ModelresponseContext(_ctx, getState());
+    enterRule(local_ctx, 158, RULEmodelresponse);
     try {
       setState(976);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 63, _ctx)) {
         case 1:
-          _localctx = new Resp_def_funContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new RespdeffunContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(964);
             match(ParOpen);
             setState(965);
-            cmd_defineFun();
+            cmddefineFun();
             setState(966);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Resp_def_fun_recContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new RespdeffunrecContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(968);
             match(ParOpen);
             setState(969);
-            cmd_defineFunRec();
+            cmddefineFunRec();
             setState(970);
             match(ParClose);
           }
           break;
         case 3:
-          _localctx = new Resp_def_funs_recContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new RespdeffunsrecContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(972);
             match(ParOpen);
             setState(973);
-            cmd_defineFunsRec();
+            cmddefineFunsRec();
             setState(974);
             match(ParClose);
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_responseContext extends ParserRuleContext {
-    public Info_responseContext(ParserRuleContext parent, int invokingState) {
+  public static class InforesponseContext extends ParserRuleContext {
+    public InforesponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_info_response;
+      return RULEinforesponse;
     }
 
-    public Info_responseContext() {}
+    public InforesponseContext() {}
 
-    public void copyFrom(Info_responseContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(InforesponseContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_authorsContext extends Info_responseContext {
-    public TerminalNode PK_Authors() {
-      return getToken(smtlibv2Parser.PK_Authors, 0);
+  public static class InfoauthorsContext extends InforesponseContext {
+    public TerminalNode PKAuthors() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAuthors, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Info_authorsContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfoauthorsContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterInfo_authors(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterInfoauthors(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitInfo_authors(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfoauthors(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_authors(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoauthors(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_versionContext extends Info_responseContext {
-    public TerminalNode PK_Version() {
-      return getToken(smtlibv2Parser.PK_Version, 0);
+  public static class InfoversionContext extends InforesponseContext {
+    public TerminalNode PKVersion() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKVersion, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Info_versionContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfoversionContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterInfo_version(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterInfoversion(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitInfo_version(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfoversion(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_version(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoversion(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_attrContext extends Info_responseContext {
+  public static class InfoattrContext extends InforesponseContext {
     public AttributeContext attribute() {
       return getRuleContext(AttributeContext.class, 0);
     }
 
-    public Info_attrContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfoattrContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterInfo_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfoattr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitInfo_attr(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfoattr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_attr(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoattr(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_errorContext extends Info_responseContext {
-    public TerminalNode PK_ErrorBehaviour() {
-      return getToken(smtlibv2Parser.PK_ErrorBehaviour, 0);
+  public static class InfoerrorContext extends InforesponseContext {
+    public TerminalNode PKErrorBehaviour() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKErrorBehaviour, 0);
     }
 
-    public Error_behaviourContext error_behaviour() {
-      return getRuleContext(Error_behaviourContext.class, 0);
+    public ErrorbehaviourContext errorbehaviour() {
+      return getRuleContext(ErrorbehaviourContext.class, 0);
     }
 
-    public Info_errorContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfoerrorContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterInfo_error(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfoerror(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitInfo_error(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfoerror(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_error(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoerror(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_assert_stackContext extends Info_responseContext {
-    public TerminalNode PK_AssertionStackLevels() {
-      return getToken(smtlibv2Parser.PK_AssertionStackLevels, 0);
+  public static class InfoassertstackContext extends InforesponseContext {
+    public TerminalNode PKAssertionStackLevels() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKAssertionStackLevels,
+          0);
     }
 
     public NumeralContext numeral() {
       return getRuleContext(NumeralContext.class, 0);
     }
 
-    public Info_assert_stackContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfoassertstackContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterInfo_assert_stack(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterInfoassertstack(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitInfo_assert_stack(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitInfoassertstack(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_assert_stack(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoassertstack(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_r_unknownContext extends Info_responseContext {
-    public TerminalNode PK_ReasonUnknown() {
-      return getToken(smtlibv2Parser.PK_ReasonUnknown, 0);
+  public static class InforunknownContext extends InforesponseContext {
+    public TerminalNode PKReasonUnknown() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKReasonUnknown, 0);
     }
 
-    public Reason_unknownContext reason_unknown() {
-      return getRuleContext(Reason_unknownContext.class, 0);
+    public ReasonunknownContext reasonunknown() {
+      return getRuleContext(ReasonunknownContext.class, 0);
     }
 
-    public Info_r_unknownContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InforunknownContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterInfo_r_unknown(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterInforunknown(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitInfo_r_unknown(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitInforunknown(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_r_unknown(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInforunknown(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Info_nameContext extends Info_responseContext {
-    public TerminalNode PK_Name() {
-      return getToken(smtlibv2Parser.PK_Name, 0);
+  public static class InfonameContext extends InforesponseContext {
+    public TerminalNode PKName() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PKName, 0);
     }
 
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Info_nameContext(Info_responseContext ctx) {
-      copyFrom(ctx);
+    public InfonameContext(InforesponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterInfo_name(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfoname(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitInfo_name(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfoname(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitInfo_name(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitInfoname(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Info_responseContext info_response() throws RecognitionException {
-    Info_responseContext _localctx = new Info_responseContext(_ctx, getState());
-    enterRule(_localctx, 160, RULE_info_response);
+  public final InforesponseContext inforesponse() throws RecognitionException {
+    InforesponseContext local_ctx = new InforesponseContext(_ctx, getState());
+    enterRule(local_ctx, 160, RULEinforesponse);
     try {
       setState(991);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 64, _ctx)) {
         case 1:
-          _localctx = new Info_assert_stackContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new InfoassertstackContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(978);
-            match(PK_AssertionStackLevels);
+            match(PKAssertionStackLevels);
             setState(979);
             numeral();
           }
           break;
         case 2:
-          _localctx = new Info_authorsContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new InfoauthorsContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(980);
-            match(PK_Authors);
+            match(PKAuthors);
             setState(981);
             string();
           }
           break;
         case 3:
-          _localctx = new Info_errorContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new InfoerrorContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(982);
-            match(PK_ErrorBehaviour);
+            match(PKErrorBehaviour);
             setState(983);
-            error_behaviour();
+            errorbehaviour();
           }
           break;
         case 4:
-          _localctx = new Info_nameContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new InfonameContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(984);
-            match(PK_Name);
+            match(PKName);
             setState(985);
             string();
           }
           break;
         case 5:
-          _localctx = new Info_r_unknownContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new InforunknownContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(986);
-            match(PK_ReasonUnknown);
+            match(PKReasonUnknown);
             setState(987);
-            reason_unknown();
+            reasonunknown();
           }
           break;
         case 6:
-          _localctx = new Info_versionContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new InfoversionContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(988);
-            match(PK_Version);
+            match(PKVersion);
             setState(989);
             string();
           }
           break;
         case 7:
-          _localctx = new Info_attrContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new InfoattrContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(990);
             attribute();
@@ -12298,19 +12399,19 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Valuation_pairContext extends ParserRuleContext {
+  public static class ValuationpairContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public List<TermContext> term() {
@@ -12322,43 +12423,43 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Valuation_pairContext(ParserRuleContext parent, int invokingState) {
+    public ValuationpairContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_valuation_pair;
+      return RULEvaluationpair;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterValuation_pair(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterValuationpair(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitValuation_pair(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitValuationpair(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitValuation_pair(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitValuationpair(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Valuation_pairContext valuation_pair() throws RecognitionException {
-    Valuation_pairContext _localctx = new Valuation_pairContext(_ctx, getState());
-    enterRule(_localctx, 162, RULE_valuation_pair);
+  public final ValuationpairContext valuationpair() throws RecognitionException {
+    ValuationpairContext local_ctx = new ValuationpairContext(_ctx, getState());
+    enterRule(local_ctx, 162, RULEvaluationpair);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(993);
         match(ParOpen);
@@ -12370,140 +12471,141 @@ public class smtlibv2Parser extends Parser {
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class T_valuation_pairContext extends ParserRuleContext {
+  public static class TvaluationpairContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public SymbolContext symbol() {
       return getRuleContext(SymbolContext.class, 0);
     }
 
-    public B_valueContext b_value() {
-      return getRuleContext(B_valueContext.class, 0);
+    public BvalueContext bvalue() {
+      return getRuleContext(BvalueContext.class, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public T_valuation_pairContext(ParserRuleContext parent, int invokingState) {
+    public TvaluationpairContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_t_valuation_pair;
+      return RULEtvaluationpair;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterT_valuation_pair(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterTvaluationpair(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitT_valuation_pair(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitTvaluationpair(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitT_valuation_pair(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitTvaluationpair(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final T_valuation_pairContext t_valuation_pair() throws RecognitionException {
-    T_valuation_pairContext _localctx = new T_valuation_pairContext(_ctx, getState());
-    enterRule(_localctx, 164, RULE_t_valuation_pair);
+  public final TvaluationpairContext tvaluationpair() throws RecognitionException {
+    TvaluationpairContext local_ctx = new TvaluationpairContext(_ctx, getState());
+    enterRule(local_ctx, 164, RULEtvaluationpair);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(998);
         match(ParOpen);
         setState(999);
         symbol();
         setState(1000);
-        b_value();
+        bvalue();
         setState(1001);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Check_sat_responseContext extends ParserRuleContext {
-    public TerminalNode PS_Sat() {
-      return getToken(smtlibv2Parser.PS_Sat, 0);
+  public static class ChecksatresponseContext extends ParserRuleContext {
+    public TerminalNode PSSat() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSSat, 0);
     }
 
-    public TerminalNode PS_Unsat() {
-      return getToken(smtlibv2Parser.PS_Unsat, 0);
+    public TerminalNode PSUnsat() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnsat, 0);
     }
 
-    public TerminalNode PS_Unknown() {
-      return getToken(smtlibv2Parser.PS_Unknown, 0);
+    public TerminalNode PSUnknown() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnknown, 0);
     }
 
-    public Check_sat_responseContext(ParserRuleContext parent, int invokingState) {
+    public ChecksatresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_check_sat_response;
+      return RULEchecksatresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterCheck_sat_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterChecksatresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitCheck_sat_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitChecksatresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitCheck_sat_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitChecksatresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Check_sat_responseContext check_sat_response() throws RecognitionException {
-    Check_sat_responseContext _localctx = new Check_sat_responseContext(_ctx, getState());
-    enterRule(_localctx, 166, RULE_check_sat_response);
-    int _la;
+  public final ChecksatresponseContext checksatresponse() throws RecognitionException {
+    ChecksatresponseContext local_ctx = new ChecksatresponseContext(_ctx, getState());
+    enterRule(local_ctx, 166, RULEchecksatresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1003);
-        _la = _input.LA(1);
-        if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & 5308416L) != 0))) {
+        la = _input.LA(1);
+        if (!((((la) & ~0x3f) == 0 && ((1L << la) & 5308416L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
           if (_input.LA(1) == Token.EOF) matchedEOF = true;
@@ -12512,77 +12614,77 @@ public class smtlibv2Parser extends Parser {
         }
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Echo_responseContext extends ParserRuleContext {
+  public static class EchoresponseContext extends ParserRuleContext {
     public StringContext string() {
       return getRuleContext(StringContext.class, 0);
     }
 
-    public Echo_responseContext(ParserRuleContext parent, int invokingState) {
+    public EchoresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_echo_response;
+      return RULEechoresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterEcho_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterEchoresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitEcho_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitEchoresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitEcho_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitEchoresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Echo_responseContext echo_response() throws RecognitionException {
-    Echo_responseContext _localctx = new Echo_responseContext(_ctx, getState());
-    enterRule(_localctx, 168, RULE_echo_response);
+  public final EchoresponseContext echoresponse() throws RecognitionException {
+    EchoresponseContext local_ctx = new EchoresponseContext(_ctx, getState());
+    enterRule(local_ctx, 168, RULEechoresponse);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1005);
         string();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_assertions_responseContext extends ParserRuleContext {
+  public static class GetassertionsresponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<TermContext> term() {
@@ -12593,50 +12695,49 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(TermContext.class, i);
     }
 
-    public Get_assertions_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetassertionsresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_assertions_response;
+      return RULEgetassertionsresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_assertions_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetassertionsresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_assertions_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetassertionsresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_assertions_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetassertionsresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_assertions_responseContext get_assertions_response()
-      throws RecognitionException {
-    Get_assertions_responseContext _localctx = new Get_assertions_responseContext(_ctx, getState());
-    enterRule(_localctx, 170, RULE_get_assertions_response);
-    int _la;
+  public final GetassertionsresponseContext getassertionsresponse() throws RecognitionException {
+    GetassertionsresponseContext local_ctx = new GetassertionsresponseContext(_ctx, getState());
+    enterRule(local_ctx, 170, RULEgetassertionsresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1007);
         match(ParOpen);
         setState(1011);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388580L) != 0)
-            || ((((_la - 66)) & ~0x3f) == 0 && ((1L << (_la - 66)) & 144115188075864079L) != 0)) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388580L) != 0)
+            || ((((la - 66)) & ~0x3f) == 0 && ((1L << (la - 66)) & 144115188075864079L) != 0)) {
           {
             {
               setState(1008);
@@ -12645,343 +12746,342 @@ public class smtlibv2Parser extends Parser {
           }
           setState(1013);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(1014);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_assignment_responseContext extends ParserRuleContext {
+  public static class GetassignmentresponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<T_valuation_pairContext> t_valuation_pair() {
-      return getRuleContexts(T_valuation_pairContext.class);
+    public List<TvaluationpairContext> tvaluationpair() {
+      return getRuleContexts(TvaluationpairContext.class);
     }
 
-    public T_valuation_pairContext t_valuation_pair(int i) {
-      return getRuleContext(T_valuation_pairContext.class, i);
+    public TvaluationpairContext tvaluationpair(int i) {
+      return getRuleContext(TvaluationpairContext.class, i);
     }
 
-    public Get_assignment_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetassignmentresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_assignment_response;
+      return RULEgetassignmentresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_assignment_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetassignmentresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_assignment_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetassignmentresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_assignment_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetassignmentresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_assignment_responseContext get_assignment_response()
-      throws RecognitionException {
-    Get_assignment_responseContext _localctx = new Get_assignment_responseContext(_ctx, getState());
-    enterRule(_localctx, 172, RULE_get_assignment_response);
-    int _la;
+  public final GetassignmentresponseContext getassignmentresponse() throws RecognitionException {
+    GetassignmentresponseContext local_ctx = new GetassignmentresponseContext(_ctx, getState());
+    enterRule(local_ctx, 172, RULEgetassignmentresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1016);
         match(ParOpen);
         setState(1020);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while (_la == ParOpen) {
+        la = _input.LA(1);
+        while (la == ParOpen) {
           {
             {
               setState(1017);
-              t_valuation_pair();
+              tvaluationpair();
             }
           }
           setState(1022);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(1023);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_info_responseContext extends ParserRuleContext {
+  public static class GetinforesponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Info_responseContext> info_response() {
-      return getRuleContexts(Info_responseContext.class);
+    public List<InforesponseContext> inforesponse() {
+      return getRuleContexts(InforesponseContext.class);
     }
 
-    public Info_responseContext info_response(int i) {
-      return getRuleContext(Info_responseContext.class, i);
+    public InforesponseContext inforesponse(int i) {
+      return getRuleContext(InforesponseContext.class, i);
     }
 
-    public Get_info_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetinforesponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_info_response;
+      return RULEgetinforesponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_info_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetinforesponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_info_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetinforesponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_info_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetinforesponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_info_responseContext get_info_response() throws RecognitionException {
-    Get_info_responseContext _localctx = new Get_info_responseContext(_ctx, getState());
-    enterRule(_localctx, 174, RULE_get_info_response);
-    int _la;
+  public final GetinforesponseContext getinforesponse() throws RecognitionException {
+    GetinforesponseContext local_ctx = new GetinforesponseContext(_ctx, getState());
+    enterRule(local_ctx, 174, RULEgetinforesponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1025);
         match(ParOpen);
         setState(1027);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(1026);
-              info_response();
+              inforesponse();
             }
           }
           setState(1029);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (((((_la - 80)) & ~0x3f) == 0 && ((1L << (_la - 80)) & 4398046511103L) != 0));
+          la = _input.LA(1);
+        } while (((((la - 80)) & ~0x3f) == 0 && ((1L << (la - 80)) & 4398046511103L) != 0));
         setState(1031);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_model_responseContext extends ParserRuleContext {
-    public Get_model_responseContext(ParserRuleContext parent, int invokingState) {
+  public static class GetmodelresponseContext extends ParserRuleContext {
+    public GetmodelresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_model_response;
+      return RULEgetmodelresponse;
     }
 
-    public Get_model_responseContext() {}
+    public GetmodelresponseContext() {}
 
-    public void copyFrom(Get_model_responseContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(GetmodelresponseContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Model_respContext extends Get_model_responseContext {
+  public static class ModelrespContext extends GetmodelresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Model_responseContext> model_response() {
-      return getRuleContexts(Model_responseContext.class);
+    public List<ModelresponseContext> modelresponse() {
+      return getRuleContexts(ModelresponseContext.class);
     }
 
-    public Model_responseContext model_response(int i) {
-      return getRuleContext(Model_responseContext.class, i);
+    public ModelresponseContext modelresponse(int i) {
+      return getRuleContext(ModelresponseContext.class, i);
     }
 
-    public Model_respContext(Get_model_responseContext ctx) {
-      copyFrom(ctx);
+    public ModelrespContext(GetmodelresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterModel_resp(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterModelresp(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitModel_resp(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitModelresp(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitModel_resp(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitModelresp(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Rs_modelContext extends Get_model_responseContext {
+  public static class RsmodelContext extends GetmodelresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode RS_Model() {
-      return getToken(smtlibv2Parser.RS_Model, 0);
+    public TerminalNode RSModel() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.RSModel, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Model_responseContext> model_response() {
-      return getRuleContexts(Model_responseContext.class);
+    public List<ModelresponseContext> modelresponse() {
+      return getRuleContexts(ModelresponseContext.class);
     }
 
-    public Model_responseContext model_response(int i) {
-      return getRuleContext(Model_responseContext.class, i);
+    public ModelresponseContext modelresponse(int i) {
+      return getRuleContext(ModelresponseContext.class, i);
     }
 
-    public Rs_modelContext(Get_model_responseContext ctx) {
-      copyFrom(ctx);
+    public RsmodelContext(GetmodelresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterRs_model(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRsmodel(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitRs_model(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRsmodel(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitRs_model(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRsmodel(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_model_responseContext get_model_response() throws RecognitionException {
-    Get_model_responseContext _localctx = new Get_model_responseContext(_ctx, getState());
-    enterRule(_localctx, 176, RULE_get_model_response);
-    int _la;
+  public final GetmodelresponseContext getmodelresponse() throws RecognitionException {
+    GetmodelresponseContext local_ctx = new GetmodelresponseContext(_ctx, getState());
+    enterRule(local_ctx, 176, RULEgetmodelresponse);
+    int la;
     try {
       setState(1050);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 70, _ctx)) {
         case 1:
-          _localctx = new Rs_modelContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new RsmodelContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(1033);
             match(ParOpen);
             setState(1034);
-            match(RS_Model);
+            match(RSModel);
             setState(1038);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (_la == ParOpen) {
+            la = _input.LA(1);
+            while (la == ParOpen) {
               {
                 {
                   setState(1035);
-                  model_response();
+                  modelresponse();
                 }
               }
               setState(1040);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(1041);
             match(ParClose);
           }
           break;
         case 2:
-          _localctx = new Model_respContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new ModelrespContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(1042);
             match(ParOpen);
             setState(1046);
             _errHandler.sync(this);
-            _la = _input.LA(1);
-            while (_la == ParOpen) {
+            la = _input.LA(1);
+            while (la == ParOpen) {
               {
                 {
                   setState(1043);
-                  model_response();
+                  modelresponse();
                 }
               }
               setState(1048);
               _errHandler.sync(this);
-              _la = _input.LA(1);
+              la = _input.LA(1);
             }
             setState(1049);
             match(ParClose);
@@ -12989,131 +13089,131 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_option_responseContext extends ParserRuleContext {
-    public Attribute_valueContext attribute_value() {
-      return getRuleContext(Attribute_valueContext.class, 0);
+  public static class GetoptionresponseContext extends ParserRuleContext {
+    public AttributevalueContext attributevalue() {
+      return getRuleContext(AttributevalueContext.class, 0);
     }
 
-    public Get_option_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetoptionresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_option_response;
+      return RULEgetoptionresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_option_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetoptionresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_option_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetoptionresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_option_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetoptionresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_option_responseContext get_option_response() throws RecognitionException {
-    Get_option_responseContext _localctx = new Get_option_responseContext(_ctx, getState());
-    enterRule(_localctx, 178, RULE_get_option_response);
+  public final GetoptionresponseContext getoptionresponse() throws RecognitionException {
+    GetoptionresponseContext local_ctx = new GetoptionresponseContext(_ctx, getState());
+    enterRule(local_ctx, 178, RULEgetoptionresponse);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1052);
-        attribute_value();
+        attributevalue();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_proof_responseContext extends ParserRuleContext {
-    public S_exprContext s_expr() {
-      return getRuleContext(S_exprContext.class, 0);
+  public static class GetproofresponseContext extends ParserRuleContext {
+    public SexprContext sexpr() {
+      return getRuleContext(SexprContext.class, 0);
     }
 
-    public Get_proof_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetproofresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_proof_response;
+      return RULEgetproofresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_proof_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetproofresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_proof_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetproofresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_proof_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetproofresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_proof_responseContext get_proof_response() throws RecognitionException {
-    Get_proof_responseContext _localctx = new Get_proof_responseContext(_ctx, getState());
-    enterRule(_localctx, 180, RULE_get_proof_response);
+  public final GetproofresponseContext getproofresponse() throws RecognitionException {
+    GetproofresponseContext local_ctx = new GetproofresponseContext(_ctx, getState());
+    enterRule(local_ctx, 180, RULEgetproofresponse);
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1054);
-        s_expr();
+        sexpr();
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_unsat_assump_responseContext extends ParserRuleContext {
+  public static class GetunsatassumpresponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SymbolContext> symbol() {
@@ -13124,50 +13224,48 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SymbolContext.class, i);
     }
 
-    public Get_unsat_assump_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetunsatassumpresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_unsat_assump_response;
+      return RULEgetunsatassumpresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_unsat_assump_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetunsatassumpresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_unsat_assump_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetunsatassumpresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_assump_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetunsatassumpresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_unsat_assump_responseContext get_unsat_assump_response()
-      throws RecognitionException {
-    Get_unsat_assump_responseContext _localctx =
-        new Get_unsat_assump_responseContext(_ctx, getState());
-    enterRule(_localctx, 182, RULE_get_unsat_assump_response);
-    int _la;
+  public final GetunsatassumpresponseContext getunsatassumpresponse() throws RecognitionException {
+    GetunsatassumpresponseContext local_ctx = new GetunsatassumpresponseContext(_ctx, getState());
+    enterRule(local_ctx, 182, RULEgetunsatassumpresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1056);
         match(ParOpen);
         setState(1060);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0) || _la == UndefinedSymbol) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0) || la == UndefinedSymbol) {
           {
             {
               setState(1057);
@@ -13176,29 +13274,29 @@ public class smtlibv2Parser extends Parser {
           }
           setState(1062);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(1063);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_unsat_core_responseContext extends ParserRuleContext {
+  public static class GetunsatcoreresponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
     public List<SymbolContext> symbol() {
@@ -13209,49 +13307,48 @@ public class smtlibv2Parser extends Parser {
       return getRuleContext(SymbolContext.class, i);
     }
 
-    public Get_unsat_core_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetunsatcoreresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_unsat_core_response;
+      return RULEgetunsatcoreresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_unsat_core_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetunsatcoreresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_unsat_core_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetunsatcoreresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_core_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetunsatcoreresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_unsat_core_responseContext get_unsat_core_response()
-      throws RecognitionException {
-    Get_unsat_core_responseContext _localctx = new Get_unsat_core_responseContext(_ctx, getState());
-    enterRule(_localctx, 184, RULE_get_unsat_core_response);
-    int _la;
+  public final GetunsatcoreresponseContext getunsatcoreresponse() throws RecognitionException {
+    GetunsatcoreresponseContext local_ctx = new GetunsatcoreresponseContext(_ctx, getState());
+    enterRule(local_ctx, 184, RULEgetunsatcoreresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1065);
         match(ParOpen);
         setState(1069);
         _errHandler.sync(this);
-        _la = _input.LA(1);
-        while ((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388544L) != 0) || _la == UndefinedSymbol) {
+        la = _input.LA(1);
+        while ((((la) & ~0x3f) == 0 && ((1L << la) & 8388544L) != 0) || la == UndefinedSymbol) {
           {
             {
               setState(1066);
@@ -13260,669 +13357,667 @@ public class smtlibv2Parser extends Parser {
           }
           setState(1071);
           _errHandler.sync(this);
-          _la = _input.LA(1);
+          la = _input.LA(1);
         }
         setState(1072);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Get_value_responseContext extends ParserRuleContext {
+  public static class GetvalueresponseContext extends ParserRuleContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public List<Valuation_pairContext> valuation_pair() {
-      return getRuleContexts(Valuation_pairContext.class);
+    public List<ValuationpairContext> valuationpair() {
+      return getRuleContexts(ValuationpairContext.class);
     }
 
-    public Valuation_pairContext valuation_pair(int i) {
-      return getRuleContext(Valuation_pairContext.class, i);
+    public ValuationpairContext valuationpair(int i) {
+      return getRuleContext(ValuationpairContext.class, i);
     }
 
-    public Get_value_responseContext(ParserRuleContext parent, int invokingState) {
+    public GetvalueresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_get_value_response;
+      return RULEgetvalueresponse;
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterGet_value_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterGetvalueresponse(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitGet_value_response(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitGetvalueresponse(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitGet_value_response(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitGetvalueresponse(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Get_value_responseContext get_value_response() throws RecognitionException {
-    Get_value_responseContext _localctx = new Get_value_responseContext(_ctx, getState());
-    enterRule(_localctx, 186, RULE_get_value_response);
-    int _la;
+  public final GetvalueresponseContext getvalueresponse() throws RecognitionException {
+    GetvalueresponseContext local_ctx = new GetvalueresponseContext(_ctx, getState());
+    enterRule(local_ctx, 186, RULEgetvalueresponse);
+    int la;
     try {
-      enterOuterAlt(_localctx, 1);
+      enterOuterAlt(local_ctx, 1);
       {
         setState(1074);
         match(ParOpen);
         setState(1076);
         _errHandler.sync(this);
-        _la = _input.LA(1);
+        la = _input.LA(1);
         do {
           {
             {
               setState(1075);
-              valuation_pair();
+              valuationpair();
             }
           }
           setState(1078);
           _errHandler.sync(this);
-          _la = _input.LA(1);
-        } while (_la == ParOpen);
+          la = _input.LA(1);
+        } while (la == ParOpen);
         setState(1080);
         match(ParClose);
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Specific_success_responseContext extends ParserRuleContext {
-    public Specific_success_responseContext(ParserRuleContext parent, int invokingState) {
+  public static class SpecificsuccessresponseContext extends ParserRuleContext {
+    public SpecificsuccessresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_specific_success_response;
+      return RULEspecificsuccessresponse;
     }
 
-    public Specific_success_responseContext() {}
+    public SpecificsuccessresponseContext() {}
 
-    public void copyFrom(Specific_success_responseContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(SpecificsuccessresponseContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_unsat_coreContext extends Specific_success_responseContext {
-    public Get_unsat_core_responseContext get_unsat_core_response() {
-      return getRuleContext(Get_unsat_core_responseContext.class, 0);
+  public static class RespunsatcoreContext extends SpecificsuccessresponseContext {
+    public GetunsatcoreresponseContext getunsatcoreresponse() {
+      return getRuleContext(GetunsatcoreresponseContext.class, 0);
     }
 
-    public Resp_unsat_coreContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespunsatcoreContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespunsatcore(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_unsat_core(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespunsatcore(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_unsat_core(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespunsatcore(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_echoContext extends Specific_success_responseContext {
-    public Echo_responseContext echo_response() {
-      return getRuleContext(Echo_responseContext.class, 0);
+  public static class RespechoContext extends SpecificsuccessresponseContext {
+    public EchoresponseContext echoresponse() {
+      return getRuleContext(EchoresponseContext.class, 0);
     }
 
-    public Resp_echoContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespechoContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterResp_echo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRespecho(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitResp_echo(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespecho(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_echo(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespecho(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_get_assertContext extends Specific_success_responseContext {
-    public Get_assertions_responseContext get_assertions_response() {
-      return getRuleContext(Get_assertions_responseContext.class, 0);
+  public static class RespgetassertContext extends SpecificsuccessresponseContext {
+    public GetassertionsresponseContext getassertionsresponse() {
+      return getRuleContext(GetassertionsresponseContext.class, 0);
     }
 
-    public Resp_get_assertContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespgetassertContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_get_assert(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespgetassert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_get_assert(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespgetassert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_get_assert(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespgetassert(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_proofContext extends Specific_success_responseContext {
-    public Get_proof_responseContext get_proof_response() {
-      return getRuleContext(Get_proof_responseContext.class, 0);
+  public static class RespproofContext extends SpecificsuccessresponseContext {
+    public GetproofresponseContext getproofresponse() {
+      return getRuleContext(GetproofresponseContext.class, 0);
     }
 
-    public Resp_proofContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespproofContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterResp_proof(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRespproof(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitResp_proof(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespproof(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_proof(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespproof(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_get_modelContext extends Specific_success_responseContext {
-    public Get_model_responseContext get_model_response() {
-      return getRuleContext(Get_model_responseContext.class, 0);
+  public static class RespgetmodelContext extends SpecificsuccessresponseContext {
+    public GetmodelresponseContext getmodelresponse() {
+      return getRuleContext(GetmodelresponseContext.class, 0);
     }
 
-    public Resp_get_modelContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespgetmodelContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_get_model(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespgetmodel(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_get_model(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespgetmodel(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_get_model(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespgetmodel(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_check_satContext extends Specific_success_responseContext {
-    public Check_sat_responseContext check_sat_response() {
-      return getRuleContext(Check_sat_responseContext.class, 0);
+  public static class RespchecksatContext extends SpecificsuccessresponseContext {
+    public ChecksatresponseContext checksatresponse() {
+      return getRuleContext(ChecksatresponseContext.class, 0);
     }
 
-    public Resp_check_satContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespchecksatContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_check_sat(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespchecksat(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_check_sat(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespchecksat(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_check_sat(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespchecksat(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_get_infoContext extends Specific_success_responseContext {
-    public Get_info_responseContext get_info_response() {
-      return getRuleContext(Get_info_responseContext.class, 0);
+  public static class RespgetinfoContext extends SpecificsuccessresponseContext {
+    public GetinforesponseContext getinforesponse() {
+      return getRuleContext(GetinforesponseContext.class, 0);
     }
 
-    public Resp_get_infoContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespgetinfoContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_get_info(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespgetinfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_get_info(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespgetinfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_get_info(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespgetinfo(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_optionContext extends Specific_success_responseContext {
-    public Get_option_responseContext get_option_response() {
-      return getRuleContext(Get_option_responseContext.class, 0);
+  public static class RespoptionContext extends SpecificsuccessresponseContext {
+    public GetoptionresponseContext getoptionresponse() {
+      return getRuleContext(GetoptionresponseContext.class, 0);
     }
 
-    public Resp_optionContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespoptionContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRespoption(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitResp_option(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespoption(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_option(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespoption(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_unsat_assumeContext extends Specific_success_responseContext {
-    public Get_unsat_assump_responseContext get_unsat_assump_response() {
-      return getRuleContext(Get_unsat_assump_responseContext.class, 0);
+  public static class RespunsatassumeContext extends SpecificsuccessresponseContext {
+    public GetunsatassumpresponseContext getunsatassumpresponse() {
+      return getRuleContext(GetunsatassumpresponseContext.class, 0);
     }
 
-    public Resp_unsat_assumeContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespunsatassumeContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespunsatassume(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_unsat_assume(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespunsatassume(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_unsat_assume(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespunsatassume(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_valueContext extends Specific_success_responseContext {
-    public Get_value_responseContext get_value_response() {
-      return getRuleContext(Get_value_responseContext.class, 0);
+  public static class RespvalueContext extends SpecificsuccessresponseContext {
+    public GetvalueresponseContext getvalueresponse() {
+      return getRuleContext(GetvalueresponseContext.class, 0);
     }
 
-    public Resp_valueContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespvalueContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterResp_value(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRespvalue(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitResp_value(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespvalue(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_value(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespvalue(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_gett_assignContext extends Specific_success_responseContext {
-    public Get_assignment_responseContext get_assignment_response() {
-      return getRuleContext(Get_assignment_responseContext.class, 0);
+  public static class RespgettassignContext extends SpecificsuccessresponseContext {
+    public GetassignmentresponseContext getassignmentresponse() {
+      return getRuleContext(GetassignmentresponseContext.class, 0);
     }
 
-    public Resp_gett_assignContext(Specific_success_responseContext ctx) {
-      copyFrom(ctx);
+    public RespgettassignContext(SpecificsuccessresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_gett_assign(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespgettassign(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_gett_assign(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespgettassign(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_gett_assign(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespgettassign(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final Specific_success_responseContext specific_success_response()
+  public final SpecificsuccessresponseContext specificsuccessresponse()
       throws RecognitionException {
-    Specific_success_responseContext _localctx =
-        new Specific_success_responseContext(_ctx, getState());
-    enterRule(_localctx, 188, RULE_specific_success_response);
+    SpecificsuccessresponseContext local_ctx = new SpecificsuccessresponseContext(_ctx, getState());
+    enterRule(local_ctx, 188, RULEspecificsuccessresponse);
     try {
       setState(1093);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 74, _ctx)) {
         case 1:
-          _localctx = new Resp_check_satContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new RespchecksatContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(1082);
-            check_sat_response();
+            checksatresponse();
           }
           break;
         case 2:
-          _localctx = new Resp_echoContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new RespechoContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(1083);
-            echo_response();
+            echoresponse();
           }
           break;
         case 3:
-          _localctx = new Resp_get_assertContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new RespgetassertContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(1084);
-            get_assertions_response();
+            getassertionsresponse();
           }
           break;
         case 4:
-          _localctx = new Resp_gett_assignContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new RespgettassignContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(1085);
-            get_assignment_response();
+            getassignmentresponse();
           }
           break;
         case 5:
-          _localctx = new Resp_get_infoContext(_localctx);
-          enterOuterAlt(_localctx, 5);
+          local_ctx = new RespgetinfoContext(local_ctx);
+          enterOuterAlt(local_ctx, 5);
           {
             setState(1086);
-            get_info_response();
+            getinforesponse();
           }
           break;
         case 6:
-          _localctx = new Resp_get_modelContext(_localctx);
-          enterOuterAlt(_localctx, 6);
+          local_ctx = new RespgetmodelContext(local_ctx);
+          enterOuterAlt(local_ctx, 6);
           {
             setState(1087);
-            get_model_response();
+            getmodelresponse();
           }
           break;
         case 7:
-          _localctx = new Resp_optionContext(_localctx);
-          enterOuterAlt(_localctx, 7);
+          local_ctx = new RespoptionContext(local_ctx);
+          enterOuterAlt(local_ctx, 7);
           {
             setState(1088);
-            get_option_response();
+            getoptionresponse();
           }
           break;
         case 8:
-          _localctx = new Resp_proofContext(_localctx);
-          enterOuterAlt(_localctx, 8);
+          local_ctx = new RespproofContext(local_ctx);
+          enterOuterAlt(local_ctx, 8);
           {
             setState(1089);
-            get_proof_response();
+            getproofresponse();
           }
           break;
         case 9:
-          _localctx = new Resp_unsat_assumeContext(_localctx);
-          enterOuterAlt(_localctx, 9);
+          local_ctx = new RespunsatassumeContext(local_ctx);
+          enterOuterAlt(local_ctx, 9);
           {
             setState(1090);
-            get_unsat_assump_response();
+            getunsatassumpresponse();
           }
           break;
         case 10:
-          _localctx = new Resp_unsat_coreContext(_localctx);
-          enterOuterAlt(_localctx, 10);
+          local_ctx = new RespunsatcoreContext(local_ctx);
+          enterOuterAlt(local_ctx, 10);
           {
             setState(1091);
-            get_unsat_core_response();
+            getunsatcoreresponse();
           }
           break;
         case 11:
-          _localctx = new Resp_valueContext(_localctx);
-          enterOuterAlt(_localctx, 11);
+          local_ctx = new RespvalueContext(local_ctx);
+          enterOuterAlt(local_ctx, 11);
           {
             setState(1092);
-            get_value_response();
+            getvalueresponse();
           }
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class General_responseContext extends ParserRuleContext {
-    public General_responseContext(ParserRuleContext parent, int invokingState) {
+  public static class GeneralresponseContext extends ParserRuleContext {
+    public GeneralresponseContext(ParserRuleContext parent, int invokingState) {
       super(parent, invokingState);
     }
 
     @Override
     public int getRuleIndex() {
-      return RULE_general_response;
+      return RULEgeneralresponse;
     }
 
-    public General_responseContext() {}
+    public GeneralresponseContext() {}
 
-    public void copyFrom(General_responseContext ctx) {
-      super.copyFrom(ctx);
+    public void copyFrom(GeneralresponseContext _ctx) {
+      super.copyFrom(_ctx);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_unsupportedContext extends General_responseContext {
-    public TerminalNode PS_Unsupported() {
-      return getToken(smtlibv2Parser.PS_Unsupported, 0);
+  public static class RespunsupportedContext extends GeneralresponseContext {
+    public TerminalNode PSUnsupported() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSUnsupported, 0);
     }
 
-    public Resp_unsupportedContext(General_responseContext ctx) {
-      copyFrom(ctx);
+    public RespunsupportedContext(GeneralresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_unsupported(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespunsupported(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_unsupported(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespunsupported(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_unsupported(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespunsupported(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_successContext extends General_responseContext {
-    public TerminalNode PS_Success() {
-      return getToken(smtlibv2Parser.PS_Success, 0);
+  public static class RespsuccessContext extends GeneralresponseContext {
+    public TerminalNode PSSuccess() {
+      return getToken(
+          org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSSuccess, 0);
     }
 
-    public Resp_successContext(General_responseContext ctx) {
-      copyFrom(ctx);
+    public RespsuccessContext(GeneralresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_success(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespsuccess(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_success(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRespsuccess(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_success(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespsuccess(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_spec_successsContext extends General_responseContext {
-    public Specific_success_responseContext specific_success_response() {
-      return getRuleContext(Specific_success_responseContext.class, 0);
+  public static class RespspecsuccesssContext extends GeneralresponseContext {
+    public SpecificsuccessresponseContext specificsuccessresponse() {
+      return getRuleContext(SpecificsuccessresponseContext.class, 0);
     }
 
-    public Resp_spec_successsContext(General_responseContext ctx) {
-      copyFrom(ctx);
+    public RespspecsuccesssContext(GeneralresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).enterResp_spec_successs(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).enterRespspecsuccesss(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener)
-        ((smtlibv2Listener) listener).exitResp_spec_successs(this);
+      if (listener instanceof Smtlibv2Listener)
+        ((Smtlibv2Listener) listener).exitRespspecsuccesss(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_spec_successs(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitRespspecsuccesss(this);
       else return visitor.visitChildren(this);
     }
   }
 
   @SuppressWarnings("CheckReturnValue")
-  public static class Resp_errorContext extends General_responseContext {
+  public static class ResperrorContext extends GeneralresponseContext {
     public TerminalNode ParOpen() {
-      return getToken(smtlibv2Parser.ParOpen, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParOpen, 0);
     }
 
-    public TerminalNode PS_Error() {
-      return getToken(smtlibv2Parser.PS_Error, 0);
+    public TerminalNode PSError() {
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.PSError, 0);
     }
 
     public StringContext string() {
@@ -13930,70 +14025,70 @@ public class smtlibv2Parser extends Parser {
     }
 
     public TerminalNode ParClose() {
-      return getToken(smtlibv2Parser.ParClose, 0);
+      return getToken(org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.ParClose, 0);
     }
 
-    public Resp_errorContext(General_responseContext ctx) {
-      copyFrom(ctx);
+    public ResperrorContext(GeneralresponseContext _ctx) {
+      copyFrom(_ctx);
     }
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).enterResp_error(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterResperror(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof smtlibv2Listener) ((smtlibv2Listener) listener).exitResp_error(this);
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResperror(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof smtlibv2Visitor)
-        return ((smtlibv2Visitor<? extends T>) visitor).visitResp_error(this);
+      if (visitor instanceof Smtlibv2Visitor)
+        return ((Smtlibv2Visitor<? extends T>) visitor).visitResperror(this);
       else return visitor.visitChildren(this);
     }
   }
 
-  public final General_responseContext general_response() throws RecognitionException {
-    General_responseContext _localctx = new General_responseContext(_ctx, getState());
-    enterRule(_localctx, 190, RULE_general_response);
+  public final GeneralresponseContext generalresponse() throws RecognitionException {
+    GeneralresponseContext local_ctx = new GeneralresponseContext(_ctx, getState());
+    enterRule(local_ctx, 190, RULEgeneralresponse);
     try {
       setState(1103);
       _errHandler.sync(this);
       switch (getInterpreter().adaptivePredict(_input, 75, _ctx)) {
         case 1:
-          _localctx = new Resp_successContext(_localctx);
-          enterOuterAlt(_localctx, 1);
+          local_ctx = new RespsuccessContext(local_ctx);
+          enterOuterAlt(local_ctx, 1);
           {
             setState(1095);
-            match(PS_Success);
+            match(PSSuccess);
           }
           break;
         case 2:
-          _localctx = new Resp_spec_successsContext(_localctx);
-          enterOuterAlt(_localctx, 2);
+          local_ctx = new RespspecsuccesssContext(local_ctx);
+          enterOuterAlt(local_ctx, 2);
           {
             setState(1096);
-            specific_success_response();
+            specificsuccessresponse();
           }
           break;
         case 3:
-          _localctx = new Resp_unsupportedContext(_localctx);
-          enterOuterAlt(_localctx, 3);
+          local_ctx = new RespunsupportedContext(local_ctx);
+          enterOuterAlt(local_ctx, 3);
           {
             setState(1097);
-            match(PS_Unsupported);
+            match(PSUnsupported);
           }
           break;
         case 4:
-          _localctx = new Resp_errorContext(_localctx);
-          enterOuterAlt(_localctx, 4);
+          local_ctx = new ResperrorContext(local_ctx);
+          enterOuterAlt(local_ctx, 4);
           {
             setState(1098);
             match(ParOpen);
             setState(1099);
-            match(PS_Error);
+            match(PSError);
             setState(1100);
             string();
             setState(1101);
@@ -14002,16 +14097,16 @@ public class smtlibv2Parser extends Parser {
           break;
       }
     } catch (RecognitionException re) {
-      _localctx.exception = re;
+      local_ctx.exception = re;
       _errHandler.reportError(this, re);
       _errHandler.recover(this, re);
     } finally {
       exitRule();
     }
-    return _localctx;
+    return local_ctx;
   }
 
-  public static final String _serializedATN =
+  public static final String serializedATN =
       "\u0004\u0001|\u0452\u0002\u0000\u0007\u0000\u0002\u0001\u0007\u0001\u0002"
           + "\u0002\u0007\u0002\u0002\u0003\u0007\u0003\u0002\u0004\u0007\u0004\u0002"
           + "\u0005\u0007\u0005\u0002\u0006\u0007\u0006\u0002\u0007\u0007\u0007\u0002"
@@ -14035,7 +14130,7 @@ public class smtlibv2Parser extends Parser {
           + "P\u0007P\u0002Q\u0007Q\u0002R\u0007R\u0002S\u0007S\u0002T\u0007T\u0002"
           + "U\u0007U\u0002V\u0007V\u0002W\u0007W\u0002X\u0007X\u0002Y\u0007Y\u0002"
           + "Z\u0007Z\u0002[\u0007[\u0002\\\u0007\\\u0002]\u0007]\u0002^\u0007^\u0002"
-          + "_\u0007_\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001"
+          + "\u0007\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001"
           + "\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001\u0000\u0001"
           + "\u0000\u0003\u0000\u00cd\b\u0000\u0001\u0001\u0001\u0001\u0001\u0002\u0001"
           + "\u0002\u0003\u0002\u00d3\b\u0002\u0001\u0003\u0001\u0003\u0001\u0004\u0001"
@@ -14147,8 +14242,8 @@ public class smtlibv2Parser extends Parser {
           + "\b[\n[\f[\u0426\t[\u0001[\u0001[\u0001\\\u0001\\\u0005\\\u042c\b\\\n\\"
           + "\f\\\u042f\t\\\u0001\\\u0001\\\u0001]\u0001]\u0004]\u0435\b]\u000b]\f"
           + "]\u0436\u0001]\u0001]\u0001^\u0001^\u0001^\u0001^\u0001^\u0001^\u0001"
-          + "^\u0001^\u0001^\u0001^\u0001^\u0003^\u0446\b^\u0001_\u0001_\u0001_\u0001"
-          + "_\u0001_\u0001_\u0001_\u0001_\u0003_\u0450\b_\u0001_\u0000\u0000`\u0000"
+          + "^\u0001^\u0001^\u0001^\u0001^\u0003^\u0446\b^\u0001\u0001\u0001\u0001"
+          + "\u0001\u0001\u0001\u0001\u0003\u0450\b\u0001\u0000\u0000`\u0000"
           + "\u0002\u0004\u0006\b\n\f\u000e\u0010\u0012\u0014\u0016\u0018\u001a\u001c"
           + "\u001e \"$&(*,.02468:<>@BDFHJLNPRTVXZ\\^`bdfhjlnprtvxz|~\u0080\u0082\u0084"
           + "\u0086\u0088\u008a\u008c\u008e\u0090\u0092\u0094\u0096\u0098\u009a\u009c"
@@ -14205,7 +14300,7 @@ public class smtlibv2Parser extends Parser {
           + "\u00c3\u00c4\u0003@ \u0000\u00c4\u00c5\u0005\u0000\u0000\u0001\u00c5\u00cd"
           + "\u0001\u0000\u0000\u0000\u00c6\u00c7\u0003T*\u0000\u00c7\u00c8\u0005\u0000"
           + "\u0000\u0001\u00c8\u00cd\u0001\u0000\u0000\u0000\u00c9\u00ca\u0003\u00be"
-          + "_\u0000\u00ca\u00cb\u0005\u0000\u0000\u0001\u00cb\u00cd\u0001\u0000\u0000"
+          + "\u0000\u00ca\u00cb\u0005\u0000\u0000\u0001\u00cb\u00cd\u0001\u0000\u0000"
           + "\u0000\u00cc\u00c0\u0001\u0000\u0000\u0000\u00cc\u00c3\u0001\u0000\u0000"
           + "\u0000\u00cc\u00c6\u0001\u0000\u0000\u0000\u00cc\u00c9\u0001\u0000\u0000"
           + "\u0000\u00cd\u0001\u0001\u0000\u0000\u0000\u00ce\u00cf\u0007\u0000\u0000"
@@ -14468,7 +14563,7 @@ public class smtlibv2Parser extends Parser {
           + "\u029c\u0005\u001a\u0000\u0000\u029c\u029d\u0003\f\u0006\u0000\u029d\u029e"
           + "\u0003(\u0014\u0000\u029e]\u0001\u0000\u0000\u0000\u029f\u02a0\u0005\u001b"
           + "\u0000\u0000\u02a0\u02a1\u0003\f\u0006\u0000\u02a1\u02a2\u0003L&\u0000"
-          + "\u02a2_\u0001\u0000\u0000\u0000\u02a3\u02a4\u0005\u001c\u0000\u0000\u02a4"
+          + "\u02a2\u0001\u0000\u0000\u0000\u02a3\u02a4\u0005\u001c\u0000\u0000\u02a4"
           + "\u02a6\u0005\u0002\u0000\u0000\u02a5\u02a7\u0003F#\u0000\u02a6\u02a5\u0001"
           + "\u0000\u0000\u0000\u02a7\u02a8\u0001\u0000\u0000\u0000\u02a8\u02a6\u0001"
           + "\u0000\u0000\u0000\u02a8\u02a9\u0001\u0000\u0000\u0000\u02a9\u02aa\u0001"
@@ -14721,12 +14816,12 @@ public class smtlibv2Parser extends Parser {
           + "\u0296\u02a8\u02af\u02b9\u02ce\u02d5\u02df\u0301\u0390\u03b1\u03bb\u03c2"
           + "\u03d0\u03df\u03f3\u03fc\u0405\u040e\u0416\u041a\u0424\u042d\u0436\u0445"
           + "\u044f";
-  public static final ATN _ATN = new ATNDeserializer().deserialize(_serializedATN.toCharArray());
+  public static final ATN ATN = new ATNDeserializer().deserialize(serializedATN.toCharArray());
 
   static {
-    _decisionToDFA = new DFA[_ATN.getNumberOfDecisions()];
-    for (int i = 0; i < _ATN.getNumberOfDecisions(); i++) {
-      _decisionToDFA[i] = new DFA(_ATN.getDecisionState(i), i);
+    decisionToDFA = new DFA[ATN.getNumberOfDecisions()];
+    for (int i = 0; i < ATN.getNumberOfDecisions(); i++) {
+      decisionToDFA[i] = new DFA(ATN.getDecisionState(i), i);
     }
   }
 }

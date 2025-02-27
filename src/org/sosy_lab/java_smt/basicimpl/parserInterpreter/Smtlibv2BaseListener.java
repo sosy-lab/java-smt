@@ -1,5 +1,6 @@
 // Generated from
-// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+// /home/dalux/Dokumente/IdeaProjects/java-smt/src/org/
+// sosy_lab/javaSmt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -7,18 +8,18 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 /**
- * This class provides an empty implementation of {@link smtlibv2Listener}, which can be extended to
+ * This class provides an empty implementation of {@link Smtlibv2Listener}, which can be extended to
  * create a listener which only needs to handle a subset of the available methods.
  */
 @SuppressWarnings("CheckReturnValue")
-public class smtlibv2BaseListener implements smtlibv2Listener {
+public class Smtlibv2BaseListener implements Smtlibv2Listener {
   /**
    * {@inheritDoc}
    *
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterStart_logic(smtlibv2Parser.Start_logicContext ctx) {}
+  public void enterStartlogic(Smtlibv2Parser.StartlogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -26,7 +27,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitStart_logic(smtlibv2Parser.Start_logicContext ctx) {}
+  public void exitStartlogic(Smtlibv2Parser.StartlogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -34,7 +35,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterStart_theory(smtlibv2Parser.Start_theoryContext ctx) {}
+  public void enterStarttheory(Smtlibv2Parser.StarttheoryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -42,7 +43,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitStart_theory(smtlibv2Parser.Start_theoryContext ctx) {}
+  public void exitStarttheory(Smtlibv2Parser.StarttheoryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -50,7 +51,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterStart_script(smtlibv2Parser.Start_scriptContext ctx) {}
+  public void enterStartscript(Smtlibv2Parser.StartscriptContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -58,7 +59,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitStart_script(smtlibv2Parser.Start_scriptContext ctx) {}
+  public void exitStartscript(Smtlibv2Parser.StartscriptContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -66,7 +67,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterStart_gen_resp(smtlibv2Parser.Start_gen_respContext ctx) {}
+  public void enterStartgenresp(Smtlibv2Parser.StartgenrespContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -74,7 +75,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitStart_gen_resp(smtlibv2Parser.Start_gen_respContext ctx) {}
+  public void exitStartgenresp(Smtlibv2Parser.StartgenrespContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -82,7 +83,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGeneralReservedWord(smtlibv2Parser.GeneralReservedWordContext ctx) {}
+  public void enterGeneralReservedWord(Smtlibv2Parser.GeneralReservedWordContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -90,7 +91,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGeneralReservedWord(smtlibv2Parser.GeneralReservedWordContext ctx) {}
+  public void exitGeneralReservedWord(Smtlibv2Parser.GeneralReservedWordContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -98,7 +99,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSimp_pre_symb(smtlibv2Parser.Simp_pre_symbContext ctx) {}
+  public void enterSimppresymb(Smtlibv2Parser.SimppresymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -106,7 +107,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSimp_pre_symb(smtlibv2Parser.Simp_pre_symbContext ctx) {}
+  public void exitSimppresymb(Smtlibv2Parser.SimppresymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -114,7 +115,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSimp_undef_symb(smtlibv2Parser.Simp_undef_symbContext ctx) {}
+  public void enterSimpundefsymb(Smtlibv2Parser.SimpundefsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -122,7 +123,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSimp_undef_symb(smtlibv2Parser.Simp_undef_symbContext ctx) {}
+  public void exitSimpundefsymb(Smtlibv2Parser.SimpundefsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -130,7 +131,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterQuotedSymbol(smtlibv2Parser.QuotedSymbolContext ctx) {}
+  public void enterQuotedSymbol(Smtlibv2Parser.QuotedSymbolContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -138,7 +139,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitQuotedSymbol(smtlibv2Parser.QuotedSymbolContext ctx) {}
+  public void exitQuotedSymbol(Smtlibv2Parser.QuotedSymbolContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -146,7 +147,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPredefSymbol(smtlibv2Parser.PredefSymbolContext ctx) {}
+  public void enterPredefSymbol(Smtlibv2Parser.PredefSymbolContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -154,7 +155,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPredefSymbol(smtlibv2Parser.PredefSymbolContext ctx) {}
+  public void exitPredefSymbol(Smtlibv2Parser.PredefSymbolContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -162,7 +163,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPredefKeyword(smtlibv2Parser.PredefKeywordContext ctx) {}
+  public void enterPredefKeyword(Smtlibv2Parser.PredefKeywordContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -170,7 +171,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPredefKeyword(smtlibv2Parser.PredefKeywordContext ctx) {}
+  public void exitPredefKeyword(Smtlibv2Parser.PredefKeywordContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -178,7 +179,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSimpsymb(smtlibv2Parser.SimpsymbContext ctx) {}
+  public void enterSimpsymb(Smtlibv2Parser.SimpsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -186,7 +187,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSimpsymb(smtlibv2Parser.SimpsymbContext ctx) {}
+  public void exitSimpsymb(Smtlibv2Parser.SimpsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -194,7 +195,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterQuotsymb(smtlibv2Parser.QuotsymbContext ctx) {}
+  public void enterQuotsymb(Smtlibv2Parser.QuotsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -202,7 +203,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitQuotsymb(smtlibv2Parser.QuotsymbContext ctx) {}
+  public void exitQuotsymb(Smtlibv2Parser.QuotsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -210,7 +211,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterNumeral(smtlibv2Parser.NumeralContext ctx) {}
+  public void enterNumeral(Smtlibv2Parser.NumeralContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -218,7 +219,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitNumeral(smtlibv2Parser.NumeralContext ctx) {}
+  public void exitNumeral(Smtlibv2Parser.NumeralContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -226,7 +227,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecimal(smtlibv2Parser.DecimalContext ctx) {}
+  public void enterDecimal(Smtlibv2Parser.DecimalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -234,7 +235,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecimal(smtlibv2Parser.DecimalContext ctx) {}
+  public void exitDecimal(Smtlibv2Parser.DecimalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -242,7 +243,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterHexadecimal(smtlibv2Parser.HexadecimalContext ctx) {}
+  public void enterHexadecimal(Smtlibv2Parser.HexadecimalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -250,7 +251,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitHexadecimal(smtlibv2Parser.HexadecimalContext ctx) {}
+  public void exitHexadecimal(Smtlibv2Parser.HexadecimalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -258,7 +259,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterBinary(smtlibv2Parser.BinaryContext ctx) {}
+  public void enterBinary(Smtlibv2Parser.BinaryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -266,7 +267,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitBinary(smtlibv2Parser.BinaryContext ctx) {}
+  public void exitBinary(Smtlibv2Parser.BinaryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -274,7 +275,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterString(smtlibv2Parser.StringContext ctx) {}
+  public void enterString(Smtlibv2Parser.StringContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -282,7 +283,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitString(smtlibv2Parser.StringContext ctx) {}
+  public void exitString(Smtlibv2Parser.StringContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -290,7 +291,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFloatingpoint(smtlibv2Parser.FloatingpointContext ctx) {}
+  public void enterFloatingpoint(Smtlibv2Parser.FloatingpointContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -298,7 +299,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFloatingpoint(smtlibv2Parser.FloatingpointContext ctx) {}
+  public void exitFloatingpoint(Smtlibv2Parser.FloatingpointContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -306,7 +307,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPre_key(smtlibv2Parser.Pre_keyContext ctx) {}
+  public void enterPrekey(Smtlibv2Parser.PrekeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -314,7 +315,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPre_key(smtlibv2Parser.Pre_keyContext ctx) {}
+  public void exitPrekey(Smtlibv2Parser.PrekeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -322,7 +323,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterKey_simsymb(smtlibv2Parser.Key_simsymbContext ctx) {}
+  public void enterKeysimsymb(Smtlibv2Parser.KeysimsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -330,7 +331,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitKey_simsymb(smtlibv2Parser.Key_simsymbContext ctx) {}
+  public void exitKeysimsymb(Smtlibv2Parser.KeysimsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -338,7 +339,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_num(smtlibv2Parser.Spec_constant_numContext ctx) {}
+  public void enterSpecconstantnum(Smtlibv2Parser.SpecconstantnumContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -346,7 +347,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_num(smtlibv2Parser.Spec_constant_numContext ctx) {}
+  public void exitSpecconstantnum(Smtlibv2Parser.SpecconstantnumContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -354,7 +355,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_dec(smtlibv2Parser.Spec_constant_decContext ctx) {}
+  public void enterSpecconstantdec(Smtlibv2Parser.SpecconstantdecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -362,7 +363,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_dec(smtlibv2Parser.Spec_constant_decContext ctx) {}
+  public void exitSpecconstantdec(Smtlibv2Parser.SpecconstantdecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -370,7 +371,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx) {}
+  public void enterSpecconstanthex(Smtlibv2Parser.SpecconstanthexContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -378,7 +379,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_hex(smtlibv2Parser.Spec_constant_hexContext ctx) {}
+  public void exitSpecconstanthex(Smtlibv2Parser.SpecconstanthexContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -386,7 +387,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) {}
+  public void enterSpecconstantbin(Smtlibv2Parser.SpecconstantbinContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -394,7 +395,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_bin(smtlibv2Parser.Spec_constant_binContext ctx) {}
+  public void exitSpecconstantbin(Smtlibv2Parser.SpecconstantbinContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -402,7 +403,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx) {}
+  public void enterSpecconstantstring(Smtlibv2Parser.SpecconstantstringContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -410,7 +411,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_string(smtlibv2Parser.Spec_constant_stringContext ctx) {}
+  public void exitSpecconstantstring(Smtlibv2Parser.SpecconstantstringContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -418,8 +419,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSpec_constant_floating_point(
-      smtlibv2Parser.Spec_constant_floating_pointContext ctx) {}
+  public void enterSpecconstantfloatingpoint(Smtlibv2Parser.SpecconstantfloatingpointContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -427,8 +427,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSpec_constant_floating_point(
-      smtlibv2Parser.Spec_constant_floating_pointContext ctx) {}
+  public void exitSpecconstantfloatingpoint(Smtlibv2Parser.SpecconstantfloatingpointContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -436,7 +435,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterS_expr_spec(smtlibv2Parser.S_expr_specContext ctx) {}
+  public void enterSexprspec(Smtlibv2Parser.SexprspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -444,7 +443,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitS_expr_spec(smtlibv2Parser.S_expr_specContext ctx) {}
+  public void exitSexprspec(Smtlibv2Parser.SexprspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -452,7 +451,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterS_expr_symb(smtlibv2Parser.S_expr_symbContext ctx) {}
+  public void enterSexprsymb(Smtlibv2Parser.SexprsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -460,7 +459,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitS_expr_symb(smtlibv2Parser.S_expr_symbContext ctx) {}
+  public void exitSexprsymb(Smtlibv2Parser.SexprsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -468,7 +467,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterS_expr_key(smtlibv2Parser.S_expr_keyContext ctx) {}
+  public void enterSexprkey(Smtlibv2Parser.SexprkeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -476,7 +475,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitS_expr_key(smtlibv2Parser.S_expr_keyContext ctx) {}
+  public void exitSexprkey(Smtlibv2Parser.SexprkeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -484,7 +483,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMulti_s_expr(smtlibv2Parser.Multi_s_exprContext ctx) {}
+  public void enterMultisexpr(Smtlibv2Parser.MultisexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -492,7 +491,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMulti_s_expr(smtlibv2Parser.Multi_s_exprContext ctx) {}
+  public void exitMultisexpr(Smtlibv2Parser.MultisexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -500,7 +499,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterIdx_num(smtlibv2Parser.Idx_numContext ctx) {}
+  public void enterIdxnum(Smtlibv2Parser.IdxnumContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -508,7 +507,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitIdx_num(smtlibv2Parser.Idx_numContext ctx) {}
+  public void exitIdxnum(Smtlibv2Parser.IdxnumContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -516,7 +515,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterIdx_symb(smtlibv2Parser.Idx_symbContext ctx) {}
+  public void enterIdxsymb(Smtlibv2Parser.IdxsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -524,7 +523,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitIdx_symb(smtlibv2Parser.Idx_symbContext ctx) {}
+  public void exitIdxsymb(Smtlibv2Parser.IdxsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -532,7 +531,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterId_symb(smtlibv2Parser.Id_symbContext ctx) {}
+  public void enterIdsymb(Smtlibv2Parser.IdsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -540,7 +539,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitId_symb(smtlibv2Parser.Id_symbContext ctx) {}
+  public void exitIdsymb(Smtlibv2Parser.IdsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -548,7 +547,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx) {}
+  public void enterIdsymbidx(Smtlibv2Parser.IdsymbidxContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -556,7 +555,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitId_symb_idx(smtlibv2Parser.Id_symb_idxContext ctx) {}
+  public void exitIdsymbidx(Smtlibv2Parser.IdsymbidxContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -564,7 +563,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAttr_spec(smtlibv2Parser.Attr_specContext ctx) {}
+  public void enterAttrspec(Smtlibv2Parser.AttrspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -572,7 +571,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAttr_spec(smtlibv2Parser.Attr_specContext ctx) {}
+  public void exitAttrspec(Smtlibv2Parser.AttrspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -580,7 +579,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAttr_symb(smtlibv2Parser.Attr_symbContext ctx) {}
+  public void enterAttrsymb(Smtlibv2Parser.AttrsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -588,7 +587,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAttr_symb(smtlibv2Parser.Attr_symbContext ctx) {}
+  public void exitAttrsymb(Smtlibv2Parser.AttrsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -596,7 +595,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAttr_s_expr(smtlibv2Parser.Attr_s_exprContext ctx) {}
+  public void enterAttrsexpr(Smtlibv2Parser.AttrsexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -604,7 +603,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAttr_s_expr(smtlibv2Parser.Attr_s_exprContext ctx) {}
+  public void exitAttrsexpr(Smtlibv2Parser.AttrsexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -612,7 +611,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAttr_key(smtlibv2Parser.Attr_keyContext ctx) {}
+  public void enterAttrkey(Smtlibv2Parser.AttrkeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -620,7 +619,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAttr_key(smtlibv2Parser.Attr_keyContext ctx) {}
+  public void exitAttrkey(Smtlibv2Parser.AttrkeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -628,7 +627,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx) {}
+  public void enterAttrkeyattr(Smtlibv2Parser.AttrkeyattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -636,7 +635,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAttr_key_attr(smtlibv2Parser.Attr_key_attrContext ctx) {}
+  public void exitAttrkeyattr(Smtlibv2Parser.AttrkeyattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -644,7 +643,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSort_id(smtlibv2Parser.Sort_idContext ctx) {}
+  public void enterSortid(Smtlibv2Parser.SortidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -652,7 +651,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSort_id(smtlibv2Parser.Sort_idContext ctx) {}
+  public void exitSortid(Smtlibv2Parser.SortidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -660,7 +659,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMultisort(smtlibv2Parser.MultisortContext ctx) {}
+  public void enterMultisort(Smtlibv2Parser.MultisortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -668,7 +667,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMultisort(smtlibv2Parser.MultisortContext ctx) {}
+  public void exitMultisort(Smtlibv2Parser.MultisortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -676,7 +675,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterQual_id(smtlibv2Parser.Qual_idContext ctx) {}
+  public void enterQualid(Smtlibv2Parser.QualidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -684,7 +683,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitQual_id(smtlibv2Parser.Qual_idContext ctx) {}
+  public void exitQualid(Smtlibv2Parser.QualidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -692,7 +691,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) {}
+  public void enterQualidsort(Smtlibv2Parser.QualidsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -700,7 +699,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitQual_id_sort(smtlibv2Parser.Qual_id_sortContext ctx) {}
+  public void exitQualidsort(Smtlibv2Parser.QualidsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -708,7 +707,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterVar_binding(smtlibv2Parser.Var_bindingContext ctx) {}
+  public void enterVarbinding(Smtlibv2Parser.VarbindingContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -716,7 +715,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitVar_binding(smtlibv2Parser.Var_bindingContext ctx) {}
+  public void exitVarbinding(Smtlibv2Parser.VarbindingContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -724,7 +723,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSorted_var(smtlibv2Parser.Sorted_varContext ctx) {}
+  public void enterSortedvar(Smtlibv2Parser.SortedvarContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -732,7 +731,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSorted_var(smtlibv2Parser.Sorted_varContext ctx) {}
+  public void exitSortedvar(Smtlibv2Parser.SortedvarContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -740,7 +739,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPattern_symb(smtlibv2Parser.Pattern_symbContext ctx) {}
+  public void enterPatternsymb(Smtlibv2Parser.PatternsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -748,7 +747,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPattern_symb(smtlibv2Parser.Pattern_symbContext ctx) {}
+  public void exitPatternsymb(Smtlibv2Parser.PatternsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -756,7 +755,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPattern_multisymb(smtlibv2Parser.Pattern_multisymbContext ctx) {}
+  public void enterPatternmultisymb(Smtlibv2Parser.PatternmultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -764,7 +763,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPattern_multisymb(smtlibv2Parser.Pattern_multisymbContext ctx) {}
+  public void exitPatternmultisymb(Smtlibv2Parser.PatternmultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -772,7 +771,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMatch_case(smtlibv2Parser.Match_caseContext ctx) {}
+  public void enterMatchcase(Smtlibv2Parser.MatchcaseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -780,7 +779,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMatch_case(smtlibv2Parser.Match_caseContext ctx) {}
+  public void exitMatchcase(Smtlibv2Parser.MatchcaseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -788,7 +787,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) {}
+  public void enterTermspecconst(Smtlibv2Parser.TermspecconstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -796,7 +795,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_spec_const(smtlibv2Parser.Term_spec_constContext ctx) {}
+  public void exitTermspecconst(Smtlibv2Parser.TermspecconstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -804,7 +803,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {}
+  public void enterTermqualid(Smtlibv2Parser.TermqualidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -812,7 +811,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_qual_id(smtlibv2Parser.Term_qual_idContext ctx) {}
+  public void exitTermqualid(Smtlibv2Parser.TermqualidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -820,7 +819,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMultiterm(smtlibv2Parser.MultitermContext ctx) {}
+  public void enterMultiterm(Smtlibv2Parser.MultitermContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -828,7 +827,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMultiterm(smtlibv2Parser.MultitermContext ctx) {}
+  public void exitMultiterm(Smtlibv2Parser.MultitermContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -836,7 +835,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_let(smtlibv2Parser.Term_letContext ctx) {}
+  public void enterTermlet(Smtlibv2Parser.TermletContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -844,7 +843,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_let(smtlibv2Parser.Term_letContext ctx) {}
+  public void exitTermlet(Smtlibv2Parser.TermletContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -852,7 +851,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_forall(smtlibv2Parser.Term_forallContext ctx) {}
+  public void enterTermforall(Smtlibv2Parser.TermforallContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -860,7 +859,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_forall(smtlibv2Parser.Term_forallContext ctx) {}
+  public void exitTermforall(Smtlibv2Parser.TermforallContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -868,7 +867,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_exists(smtlibv2Parser.Term_existsContext ctx) {}
+  public void enterTermexists(Smtlibv2Parser.TermexistsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -876,7 +875,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_exists(smtlibv2Parser.Term_existsContext ctx) {}
+  public void exitTermexists(Smtlibv2Parser.TermexistsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -884,7 +883,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_match(smtlibv2Parser.Term_matchContext ctx) {}
+  public void enterTermmatch(Smtlibv2Parser.TermmatchContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -892,7 +891,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_match(smtlibv2Parser.Term_matchContext ctx) {}
+  public void exitTermmatch(Smtlibv2Parser.TermmatchContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -900,7 +899,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTerm_exclam(smtlibv2Parser.Term_exclamContext ctx) {}
+  public void enterTermexclam(Smtlibv2Parser.TermexclamContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -908,7 +907,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTerm_exclam(smtlibv2Parser.Term_exclamContext ctx) {}
+  public void exitTermexclam(Smtlibv2Parser.TermexclamContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -916,7 +915,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSort_symbol_decl(smtlibv2Parser.Sort_symbol_declContext ctx) {}
+  public void enterSortsymboldecl(Smtlibv2Parser.SortsymboldeclContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -924,7 +923,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSort_symbol_decl(smtlibv2Parser.Sort_symbol_declContext ctx) {}
+  public void exitSortsymboldecl(Smtlibv2Parser.SortsymboldeclContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -932,7 +931,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMeta_spec_constant(smtlibv2Parser.Meta_spec_constantContext ctx) {}
+  public void enterMetaspecconstant(Smtlibv2Parser.MetaspecconstantContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -940,7 +939,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMeta_spec_constant(smtlibv2Parser.Meta_spec_constantContext ctx) {}
+  public void exitMetaspecconstant(Smtlibv2Parser.MetaspecconstantContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -948,7 +947,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFun_symb_spec(smtlibv2Parser.Fun_symb_specContext ctx) {}
+  public void enterFunsymbspec(Smtlibv2Parser.FunsymbspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -956,7 +955,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFun_symb_spec(smtlibv2Parser.Fun_symb_specContext ctx) {}
+  public void exitFunsymbspec(Smtlibv2Parser.FunsymbspecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -964,7 +963,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFun_symb_meta(smtlibv2Parser.Fun_symb_metaContext ctx) {}
+  public void enterFunsymbmeta(Smtlibv2Parser.FunsymbmetaContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -972,7 +971,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFun_symb_meta(smtlibv2Parser.Fun_symb_metaContext ctx) {}
+  public void exitFunsymbmeta(Smtlibv2Parser.FunsymbmetaContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -980,7 +979,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFun_symb_id(smtlibv2Parser.Fun_symb_idContext ctx) {}
+  public void enterFunsymbid(Smtlibv2Parser.FunsymbidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -988,7 +987,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFun_symb_id(smtlibv2Parser.Fun_symb_idContext ctx) {}
+  public void exitFunsymbid(Smtlibv2Parser.FunsymbidContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -996,7 +995,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPar_fun_symb(smtlibv2Parser.Par_fun_symbContext ctx) {}
+  public void enterParfunsymb(Smtlibv2Parser.ParfunsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1004,7 +1003,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPar_fun_symb(smtlibv2Parser.Par_fun_symbContext ctx) {}
+  public void exitParfunsymb(Smtlibv2Parser.ParfunsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1012,7 +1011,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPar_fun_multi_symb(smtlibv2Parser.Par_fun_multi_symbContext ctx) {}
+  public void enterParfunmultisymb(Smtlibv2Parser.ParfunmultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1020,7 +1019,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPar_fun_multi_symb(smtlibv2Parser.Par_fun_multi_symbContext ctx) {}
+  public void exitParfunmultisymb(Smtlibv2Parser.ParfunmultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1028,7 +1027,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_sort(smtlibv2Parser.Theory_sortContext ctx) {}
+  public void enterTheorysort(Smtlibv2Parser.TheorysortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1036,7 +1035,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_sort(smtlibv2Parser.Theory_sortContext ctx) {}
+  public void exitTheorysort(Smtlibv2Parser.TheorysortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1044,7 +1043,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_fun(smtlibv2Parser.Theory_funContext ctx) {}
+  public void enterTheoryfun(Smtlibv2Parser.TheoryfunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1052,7 +1051,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_fun(smtlibv2Parser.Theory_funContext ctx) {}
+  public void exitTheoryfun(Smtlibv2Parser.TheoryfunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1060,7 +1059,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_sort_descr(smtlibv2Parser.Theory_sort_descrContext ctx) {}
+  public void enterTheorysortdescr(Smtlibv2Parser.TheorysortdescrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1068,7 +1067,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_sort_descr(smtlibv2Parser.Theory_sort_descrContext ctx) {}
+  public void exitTheorysortdescr(Smtlibv2Parser.TheorysortdescrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1076,7 +1075,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_fun_descr(smtlibv2Parser.Theory_fun_descrContext ctx) {}
+  public void enterTheoryfundescr(Smtlibv2Parser.TheoryfundescrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1084,7 +1083,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_fun_descr(smtlibv2Parser.Theory_fun_descrContext ctx) {}
+  public void exitTheoryfundescr(Smtlibv2Parser.TheoryfundescrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1092,7 +1091,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_def(smtlibv2Parser.Theory_defContext ctx) {}
+  public void enterTheorydef(Smtlibv2Parser.TheorydefContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1100,7 +1099,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_def(smtlibv2Parser.Theory_defContext ctx) {}
+  public void exitTheorydef(Smtlibv2Parser.TheorydefContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1108,7 +1107,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_val(smtlibv2Parser.Theory_valContext ctx) {}
+  public void enterTheoryval(Smtlibv2Parser.TheoryvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1116,7 +1115,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_val(smtlibv2Parser.Theory_valContext ctx) {}
+  public void exitTheoryval(Smtlibv2Parser.TheoryvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1124,7 +1123,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_notes(smtlibv2Parser.Theory_notesContext ctx) {}
+  public void enterTheorynotes(Smtlibv2Parser.TheorynotesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1132,7 +1131,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_notes(smtlibv2Parser.Theory_notesContext ctx) {}
+  public void exitTheorynotes(Smtlibv2Parser.TheorynotesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1140,7 +1139,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_attr(smtlibv2Parser.Theory_attrContext ctx) {}
+  public void enterTheoryattr(Smtlibv2Parser.TheoryattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1148,7 +1147,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_attr(smtlibv2Parser.Theory_attrContext ctx) {}
+  public void exitTheoryattr(Smtlibv2Parser.TheoryattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1156,7 +1155,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterTheory_decl(smtlibv2Parser.Theory_declContext ctx) {}
+  public void enterTheorydecl(Smtlibv2Parser.TheorydeclContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1164,7 +1163,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitTheory_decl(smtlibv2Parser.Theory_declContext ctx) {}
+  public void exitTheorydecl(Smtlibv2Parser.TheorydeclContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1172,7 +1171,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_theory(smtlibv2Parser.Logic_theoryContext ctx) {}
+  public void enterLogictheory(Smtlibv2Parser.LogictheoryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1180,7 +1179,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_theory(smtlibv2Parser.Logic_theoryContext ctx) {}
+  public void exitLogictheory(Smtlibv2Parser.LogictheoryContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1188,7 +1187,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_language(smtlibv2Parser.Logic_languageContext ctx) {}
+  public void enterLogiclanguage(Smtlibv2Parser.LogiclanguageContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1196,7 +1195,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_language(smtlibv2Parser.Logic_languageContext ctx) {}
+  public void exitLogiclanguage(Smtlibv2Parser.LogiclanguageContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1204,7 +1203,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_ext(smtlibv2Parser.Logic_extContext ctx) {}
+  public void enterLogicext(Smtlibv2Parser.LogicextContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1212,7 +1211,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_ext(smtlibv2Parser.Logic_extContext ctx) {}
+  public void exitLogicext(Smtlibv2Parser.LogicextContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1220,7 +1219,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_val(smtlibv2Parser.Logic_valContext ctx) {}
+  public void enterLogicval(Smtlibv2Parser.LogicvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1228,7 +1227,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_val(smtlibv2Parser.Logic_valContext ctx) {}
+  public void exitLogicval(Smtlibv2Parser.LogicvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1236,7 +1235,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_notes(smtlibv2Parser.Logic_notesContext ctx) {}
+  public void enterLogicnotes(Smtlibv2Parser.LogicnotesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1244,7 +1243,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_notes(smtlibv2Parser.Logic_notesContext ctx) {}
+  public void exitLogicnotes(Smtlibv2Parser.LogicnotesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1252,7 +1251,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic_attr(smtlibv2Parser.Logic_attrContext ctx) {}
+  public void enterLogicattr(Smtlibv2Parser.LogicattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1260,7 +1259,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic_attr(smtlibv2Parser.Logic_attrContext ctx) {}
+  public void exitLogicattr(Smtlibv2Parser.LogicattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1268,7 +1267,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterLogic(smtlibv2Parser.LogicContext ctx) {}
+  public void enterLogic(Smtlibv2Parser.LogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1276,7 +1275,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitLogic(smtlibv2Parser.LogicContext ctx) {}
+  public void exitLogic(Smtlibv2Parser.LogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1284,7 +1283,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSort_dec(smtlibv2Parser.Sort_decContext ctx) {}
+  public void enterSortdec(Smtlibv2Parser.SortdecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1292,7 +1291,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSort_dec(smtlibv2Parser.Sort_decContext ctx) {}
+  public void exitSortdec(Smtlibv2Parser.SortdecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1300,7 +1299,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSelector_dec(smtlibv2Parser.Selector_decContext ctx) {}
+  public void enterSelectordec(Smtlibv2Parser.SelectordecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1308,7 +1307,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSelector_dec(smtlibv2Parser.Selector_decContext ctx) {}
+  public void exitSelectordec(Smtlibv2Parser.SelectordecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1316,7 +1315,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterConstructor_dec(smtlibv2Parser.Constructor_decContext ctx) {}
+  public void enterConstructordec(Smtlibv2Parser.ConstructordecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1324,7 +1323,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitConstructor_dec(smtlibv2Parser.Constructor_decContext ctx) {}
+  public void exitConstructordec(Smtlibv2Parser.ConstructordecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1332,7 +1331,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterData_constr(smtlibv2Parser.Data_constrContext ctx) {}
+  public void enterDataconstr(Smtlibv2Parser.DataconstrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1340,7 +1339,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitData_constr(smtlibv2Parser.Data_constrContext ctx) {}
+  public void exitDataconstr(Smtlibv2Parser.DataconstrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1348,7 +1347,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterData_multisymb(smtlibv2Parser.Data_multisymbContext ctx) {}
+  public void enterDatamultisymb(Smtlibv2Parser.DatamultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1356,7 +1355,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitData_multisymb(smtlibv2Parser.Data_multisymbContext ctx) {}
+  public void exitDatamultisymb(Smtlibv2Parser.DatamultisymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1364,7 +1363,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFunction_dec(smtlibv2Parser.Function_decContext ctx) {}
+  public void enterFunctiondec(Smtlibv2Parser.FunctiondecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1372,7 +1371,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFunction_dec(smtlibv2Parser.Function_decContext ctx) {}
+  public void exitFunctiondec(Smtlibv2Parser.FunctiondecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1380,7 +1379,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterFunction_def(smtlibv2Parser.Function_defContext ctx) {}
+  public void enterFunctiondef(Smtlibv2Parser.FunctiondefContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1388,7 +1387,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitFunction_def(smtlibv2Parser.Function_defContext ctx) {}
+  public void exitFunctiondef(Smtlibv2Parser.FunctiondefContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1396,7 +1395,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProp_symb(smtlibv2Parser.Prop_symbContext ctx) {}
+  public void enterPropsymb(Smtlibv2Parser.PropsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1404,7 +1403,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProp_symb(smtlibv2Parser.Prop_symbContext ctx) {}
+  public void exitPropsymb(Smtlibv2Parser.PropsymbContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1412,7 +1411,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProp_not(smtlibv2Parser.Prop_notContext ctx) {}
+  public void enterPropnot(Smtlibv2Parser.PropnotContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1420,7 +1419,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProp_not(smtlibv2Parser.Prop_notContext ctx) {}
+  public void exitPropnot(Smtlibv2Parser.PropnotContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1428,7 +1427,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterScript(smtlibv2Parser.ScriptContext ctx) {}
+  public void enterScript(Smtlibv2Parser.ScriptContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1436,7 +1435,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitScript(smtlibv2Parser.ScriptContext ctx) {}
+  public void exitScript(Smtlibv2Parser.ScriptContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1444,7 +1443,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {}
+  public void enterCmdassert(Smtlibv2Parser.CmdassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1452,7 +1451,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_assert(smtlibv2Parser.Cmd_assertContext ctx) {}
+  public void exitCmdassert(Smtlibv2Parser.CmdassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1460,7 +1459,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_checkSat(smtlibv2Parser.Cmd_checkSatContext ctx) {}
+  public void enterCmdcheckSat(Smtlibv2Parser.CmdcheckSatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1468,7 +1467,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_checkSat(smtlibv2Parser.Cmd_checkSatContext ctx) {}
+  public void exitCmdcheckSat(Smtlibv2Parser.CmdcheckSatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1476,7 +1475,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_checkSatAssuming(smtlibv2Parser.Cmd_checkSatAssumingContext ctx) {}
+  public void enterCmdcheckSatAssuming(Smtlibv2Parser.CmdcheckSatAssumingContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1484,7 +1483,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_checkSatAssuming(smtlibv2Parser.Cmd_checkSatAssumingContext ctx) {}
+  public void exitCmdcheckSatAssuming(Smtlibv2Parser.CmdcheckSatAssumingContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1492,7 +1491,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx) {}
+  public void enterCmddeclareConst(Smtlibv2Parser.CmddeclareConstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1500,7 +1499,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_declareConst(smtlibv2Parser.Cmd_declareConstContext ctx) {}
+  public void exitCmddeclareConst(Smtlibv2Parser.CmddeclareConstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1508,7 +1507,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_declareDatatype(smtlibv2Parser.Cmd_declareDatatypeContext ctx) {}
+  public void enterCmddeclareDatatype(Smtlibv2Parser.CmddeclareDatatypeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1516,7 +1515,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_declareDatatype(smtlibv2Parser.Cmd_declareDatatypeContext ctx) {}
+  public void exitCmddeclareDatatype(Smtlibv2Parser.CmddeclareDatatypeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1524,7 +1523,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) {}
+  public void enterCmddeclareDatatypes(Smtlibv2Parser.CmddeclareDatatypesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1532,7 +1531,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_declareDatatypes(smtlibv2Parser.Cmd_declareDatatypesContext ctx) {}
+  public void exitCmddeclareDatatypes(Smtlibv2Parser.CmddeclareDatatypesContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1540,7 +1539,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) {}
+  public void enterCmddeclareFun(Smtlibv2Parser.CmddeclareFunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1548,7 +1547,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_declareFun(smtlibv2Parser.Cmd_declareFunContext ctx) {}
+  public void exitCmddeclareFun(Smtlibv2Parser.CmddeclareFunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1556,7 +1555,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_declareSort(smtlibv2Parser.Cmd_declareSortContext ctx) {}
+  public void enterCmddeclareSort(Smtlibv2Parser.CmddeclareSortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1564,7 +1563,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_declareSort(smtlibv2Parser.Cmd_declareSortContext ctx) {}
+  public void exitCmddeclareSort(Smtlibv2Parser.CmddeclareSortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1572,7 +1571,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_defineFun(smtlibv2Parser.Cmd_defineFunContext ctx) {}
+  public void enterCmddefineFun(Smtlibv2Parser.CmddefineFunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1580,7 +1579,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_defineFun(smtlibv2Parser.Cmd_defineFunContext ctx) {}
+  public void exitCmddefineFun(Smtlibv2Parser.CmddefineFunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1588,7 +1587,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_defineFunRec(smtlibv2Parser.Cmd_defineFunRecContext ctx) {}
+  public void enterCmddefineFunRec(Smtlibv2Parser.CmddefineFunRecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1596,7 +1595,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_defineFunRec(smtlibv2Parser.Cmd_defineFunRecContext ctx) {}
+  public void exitCmddefineFunRec(Smtlibv2Parser.CmddefineFunRecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1604,7 +1603,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_defineFunsRec(smtlibv2Parser.Cmd_defineFunsRecContext ctx) {}
+  public void enterCmddefineFunsRec(Smtlibv2Parser.CmddefineFunsRecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1612,7 +1611,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_defineFunsRec(smtlibv2Parser.Cmd_defineFunsRecContext ctx) {}
+  public void exitCmddefineFunsRec(Smtlibv2Parser.CmddefineFunsRecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1620,7 +1619,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_defineSort(smtlibv2Parser.Cmd_defineSortContext ctx) {}
+  public void enterCmddefineSort(Smtlibv2Parser.CmddefineSortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1628,7 +1627,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_defineSort(smtlibv2Parser.Cmd_defineSortContext ctx) {}
+  public void exitCmddefineSort(Smtlibv2Parser.CmddefineSortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1636,7 +1635,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_echo(smtlibv2Parser.Cmd_echoContext ctx) {}
+  public void enterCmdecho(Smtlibv2Parser.CmdechoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1644,7 +1643,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_echo(smtlibv2Parser.Cmd_echoContext ctx) {}
+  public void exitCmdecho(Smtlibv2Parser.CmdechoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1652,7 +1651,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_exit(smtlibv2Parser.Cmd_exitContext ctx) {}
+  public void enterCmdexit(Smtlibv2Parser.CmdexitContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1660,7 +1659,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_exit(smtlibv2Parser.Cmd_exitContext ctx) {}
+  public void exitCmdexit(Smtlibv2Parser.CmdexitContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1668,7 +1667,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getAssertions(smtlibv2Parser.Cmd_getAssertionsContext ctx) {}
+  public void enterCmdgetAssertions(Smtlibv2Parser.CmdgetAssertionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1676,7 +1675,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getAssertions(smtlibv2Parser.Cmd_getAssertionsContext ctx) {}
+  public void exitCmdgetAssertions(Smtlibv2Parser.CmdgetAssertionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1684,7 +1683,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getAssignment(smtlibv2Parser.Cmd_getAssignmentContext ctx) {}
+  public void enterCmdgetAssignment(Smtlibv2Parser.CmdgetAssignmentContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1692,7 +1691,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getAssignment(smtlibv2Parser.Cmd_getAssignmentContext ctx) {}
+  public void exitCmdgetAssignment(Smtlibv2Parser.CmdgetAssignmentContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1700,7 +1699,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getInfo(smtlibv2Parser.Cmd_getInfoContext ctx) {}
+  public void enterCmdgetInfo(Smtlibv2Parser.CmdgetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1708,7 +1707,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getInfo(smtlibv2Parser.Cmd_getInfoContext ctx) {}
+  public void exitCmdgetInfo(Smtlibv2Parser.CmdgetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1716,7 +1715,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getModel(smtlibv2Parser.Cmd_getModelContext ctx) {}
+  public void enterCmdgetModel(Smtlibv2Parser.CmdgetModelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1724,7 +1723,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getModel(smtlibv2Parser.Cmd_getModelContext ctx) {}
+  public void exitCmdgetModel(Smtlibv2Parser.CmdgetModelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1732,7 +1731,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getOption(smtlibv2Parser.Cmd_getOptionContext ctx) {}
+  public void enterCmdgetOption(Smtlibv2Parser.CmdgetOptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1740,7 +1739,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getOption(smtlibv2Parser.Cmd_getOptionContext ctx) {}
+  public void exitCmdgetOption(Smtlibv2Parser.CmdgetOptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1748,7 +1747,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getProof(smtlibv2Parser.Cmd_getProofContext ctx) {}
+  public void enterCmdgetProof(Smtlibv2Parser.CmdgetProofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1756,7 +1755,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getProof(smtlibv2Parser.Cmd_getProofContext ctx) {}
+  public void exitCmdgetProof(Smtlibv2Parser.CmdgetProofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1764,7 +1763,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getUnsatAssumptions(smtlibv2Parser.Cmd_getUnsatAssumptionsContext ctx) {}
+  public void enterCmdgetUnsatAssumptions(Smtlibv2Parser.CmdgetUnsatAssumptionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1772,7 +1771,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getUnsatAssumptions(smtlibv2Parser.Cmd_getUnsatAssumptionsContext ctx) {}
+  public void exitCmdgetUnsatAssumptions(Smtlibv2Parser.CmdgetUnsatAssumptionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1780,7 +1779,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getUnsatCore(smtlibv2Parser.Cmd_getUnsatCoreContext ctx) {}
+  public void enterCmdgetUnsatCore(Smtlibv2Parser.CmdgetUnsatCoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1788,7 +1787,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getUnsatCore(smtlibv2Parser.Cmd_getUnsatCoreContext ctx) {}
+  public void exitCmdgetUnsatCore(Smtlibv2Parser.CmdgetUnsatCoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1796,7 +1795,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_getValue(smtlibv2Parser.Cmd_getValueContext ctx) {}
+  public void enterCmdgetValue(Smtlibv2Parser.CmdgetValueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1804,7 +1803,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_getValue(smtlibv2Parser.Cmd_getValueContext ctx) {}
+  public void exitCmdgetValue(Smtlibv2Parser.CmdgetValueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1812,7 +1811,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_pop(smtlibv2Parser.Cmd_popContext ctx) {}
+  public void enterCmdpop(Smtlibv2Parser.CmdpopContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1820,7 +1819,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_pop(smtlibv2Parser.Cmd_popContext ctx) {}
+  public void exitCmdpop(Smtlibv2Parser.CmdpopContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1828,7 +1827,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_push(smtlibv2Parser.Cmd_pushContext ctx) {}
+  public void enterCmdpush(Smtlibv2Parser.CmdpushContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1836,7 +1835,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_push(smtlibv2Parser.Cmd_pushContext ctx) {}
+  public void exitCmdpush(Smtlibv2Parser.CmdpushContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1844,7 +1843,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_reset(smtlibv2Parser.Cmd_resetContext ctx) {}
+  public void enterCmdreset(Smtlibv2Parser.CmdresetContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1852,7 +1851,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_reset(smtlibv2Parser.Cmd_resetContext ctx) {}
+  public void exitCmdreset(Smtlibv2Parser.CmdresetContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1860,7 +1859,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_resetAssertions(smtlibv2Parser.Cmd_resetAssertionsContext ctx) {}
+  public void enterCmdresetAssertions(Smtlibv2Parser.CmdresetAssertionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1868,7 +1867,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_resetAssertions(smtlibv2Parser.Cmd_resetAssertionsContext ctx) {}
+  public void exitCmdresetAssertions(Smtlibv2Parser.CmdresetAssertionsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1876,7 +1875,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_setInfo(smtlibv2Parser.Cmd_setInfoContext ctx) {}
+  public void enterCmdsetInfo(Smtlibv2Parser.CmdsetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1884,7 +1883,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_setInfo(smtlibv2Parser.Cmd_setInfoContext ctx) {}
+  public void exitCmdsetInfo(Smtlibv2Parser.CmdsetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1892,7 +1891,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_setLogic(smtlibv2Parser.Cmd_setLogicContext ctx) {}
+  public void enterCmdsetLogic(Smtlibv2Parser.CmdsetLogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1900,7 +1899,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_setLogic(smtlibv2Parser.Cmd_setLogicContext ctx) {}
+  public void exitCmdsetLogic(Smtlibv2Parser.CmdsetLogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1908,7 +1907,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCmd_setOption(smtlibv2Parser.Cmd_setOptionContext ctx) {}
+  public void enterCmdsetOption(Smtlibv2Parser.CmdsetOptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1916,7 +1915,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCmd_setOption(smtlibv2Parser.Cmd_setOptionContext ctx) {}
+  public void exitCmdsetOption(Smtlibv2Parser.CmdsetOptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1924,7 +1923,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAssert(smtlibv2Parser.AssertContext ctx) {}
+  public void enterAssert(Smtlibv2Parser.AssertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1932,7 +1931,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAssert(smtlibv2Parser.AssertContext ctx) {}
+  public void exitAssert(Smtlibv2Parser.AssertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1940,7 +1939,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCheck(smtlibv2Parser.CheckContext ctx) {}
+  public void enterCheck(Smtlibv2Parser.CheckContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1948,7 +1947,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCheck(smtlibv2Parser.CheckContext ctx) {}
+  public void exitCheck(Smtlibv2Parser.CheckContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1956,7 +1955,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCheck_assume(smtlibv2Parser.Check_assumeContext ctx) {}
+  public void enterCheckassume(Smtlibv2Parser.CheckassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1964,7 +1963,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCheck_assume(smtlibv2Parser.Check_assumeContext ctx) {}
+  public void exitCheckassume(Smtlibv2Parser.CheckassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1972,7 +1971,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecl_const(smtlibv2Parser.Decl_constContext ctx) {}
+  public void enterDeclconst(Smtlibv2Parser.DeclconstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1980,7 +1979,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecl_const(smtlibv2Parser.Decl_constContext ctx) {}
+  public void exitDeclconst(Smtlibv2Parser.DeclconstContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1988,7 +1987,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecl_data(smtlibv2Parser.Decl_dataContext ctx) {}
+  public void enterDecldata(Smtlibv2Parser.DecldataContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -1996,7 +1995,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecl_data(smtlibv2Parser.Decl_dataContext ctx) {}
+  public void exitDecldata(Smtlibv2Parser.DecldataContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2004,7 +2003,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecl_datas(smtlibv2Parser.Decl_datasContext ctx) {}
+  public void enterDecldatas(Smtlibv2Parser.DecldatasContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2012,7 +2011,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecl_datas(smtlibv2Parser.Decl_datasContext ctx) {}
+  public void exitDecldatas(Smtlibv2Parser.DecldatasContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2020,7 +2019,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecl_fun(smtlibv2Parser.Decl_funContext ctx) {}
+  public void enterDeclfun(Smtlibv2Parser.DeclfunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2028,7 +2027,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecl_fun(smtlibv2Parser.Decl_funContext ctx) {}
+  public void exitDeclfun(Smtlibv2Parser.DeclfunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2036,7 +2035,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDecl_sort(smtlibv2Parser.Decl_sortContext ctx) {}
+  public void enterDeclsort(Smtlibv2Parser.DeclsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2044,7 +2043,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDecl_sort(smtlibv2Parser.Decl_sortContext ctx) {}
+  public void exitDeclsort(Smtlibv2Parser.DeclsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2052,7 +2051,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDef_fun(smtlibv2Parser.Def_funContext ctx) {}
+  public void enterDeffun(Smtlibv2Parser.DeffunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2060,7 +2059,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDef_fun(smtlibv2Parser.Def_funContext ctx) {}
+  public void exitDeffun(Smtlibv2Parser.DeffunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2068,7 +2067,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDef_fun_rec(smtlibv2Parser.Def_fun_recContext ctx) {}
+  public void enterDeffunrec(Smtlibv2Parser.DeffunrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2076,7 +2075,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDef_fun_rec(smtlibv2Parser.Def_fun_recContext ctx) {}
+  public void exitDeffunrec(Smtlibv2Parser.DeffunrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2084,7 +2083,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDef_funs_rec(smtlibv2Parser.Def_funs_recContext ctx) {}
+  public void enterDeffunsrec(Smtlibv2Parser.DeffunsrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2092,7 +2091,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDef_funs_rec(smtlibv2Parser.Def_funs_recContext ctx) {}
+  public void exitDeffunsrec(Smtlibv2Parser.DeffunsrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2100,7 +2099,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDef_sort(smtlibv2Parser.Def_sortContext ctx) {}
+  public void enterDefsort(Smtlibv2Parser.DefsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2108,7 +2107,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDef_sort(smtlibv2Parser.Def_sortContext ctx) {}
+  public void exitDefsort(Smtlibv2Parser.DefsortContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2116,7 +2115,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterEcho(smtlibv2Parser.EchoContext ctx) {}
+  public void enterEcho(Smtlibv2Parser.EchoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2124,7 +2123,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitEcho(smtlibv2Parser.EchoContext ctx) {}
+  public void exitEcho(Smtlibv2Parser.EchoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2132,7 +2131,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterExit(smtlibv2Parser.ExitContext ctx) {}
+  public void enterExit(Smtlibv2Parser.ExitContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2140,7 +2139,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitExit(smtlibv2Parser.ExitContext ctx) {}
+  public void exitExit(Smtlibv2Parser.ExitContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2148,7 +2147,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_assert(smtlibv2Parser.Get_assertContext ctx) {}
+  public void enterGetassert(Smtlibv2Parser.GetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2156,7 +2155,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_assert(smtlibv2Parser.Get_assertContext ctx) {}
+  public void exitGetassert(Smtlibv2Parser.GetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2164,7 +2163,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_assign(smtlibv2Parser.Get_assignContext ctx) {}
+  public void enterGetassign(Smtlibv2Parser.GetassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2172,7 +2171,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_assign(smtlibv2Parser.Get_assignContext ctx) {}
+  public void exitGetassign(Smtlibv2Parser.GetassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2180,7 +2179,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_info(smtlibv2Parser.Get_infoContext ctx) {}
+  public void enterGetinfo(Smtlibv2Parser.GetinfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2188,7 +2187,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_info(smtlibv2Parser.Get_infoContext ctx) {}
+  public void exitGetinfo(Smtlibv2Parser.GetinfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2196,7 +2195,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_model(smtlibv2Parser.Get_modelContext ctx) {}
+  public void enterGetmodel(Smtlibv2Parser.GetmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2204,7 +2203,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_model(smtlibv2Parser.Get_modelContext ctx) {}
+  public void exitGetmodel(Smtlibv2Parser.GetmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2212,7 +2211,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_option(smtlibv2Parser.Get_optionContext ctx) {}
+  public void enterGetoption(Smtlibv2Parser.GetoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2220,7 +2219,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_option(smtlibv2Parser.Get_optionContext ctx) {}
+  public void exitGetoption(Smtlibv2Parser.GetoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2228,7 +2227,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_proof(smtlibv2Parser.Get_proofContext ctx) {}
+  public void enterGetproof(Smtlibv2Parser.GetproofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2236,7 +2235,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_proof(smtlibv2Parser.Get_proofContext ctx) {}
+  public void exitGetproof(Smtlibv2Parser.GetproofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2244,7 +2243,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_unsat_assume(smtlibv2Parser.Get_unsat_assumeContext ctx) {}
+  public void enterGetunsatassume(Smtlibv2Parser.GetunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2252,7 +2251,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_unsat_assume(smtlibv2Parser.Get_unsat_assumeContext ctx) {}
+  public void exitGetunsatassume(Smtlibv2Parser.GetunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2260,7 +2259,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_unsat_core(smtlibv2Parser.Get_unsat_coreContext ctx) {}
+  public void enterGetunsatcore(Smtlibv2Parser.GetunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2268,7 +2267,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_unsat_core(smtlibv2Parser.Get_unsat_coreContext ctx) {}
+  public void exitGetunsatcore(Smtlibv2Parser.GetunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2276,7 +2275,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_val(smtlibv2Parser.Get_valContext ctx) {}
+  public void enterGetval(Smtlibv2Parser.GetvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2284,7 +2283,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_val(smtlibv2Parser.Get_valContext ctx) {}
+  public void exitGetval(Smtlibv2Parser.GetvalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2292,7 +2291,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPop(smtlibv2Parser.PopContext ctx) {}
+  public void enterPop(Smtlibv2Parser.PopContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2300,7 +2299,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPop(smtlibv2Parser.PopContext ctx) {}
+  public void exitPop(Smtlibv2Parser.PopContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2308,7 +2307,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPush(smtlibv2Parser.PushContext ctx) {}
+  public void enterPush(Smtlibv2Parser.PushContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2316,7 +2315,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPush(smtlibv2Parser.PushContext ctx) {}
+  public void exitPush(Smtlibv2Parser.PushContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2324,7 +2323,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterReset(smtlibv2Parser.ResetContext ctx) {}
+  public void enterReset(Smtlibv2Parser.ResetContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2332,7 +2331,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitReset(smtlibv2Parser.ResetContext ctx) {}
+  public void exitReset(Smtlibv2Parser.ResetContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2340,7 +2339,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterReset_assert(smtlibv2Parser.Reset_assertContext ctx) {}
+  public void enterResetassert(Smtlibv2Parser.ResetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2348,7 +2347,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitReset_assert(smtlibv2Parser.Reset_assertContext ctx) {}
+  public void exitResetassert(Smtlibv2Parser.ResetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2356,7 +2355,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSetInfo(smtlibv2Parser.SetInfoContext ctx) {}
+  public void enterSetInfo(Smtlibv2Parser.SetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2364,7 +2363,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSetInfo(smtlibv2Parser.SetInfoContext ctx) {}
+  public void exitSetInfo(Smtlibv2Parser.SetInfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2372,7 +2371,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSet_logic(smtlibv2Parser.Set_logicContext ctx) {}
+  public void enterSetlogic(Smtlibv2Parser.SetlogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2380,7 +2379,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSet_logic(smtlibv2Parser.Set_logicContext ctx) {}
+  public void exitSetlogic(Smtlibv2Parser.SetlogicContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2388,7 +2387,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterSet_option(smtlibv2Parser.Set_optionContext ctx) {}
+  public void enterSetoption(Smtlibv2Parser.SetoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2396,7 +2395,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitSet_option(smtlibv2Parser.Set_optionContext ctx) {}
+  public void exitSetoption(Smtlibv2Parser.SetoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2404,7 +2403,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterB_value(smtlibv2Parser.B_valueContext ctx) {}
+  public void enterBvalue(Smtlibv2Parser.BvalueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2412,7 +2411,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitB_value(smtlibv2Parser.B_valueContext ctx) {}
+  public void exitBvalue(Smtlibv2Parser.BvalueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2420,7 +2419,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterDiagnose(smtlibv2Parser.DiagnoseContext ctx) {}
+  public void enterDiagnose(Smtlibv2Parser.DiagnoseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2428,7 +2427,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitDiagnose(smtlibv2Parser.DiagnoseContext ctx) {}
+  public void exitDiagnose(Smtlibv2Parser.DiagnoseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2436,7 +2435,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGlobal(smtlibv2Parser.GlobalContext ctx) {}
+  public void enterGlobal(Smtlibv2Parser.GlobalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2444,7 +2443,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGlobal(smtlibv2Parser.GlobalContext ctx) {}
+  public void exitGlobal(Smtlibv2Parser.GlobalContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2452,7 +2451,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInteractive(smtlibv2Parser.InteractiveContext ctx) {}
+  public void enterInteractive(Smtlibv2Parser.InteractiveContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2460,7 +2459,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInteractive(smtlibv2Parser.InteractiveContext ctx) {}
+  public void exitInteractive(Smtlibv2Parser.InteractiveContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2468,7 +2467,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterPrint_succ(smtlibv2Parser.Print_succContext ctx) {}
+  public void enterPrintsucc(Smtlibv2Parser.PrintsuccContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2476,7 +2475,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitPrint_succ(smtlibv2Parser.Print_succContext ctx) {}
+  public void exitPrintsucc(Smtlibv2Parser.PrintsuccContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2484,7 +2483,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_assert(smtlibv2Parser.Prod_assertContext ctx) {}
+  public void enterProdassert(Smtlibv2Parser.ProdassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2492,7 +2491,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_assert(smtlibv2Parser.Prod_assertContext ctx) {}
+  public void exitProdassert(Smtlibv2Parser.ProdassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2500,7 +2499,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_assign(smtlibv2Parser.Prod_assignContext ctx) {}
+  public void enterProdassign(Smtlibv2Parser.ProdassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2508,7 +2507,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_assign(smtlibv2Parser.Prod_assignContext ctx) {}
+  public void exitProdassign(Smtlibv2Parser.ProdassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2516,7 +2515,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_mod(smtlibv2Parser.Prod_modContext ctx) {}
+  public void enterProdmod(Smtlibv2Parser.ProdmodContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2524,7 +2523,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_mod(smtlibv2Parser.Prod_modContext ctx) {}
+  public void exitProdmod(Smtlibv2Parser.ProdmodContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2532,7 +2531,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_proofs(smtlibv2Parser.Prod_proofsContext ctx) {}
+  public void enterProdproofs(Smtlibv2Parser.ProdproofsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2540,7 +2539,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_proofs(smtlibv2Parser.Prod_proofsContext ctx) {}
+  public void exitProdproofs(Smtlibv2Parser.ProdproofsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2548,7 +2547,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_unsat_assume(smtlibv2Parser.Prod_unsat_assumeContext ctx) {}
+  public void enterProdunsatassume(Smtlibv2Parser.ProdunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2556,7 +2555,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_unsat_assume(smtlibv2Parser.Prod_unsat_assumeContext ctx) {}
+  public void exitProdunsatassume(Smtlibv2Parser.ProdunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2564,7 +2563,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterProd_unsat_core(smtlibv2Parser.Prod_unsat_coreContext ctx) {}
+  public void enterProdunsatcore(Smtlibv2Parser.ProdunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2572,7 +2571,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitProd_unsat_core(smtlibv2Parser.Prod_unsat_coreContext ctx) {}
+  public void exitProdunsatcore(Smtlibv2Parser.ProdunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2580,7 +2579,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterRand_seed(smtlibv2Parser.Rand_seedContext ctx) {}
+  public void enterRandseed(Smtlibv2Parser.RandseedContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2588,7 +2587,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitRand_seed(smtlibv2Parser.Rand_seedContext ctx) {}
+  public void exitRandseed(Smtlibv2Parser.RandseedContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2596,7 +2595,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterReg_out(smtlibv2Parser.Reg_outContext ctx) {}
+  public void enterRegout(Smtlibv2Parser.RegoutContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2604,7 +2603,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitReg_out(smtlibv2Parser.Reg_outContext ctx) {}
+  public void exitRegout(Smtlibv2Parser.RegoutContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2612,7 +2611,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterRepro(smtlibv2Parser.ReproContext ctx) {}
+  public void enterRepro(Smtlibv2Parser.ReproContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2620,7 +2619,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitRepro(smtlibv2Parser.ReproContext ctx) {}
+  public void exitRepro(Smtlibv2Parser.ReproContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2628,7 +2627,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterVerbose(smtlibv2Parser.VerboseContext ctx) {}
+  public void enterVerbose(Smtlibv2Parser.VerboseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2636,7 +2635,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitVerbose(smtlibv2Parser.VerboseContext ctx) {}
+  public void exitVerbose(Smtlibv2Parser.VerboseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2644,7 +2643,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterOpt_attr(smtlibv2Parser.Opt_attrContext ctx) {}
+  public void enterOptattr(Smtlibv2Parser.OptattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2652,7 +2651,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitOpt_attr(smtlibv2Parser.Opt_attrContext ctx) {}
+  public void exitOptattr(Smtlibv2Parser.OptattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2660,7 +2659,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAll_stat(smtlibv2Parser.All_statContext ctx) {}
+  public void enterAllstat(Smtlibv2Parser.AllstatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2668,7 +2667,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAll_stat(smtlibv2Parser.All_statContext ctx) {}
+  public void exitAllstat(Smtlibv2Parser.AllstatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2676,7 +2675,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAssert_stack(smtlibv2Parser.Assert_stackContext ctx) {}
+  public void enterAssertstack(Smtlibv2Parser.AssertstackContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2684,7 +2683,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAssert_stack(smtlibv2Parser.Assert_stackContext ctx) {}
+  public void exitAssertstack(Smtlibv2Parser.AssertstackContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2692,7 +2691,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterAuthors(smtlibv2Parser.AuthorsContext ctx) {}
+  public void enterAuthors(Smtlibv2Parser.AuthorsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2700,7 +2699,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitAuthors(smtlibv2Parser.AuthorsContext ctx) {}
+  public void exitAuthors(Smtlibv2Parser.AuthorsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2708,7 +2707,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterError(smtlibv2Parser.ErrorContext ctx) {}
+  public void enterError(Smtlibv2Parser.ErrorContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2716,7 +2715,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitError(smtlibv2Parser.ErrorContext ctx) {}
+  public void exitError(Smtlibv2Parser.ErrorContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2724,7 +2723,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterName(smtlibv2Parser.NameContext ctx) {}
+  public void enterName(Smtlibv2Parser.NameContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2732,7 +2731,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitName(smtlibv2Parser.NameContext ctx) {}
+  public void exitName(Smtlibv2Parser.NameContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2740,7 +2739,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterR_unknown(smtlibv2Parser.R_unknownContext ctx) {}
+  public void enterRunknown(Smtlibv2Parser.RunknownContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2748,7 +2747,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitR_unknown(smtlibv2Parser.R_unknownContext ctx) {}
+  public void exitRunknown(Smtlibv2Parser.RunknownContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2756,7 +2755,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterVersion(smtlibv2Parser.VersionContext ctx) {}
+  public void enterVersion(Smtlibv2Parser.VersionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2764,7 +2763,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitVersion(smtlibv2Parser.VersionContext ctx) {}
+  public void exitVersion(Smtlibv2Parser.VersionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2772,7 +2771,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_key(smtlibv2Parser.Info_keyContext ctx) {}
+  public void enterInfokey(Smtlibv2Parser.InfokeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2780,7 +2779,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_key(smtlibv2Parser.Info_keyContext ctx) {}
+  public void exitInfokey(Smtlibv2Parser.InfokeyContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2788,7 +2787,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterError_behaviour(smtlibv2Parser.Error_behaviourContext ctx) {}
+  public void enterErrorbehaviour(Smtlibv2Parser.ErrorbehaviourContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2796,7 +2795,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitError_behaviour(smtlibv2Parser.Error_behaviourContext ctx) {}
+  public void exitErrorbehaviour(Smtlibv2Parser.ErrorbehaviourContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2804,7 +2803,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterMemout(smtlibv2Parser.MemoutContext ctx) {}
+  public void enterMemout(Smtlibv2Parser.MemoutContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2812,7 +2811,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitMemout(smtlibv2Parser.MemoutContext ctx) {}
+  public void exitMemout(Smtlibv2Parser.MemoutContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2820,7 +2819,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterIncomp(smtlibv2Parser.IncompContext ctx) {}
+  public void enterIncomp(Smtlibv2Parser.IncompContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2828,7 +2827,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitIncomp(smtlibv2Parser.IncompContext ctx) {}
+  public void exitIncomp(Smtlibv2Parser.IncompContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2836,7 +2835,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterR_unnown_s_expr(smtlibv2Parser.R_unnown_s_exprContext ctx) {}
+  public void enterRunnownsexpr(Smtlibv2Parser.RunnownsexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2844,7 +2843,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitR_unnown_s_expr(smtlibv2Parser.R_unnown_s_exprContext ctx) {}
+  public void exitRunnownsexpr(Smtlibv2Parser.RunnownsexprContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2852,7 +2851,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_def_fun(smtlibv2Parser.Resp_def_funContext ctx) {}
+  public void enterRespdeffun(Smtlibv2Parser.RespdeffunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2860,7 +2859,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_def_fun(smtlibv2Parser.Resp_def_funContext ctx) {}
+  public void exitRespdeffun(Smtlibv2Parser.RespdeffunContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2868,7 +2867,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_def_fun_rec(smtlibv2Parser.Resp_def_fun_recContext ctx) {}
+  public void enterRespdeffunrec(Smtlibv2Parser.RespdeffunrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2876,7 +2875,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_def_fun_rec(smtlibv2Parser.Resp_def_fun_recContext ctx) {}
+  public void exitRespdeffunrec(Smtlibv2Parser.RespdeffunrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2884,7 +2883,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_def_funs_rec(smtlibv2Parser.Resp_def_funs_recContext ctx) {}
+  public void enterRespdeffunsrec(Smtlibv2Parser.RespdeffunsrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2892,7 +2891,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_def_funs_rec(smtlibv2Parser.Resp_def_funs_recContext ctx) {}
+  public void exitRespdeffunsrec(Smtlibv2Parser.RespdeffunsrecContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2900,7 +2899,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_assert_stack(smtlibv2Parser.Info_assert_stackContext ctx) {}
+  public void enterInfoassertstack(Smtlibv2Parser.InfoassertstackContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2908,7 +2907,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_assert_stack(smtlibv2Parser.Info_assert_stackContext ctx) {}
+  public void exitInfoassertstack(Smtlibv2Parser.InfoassertstackContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2916,7 +2915,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_authors(smtlibv2Parser.Info_authorsContext ctx) {}
+  public void enterInfoauthors(Smtlibv2Parser.InfoauthorsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2924,7 +2923,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_authors(smtlibv2Parser.Info_authorsContext ctx) {}
+  public void exitInfoauthors(Smtlibv2Parser.InfoauthorsContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2932,7 +2931,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_error(smtlibv2Parser.Info_errorContext ctx) {}
+  public void enterInfoerror(Smtlibv2Parser.InfoerrorContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2940,7 +2939,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_error(smtlibv2Parser.Info_errorContext ctx) {}
+  public void exitInfoerror(Smtlibv2Parser.InfoerrorContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2948,7 +2947,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_name(smtlibv2Parser.Info_nameContext ctx) {}
+  public void enterInfoname(Smtlibv2Parser.InfonameContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2956,7 +2955,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_name(smtlibv2Parser.Info_nameContext ctx) {}
+  public void exitInfoname(Smtlibv2Parser.InfonameContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2964,7 +2963,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_r_unknown(smtlibv2Parser.Info_r_unknownContext ctx) {}
+  public void enterInforunknown(Smtlibv2Parser.InforunknownContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2972,7 +2971,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_r_unknown(smtlibv2Parser.Info_r_unknownContext ctx) {}
+  public void exitInforunknown(Smtlibv2Parser.InforunknownContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2980,7 +2979,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_version(smtlibv2Parser.Info_versionContext ctx) {}
+  public void enterInfoversion(Smtlibv2Parser.InfoversionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2988,7 +2987,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_version(smtlibv2Parser.Info_versionContext ctx) {}
+  public void exitInfoversion(Smtlibv2Parser.InfoversionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -2996,7 +2995,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterInfo_attr(smtlibv2Parser.Info_attrContext ctx) {}
+  public void enterInfoattr(Smtlibv2Parser.InfoattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3004,7 +3003,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitInfo_attr(smtlibv2Parser.Info_attrContext ctx) {}
+  public void exitInfoattr(Smtlibv2Parser.InfoattrContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3012,7 +3011,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterValuation_pair(smtlibv2Parser.Valuation_pairContext ctx) {}
+  public void enterValuationpair(Smtlibv2Parser.ValuationpairContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3020,7 +3019,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitValuation_pair(smtlibv2Parser.Valuation_pairContext ctx) {}
+  public void exitValuationpair(Smtlibv2Parser.ValuationpairContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3028,7 +3027,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterT_valuation_pair(smtlibv2Parser.T_valuation_pairContext ctx) {}
+  public void enterTvaluationpair(Smtlibv2Parser.TvaluationpairContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3036,7 +3035,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitT_valuation_pair(smtlibv2Parser.T_valuation_pairContext ctx) {}
+  public void exitTvaluationpair(Smtlibv2Parser.TvaluationpairContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3044,7 +3043,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterCheck_sat_response(smtlibv2Parser.Check_sat_responseContext ctx) {}
+  public void enterChecksatresponse(Smtlibv2Parser.ChecksatresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3052,7 +3051,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitCheck_sat_response(smtlibv2Parser.Check_sat_responseContext ctx) {}
+  public void exitChecksatresponse(Smtlibv2Parser.ChecksatresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3060,7 +3059,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterEcho_response(smtlibv2Parser.Echo_responseContext ctx) {}
+  public void enterEchoresponse(Smtlibv2Parser.EchoresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3068,7 +3067,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitEcho_response(smtlibv2Parser.Echo_responseContext ctx) {}
+  public void exitEchoresponse(Smtlibv2Parser.EchoresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3076,7 +3075,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_assertions_response(smtlibv2Parser.Get_assertions_responseContext ctx) {}
+  public void enterGetassertionsresponse(Smtlibv2Parser.GetassertionsresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3084,7 +3083,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_assertions_response(smtlibv2Parser.Get_assertions_responseContext ctx) {}
+  public void exitGetassertionsresponse(Smtlibv2Parser.GetassertionsresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3092,7 +3091,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_assignment_response(smtlibv2Parser.Get_assignment_responseContext ctx) {}
+  public void enterGetassignmentresponse(Smtlibv2Parser.GetassignmentresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3100,7 +3099,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_assignment_response(smtlibv2Parser.Get_assignment_responseContext ctx) {}
+  public void exitGetassignmentresponse(Smtlibv2Parser.GetassignmentresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3108,7 +3107,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_info_response(smtlibv2Parser.Get_info_responseContext ctx) {}
+  public void enterGetinforesponse(Smtlibv2Parser.GetinforesponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3116,7 +3115,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_info_response(smtlibv2Parser.Get_info_responseContext ctx) {}
+  public void exitGetinforesponse(Smtlibv2Parser.GetinforesponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3124,7 +3123,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterRs_model(smtlibv2Parser.Rs_modelContext ctx) {}
+  public void enterRsmodel(Smtlibv2Parser.RsmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3132,7 +3131,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitRs_model(smtlibv2Parser.Rs_modelContext ctx) {}
+  public void exitRsmodel(Smtlibv2Parser.RsmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3140,7 +3139,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterModel_resp(smtlibv2Parser.Model_respContext ctx) {}
+  public void enterModelresp(Smtlibv2Parser.ModelrespContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3148,7 +3147,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitModel_resp(smtlibv2Parser.Model_respContext ctx) {}
+  public void exitModelresp(Smtlibv2Parser.ModelrespContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3156,7 +3155,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_option_response(smtlibv2Parser.Get_option_responseContext ctx) {}
+  public void enterGetoptionresponse(Smtlibv2Parser.GetoptionresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3164,7 +3163,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_option_response(smtlibv2Parser.Get_option_responseContext ctx) {}
+  public void exitGetoptionresponse(Smtlibv2Parser.GetoptionresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3172,7 +3171,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_proof_response(smtlibv2Parser.Get_proof_responseContext ctx) {}
+  public void enterGetproofresponse(Smtlibv2Parser.GetproofresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3180,7 +3179,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_proof_response(smtlibv2Parser.Get_proof_responseContext ctx) {}
+  public void exitGetproofresponse(Smtlibv2Parser.GetproofresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3188,7 +3187,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_unsat_assump_response(smtlibv2Parser.Get_unsat_assump_responseContext ctx) {}
+  public void enterGetunsatassumpresponse(Smtlibv2Parser.GetunsatassumpresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3196,7 +3195,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_unsat_assump_response(smtlibv2Parser.Get_unsat_assump_responseContext ctx) {}
+  public void exitGetunsatassumpresponse(Smtlibv2Parser.GetunsatassumpresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3204,7 +3203,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_unsat_core_response(smtlibv2Parser.Get_unsat_core_responseContext ctx) {}
+  public void enterGetunsatcoreresponse(Smtlibv2Parser.GetunsatcoreresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3212,7 +3211,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_unsat_core_response(smtlibv2Parser.Get_unsat_core_responseContext ctx) {}
+  public void exitGetunsatcoreresponse(Smtlibv2Parser.GetunsatcoreresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3220,7 +3219,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterGet_value_response(smtlibv2Parser.Get_value_responseContext ctx) {}
+  public void enterGetvalueresponse(Smtlibv2Parser.GetvalueresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3228,7 +3227,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitGet_value_response(smtlibv2Parser.Get_value_responseContext ctx) {}
+  public void exitGetvalueresponse(Smtlibv2Parser.GetvalueresponseContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3236,7 +3235,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_check_sat(smtlibv2Parser.Resp_check_satContext ctx) {}
+  public void enterRespchecksat(Smtlibv2Parser.RespchecksatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3244,7 +3243,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_check_sat(smtlibv2Parser.Resp_check_satContext ctx) {}
+  public void exitRespchecksat(Smtlibv2Parser.RespchecksatContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3252,7 +3251,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_echo(smtlibv2Parser.Resp_echoContext ctx) {}
+  public void enterRespecho(Smtlibv2Parser.RespechoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3260,7 +3259,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_echo(smtlibv2Parser.Resp_echoContext ctx) {}
+  public void exitRespecho(Smtlibv2Parser.RespechoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3268,7 +3267,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_get_assert(smtlibv2Parser.Resp_get_assertContext ctx) {}
+  public void enterRespgetassert(Smtlibv2Parser.RespgetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3276,7 +3275,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_get_assert(smtlibv2Parser.Resp_get_assertContext ctx) {}
+  public void exitRespgetassert(Smtlibv2Parser.RespgetassertContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3284,7 +3283,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_gett_assign(smtlibv2Parser.Resp_gett_assignContext ctx) {}
+  public void enterRespgettassign(Smtlibv2Parser.RespgettassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3292,7 +3291,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_gett_assign(smtlibv2Parser.Resp_gett_assignContext ctx) {}
+  public void exitRespgettassign(Smtlibv2Parser.RespgettassignContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3300,7 +3299,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx) {}
+  public void enterRespgetinfo(Smtlibv2Parser.RespgetinfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3308,7 +3307,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_get_info(smtlibv2Parser.Resp_get_infoContext ctx) {}
+  public void exitRespgetinfo(Smtlibv2Parser.RespgetinfoContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3316,7 +3315,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) {}
+  public void enterRespgetmodel(Smtlibv2Parser.RespgetmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3324,7 +3323,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_get_model(smtlibv2Parser.Resp_get_modelContext ctx) {}
+  public void exitRespgetmodel(Smtlibv2Parser.RespgetmodelContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3332,7 +3331,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_option(smtlibv2Parser.Resp_optionContext ctx) {}
+  public void enterRespoption(Smtlibv2Parser.RespoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3340,7 +3339,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_option(smtlibv2Parser.Resp_optionContext ctx) {}
+  public void exitRespoption(Smtlibv2Parser.RespoptionContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3348,7 +3347,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_proof(smtlibv2Parser.Resp_proofContext ctx) {}
+  public void enterRespproof(Smtlibv2Parser.RespproofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3356,7 +3355,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_proof(smtlibv2Parser.Resp_proofContext ctx) {}
+  public void exitRespproof(Smtlibv2Parser.RespproofContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3364,7 +3363,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_unsat_assume(smtlibv2Parser.Resp_unsat_assumeContext ctx) {}
+  public void enterRespunsatassume(Smtlibv2Parser.RespunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3372,7 +3371,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_unsat_assume(smtlibv2Parser.Resp_unsat_assumeContext ctx) {}
+  public void exitRespunsatassume(Smtlibv2Parser.RespunsatassumeContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3380,7 +3379,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_unsat_core(smtlibv2Parser.Resp_unsat_coreContext ctx) {}
+  public void enterRespunsatcore(Smtlibv2Parser.RespunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3388,7 +3387,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_unsat_core(smtlibv2Parser.Resp_unsat_coreContext ctx) {}
+  public void exitRespunsatcore(Smtlibv2Parser.RespunsatcoreContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3396,7 +3395,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_value(smtlibv2Parser.Resp_valueContext ctx) {}
+  public void enterRespvalue(Smtlibv2Parser.RespvalueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3404,7 +3403,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_value(smtlibv2Parser.Resp_valueContext ctx) {}
+  public void exitRespvalue(Smtlibv2Parser.RespvalueContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3412,7 +3411,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_success(smtlibv2Parser.Resp_successContext ctx) {}
+  public void enterRespsuccess(Smtlibv2Parser.RespsuccessContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3420,7 +3419,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_success(smtlibv2Parser.Resp_successContext ctx) {}
+  public void exitRespsuccess(Smtlibv2Parser.RespsuccessContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3428,7 +3427,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_spec_successs(smtlibv2Parser.Resp_spec_successsContext ctx) {}
+  public void enterRespspecsuccesss(Smtlibv2Parser.RespspecsuccesssContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3436,7 +3435,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_spec_successs(smtlibv2Parser.Resp_spec_successsContext ctx) {}
+  public void exitRespspecsuccesss(Smtlibv2Parser.RespspecsuccesssContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3444,7 +3443,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_unsupported(smtlibv2Parser.Resp_unsupportedContext ctx) {}
+  public void enterRespunsupported(Smtlibv2Parser.RespunsupportedContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3452,7 +3451,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_unsupported(smtlibv2Parser.Resp_unsupportedContext ctx) {}
+  public void exitRespunsupported(Smtlibv2Parser.RespunsupportedContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3460,7 +3459,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void enterResp_error(smtlibv2Parser.Resp_errorContext ctx) {}
+  public void enterResperror(Smtlibv2Parser.ResperrorContext ctx) {}
 
   /**
    * {@inheritDoc}
@@ -3468,7 +3467,7 @@ public class smtlibv2BaseListener implements smtlibv2Listener {
    * <p>The default implementation does nothing.
    */
   @Override
-  public void exitResp_error(smtlibv2Parser.Resp_errorContext ctx) {}
+  public void exitResperror(Smtlibv2Parser.ResperrorContext ctx) {}
 
   /**
    * {@inheritDoc}

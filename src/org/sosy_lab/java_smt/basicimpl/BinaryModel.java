@@ -28,9 +28,10 @@ import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaManagersWrapper;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Lexer;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Lexer;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.smtlibv2Parser;
 import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 
 /**
@@ -132,9 +133,9 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   }
 
   private List<ValueAssignment> parseModel(String output) {
-    smtlibv2Lexer lexer = new smtlibv2Lexer(CharStreams.fromString(output));
-    smtlibv2Parser parser = new smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(mgr, bmgr, imgr, null, bvmgr, amgr, umgr, null, null);
+    Smtlibv2Lexer lexer = new Smtlibv2Lexer(CharStreams.fromString(output));
+    Smtlibv2Parser parser = new Smtlibv2Parser(new CommonTokenStream(lexer));
+    Visitor visitor = new Visitor(new FormulaManagersWrapper(mgr));
     visitor.visit(parser.start());
     return visitor.getAssignments();
   }
