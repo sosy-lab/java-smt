@@ -41,11 +41,6 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment;
 // TODO Add support for arbitrary SMTLIB compatible solvers
 public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnvironment> {
   AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> mgr;
-  private final BooleanFormulaManager bmgr;
-  private final IntegerFormulaManager imgr;
-  private final BitvectorFormulaManager bvmgr;
-  private final ArrayFormulaManager amgr;
-  private final UFManager umgr;
 
   /** Model.ValuesAssignments for the parsed Princess model. */
   private ImmutableList<ValueAssignment> finalList = ImmutableList.of();
@@ -58,12 +53,6 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
       AbstractFormulaManager<IExpression, Sort, PrincessEnvironment, ?> pFormulaManager) {
     super(prover, pCreator);
     mgr = pFormulaManager;
-    bmgr = mgr.getBooleanFormulaManager();
-    imgr = mgr.getIntegerFormulaManager();
-    // rmgr = Objects.requireNonNull(formulaManager.getRationalFormulaManager());
-    bvmgr = mgr.getBitvectorFormulaManager();
-    amgr = mgr.getArrayFormulaManager();
-    umgr = mgr.getUFManager();
   }
 
   @Override
