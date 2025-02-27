@@ -1,6 +1,26 @@
+/*
+ *  JavaSMT is an API wrapper for a collection of SMT solvers.
+ *  This file is part of JavaSMT.
+ *
+ *  Copyright (C) 2007-2016  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 // Generated from
-// /home/dalux/Dokumente/IdeaProjects/java-smt/
-// src/org/sosy_lab/javaSmt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
+// /home/davidg/IdeaProjects/java-smt/src/org/sosy_lab/
+// java_smt/basicimpl/parserInterpreter/smtlibv2.g4 by ANTLR 4.13.2
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
@@ -14,40 +34,40 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   /**
-   * Visit a parse tree produced by the {@code startlogic} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code start_logic} labeled alternative in {@link
    * Smtlibv2Parser#start}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitStartlogic(Smtlibv2Parser.StartlogicContext ctx);
+  T visitStart_logic(Smtlibv2Parser.Start_logicContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code starttheory} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code start_theory} labeled alternative in {@link
    * Smtlibv2Parser#start}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitStarttheory(Smtlibv2Parser.StarttheoryContext ctx);
+  T visitStart_theory(Smtlibv2Parser.Start_theoryContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code startscript} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code start_script} labeled alternative in {@link
    * Smtlibv2Parser#start}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitStartscript(Smtlibv2Parser.StartscriptContext ctx);
+  T visitStart_script(Smtlibv2Parser.Start_scriptContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code startgenresp} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code start_gen_resp} labeled alternative in {@link
    * Smtlibv2Parser#start}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitStartgenresp(Smtlibv2Parser.StartgenrespContext ctx);
+  T visitStart_gen_resp(Smtlibv2Parser.Start_gen_respContext ctx);
 
   /**
    * Visit a parse tree produced by {@link Smtlibv2Parser#generalReservedWord}.
@@ -58,22 +78,22 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitGeneralReservedWord(Smtlibv2Parser.GeneralReservedWordContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code simppresymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code simp_pre_symb} labeled alternative in {@link
    * Smtlibv2Parser#simpleSymbol}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSimppresymb(Smtlibv2Parser.SimppresymbContext ctx);
+  T visitSimp_pre_symb(Smtlibv2Parser.Simp_pre_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code simpundefsymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code simp_undef_symb} labeled alternative in {@link
    * Smtlibv2Parser#simpleSymbol}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSimpundefsymb(Smtlibv2Parser.SimpundefsymbContext ctx);
+  T visitSimp_undef_symb(Smtlibv2Parser.Simp_undef_symbContext ctx);
 
   /**
    * Visit a parse tree produced by {@link Smtlibv2Parser#quotedSymbol}.
@@ -166,202 +186,202 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitFloatingpoint(Smtlibv2Parser.FloatingpointContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code prekey} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code pre_key} labeled alternative in {@link
    * Smtlibv2Parser#keyword}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPrekey(Smtlibv2Parser.PrekeyContext ctx);
+  T visitPre_key(Smtlibv2Parser.Pre_keyContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code keysimsymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code key_simsymb} labeled alternative in {@link
    * Smtlibv2Parser#keyword}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitKeysimsymb(Smtlibv2Parser.KeysimsymbContext ctx);
+  T visitKey_simsymb(Smtlibv2Parser.Key_simsymbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstantnum} labeled alternative in {@link
-   * Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_num} labeled alternative in {@link
+   * Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstantnum(Smtlibv2Parser.SpecconstantnumContext ctx);
+  T visitSpec_constant_num(Smtlibv2Parser.Spec_constant_numContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstantdec} labeled alternative in {@link
-   * Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_dec} labeled alternative in {@link
+   * Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstantdec(Smtlibv2Parser.SpecconstantdecContext ctx);
+  T visitSpec_constant_dec(Smtlibv2Parser.Spec_constant_decContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstanthex} labeled alternative in {@link
-   * Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_hex} labeled alternative in {@link
+   * Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstanthex(Smtlibv2Parser.SpecconstanthexContext ctx);
+  T visitSpec_constant_hex(Smtlibv2Parser.Spec_constant_hexContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstantbin} labeled alternative in {@link
-   * Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_bin} labeled alternative in {@link
+   * Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstantbin(Smtlibv2Parser.SpecconstantbinContext ctx);
+  T visitSpec_constant_bin(Smtlibv2Parser.Spec_constant_binContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstantstring} labeled alternative in {@link
-   * Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_string} labeled alternative in {@link
+   * Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstantstring(Smtlibv2Parser.SpecconstantstringContext ctx);
+  T visitSpec_constant_string(Smtlibv2Parser.Spec_constant_stringContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code specconstantfloatingpoint} labeled alternative in
-   * {@link Smtlibv2Parser#specconstant}.
+   * Visit a parse tree produced by the {@code spec_constant_floating_point} labeled alternative in
+   * {@link Smtlibv2Parser#spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSpecconstantfloatingpoint(Smtlibv2Parser.SpecconstantfloatingpointContext ctx);
+  T visitSpec_constant_floating_point(Smtlibv2Parser.Spec_constant_floating_pointContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code sexprspec} labeled alternative in {@link
-   * Smtlibv2Parser#sexpr}.
+   * Visit a parse tree produced by the {@code s_expr_spec} labeled alternative in {@link
+   * Smtlibv2Parser#s_expr}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSexprspec(Smtlibv2Parser.SexprspecContext ctx);
+  T visitS_expr_spec(Smtlibv2Parser.S_expr_specContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code sexprsymb} labeled alternative in {@link
-   * Smtlibv2Parser#sexpr}.
+   * Visit a parse tree produced by the {@code s_expr_symb} labeled alternative in {@link
+   * Smtlibv2Parser#s_expr}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSexprsymb(Smtlibv2Parser.SexprsymbContext ctx);
+  T visitS_expr_symb(Smtlibv2Parser.S_expr_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code sexprkey} labeled alternative in {@link
-   * Smtlibv2Parser#sexpr}.
+   * Visit a parse tree produced by the {@code s_expr_key} labeled alternative in {@link
+   * Smtlibv2Parser#s_expr}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSexprkey(Smtlibv2Parser.SexprkeyContext ctx);
+  T visitS_expr_key(Smtlibv2Parser.S_expr_keyContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code multisexpr} labeled alternative in {@link
-   * Smtlibv2Parser#sexpr}.
+   * Visit a parse tree produced by the {@code multi_s_expr} labeled alternative in {@link
+   * Smtlibv2Parser#s_expr}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitMultisexpr(Smtlibv2Parser.MultisexprContext ctx);
+  T visitMulti_s_expr(Smtlibv2Parser.Multi_s_exprContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code idxnum} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code idx_num} labeled alternative in {@link
    * Smtlibv2Parser#index}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitIdxnum(Smtlibv2Parser.IdxnumContext ctx);
+  T visitIdx_num(Smtlibv2Parser.Idx_numContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code idxsymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code idx_symb} labeled alternative in {@link
    * Smtlibv2Parser#index}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitIdxsymb(Smtlibv2Parser.IdxsymbContext ctx);
+  T visitIdx_symb(Smtlibv2Parser.Idx_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code idsymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code id_symb} labeled alternative in {@link
    * Smtlibv2Parser#identifier}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitIdsymb(Smtlibv2Parser.IdsymbContext ctx);
+  T visitId_symb(Smtlibv2Parser.Id_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code idsymbidx} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code id_symb_idx} labeled alternative in {@link
    * Smtlibv2Parser#identifier}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitIdsymbidx(Smtlibv2Parser.IdsymbidxContext ctx);
+  T visitId_symb_idx(Smtlibv2Parser.Id_symb_idxContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code attrspec} labeled alternative in {@link
-   * Smtlibv2Parser#attributevalue}.
+   * Visit a parse tree produced by the {@code attr_spec} labeled alternative in {@link
+   * Smtlibv2Parser#attribute_value}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAttrspec(Smtlibv2Parser.AttrspecContext ctx);
+  T visitAttr_spec(Smtlibv2Parser.Attr_specContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code attrsymb} labeled alternative in {@link
-   * Smtlibv2Parser#attributevalue}.
+   * Visit a parse tree produced by the {@code attr_symb} labeled alternative in {@link
+   * Smtlibv2Parser#attribute_value}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAttrsymb(Smtlibv2Parser.AttrsymbContext ctx);
+  T visitAttr_symb(Smtlibv2Parser.Attr_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code attrsexpr} labeled alternative in {@link
-   * Smtlibv2Parser#attributevalue}.
+   * Visit a parse tree produced by the {@code attr_s_expr} labeled alternative in {@link
+   * Smtlibv2Parser#attribute_value}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAttrsexpr(Smtlibv2Parser.AttrsexprContext ctx);
+  T visitAttr_s_expr(Smtlibv2Parser.Attr_s_exprContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code attrkey} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code attr_key} labeled alternative in {@link
    * Smtlibv2Parser#attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAttrkey(Smtlibv2Parser.AttrkeyContext ctx);
+  T visitAttr_key(Smtlibv2Parser.Attr_keyContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code attrkeyattr} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code attr_key_attr} labeled alternative in {@link
    * Smtlibv2Parser#attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAttrkeyattr(Smtlibv2Parser.AttrkeyattrContext ctx);
+  T visitAttr_key_attr(Smtlibv2Parser.Attr_key_attrContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code sortid} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code sort_id} labeled alternative in {@link
    * Smtlibv2Parser#sort}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSortid(Smtlibv2Parser.SortidContext ctx);
+  T visitSort_id(Smtlibv2Parser.Sort_idContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code multisort} labeled alternative in {@link
@@ -373,82 +393,82 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitMultisort(Smtlibv2Parser.MultisortContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code qualid} labeled alternative in {@link
-   * Smtlibv2Parser#qualidentifer}.
+   * Visit a parse tree produced by the {@code qual_id} labeled alternative in {@link
+   * Smtlibv2Parser#qual_identifer}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitQualid(Smtlibv2Parser.QualidContext ctx);
+  T visitQual_id(Smtlibv2Parser.Qual_idContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code qualidsort} labeled alternative in {@link
-   * Smtlibv2Parser#qualidentifer}.
+   * Visit a parse tree produced by the {@code qual_id_sort} labeled alternative in {@link
+   * Smtlibv2Parser#qual_identifer}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitQualidsort(Smtlibv2Parser.QualidsortContext ctx);
+  T visitQual_id_sort(Smtlibv2Parser.Qual_id_sortContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#varbinding}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#var_binding}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitVarbinding(Smtlibv2Parser.VarbindingContext ctx);
+  T visitVar_binding(Smtlibv2Parser.Var_bindingContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#sortedvar}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#sorted_var}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSortedvar(Smtlibv2Parser.SortedvarContext ctx);
+  T visitSorted_var(Smtlibv2Parser.Sorted_varContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code patternsymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code pattern_symb} labeled alternative in {@link
    * Smtlibv2Parser#pattern}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPatternsymb(Smtlibv2Parser.PatternsymbContext ctx);
+  T visitPattern_symb(Smtlibv2Parser.Pattern_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code patternmultisymb} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code pattern_multisymb} labeled alternative in {@link
    * Smtlibv2Parser#pattern}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPatternmultisymb(Smtlibv2Parser.PatternmultisymbContext ctx);
+  T visitPattern_multisymb(Smtlibv2Parser.Pattern_multisymbContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#matchcase}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#match_case}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitMatchcase(Smtlibv2Parser.MatchcaseContext ctx);
+  T visitMatch_case(Smtlibv2Parser.Match_caseContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termspecconst} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_spec_const} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermspecconst(Smtlibv2Parser.TermspecconstContext ctx);
+  T visitTerm_spec_const(Smtlibv2Parser.Term_spec_constContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termqualid} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_qual_id} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermqualid(Smtlibv2Parser.TermqualidContext ctx);
+  T visitTerm_qual_id(Smtlibv2Parser.Term_qual_idContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code multiterm} labeled alternative in {@link
@@ -460,244 +480,244 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitMultiterm(Smtlibv2Parser.MultitermContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termlet} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_let} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermlet(Smtlibv2Parser.TermletContext ctx);
+  T visitTerm_let(Smtlibv2Parser.Term_letContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termforall} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_forall} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermforall(Smtlibv2Parser.TermforallContext ctx);
+  T visitTerm_forall(Smtlibv2Parser.Term_forallContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termexists} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_exists} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermexists(Smtlibv2Parser.TermexistsContext ctx);
+  T visitTerm_exists(Smtlibv2Parser.Term_existsContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termmatch} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_match} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermmatch(Smtlibv2Parser.TermmatchContext ctx);
+  T visitTerm_match(Smtlibv2Parser.Term_matchContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code termexclam} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code term_exclam} labeled alternative in {@link
    * Smtlibv2Parser#term}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTermexclam(Smtlibv2Parser.TermexclamContext ctx);
+  T visitTerm_exclam(Smtlibv2Parser.Term_exclamContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#sortsymboldecl}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#sort_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSortsymboldecl(Smtlibv2Parser.SortsymboldeclContext ctx);
+  T visitSort_symbol_decl(Smtlibv2Parser.Sort_symbol_declContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#metaspecconstant}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#meta_spec_constant}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitMetaspecconstant(Smtlibv2Parser.MetaspecconstantContext ctx);
+  T visitMeta_spec_constant(Smtlibv2Parser.Meta_spec_constantContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code funsymbspec} labeled alternative in {@link
-   * Smtlibv2Parser#funsymboldecl}.
+   * Visit a parse tree produced by the {@code fun_symb_spec} labeled alternative in {@link
+   * Smtlibv2Parser#fun_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitFunsymbspec(Smtlibv2Parser.FunsymbspecContext ctx);
+  T visitFun_symb_spec(Smtlibv2Parser.Fun_symb_specContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code funsymbmeta} labeled alternative in {@link
-   * Smtlibv2Parser#funsymboldecl}.
+   * Visit a parse tree produced by the {@code fun_symb_meta} labeled alternative in {@link
+   * Smtlibv2Parser#fun_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitFunsymbmeta(Smtlibv2Parser.FunsymbmetaContext ctx);
+  T visitFun_symb_meta(Smtlibv2Parser.Fun_symb_metaContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code funsymbid} labeled alternative in {@link
-   * Smtlibv2Parser#funsymboldecl}.
+   * Visit a parse tree produced by the {@code fun_symb_id} labeled alternative in {@link
+   * Smtlibv2Parser#fun_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitFunsymbid(Smtlibv2Parser.FunsymbidContext ctx);
+  T visitFun_symb_id(Smtlibv2Parser.Fun_symb_idContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code parfunsymb} labeled alternative in {@link
-   * Smtlibv2Parser#parfunsymboldecl}.
+   * Visit a parse tree produced by the {@code par_fun_symb} labeled alternative in {@link
+   * Smtlibv2Parser#par_fun_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitParfunsymb(Smtlibv2Parser.ParfunsymbContext ctx);
+  T visitPar_fun_symb(Smtlibv2Parser.Par_fun_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code parfunmultisymb} labeled alternative in {@link
-   * Smtlibv2Parser#parfunsymboldecl}.
+   * Visit a parse tree produced by the {@code par_fun_multi_symb} labeled alternative in {@link
+   * Smtlibv2Parser#par_fun_symbol_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitParfunmultisymb(Smtlibv2Parser.ParfunmultisymbContext ctx);
+  T visitPar_fun_multi_symb(Smtlibv2Parser.Par_fun_multi_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theorysort} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_sort} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheorysort(Smtlibv2Parser.TheorysortContext ctx);
+  T visitTheory_sort(Smtlibv2Parser.Theory_sortContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theoryfun} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_fun} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheoryfun(Smtlibv2Parser.TheoryfunContext ctx);
+  T visitTheory_fun(Smtlibv2Parser.Theory_funContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theorysortdescr} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_sort_descr} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheorysortdescr(Smtlibv2Parser.TheorysortdescrContext ctx);
+  T visitTheory_sort_descr(Smtlibv2Parser.Theory_sort_descrContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theoryfundescr} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_fun_descr} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheoryfundescr(Smtlibv2Parser.TheoryfundescrContext ctx);
+  T visitTheory_fun_descr(Smtlibv2Parser.Theory_fun_descrContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theorydef} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_def} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheorydef(Smtlibv2Parser.TheorydefContext ctx);
+  T visitTheory_def(Smtlibv2Parser.Theory_defContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theoryval} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_val} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheoryval(Smtlibv2Parser.TheoryvalContext ctx);
+  T visitTheory_val(Smtlibv2Parser.Theory_valContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theorynotes} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_notes} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheorynotes(Smtlibv2Parser.TheorynotesContext ctx);
+  T visitTheory_notes(Smtlibv2Parser.Theory_notesContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code theoryattr} labeled alternative in {@link
-   * Smtlibv2Parser#theoryattribute}.
+   * Visit a parse tree produced by the {@code theory_attr} labeled alternative in {@link
+   * Smtlibv2Parser#theory_attribute}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheoryattr(Smtlibv2Parser.TheoryattrContext ctx);
+  T visitTheory_attr(Smtlibv2Parser.Theory_attrContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#theorydecl}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#theory_decl}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTheorydecl(Smtlibv2Parser.TheorydeclContext ctx);
+  T visitTheory_decl(Smtlibv2Parser.Theory_declContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logictheory} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_theory} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogictheory(Smtlibv2Parser.LogictheoryContext ctx);
+  T visitLogic_theory(Smtlibv2Parser.Logic_theoryContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logiclanguage} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_language} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogiclanguage(Smtlibv2Parser.LogiclanguageContext ctx);
+  T visitLogic_language(Smtlibv2Parser.Logic_languageContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logicext} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_ext} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogicext(Smtlibv2Parser.LogicextContext ctx);
+  T visitLogic_ext(Smtlibv2Parser.Logic_extContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logicval} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_val} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogicval(Smtlibv2Parser.LogicvalContext ctx);
+  T visitLogic_val(Smtlibv2Parser.Logic_valContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logicnotes} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_notes} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogicnotes(Smtlibv2Parser.LogicnotesContext ctx);
+  T visitLogic_notes(Smtlibv2Parser.Logic_notesContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code logicattr} labeled alternative in {@link
-   * Smtlibv2Parser#logicattribue}.
+   * Visit a parse tree produced by the {@code logic_attr} labeled alternative in {@link
+   * Smtlibv2Parser#logic_attribue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitLogicattr(Smtlibv2Parser.LogicattrContext ctx);
+  T visitLogic_attr(Smtlibv2Parser.Logic_attrContext ctx);
 
   /**
    * Visit a parse tree produced by {@link Smtlibv2Parser#logic}.
@@ -708,80 +728,80 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitLogic(Smtlibv2Parser.LogicContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#sortdec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#sort_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSortdec(Smtlibv2Parser.SortdecContext ctx);
+  T visitSort_dec(Smtlibv2Parser.Sort_decContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#selectordec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#selector_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSelectordec(Smtlibv2Parser.SelectordecContext ctx);
+  T visitSelector_dec(Smtlibv2Parser.Selector_decContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#constructordec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#constructor_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitConstructordec(Smtlibv2Parser.ConstructordecContext ctx);
+  T visitConstructor_dec(Smtlibv2Parser.Constructor_decContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code dataconstr} labeled alternative in {@link
-   * Smtlibv2Parser#datatypedec}.
+   * Visit a parse tree produced by the {@code data_constr} labeled alternative in {@link
+   * Smtlibv2Parser#datatype_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDataconstr(Smtlibv2Parser.DataconstrContext ctx);
+  T visitData_constr(Smtlibv2Parser.Data_constrContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code datamultisymb} labeled alternative in {@link
-   * Smtlibv2Parser#datatypedec}.
+   * Visit a parse tree produced by the {@code data_multisymb} labeled alternative in {@link
+   * Smtlibv2Parser#datatype_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDatamultisymb(Smtlibv2Parser.DatamultisymbContext ctx);
+  T visitData_multisymb(Smtlibv2Parser.Data_multisymbContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#functiondec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#function_dec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitFunctiondec(Smtlibv2Parser.FunctiondecContext ctx);
+  T visitFunction_dec(Smtlibv2Parser.Function_decContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#functiondef}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#function_def}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitFunctiondef(Smtlibv2Parser.FunctiondefContext ctx);
+  T visitFunction_def(Smtlibv2Parser.Function_defContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code propsymb} labeled alternative in {@link
-   * Smtlibv2Parser#propliteral}.
+   * Visit a parse tree produced by the {@code prop_symb} labeled alternative in {@link
+   * Smtlibv2Parser#prop_literal}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPropsymb(Smtlibv2Parser.PropsymbContext ctx);
+  T visitProp_symb(Smtlibv2Parser.Prop_symbContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code propnot} labeled alternative in {@link
-   * Smtlibv2Parser#propliteral}.
+   * Visit a parse tree produced by the {@code prop_not} labeled alternative in {@link
+   * Smtlibv2Parser#prop_literal}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPropnot(Smtlibv2Parser.PropnotContext ctx);
+  T visitProp_not(Smtlibv2Parser.Prop_notContext ctx);
 
   /**
    * Visit a parse tree produced by {@link Smtlibv2Parser#script}.
@@ -792,244 +812,244 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitScript(Smtlibv2Parser.ScriptContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdassert}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_assert}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdassert(Smtlibv2Parser.CmdassertContext ctx);
+  T visitCmd_assert(Smtlibv2Parser.Cmd_assertContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdcheckSat}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_checkSat}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdcheckSat(Smtlibv2Parser.CmdcheckSatContext ctx);
+  T visitCmd_checkSat(Smtlibv2Parser.Cmd_checkSatContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdcheckSatAssuming}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_checkSatAssuming}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdcheckSatAssuming(Smtlibv2Parser.CmdcheckSatAssumingContext ctx);
+  T visitCmd_checkSatAssuming(Smtlibv2Parser.Cmd_checkSatAssumingContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddeclareConst}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_declareConst}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddeclareConst(Smtlibv2Parser.CmddeclareConstContext ctx);
+  T visitCmd_declareConst(Smtlibv2Parser.Cmd_declareConstContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddeclareDatatype}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_declareDatatype}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddeclareDatatype(Smtlibv2Parser.CmddeclareDatatypeContext ctx);
+  T visitCmd_declareDatatype(Smtlibv2Parser.Cmd_declareDatatypeContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddeclareDatatypes}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_declareDatatypes}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddeclareDatatypes(Smtlibv2Parser.CmddeclareDatatypesContext ctx);
+  T visitCmd_declareDatatypes(Smtlibv2Parser.Cmd_declareDatatypesContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddeclareFun}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_declareFun}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddeclareFun(Smtlibv2Parser.CmddeclareFunContext ctx);
+  T visitCmd_declareFun(Smtlibv2Parser.Cmd_declareFunContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddeclareSort}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_declareSort}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddeclareSort(Smtlibv2Parser.CmddeclareSortContext ctx);
+  T visitCmd_declareSort(Smtlibv2Parser.Cmd_declareSortContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddefineFun}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_defineFun}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddefineFun(Smtlibv2Parser.CmddefineFunContext ctx);
+  T visitCmd_defineFun(Smtlibv2Parser.Cmd_defineFunContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddefineFunRec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_defineFunRec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddefineFunRec(Smtlibv2Parser.CmddefineFunRecContext ctx);
+  T visitCmd_defineFunRec(Smtlibv2Parser.Cmd_defineFunRecContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddefineFunsRec}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_defineFunsRec}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddefineFunsRec(Smtlibv2Parser.CmddefineFunsRecContext ctx);
+  T visitCmd_defineFunsRec(Smtlibv2Parser.Cmd_defineFunsRecContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmddefineSort}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_defineSort}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmddefineSort(Smtlibv2Parser.CmddefineSortContext ctx);
+  T visitCmd_defineSort(Smtlibv2Parser.Cmd_defineSortContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdecho}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_echo}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdecho(Smtlibv2Parser.CmdechoContext ctx);
+  T visitCmd_echo(Smtlibv2Parser.Cmd_echoContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdexit}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_exit}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdexit(Smtlibv2Parser.CmdexitContext ctx);
+  T visitCmd_exit(Smtlibv2Parser.Cmd_exitContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetAssertions}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getAssertions}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetAssertions(Smtlibv2Parser.CmdgetAssertionsContext ctx);
+  T visitCmd_getAssertions(Smtlibv2Parser.Cmd_getAssertionsContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetAssignment}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getAssignment}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetAssignment(Smtlibv2Parser.CmdgetAssignmentContext ctx);
+  T visitCmd_getAssignment(Smtlibv2Parser.Cmd_getAssignmentContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetInfo}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getInfo}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetInfo(Smtlibv2Parser.CmdgetInfoContext ctx);
+  T visitCmd_getInfo(Smtlibv2Parser.Cmd_getInfoContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetModel}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getModel}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetModel(Smtlibv2Parser.CmdgetModelContext ctx);
+  T visitCmd_getModel(Smtlibv2Parser.Cmd_getModelContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetOption}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getOption}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetOption(Smtlibv2Parser.CmdgetOptionContext ctx);
+  T visitCmd_getOption(Smtlibv2Parser.Cmd_getOptionContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetProof}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getProof}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetProof(Smtlibv2Parser.CmdgetProofContext ctx);
+  T visitCmd_getProof(Smtlibv2Parser.Cmd_getProofContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetUnsatAssumptions}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getUnsatAssumptions}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetUnsatAssumptions(Smtlibv2Parser.CmdgetUnsatAssumptionsContext ctx);
+  T visitCmd_getUnsatAssumptions(Smtlibv2Parser.Cmd_getUnsatAssumptionsContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetUnsatCore}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getUnsatCore}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetUnsatCore(Smtlibv2Parser.CmdgetUnsatCoreContext ctx);
+  T visitCmd_getUnsatCore(Smtlibv2Parser.Cmd_getUnsatCoreContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdgetValue}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_getValue}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdgetValue(Smtlibv2Parser.CmdgetValueContext ctx);
+  T visitCmd_getValue(Smtlibv2Parser.Cmd_getValueContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdpop}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_pop}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdpop(Smtlibv2Parser.CmdpopContext ctx);
+  T visitCmd_pop(Smtlibv2Parser.Cmd_popContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdpush}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_push}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdpush(Smtlibv2Parser.CmdpushContext ctx);
+  T visitCmd_push(Smtlibv2Parser.Cmd_pushContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdreset}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_reset}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdreset(Smtlibv2Parser.CmdresetContext ctx);
+  T visitCmd_reset(Smtlibv2Parser.Cmd_resetContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdresetAssertions}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_resetAssertions}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdresetAssertions(Smtlibv2Parser.CmdresetAssertionsContext ctx);
+  T visitCmd_resetAssertions(Smtlibv2Parser.Cmd_resetAssertionsContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdsetInfo}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_setInfo}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdsetInfo(Smtlibv2Parser.CmdsetInfoContext ctx);
+  T visitCmd_setInfo(Smtlibv2Parser.Cmd_setInfoContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdsetLogic}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_setLogic}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdsetLogic(Smtlibv2Parser.CmdsetLogicContext ctx);
+  T visitCmd_setLogic(Smtlibv2Parser.Cmd_setLogicContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#cmdsetOption}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#cmd_setOption}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCmdsetOption(Smtlibv2Parser.CmdsetOptionContext ctx);
+  T visitCmd_setOption(Smtlibv2Parser.Cmd_setOptionContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code assert} labeled alternative in {@link
@@ -1050,94 +1070,94 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitCheck(Smtlibv2Parser.CheckContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code checkassume} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code check_assume} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitCheckassume(Smtlibv2Parser.CheckassumeContext ctx);
+  T visitCheck_assume(Smtlibv2Parser.Check_assumeContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code declconst} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code decl_const} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeclconst(Smtlibv2Parser.DeclconstContext ctx);
+  T visitDecl_const(Smtlibv2Parser.Decl_constContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code decldata} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code decl_data} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDecldata(Smtlibv2Parser.DecldataContext ctx);
+  T visitDecl_data(Smtlibv2Parser.Decl_dataContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code decldatas} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code decl_datas} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDecldatas(Smtlibv2Parser.DecldatasContext ctx);
+  T visitDecl_datas(Smtlibv2Parser.Decl_datasContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code declfun} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code decl_fun} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeclfun(Smtlibv2Parser.DeclfunContext ctx);
+  T visitDecl_fun(Smtlibv2Parser.Decl_funContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code declsort} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code decl_sort} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeclsort(Smtlibv2Parser.DeclsortContext ctx);
+  T visitDecl_sort(Smtlibv2Parser.Decl_sortContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code deffun} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code def_fun} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeffun(Smtlibv2Parser.DeffunContext ctx);
+  T visitDef_fun(Smtlibv2Parser.Def_funContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code deffunrec} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code def_fun_rec} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeffunrec(Smtlibv2Parser.DeffunrecContext ctx);
+  T visitDef_fun_rec(Smtlibv2Parser.Def_fun_recContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code deffunsrec} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code def_funs_rec} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDeffunsrec(Smtlibv2Parser.DeffunsrecContext ctx);
+  T visitDef_funs_rec(Smtlibv2Parser.Def_funs_recContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code defsort} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code def_sort} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitDefsort(Smtlibv2Parser.DefsortContext ctx);
+  T visitDef_sort(Smtlibv2Parser.Def_sortContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code echo} labeled alternative in {@link
@@ -1158,85 +1178,85 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitExit(Smtlibv2Parser.ExitContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getassert} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_assert} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetassert(Smtlibv2Parser.GetassertContext ctx);
+  T visitGet_assert(Smtlibv2Parser.Get_assertContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getassign} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_assign} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetassign(Smtlibv2Parser.GetassignContext ctx);
+  T visitGet_assign(Smtlibv2Parser.Get_assignContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getinfo} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_info} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetinfo(Smtlibv2Parser.GetinfoContext ctx);
+  T visitGet_info(Smtlibv2Parser.Get_infoContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getmodel} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_model} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetmodel(Smtlibv2Parser.GetmodelContext ctx);
+  T visitGet_model(Smtlibv2Parser.Get_modelContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getoption} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_option} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetoption(Smtlibv2Parser.GetoptionContext ctx);
+  T visitGet_option(Smtlibv2Parser.Get_optionContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getproof} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_proof} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetproof(Smtlibv2Parser.GetproofContext ctx);
+  T visitGet_proof(Smtlibv2Parser.Get_proofContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getunsatassume} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_unsat_assume} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetunsatassume(Smtlibv2Parser.GetunsatassumeContext ctx);
+  T visitGet_unsat_assume(Smtlibv2Parser.Get_unsat_assumeContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getunsatcore} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_unsat_core} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetunsatcore(Smtlibv2Parser.GetunsatcoreContext ctx);
+  T visitGet_unsat_core(Smtlibv2Parser.Get_unsat_coreContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code getval} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code get_val} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetval(Smtlibv2Parser.GetvalContext ctx);
+  T visitGet_val(Smtlibv2Parser.Get_valContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code pop} labeled alternative in {@link
@@ -1266,13 +1286,13 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitReset(Smtlibv2Parser.ResetContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code resetassert} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code reset_assert} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitResetassert(Smtlibv2Parser.ResetassertContext ctx);
+  T visitReset_assert(Smtlibv2Parser.Reset_assertContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code setInfo} labeled alternative in {@link
@@ -1284,30 +1304,30 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitSetInfo(Smtlibv2Parser.SetInfoContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code setlogic} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code set_logic} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSetlogic(Smtlibv2Parser.SetlogicContext ctx);
+  T visitSet_logic(Smtlibv2Parser.Set_logicContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code setoption} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code set_option} labeled alternative in {@link
    * Smtlibv2Parser#command}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitSetoption(Smtlibv2Parser.SetoptionContext ctx);
+  T visitSet_option(Smtlibv2Parser.Set_optionContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#bvalue}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#b_value}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitBvalue(Smtlibv2Parser.BvalueContext ctx);
+  T visitB_value(Smtlibv2Parser.B_valueContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code diagnose} labeled alternative in {@link
@@ -1337,85 +1357,85 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitInteractive(Smtlibv2Parser.InteractiveContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code printsucc} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code print_succ} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitPrintsucc(Smtlibv2Parser.PrintsuccContext ctx);
+  T visitPrint_succ(Smtlibv2Parser.Print_succContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code prodassert} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_assert} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdassert(Smtlibv2Parser.ProdassertContext ctx);
+  T visitProd_assert(Smtlibv2Parser.Prod_assertContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code prodassign} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_assign} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdassign(Smtlibv2Parser.ProdassignContext ctx);
+  T visitProd_assign(Smtlibv2Parser.Prod_assignContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code prodmod} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_mod} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdmod(Smtlibv2Parser.ProdmodContext ctx);
+  T visitProd_mod(Smtlibv2Parser.Prod_modContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code prodproofs} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_proofs} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdproofs(Smtlibv2Parser.ProdproofsContext ctx);
+  T visitProd_proofs(Smtlibv2Parser.Prod_proofsContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code produnsatassume} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_unsat_assume} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdunsatassume(Smtlibv2Parser.ProdunsatassumeContext ctx);
+  T visitProd_unsat_assume(Smtlibv2Parser.Prod_unsat_assumeContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code produnsatcore} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code prod_unsat_core} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitProdunsatcore(Smtlibv2Parser.ProdunsatcoreContext ctx);
+  T visitProd_unsat_core(Smtlibv2Parser.Prod_unsat_coreContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code randseed} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code rand_seed} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRandseed(Smtlibv2Parser.RandseedContext ctx);
+  T visitRand_seed(Smtlibv2Parser.Rand_seedContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code regout} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code reg_out} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRegout(Smtlibv2Parser.RegoutContext ctx);
+  T visitReg_out(Smtlibv2Parser.Reg_outContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code repro} labeled alternative in {@link
@@ -1436,35 +1456,35 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitVerbose(Smtlibv2Parser.VerboseContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code optattr} labeled alternative in {@link
+   * Visit a parse tree produced by the {@code opt_attr} labeled alternative in {@link
    * Smtlibv2Parser#option}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitOptattr(Smtlibv2Parser.OptattrContext ctx);
+  T visitOpt_attr(Smtlibv2Parser.Opt_attrContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code allstat} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Visit a parse tree produced by the {@code all_stat} labeled alternative in {@link
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAllstat(Smtlibv2Parser.AllstatContext ctx);
+  T visitAll_stat(Smtlibv2Parser.All_statContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code assertstack} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Visit a parse tree produced by the {@code assert_stack} labeled alternative in {@link
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitAssertstack(Smtlibv2Parser.AssertstackContext ctx);
+  T visitAssert_stack(Smtlibv2Parser.Assert_stackContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code authors} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1473,7 +1493,7 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 
   /**
    * Visit a parse tree produced by the {@code error} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1482,7 +1502,7 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 
   /**
    * Visit a parse tree produced by the {@code name} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1490,17 +1510,17 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitName(Smtlibv2Parser.NameContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code runknown} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Visit a parse tree produced by the {@code r_unknown} labeled alternative in {@link
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRunknown(Smtlibv2Parser.RunknownContext ctx);
+  T visitR_unknown(Smtlibv2Parser.R_unknownContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code version} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1508,25 +1528,25 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitVersion(Smtlibv2Parser.VersionContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infokey} labeled alternative in {@link
-   * Smtlibv2Parser#infoflag}.
+   * Visit a parse tree produced by the {@code info_key} labeled alternative in {@link
+   * Smtlibv2Parser#info_flag}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfokey(Smtlibv2Parser.InfokeyContext ctx);
+  T visitInfo_key(Smtlibv2Parser.Info_keyContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#errorbehaviour}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#error_behaviour}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitErrorbehaviour(Smtlibv2Parser.ErrorbehaviourContext ctx);
+  T visitError_behaviour(Smtlibv2Parser.Error_behaviourContext ctx);
 
   /**
    * Visit a parse tree produced by the {@code memout} labeled alternative in {@link
-   * Smtlibv2Parser#reasonunknown}.
+   * Smtlibv2Parser#reason_unknown}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1535,7 +1555,7 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
 
   /**
    * Visit a parse tree produced by the {@code incomp} labeled alternative in {@link
-   * Smtlibv2Parser#reasonunknown}.
+   * Smtlibv2Parser#reason_unknown}.
    *
    * @param ctx the parse tree
    * @return the visitor result
@@ -1543,350 +1563,350 @@ public interface Smtlibv2Visitor<T> extends ParseTreeVisitor<T> {
   T visitIncomp(Smtlibv2Parser.IncompContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code runnownsexpr} labeled alternative in {@link
-   * Smtlibv2Parser#reasonunknown}.
+   * Visit a parse tree produced by the {@code r_unnown_s_expr} labeled alternative in {@link
+   * Smtlibv2Parser#reason_unknown}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRunnownsexpr(Smtlibv2Parser.RunnownsexprContext ctx);
+  T visitR_unnown_s_expr(Smtlibv2Parser.R_unnown_s_exprContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respdeffun} labeled alternative in {@link
-   * Smtlibv2Parser#modelresponse}.
+   * Visit a parse tree produced by the {@code resp_def_fun} labeled alternative in {@link
+   * Smtlibv2Parser#model_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespdeffun(Smtlibv2Parser.RespdeffunContext ctx);
+  T visitResp_def_fun(Smtlibv2Parser.Resp_def_funContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respdeffunrec} labeled alternative in {@link
-   * Smtlibv2Parser#modelresponse}.
+   * Visit a parse tree produced by the {@code resp_def_fun_rec} labeled alternative in {@link
+   * Smtlibv2Parser#model_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespdeffunrec(Smtlibv2Parser.RespdeffunrecContext ctx);
+  T visitResp_def_fun_rec(Smtlibv2Parser.Resp_def_fun_recContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respdeffunsrec} labeled alternative in {@link
-   * Smtlibv2Parser#modelresponse}.
+   * Visit a parse tree produced by the {@code resp_def_funs_rec} labeled alternative in {@link
+   * Smtlibv2Parser#model_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespdeffunsrec(Smtlibv2Parser.RespdeffunsrecContext ctx);
+  T visitResp_def_funs_rec(Smtlibv2Parser.Resp_def_funs_recContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoassertstack} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_assert_stack} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoassertstack(Smtlibv2Parser.InfoassertstackContext ctx);
+  T visitInfo_assert_stack(Smtlibv2Parser.Info_assert_stackContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoauthors} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_authors} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoauthors(Smtlibv2Parser.InfoauthorsContext ctx);
+  T visitInfo_authors(Smtlibv2Parser.Info_authorsContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoerror} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_error} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoerror(Smtlibv2Parser.InfoerrorContext ctx);
+  T visitInfo_error(Smtlibv2Parser.Info_errorContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoname} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_name} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoname(Smtlibv2Parser.InfonameContext ctx);
+  T visitInfo_name(Smtlibv2Parser.Info_nameContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code inforunknown} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_r_unknown} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInforunknown(Smtlibv2Parser.InforunknownContext ctx);
+  T visitInfo_r_unknown(Smtlibv2Parser.Info_r_unknownContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoversion} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_version} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoversion(Smtlibv2Parser.InfoversionContext ctx);
+  T visitInfo_version(Smtlibv2Parser.Info_versionContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code infoattr} labeled alternative in {@link
-   * Smtlibv2Parser#inforesponse}.
+   * Visit a parse tree produced by the {@code info_attr} labeled alternative in {@link
+   * Smtlibv2Parser#info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitInfoattr(Smtlibv2Parser.InfoattrContext ctx);
+  T visitInfo_attr(Smtlibv2Parser.Info_attrContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#valuationpair}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#valuation_pair}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitValuationpair(Smtlibv2Parser.ValuationpairContext ctx);
+  T visitValuation_pair(Smtlibv2Parser.Valuation_pairContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#tvaluationpair}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#t_valuation_pair}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitTvaluationpair(Smtlibv2Parser.TvaluationpairContext ctx);
+  T visitT_valuation_pair(Smtlibv2Parser.T_valuation_pairContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#checksatresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#check_sat_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitChecksatresponse(Smtlibv2Parser.ChecksatresponseContext ctx);
+  T visitCheck_sat_response(Smtlibv2Parser.Check_sat_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#echoresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#echo_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitEchoresponse(Smtlibv2Parser.EchoresponseContext ctx);
+  T visitEcho_response(Smtlibv2Parser.Echo_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getassertionsresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_assertions_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetassertionsresponse(Smtlibv2Parser.GetassertionsresponseContext ctx);
+  T visitGet_assertions_response(Smtlibv2Parser.Get_assertions_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getassignmentresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_assignment_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetassignmentresponse(Smtlibv2Parser.GetassignmentresponseContext ctx);
+  T visitGet_assignment_response(Smtlibv2Parser.Get_assignment_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getinforesponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_info_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetinforesponse(Smtlibv2Parser.GetinforesponseContext ctx);
+  T visitGet_info_response(Smtlibv2Parser.Get_info_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code rsmodel} labeled alternative in {@link
-   * Smtlibv2Parser#getmodelresponse}.
+   * Visit a parse tree produced by the {@code rs_model} labeled alternative in {@link
+   * Smtlibv2Parser#get_model_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRsmodel(Smtlibv2Parser.RsmodelContext ctx);
+  T visitRs_model(Smtlibv2Parser.Rs_modelContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code modelresp} labeled alternative in {@link
-   * Smtlibv2Parser#getmodelresponse}.
+   * Visit a parse tree produced by the {@code model_resp} labeled alternative in {@link
+   * Smtlibv2Parser#get_model_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitModelresp(Smtlibv2Parser.ModelrespContext ctx);
+  T visitModel_resp(Smtlibv2Parser.Model_respContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getoptionresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_option_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetoptionresponse(Smtlibv2Parser.GetoptionresponseContext ctx);
+  T visitGet_option_response(Smtlibv2Parser.Get_option_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getproofresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_proof_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetproofresponse(Smtlibv2Parser.GetproofresponseContext ctx);
+  T visitGet_proof_response(Smtlibv2Parser.Get_proof_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getunsatassumpresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_unsat_assump_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetunsatassumpresponse(Smtlibv2Parser.GetunsatassumpresponseContext ctx);
+  T visitGet_unsat_assump_response(Smtlibv2Parser.Get_unsat_assump_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getunsatcoreresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_unsat_core_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetunsatcoreresponse(Smtlibv2Parser.GetunsatcoreresponseContext ctx);
+  T visitGet_unsat_core_response(Smtlibv2Parser.Get_unsat_core_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link Smtlibv2Parser#getvalueresponse}.
+   * Visit a parse tree produced by {@link Smtlibv2Parser#get_value_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitGetvalueresponse(Smtlibv2Parser.GetvalueresponseContext ctx);
+  T visitGet_value_response(Smtlibv2Parser.Get_value_responseContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respchecksat} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_check_sat} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespchecksat(Smtlibv2Parser.RespchecksatContext ctx);
+  T visitResp_check_sat(Smtlibv2Parser.Resp_check_satContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respecho} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_echo} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespecho(Smtlibv2Parser.RespechoContext ctx);
+  T visitResp_echo(Smtlibv2Parser.Resp_echoContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respgetassert} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_get_assert} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespgetassert(Smtlibv2Parser.RespgetassertContext ctx);
+  T visitResp_get_assert(Smtlibv2Parser.Resp_get_assertContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respgettassign} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_gett_assign} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespgettassign(Smtlibv2Parser.RespgettassignContext ctx);
+  T visitResp_gett_assign(Smtlibv2Parser.Resp_gett_assignContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respgetinfo} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_get_info} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespgetinfo(Smtlibv2Parser.RespgetinfoContext ctx);
+  T visitResp_get_info(Smtlibv2Parser.Resp_get_infoContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respgetmodel} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_get_model} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespgetmodel(Smtlibv2Parser.RespgetmodelContext ctx);
+  T visitResp_get_model(Smtlibv2Parser.Resp_get_modelContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respoption} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_option} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespoption(Smtlibv2Parser.RespoptionContext ctx);
+  T visitResp_option(Smtlibv2Parser.Resp_optionContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respproof} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_proof} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespproof(Smtlibv2Parser.RespproofContext ctx);
+  T visitResp_proof(Smtlibv2Parser.Resp_proofContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respunsatassume} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_unsat_assume} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespunsatassume(Smtlibv2Parser.RespunsatassumeContext ctx);
+  T visitResp_unsat_assume(Smtlibv2Parser.Resp_unsat_assumeContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respunsatcore} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_unsat_core} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespunsatcore(Smtlibv2Parser.RespunsatcoreContext ctx);
+  T visitResp_unsat_core(Smtlibv2Parser.Resp_unsat_coreContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respvalue} labeled alternative in {@link
-   * Smtlibv2Parser#specificsuccessresponse}.
+   * Visit a parse tree produced by the {@code resp_value} labeled alternative in {@link
+   * Smtlibv2Parser#specific_success_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespvalue(Smtlibv2Parser.RespvalueContext ctx);
+  T visitResp_value(Smtlibv2Parser.Resp_valueContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respsuccess} labeled alternative in {@link
-   * Smtlibv2Parser#generalresponse}.
+   * Visit a parse tree produced by the {@code resp_success} labeled alternative in {@link
+   * Smtlibv2Parser#general_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespsuccess(Smtlibv2Parser.RespsuccessContext ctx);
+  T visitResp_success(Smtlibv2Parser.Resp_successContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respspecsuccesss} labeled alternative in {@link
-   * Smtlibv2Parser#generalresponse}.
+   * Visit a parse tree produced by the {@code resp_spec_successs} labeled alternative in {@link
+   * Smtlibv2Parser#general_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespspecsuccesss(Smtlibv2Parser.RespspecsuccesssContext ctx);
+  T visitResp_spec_successs(Smtlibv2Parser.Resp_spec_successsContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code respunsupported} labeled alternative in {@link
-   * Smtlibv2Parser#generalresponse}.
+   * Visit a parse tree produced by the {@code resp_unsupported} labeled alternative in {@link
+   * Smtlibv2Parser#general_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitRespunsupported(Smtlibv2Parser.RespunsupportedContext ctx);
+  T visitResp_unsupported(Smtlibv2Parser.Resp_unsupportedContext ctx);
 
   /**
-   * Visit a parse tree produced by the {@code resperror} labeled alternative in {@link
-   * Smtlibv2Parser#generalresponse}.
+   * Visit a parse tree produced by the {@code resp_error} labeled alternative in {@link
+   * Smtlibv2Parser#general_response}.
    *
    * @param ctx the parse tree
    * @return the visitor result
    */
-  T visitResperror(Smtlibv2Parser.ResperrorContext ctx);
+  T visitResp_error(Smtlibv2Parser.Resp_errorContext ctx);
 }

@@ -21,11 +21,13 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
@@ -39,6 +41,11 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored"})
 public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Before
+  public void setUp() {
+    assume().that(fpmgr).isNotNull();
+  }
 
   @Test
   public void testMakeFloatingPoint()

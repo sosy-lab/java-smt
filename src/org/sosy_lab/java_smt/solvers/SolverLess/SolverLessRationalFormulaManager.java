@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
@@ -65,15 +64,6 @@ public class SolverLessRationalFormulaManager
   protected DummyFormula makeVariableImpl(String i) {
     DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
     result.setName(i);
-    return result;
-  }
-
-  @Override
-  public IntegerFormula floor(NumeralFormula number) {
-    DummyFormula result =
-        new DummyFormula(
-            new DummyType(DummyType.Type.INTEGER),
-            String.valueOf((int) Double.parseDouble(number.toString())));
     return result;
   }
 

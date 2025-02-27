@@ -1,4 +1,4 @@
-// This file is part of javaSmt,
+// This file is part of JavaSMT,
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
@@ -45,34 +45,40 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.UFManager;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CmdassertContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CmddeclareConstContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CmddeclareFunContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CmdpopContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.CmdpushContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.DeclsortContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.FunctiondefContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.IdsymbContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.IdsymbidxContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_assertContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_declareConstContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_declareFunContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_popContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_pushContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Decl_sortContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Function_defContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Id_symbContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Id_symb_idxContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.MultisortContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.MultitermContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.QualidsortContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.RespgetmodelContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.SortidContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermexclamContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermexistsContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermforallContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermletContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermqualidContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.TermspecconstContext;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.VarbindingContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Qual_id_sortContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Resp_get_modelContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Sort_idContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_exclamContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_existsContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_forallContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_letContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_qual_idContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_spec_constContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
 
 /**
- * Implements a method from Smtlibv2BaseVisitor for each node in a parse tree that requires some
- * form of action in order to transform the parsed SMT-LIB2 into javaSmt.
+ * Implements a method from smtlibv2BaseVisitor for each node in a parse tree that requires some
+ * form of action in order to transform the parsed SMT-LIB2 into JavaSMT.
  */
-@SuppressWarnings({"CheckReturnValue", "unchecked", "NonApiType", "StringSplitter"})
+@SuppressWarnings({
+  "CheckReturnValue",
+  "unchecked",
+  "NonApiType",
+  "StringSplitter",
+  "UnnecessaryParentheses"
+})
 public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   /**
@@ -118,18 +124,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   /** is set to 'true' if a node 'model' is encountered. */
   private boolean isModel = false;
 
-  @Override
-  public Object visitTermlet(TermletContext ctx) {
-    for (int i = 0; i < ctx.varbinding().size(); i++) {
-      visit(ctx.varbinding(i));
-    }
-    Formula formula = (Formula) visit(ctx.term());
-    for (int j = 0; j < ctx.varbinding().size(); j++) {
-      letVariables.remove(ctx.varbinding(j).symbol().getText());
-    }
-    return formula;
-  }
-
   // TODO Does the visitor use its own solver instance, or should the formulas be added to an
   //  existing instance?
   public Visitor(FormulaManagersWrapper managers) {
@@ -146,14 +140,14 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   @Override
   // TODO Is this for sort declarations? If so, we may not need it.
-  public List<String> visitIdsymb(IdsymbContext ctx) {
+  public List<String> visitId_symb(Id_symbContext ctx) {
     List<String> sort = new ArrayList<>();
     sort.add(ctx.getText());
     return sort;
   }
 
   @Override
-  public List<String> visitIdsymbidx(IdsymbidxContext ctx) {
+  public List<String> visitId_symb_idx(Id_symb_idxContext ctx) {
     List<String> sort = new ArrayList<>();
     sort.add(ctx.symbol().getText());
     for (int i = 0; i < ctx.index().size(); i++) {
@@ -191,12 +185,12 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    */
   private static List<String> getAllAllowedFPBeginningsWithInts() {
     List<String> beginnings = new ArrayList<>();
-    beginnings.add("(FloatingPoint");
-    beginnings.add("(+oo");
-    beginnings.add("(-oo");
-    beginnings.add("(+zero");
-    beginnings.add("(-zero");
-    beginnings.add("(NaN");
+    beginnings.add("(_FloatingPoint");
+    beginnings.add("(_+oo");
+    beginnings.add("(_-oo");
+    beginnings.add("(_+zero");
+    beginnings.add("(_-zero");
+    beginnings.add("(_NaN");
     return beginnings;
   }
 
@@ -240,8 +234,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    */
   public static FormulaType<?> parseToBitVecFormulaTypeIfMatching(String type) {
     String bvSize = "";
-    if (type.startsWith("(BitVec")) {
-      bvSize = Iterables.get(Splitter.on("BitVec").split(type), 1);
+    if (type.startsWith("(_BitVec")) {
+      bvSize = Iterables.get(Splitter.on("_BitVec").split(type), 1);
       bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
       return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSize));
     }
@@ -333,9 +327,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       } else if (operand.startsWith("(fp")) {
         try {
           String[] parts = operand.split(" ");
-          String signPart = parts[1]; // ( BitVec 1)
-          String exponentPart = parts[2]; // ( BitVec eb)
-          String mantissaPart = parts[3]; // ( BitVec man)
+          String signPart = parts[1]; // (_ BitVec 1)
+          String exponentPart = parts[2]; // (_ BitVec eb)
+          String mantissaPart = parts[3]; // (_ BitVec man)
 
           int sign = parseBitVec(signPart);
           int exponent = parseBitVec(exponentPart);
@@ -400,7 +394,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   private ParserFormula createParserFormulaForString(String operand) {
-    if (!operand.startsWith("\"") || !operand.endsWith("\"")) {
+    if (!(operand.startsWith("\"") && operand.endsWith("\""))) {
       throw new ParserException("Invalid string format: " + operand);
     }
     return new ParserFormula(
@@ -409,7 +403,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   private static int parseBitVec(String bitVecPart) {
-    if (!bitVecPart.startsWith("( BitVec")) {
+    if (!bitVecPart.startsWith("(_ BitVec")) {
       throw new IllegalArgumentException("Invalid BitVec format: " + bitVecPart);
     }
     String bitValue = bitVecPart.split(" ")[2].replace(")", "");
@@ -417,25 +411,25 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   private static int getBitVecSize(String bitVecPart) {
-    if (!bitVecPart.startsWith("( BitVec")) {
+    if (!bitVecPart.startsWith("(_ BitVec")) {
       throw new IllegalArgumentException("Invalid BitVec format: " + bitVecPart);
     }
     return Integer.parseInt(bitVecPart.split(" ")[2].replace(")", ""));
   }
 
   /**
-   * Sees if a SMT2 String is a Bitvector.
+   * Sees if a SMT2 String is a Bitvector
    *
    * @param smt2 Smt2 String
-   * @return true if it starts with "(Bitvec"
+   * @return true if it starts with "(_Bitvec"
    */
   public static boolean isABitVecInSMT2(String smt2) {
-    return smt2.startsWith("(BitVec");
+    return smt2.startsWith("(_BitVec");
   }
 
   /**
    * Sees if SMT2 String is a FloatingPoint by comparing it's beginning to the accepted ways of
-   * defining a Floating-Point in SMT2.
+   * defining a Floating-Point in SMT2
    *
    * @param smt2 String in smt2 format
    * @return true if at least one beginning is matched
@@ -446,7 +440,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public FormulaType<?> visitSortid(SortidContext ctx) {
+  public FormulaType<?> visitSort_id(Sort_idContext ctx) {
     String type = ctx.getText();
 
     if (isABitVecInSMT2(type)) {
@@ -471,7 +465,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Tuple2<String, FormulaType<?>> visitQualidsort(QualidsortContext ctx) {
+  public Tuple2<String, FormulaType<?>> visitQual_id_sort(Qual_id_sortContext ctx) {
     String operator = ctx.identifier().getText();
     FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
     Tuple2<String, FormulaType<?>> result = new Tuple2<>(operator, sort);
@@ -479,7 +473,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitVarbinding(VarbindingContext ctx) {
+  public Object visitVar_binding(Var_bindingContext ctx) {
     String name = ctx.symbol().getText();
     Formula formula = (Formula) visit(ctx.term());
     letVariables.put(name, new ParserFormula(formula));
@@ -553,7 +547,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitTermspecconst(TermspecconstContext ctx) {
+  public Object visitTerm_spec_const(Term_spec_constContext ctx) {
     String operand = ctx.getText();
     if (variables.containsKey(operand)) {
       return variables.get(operand).javaSmt;
@@ -588,7 +582,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitTermqualid(TermqualidContext ctx) {
+  public Object visitTerm_qual_id(Term_qual_idContext ctx) {
     String operand = replaceReservedChars(ctx.getText());
     List<String> bitVec = (List<String>) visitChildren(ctx);
     if (letVariables.containsKey(operand)) {
@@ -642,7 +636,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   // TODO Can we get a better return type?
   @Override
   public Object visitMultiterm(MultitermContext ctx) {
-    Object identifier = visit(ctx.qualidentifer());
+    Object identifier = visit(ctx.qual_identifer());
     List<String> operators = null;
     String operator = "";
     FormulaType<?> sort = null;
@@ -937,7 +931,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two numeral operands as input. ");
         }
 
-      case "toint":
+      case "to_int":
         if (operands.size() == 1) {
           try {
             List<NumeralFormula> numeralOperands =
@@ -1249,7 +1243,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(
               operator + " takes one bitvector and two integers as " + "input.");
         }
-      case "zeroextend":
+      case "zero_extend":
         if (operands.size() == 1) {
           if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
@@ -1266,7 +1260,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         } else {
           throw new ParserException(operator + " takes one bitvector and one integer as input.");
         }
-      case "signextend":
+      case "sign_extend":
         if (operands.size() == 1) {
           if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
@@ -1295,10 +1289,10 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           }
         }
       case "int2bv":
-      case "rotateleft":
-      case "rotateright":
+      case "rotate_left":
+      case "rotate_right":
       case "repeat":
-        throw new ParserException(operator + " is not available in javaSmt");
+        throw new ParserException(operator + " is not available in JavaSMT");
 
       case "select":
         // array operators
@@ -1327,7 +1321,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one array and one index as input. ");
         }
       case "const":
-        // TODO I believe javaSmt now supports const arrays?
+        // TODO I believe JavaSMT now supports const arrays?
         if (isModel) {
           variables.put(
               "temp",
@@ -1348,7 +1342,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                           (FormulaType.ArrayFormulaType<?, ?>) sort)));
           return variables.get("temp").javaSmt;
         } else {
-          throw new ParserException("\"as const\" is not supported by javaSmt");
+          throw new ParserException("\"as const\" is not supported by JavaSMT");
         }
       case "fp.abs":
         if (operands.size() == 1) {
@@ -1370,7 +1364,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               .add(
                   (FloatingPointFormula) operands.get(1),
                   (FloatingPointFormula) operands.get(2),
-                  parseRoundingModesTojavaSmtFormat(operands.get(0).toString()));
+                  parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException(
               "fp.add requires a rounding mode and exactly two "
@@ -1382,7 +1376,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               .subtract(
                   (FloatingPointFormula) operands.get(1),
                   (FloatingPointFormula) operands.get(2),
-                  parseRoundingModesTojavaSmtFormat(operands.get(0).toString()));
+                  parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException(
               "fp.sub requires a rounding mode and exactly two "
@@ -1394,7 +1388,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               .multiply(
                   (FloatingPointFormula) operands.get(1),
                   (FloatingPointFormula) operands.get(2),
-                  parseRoundingModesTojavaSmtFormat(operands.get(0).toString()));
+                  parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException(
               "fp.mul requires a rounding mode and exactly two "
@@ -1406,7 +1400,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               .divide(
                   (FloatingPointFormula) operands.get(1),
                   (FloatingPointFormula) operands.get(2),
-                  parseRoundingModesTojavaSmtFormat(operands.get(0).toString()));
+                  parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException(
               "fp.div requires a rounding mode and exactly two "
@@ -1414,22 +1408,22 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
       case "fp.fma":
         // TODO: Seems to not be supported yet, but can be implemented
-        throw new UnsupportedOperationException("fp.fma isn't supported by javaSmt");
+        throw new UnsupportedOperationException("fp.fma isn't supported by JavaSMT");
       case "fp.sqrt":
         if (operands.size() == 2) {
           return Objects.requireNonNull(fpmgr)
               .sqrt(
                   (FloatingPointFormula) operands.get(1),
-                  parseRoundingModesTojavaSmtFormat(operands.get(0).toString()));
+                  parseRoundingModesToJavaSMTFormat(operands.get(0).toString()));
         } else {
           throw new ParserException(
               "fp.sqrt requires a rounding mode and exactly one "
                   + "FloatingPointFormula operand.");
         }
       case "fp.rem":
-        throw new UnsupportedOperationException("fp.rem is not supported by javaSmt");
+        throw new UnsupportedOperationException("fp.rem is not supported by JavaSMT");
       case "fp.roundToIntegral":
-        throw new UnsupportedOperationException("fp.roundToIntegral is not supported by javaSmt");
+        throw new UnsupportedOperationException("fp.roundToIntegral is not supported by JavaSMT");
       case "fp.min":
         if (operands.size() == 2) {
           return Objects.requireNonNull(fpmgr)
@@ -1527,7 +1521,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               "fp.isNegative requires exactly one " + "FloatingPointFormula operand.");
         }
       case "fp.isPositive":
-        throw new ParserException("fp.isPositive is not supported by javaSmt");
+        throw new ParserException("fp.isPositive is not supported by JavaSMT");
       case "str.++":
         if (operands.size() != 2) {
           throw new ParserException("str.++ requires exactly 2 operands.");
@@ -1547,9 +1541,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             .charAt((StringFormula) operands.get(0), (IntegerFormula) operands.get(1));
 
       case "str.<":
-        throw new UnsupportedOperationException("str.< is not supported in javaSmt");
+        throw new UnsupportedOperationException("str.< is not supported in JavaSMT");
       case "str.<=":
-        throw new UnsupportedOperationException("str.<= is not supported in javaSmt");
+        throw new UnsupportedOperationException("str.<= is not supported in JavaSMT");
       case "str.substr":
         if (operands.size() != 3) {
           throw new ParserException("str.substr requires exactly 3 operands.");
@@ -1595,40 +1589,40 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                 (StringFormula) operands.get(0),
                 (StringFormula) operands.get(1),
                 (StringFormula) operands.get(2));
-      case "str.replaceall":
+      case "str.replace_all":
         if (operands.size() != 3) {
-          throw new ParserException("str.replaceall requires exactly 3 operands.");
+          throw new ParserException("str.replace_all requires exactly 3 operands.");
         }
         return Objects.requireNonNull(smgr)
             .replaceAll(
                 (StringFormula) operands.get(0),
                 (StringFormula) operands.get(1),
                 (StringFormula) operands.get(2));
-      case "str.toint":
+      case "str.to_int":
         if (operands.size() != 1) {
-          throw new ParserException("str.toint requires exactly 1 operand.");
+          throw new ParserException("str.to_int requires exactly 1 operand.");
         }
         return Objects.requireNonNull(smgr).toIntegerFormula((StringFormula) operands.get(0));
-      case "str.fromint":
+      case "str.from_int":
         if (operands.size() != 1) {
-          throw new ParserException("str.fromint requires exactly 1 operand.");
+          throw new ParserException("str.from_int requires exactly 1 operand.");
         }
         return Objects.requireNonNull(smgr).toStringFormula((IntegerFormula) operands.get(0));
-      case "str.tocode":
-        throw new ParserException("str.tocode is not supported in javaSmt");
-      case "str.fromcode":
-        throw new ParserException("str.fromcode is not supported in javaSmt");
-      case "str.tore":
+      case "str.to_code":
+        throw new ParserException("str.to_code is not supported in JavaSMT");
+      case "str.from_code":
+        throw new ParserException("str.from_code is not supported in JavaSMT");
+      case "str.to_re":
         if (operands.size() != 1) {
-          throw new ParserException("str.tore requires exactly 1 operand.");
+          throw new ParserException("str.to_re requires exactly 1 operand.");
         }
         return Objects.requireNonNull(smgr).makeRegex(operands.get(0).toString());
-      case "str.inre":
+      case "str.in_re":
         if (operands.size() != 2) {
-          throw new ParserException("str.inre requires exactly 2 operands.");
+          throw new ParserException("str.in_re requires exactly 2 operands.");
         }
         if (!(operands.get(1) instanceof RegexFormula)) {
-          throw new ParserException("Second operand of str.inre must be a RegexFormula.");
+          throw new ParserException("Second operand of str.in_re must be a RegexFormula.");
         }
         return Objects.requireNonNull(smgr)
             .in((StringFormula) operands.get(0), (RegexFormula) operands.get(1));
@@ -1762,30 +1756,42 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitTermforall(TermforallContext ctx) {
+  public Object visitTerm_let(Term_letContext ctx) {
+    for (int i = 0; i < ctx.var_binding().size(); i++) {
+      visit(ctx.var_binding(i));
+    }
+    Formula formula = (Formula) visit(ctx.term());
+    for (int j = 0; j < ctx.var_binding().size(); j++) {
+      letVariables.remove(ctx.var_binding(j).symbol().getText());
+    }
+    return formula;
+  }
+
+  @Override
+  public Object visitTerm_forall(Term_forallContext ctx) {
     throw new ParserException("Parser does not support Quantifiers");
   }
 
   @Override
-  public Object visitTermexists(TermexistsContext ctx) {
+  public Object visitTerm_exists(Term_existsContext ctx) {
     throw new ParserException("Parser does not support Quantifiers");
   }
 
   @Override
-  public Object visitTermexclam(TermexclamContext ctx) {
+  public Object visitTerm_exclam(Term_exclamContext ctx) {
     throw new ParserException("Parser does not support Attributed Expressions");
   }
 
   @Override
-  public Object visitFunctiondef(FunctiondefContext ctx) {
+  public Object visitFunction_def(Function_defContext ctx) {
     String variable = replaceReservedChars(ctx.symbol().getText());
 
     List<FormulaType<?>> javaSorts;
     List<Formula> inputParams = new ArrayList<>();
-    if (!ctx.sortedvar().isEmpty()) {
-      for (int i = 0; i < ctx.sortedvar().size(); i++) {
-        String name = ctx.sortedvar(i).symbol().getText();
-        FormulaType<?> sort = (FormulaType<?>) visit(ctx.sortedvar(i).sort());
+    if (!ctx.sorted_var().isEmpty()) {
+      for (int i = 0; i < ctx.sorted_var().size(); i++) {
+        String name = ctx.sorted_var(i).symbol().getText();
+        FormulaType<?> sort = (FormulaType<?>) visit(ctx.sorted_var(i).sort());
         Formula temp = mapKey(sort, name);
         variables.put(name, new ParserFormula(temp));
         inputParams.add(temp);
@@ -1817,7 +1823,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     String keyString = replaceReplacedChars(key.toString());
     String valueString = value.toString();
     // TODO Does this add function definitions to the model?
-    //  UPDATE Actually this is used together with `visitRespgetmodel` to parse the model returned
+    //  UPDATE Actually this is used together with `visitResp_get_model` to parse the model returned
     //         by the solver after (get-model) is used.
     if (isModel) {
       Model.ValueAssignment assignment =
@@ -1829,7 +1835,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitCmdassert(CmdassertContext ctx) {
+  public Object visitCmd_assert(Cmd_assertContext ctx) {
     Object result = visitChildren(ctx);
     try {
       constraints.add((BooleanFormula) result);
@@ -1840,7 +1846,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitCmddeclareConst(CmddeclareConstContext ctx) {
+  public Object visitCmd_declareConst(Cmd_declareConstContext ctx) {
     String variableSymbol = ctx.symbol().getText();
     FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
 
@@ -1899,9 +1905,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (type.isRationalType()) {
       return "Real";
     } else if (type.isFloatingPointType()) {
-      return "( FloatingPoint ";
+      return "(_ FloatingPoint ";
     } else if (type.isBitvectorType()) {
-      return "( BitVec " + ((BitvectorType) type).getSize() + ")";
+      return "(_ BitVec " + ((BitvectorType) type).getSize() + ")";
     } else if (type.isArrayType()) {
       return "(Array "
           + getArrayStrings(((FormulaType.ArrayFormulaType<?, ?>) type).getIndexType())
@@ -2004,7 +2010,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitCmddeclareFun(CmddeclareFunContext ctx) {
+  public Object visitCmd_declareFun(Cmd_declareFunContext ctx) {
     String variable = replaceReservedChars(ctx.symbol().getText());
 
     FormulaType<?> returnType = (FormulaType<?>) visit(ctx.sort(ctx.sort().size() - 1));
@@ -2026,12 +2032,12 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   /**
    * Method for parsing a String to the matching Rounding Mode from the FloatingPointRoundMode
-   * Interface.
+   * Interface
    *
    * @param roundingModeInSMTLIB SMTLIB2 String
    * @return matching FloatingPointRoundingMode
    */
-  public static FloatingPointRoundingMode parseRoundingModesTojavaSmtFormat(
+  public static FloatingPointRoundingMode parseRoundingModesToJavaSMTFormat(
       String roundingModeInSMTLIB) {
     if (roundingModeInSMTLIB.equals("RNE")
         || roundingModeInSMTLIB.equals("roundNearestTiesToEven")) {
@@ -2054,22 +2060,22 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   @Override
-  public Object visitCmdpop(CmdpopContext ctx) {
+  public Object visitCmd_pop(Cmd_popContext ctx) {
     throw new ParserException("Parser does not support \"pop\"");
   }
 
   @Override
-  public Object visitCmdpush(CmdpushContext ctx) {
+  public Object visitCmd_push(Cmd_pushContext ctx) {
     throw new ParserException("Parser does not support \"push\"");
   }
 
   @Override
-  public Object visitDeclsort(DeclsortContext ctx) {
-    throw new ParserException("javaSmt does not support \"declare-sort\"");
+  public Object visitDecl_sort(Decl_sortContext ctx) {
+    throw new ParserException("JavaSMT does not support \"declare-sort\"");
   }
 
   @Override
-  public Object visitRespgetmodel(RespgetmodelContext ctx) {
+  public Object visitResp_get_model(Resp_get_modelContext ctx) {
     isModel = true;
     return visitChildren(ctx);
   }

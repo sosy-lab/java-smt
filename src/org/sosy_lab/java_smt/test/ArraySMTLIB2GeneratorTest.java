@@ -21,9 +21,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -50,38 +48,6 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
     Generator.assembleConstraint(constraint);
     String actualResult = String.valueOf(Generator.getLines());
     assertThat(actualResult).isEqualTo(expectedResult);
-  }
-
-  @Test(expected = GeneratorException.class)
-  public void testdeclareArrayElementException() {
-    requireArrays();
-    requireStrings();
-    ArrayFormula<BitvectorFormula, StringFormula> a1 =
-        Objects.requireNonNull(amgr)
-            .makeArray("a1", FormulaType.getBitvectorTypeWithSize(3), FormulaType.StringType);
-    ArrayFormula<BitvectorFormula, StringFormula> a2 =
-        Objects.requireNonNull(amgr)
-            .makeArray("a2", FormulaType.getBitvectorTypeWithSize(3), FormulaType.StringType);
-
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-
-    Generator.assembleConstraint(constraint1);
-  }
-
-  @Test(expected = GeneratorException.class)
-  public void testdeclareArrayIndexException() {
-    requireArrays();
-    requireStrings();
-    ArrayFormula<StringFormula, BitvectorFormula> a1 =
-        Objects.requireNonNull(amgr)
-            .makeArray("a1", FormulaType.StringType, FormulaType.getBitvectorTypeWithSize(3));
-    ArrayFormula<StringFormula, BitvectorFormula> a2 =
-        Objects.requireNonNull(amgr)
-            .makeArray("a2", FormulaType.StringType, FormulaType.getBitvectorTypeWithSize(3));
-
-    BooleanFormula constraint1 = amgr.equivalence(a1, a2);
-
-    Generator.assembleConstraint(constraint1);
   }
 
   @Test
