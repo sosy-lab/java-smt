@@ -19,6 +19,7 @@
  */
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -403,23 +404,23 @@ public class FloatingPointGenerator {
   }
 
   private static void logUnaryOp(Object result, String op, Object n) {
-    List<Object> inputParams = List.of(n);
+    List<Object> inputParams = ImmutableList.of(n);
     logOperation(result, inputParams, "(" + op + " %s)", Keyword.SKIP);
   }
 
   private static void logUnaryOpWithMode(Object result, String op, String mode, Object n) {
-    List<Object> inputParams = List.of(mode, n);
+    List<Object> inputParams = ImmutableList.of(mode, n);
     logOperation(result, inputParams, "(" + op + " %s %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOp(Object result, String op, Object num1, Object num2) {
-    List<Object> inputParams = List.of(num1, num2);
+    List<Object> inputParams = ImmutableList.of(num1, num2);
     logOperation(result, inputParams, "(" + op + " %s %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOpWithMode(
       Object result, String op, String mode, Object num1, Object num2) {
-    List<Object> inputParams = List.of(mode, num1, num2);
+    List<Object> inputParams = ImmutableList.of(mode, num1, num2);
     logOperation(result, inputParams, "(" + op + " %s %s %s)", Keyword.SKIP);
   }
 

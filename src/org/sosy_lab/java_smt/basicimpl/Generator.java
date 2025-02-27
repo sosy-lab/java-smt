@@ -61,15 +61,16 @@ public class Generator {
   private static final String file = "Out.smt2";
 
   public static StringBuilder getLines() {
-    return lines;
+    return new StringBuilder(lines);
   }
 
+
   public static List<FunctionEnvironment> getExecutedAggregator() {
-    return executedAggregator;
+    return List.copyOf(executedAggregator);
   }
 
   public static List<FunctionEnvironment> getRegisteredVariables() {
-    return registeredVariables;
+    return List.copyOf(registeredVariables);
   }
 
   protected static void writeToFile(String line, String fileName) throws IOException {
