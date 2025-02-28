@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+
+<!--
+This file is part of CPAchecker,
+a tool for configurable software verification:
+https://cpachecker.sosy-lab.org
+
+SPDX-FileCopyrightText: 2007-2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!DOCTYPE suppressions PUBLIC "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN" "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+  <!-- Generated code gets excluded -->
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Visitor.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2Listener.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2Visitor.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2Lexer.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2Parser.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2BaseListener.java" checks=".*"/>
+  <suppress files="src/org/sosy_lab/java_smt/basicimpl/parserInterpreter/Smtlibv2BaseVisitor.java" checks=".*"/>
+</suppressions>
