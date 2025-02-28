@@ -261,6 +261,84 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
+  public void testStringRange() throws SolverException, InterruptedException {
+    StringFormula var = smgr.makeVariable("str");
+
+    // Try something simple:
+    // StringFormulaManager.range("a","b") should not be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("a"), smgr.makeString("b"))))
+        .isSatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('a', 'b'))).isSatisfiable();
+
+    // Check again with a single element interval:
+    // StringFormulaManager.range("a","a") should not be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("a"), smgr.makeString("a"))))
+        .isSatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('a', 'a'))).isSatisfiable();
+
+    // Check again for Unicode characters:
+    // StringFormulaManager.range("ꯍ","ꯎ") should not be empty
+    if (solver != Solvers.CVC4) {
+      // FIXME CVC4 only support ASCII characters for range()
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("ꯍ"), smgr.makeString("ꯎ"))))
+          .isSatisfiable();
+      assertThatFormula(smgr.in(var, smgr.range('ꯍ', 'ꯎ'))).isSatisfiable();
+    }
+
+    // And once more with Unicode characters that are not in the BMP:
+    // StringFormulaManager.range("𠃋","𠃋") should not be empty
+    if (solver != Solvers.PRINCESS && solver != Solvers.CVC4) {
+      // FIXME CVC4 only support ASCII characters for range()
+      // FIXME Princess can't handle surrogate pairs
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("𠃋"), smgr.makeString("𠃋"))))
+          .isSatisfiable();
+    }
+
+    // Check some corner cases:
+    // StringFormulaManager.range("b", "a") should be empty
+    if (solver != Solvers.CVC4) {
+      // FIXME CVC4 expects that the lower bound is smaller or equal to the upper bound
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("b"), smgr.makeString("a"))))
+          .isUnsatisfiable();
+      assertThatFormula(smgr.in(var, smgr.range('b', 'a'))).isUnsatisfiable();
+    }
+
+    // Only 'singleton' Strings (= Strings with one character) are allowed:
+    // StringFormulaManager.range("", "a") should be empty
+    if (solver != Solvers.CVC4) {
+      // FIXME CVC4 expects both bounds to be single character Strings
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString(""), smgr.makeString("a"))))
+          .isUnsatisfiable();
+    }
+
+    // Try again with two characters:
+    // StringFormulaManager.range("aa", "ab") should be empty
+    if (solver != Solvers.CVC4) {
+      // FIXME CVC4 expects both bounds to be single character Strings
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("aa"), smgr.makeString("ab"))))
+          .isUnsatisfiable();
+    }
+
+    // Now use variables for the bounds:
+    // StringFormulaManager.range(lower, "b") should be empty iff "b" < lower
+    StringFormula lower = smgr.makeVariable("lower");
+    if (solver != Solvers.PRINCESS && solver != Solvers.CVC4) {
+      // FIXME CVC4 only supports String constants as bounds and will fail for variables
+      // FIXME Princess will crash when using variables as bounds
+      assertThatFormula(
+              bmgr.and(
+                  smgr.equal(lower, smgr.makeString("a")),
+                  smgr.in(var, smgr.range(lower, smgr.makeString("b")))))
+          .isSatisfiable();
+      assertThatFormula(
+              bmgr.and(
+                  smgr.equal(lower, smgr.makeString("c")),
+                  smgr.in(var, smgr.range(lower, smgr.makeString("b")))))
+          .isUnsatisfiable();
+    }
+  }
+
+  @Test
   public void testStringPrefixSuffixConcat() throws SolverException, InterruptedException {
     // FIXME: Princess will timeout on this test
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
