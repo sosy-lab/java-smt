@@ -605,6 +605,9 @@ class PrincessEnvironment {
    * @throws IllegalArgumentException for any other type.
    */
   private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
+    if (type1.equals(type2)) {
+      return type1;
+    }
     if ((type1.isIntegerType() || type1.isRationalType())
         && (type2.isIntegerType() || type2.isRationalType())) {
       return type1.isRationalType() ? type1 : type2;
