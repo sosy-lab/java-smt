@@ -166,7 +166,7 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm range(IExpression start, IExpression end) {
-    return new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq());
+    return new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq(start, end));
   }
 
   @Override
