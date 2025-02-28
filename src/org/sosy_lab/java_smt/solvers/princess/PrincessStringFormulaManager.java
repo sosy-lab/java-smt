@@ -11,11 +11,16 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 
+import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.parser.ITermITE;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -166,7 +171,19 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm range(IExpression start, IExpression end) {
-    return new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq(start, end));
+    // Precondition: Both bounds must be single character Strings and the lower bound must be
+    // smaller or equal to the upper bound. Otherwise, return the empty language.
+    ITerm one = new IIntLit(IdealInt.apply(1));
+    IFormula cond =
+        new IBinFormula(
+            IBinJunctor.And(),
+            lessOrEquals(start, end),
+            new IBinFormula(
+                IBinJunctor.And(), length(start).$eq$eq$eq(one), length(end).$eq$eq$eq(one)));
+    return new ITermITE(
+        cond,
+        new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq(start, end)),
+        noneImpl());
   }
 
   @Override

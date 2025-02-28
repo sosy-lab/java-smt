@@ -145,6 +145,7 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
 
   @Override
   protected Expr range(Expr start, Expr end) {
+    // FIXME CVC4 will crash when start > end, even if we add an ITE with preconditions
     return exprManager.mkExpr(Kind.REGEXP_RANGE, start, end);
   }
 
