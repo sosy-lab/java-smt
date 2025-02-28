@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 
-  private static final int TIMOUT_MILLISECONDS = 20000;
+  private static final int TIMEOUT_MILLISECONDS = 20000;
 
   private static final int[] DELAY_IN_MILLISECONDS = {5, 10, 20, 50, 100};
 
@@ -76,7 +76,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     assertThrows(msg, InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF));
   }
 
-  @Test(timeout = TIMOUT_MILLISECONDS)
+  @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testProverTimeoutInt() throws InterruptedException {
     requireIntegers();
     TruthJUnit.assume()
@@ -86,7 +86,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
-  @Test(timeout = TIMOUT_MILLISECONDS)
+  @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testProverTimeoutBv() throws InterruptedException {
     requireBitvectors();
     TruthJUnit.assume()
@@ -97,7 +97,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
-  @Test(timeout = TIMOUT_MILLISECONDS)
+  @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
     requireInterpolation();
     requireIntegers();
@@ -108,7 +108,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
-  @Test(timeout = TIMOUT_MILLISECONDS)
+  @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testOptimizationProverTimeout() throws InterruptedException {
     requireOptimization();
     requireIntegers();
