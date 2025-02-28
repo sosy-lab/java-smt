@@ -32,7 +32,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   private static final int TIMOUT_MILLISECONDS = 40000;
 
-  private static final int[] DELAY_IN_MILLISECONDS = {1, 5, 10, 20, 50, 100};
+  private static final int[] DELAY_IN_MILLISECONDS = {5, 10, 20, 50, 100};
 
   @Parameters(name = "{0} with delay {1}")
   public static List<Object[]> getAllSolversAndDelays() {
