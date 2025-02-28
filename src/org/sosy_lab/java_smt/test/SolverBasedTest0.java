@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -39,7 +40,6 @@ import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -241,11 +241,11 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.YICES2);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   protected final void requireFPToBitvector() {
     requireFloats();
     try {
-      fpmgr.toIeeeBitvector(
-          fpmgr.makeNumber(0, FloatingPointType.getSinglePrecisionFloatingPointType()));
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
