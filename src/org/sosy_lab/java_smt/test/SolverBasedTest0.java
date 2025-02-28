@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -241,10 +242,16 @@ public abstract class SolverBasedTest0 {
   }
 
   protected final void requireFPToBitvector() {
-    assume()
-        .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(
+          fpmgr.makeNumber(0, FloatingPointType.getSinglePrecisionFloatingPointType()));
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .that(solverToUse())
+          .isNull();
+    }
   }
 
   /** Skip test if the solver does not support quantifiers. */
