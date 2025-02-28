@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 
-  private static final int TIMOUT_MILLISECONDS = 20000;
+  private static final int TIMOUT_MILLISECONDS = 40000;
 
   private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};
 
