@@ -20,10 +20,13 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.io.IOException;
 import java.util.Objects;
+import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -33,6 +36,15 @@ import org.sosy_lab.java_smt.api.StringFormula;
 @SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
+  @Before
+  public void setUp() {
+    assume().that(smgr).isNotNull();
+  }
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    ConfigurationBuilder newConfig = super.createTestConfigBuilder();
+    return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
   @Test
   public void testDeclareString()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {

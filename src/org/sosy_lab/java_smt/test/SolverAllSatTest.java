@@ -34,10 +34,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {
-  @Before
-  public void checkNotSolverless() {
-    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
-  }
+
 
   @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
@@ -71,6 +68,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
     switch (proverEnv) {
       case "normal":
         env = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT);

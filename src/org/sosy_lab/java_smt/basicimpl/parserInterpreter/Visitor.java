@@ -196,7 +196,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   /**
    * Returns all the first parts without numbers of legal Strings how a floating Point can be
-   * defined in SMTLIB2 where non-Integers are used, f.e. Bitvectors and Hexadecimal Floating-Points
+   * defined in SMTLIB2 where non-Integers are used, f.e. Bitvector Floating-Points.
    *
    * @return ArrayList with the fitting strings
    */
@@ -204,7 +204,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     List<String> beginnings = new ArrayList<>();
     beginnings.add("Float");
     beginnings.add("(fp #b");
-    beginnings.add("#x");
     return beginnings;
   }
 
@@ -350,42 +349,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           return new ParserFormula(fpFormula);
         } catch (Exception e) {
           throw new ParserException("Invalid FloatingPoint format: " + operand, e);
-        }
-      } else if (operand.startsWith("#x")) {
-        try {
-          String hexValue = operand.substring(2);
-          int pIndex = hexValue.indexOf('p');
-          if (pIndex == -1) {
-            throw new ParserException(
-                "Missing exponent in hexadecimal floating-point format: " + operand);
-          }
-          String mantissaPart = hexValue.substring(0, pIndex);
-          String exponentPart = hexValue.substring(pIndex + 1);
-          String[] mantissaParts = mantissaPart.split("\\.");
-          BigInteger wholePart = new BigInteger(mantissaParts[0], 16); // Ganzzahliger Teil
-          BigInteger fractionalPart =
-              (mantissaParts.length > 1)
-                  ? new BigInteger(mantissaParts[1], 16)
-                  : BigInteger.ZERO; // Nachkommastellen
-          int fractionalLength =
-              (mantissaParts.length > 1)
-                  ? mantissaParts[1].length() * 4
-                  : 0; // Anzahl der Bits nach dem Punkt
-          BigDecimal mantissa =
-              new BigDecimal(wholePart)
-                  .add(
-                      new BigDecimal(fractionalPart)
-                          .divide(BigDecimal.valueOf(1L << fractionalLength)));
-          int exponent = Integer.parseInt(exponentPart);
-          BigDecimal finalValue = mantissa.multiply(BigDecimal.valueOf(Math.pow(2, exponent)));
-
-          FloatingPointFormula fpFormula =
-              fpmgr.makeNumber(finalValue, FormulaType.getDoublePrecisionFloatingPointType());
-          return new ParserFormula(fpFormula);
-
-        } catch (Exception e) {
-          throw new ParserException(
-              "Invalid SMT2 hexadecimal floating-point format: " + operand, e);
         }
       }
     }

@@ -29,6 +29,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -41,6 +42,12 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored"})
 public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Override
+  protected ConfigurationBuilder createTestConfigBuilder() {
+    ConfigurationBuilder newConfig = super.createTestConfigBuilder();
+    return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
 
   @Before
   public void setUp() {

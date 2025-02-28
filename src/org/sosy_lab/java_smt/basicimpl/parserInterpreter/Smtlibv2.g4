@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-grammar smtlibv2;
+grammar Smtlibv2;
 
 
 // Lexer Rules Start
@@ -212,9 +212,6 @@ CMD_SetOption
     : 'set-option'
     ;
 
-
-
-
 // General reserved words
 
 GRW_Exclamation
@@ -275,13 +272,9 @@ Decimal
     ;
 
 NumeralExponentsWithSpace
-: Space FloatingPointNumeral Space FloatingPointNumeral
+: Space Numeral Space Numeral
       ;
 
-//Floating Points
-FloatingPointNumeral // numerals greater than 1 (according to smtlib format)
-    : [2-9] Digit*
-    ;
 
 FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
     : ParOpen ShortFloats ParClose
@@ -294,10 +287,6 @@ NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
 
 BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
     : ParOpen 'fp' Space Binary Space Binary Space Binary ParClose
-    ;
-
-HexadecimalFloatingPoint // support for hexadecimal Floating Points e.g. (#x1.8p+1)
-    : '#' 'x' HexDigit+ '.' HexDigit* 'p' [+-]? [0-9]+
     ;
 
 FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
@@ -320,7 +309,6 @@ FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater th
      : NumeralFloatingPoint
      | FloatingPointShortVariant
      | BinaryFloatingPoint
-     | HexadecimalFloatingPoint
      | FloatingPointPlusOrMinusInfinity
      | NotANumberFloatingPoint
      ;
@@ -362,6 +350,8 @@ fragment Sym
     | '&'
     | '^'
     | '<'
+    | '>='
+    | '<='
     | '>'
     | '@'
     | '.'

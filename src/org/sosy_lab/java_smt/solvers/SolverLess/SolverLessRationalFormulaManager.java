@@ -68,6 +68,12 @@ public class SolverLessRationalFormulaManager
   }
 
   @Override
+  protected DummyFormula floor(DummyFormula number) {
+    return new DummyFormula(new DummyType(DummyType.Type.INTEGER),
+        String.valueOf(Integer.parseInt(String.valueOf((int)Double.parseDouble(number.toString())))));
+  }
+
+  @Override
   public FormulaType<RationalFormula> getFormulaType() {
     return FormulaType.RationalType;
   }
