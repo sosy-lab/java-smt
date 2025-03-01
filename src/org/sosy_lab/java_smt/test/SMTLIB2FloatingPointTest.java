@@ -98,7 +98,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   private final FormulaType.FloatingPointType fpType =
       FormulaType.getSinglePrecisionFloatingPointType();
 
-  /** Test für makeNumber(double, FloatingPointType) */
   @Test
   public void testMakeFloatingPointFromDouble()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
@@ -125,7 +124,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     assertThat(expectedResult.equals(actualResult));
   }
 
-  /** Test für makeNumber(Rational, FloatingPointType) */
   @Test
   public void testMakeFloatingPointFromRational()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
@@ -158,7 +156,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     assertThat(expectedResult.equals(actualResult));
   }
 
-  /** Test für makeNumber(BigDecimal, FloatingPointType) */
   @Test
   public void testMakeFloatingPointFromBigDecimal()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
@@ -187,7 +184,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     assertThat(constraint.equals(actualResult));
   }
 
-  /** Test für makeNumber(String, FloatingPointType) */
   @Test
   public void testMakeFloatingPointFromString()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {

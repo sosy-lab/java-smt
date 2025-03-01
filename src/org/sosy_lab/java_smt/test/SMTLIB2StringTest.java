@@ -40,11 +40,13 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   public void setUp() {
     assume().that(smgr).isNotNull();
   }
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
     return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
   }
+
   @Test
   public void testDeclareString()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {

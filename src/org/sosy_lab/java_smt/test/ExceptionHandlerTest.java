@@ -20,6 +20,7 @@ public class ExceptionHandlerTest extends SolverBasedTest0.ParameterizedSolverBa
   public void setup() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
   }
+
   @Test(expected = Exception.class)
   @SuppressWarnings("CheckReturnValue")
   public void testErrorHandling() {

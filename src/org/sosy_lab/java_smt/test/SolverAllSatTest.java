@@ -35,7 +35,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @RunWith(Parameterized.class)
 public class SolverAllSatTest extends SolverBasedTest0 {
 
-
   @Parameters(name = "solver {0} with prover {1}")
   public static Iterable<Object[]> getAllSolvers() {
     List<Object[]> junitParams = new ArrayList<>();

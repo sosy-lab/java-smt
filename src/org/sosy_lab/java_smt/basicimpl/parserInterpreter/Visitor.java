@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
