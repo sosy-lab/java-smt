@@ -20,6 +20,8 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -139,21 +141,21 @@ public class SolverLessFormulaCreator
           extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
     }
     if (pT instanceof RationalFormula) {
-      if (pT.toString().equals("")) {
+      if (pT.toString().isEmpty()) {
         return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
       }
       DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL), pT.toString());
       return result;
     }
     if (pT instanceof IntegerFormula) {
-      if (pT.toString().equals("")) {
+      if (pT.toString().isEmpty()) {
         return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
       }
       DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER), pT.toString());
       return result;
     }
     if (pT instanceof BooleanFormula) {
-      if (pT.toString().equals("")) {
+      if (pT.toString().isEmpty()) {
         return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
       }
       DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
@@ -240,9 +242,7 @@ public class SolverLessFormulaCreator
   @Override
   public DummyFunction declareUFImpl(
       String pName, DummyType pReturnType, List<DummyType> pArgTypes) {
-    if (pName.isEmpty()) {
-      throw new IllegalArgumentException("UF name cannot be null or empty");
-    }
+    checkArgument(!pName.isEmpty(), "UF name cannot be null or empty");
 
     return uninterpretedFunctions.computeIfAbsent(
         pName,
@@ -257,10 +257,7 @@ public class SolverLessFormulaCreator
 
   @Override
   public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
-    if (args.contains(null)) {
-      throw new IllegalArgumentException("Arguments cannot be null");
-    }
-
+    checkArgument(!args.contains(null), "Arguments cannot be null");
     List<DummyType> expectedTypes = declaration.getArgumentTypes();
     if (args.size() != expectedTypes.size()) {
       throw new IllegalArgumentException(

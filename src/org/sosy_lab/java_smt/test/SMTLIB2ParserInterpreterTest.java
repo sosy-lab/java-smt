@@ -1237,6 +1237,19 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   }
 
   @Test
+  public void testEqual()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
+    String x = "(assert (= 5 5))";
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    IntegerFormula a = imgr.makeNumber(5);
+    IntegerFormula b = imgr.makeNumber(5);
+    BooleanFormula constraint = imgr.equal(a, b);
+
+    assertThat(actualResult).isEqualTo(constraint);
+  }
+
+  @Test
   public void testIntegerGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();

@@ -696,25 +696,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterStart_script(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitStart_script(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitStart_script(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -734,25 +730,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterStart_gen_resp(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitStart_gen_resp(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitStart_gen_resp(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -772,25 +764,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterStart_logic(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitStart_logic(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitStart_logic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitStart_logic(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -810,25 +797,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterStart_theory(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitStart_theory(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitStart_theory(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -959,25 +942,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGeneralReservedWord(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGeneralReservedWord(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGeneralReservedWord(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -994,9 +973,7 @@ public class Smtlibv2Parser extends Parser {
             || ((((_la - 64)) & ~0x3f) == 0 && ((1L << (_la - 64)) & 72057594037927939L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -1041,25 +1018,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSimp_pre_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSimp_pre_symb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSimp_pre_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1075,25 +1048,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSimp_undef_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSimp_undef_symb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSimp_undef_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1165,25 +1134,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterQuotedSymbol(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitQuotedSymbol(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitQuotedSymbol(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1283,25 +1248,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPredefSymbol(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPredefSymbol(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPredefSymbol(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1317,9 +1278,7 @@ public class Smtlibv2Parser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & 8388480L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -1511,25 +1470,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPredefKeyword(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPredefKeyword(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPredefKeyword(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1545,9 +1500,7 @@ public class Smtlibv2Parser extends Parser {
         if (!(((((_la - 79)) & ~0x3f) == 0 && ((1L << (_la - 79)) & 2199023255551L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -1592,25 +1545,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSimpsymb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSimpsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSimpsymb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSimpsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSimpsymb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1626,25 +1573,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterQuotsymb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterQuotsymb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitQuotsymb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitQuotsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitQuotsymb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1717,25 +1658,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterNumeral(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterNumeral(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitNumeral(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitNumeral(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitNumeral(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1775,25 +1710,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecimal(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecimal(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecimal(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecimal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecimal(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1833,25 +1762,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterHexadecimal(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitHexadecimal(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitHexadecimal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitHexadecimal(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1891,25 +1815,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterBinary(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterBinary(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitBinary(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitBinary(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitBinary(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -1949,25 +1867,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterString(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterString(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitString(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitString(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitString(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2007,25 +1919,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFloatingpoint(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitFloatingpoint(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFloatingpoint(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2082,25 +1990,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterKey_simsymb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitKey_simsymb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitKey_simsymb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitKey_simsymb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2116,25 +2019,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterPre_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPre_key(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitPre_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPre_key(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPre_key(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2246,25 +2143,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_hex(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_hex(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_hex(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2280,25 +2173,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_floating_point(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_floating_point(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_floating_point(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2314,25 +2203,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_bin(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_bin(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_bin(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2348,25 +2233,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_num(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_num(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_num(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2382,25 +2263,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_dec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_dec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_dec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2416,25 +2293,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSpec_constant_string(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSpec_constant_string(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSpec_constant_string(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2536,25 +2409,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterS_expr_spec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitS_expr_spec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitS_expr_spec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitS_expr_spec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2570,25 +2438,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterS_expr_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitS_expr_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitS_expr_symb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitS_expr_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2604,25 +2467,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterS_expr_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterS_expr_key(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitS_expr_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitS_expr_key(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitS_expr_key(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2650,25 +2507,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterMulti_s_expr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitMulti_s_expr(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMulti_s_expr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2836,25 +2689,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterIdx_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdx_symb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitIdx_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdx_symb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitIdx_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2870,25 +2717,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterIdx_num(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIdx_num(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitIdx_num(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIdx_num(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitIdx_num(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -2995,25 +2836,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterId_symb_idx(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitId_symb_idx(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitId_symb_idx(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitId_symb_idx(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3029,25 +2865,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterId_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterId_symb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitId_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitId_symb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitId_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3169,25 +2999,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterAttr_s_expr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAttr_s_expr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttr_s_expr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAttr_s_expr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3203,25 +3028,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAttr_spec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttr_spec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAttr_spec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttr_spec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAttr_spec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3237,25 +3056,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAttr_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttr_symb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAttr_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttr_symb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAttr_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3378,25 +3191,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterAttr_key_attr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitAttr_key_attr(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAttr_key_attr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3412,25 +3221,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAttr_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAttr_key(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAttr_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAttr_key(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAttr_key(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3516,25 +3319,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterMultisort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMultisort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitMultisort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMultisort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMultisort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3550,25 +3347,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSort_id(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSort_id(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSort_id(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSort_id(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSort_id(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3672,25 +3463,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterQual_id_sort(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitQual_id_sort(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitQual_id_sort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3706,25 +3493,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterQual_id(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterQual_id(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitQual_id(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitQual_id(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitQual_id(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3799,25 +3580,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterVar_binding(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitVar_binding(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVar_binding(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitVar_binding(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3875,25 +3651,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSorted_var(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSorted_var(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSorted_var(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSorted_var(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSorted_var(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3952,25 +3722,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPattern_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPattern_symb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPattern_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -3998,25 +3764,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPattern_multisymb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPattern_multisymb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPattern_multisymb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4122,25 +3884,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterMatch_case(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMatch_case(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitMatch_case(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMatch_case(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMatch_case(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4227,25 +3983,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTerm_exists(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTerm_exists(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTerm_exists(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_exists(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4277,25 +4028,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterMultiterm(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMultiterm(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitMultiterm(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMultiterm(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMultiterm(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4339,25 +4084,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTerm_forall(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTerm_forall(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTerm_forall(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_forall(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4373,25 +4113,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTerm_qual_id(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitTerm_qual_id(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_qual_id(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4407,25 +4143,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTerm_spec_const(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitTerm_spec_const(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_spec_const(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4469,25 +4201,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterTerm_let(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTerm_let(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTerm_let(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTerm_let(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_let(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4531,25 +4257,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterTerm_match(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTerm_match(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTerm_match(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTerm_match(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_match(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4585,25 +4305,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTerm_exclam(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTerm_exclam(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTerm_exclam(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTerm_exclam(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4862,25 +4577,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSort_symbol_decl(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSort_symbol_decl(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSort_symbol_decl(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4949,25 +4660,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterMeta_spec_constant(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitMeta_spec_constant(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMeta_spec_constant(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -4983,9 +4690,7 @@ public class Smtlibv2Parser extends Parser {
         if (!(((((_la - 57)) & ~0x3f) == 0 && ((1L << (_la - 57)) & 321L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -5054,25 +4759,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFun_symb_id(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitFun_symb_id(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitFun_symb_id(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFun_symb_id(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5108,25 +4808,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFun_symb_spec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitFun_symb_spec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFun_symb_spec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5162,25 +4858,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFun_symb_meta(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitFun_symb_meta(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFun_symb_meta(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5330,25 +5022,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPar_fun_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPar_fun_symb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPar_fun_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5408,25 +5096,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterPar_fun_multi_symb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitPar_fun_multi_symb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPar_fun_multi_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5569,25 +5253,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_sort(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_sort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_sort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_sort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5607,25 +5286,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_notes(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitTheory_notes(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_notes(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5645,25 +5320,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterTheory_def(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheory_def(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_def(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_def(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_def(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5695,25 +5364,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterTheory_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheory_fun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_fun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_fun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5729,25 +5392,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_attr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_attr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_attr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5767,25 +5425,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterTheory_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterTheory_val(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_val(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_val(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5805,25 +5457,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_sort_descr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitTheory_sort_descr(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_sort_descr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -5843,25 +5491,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_fun_descr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitTheory_fun_descr(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_fun_descr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6031,25 +5675,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterTheory_decl(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitTheory_decl(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitTheory_decl(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitTheory_decl(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6127,25 +5766,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterLogic_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogic_val(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitLogic_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic_val(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_val(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6161,25 +5794,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterLogic_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogic_attr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitLogic_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic_attr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_attr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6211,25 +5838,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterLogic_theory(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitLogic_theory(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_theory(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6249,25 +5872,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterLogic_language(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitLogic_language(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_language(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6287,25 +5906,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterLogic_ext(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogic_ext(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitLogic_ext(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic_ext(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_ext(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6325,25 +5938,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterLogic_notes(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitLogic_notes(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic_notes(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic_notes(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6478,25 +6086,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterLogic(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterLogic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitLogic(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitLogic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitLogic(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6569,25 +6171,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSort_dec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSort_dec(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSort_dec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSort_dec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSort_dec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6645,25 +6241,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterSelector_dec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitSelector_dec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSelector_dec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6725,25 +6317,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterConstructor_dec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitConstructor_dec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitConstructor_dec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6847,25 +6435,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterData_multisymb(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitData_multisymb(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitData_multisymb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -6893,25 +6477,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterData_constr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitData_constr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitData_constr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitData_constr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7052,25 +6631,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFunction_dec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitFunction_dec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFunction_dec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7159,25 +6734,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterFunction_def(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitFunction_def(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitFunction_def(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7265,25 +6836,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterProp_not(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProp_not(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProp_not(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProp_not(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProp_not(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7299,25 +6864,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterProp_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProp_symb(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProp_symb(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProp_symb(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProp_symb(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7401,25 +6960,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterScript(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterScript(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitScript(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitScript(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitScript(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7476,25 +7029,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_assert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_assert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_assert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_assert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_assert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7536,25 +7083,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_checkSat(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_checkSat(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_checkSat(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7610,25 +7153,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_checkSatAssuming(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_checkSatAssuming(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_checkSatAssuming(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7695,25 +7234,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_declareConst(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_declareConst(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_declareConst(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7765,25 +7300,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_declareDatatype(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_declareDatatype(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_declareDatatype(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7859,25 +7390,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_declareDatatypes(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_declareDatatypes(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_declareDatatypes(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -7974,25 +7501,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_declareFun(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_declareFun(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_declareFun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8063,25 +7586,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_declareSort(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_declareSort(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_declareSort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8129,25 +7648,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_defineFun(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_defineFun(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8193,25 +7708,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_defineFunRec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_defineFunRec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFunRec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8285,25 +7796,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_defineFunsRec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_defineFunsRec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_defineFunsRec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8401,25 +7908,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_defineSort(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_defineSort(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_defineSort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8486,25 +7989,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_echo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_echo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_echo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_echo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_echo(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8546,25 +8043,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_exit(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_exit(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_exit(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_exit(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_exit(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8604,25 +8095,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getAssertions(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getAssertions(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getAssertions(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8662,25 +8149,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getAssignment(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getAssignment(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getAssignment(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8724,25 +8207,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getInfo(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_getInfo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_getInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getInfo(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8784,25 +8262,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getModel(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getModel(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getModel(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8846,25 +8320,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getOption(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getOption(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getOption(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8906,25 +8376,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getProof(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getProof(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getProof(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -8964,25 +8430,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getUnsatAssumptions(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getUnsatAssumptions(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getUnsatAssumptions(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9023,25 +8485,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getUnsatCore(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getUnsatCore(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getUnsatCore(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9097,25 +8555,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_getValue(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_getValue(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_getValue(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9179,25 +8633,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_pop(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_pop(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_pop(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_pop(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_pop(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9243,25 +8691,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_push(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_push(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_push(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_push(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_push(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9303,25 +8745,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCmd_reset(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCmd_reset(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_reset(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_reset(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_reset(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9361,25 +8797,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_resetAssertions(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_resetAssertions(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_resetAssertions(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9423,25 +8855,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_setInfo(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCmd_setInfo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCmd_setInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_setInfo(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9487,25 +8914,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_setLogic(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_setLogic(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_setLogic(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9551,25 +8974,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCmd_setOption(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCmd_setOption(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCmd_setOption(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9632,25 +9051,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_model(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_model(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_model(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_model(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_model(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9674,25 +9087,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecl_datas(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecl_datas(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecl_datas(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecl_datas(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecl_datas(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9716,25 +9123,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecl_sort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecl_sort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecl_sort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecl_sort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecl_sort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9758,25 +9159,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterEcho(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterEcho(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitEcho(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitEcho(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitEcho(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9800,25 +9195,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_unsat_assume(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_unsat_assume(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_assume(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9842,25 +9233,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecl_data(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecl_data(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecl_data(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecl_data(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecl_data(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9884,25 +9269,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterPop(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPop(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitPop(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPop(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPop(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9926,25 +9305,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDef_sort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDef_sort(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDef_sort(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDef_sort(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDef_sort(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -9968,25 +9341,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAssert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAssert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAssert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAssert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAssert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10010,25 +9377,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterDef_fun_rec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDef_fun_rec(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDef_fun_rec(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDef_fun_rec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10052,25 +9414,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDef_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDef_fun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDef_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDef_fun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDef_fun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10094,25 +9450,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_assert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_assert(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_assert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_assert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_assert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10136,25 +9486,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecl_const(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecl_const(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecl_const(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecl_const(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecl_const(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10178,25 +9522,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSet_logic(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSet_logic(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSet_logic(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSet_logic(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSet_logic(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10220,25 +9558,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCheck_assume(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCheck_assume(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCheck_assume(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10262,25 +9596,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterReset_assert(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitReset_assert(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitReset_assert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10304,25 +9634,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterCheck(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterCheck(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitCheck(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitCheck(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCheck(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10346,25 +9670,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_assign(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_assign(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_assign(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_assign(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_assign(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10388,25 +9706,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterPush(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPush(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitPush(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPush(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPush(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10430,25 +9742,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterDef_funs_rec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitDef_funs_rec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDef_funs_rec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10472,25 +9780,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterExit(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterExit(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitExit(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitExit(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitExit(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10514,25 +9816,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_option(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_option(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_option(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_option(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_option(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10556,25 +9852,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_val(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_val(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_val(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_val(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10598,25 +9888,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSet_option(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSet_option(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSet_option(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSet_option(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSet_option(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10640,25 +9924,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDecl_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDecl_fun(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDecl_fun(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDecl_fun(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDecl_fun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10682,25 +9960,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_proof(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_proof(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_proof(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_proof(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_proof(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10724,25 +9996,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_unsat_core(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_unsat_core(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_core(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10766,25 +10034,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterReset(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterReset(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitReset(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitReset(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitReset(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10808,25 +10070,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGet_info(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGet_info(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGet_info(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGet_info(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_info(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -10850,25 +10106,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterSetInfo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterSetInfo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitSetInfo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitSetInfo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitSetInfo(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11271,25 +10521,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterB_value(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterB_value(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitB_value(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitB_value(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitB_value(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11305,9 +10549,7 @@ public class Smtlibv2Parser extends Parser {
         if (!(_la == PS_False || _la == PS_True)) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -11356,25 +10598,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterRand_seed(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRand_seed(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitRand_seed(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRand_seed(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitRand_seed(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11394,25 +10630,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterInteractive(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitInteractive(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInteractive(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInteractive(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11432,25 +10663,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterGlobal(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterGlobal(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitGlobal(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitGlobal(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGlobal(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11470,25 +10695,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterProd_assert(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProd_assert(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProd_assert(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_assert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11504,25 +10724,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterOpt_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterOpt_attr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitOpt_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitOpt_attr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitOpt_attr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11542,25 +10756,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterRepro(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRepro(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitRepro(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRepro(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitRepro(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11580,25 +10788,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterVerbose(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterVerbose(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitVerbose(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVerbose(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitVerbose(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11618,25 +10820,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterPrint_succ(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterPrint_succ(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitPrint_succ(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitPrint_succ(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitPrint_succ(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11656,25 +10852,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterProd_assign(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProd_assign(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProd_assign(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_assign(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11694,25 +10885,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterProd_unsat_assume(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitProd_unsat_assume(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_unsat_assume(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11732,25 +10919,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterProd_unsat_core(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitProd_unsat_core(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_unsat_core(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11770,25 +10953,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterDiagnose(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterDiagnose(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitDiagnose(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitDiagnose(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitDiagnose(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11808,25 +10985,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterProd_proofs(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProd_proofs(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProd_proofs(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_proofs(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11846,25 +11018,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterProd_mod(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterProd_mod(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitProd_mod(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitProd_mod(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitProd_mod(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -11884,25 +11050,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterReg_out(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterReg_out(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitReg_out(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitReg_out(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitReg_out(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12102,25 +11262,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterR_unknown(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterR_unknown(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitR_unknown(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitR_unknown(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitR_unknown(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12136,25 +11290,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterAssert_stack(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitAssert_stack(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAssert_stack(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12170,25 +11320,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterName(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterName(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitName(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitName(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitName(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12204,25 +11348,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterError(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterError(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitError(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitError(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitError(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12238,25 +11376,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAll_stat(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAll_stat(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAll_stat(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAll_stat(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAll_stat(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12272,25 +11404,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterVersion(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterVersion(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitVersion(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitVersion(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitVersion(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12306,25 +11432,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterInfo_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfo_key(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitInfo_key(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfo_key(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_key(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12340,25 +11460,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterAuthors(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterAuthors(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitAuthors(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitAuthors(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitAuthors(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12465,25 +11579,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterError_behaviour(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitError_behaviour(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitError_behaviour(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12499,9 +11609,7 @@ public class Smtlibv2Parser extends Parser {
         if (!(_la == PS_ContinuedExecution || _la == PS_ImmediateExit)) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -12546,25 +11654,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterMemout(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterMemout(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitMemout(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitMemout(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitMemout(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12580,25 +11682,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterIncomp(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterIncomp(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitIncomp(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitIncomp(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitIncomp(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12614,25 +11710,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterR_unnown_s_expr(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitR_unnown_s_expr(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitR_unnown_s_expr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12716,25 +11808,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_def_fun(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_def_fun(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_def_fun(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12758,25 +11846,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_def_fun_rec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_def_fun_rec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_def_fun_rec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12800,25 +11884,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_def_funs_rec(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_def_funs_rec(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_def_funs_rec(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12910,25 +11990,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterInfo_authors(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitInfo_authors(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_authors(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12948,25 +12024,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterInfo_version(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitInfo_version(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_version(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -12982,25 +12054,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterInfo_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfo_attr(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitInfo_attr(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfo_attr(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_attr(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13020,25 +12086,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterInfo_error(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfo_error(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitInfo_error(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfo_error(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_error(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13058,25 +12118,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterInfo_assert_stack(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitInfo_assert_stack(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_assert_stack(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13096,25 +12152,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterInfo_r_unknown(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitInfo_r_unknown(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_r_unknown(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13134,25 +12186,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterInfo_name(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterInfo_name(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitInfo_name(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitInfo_name(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitInfo_name(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13271,25 +12317,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterValuation_pair(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitValuation_pair(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitValuation_pair(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13347,25 +12389,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterT_valuation_pair(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitT_valuation_pair(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitT_valuation_pair(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13419,25 +12457,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterCheck_sat_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitCheck_sat_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitCheck_sat_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13453,9 +12487,7 @@ public class Smtlibv2Parser extends Parser {
         if (!((((_la) & ~0x3f) == 0 && ((1L << _la) & 5308416L) != 0))) {
           _errHandler.recoverInline(this);
         } else {
-          if (_input.LA(1) == Token.EOF) {
-            matchedEOF = true;
-          }
+          if (_input.LA(1) == Token.EOF) matchedEOF = true;
           _errHandler.reportMatch(this);
           consume();
         }
@@ -13487,25 +12519,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterEcho_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitEcho_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitEcho_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13557,25 +12585,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_assertions_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_assertions_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_assertions_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13646,25 +12670,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_assignment_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_assignment_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_assignment_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13734,25 +12754,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_info_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_info_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_info_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13834,25 +12850,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterModel_resp(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterModel_resp(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitModel_resp(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitModel_resp(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitModel_resp(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13884,25 +12894,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterRs_model(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterRs_model(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitRs_model(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitRs_model(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitRs_model(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -13992,25 +12996,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_option_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_option_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_option_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14050,25 +13050,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_proof_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_proof_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_proof_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14120,25 +13116,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_unsat_assump_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_unsat_assump_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_assump_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14209,25 +13201,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_unsat_core_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_unsat_core_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_unsat_core_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14297,25 +13285,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterGet_value_response(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitGet_value_response(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitGet_value_response(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14385,25 +13369,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_unsat_core(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_unsat_core(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_unsat_core(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14419,25 +13399,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterResp_echo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterResp_echo(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitResp_echo(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResp_echo(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_echo(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14453,25 +13427,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_get_assert(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_get_assert(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_get_assert(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14487,25 +13457,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterResp_proof(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterResp_proof(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitResp_proof(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResp_proof(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_proof(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14521,25 +13485,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_get_model(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_get_model(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_get_model(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14555,25 +13515,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_check_sat(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_check_sat(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_check_sat(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14589,25 +13545,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_get_info(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_get_info(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_get_info(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14623,25 +13575,20 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_option(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitResp_option(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResp_option(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_option(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14657,25 +13604,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_unsat_assume(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_unsat_assume(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_unsat_assume(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14691,25 +13634,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterResp_value(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterResp_value(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitResp_value(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResp_value(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_value(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14725,25 +13662,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_gett_assign(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_gett_assign(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_gett_assign(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14885,25 +13818,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_unsupported(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_unsupported(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_unsupported(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14919,25 +13848,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_success(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_success(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_success(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14953,25 +13878,21 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).enterResp_spec_successs(this);
-      }
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
+      if (listener instanceof Smtlibv2Listener)
         ((Smtlibv2Listener) listener).exitResp_spec_successs(this);
-      }
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_spec_successs(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 
@@ -14999,25 +13920,19 @@ public class Smtlibv2Parser extends Parser {
 
     @Override
     public void enterRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).enterResp_error(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).enterResp_error(this);
     }
 
     @Override
     public void exitRule(ParseTreeListener listener) {
-      if (listener instanceof Smtlibv2Listener) {
-        ((Smtlibv2Listener) listener).exitResp_error(this);
-      }
+      if (listener instanceof Smtlibv2Listener) ((Smtlibv2Listener) listener).exitResp_error(this);
     }
 
     @Override
     public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-      if (visitor instanceof Smtlibv2Visitor) {
+      if (visitor instanceof Smtlibv2Visitor)
         return ((Smtlibv2Visitor<? extends T>) visitor).visitResp_error(this);
-      } else {
-        return visitor.visitChildren(this);
-      }
+      else return visitor.visitChildren(this);
     }
   }
 

@@ -20,6 +20,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -99,82 +100,82 @@ public class StringGenerator {
   }
 
   protected static void logRegexRange(RegexFormula result, StringFormula start, StringFormula end) {
-    List<Object> inputParams = List.of(start, end);
+    List<Object> inputParams = ImmutableList.of(start, end);
     logOperation(result, inputParams, "(str.range %s %s)", Keyword.SKIP);
   }
 
   protected static void logRegexUnion(
       RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
-    List<Object> inputParams = List.of(regex1, regex2);
+    List<Object> inputParams = ImmutableList.of(regex1, regex2);
     logOperation(result, inputParams, "(re.union %s %s)", Keyword.SKIP);
   }
 
   protected static void logRegexIntersection(
       RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
-    List<Object> inputParams = List.of(regex1, regex2);
+    List<Object> inputParams = ImmutableList.of(regex1, regex2);
     logOperation(result, inputParams, "(re.inter %s %s)", Keyword.SKIP);
   }
 
   protected static void logRegexClosure(RegexFormula result, RegexFormula regex) {
-    List<Object> inputParams = List.of(regex);
+    List<Object> inputParams = ImmutableList.of(regex);
     logOperation(result, inputParams, "(re.* %s)", Keyword.SKIP);
   }
 
   protected static void logRegexComplement(RegexFormula result, RegexFormula regex) {
-    List<Object> inputParams = List.of(regex);
+    List<Object> inputParams = ImmutableList.of(regex);
     logOperation(result, inputParams, "(re.complement %s)", Keyword.SKIP);
   }
 
   protected static void logRegexDifference(
       RegexFormula result, RegexFormula regex1, RegexFormula regex2) {
-    List<Object> inputParams = List.of(regex1, regex2);
+    List<Object> inputParams = ImmutableList.of(regex1, regex2);
     logOperation(result, inputParams, "(re.diff %s %s)", Keyword.SKIP);
   }
 
   protected static void logIndexOf(
       IntegerFormula result, StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    List<Object> inputParams = List.of(str, part, startIndex);
+    List<Object> inputParams = ImmutableList.of(str, part, startIndex);
     logOperation(result, inputParams, "(str.indexof %s %s %s)", Keyword.SKIP);
   }
 
   protected static void logCharAt(Object result, StringFormula str, IntegerFormula index) {
-    List<Object> inputParams = List.of(str, index);
+    List<Object> inputParams = ImmutableList.of(str, index);
     logOperation(result, inputParams, "(str.at %s %s)", Keyword.SKIP);
   }
 
   protected static void logSubstring(
       Object result, StringFormula str, IntegerFormula index, IntegerFormula length) {
-    List<Object> inputParams = List.of(str, index, length);
+    List<Object> inputParams = ImmutableList.of(str, index, length);
     logOperation(result, inputParams, "(str.substr %s %s %s)", Keyword.SKIP);
   }
 
   protected static void logReplace(
       Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    List<Object> inputParams = List.of(fullStr, target, replacement);
+    List<Object> inputParams = ImmutableList.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replace %s %s %s)", Keyword.SKIP);
   }
 
   protected static void logReplaceAll(
       Object result, StringFormula fullStr, StringFormula target, StringFormula replacement) {
-    List<Object> inputParams = List.of(fullStr, target, replacement);
+    List<Object> inputParams = ImmutableList.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
   }
 
   protected static void logMakeRegex(RegexFormula result, String value) {
-    List<Object> inputParams = List.of(value);
+    List<Object> inputParams = ImmutableList.of(value);
     logOperation(result, inputParams, "(re.from_str \"%s\")", Keyword.SKIP);
   }
 
   protected static void logRegexAll(RegexFormula result) {
-    logOperation(result, List.of(), "(re.all)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(), "(re.all)", Keyword.SKIP);
   }
 
   protected static void logRegexNone(RegexFormula result) {
-    logOperation(result, List.of(), "(re.none)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(), "(re.none)", Keyword.SKIP);
   }
 
   protected static void logRegexAllChar(RegexFormula result) {
-    logOperation(result, List.of(), "(re.allchar)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(), "(re.allchar)", Keyword.SKIP);
   }
 
   protected static void logRegexConcat(RegexFormula result, List<RegexFormula> parts) {
@@ -182,39 +183,39 @@ public class StringGenerator {
   }
 
   protected static void logRegexOptional(RegexFormula result, RegexFormula regex) {
-    logOperation(result, List.of(regex), "(re.opt %s)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(regex), "(re.opt %s)", Keyword.SKIP);
   }
 
   protected static void logRegexTimes(RegexFormula result, RegexFormula regex, int repetitions) {
-    logOperation(result, List.of(regex, repetitions), "(re.tms %s %d)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(regex, repetitions), "(re.tms %s %d)", Keyword.SKIP);
   }
 
   protected static void logRegexCross(RegexFormula result, RegexFormula regex) {
-    logOperation(result, List.of(regex), "(re.cross %s)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(regex), "(re.cross %s)", Keyword.SKIP);
   }
 
   protected static void logLength(IntegerFormula result, StringFormula str) {
-    List<Object> inputParams = List.of(str);
+    List<Object> inputParams = ImmutableList.of(str);
     logOperation(result, inputParams, "(str.len %s)", Keyword.SKIP);
   }
 
   protected static void logIn(BooleanFormula result, StringFormula str, Object regex) {
-    List<Object> inputParams = List.of(str, regex);
+    List<Object> inputParams = ImmutableList.of(str, regex);
     logOperation(result, inputParams, "(str.in_re %s %s)", Keyword.SKIP);
   }
 
   protected static void logToInteger(IntegerFormula result, StringFormula str) {
-    List<Object> inputParams = List.of(str);
+    List<Object> inputParams = ImmutableList.of(str);
     logOperation(result, inputParams, "(str.to_int %s)", Keyword.SKIP);
   }
 
   protected static void logToString(Object result, IntegerFormula number) {
-    List<Object> inputParams = List.of(number);
+    List<Object> inputParams = ImmutableList.of(number);
     logOperation(result, inputParams, "(int.to_str %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOp(Object result, String op, Object n1, Object n2) {
-    List<Object> inputParams = List.of(n1, n2);
+    List<Object> inputParams = ImmutableList.of(n1, n2);
     logOperation(result, inputParams, "(" + op + " %s %s)", Keyword.SKIP);
   }
 
