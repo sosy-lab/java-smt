@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
@@ -31,15 +30,15 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @RunWith(Parameterized.class)
 public class TimeoutTest extends SolverBasedTest0 {
 
-  private static final int TIMEOUT_MILLISECONDS = 10000;
+  private static final int TIMEOUT_MILLISECONDS = 20000;
 
-  private static final int[] DELAYS = {1, 5, 10, 20, 50, 100};
+  private static final int[] DELAY_IN_MILLISECONDS = {5, 10, 20, 50, 100};
 
   @Parameters(name = "{0} with delay {1}")
   public static List<Object[]> getAllSolversAndDelays() {
     List<Object[]> lst = new ArrayList<>();
     for (Solvers solver : ParameterizedSolverBasedTest0.getAllSolvers()) {
-      for (int delay : DELAYS) {
+      for (int delay : DELAY_IN_MILLISECONDS) {
         lst.add(new Object[] {solver, delay});
       }
     }
@@ -94,12 +93,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         .withMessage(solverToUse() + " does not support interruption")
         .that(solverToUse())
         .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-    if (IS_WINDOWS) {
-      TruthJUnit.assume()
-          .withMessage(solverToUse() + " has a regression in this test on Windows")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.BITWUZLA);
-    }
+
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
@@ -124,13 +118,13 @@ public class TimeoutTest extends SolverBasedTest0 {
   private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws InterruptedException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    testBasicProverTimeout(proverConstructor, gen.generate(100));
+    testBasicProverTimeout(proverConstructor, gen.generate(200));
   }
 
   private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
       throws InterruptedException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    testBasicProverTimeout(proverConstructor, gen.generate(100));
+    testBasicProverTimeout(proverConstructor, gen.generate(200));
   }
 
   @SuppressWarnings("CheckReturnValue")
