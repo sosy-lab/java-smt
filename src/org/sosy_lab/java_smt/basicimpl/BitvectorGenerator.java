@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.Long.parseLong;
 
 import java.math.BigInteger;
@@ -21,9 +22,11 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class BitvectorGenerator {
-  private BitvectorGenerator() {}
+  private BitvectorGenerator() {
+  }
 
   protected static void logMakeBitVector(Object result, int length, BigInteger i) {
+    checkNotNull(result, "result cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
     inputParams.add(i.toString());
@@ -41,6 +44,8 @@ public class BitvectorGenerator {
   }
 
   protected static void logMakeBitVector(BitvectorFormula result, int length, IntegerFormula pI) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pI, "result cannot be null");
     // TODO We need to convert the integer formula to bitvector. It doesn't have to be a constant.
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(Long.toString(length));
@@ -60,6 +65,9 @@ public class BitvectorGenerator {
 
   protected static void logMakeBitVecVariable(
       BitvectorFormula result, BitvectorType pType, String pVar) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pVar, "result cannot be null");
+    checkNotNull(pType, "result cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -71,6 +79,8 @@ public class BitvectorGenerator {
   }
 
   protected static void logMakeBitVecVariable(BitvectorFormula result, int pLength, String pVar) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pVar, "result cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -83,6 +93,10 @@ public class BitvectorGenerator {
 
   protected static void logBVEqual(
       Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -94,6 +108,8 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVNegate(Object result, BitvectorFormula pNumber) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     Function<List<Object>, String> functionToString =
@@ -104,6 +120,9 @@ public class BitvectorGenerator {
 
   protected static void logBVAdd(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -116,6 +135,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSub(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -128,6 +150,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSDivide(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -140,6 +165,9 @@ public class BitvectorGenerator {
 
   protected static void logBVUDivide(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -152,6 +180,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSModulo(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -164,6 +195,9 @@ public class BitvectorGenerator {
 
   protected static void logBVUModulo(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -176,6 +210,9 @@ public class BitvectorGenerator {
 
   protected static void logBVMultiply(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -188,6 +225,9 @@ public class BitvectorGenerator {
 
   protected static void logBVUGreaterThan(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -200,6 +240,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSGreaterThan(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -212,6 +255,9 @@ public class BitvectorGenerator {
 
   protected static void logBVUGreaterOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -224,6 +270,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSGreaterOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -236,6 +285,9 @@ public class BitvectorGenerator {
 
   protected static void logBVULessThan(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -248,6 +300,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSLessThan(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -260,6 +315,9 @@ public class BitvectorGenerator {
 
   protected static void logBVULessOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -272,6 +330,9 @@ public class BitvectorGenerator {
 
   protected static void logBVSLessOrEqual(
       BooleanFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -283,6 +344,8 @@ public class BitvectorGenerator {
   }
 
   protected static void logBVNot(Object result, BitvectorFormula pNumber) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     Function<List<Object>, String> saveResult =
@@ -293,6 +356,9 @@ public class BitvectorGenerator {
 
   protected static void logBVAnd(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -305,6 +371,9 @@ public class BitvectorGenerator {
 
   protected static void logBVOr(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -317,6 +386,9 @@ public class BitvectorGenerator {
 
   protected static void logBVXor(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber1, "pNumber1 cannot be null");
+    checkNotNull(pNumber2, "pNumber2 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -329,6 +401,8 @@ public class BitvectorGenerator {
 
   protected static void logBVSShiftRight(
       BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -341,6 +415,8 @@ public class BitvectorGenerator {
 
   protected static void logBVUShiftRight(
       BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -353,6 +429,8 @@ public class BitvectorGenerator {
 
   protected static void logBVShiftLeft(
       BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula toShift) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(toShift);
@@ -365,6 +443,8 @@ public class BitvectorGenerator {
 
   protected static void logConcat(
       BitvectorFormula result, BitvectorFormula pNumber, BitvectorFormula append) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(append);
@@ -377,6 +457,8 @@ public class BitvectorGenerator {
 
   protected static void logExtract(
       BitvectorFormula result, BitvectorFormula pNumber, int pMsb, int pLsb) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pMsb));
@@ -396,6 +478,8 @@ public class BitvectorGenerator {
 
   protected static void logUExtend(
       BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));
@@ -408,6 +492,8 @@ public class BitvectorGenerator {
 
   protected static void logSExtend(
       BitvectorFormula result, BitvectorFormula pNumber, int pExtensionBits) {
+    checkNotNull(result, "result cannot be null");
+    checkNotNull(pNumber, "pNumber1 cannot be null");
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber);
     inputParams.add(String.valueOf(pExtensionBits));

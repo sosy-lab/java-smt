@@ -39,11 +39,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 @RunWith(Parameterized.class)
 public class TranslateFormulaTest {
   private final LogManager logger = LogManager.createTestLogManager();
-
   private SolverContext from;
   private SolverContext to;
   private FormulaManager managerFrom;
   private FormulaManager managerTo;
+  @Before
+  public void excludeSolverless() {
+    assume().withMessage("Solverless should be excluded from all tests")
+        .that(translateFrom).isNotEqualTo(Solvers.SOLVERLESS);
+    assume().that(translateTo).isNotEqualTo(Solvers.SOLVERLESS);
+  }
 
   @Parameter(0)
   public Solvers translateFrom;
@@ -92,14 +97,14 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
   }
 
   private void requireIntegers() {
@@ -150,7 +155,7 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver does not support shared terms or dump/parse")
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.SOLVERLESS);
 
     BooleanFormula inputFrom = createTestFormula(managerFrom);
     BooleanFormula inputTo = createTestFormula(managerTo);
