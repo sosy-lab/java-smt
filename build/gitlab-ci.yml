@@ -261,18 +261,15 @@ deploy-gh-pages:
 
 
 # Build container images
-# following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 .build-docker:
   stage: images
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  variables:
-    EXTRA_ARGS: ""
+  image: quay.io/podman/stable
   script:
-    - mkdir -p /root/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE$IMAGE $EXTRA_ARGS
+    - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - podman build --userns=host --platform $DOCKER_PLATFORMS --manifest $IMAGE -f $DOCKERFILE
+    - podman tag $IMAGE $CI_REGISTRY_IMAGE/$IMAGE
+    - podman manifest inspect $IMAGE
+    - podman manifest push --all $CI_REGISTRY_IMAGE/$IMAGE
   only:
     - schedules
     - web
@@ -284,4 +281,5 @@ build-docker:test:
       - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
   variables:
     DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
-    IMAGE: /test:$JDK_VERSION
+    IMAGE: test:$JDK_VERSION
+    DOCKER_PLATFORMS: linux/amd64,linux/arm64
