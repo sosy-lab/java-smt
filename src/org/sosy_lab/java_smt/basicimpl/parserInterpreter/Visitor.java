@@ -171,7 +171,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   private static List<String> getAllAllowedFPBeginnigs() {
     List<String> result = new ArrayList<>(getAllAllowedFPBeginningsWithInts());
-    ;
     result.addAll(getAllAllowedFPBeginningsWithoutInts());
     return result;
   }
