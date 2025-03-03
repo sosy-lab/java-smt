@@ -129,7 +129,8 @@ public abstract class Mathsat5AbstractNativeApiTest {
   // msat_to_smtlib2() can not export quantified formulas, use msat_to_smtlib2_ext() instead
   @Test
   public void quantifierToSmtlib2() {
-    String expectedSMTLib2 = "TODO";
+    String expectedSMTLib2Formula = "Bool (forall ((x Int)) (.def_14 x))";
+    String expectedSMTLib2Def = "((x Int)) Bool (= x 1)";
 
     long type = msat_get_integer_type(env);
     long xFun = msat_declare_function(env, "x", type);
@@ -142,9 +143,10 @@ public abstract class Mathsat5AbstractNativeApiTest {
     long substBody =   msat_apply_substitution(env, body, 1, new long[]{x}, new long[]{boundX});
 
     long quantifiedFormula = msat_make_forall(env, boundX, substBody);
-    String smtlib2OfFormula = msat_to_smtlib2_ext(env, quantifiedFormula, null, 1);
+    String smtlib2OfFormula = msat_to_smtlib2_ext(env, quantifiedFormula, "", 1);
 
-    assertThat(smtlib2OfFormula).isEqualTo(expectedSMTLib2);
+    assertThat(smtlib2OfFormula).contains(expectedSMTLib2Formula);
+    assertThat(smtlib2OfFormula).contains(expectedSMTLib2Def);
   }
 
   // Test msat_to_smtlib2_term()
