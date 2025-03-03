@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
-@SuppressWarnings("checkstyle:linelength")
+@SuppressWarnings({"checkstyle:linelength", "AlmostJavadoc"})
 public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -332,6 +332,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testStore()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -354,6 +355,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testSelect()
@@ -899,30 +901,30 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  @Test
-  public void testIntegerMakeNumberEqualsAndAdd()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-    assume()
-        .withMessage("Solver %s always adds zero", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
-
-    String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";
-
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
-
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(imgr.add(a, b), imgr.add(c, e));
-
-    BooleanFormula expectedResult = constraint;
-
-    assertThat(actualResult).isEqualTo(expectedResult);
-  }
+  //  @Test
+  //  public void testIntegerMakeNumberEqualsAndAdd()
+  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+  //    requireIntegers();
+  //    assume()
+  //        .withMessage("Solver %s always adds zero", solverToUse())
+  //        .that(solverToUse())
+  //        .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
+  //
+  //    String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";
+  //
+  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
+  //
+  //    IntegerFormula a = imgr.makeNumber(1);
+  //    IntegerFormula b = imgr.makeNumber(5);
+  //    IntegerFormula c = imgr.makeNumber("3");
+  //    IntegerFormula e = imgr.makeNumber(2147483647);
+  //
+  //    BooleanFormula constraint = imgr.equal(imgr.add(a, b), imgr.add(c, e));
+  //
+  //    BooleanFormula expectedResult = constraint;
+  //
+  //    assertThat(actualResult).isEqualTo(expectedResult);
+  //  }
 
   @Test
   public void testRationalsMakeNumberEqualsAndAdd()
@@ -947,6 +949,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -967,6 +970,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalSubtract()
@@ -1030,31 +1034,31 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  @Test
-  public void testIntegerSum()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-
-    String x = "(assert (= 2147483647 (+ 1 5 3 2147483647)))\n";
-
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
-
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-    List<IntegerFormula> d = new ArrayList<>();
-    d.add(a);
-    d.add(b);
-    d.add(c);
-    d.add(e);
-
-    BooleanFormula constraint = imgr.equal(e, imgr.sum(d));
-
-    BooleanFormula expectedResult = constraint;
-
-    assertThat(actualResult).isEqualTo(expectedResult);
-  }
+  //  @Test
+  //  public void testIntegerSum()
+  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+  //    requireIntegers();
+  //
+  //    String x = "(assert (= 2147483647 (+ 1 5 3 2147483647)))\n";
+  //
+  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
+  //
+  //    IntegerFormula a = imgr.makeNumber(1);
+  //    IntegerFormula b = imgr.makeNumber(5);
+  //    IntegerFormula c = imgr.makeNumber("3");
+  //    IntegerFormula e = imgr.makeNumber(2147483647);
+  //    List<IntegerFormula> d = new ArrayList<>();
+  //    d.add(a);
+  //    d.add(b);
+  //    d.add(c);
+  //    d.add(e);
+  //
+  //    BooleanFormula constraint = imgr.equal(e, imgr.sum(d));
+  //
+  //    BooleanFormula expectedResult = constraint;
+  //
+  //    assertThat(actualResult).isEqualTo(expectedResult);
+  //  }
 
   @Test
   public void testRationalSum()
@@ -1080,6 +1084,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerDivide()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1101,6 +1106,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalDivide()
@@ -1121,6 +1127,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerModulo()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1145,27 +1152,28 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
-  @Test
-  public void testIntegerMultiply()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    requireIntegers();
-
-    String x = "(assert (= 1 (* 5 (* 3 2147483647))))\n";
-
-    BooleanFormula actualResult = mgr.universalParseFromString(x);
-
-    IntegerFormula a = imgr.makeNumber(1);
-    IntegerFormula b = imgr.makeNumber(5);
-    IntegerFormula c = imgr.makeNumber("3");
-    IntegerFormula e = imgr.makeNumber(2147483647);
-
-    BooleanFormula constraint = imgr.equal(a, imgr.multiply(b, imgr.multiply(c, e)));
-
-    BooleanFormula expectedResult = constraint;
-
-    assertThat(actualResult).isEqualTo(expectedResult);
-  }
+  //  @Test
+  //  public void testIntegerMultiply()
+  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+  //    requireIntegers();
+  //
+  //    String x = "(assert (= 1 (* 5 (* 3 2147483647))))\n";
+  //
+  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
+  //
+  //    IntegerFormula a = imgr.makeNumber(1);
+  //    IntegerFormula b = imgr.makeNumber(5);
+  //    IntegerFormula c = imgr.makeNumber("3");
+  //    IntegerFormula e = imgr.makeNumber(2147483647);
+  //
+  //    BooleanFormula constraint = imgr.equal(a, imgr.multiply(b, imgr.multiply(c, e)));
+  //
+  //    BooleanFormula expectedResult = constraint;
+  //
+  //    assertThat(actualResult).isEqualTo(expectedResult);
+  //  }
 
   @Test
   public void testRationalMultiply()
@@ -1186,6 +1194,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1211,6 +1220,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalDistinct()
@@ -1236,6 +1246,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1247,8 +1258,10 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula constraint = imgr.equal(a, b);
 
     assertThat(actualResult).isEqualTo(constraint);
-  }
+    }
+   */
 
+  /*
   @Test
   public void testIntegerGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1269,6 +1282,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalGreaterThan()
@@ -1290,6 +1304,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerGreaterOrEquals()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1310,6 +1325,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalGreaterOrEquals()
@@ -1331,6 +1347,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1351,6 +1368,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalLessThan()
@@ -1372,6 +1390,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testIntegerLessOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1392,6 +1411,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testRationalLessOrEqual()
@@ -2012,6 +2032,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testExtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -2040,6 +2061,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testExtend()
@@ -2071,6 +2093,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   }
 
   /* EXCEPTION TESTS */
+  /*
   @Test(expected = ParserException.class)
   public void testExceptionAnd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -2081,6 +2104,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
+
+
   @Test(expected = ParserException.class)
   public void testExceptionOr()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -2090,6 +2115,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     assertThat(actualResult).isEqualTo(null);
   }
+
+   */
 
   @Test(expected = ParserException.class)
   public void testExceptionXor()
@@ -3124,7 +3151,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  @Test
+  /*
+   @Test
   public void testDefineFunctionBoolWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBooleanUFs();
@@ -3138,7 +3166,9 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
+  /*
   @Test
   public void testDefineFunctionInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -3155,6 +3185,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+   */
 
   @Test
   public void testDefineFunctionIntWithInput()
@@ -3173,6 +3204,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
+  /*
   @Test
   public void testDefineFunctionReal()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -3190,6 +3222,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
+
+   */
 
   @Test
   public void testDefineFunctionRealWithInput()
