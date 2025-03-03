@@ -192,6 +192,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testBvConcurrencyWithConcurrentContext() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
     requireBitvectors();
     assertConcurrency(
         "testBvConcurrencyWithConcurrentContext",

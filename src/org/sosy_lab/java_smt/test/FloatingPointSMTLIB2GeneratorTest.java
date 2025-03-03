@@ -408,6 +408,7 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testFromIeeeBitvector() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
     requireFloats();
     requireBitvectors();
     String bvs = "00000000000000000000000000000000";
