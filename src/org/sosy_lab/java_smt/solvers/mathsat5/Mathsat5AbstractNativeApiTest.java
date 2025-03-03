@@ -150,7 +150,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
   // Test msat_to_smtlib2_term()
   @Test
   public void smtlib2ToTerm() {
-    String expectedSMTLib2 = "TODO";
+    String expectedSMTLib2 = "(forall ((x Int)) (= x 1))";
 
     long type = msat_get_integer_type(env);
     long xFun = msat_declare_function(env, "x", type);
