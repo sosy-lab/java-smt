@@ -713,7 +713,8 @@ final class Mathsat5NativeApi {
   /**
    * @param env The environment in which term is defined.
    * @param term The term to convert.
-   * @param logic_name Name of the SMT-LIBv2 logic for the output. Can be NULL.
+   * @param logic_name Name of the SMT-LIBv2 logic for the output. Can be empty string (not NULL
+   *                   as in the MathSAT5 documentation!).
    * @param use_defines If nonzero, the output will contain define-funs instead of let bindings.
    * @return a string in SMT-LIB v2 format for the formula represented by term, or NULL in case of
    *     errors. If not NULL, the returned string must be deallocated by the user with msat_free().
