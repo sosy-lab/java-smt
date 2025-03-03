@@ -1044,7 +1044,8 @@ ENV_ARG(1)
 TERM_ARG(2)
 STRING_ARG(3)
 SIMPLE_ARG(int, 4)
-CALL4(char *, func)
+CALL4(char *, to_smtlib2_ext)
+FREE_STRING_ARG(3)
 STRING_RETURN
 
 DEFINE_FUNC(jfailureCode, 1push_1backtrack_1point) WITH_ONE_ARG(jenv)
