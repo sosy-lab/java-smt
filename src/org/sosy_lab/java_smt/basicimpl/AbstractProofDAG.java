@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
@@ -37,7 +38,7 @@ public abstract class AbstractProofDAG<R> implements ProofDAG<R> {
   }
 
   @Override
-  public void addEdge(int parentNodeId, int childNodeId) {
+  public void addEdge(ProofNode<R> parentNodeId, ProofNode<R> childNodeId) {
     ProofNode<R> parent = nodes.get(parentNodeId);
     ProofNode<R> child = nodes.get(childNodeId);
     if (parent != null && child != null) {

@@ -15,14 +15,16 @@ package org.sosy_lab.java_smt;
  *
  * @author Gabriel Carpio
  */
-public class resProofRule {
+public class ResProofRule {
 
   /**
    * Any operation that proves a term.
    */
-  public enum Rule{
+  public enum ResAxiom {
     //Resolution Rule
     RESOLUTION("res", "(res t proof1 proof2)"),
+
+    ASSUME("assume", "(assume t)"),
     // Logical operators
     TRUE_POSITIVE("true+", "(+ true)"),
     FALSE_NEGATIVE("false-", "(- false)"),
@@ -104,7 +106,7 @@ public class resProofRule {
     private final String name;
     private final String clause;
 
-    Rule(String name, String clause) {
+    ResAxiom(String name, String clause) {
       this.name = name;
       this.clause = clause;
     }
@@ -124,8 +126,8 @@ public class resProofRule {
    * @param name The name of the proof rule.
    * @return The matching ProofRule, or null if not found.
    */
-  public static Rule getRuleByName(String name) {
-    for (Rule rule : Rule.values()) {
+  public static ResAxiom getRuleByName(String name) {
+    for (ResAxiom rule : ResAxiom.values()) {
       if (rule.getName().equalsIgnoreCase(name)) {
         return rule;
       }
@@ -138,7 +140,7 @@ public class resProofRule {
    */
   public static void printAllRules() {
     System.out.println("Available Proof Rules:");
-    for (Rule rule : Rule.values()) {
+    for (ResAxiom rule : ResAxiom.values()) {
       System.out.println(rule.getName() + ": " + rule.getClause());
     }
   }

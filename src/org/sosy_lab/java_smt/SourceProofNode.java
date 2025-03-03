@@ -13,12 +13,13 @@ package org.sosy_lab.java_smt;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
+import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
-public class SourceProofNode extends AbstractProofNode<resProofRule.Rule>
-    implements ProofNode<resProofRule.Rule> {
+public class SourceProofNode extends AbstractProofNode<ResAxiom>
+    implements ProofNode<ResAxiom> {
 
 
-  public SourceProofNode(resProofRule.Rule rule, Formula formula) {
+  public SourceProofNode(ResAxiom rule, Formula formula) {
     super(rule, formula);
   }
 

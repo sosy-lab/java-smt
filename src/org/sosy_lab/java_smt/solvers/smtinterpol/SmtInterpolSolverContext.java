@@ -10,7 +10,9 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.SMTInterpol.ProofMode;
 
+import ap.Prover;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import de.uni_freiburg.informatik.ultimate.logic.LoggingScript;
@@ -202,6 +204,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
     newOptions.put(":produce-models", pOptions.contains(ProverOptions.GENERATE_MODELS));
+    newOptions.put(":produce-proofs", pOptions.contains(ProverOptions.GENERATE_PROOFS));
 
     SMTInterpol smtInterpol =
         new SMTInterpol(getSmtInterpol(), newOptions, CopyMode.RESET_TO_DEFAULT);

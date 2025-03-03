@@ -13,14 +13,14 @@ package org.sosy_lab.java_smt.api.proofs;
 import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.SourceProofNode;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.resProofRule.Rule;
+import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
 public class ProofFactory {
-  public static ProofNode<Rule> createSourceNode(Rule rule, Formula formula) {
+  public static ProofNode<ResAxiom> createSourceNode(ResAxiom rule, Formula formula) {
     return new SourceProofNode(rule, formula);
   }
 
-  public static ProofNode<Rule> createResolutionNode(Formula formula, Formula pivot) {
+  public static ProofNode<ResAxiom> createResolutionNode(Formula formula, Formula pivot) {
     return new ResolutionProofNode(formula, pivot);
   }
 }
