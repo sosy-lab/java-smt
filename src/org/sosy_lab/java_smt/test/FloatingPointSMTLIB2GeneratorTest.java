@@ -5,8 +5,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-
 import static com.google.common.truth.TruthJUnit.assume;
+
 import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Before;
