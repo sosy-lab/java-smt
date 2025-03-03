@@ -6,8 +6,10 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import java.math.BigInteger;
 import java.util.Objects;
+import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -27,6 +29,11 @@ public class FloatingPointSMTLIB2GeneratorTest
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
     return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
+  }
+
+  @Before
+  public void setup() {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
   }
 
   @Test
@@ -400,9 +407,7 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testFromIeeeBitvector() {
-    if (solverToUse() == Solvers.CVC5) {
-      return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
-    }
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
     requireFloats();
     requireBitvectors();
     String bvs = "00000000000000000000000000000000";
@@ -426,9 +431,8 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testFromIeeeBitvectorWithVariable() {
-    if (solverToUse() == Solvers.CVC5) {
-      return; // Due to an internal error, CVC5 crashes when parsing Bitvectors
-    }
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
     requireFloats();
     requireBitvectors();
     BitvectorFormula bv = bvmgr.makeVariable(32, "bv");

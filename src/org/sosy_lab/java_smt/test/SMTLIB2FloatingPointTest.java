@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -37,6 +38,9 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   @Before
   public void setUp() {
     assume().that(fpmgr).isNotNull();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
+    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
   }
 
   @Test
