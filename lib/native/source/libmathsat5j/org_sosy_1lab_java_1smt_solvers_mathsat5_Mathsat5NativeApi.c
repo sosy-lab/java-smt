@@ -1037,7 +1037,7 @@ make_term_from_string(from_smtlib1, 1from_1smtlib1)
 make_term_from_string(from_smtlib2, 1from_1smtlib2)
 term_to_string(to_smtlib1, 1to_1smtlib1)
 term_to_string(to_smtlib2, 1to_1smtlib2)
-term_to_string(to_smtlib2_term, 1to_1smtlib2_term)
+term_to_string(to_smtlib2_term, 1to_1smtlib2_1term)
 
 DEFINE_FUNC(string, 1to_1smtlib2_1ext) WITH_FOUR_ARGS(jenv, jterm, string, int)
 ENV_ARG(1)
