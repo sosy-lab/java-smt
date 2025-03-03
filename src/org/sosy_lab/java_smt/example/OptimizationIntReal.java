@@ -35,7 +35,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Example for optimizing 'x' with the constraint '0 &lt;= x &lt; 10'. We show the difference
  * between optimizing in integer and rational logic.
  */
-public class OptimizationIntReal {
+public final class OptimizationIntReal {
 
   /** A correct value is determined in a region of size EPSILON around the real bound. */
   private static final Rational EPSILON = Rational.ofString("1/1000");

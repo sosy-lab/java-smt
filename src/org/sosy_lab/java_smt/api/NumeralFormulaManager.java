@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
  * @param <ParamFormulaType> formulaType of the parameters
  * @param <ResultFormulaType> formulaType of arithmetic results
  */
+@SuppressWarnings("InterfaceTypeParameterName")
 public interface NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula> {
 
@@ -67,9 +68,10 @@ public interface NumeralFormulaManager<
   ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2);
 
   /**
-   * Create a formula representing the division of two operands.
+   * Create a formula representing the division of two operands according to Boute's Euclidean
+   * definition.
    *
-   * <p>If the denumerator evaluates to zero (division-by-zero), either directly as value or
+   * <p>If the denominator evaluates to zero (division-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
    * value for the result of the division (cf. SMTLIB standard for the division operator in Ints or
    * Reals theory).
@@ -77,7 +79,7 @@ public interface NumeralFormulaManager<
    * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a division-by-zero
    * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.
    */
-  ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denumerator);
+  ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denominator);
 
   ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2);
 

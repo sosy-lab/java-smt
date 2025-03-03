@@ -23,6 +23,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NEG;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ROL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ROR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
@@ -458,6 +460,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_SIGN_EXTENSION;
       case MSAT_TAG_BV_ZEXT:
         return FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case MSAT_TAG_BV_ROL:
+        return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case MSAT_TAG_BV_ROR:
+        return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;

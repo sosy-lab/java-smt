@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import io.github.cvc5.CVC5ApiException;
@@ -35,6 +36,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
   private final FormulaManager mgr;
   private final Set<ProverOptions> solverOptions;
+  private final ImmutableMap<String, String> furtherOptionsMap;
   private final int seed;
   private final CVC5BooleanFormulaManager bmgr;
   private final boolean validateInterpolants;
@@ -45,13 +47,15 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
+      ImmutableMap<String, String> pFurtherOptionsMap,
       boolean pValidateInterpolants) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr);
+    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr, pFurtherOptionsMap);
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
     validateInterpolants = pValidateInterpolants;
+    furtherOptionsMap = pFurtherOptionsMap;
   }
 
   /**
@@ -59,8 +63,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
    * produce-interpolants which is set here. From CVC5AbstractProver Line 66
    */
   @Override
-  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
-    super.setSolverOptions(randomSeed, pOptions, pSolver);
+  protected void setSolverOptions(
+      int randomSeed,
+      Set<ProverOptions> pOptions,
+      ImmutableMap<String, String> pFurtherOptionsMap,
+      Solver pSolver) {
+    super.setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, pSolver);
     pSolver.setOption("produce-interpolants", "true");
   }
 
@@ -174,7 +182,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
     Solver itpSolver = new Solver();
-    setSolverOptions(seed, solverOptions, itpSolver);
+    setSolverOptions(seed, solverOptions, furtherOptionsMap, itpSolver);
 
     Term interpolant;
     try {
@@ -216,7 +224,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     // build and check both Craig interpolation formulas with the generated interpolant.
     Solver validationSolver = new Solver();
     // interpolation option is not required for validation
-    super.setSolverOptions(seed, solverOptions, validationSolver);
+    super.setSolverOptions(seed, solverOptions, furtherOptionsMap, validationSolver);
     try {
       validationSolver.push();
       validationSolver.assertFormula(validationSolver.mkTerm(Kind.IMPLIES, phiPlus, interpolant));

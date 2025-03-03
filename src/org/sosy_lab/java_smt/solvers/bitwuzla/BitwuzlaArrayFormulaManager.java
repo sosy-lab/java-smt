@@ -49,11 +49,11 @@ public class BitwuzlaArrayFormulaManager
   @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> Term internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Term defaultElement) {
     final ArrayFormulaType<TI, TE> arrayFormulaType =
         FormulaType.getArrayType(pIndexType, pElementType);
     final Sort bitwuzlaArrayType = toSolverType(arrayFormulaType);
-    return termManager.mk_const_array(bitwuzlaArrayType, elseElem);
+    return termManager.mk_const_array(bitwuzlaArrayType, defaultElement);
   }
 
   @Override

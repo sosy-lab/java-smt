@@ -79,10 +79,10 @@ public class DebuggingArrayFormulaManager implements ArrayFormulaManager {
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
     debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(elseElem);
-    ArrayFormula<TI, TE> result = delegate.makeArray(pIndexType, pElementType, elseElem);
+    debugging.assertFormulaInContext(defaultElement);
+    ArrayFormula<TI, TE> result = delegate.makeArray(pIndexType, pElementType, defaultElement);
     debugging.addFormulaTerm(result);
     return result;
   }

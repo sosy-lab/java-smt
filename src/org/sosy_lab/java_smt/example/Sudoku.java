@@ -88,7 +88,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * </pre>
  */
 @SuppressWarnings("unused")
-public class Sudoku {
+public final class Sudoku {
 
   public static final int SIZE = 9;
   private static final int BLOCKSIZE = 3;

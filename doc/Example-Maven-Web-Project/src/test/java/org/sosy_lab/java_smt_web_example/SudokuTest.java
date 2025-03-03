@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -15,10 +15,13 @@ import static org.sosy_lab.java_smt.example.Sudoku.SIZE;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -28,7 +31,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.example.Sudoku.IntegerBasedSudokuSolver;
+import org.sosy_lab.java_smt.example.Sudoku;
 import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
 
 /**
@@ -69,7 +72,16 @@ import org.sosy_lab.java_smt.example.Sudoku.SudokuSolver;
  * 451839627
  * </pre>
  */
+@RunWith(Parameterized.class)
 public class SudokuTest {
+
+  @Parameterized.Parameters(name = "{0}")
+  public static List<Solvers> getSolvers() {
+    return Arrays.asList(Solvers.values());
+  }
+
+  @Parameterized.Parameter(0)
+  public Solvers solver;
 
   private static final String OS = System.getProperty("os.name").toLowerCase().replace(" ", "");
   private static final boolean IS_WINDOWS = OS.startsWith("windows");
@@ -90,9 +102,12 @@ public class SudokuTest {
         return true;
       case BOOLECTOR:
       case CVC4:
+      case CVC5:
+      case OPENSMT:
       case YICES2:
         return IS_LINUX;
       case MATHSAT5:
+      case BITWUZLA:
         return IS_LINUX || IS_WINDOWS;
       case Z3:
         return IS_LINUX || IS_WINDOWS || IS_MAC;
@@ -147,50 +162,14 @@ public class SudokuTest {
   }
 
   @Test
-  public void princessSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.PRINCESS);
-  }
-
-  @Test
-  public void z3SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.Z3);
-  }
-
-  @Test
-  public void mathsatSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.MATHSAT5);
-  }
-
-  @Test
-  public void boolectorSudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    // Boolector does not support Integer logic
-    // checkSudoku(Solvers.BOOLECTOR);
-  }
-
-  @Test
-  public void cvc4SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.CVC4);
-  }
-
-  @Test
-  public void yices2SudokuTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
-    checkSudoku(Solvers.YICES2);
-  }
-
-  private void checkSudoku(Solvers solver)
+  public void checkSudoku()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     assumeTrue(isOperatingSystemSupported(solver));
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
     Integer[][] grid = readGridFromString(input);
 
-    SudokuSolver<?> sudoku = new IntegerBasedSudokuSolver(context);
+    SudokuSolver<?> sudoku = new Sudoku.BooleanBasedSudokuSolver(context);
     Integer[][] solution = sudoku.solve(grid);
 
     assertNotNull(solution);

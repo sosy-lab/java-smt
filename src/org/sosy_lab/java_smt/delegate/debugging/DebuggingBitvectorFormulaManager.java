@@ -115,32 +115,32 @@ public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager
 
   @Override
   public BitvectorFormula divide(
-      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
+      BitvectorFormula numerator, BitvectorFormula denominator, boolean signed) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
-    debugging.assertFormulaInContext(denumerator);
-    BitvectorFormula result = delegate.divide(numerator, denumerator, signed);
+    debugging.assertFormulaInContext(denominator);
+    BitvectorFormula result = delegate.divide(numerator, denominator, signed);
     debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
-  public BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denumerator) {
+  public BitvectorFormula smodulo(BitvectorFormula numerator, BitvectorFormula denominator) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
-    debugging.assertFormulaInContext(denumerator);
-    BitvectorFormula result = delegate.smodulo(numerator, denumerator);
+    debugging.assertFormulaInContext(denominator);
+    BitvectorFormula result = delegate.smodulo(numerator, denominator);
     debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
   public BitvectorFormula remainder(
-      BitvectorFormula numerator, BitvectorFormula denumerator, boolean signed) {
+      BitvectorFormula numerator, BitvectorFormula denominator, boolean signed) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
-    debugging.assertFormulaInContext(denumerator);
-    BitvectorFormula result = delegate.remainder(numerator, denumerator, signed);
+    debugging.assertFormulaInContext(denominator);
+    BitvectorFormula result = delegate.remainder(numerator, denominator, signed);
     debugging.addFormulaTerm(result);
     return result;
   }

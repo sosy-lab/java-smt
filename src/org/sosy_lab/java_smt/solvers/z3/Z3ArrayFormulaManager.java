@@ -43,8 +43,8 @@ class Z3ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long, Long
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long elseElem) {
-    return Native.mkConstArray(z3context, toSolverType(pIndexType), elseElem);
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long defaultElement) {
+    return Native.mkConstArray(z3context, toSolverType(pIndexType), defaultElement);
   }
 
   @Override

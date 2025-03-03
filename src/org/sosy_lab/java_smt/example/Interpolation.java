@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** Examples for Craig/sequential/tree interpolation. */
-public class Interpolation {
+public final class Interpolation {
 
   private Interpolation() {
     // never called

@@ -16,5 +16,6 @@ import com.google.errorprone.annotations.Immutable;
  * @param <TI> Index type.
  * @param <TE> Element type.
  */
+@SuppressWarnings("InterfaceTypeParameterName")
 @Immutable
 public interface ArrayFormula<TI extends Formula, TE extends Formula> extends Formula {}

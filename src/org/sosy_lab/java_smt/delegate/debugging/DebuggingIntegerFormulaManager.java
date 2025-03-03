@@ -50,11 +50,11 @@ public class DebuggingIntegerFormulaManager
   }
 
   @Override
-  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denumerator) {
+  public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(numerator);
-    debugging.assertFormulaInContext(denumerator);
-    IntegerFormula result = delegate.modulo(numerator, denumerator);
+    debugging.assertFormulaInContext(denominator);
+    IntegerFormula result = delegate.modulo(numerator, denominator);
     debugging.addFormulaTerm(result);
     return result;
   }

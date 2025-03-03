@@ -76,9 +76,9 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
           TE extends Formula,
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
-      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
     final TFormulaInfo arrayConst =
-        internalMakeArray(pIndexType, pElementType, extractInfo(elseElem));
+        internalMakeArray(pIndexType, pElementType, extractInfo(defaultElement));
     return getFormulaCreator().encapsulateArray(arrayConst, pIndexType, pElementType);
   }
 
@@ -86,7 +86,7 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType);
 
   protected abstract <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, TFormulaInfo elseElem);
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, TFormulaInfo defaultElement);
 
   @Override
   public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {

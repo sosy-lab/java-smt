@@ -136,8 +136,8 @@ public class TimeoutTest extends SolverBasedTest0 {
               try {
                 Thread.sleep(delay);
                 shutdownManager.requestShutdown("Shutdown Request");
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
+              } catch (InterruptedException exception) {
+                throw new UnsupportedOperationException("Unexpected interrupt", exception);
               }
             });
 

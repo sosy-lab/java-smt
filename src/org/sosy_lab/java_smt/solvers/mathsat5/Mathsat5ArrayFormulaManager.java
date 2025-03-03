@@ -47,9 +47,9 @@ class Mathsat5ArrayFormulaManager extends AbstractArrayFormulaManager<Long, Long
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long defaultElement) {
     final Long mathsatArrayType = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    return msat_make_array_const(mathsatEnv, mathsatArrayType, elseElem);
+    return msat_make_array_const(mathsatEnv, mathsatArrayType, defaultElement);
   }
 
   @Override

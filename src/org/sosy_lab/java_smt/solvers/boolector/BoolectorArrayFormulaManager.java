@@ -67,7 +67,7 @@ public class BoolectorArrayFormulaManager
 
   @Override
   protected <TI extends Formula, TE extends Formula> Long internalMakeArray(
-      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long elseElem) {
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Long defaultElement) {
     throw new UnsupportedOperationException();
   }
 

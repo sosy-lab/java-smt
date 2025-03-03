@@ -18,11 +18,13 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
@@ -261,11 +263,83 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return enumManager;
   }
 
-  public abstract Appender dumpFormula(TFormulaInfo t);
+  protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
+
+  /**
+   * Takes a SMT-LIB2 script and cleans it up.
+   *
+   * <p>We remove all comments and put each command on its own line. Declarations and asserts are
+   * kept and everything else is removed. For <code>(set-logic ..)</code> we make sure that it's at
+   * the top of the file before removing it, and for <code>(exit)</code> we make sure that it can
+   * only occur as the last command.
+   */
+  private String sanitize(String formulaStr) {
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
+
+    StringBuilder builder = new StringBuilder();
+    int pos = 0; // index of the current token
+
+    for (String token : tokens) {
+      if (Tokenizer.isSetLogicToken(token)) {
+        // Skip the (set-logic ...) command at the beginning of the input
+        Preconditions.checkArgument(pos == 0);
+
+      } else if (Tokenizer.isExitToken(token)) {
+        // Skip the (exit) command at the end of the input
+        Preconditions.checkArgument(pos == tokens.size() - 1);
+
+      } else if (Tokenizer.isDeclarationToken(token)
+          || Tokenizer.isDefinitionToken(token)
+          || Tokenizer.isAssertToken(token)) {
+        // Keep only declaration, definitions and assertion
+        builder.append(token).append('\n');
+
+      } else if (Tokenizer.isForbiddenToken(token)) {
+        // Throw an exception if the script contains commands like (pop) or (reset) that change the
+        // state of the assertion stack.
+        // We could keep track of the state of the stack and only consider the formulas that remain
+        // on the stack at the end of the script. However, this does not seem worth it at the
+        // moment. If needed, this feature can still be added later.
+        String message;
+        if (Tokenizer.isPushToken(token)) {
+          message = "(push ...)";
+        } else if (Tokenizer.isPopToken(token)) {
+          message = "(pop ...)";
+        } else if (Tokenizer.isResetAssertionsToken(token)) {
+          message = "(reset-assertions)";
+        } else if (Tokenizer.isResetToken(token)) {
+          message = "(reset)";
+        } else {
+          // Should be unreachable
+          throw new UnsupportedOperationException();
+        }
+        throw new IllegalArgumentException(
+            String.format("SMTLIB command '%s' is not supported when parsing formulas.", message));
+
+      } else {
+        // Remove everything else
+      }
+      pos++;
+    }
+    return builder.toString();
+  }
+
+  @Override
+  public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
+    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+  }
+
+  protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
 
   @Override
   public Appender dumpFormula(BooleanFormula t) {
-    return dumpFormula(formulaCreator.extractInfo(t));
+    return new Appenders.AbstractAppender() {
+      @Override
+      public void appendTo(Appendable out) throws IOException {
+        String raw = dumpFormulaImpl(formulaCreator.extractInfo(t));
+        out.append(sanitize(raw));
+      }
+    };
   }
 
   @Override
@@ -450,10 +524,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
     if (declaration.getKind() == FunctionDeclarationKind.CONST) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) declaration.getType();
-      Formula elseElem = Iterables.getOnlyElement(args);
+      Formula defaultElement = Iterables.getOnlyElement(args);
       return (T)
           arrayManager.makeArray(
-              arrayType.getIndexType(), getFormulaType(elseElem), Iterables.getOnlyElement(args));
+              arrayType.getIndexType(),
+              getFormulaType(defaultElement),
+              Iterables.getOnlyElement(args));
     }
 
     return formulaCreator.callFunction(declaration, args);

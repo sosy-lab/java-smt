@@ -42,7 +42,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  *   ..Q.
  * </pre>
  */
-public class NQueens {
+public final class NQueens {
   private final SolverContext context;
   private final BooleanFormulaManager bmgr;
   private final int n;

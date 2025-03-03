@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Result;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -54,7 +56,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ShutdownNotifier pShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
-      FormulaManager pMgr) {
+      FormulaManager pMgr,
+      ImmutableMap<String, String> pFurtherOptionsMap) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     mgr = pMgr;
@@ -63,10 +66,14 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     solver = new Solver();
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
 
-    setSolverOptions(randomSeed, pOptions, solver);
+    setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, solver);
   }
 
-  protected void setSolverOptions(int randomSeed, Set<ProverOptions> pOptions, Solver pSolver) {
+  protected void setSolverOptions(
+      int randomSeed,
+      Set<ProverOptions> pOptions,
+      ImmutableMap<String, String> pFurtherOptionsMap,
+      Solver pSolver) {
     if (incremental) {
       pSolver.setOption("incremental", "true");
     }
@@ -86,6 +93,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
     pSolver.setOption("full-saturate-quant", "true");
+
+    for (Entry<String, String> option : pFurtherOptionsMap.entrySet()) {
+      pSolver.setOption(option.getKey(), option.getValue());
+    }
   }
 
   @Override

@@ -93,114 +93,114 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   private void assertDivision(
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertDivision(true, numerator, denumerator, expectedResult, constraints);
+    assertDivision(true, numerator, denominator, expectedResult, constraints);
   }
 
   private void assertDivision(
       boolean includeNegation,
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildDivision(numerator, denumerator, expectedResult), constraints);
+        includeNegation, buildDivision(numerator, denominator, expectedResult), constraints);
   }
 
   private void assertDivision(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertDivision(true, numerator, denumerator, signed, expectedResult, constraints);
+    assertDivision(true, numerator, denominator, signed, expectedResult, constraints);
   }
 
   private void assertDivision(
       boolean includeNegation,
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
         includeNegation,
-        buildDivision(numerator, denumerator, signed, expectedResult),
+        buildDivision(numerator, denominator, signed, expectedResult),
         constraints);
   }
 
   private void assertModulo(
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertModulo(true, numerator, denumerator, expectedResult, constraints);
+    assertModulo(true, numerator, denominator, expectedResult, constraints);
   }
 
   private void assertModulo(
       boolean includeNegation,
       IntegerFormula numerator,
-      IntegerFormula denumerator,
+      IntegerFormula denominator,
       IntegerFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildModulo(numerator, denumerator, expectedResult), constraints);
+        includeNegation, buildModulo(numerator, denominator, expectedResult), constraints);
   }
 
   private void assertModulo(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
-    assertModulo(true, numerator, denumerator, signed, expectedResult, constraints);
+    assertModulo(true, numerator, denominator, signed, expectedResult, constraints);
   }
 
   private void assertModulo(
       boolean includeNegation,
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult,
       BooleanFormula... constraints)
       throws SolverException, InterruptedException {
     assertOperation(
-        includeNegation, buildModulo(numerator, denumerator, signed, expectedResult), constraints);
+        includeNegation, buildModulo(numerator, denominator, signed, expectedResult), constraints);
   }
 
   private BooleanFormula buildDivision(
-      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
-    return imgr.equal(imgr.divide(numerator, denumerator), expectedResult);
+      IntegerFormula numerator, IntegerFormula denominator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.divide(numerator, denominator), expectedResult);
   }
 
   private BooleanFormula buildDivision(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.divide(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.divide(numerator, denominator, signed), expectedResult);
   }
 
   private BooleanFormula buildModulo(
-      IntegerFormula numerator, IntegerFormula denumerator, IntegerFormula expectedResult) {
-    return imgr.equal(imgr.modulo(numerator, denumerator), expectedResult);
+      IntegerFormula numerator, IntegerFormula denominator, IntegerFormula expectedResult) {
+    return imgr.equal(imgr.modulo(numerator, denominator), expectedResult);
   }
 
   private BooleanFormula buildModulo(
       BitvectorFormula numerator,
-      BitvectorFormula denumerator,
+      BitvectorFormula denominator,
       boolean signed,
       BitvectorFormula expectedResult) {
-    return bvmgr.equal(bvmgr.remainder(numerator, denumerator, signed), expectedResult);
+    return bvmgr.equal(bvmgr.remainder(numerator, denominator, signed), expectedResult);
   }
 
   private void assertOperation(
@@ -277,7 +277,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void intTest3_DivModLinear_zeroDenumerator() throws SolverException, InterruptedException {
+  public void intTest3_DivModLinear_zeroDenominator() throws SolverException, InterruptedException {
     requireIntegers();
     IntegerFormula a = imgr.makeVariable("int_a");
 

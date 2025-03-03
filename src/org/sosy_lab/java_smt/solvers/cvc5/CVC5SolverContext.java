@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,12 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
+import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableMap;
+import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Solver;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -31,15 +36,37 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.cvc5")
-  private static class CVC5Settings {
+  private static final class CVC5Settings {
 
     @Option(
         secure = true,
         description = "apply additional validation checks for interpolation results")
     private boolean validateInterpolants = false;
 
+    @Option(
+        secure = true,
+        description =
+            "Further options that will be passed to CVC5 in addition to the default options. "
+                + "Format is 'key1=value1,key2=value2'")
+    private String furtherOptions = "";
+
+    private final ImmutableMap<String, String> furtherOptionsMap;
+
     private CVC5Settings(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
+
+      MapSplitter optionSplitter =
+          Splitter.on(',')
+              .trimResults()
+              .omitEmptyStrings()
+              .withKeyValueSeparator(Splitter.on('=').limit(2).trimResults());
+
+      try {
+        furtherOptionsMap = ImmutableMap.copyOf(optionSplitter.split(furtherOptions));
+      } catch (IllegalArgumentException e) {
+        throw new InvalidConfigurationException(
+            "Invalid CVC5 option in \"" + furtherOptions + "\": " + e.getMessage(), e);
+      }
     }
   }
 
@@ -94,7 +121,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // We keep this instance available until the whole context is closed.
     Solver newSolver = new Solver();
 
-    setSolverOptions(newSolver, randomSeed);
+    try {
+      setSolverOptions(newSolver, randomSeed, settings.furtherOptionsMap);
+    } catch (CVC5ApiRecoverableException e) { // we do not want to recover after invalid options.
+      throw new InvalidConfigurationException(e.getMessage(), e);
+    }
 
     CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
 
@@ -133,10 +164,20 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
   }
 
-  /** Set common options for a CVC5 solver. */
-  private static void setSolverOptions(Solver pSolver, int randomSeed) {
+  /**
+   * Set common options for a CVC5 solver.
+   *
+   * @throws CVC5ApiRecoverableException from native code.
+   */
+  private static void setSolverOptions(
+      Solver pSolver, int randomSeed, ImmutableMap<String, String> furtherOptions)
+      throws CVC5ApiRecoverableException {
     pSolver.setOption("seed", String.valueOf(randomSeed));
     pSolver.setOption("output-language", "smtlib2");
+
+    for (Entry<String, String> option : furtherOptions.entrySet()) {
+      pSolver.setOption(option.getKey(), option.getValue());
+    }
 
     // Set Strings option to enable all String features (such as lessOrEquals).
     // This should not have any effect for non-string theories.
@@ -182,7 +223,12 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new CVC5TheoremProver(
-        creator, shutdownNotifier, randomSeed, pOptions, getFormulaManager());
+        creator,
+        shutdownNotifier,
+        randomSeed,
+        pOptions,
+        getFormulaManager(),
+        settings.furtherOptionsMap);
   }
 
   @Override
@@ -200,6 +246,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         randomSeed,
         pOptions,
         getFormulaManager(),
+        settings.furtherOptionsMap,
         settings.validateInterpolants);
   }
 
