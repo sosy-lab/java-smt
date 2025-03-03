@@ -22,8 +22,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
 public class BitvectorGenerator {
-  private BitvectorGenerator() {
-  }
+  private BitvectorGenerator() {}
 
   protected static void logMakeBitVector(Object result, int length, BigInteger i) {
     checkNotNull(result, "result cannot be null");
@@ -93,7 +92,6 @@ public class BitvectorGenerator {
 
   protected static void logBVEqual(
       Object result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
-    checkNotNull(result, "result cannot be null");
     checkNotNull(result, "result cannot be null");
     checkNotNull(pNumber1, "pNumber1 cannot be null");
     checkNotNull(pNumber2, "pNumber2 cannot be null");

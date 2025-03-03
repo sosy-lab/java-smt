@@ -41,7 +41,9 @@ public class SolverLessArrayFormulaManager
 
   @Override
   protected DummyFormula store(DummyFormula pArray, DummyFormula pIndex, DummyFormula pValue) {
-    return new DummyFormula(pIndex, pValue);
+    DummyFormula result = new DummyFormula(pIndex, pValue);
+    result.setName(pArray.getName());
+    return result;
   }
 
   @Override
@@ -57,6 +59,6 @@ public class SolverLessArrayFormulaManager
 
   @Override
   protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+    return new DummyFormula(pArray1.equals(pArray2));
   }
 }

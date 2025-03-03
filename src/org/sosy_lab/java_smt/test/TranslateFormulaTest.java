@@ -43,10 +43,13 @@ public class TranslateFormulaTest {
   private SolverContext to;
   private FormulaManager managerFrom;
   private FormulaManager managerTo;
+
   @Before
   public void excludeSolverless() {
-    assume().withMessage("Solverless should be excluded from all tests")
-        .that(translateFrom).isNotEqualTo(Solvers.SOLVERLESS);
+    assume()
+        .withMessage("Solverless should be excluded from all tests")
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.SOLVERLESS);
     assume().that(translateTo).isNotEqualTo(Solvers.SOLVERLESS);
   }
 
@@ -97,14 +100,16 @@ public class TranslateFormulaTest {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
+        .isNoneOf(
+            Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
   }
 
   private void requireParserFrom() {
     assume()
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
+        .isNoneOf(
+            Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5, Solvers.SOLVERLESS);
   }
 
   private void requireIntegers() {

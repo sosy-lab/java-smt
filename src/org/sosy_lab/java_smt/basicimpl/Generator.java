@@ -107,7 +107,7 @@ public class Generator {
     } else {
       // Functions of any kind
       Optional<FunctionEnvironment> maybeMethodToEvaluate =
-          executedAggregator.stream().filter(x -> x.getResult().equals(constraint)).findFirst();
+          executedAggregator.stream().filter(x -> x.getResult() == constraint).findFirst();
 
       Preconditions.checkState(maybeMethodToEvaluate.isPresent());
       FunctionEnvironment methodToEvaluate = maybeMethodToEvaluate.orElseThrow();

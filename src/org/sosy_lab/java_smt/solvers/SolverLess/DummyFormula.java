@@ -5,6 +5,7 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -343,5 +344,43 @@ public class DummyFormula
 
   public void setRepresentation(String pS) {
     representation = pS;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof DummyFormula)) {
+      return false;
+    }
+
+    DummyFormula that = (DummyFormula) obj;
+
+    if (!name.equals(that.name)) {
+      return false;
+    }
+    if (!value.equals(that.value)) {
+      return false;
+    }
+    if (!representation.equals(that.representation)) {
+      return false;
+    }
+    if (!formulaType.equals(that.formulaType)) {
+      return false;
+    }
+
+    if (formulaType.isArray()) {
+      return firstArrayParameter.equals(that.firstArrayParameter)
+          && secondArrayParameter.equals(that.secondArrayParameter);
+    }
+    System.out.println(this + " vs. " + that + "evaluated to equal");
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+        name, value, representation, formulaType, firstArrayParameter, secondArrayParameter);
   }
 }

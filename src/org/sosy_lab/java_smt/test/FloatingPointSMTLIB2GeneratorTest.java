@@ -20,11 +20,8 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings({"all"})
-public class FloatingPointSMTLIB2GeneratorTest extends SolverBasedTest0 {
-  @Override
-  protected Solvers solverToUse() {
-    return Solvers.CVC5;
-  }
+public class FloatingPointSMTLIB2GeneratorTest
+    extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
