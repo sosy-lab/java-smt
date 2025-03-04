@@ -126,7 +126,14 @@ public abstract class Mathsat5AbstractNativeApiTest {
     msat_pop_backtrack_point(env);
   }
 
-  // msat_to_smtlib2() can not export quantified formulas, use msat_to_smtlib2_ext() instead
+  /*
+   * msat_to_smtlib2() can not export quantified formulas, use msat_to_smtlib2_ext() instead.
+   * Output is the following, but we can't guarantee the naming of the definitions to be consistent:
+   * (set-info :source |printed by MathSAT|)
+   * (define-fun .def_14 ((x Int)) Bool (= x 1))
+   * (define-fun .def_15 () Bool (forall ((x Int)) (.def_14 x)))
+   * (assert .def_15)
+   */
   @Test
   public void quantifierToSmtlib2() {
     String expectedSMTLib2Formula = "Bool (forall ((x Int)) (.def_14 x))";
@@ -140,7 +147,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
     long body = msat_make_equal(env, x, one);
     // Make bound x and substitute
     long boundX = msat_make_variable(env, "x", type);
-    long substBody =   msat_apply_substitution(env, body, 1, new long[]{x}, new long[]{boundX});
+    long substBody = msat_apply_substitution(env, body, 1, new long[] {x}, new long[] {boundX});
 
     long quantifiedFormula = msat_make_forall(env, boundX, substBody);
     String smtlib2OfFormula = msat_to_smtlib2_ext(env, quantifiedFormula, "", 1);
@@ -162,7 +169,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
     long body = msat_make_equal(env, x, one);
     // Make bound x and substitute
     long boundX = msat_make_variable(env, "x", type);
-    long substBody =   msat_apply_substitution(env, body, 1, new long[]{x}, new long[]{boundX});
+    long substBody = msat_apply_substitution(env, body, 1, new long[] {x}, new long[] {boundX});
 
     long quantifiedFormula = msat_make_forall(env, boundX, substBody);
     String smtlib2OfFormula = msat_to_smtlib2_term(env, quantifiedFormula);
