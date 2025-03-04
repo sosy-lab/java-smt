@@ -1037,8 +1037,16 @@ make_term_from_string(from_smtlib1, 1from_1smtlib1)
 make_term_from_string(from_smtlib2, 1from_1smtlib2)
 term_to_string(to_smtlib1, 1to_1smtlib1)
 term_to_string(to_smtlib2, 1to_1smtlib2)
-term_to_string(to_smtlib2_term, 1to_1smtlib2_term)
+term_to_string(to_smtlib2_term, 1to_1smtlib2_1term)
 
+DEFINE_FUNC(string, 1to_1smtlib2_1ext) WITH_FOUR_ARGS(jenv, jterm, string, int)
+ENV_ARG(1)
+TERM_ARG(2)
+STRING_ARG(3)
+SIMPLE_ARG(int, 4)
+CALL4(char *, to_smtlib2_ext)
+FREE_STRING_ARG(3)
+STRING_RETURN
 
 DEFINE_FUNC(jfailureCode, 1push_1backtrack_1point) WITH_ONE_ARG(jenv)
 ENV_ARG_VOID(1)
