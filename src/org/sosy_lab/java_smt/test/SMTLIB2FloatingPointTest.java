@@ -38,9 +38,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   @Before
   public void setUp() {
     assume().that(fpmgr).isNotNull();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC4);
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
-    assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
   }
 
   @Test

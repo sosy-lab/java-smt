@@ -19,7 +19,9 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
     setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
     setDefault(FormulaType.BitvectorType.class, FormulaType.getBitvectorTypeWithSize(32));
+    /*
     ignoreClasses(
+
         cls ->
             cls == BinaryModel.class
                 || cls == BitvectorGenerator.class
@@ -33,5 +35,7 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
                 || cls == ModelException.class
                 || cls == Generator.class
                 || cls == NumeralGenerator.class);
+
+  */
   }
 }

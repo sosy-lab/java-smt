@@ -70,33 +70,33 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.IntegerType, FormulaType.IntegerType);
     ArrayFormula<
+        ArrayFormula<IntegerFormula, IntegerFormula>,
+        ArrayFormula<
             ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<
-                ArrayFormula<IntegerFormula, IntegerFormula>,
-                ArrayFormula<IntegerFormula, IntegerFormula>>>
+            ArrayFormula<IntegerFormula, IntegerFormula>>>
         c1 =
-            amgr.makeArray(
-                "c1",
+        amgr.makeArray(
+            "c1",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
-                        FormulaType.getArrayType(
-                            FormulaType.IntegerType, FormulaType.IntegerType))));
+                        FormulaType.IntegerType, FormulaType.IntegerType))));
     ArrayFormula<
+        ArrayFormula<IntegerFormula, IntegerFormula>,
+        ArrayFormula<
             ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<
-                ArrayFormula<IntegerFormula, IntegerFormula>,
-                ArrayFormula<IntegerFormula, IntegerFormula>>>
+            ArrayFormula<IntegerFormula, IntegerFormula>>>
         c2 =
-            amgr.makeArray(
-                "c2",
+        amgr.makeArray(
+            "c2",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
-                        FormulaType.getArrayType(
-                            FormulaType.IntegerType, FormulaType.IntegerType))));
+                        FormulaType.IntegerType, FormulaType.IntegerType))));
 
     BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
@@ -130,35 +130,35 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.RationalType, FormulaType.RationalType);
     ArrayFormula<
+        ArrayFormula<RationalFormula, RationalFormula>,
+        ArrayFormula<
             ArrayFormula<RationalFormula, RationalFormula>,
-            ArrayFormula<
-                ArrayFormula<RationalFormula, RationalFormula>,
-                ArrayFormula<RationalFormula, RationalFormula>>>
+            ArrayFormula<RationalFormula, RationalFormula>>>
         c1 =
-            amgr.makeArray(
-                "c1",
+        amgr.makeArray(
+            "c1",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(
-                            FormulaType.RationalType, FormulaType.RationalType),
-                        FormulaType.getArrayType(
-                            FormulaType.RationalType, FormulaType.RationalType))));
+                        FormulaType.RationalType, FormulaType.RationalType),
+                    FormulaType.getArrayType(
+                        FormulaType.RationalType, FormulaType.RationalType))));
     ArrayFormula<
+        ArrayFormula<RationalFormula, RationalFormula>,
+        ArrayFormula<
             ArrayFormula<RationalFormula, RationalFormula>,
-            ArrayFormula<
-                ArrayFormula<RationalFormula, RationalFormula>,
-                ArrayFormula<RationalFormula, RationalFormula>>>
+            ArrayFormula<RationalFormula, RationalFormula>>>
         c2 =
-            amgr.makeArray(
-                "c2",
+        amgr.makeArray(
+            "c2",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.RationalType, FormulaType.RationalType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(
-                            FormulaType.RationalType, FormulaType.RationalType),
-                        FormulaType.getArrayType(
-                            FormulaType.RationalType, FormulaType.RationalType))));
+                        FormulaType.RationalType, FormulaType.RationalType),
+                    FormulaType.getArrayType(
+                        FormulaType.RationalType, FormulaType.RationalType))));
 
     BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
@@ -193,33 +193,33 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
         Objects.requireNonNull(amgr)
             .makeArray("a2", FormulaType.BooleanType, FormulaType.BooleanType);
     ArrayFormula<
+        ArrayFormula<BooleanFormula, BooleanFormula>,
+        ArrayFormula<
             ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<
-                ArrayFormula<BooleanFormula, BooleanFormula>,
-                ArrayFormula<BooleanFormula, BooleanFormula>>>
+            ArrayFormula<BooleanFormula, BooleanFormula>>>
         c1 =
-            amgr.makeArray(
-                "c1",
+        amgr.makeArray(
+            "c1",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
-                        FormulaType.getArrayType(
-                            FormulaType.BooleanType, FormulaType.BooleanType))));
+                        FormulaType.BooleanType, FormulaType.BooleanType))));
     ArrayFormula<
+        ArrayFormula<BooleanFormula, BooleanFormula>,
+        ArrayFormula<
             ArrayFormula<BooleanFormula, BooleanFormula>,
-            ArrayFormula<
-                ArrayFormula<BooleanFormula, BooleanFormula>,
-                ArrayFormula<BooleanFormula, BooleanFormula>>>
+            ArrayFormula<BooleanFormula, BooleanFormula>>>
         c2 =
-            amgr.makeArray(
-                "c2",
+        amgr.makeArray(
+            "c2",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                 FormulaType.getArrayType(
                     FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
-                        FormulaType.getArrayType(
-                            FormulaType.BooleanType, FormulaType.BooleanType))));
+                        FormulaType.BooleanType, FormulaType.BooleanType))));
 
     BooleanFormula constraint = bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(c1, c2));
 
@@ -296,33 +296,33 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     ArrayFormula<BitvectorFormula, BooleanFormula> b2 =
         amgr.makeArray("b2", FormulaType.getBitvectorTypeWithSize(3), FormulaType.BooleanType);
     ArrayFormula<
-            ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<
-                ArrayFormula<BooleanFormula, BooleanFormula>,
-                ArrayFormula<IntegerFormula, BitvectorFormula>>>
+        ArrayFormula<IntegerFormula, IntegerFormula>,
+        ArrayFormula<
+            ArrayFormula<BooleanFormula, BooleanFormula>,
+            ArrayFormula<IntegerFormula, BitvectorFormula>>>
         c1 =
-            amgr.makeArray(
-                "c1",
+        amgr.makeArray(
+            "c1",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+                    FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
-                        FormulaType.getArrayType(
-                            FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
+                        FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
     ArrayFormula<
-            ArrayFormula<IntegerFormula, IntegerFormula>,
-            ArrayFormula<
-                ArrayFormula<BooleanFormula, BooleanFormula>,
-                ArrayFormula<IntegerFormula, BitvectorFormula>>>
+        ArrayFormula<IntegerFormula, IntegerFormula>,
+        ArrayFormula<
+            ArrayFormula<BooleanFormula, BooleanFormula>,
+            ArrayFormula<IntegerFormula, BitvectorFormula>>>
         c2 =
-            amgr.makeArray(
-                "c2",
+        amgr.makeArray(
+            "c2",
+            FormulaType.getArrayType(
+                FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
                 FormulaType.getArrayType(
-                    FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType),
+                    FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
                     FormulaType.getArrayType(
-                        FormulaType.getArrayType(FormulaType.BooleanType, FormulaType.BooleanType),
-                        FormulaType.getArrayType(
-                            FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
+                        FormulaType.IntegerType, FormulaType.getBitvectorTypeWithSize(3)))));
 
     BooleanFormula constraint =
         bmgr.and(amgr.equivalence(a1, a2), amgr.equivalence(b1, b2), amgr.equivalence(c1, c2));
@@ -332,7 +332,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testStore()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -355,7 +354,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
+
 
   @Test
   public void testSelect()
@@ -901,30 +900,30 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  //  @Test
-  //  public void testIntegerMakeNumberEqualsAndAdd()
-  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-  //    requireIntegers();
-  //    assume()
-  //        .withMessage("Solver %s always adds zero", solverToUse())
-  //        .that(solverToUse())
-  //        .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
-  //
-  //    String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";
-  //
-  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
-  //
-  //    IntegerFormula a = imgr.makeNumber(1);
-  //    IntegerFormula b = imgr.makeNumber(5);
-  //    IntegerFormula c = imgr.makeNumber("3");
-  //    IntegerFormula e = imgr.makeNumber(2147483647);
-  //
-  //    BooleanFormula constraint = imgr.equal(imgr.add(a, b), imgr.add(c, e));
-  //
-  //    BooleanFormula expectedResult = constraint;
-  //
-  //    assertThat(actualResult).isEqualTo(expectedResult);
-  //  }
+    @Test
+    public void testIntegerMakeNumberEqualsAndAdd()
+        throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      requireIntegers();
+      assume()
+          .withMessage("Solver %s always adds zero", solverToUse())
+          .that(solverToUse())
+          .isNoneOf(Solvers.CVC5, Solvers.CVC4, Solvers.PRINCESS, Solvers.SMTINTERPOL);
+
+      String x = "(assert (= (+ 1 5) (+ 3 2147483647)))\n";
+
+      BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+      IntegerFormula a = imgr.makeNumber(1);
+      IntegerFormula b = imgr.makeNumber(5);
+      IntegerFormula c = imgr.makeNumber("3");
+      IntegerFormula e = imgr.makeNumber(2147483647);
+
+      BooleanFormula constraint = imgr.equal(imgr.add(a, b), imgr.add(c, e));
+
+      BooleanFormula expectedResult = constraint;
+
+      assertThat(actualResult).isEqualTo(expectedResult);
+    }
 
   @Test
   public void testRationalsMakeNumberEqualsAndAdd()
@@ -949,7 +948,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testIntegerSubtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -970,7 +968,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testRationalSubtract()
@@ -1034,31 +1031,31 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  //  @Test
-  //  public void testIntegerSum()
-  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-  //    requireIntegers();
-  //
-  //    String x = "(assert (= 2147483647 (+ 1 5 3 2147483647)))\n";
-  //
-  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
-  //
-  //    IntegerFormula a = imgr.makeNumber(1);
-  //    IntegerFormula b = imgr.makeNumber(5);
-  //    IntegerFormula c = imgr.makeNumber("3");
-  //    IntegerFormula e = imgr.makeNumber(2147483647);
-  //    List<IntegerFormula> d = new ArrayList<>();
-  //    d.add(a);
-  //    d.add(b);
-  //    d.add(c);
-  //    d.add(e);
-  //
-  //    BooleanFormula constraint = imgr.equal(e, imgr.sum(d));
-  //
-  //    BooleanFormula expectedResult = constraint;
-  //
-  //    assertThat(actualResult).isEqualTo(expectedResult);
-  //  }
+    @Test
+    public void testIntegerSum()
+        throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      requireIntegers();
+
+      String x = "(assert (= 2147483647 (+ 1 5 3 2147483647)))\n";
+
+      BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+      IntegerFormula a = imgr.makeNumber(1);
+      IntegerFormula b = imgr.makeNumber(5);
+      IntegerFormula c = imgr.makeNumber("3");
+      IntegerFormula e = imgr.makeNumber(2147483647);
+      List<IntegerFormula> d = new ArrayList<>();
+      d.add(a);
+      d.add(b);
+      d.add(c);
+      d.add(e);
+
+      BooleanFormula constraint = imgr.equal(e, imgr.sum(d));
+
+      BooleanFormula expectedResult = constraint;
+
+      assertThat(actualResult).isEqualTo(expectedResult);
+    }
 
   @Test
   public void testRationalSum()
@@ -1084,7 +1081,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testIntegerDivide()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1106,7 +1102,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testRationalDivide()
@@ -1127,7 +1122,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testIntegerModulo()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1152,28 +1146,28 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
-  //  @Test
-  //  public void testIntegerMultiply()
-  //      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-  //    requireIntegers();
-  //
-  //    String x = "(assert (= 1 (* 5 (* 3 2147483647))))\n";
-  //
-  //    BooleanFormula actualResult = mgr.universalParseFromString(x);
-  //
-  //    IntegerFormula a = imgr.makeNumber(1);
-  //    IntegerFormula b = imgr.makeNumber(5);
-  //    IntegerFormula c = imgr.makeNumber("3");
-  //    IntegerFormula e = imgr.makeNumber(2147483647);
-  //
-  //    BooleanFormula constraint = imgr.equal(a, imgr.multiply(b, imgr.multiply(c, e)));
-  //
-  //    BooleanFormula expectedResult = constraint;
-  //
-  //    assertThat(actualResult).isEqualTo(expectedResult);
-  //  }
+
+    @Test
+    public void testIntegerMultiply()
+        throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+      requireIntegers();
+
+      String x = "(assert (= 1 (* 5 (* 3 2147483647))))\n";
+
+      BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+      IntegerFormula a = imgr.makeNumber(1);
+      IntegerFormula b = imgr.makeNumber(5);
+      IntegerFormula c = imgr.makeNumber("3");
+      IntegerFormula e = imgr.makeNumber(2147483647);
+
+      BooleanFormula constraint = imgr.equal(a, imgr.multiply(b, imgr.multiply(c, e)));
+
+      BooleanFormula expectedResult = constraint;
+
+      assertThat(actualResult).isEqualTo(expectedResult);
+    }
 
   @Test
   public void testRationalMultiply()
@@ -1194,7 +1188,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
+
   @Test
   public void testIntegerDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1220,7 +1214,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testRationalDistinct()
@@ -1246,7 +1239,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1259,9 +1251,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(constraint);
     }
-   */
 
-  /*
   @Test
   public void testIntegerGreaterThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1282,7 +1272,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testRationalGreaterThan()
@@ -1304,7 +1293,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testIntegerGreaterOrEquals()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1325,7 +1313,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
+
 
   @Test
   public void testRationalGreaterOrEquals()
@@ -1346,8 +1334,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-
-  /*
   @Test
   public void testIntegerLessThan()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1368,7 +1354,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
+
 
   @Test
   public void testRationalLessThan()
@@ -1390,7 +1376,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testIntegerLessOrEqual()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -1411,7 +1396,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testRationalLessOrEqual()
@@ -2032,7 +2016,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
+
   @Test
   public void testExtract()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -2061,7 +2045,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
+
 
   @Test
   public void testExtend()
@@ -2093,7 +2077,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   }
 
   /* EXCEPTION TESTS */
-  /*
+
   @Test(expected = ParserException.class)
   public void testExceptionAnd()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -2116,7 +2100,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
-   */
 
   @Test(expected = ParserException.class)
   public void testExceptionXor()
@@ -3151,7 +3134,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
    @Test
   public void testDefineFunctionBoolWithInput()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -3166,9 +3148,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
-  /*
   @Test
   public void testDefineFunctionInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -3185,7 +3165,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
-   */
 
   @Test
   public void testDefineFunctionIntWithInput()
@@ -3204,7 +3183,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-  /*
   @Test
   public void testDefineFunctionReal()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -3223,7 +3201,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 
-   */
 
   @Test
   public void testDefineFunctionRealWithInput()
@@ -3411,8 +3388,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3461,8 +3438,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3518,8 +3495,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3598,8 +3575,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3654,8 +3631,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3736,8 +3713,8 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     String expectedResult = modelToString(ImmutableList.copyOf(temp));
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(
-            SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
+             context.newProverEnvironment(
+                 SolverContext.ProverOptions.GENERATE_MODELS, ProverOptions.USE_BINARY)) {
       prover.addConstraint(b);
       boolean isUnsat = prover.isUnsat();
       if (!isUnsat) {
@@ -3752,3 +3729,4 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     }
   }
 }
+
