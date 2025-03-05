@@ -9,163 +9,165 @@ import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 public class SolverLessStringFormulaManager
-    extends AbstractStringFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends AbstractStringFormulaManager<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessStringFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
 
   @Override
-  protected DummyFormula makeStringImpl(String value) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula makeStringImpl(String value) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula makeVariableImpl(String pVar) {
-    DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula makeVariableImpl(String pVar) {
+    SMTLIB2Formula result = new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
     result.setName(pVar);
     return result;
   }
 
   @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula equal(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterThan(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterOrEquals(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessThan(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessOrEquals(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula length(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula length(SMTLIB2Formula pParam) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula concatImpl(List<DummyFormula> parts) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula concatImpl(List<SMTLIB2Formula> parts) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula prefix(DummyFormula prefix, DummyFormula str) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula prefix(SMTLIB2Formula prefix, SMTLIB2Formula str) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula suffix(DummyFormula suffix, DummyFormula str) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula suffix(SMTLIB2Formula suffix, SMTLIB2Formula str) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula in(DummyFormula str, DummyFormula regex) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula in(SMTLIB2Formula str, SMTLIB2Formula regex) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula contains(DummyFormula str, DummyFormula part) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula contains(SMTLIB2Formula str, SMTLIB2Formula part) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula indexOf(DummyFormula str, DummyFormula part, DummyFormula startIndex) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula indexOf(
+      SMTLIB2Formula str, SMTLIB2Formula part, SMTLIB2Formula startIndex) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula charAt(DummyFormula str, DummyFormula index) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula charAt(SMTLIB2Formula str, SMTLIB2Formula index) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula substring(DummyFormula str, DummyFormula index, DummyFormula length) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula substring(
+      SMTLIB2Formula str, SMTLIB2Formula index, SMTLIB2Formula length) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula replace(
-      DummyFormula fullStr, DummyFormula target, DummyFormula replacement) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula replace(
+      SMTLIB2Formula fullStr, SMTLIB2Formula target, SMTLIB2Formula replacement) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula replaceAll(
-      DummyFormula fullStr, DummyFormula target, DummyFormula replacement) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula replaceAll(
+      SMTLIB2Formula fullStr, SMTLIB2Formula target, SMTLIB2Formula replacement) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 
   @Override
-  protected DummyFormula makeRegexImpl(String value) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula makeRegexImpl(String value) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula noneImpl() {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula noneImpl() {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula allImpl() {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula allImpl() {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula allCharImpl() {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula allCharImpl() {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula range(DummyFormula start, DummyFormula end) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula range(SMTLIB2Formula start, SMTLIB2Formula end) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula concatRegexImpl(List<DummyFormula> parts) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula concatRegexImpl(List<SMTLIB2Formula> parts) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula union(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula union(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula intersection(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula intersection(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula closure(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula closure(SMTLIB2Formula pParam) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula complement(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+  protected SMTLIB2Formula complement(SMTLIB2Formula pParam) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
   }
 
   @Override
-  protected DummyFormula toIntegerFormula(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula toIntegerFormula(SMTLIB2Formula pParam) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula toStringFormula(DummyFormula pParam) {
-    return new DummyFormula(new DummyType(DummyType.Type.STRING));
+  protected SMTLIB2Formula toStringFormula(SMTLIB2Formula pParam) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
   }
 }

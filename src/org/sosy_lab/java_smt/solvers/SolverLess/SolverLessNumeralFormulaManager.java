@@ -11,64 +11,65 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager;
 
 public abstract class SolverLessNumeralFormulaManager<
         T extends NumeralFormula, Y extends NumeralFormula>
-    extends AbstractNumeralFormulaManager<DummyFormula, DummyType, DummyEnv, T, Y, DummyFunction> {
+    extends AbstractNumeralFormulaManager<
+        SMTLIB2Formula, DummyType, DummyEnv, T, Y, DummyFunction> {
   public SolverLessNumeralFormulaManager(SolverLessFormulaCreator creator) {
     super(creator, NonLinearArithmetic.APPROXIMATE_FALLBACK);
   }
 
   @Override
-  protected boolean isNumeral(DummyFormula val) {
+  protected boolean isNumeral(SMTLIB2Formula val) {
     return val.getFormulaType().isInteger() || val.getFormulaType().isRational();
   }
 
   @Override
-  protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(pParam1.getFormulaType());
+  protected SMTLIB2Formula negate(SMTLIB2Formula pParam1) {
+    return new SMTLIB2Formula(pParam1.getFormulaType());
   }
 
   @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
+  protected SMTLIB2Formula add(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
     if (pParam1.getFormulaType().isRational() || pParam2.getFormulaType().isRational()) {
-      return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+      return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
     }
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
+  protected SMTLIB2Formula subtract(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
     if (pParam1.getFormulaType().isRational() || pParam2.getFormulaType().isRational()) {
-      return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+      return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
     }
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula equal(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula distinctImpl(List<DummyFormula> pNumbers) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula distinctImpl(List<SMTLIB2Formula> pNumbers) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterThan(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterOrEquals(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessThan(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessOrEquals(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 }

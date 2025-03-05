@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 @SuppressWarnings("StringSplitter")
 public class SolverLessFormulaCreator
-    extends FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends FormulaCreator<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 
   private final Map<String, DummyFunction> uninterpretedFunctions = new HashMap<>();
 
@@ -54,8 +54,8 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public DummyFormula makeVariable(DummyType pDummyType, String varName) {
-    DummyFormula result = new DummyFormula(pDummyType);
+  public SMTLIB2Formula makeVariable(DummyType pDummyType, String varName) {
+    SMTLIB2Formula result = new SMTLIB2Formula(pDummyType);
     result.setName(varName);
     return result;
   }
@@ -63,21 +63,21 @@ public class SolverLessFormulaCreator
   @Override
   @SuppressWarnings("unchecked")
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
-    if (formula instanceof DummyFormula) {
-      DummyFormula dummyFormula = (DummyFormula) formula;
-      switch (dummyFormula.getFormulaType().myType) {
+    if (formula instanceof SMTLIB2Formula) {
+      SMTLIB2Formula solverLessFormula = (SMTLIB2Formula) formula;
+      switch (solverLessFormula.getFormulaType().myType) {
         case BITVECTOR:
           return (FormulaType<T>)
-              FormulaType.getBitvectorTypeWithSize(dummyFormula.getBitvectorLength());
+              FormulaType.getBitvectorTypeWithSize(solverLessFormula.getBitvectorLength());
         case FLOATING_POINT:
           return (FormulaType<T>)
               FormulaType.getFloatingPointType(
-                  dummyFormula.getExponent(), dummyFormula.getMantissa());
+                  solverLessFormula.getExponent(), solverLessFormula.getMantissa());
         case ARRAY:
           return (FormulaType<T>)
               FormulaType.getArrayType(
-                  dummyFormula.getFirstArrayParameter().getFormulaTypeForCreator(),
-                  dummyFormula.getSecondArrayParameter().getFormulaTypeForCreator());
+                  solverLessFormula.getFirstArrayParameter().getFormulaTypeForCreator(),
+                  solverLessFormula.getSecondArrayParameter().getFormulaTypeForCreator());
         case RATIONAL:
           return (FormulaType<T>) FormulaType.RationalType;
         case STRING:
@@ -104,50 +104,52 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public FormulaType<?> getFormulaType(DummyFormula formula) {
+  public FormulaType<?> getFormulaType(SMTLIB2Formula formula) {
     return formula.getFormulaTypeForCreator();
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, DummyFormula f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, SMTLIB2Formula f) {
     return null;
   }
 
   @Override
-  protected DummyFormula extractInfo(Formula pT) {
-    if (pT instanceof DummyFormula) {
-      return (DummyFormula) pT;
+  protected SMTLIB2Formula extractInfo(Formula pT) {
+    if (pT instanceof SMTLIB2Formula) {
+      return (SMTLIB2Formula) pT;
     }
     if (pT instanceof BitvectorFormula) {
-      return new DummyFormula(extractBitvectorLengthFromString(pT.toString()));
+      return new SMTLIB2Formula(extractBitvectorLengthFromString(pT.toString()));
     }
     if (pT instanceof FloatingPointFormula) {
-      return new DummyFormula(
+      return new SMTLIB2Formula(
           extractExponentFromString(pT.toString()), extractMantissaFromString(pT.toString()));
     }
     if (pT instanceof RationalFormula) {
       if (pT.toString().isEmpty()) {
-        return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+        return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
       }
-      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL), pT.toString());
+      SMTLIB2Formula result =
+          new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), pT.toString());
       return result;
     }
     if (pT instanceof IntegerFormula) {
       if (pT.toString().isEmpty()) {
-        return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+        return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
       }
-      DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER), pT.toString());
+      SMTLIB2Formula result =
+          new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), pT.toString());
       return result;
     }
     if (pT instanceof BooleanFormula) {
       if (pT.toString().isEmpty()) {
-        return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+        return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
       }
-      DummyFormula result = new DummyFormula(Boolean.parseBoolean(pT.toString()));
+      SMTLIB2Formula result = new SMTLIB2Formula(Boolean.parseBoolean(pT.toString()));
       return result;
     }
     if (pT instanceof ArrayFormula) {
-      DummyFormula.createDummyFormulaArrayFromString(pT.toString());
+      SMTLIB2Formula.createDummyFormulaArrayFromString(pT.toString());
     }
 
     return super.extractInfo(pT);
@@ -241,7 +243,7 @@ public class SolverLessFormulaCreator
   }
 
   @Override
-  public DummyFormula callFunctionImpl(DummyFunction declaration, List<DummyFormula> args) {
+  public SMTLIB2Formula callFunctionImpl(DummyFunction declaration, List<SMTLIB2Formula> args) {
     checkArgument(!args.contains(null), "Arguments cannot be null");
     List<DummyType> expectedTypes = declaration.getArgumentTypes();
     if (args.size() != expectedTypes.size()) {
@@ -256,36 +258,36 @@ public class SolverLessFormulaCreator
             String.format("Argument %d has type %s, but expected %s", i, actual, expected));
       }
     }
-    DummyFormula result;
+    SMTLIB2Formula result;
     if (declaration.getReturnType().isBitvector()) {
-      for (DummyFormula arg : args) {
+      for (SMTLIB2Formula arg : args) {
         if (arg.getFormulaType().isBitvector()) {
-          result = new DummyFormula(arg.getBitvectorLength());
+          result = new SMTLIB2Formula(arg.getBitvectorLength());
         }
       }
     }
     if (declaration.getReturnType().isFloatingPoint()) {
-      for (DummyFormula arg : args) {
+      for (SMTLIB2Formula arg : args) {
         if (arg.getFormulaType().isFloatingPoint()) {
-          result = new DummyFormula(arg.getExponent(), arg.getMantissa());
+          result = new SMTLIB2Formula(arg.getExponent(), arg.getMantissa());
         }
       }
     }
     if (declaration.getReturnType().isArray()) {
-      for (DummyFormula arg : args) {
+      for (SMTLIB2Formula arg : args) {
         if (arg.getFormulaType().isArray()) {
-          result = new DummyFormula(arg.getFirstArrayParameter(), arg.getSecondArrayParameter());
+          result = new SMTLIB2Formula(arg.getFirstArrayParameter(), arg.getSecondArrayParameter());
         }
       }
     }
-    result = new DummyFormula(declaration.getReturnType());
+    result = new SMTLIB2Formula(declaration.getReturnType());
     result.setName(declaration.getName());
 
     return result;
   }
 
   @Override
-  protected DummyFunction getBooleanVarDeclarationImpl(DummyFormula pDummyFormula) {
+  protected DummyFunction getBooleanVarDeclarationImpl(SMTLIB2Formula pSMTLIB2Formula) {
     return new DummyFunction(); // not supported
   }
 }

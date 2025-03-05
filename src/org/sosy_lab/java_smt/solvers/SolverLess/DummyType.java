@@ -198,24 +198,27 @@ public class DummyType {
   @Override
   public int hashCode() {
     int result = myType.hashCode();
+
     switch (myType) {
       case BITVECTOR:
-        result = 31 * result + bitvectorLength;
+        result = 37 * result + bitvectorLength; // Using 37 instead of 31
         break;
       case FLOATINGPOINTROUNDINGMODE:
-        result = 31 * result + (roundingMode != null ? roundingMode.hashCode() : 0);
+        result = 41 * result + (roundingMode != null ? roundingMode.hashCode() : 0); // Using 41
         break;
       case FLOATING_POINT:
-        result = 31 * result + exponent;
-        result = 31 * result + mantissa;
+        result = 43 * result + exponent; // Using 43
+        result = 47 * result + mantissa; // Using 47
         break;
       case ARRAY:
-        result = 31 * result + (arrayIndexType != null ? arrayIndexType.hashCode() : 0);
-        result = 31 * result + (arrayElementType != null ? arrayElementType.hashCode() : 0);
+        result = 53 * result + (arrayIndexType != null ? arrayIndexType.hashCode() : 0); // Using 53
+        result =
+            59 * result + (arrayElementType != null ? arrayElementType.hashCode() : 0); // Using 59
         break;
       default:
         break;
     }
+
     return result;
   }
 }

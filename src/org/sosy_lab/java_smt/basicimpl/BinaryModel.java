@@ -23,7 +23,6 @@ import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaManagersWrapper;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
@@ -119,7 +118,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   private List<ValueAssignment> parseModel(String output) {
     Smtlibv2Lexer lexer = new Smtlibv2Lexer(CharStreams.fromString(output));
     Smtlibv2Parser parser = new Smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(new FormulaManagersWrapper(mgr));
+    Visitor visitor = new Visitor(mgr);
     visitor.visit(parser.start());
     return visitor.getAssignments();
   }

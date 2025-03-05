@@ -21,40 +21,40 @@ public class SolverLessRationalFormulaManager
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), Long.toString(i));
+  protected SMTLIB2Formula makeNumberImpl(long i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), Long.toString(i));
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), i.toString());
+  protected SMTLIB2Formula makeNumberImpl(BigInteger i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), i.toString());
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), i);
+  protected SMTLIB2Formula makeNumberImpl(String i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), i);
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), Double.toString(pNumber));
+  protected SMTLIB2Formula makeNumberImpl(double pNumber) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), Double.toString(pNumber));
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(new DummyType(DummyType.Type.RATIONAL), pNumber.toPlainString());
+  protected SMTLIB2Formula makeNumberImpl(BigDecimal pNumber) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL), pNumber.toPlainString());
   }
 
   @Override
-  protected DummyFormula makeVariableImpl(String i) {
-    DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+  protected SMTLIB2Formula makeVariableImpl(String i) {
+    SMTLIB2Formula result = new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
     result.setName(i);
     return result;
   }
 
   @Override
-  protected DummyFormula floor(DummyFormula number) {
-    return new DummyFormula(
+  protected SMTLIB2Formula floor(SMTLIB2Formula number) {
+    return new SMTLIB2Formula(
         new DummyType(DummyType.Type.INTEGER),
         String.valueOf(
             Integer.parseInt(String.valueOf((int) Double.parseDouble(number.toString())))));

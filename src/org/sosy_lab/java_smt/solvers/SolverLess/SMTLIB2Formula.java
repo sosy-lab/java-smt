@@ -18,7 +18,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @SuppressWarnings({"StringCaseLocaleUsage", "rawtypes", "Immutable"})
 // @Immutable
-public class DummyFormula
+public class SMTLIB2Formula
     implements Formula,
         BitvectorFormula,
         FloatingPointFormula,
@@ -27,16 +27,16 @@ public class DummyFormula
         BooleanFormula,
         IntegerFormula,
         RationalFormula {
-  private String name = "unnamed";
-  private DummyFormula firstArrayParameter = null;
-  private DummyFormula secondArrayParameter = null;
+  private String name = "anonymous";
+  private SMTLIB2Formula firstArrayParameter = null;
+  private SMTLIB2Formula secondArrayParameter = null;
   private String representation = "";
   private final DummyType formulaType;
   private String value = "";
 
-  public DummyFormula(DummyType pFormulaType) {
+  public SMTLIB2Formula(DummyType pFormulaType) {
     if (pFormulaType.isArray()) {
-      DummyFormula formula = createDummyFormulaArrayFromString(pFormulaType.toString());
+      SMTLIB2Formula formula = createDummyFormulaArrayFromString(pFormulaType.toString());
       firstArrayParameter = formula.getFirstArrayParameter();
       secondArrayParameter = formula.getSecondArrayParameter();
       representation = formula.representation;
@@ -49,13 +49,13 @@ public class DummyFormula
     updateRepresentation();
   }
 
-  public DummyFormula(boolean value) {
+  public SMTLIB2Formula(boolean value) {
     formulaType = new DummyType(DummyType.Type.BOOLEAN);
     this.value = String.valueOf(value);
     updateRepresentation();
   }
 
-  public DummyFormula(DummyType pFormulaType, String pRepresentation) {
+  public SMTLIB2Formula(DummyType pFormulaType, String pRepresentation) {
     formulaType = pFormulaType;
     representation = pRepresentation;
     if (pFormulaType.isInteger() || pFormulaType.isRational()) {
@@ -64,9 +64,9 @@ public class DummyFormula
     updateRepresentation();
   }
 
-  public DummyFormula(
-      DummyFormula pFirstArrayParameter,
-      DummyFormula pSecondArrayParameter) { // if it represents an array
+  public SMTLIB2Formula(
+      SMTLIB2Formula pFirstArrayParameter,
+      SMTLIB2Formula pSecondArrayParameter) { // if it represents an array
     representation = "";
     formulaType =
         new DummyType(
@@ -77,12 +77,12 @@ public class DummyFormula
     updateRepresentation();
   }
 
-  public DummyFormula(int exponent, int mantissa) { // if it represents a FloatingPoint
+  public SMTLIB2Formula(int exponent, int mantissa) { // if it represents a FloatingPoint
     formulaType = new DummyType(exponent, mantissa);
     updateRepresentation();
   }
 
-  public DummyFormula(int pBitvectorLength) {
+  public SMTLIB2Formula(int pBitvectorLength) {
     formulaType = new DummyType(pBitvectorLength);
     updateRepresentation();
   }
@@ -101,34 +101,34 @@ public class DummyFormula
    * @param pType FormulaType-Object
    * @return DummyFormula with the correct Type.
    */
-  public static DummyFormula getDummyFormulaFromObject(FormulaType<?> pType) {
+  public static SMTLIB2Formula getDummyFormulaFromObject(FormulaType<?> pType) {
     if (pType.isArrayType()) {
       FormulaType.ArrayFormulaType<?, ?> arrayType = (FormulaType.ArrayFormulaType<?, ?>) pType;
       FormulaType<?> indexType = arrayType.getIndexType();
       FormulaType<?> elementType = arrayType.getElementType();
-      return new DummyFormula(
+      return new SMTLIB2Formula(
           getDummyFormulaFromObject(indexType), getDummyFormulaFromObject(elementType));
     } else if (pType.isBitvectorType()) {
       FormulaType.BitvectorType bitvectorType = (FormulaType.BitvectorType) pType;
       int size = bitvectorType.getSize();
-      return new DummyFormula(size);
+      return new SMTLIB2Formula(size);
     } else if (pType.isBooleanType()) {
-      return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+      return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
     } else if (pType.isFloatingPointType()) {
       FormulaType.FloatingPointType floatingPointType = (FormulaType.FloatingPointType) pType;
       int exponentSize = floatingPointType.getExponentSize();
       int mantissaSize = floatingPointType.getMantissaSize();
-      return new DummyFormula(exponentSize, mantissaSize);
+      return new SMTLIB2Formula(exponentSize, mantissaSize);
     } else if (pType.isNumeralType()) {
       if (pType.isIntegerType()) {
-        return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+        return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
       } else if (pType.isRationalType()) {
-        return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+        return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
       }
     } else if (pType.isStringType()) {
-      return new DummyFormula(new DummyType(DummyType.Type.STRING));
+      return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
     } else if (pType.isRegexType()) {
-      return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+      return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
     } else {
       throw new IllegalArgumentException("Unsupported FormulaType: " + pType);
     }
@@ -169,7 +169,7 @@ public class DummyFormula
    * @param input String in the Array Element, Element
    * @return DummyFormula representing the Array without values.
    */
-  public static DummyFormula createDummyFormulaArrayFromString(String input) {
+  public static SMTLIB2Formula createDummyFormulaArrayFromString(String input) {
     input = input.trim();
 
     if (input.startsWith("Array<") && input.endsWith(">")) {
@@ -183,30 +183,30 @@ public class DummyFormula
       String firstParameter = content.substring(0, commaIndex).trim();
       String secondParameter = content.substring(commaIndex + 1).trim();
 
-      DummyFormula firstArrayParameter = createDummyFormulaArrayFromString(firstParameter);
-      DummyFormula secondArrayParameter = createDummyFormulaArrayFromString(secondParameter);
+      SMTLIB2Formula firstArrayParameter = createDummyFormulaArrayFromString(firstParameter);
+      SMTLIB2Formula secondArrayParameter = createDummyFormulaArrayFromString(secondParameter);
 
-      return new DummyFormula(firstArrayParameter, secondArrayParameter);
+      return new SMTLIB2Formula(firstArrayParameter, secondArrayParameter);
     }
 
     try {
       String convertedType = input.toUpperCase();
       switch (convertedType.substring(0, 3)) {
         case "INT":
-          return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+          return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
         case "RAT":
-          return new DummyFormula(new DummyType(DummyType.Type.RATIONAL));
+          return new SMTLIB2Formula(new DummyType(DummyType.Type.RATIONAL));
         case "BOO":
-          return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+          return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
         case "STR":
-          return new DummyFormula(new DummyType(DummyType.Type.STRING));
+          return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
         case "REG":
-          return new DummyFormula(new DummyType(DummyType.Type.REGEX));
+          return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
         case "BIT":
-          return new DummyFormula(
+          return new SMTLIB2Formula(
               new DummyType(SolverLessFormulaCreator.extractBitvectorLengthFromString(input)));
         case "FLO":
-          return new DummyFormula(
+          return new SMTLIB2Formula(
               new DummyType(
                   SolverLessFormulaCreator.extractExponentFromString(input),
                   SolverLessFormulaCreator.extractMantissaFromString(input)));
@@ -320,11 +320,11 @@ public class DummyFormula
     return formulaType.getBitvectorLength();
   }
 
-  public DummyFormula getFirstArrayParameter() {
+  public SMTLIB2Formula getFirstArrayParameter() {
     return firstArrayParameter;
   }
 
-  public DummyFormula getSecondArrayParameter() {
+  public SMTLIB2Formula getSecondArrayParameter() {
     return secondArrayParameter;
   }
 
@@ -351,11 +351,11 @@ public class DummyFormula
     if (this == obj) {
       return true;
     }
-    if (!(obj instanceof DummyFormula)) {
+    if (!(obj instanceof SMTLIB2Formula)) {
       return false;
     }
 
-    DummyFormula that = (DummyFormula) obj;
+    SMTLIB2Formula that = (SMTLIB2Formula) obj;
 
     if (!name.equals(that.name)) {
       return false;
@@ -374,7 +374,6 @@ public class DummyFormula
       return firstArrayParameter.equals(that.firstArrayParameter)
           && secondArrayParameter.equals(that.secondArrayParameter);
     }
-    System.out.println(this + " vs. " + that + "evaluated to equal");
     return true;
   }
 

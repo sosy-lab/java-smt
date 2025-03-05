@@ -46,7 +46,6 @@ import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.FormulaManagersWrapper;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Lexer;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Visitor;
@@ -187,7 +186,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public BooleanFormula universalParseFromString(String pString) {
     Smtlibv2Lexer lexer = new Smtlibv2Lexer(CharStreams.fromString(pString));
     Smtlibv2Parser parser = new Smtlibv2Parser(new CommonTokenStream(lexer));
-    Visitor visitor = new Visitor(new FormulaManagersWrapper(this));
+    Visitor visitor = new Visitor(this);
     visitor.visit(parser.start());
     List<BooleanFormula> constraints = visitor.getConstraints();
 

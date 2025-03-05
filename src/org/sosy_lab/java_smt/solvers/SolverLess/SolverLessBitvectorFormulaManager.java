@@ -11,7 +11,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
 public class SolverLessBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends AbstractBitvectorFormulaManager<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessBitvectorFormulaManager(
       SolverLessFormulaCreator pSolverLessFormulaCreator,
@@ -20,144 +20,148 @@ public class SolverLessBitvectorFormulaManager
   }
 
   @Override
-  protected DummyFormula makeBitvectorImpl(int length, DummyFormula pParam1) {
-    return new DummyFormula(length);
+  protected SMTLIB2Formula makeBitvectorImpl(int length, SMTLIB2Formula pParam1) {
+    return new SMTLIB2Formula(length);
   }
 
   @Override
-  protected DummyFormula toIntegerFormulaImpl(DummyFormula pI, boolean signed) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula toIntegerFormulaImpl(SMTLIB2Formula pI, boolean signed) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula makeBitvectorImpl(int pLength, long pI) {
-    return new DummyFormula(pLength);
+  protected SMTLIB2Formula makeBitvectorImpl(int pLength, long pI) {
+    return new SMTLIB2Formula(pLength);
   }
 
   @Override
-  protected DummyFormula distinctImpl(List<DummyFormula> pBits) {
+  protected SMTLIB2Formula distinctImpl(List<SMTLIB2Formula> pBits) {
     return super.distinctImpl(pBits);
   }
 
   @Override
-  protected DummyFormula negate(DummyFormula pParam1) {
-    return new DummyFormula(pParam1.getBitvectorLength());
+  protected SMTLIB2Formula negate(SMTLIB2Formula pParam1) {
+    return new SMTLIB2Formula(pParam1.getBitvectorLength());
   }
 
   @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula add(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula subtract(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula divide(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula divide(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula modulo(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula modulo(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula multiply(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula multiply(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula equal(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula equal(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterThan(
+      SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula greaterOrEquals(
-      DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula greaterOrEquals(
+      SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessThan(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessThan(
+      SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula lessOrEquals(DummyFormula pParam1, DummyFormula pParam2, boolean signed) {
-    return new DummyFormula(new DummyType(DummyType.Type.BOOLEAN));
+  protected SMTLIB2Formula lessOrEquals(
+      SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
-  protected DummyFormula not(DummyFormula pParam1) {
-    return new DummyFormula(pParam1.getBitvectorLength());
+  protected SMTLIB2Formula not(SMTLIB2Formula pParam1) {
+    return new SMTLIB2Formula(pParam1.getBitvectorLength());
   }
 
   @Override
-  protected DummyFormula and(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula and(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula or(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(
+  protected SMTLIB2Formula or(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(
         Math.max(
             pParam1.getBitvectorLength(),
             pParam2.getBitvectorLength())); // Boolean formulas do not have a length.
   }
 
   @Override
-  protected DummyFormula xor(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula xor(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
   }
 
   @Override
-  protected DummyFormula makeBitvectorImpl(int pLength, BigInteger pI) {
-    return new DummyFormula(pLength);
+  protected SMTLIB2Formula makeBitvectorImpl(int pLength, BigInteger pI) {
+    return new SMTLIB2Formula(pLength);
   }
 
   @Override
-  protected DummyFormula makeVariableImpl(int pLength, String pVar) {
-    DummyFormula result = new DummyFormula(pLength);
+  protected SMTLIB2Formula makeVariableImpl(int pLength, String pVar) {
+    SMTLIB2Formula result = new SMTLIB2Formula(pLength);
     result.setName(pVar);
     return result;
   }
 
   @Override
-  protected DummyFormula shiftRight(DummyFormula pNumber, DummyFormula toShift, boolean signed) {
-    return new DummyFormula(pNumber.getBitvectorLength());
+  protected SMTLIB2Formula shiftRight(
+      SMTLIB2Formula pNumber, SMTLIB2Formula toShift, boolean signed) {
+    return new SMTLIB2Formula(pNumber.getBitvectorLength());
   }
 
   @Override
-  protected DummyFormula shiftLeft(DummyFormula pExtract, DummyFormula pExtract2) {
-    return new DummyFormula(pExtract.getBitvectorLength());
+  protected SMTLIB2Formula shiftLeft(SMTLIB2Formula pExtract, SMTLIB2Formula pExtract2) {
+    return new SMTLIB2Formula(pExtract.getBitvectorLength());
   }
 
   @Override
-  protected DummyFormula concat(DummyFormula number, DummyFormula pAppend) {
+  protected SMTLIB2Formula concat(SMTLIB2Formula number, SMTLIB2Formula pAppend) {
     int newLength = number.getBitvectorLength() + pAppend.getBitvectorLength();
-    return new DummyFormula(newLength);
+    return new SMTLIB2Formula(newLength);
   }
 
   @Override
-  protected DummyFormula extract(DummyFormula pNumber, int pMsb, int pLsb) {
+  protected SMTLIB2Formula extract(SMTLIB2Formula pNumber, int pMsb, int pLsb) {
     int newLength = pMsb - pLsb + 1;
-    return new DummyFormula(newLength);
+    return new SMTLIB2Formula(newLength);
   }
 
   @Override
-  protected DummyFormula extend(DummyFormula pNumber, int pExtensionBits, boolean pSigned) {
-    return new DummyFormula(pNumber.getBitvectorLength() + pExtensionBits);
+  protected SMTLIB2Formula extend(SMTLIB2Formula pNumber, int pExtensionBits, boolean pSigned) {
+    return new SMTLIB2Formula(pNumber.getBitvectorLength() + pExtensionBits);
   }
 
-  public FormulaType<?> getFormulaType(DummyFormula formula) {
+  public FormulaType<?> getFormulaType(SMTLIB2Formula formula) {
     if (formula.getFormulaType().isBitvector()) {
       return FormulaType.getBitvectorTypeWithSize(formula.getBitvectorLength());
     }

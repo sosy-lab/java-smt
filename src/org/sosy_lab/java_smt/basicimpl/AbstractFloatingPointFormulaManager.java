@@ -157,10 +157,11 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   /** directly catch the most common special String constants. */
   protected TFormulaInfo makeNumberImpl(
       String pN, FormulaType.FloatingPointType pType, TFormulaInfo pFloatingPointRoundingMode) {
-    if (pN.startsWith("+")) {
-      pN = pN.substring(1);
+    String input = pN;
+    if (input.startsWith("+")) {
+      input = input.substring(1);
     }
-    switch (pN) {
+    switch (input) {
       case "NaN":
       case "-NaN":
         return makeNaNImpl(pType);
@@ -169,7 +170,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       case "-Infinity":
         return makeMinusInfinityImpl(pType);
       default:
-        return makeNumberAndRound(pN, pType, pFloatingPointRoundingMode);
+        return makeNumberAndRound(input, pType, pFloatingPointRoundingMode);
     }
   }
 
