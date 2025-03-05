@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -125,16 +126,24 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   // TODO Does the visitor use its own solver instance, or should the formulas be added to an
   //  existing instance?
-  public Visitor(FormulaManagersWrapper managers) {
-    this.fmgr = managers.getFmgr();
-    this.bmgr = managers.getBmgr();
-    this.imgr = managers.getImgr();
-    this.rmgr = managers.getRmgr();
-    this.bvmgr = managers.getBimgr();
-    this.amgr = managers.getAmgr();
-    this.ufmgr = managers.getUmgr();
-    this.fpmgr = managers.getFpmgr();
-    this.smgr = managers.getSmgr();
+  public Visitor(FormulaManager manager) {
+    fmgr = manager;
+    bmgr = manager.getBooleanFormulaManager();
+    imgr = safeGetManager(manager::getIntegerFormulaManager);
+    rmgr = safeGetManager(manager::getRationalFormulaManager);
+    bvmgr = safeGetManager(manager::getBitvectorFormulaManager);
+    amgr = safeGetManager(manager::getArrayFormulaManager);
+    fpmgr = safeGetManager(manager::getFloatingPointFormulaManager);
+    smgr = safeGetManager(manager::getStringFormulaManager);
+    ufmgr = manager.getUFManager();
+  }
+
+  private <T> T safeGetManager(Supplier<T> supplier) {
+    try {
+      return supplier.get();
+    } catch (UnsupportedOperationException e) {
+      return null;
+    }
   }
 
   @Override

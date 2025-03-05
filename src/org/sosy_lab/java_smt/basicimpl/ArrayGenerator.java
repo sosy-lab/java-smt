@@ -49,7 +49,7 @@ public class ArrayGenerator {
       return "String";
     } else {
       throw new GeneratorException(
-          pElementType + "is not available yet in ArrayGenerator as " + "element for Arrays");
+          pElementType + "is not available yet in ArrayGenerator as element for Arrays");
     }
   }
 
@@ -78,7 +78,7 @@ public class ArrayGenerator {
       return "String";
     } else {
       throw new GeneratorException(
-          pIndexType + "is not available yet in ArrayGenerator as " + "index for Arrays");
+          pIndexType + "is not available yet in ArrayGenerator as index for Arrays");
     }
   }
 

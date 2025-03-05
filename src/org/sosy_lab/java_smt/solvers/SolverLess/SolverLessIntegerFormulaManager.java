@@ -20,46 +20,46 @@ public class SolverLessIntegerFormulaManager
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(long i) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), String.valueOf(i));
+  protected SMTLIB2Formula makeNumberImpl(long i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), String.valueOf(i));
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(BigInteger i) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), String.valueOf(i));
+  protected SMTLIB2Formula makeNumberImpl(BigInteger i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), String.valueOf(i));
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(String i) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), i);
+  protected SMTLIB2Formula makeNumberImpl(String i) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), i);
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(double pNumber) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), String.valueOf(pNumber));
+  protected SMTLIB2Formula makeNumberImpl(double pNumber) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), String.valueOf(pNumber));
   }
 
   @Override
-  protected DummyFormula makeNumberImpl(BigDecimal pNumber) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER), String.valueOf(pNumber));
+  protected SMTLIB2Formula makeNumberImpl(BigDecimal pNumber) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER), String.valueOf(pNumber));
   }
 
   @Override
-  protected DummyFormula makeVariableImpl(String i) {
+  protected SMTLIB2Formula makeVariableImpl(String i) {
 
-    DummyFormula result = new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+    SMTLIB2Formula result = new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
     result.setName(i);
     return result;
   }
 
   @Override
-  protected DummyFormula add(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula add(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override
-  protected DummyFormula subtract(DummyFormula pParam1, DummyFormula pParam2) {
-    return new DummyFormula(new DummyType(DummyType.Type.INTEGER));
+  protected SMTLIB2Formula subtract(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
   }
 
   @Override

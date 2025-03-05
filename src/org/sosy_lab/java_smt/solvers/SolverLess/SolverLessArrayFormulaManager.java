@@ -12,14 +12,14 @@ import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class SolverLessArrayFormulaManager
-    extends AbstractArrayFormulaManager<DummyFormula, DummyType, DummyEnv, DummyFunction> {
+    extends AbstractArrayFormulaManager<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 
   public SolverLessArrayFormulaManager(SolverLessFormulaCreator pCreator) {
     super(pCreator);
   }
 
   protected SolverLessArrayFormulaManager(
-      FormulaCreator<DummyFormula, DummyType, DummyEnv, DummyFunction> pFormulaCreator) {
+      FormulaCreator<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> pFormulaCreator) {
     super(pFormulaCreator);
   }
 
@@ -30,9 +30,9 @@ public class SolverLessArrayFormulaManager
   }
 
   @Override
-  protected DummyFormula select(DummyFormula pArray, DummyFormula pIndex) {
+  protected SMTLIB2Formula select(SMTLIB2Formula pArray, SMTLIB2Formula pIndex) {
     if (pArray.getSecondArrayParameter().getFormulaType().isArray()) {
-      return new DummyFormula(
+      return new SMTLIB2Formula(
           pArray.getSecondArrayParameter().getFirstArrayParameter(),
           pArray.getSecondArrayParameter().getSecondArrayParameter());
     }
@@ -40,25 +40,26 @@ public class SolverLessArrayFormulaManager
   }
 
   @Override
-  protected DummyFormula store(DummyFormula pArray, DummyFormula pIndex, DummyFormula pValue) {
-    DummyFormula result = new DummyFormula(pIndex, pValue);
+  protected SMTLIB2Formula store(
+      SMTLIB2Formula pArray, SMTLIB2Formula pIndex, SMTLIB2Formula pValue) {
+    SMTLIB2Formula result = new SMTLIB2Formula(pIndex, pValue);
     result.setName(pArray.getName());
     return result;
   }
 
   @Override
-  protected <T1 extends Formula, T2 extends Formula> DummyFormula internalMakeArray(
+  protected <T1 extends Formula, T2 extends Formula> SMTLIB2Formula internalMakeArray(
       String pName, FormulaType<T1> pIndexType, FormulaType<T2> pElementType) {
-    DummyFormula result =
-        new DummyFormula(
-            DummyFormula.getDummyFormulaFromObject(pIndexType),
-            DummyFormula.getDummyFormulaFromObject(pElementType));
+    SMTLIB2Formula result =
+        new SMTLIB2Formula(
+            SMTLIB2Formula.getDummyFormulaFromObject(pIndexType),
+            SMTLIB2Formula.getDummyFormulaFromObject(pElementType));
     result.setName(pName);
     return result;
   }
 
   @Override
-  protected DummyFormula equivalence(DummyFormula pArray1, DummyFormula pArray2) {
-    return new DummyFormula(pArray1.equals(pArray2));
+  protected SMTLIB2Formula equivalence(SMTLIB2Formula pArray1, SMTLIB2Formula pArray2) {
+    return new SMTLIB2Formula(pArray1.equals(pArray2));
   }
 }
