@@ -43,8 +43,11 @@ build-dependencies:
 
 
 # Build binaries and provide them to later stages
-.build:
+build:
   stage: build
+  parallel:
+    matrix:
+      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
   script: "ant $ANT_PROPS_BUILD jar"
   interruptible: true
   artifacts:
@@ -53,22 +56,7 @@ build-dependencies:
       - "*.jar"
       - "hs_err_pid*.log"
       - "core.*"
-
-build:jdk-11:
-  extends: .build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-11
-
-build:jdk-17:
-  extends: .build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
-
-build:jdk-21:
-  extends: .build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
-build:jdk-23:
-  extends: .build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
+  image: ${CI_REGISTRY_IMAGE}/test:$JDK_VERSION
 
 
 # For checks that need the binaries
@@ -124,7 +112,7 @@ javadoc:
   script: "ant $ANT_PROPS_CHECKS javadoc"
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
   artifacts:
     paths:
       - "Javadoc/"
@@ -136,7 +124,7 @@ spotbugs:
     - 'test \! -f SpotBugs.html'
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
   artifacts:
     paths:
       - "SpotBugs.html"
@@ -144,7 +132,9 @@ spotbugs:
 
 .unit-tests:
   extends: .binary_check
-  script: "ant $ANT_PROPS_CHECKS unit-tests-coverage"
+  script:
+    - "uname -a"
+    - "ant $ANT_PROPS_CHECKS unit-tests-coverage"
   artifacts:
     paths:
       - "JUnit.html"
@@ -154,33 +144,61 @@ spotbugs:
     reports:
       junit: "junit/TESTS-TestSuites.xml"
 
-unit-tests:jdk-11:
+.unit-tests:jdk-11:
   extends: .unit-tests
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
+
+.unit-tests:jdk-17:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-17} ] } }
+
+.unit-tests:jdk-21:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-21} ] } }
+
+.unit-tests:jdk-23:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-23} ] } }
+
+unit-tests:x86_64:jdk-11:
+  extends: .unit-tests:jdk-11
   image: ${CI_REGISTRY_IMAGE}/test:jdk-11
 
-unit-tests:jdk-17:
-  extends: .unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-17
+unit-tests:x86_64:jdk-17:
+  extends: .unit-tests:jdk-17
   image: ${CI_REGISTRY_IMAGE}/test:jdk-17
 
-unit-tests:jdk-21:
-  extends: .unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-21
+unit-tests:x86_64:jdk-21:
+  extends: .unit-tests:jdk-21
   image: ${CI_REGISTRY_IMAGE}/test:jdk-21
 
-unit-tests:jdk-23:
-  extends: .unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-23
+unit-tests:x86_64:jdk-23:
+  extends: .unit-tests:jdk-23
   image: ${CI_REGISTRY_IMAGE}/test:jdk-23
+
+unit-tests:arm64:jdk-11:
+  extends: .unit-tests:jdk-11
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-11", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-17:
+  extends: .unit-tests:jdk-17
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-17", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-21:
+  extends: .unit-tests:jdk-21
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-21", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-23:
+  extends: .unit-tests:jdk-23
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-23", docker: { platform: linux/arm64 } }
 
 
 refaster:
@@ -227,7 +245,7 @@ deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
   needs:
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
     - javadoc
   environment: deploy/gh-pages
   only:
