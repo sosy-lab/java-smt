@@ -29,7 +29,6 @@ variables:
 # Download dependencies and provide them to later stages
 build-dependencies:
   stage: dependencies
-  dependencies: []
   script: "ant build-dependencies"
   interruptible: true
   cache:
@@ -80,8 +79,6 @@ build:jdk-23:
 # For checks that only need the source code, not the binaries
 .source_check:
   stage: checks
-  dependencies:
-    - build-dependencies
   needs:
     - build-dependencies
   interruptible: true
@@ -125,9 +122,6 @@ checkstyle:
 javadoc:
   extends: .binary_check
   script: "ant $ANT_PROPS_CHECKS javadoc"
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -140,9 +134,6 @@ spotbugs:
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'test \! -f SpotBugs.html'
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -165,9 +156,6 @@ spotbugs:
 
 unit-tests:jdk-11:
   extends: .unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
     - build:jdk-11
@@ -175,9 +163,6 @@ unit-tests:jdk-11:
 
 unit-tests:jdk-17:
   extends: .unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-17
   needs:
     - build-dependencies
     - build:jdk-17
@@ -185,9 +170,6 @@ unit-tests:jdk-17:
 
 unit-tests:jdk-21:
   extends: .unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-21
   needs:
     - build-dependencies
     - build:jdk-21
@@ -195,9 +177,6 @@ unit-tests:jdk-21:
 
 unit-tests:jdk-23:
   extends: .unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-23
   needs:
     - build-dependencies
     - build:jdk-23
@@ -236,7 +215,6 @@ refaster:
 # check license declarations etc.
 reuse:
   stage: checks
-  dependencies: []
   needs: []
   image:
     name: fsfe/reuse:3
@@ -248,9 +226,6 @@ reuse:
 deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
-  dependencies:
-    - build:jdk-11
-    - javadoc
   needs:
     - build:jdk-11
     - javadoc
