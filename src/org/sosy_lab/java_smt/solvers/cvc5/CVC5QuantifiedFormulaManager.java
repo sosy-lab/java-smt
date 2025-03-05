@@ -8,36 +8,27 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
-
 
 public class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
 
   private final Solver solver;
 
-  private Optional<CVC5FormulaManager> fmgr;
-
-
   protected CVC5QuantifiedFormulaManager(
       FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator, LogManager pLogger) {
     super(pFormulaCreator, pLogger);
-
     solver = pFormulaCreator.getEnv();
-    fmgr = Optional.empty();
   }
 
   /*
@@ -69,10 +60,9 @@ public class CVC5QuantifiedFormulaManager
   protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
       throws UnsupportedOperationException {
 
-    CVC5FormulaManager formulaManager = fmgr.get();
+    CVC5FormulaManager formulaManager = (CVC5FormulaManager) getFormulaManager();
     de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        getUltimateEliminatorWrapper().parse(
-            formulaManager.dumpFormulaImpl(pExtractInfo));
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Term result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
@@ -104,14 +94,5 @@ public class CVC5QuantifiedFormulaManager
       Term boundVarsList = solver.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
       return solver.mkTerm(quant, boundVarsList, substBody);
     }
-  }
-
-  @Override
-  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Term> pVariables, Term pBody) {
-    throw new UnsupportedOperationException();
-  }
-
-  public void setFormulaManager(CVC5FormulaManager pFmgr) {
-    fmgr = Optional.of(pFmgr);
   }
 }

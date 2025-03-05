@@ -14,9 +14,7 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
@@ -26,14 +24,10 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   private final long z3context;
   private final Z3FormulaCreator z3FormulaCreator;
 
-  private Optional<Z3FormulaManager> fmgr;
-
-  Z3QuantifiedFormulaManager(Z3FormulaCreator creator,
-                             LogManager pLogger) {
+  Z3QuantifiedFormulaManager(Z3FormulaCreator creator, LogManager pLogger) {
     super(creator, pLogger);
     this.z3context = creator.getEnv();
     z3FormulaCreator = creator;
-    fmgr = Optional.empty();
   }
 
   @Override
@@ -51,11 +45,6 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   }
 
   @Override
-  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Long> pVariables, Long pBody) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   protected Long eliminateQuantifiers(Long pExtractInfo)
       throws SolverException, InterruptedException {
     // It is recommended (personal communication with Nikolaj Bjorner)
@@ -70,17 +59,12 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   @Override
   protected Long eliminateQuantifiersUltimateEliminator(Long pExtractInfo)
       throws UnsupportedOperationException {
-    Z3FormulaManager formulaManager = fmgr.get();
+    Z3FormulaManager formulaManager = (Z3FormulaManager) getFormulaManager();
     Term formula =
-        getUltimateEliminatorWrapper().parse(
-            formulaManager.dumpFormulaImpl(pExtractInfo));
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Long result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
     return result;
-  }
-
-  public void setFormulaManager(Z3FormulaManager pFmgr) {
-    fmgr = Optional.of(pFmgr);
   }
 }

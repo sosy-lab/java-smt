@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -73,17 +72,11 @@ public class Yices2QuantifiedFormulaManager
   }
 
   @Override
-  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Integer> pVariables, Integer pBody) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   protected Integer eliminateQuantifiersUltimateEliminator(Integer pExtractInfo)
       throws UnsupportedOperationException, IOException {
     Yices2FormulaManager formulaManager = fmgr.get();
     Term formula =
-        getUltimateEliminatorWrapper().parse(
-            formulaManager.dumpFormulaImpl(pExtractInfo));
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Integer result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());

@@ -11,9 +11,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
@@ -25,23 +23,15 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
-
-
 public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  private Optional<BitwuzlaFormulaManager> fmgr;
-
-  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator,
-                                             LogManager pLogger) {
+  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator, LogManager pLogger) {
     super(pCreator, pLogger);
     termManager = pCreator.getTermManager();
-    fmgr = Optional.empty();
   }
-  public void setFmgr(BitwuzlaFormulaManager pFmgr) {
-    fmgr = Optional.of(pFmgr);
-  }
+
   @Override
   protected Term eliminateQuantifiers(Term pExtractInfo)
       throws SolverException, InterruptedException {
@@ -51,10 +41,9 @@ public class BitwuzlaQuantifiedFormulaManager
   @Override
   protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
       throws UnsupportedOperationException {
-    BitwuzlaFormulaManager formulaManager = fmgr.get();
+    BitwuzlaFormulaManager formulaManager = (BitwuzlaFormulaManager) getFormulaManager();
     de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        getUltimateEliminatorWrapper().parse(
-            formulaManager.dumpFormulaImpl(pExtractInfo));
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Term result =
         formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
@@ -97,10 +86,5 @@ public class BitwuzlaQuantifiedFormulaManager
       }
     }
     return currentFormula;
-  }
-
-  @Override
-  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Term> pVariables, Term pBody) {
-    throw new UnsupportedOperationException();
   }
 }

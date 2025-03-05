@@ -22,10 +22,16 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -58,7 +64,7 @@ public final class NQueens {
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
-    Solvers solver = Solvers.SMTINTERPOL;
+    Solvers solver = Solvers.MATHSAT5;
     try (SolverContext context =
         SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
       try (Scanner sc = new Scanner(System.in, Charset.defaultCharset())) {
@@ -212,7 +218,8 @@ public final class NQueens {
    *     configuration
    * @return a list of BooleanFormula objects representing the constraints added by this rule.
    */
-  private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols) {
+  private List<BooleanFormula> diagonalRule(BooleanFormula[][] symbols)
+      throws SolverException, InterruptedException {
     final List<BooleanFormula> rules = new ArrayList<>();
     int numDiagonals = 2 * n - 1;
     BooleanFormula[][] downwardDiagonal = new BooleanFormula[numDiagonals][n];
@@ -247,6 +254,48 @@ public final class NQueens {
         }
       }
     }
+    IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
+    QuantifiedFormulaManager qmgr = context.getFormulaManager().getQuantifiedFormulaManager();
+    ArrayFormulaManager amgr = context.getFormulaManager().getArrayFormulaManager();
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    ArrayFormula<IntegerFormula, IntegerFormula> var =
+        context
+            .getFormulaManager()
+            .getArrayFormulaManager()
+            .makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
+    BooleanFormula query =
+        qmgr.forall(
+            var,
+            bmgr.and(
+                imgr.lessOrEquals(amgr.select(var, k), amgr.select(var, i)),
+                imgr.greaterOrEquals(amgr.select(var, k), amgr.select(var, i))));
+
+    String dumpf = context.getFormulaManager().dumpFormula(query).toString();
+    String dumped =
+        "(declare-fun k () (_ FloatingPoint 8 24))\n"
+            + "(declare-fun i () (_ FloatingPoint 8 24))\n"
+            + "(assert (forall ((a (Array (_ FloatingPoint 8 24) (_ FloatingPoint 8 24)))) (="
+            + " (select a k) (select a i))))";
+
+    String dumped2 =
+        "(declare-const x FloatingPoint)\n"
+            + "(declare-const y FloatingPoint) \n"
+            + "(assert (> x 5))\n"
+            + "(assert (<= y 10))";
+
+    String nonArray = "(declare-const x FloatingPoint)\n (assert (exists ((x Int)) (= (+ x 1) 2))";
+    // + "(declare-fun a () (Array Int Int))\n"
+    // UltimateEliminatorParser.dumpFormula(ue.simplify(formula)).toString();
+    // BooleanFormula bformula = context.getFormulaManager().parse(dumped);
+    context
+        .getFormulaManager()
+        .getQuantifiedFormulaManager()
+        .setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+    rules.add(
+        context.getFormulaManager().getQuantifiedFormulaManager().eliminateQuantifiers(query));
     return rules;
   }
 

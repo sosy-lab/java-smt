@@ -16,7 +16,6 @@ import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -92,10 +91,5 @@ public class CVC4QuantifiedFormulaManager
       Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
       return exprManager.mkExpr(quant, quantifiedVars, substBody);
     }
-  }
-
-  @Override
-  public BooleanFormula mkWithoutQuantifier(Quantifier pQ, List<Expr> pVariables, Expr pBody) {
-    throw new UnsupportedOperationException();
   }
 }

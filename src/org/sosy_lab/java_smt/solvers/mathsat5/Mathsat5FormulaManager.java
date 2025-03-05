@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
 
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
@@ -68,9 +69,15 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public String dumpFormulaImpl(final Long f) {
+    assert getFormulaCreator().getFormulaType(f) instanceof FormulaType
+        : "Only Formulas may be dumped";
+    return msat_to_smtlib2(getEnvironment(), f);
+  }
+
+  public String dumpFormulaImplExt(final Long f, String name) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return msat_to_smtlib2(getEnvironment(), f);
+    return msat_to_smtlib2_ext(getEnvironment(), f, name, 1);
   }
 
   @Override
