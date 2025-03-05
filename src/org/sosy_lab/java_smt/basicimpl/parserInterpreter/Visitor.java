@@ -102,9 +102,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   private final BooleanFormulaManager bmgr;
   private final @Nullable IntegerFormulaManager imgr;
   private final @Nullable RationalFormulaManager rmgr;
-  private final @Nullable BitvectorFormulaManager bimgr;
+  private final @Nullable BitvectorFormulaManager bvmgr;
   private final @Nullable ArrayFormulaManager amgr;
-  private final UFManager umgr;
+  private final UFManager ufmgr;
   private final @Nullable FloatingPointFormulaManager fpmgr;
   private final @Nullable StringFormulaManager smgr;
   List<Model.ValueAssignment> assignments = new ArrayList<>();
@@ -130,9 +130,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     this.bmgr = managers.getBmgr();
     this.imgr = managers.getImgr();
     this.rmgr = managers.getRmgr();
-    this.bimgr = managers.getBimgr();
+    this.bvmgr = managers.getBimgr();
     this.amgr = managers.getAmgr();
-    this.umgr = managers.getUmgr();
+    this.ufmgr = managers.getUmgr();
     this.fpmgr = managers.getFpmgr();
     this.smgr = managers.getSmgr();
   }
@@ -332,15 +332,15 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           int exponent = parseBitVec(exponentPart);
           int mantissa = parseBitVec(mantissaPart.replace(")", ""));
 
-          BitvectorFormula signFormula = bimgr.makeBitvector(1, sign);
+          BitvectorFormula signFormula = bvmgr.makeBitvector(1, sign);
           BitvectorFormula exponentFormula =
-              bimgr.makeBitvector(getBitVecSize(exponentPart), exponent);
+              bvmgr.makeBitvector(getBitVecSize(exponentPart), exponent);
           BitvectorFormula mantissaFormula =
-              bimgr.makeBitvector(getBitVecSize(mantissaPart), mantissa);
+              bvmgr.makeBitvector(getBitVecSize(mantissaPart), mantissa);
 
           FloatingPointFormula fpFormula =
               fpmgr.fromIeeeBitvector(
-                  bimgr.concat(signFormula, bimgr.concat(exponentFormula, mantissaFormula)),
+                  bvmgr.concat(signFormula, bvmgr.concat(exponentFormula, mantissaFormula)),
                   FormulaType.getFloatingPointType(
                       getBitVecSize(exponentPart), getBitVecSize(mantissaPart)));
 
@@ -531,12 +531,12 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
       int index = binVal.length();
       int value = Integer.parseInt(binVal, 2);
-      return Objects.requireNonNull(bimgr).makeBitvector(index, value);
+      return Objects.requireNonNull(bvmgr).makeBitvector(index, value);
     } else if (operand.startsWith("#x")) {
       String hexVal = Iterables.get(Splitter.on('x').split(operand), 1);
       int index = (hexVal.length() * 4);
       BigInteger value = new BigInteger(hexVal, 16);
-      return Objects.requireNonNull(bimgr).makeBitvector(index, value);
+      return Objects.requireNonNull(bvmgr).makeBitvector(index, value);
     } else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
@@ -550,7 +550,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       if (!(letVariables.get(operand).type == null)
           && Objects.equals(letVariables.get(operand).type, "UF")
           && letVariables.get(operand).inputParams == null) {
-        return umgr.callUF(
+        return ufmgr.callUF(
             (FunctionDeclaration<Formula>) letVariables.get(operand).javaSmt, new ArrayList<>());
       }
       return letVariables.get(operand).javaSmt;
@@ -559,7 +559,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           && Objects.equals(variables.get(operand).type, "UF")
           && !(variables.get(operand).inputParams == null)
           && Objects.requireNonNull(variables.get(operand).inputParams).isEmpty()) {
-        return umgr.callUF(
+        return ufmgr.callUF(
             (FunctionDeclaration<Formula>) variables.get(operand).javaSmt, new ArrayList<>());
       }
       return variables.get(operand).javaSmt;
@@ -572,7 +572,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (!bitVec.isEmpty()) {
       BigInteger value = new BigInteger(Iterables.get(Splitter.on('v').split(bitVec.get(0)), 1));
       int index = Integer.parseInt(bitVec.get(1));
-      return Objects.requireNonNull(bimgr).makeBitvector(index, value);
+      return Objects.requireNonNull(bvmgr).makeBitvector(index, value);
     } else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
@@ -911,7 +911,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr).negate((BitvectorFormula) operands.get(0));
+            return Objects.requireNonNull(bvmgr).negate((BitvectorFormula) operands.get(0));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
           }
@@ -921,7 +921,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .add((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -932,7 +932,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .subtract((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -943,7 +943,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .divide(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -955,7 +955,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .divide(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -967,8 +967,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
-                .modulo(
+            return Objects.requireNonNull(bvmgr)
+                .remainder(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -979,8 +979,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
-                .modulo(
+            return Objects.requireNonNull(bvmgr)
+                .remainder(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -991,7 +991,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .multiply((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1002,7 +1002,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .greaterThan(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -1014,7 +1014,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .greaterThan(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -1026,7 +1026,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .greaterOrEquals(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -1038,7 +1038,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .greaterOrEquals(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -1050,7 +1050,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .lessThan(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -1062,7 +1062,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .lessThan(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -1074,7 +1074,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .lessOrEquals(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -1086,7 +1086,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .lessOrEquals(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -1098,7 +1098,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr).not((BitvectorFormula) operands.get(0));
+            return Objects.requireNonNull(bvmgr).not((BitvectorFormula) operands.get(0));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
           }
@@ -1108,7 +1108,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .and((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1119,7 +1119,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .or((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1130,7 +1130,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .xor((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1141,7 +1141,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .shiftRight(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), true);
           } catch (Exception e) {
@@ -1153,7 +1153,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .shiftRight(
                     (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1), false);
           } catch (Exception e) {
@@ -1165,7 +1165,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .shiftLeft((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1176,7 +1176,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes two bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .concat((BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1190,7 +1190,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             int right = Integer.parseInt(operators.get(2));
             int left = Integer.parseInt(operators.get(1));
             try {
-              return Objects.requireNonNull(bimgr)
+              return Objects.requireNonNull(bvmgr)
                   .extract((BitvectorFormula) operands.get(0), left, right);
             } catch (Exception e) {
               throw new ParserException(
@@ -1209,7 +1209,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
             try {
-              return Objects.requireNonNull(bimgr)
+              return Objects.requireNonNull(bvmgr)
                   .extend((BitvectorFormula) operands.get(0), extension, false);
             } catch (Exception e) {
               throw new ParserException(
@@ -1226,7 +1226,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           if (Objects.requireNonNull(operators).size() == 2 && isInteger(operators.get(1))) {
             int extension = Integer.parseInt(operators.get(1));
             try {
-              return Objects.requireNonNull(bimgr)
+              return Objects.requireNonNull(bvmgr)
                   .extend((BitvectorFormula) operands.get(0), extension, true);
             } catch (Exception e) {
               throw new ParserException(
@@ -1243,7 +1243,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(operator + " takes one bitvector operand as input.");
         } else {
           try {
-            return Objects.requireNonNull(bimgr)
+            return Objects.requireNonNull(bvmgr)
                 .toIntegerFormula((BitvectorFormula) operands.get(0), false);
           } catch (Exception e) {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
@@ -1660,7 +1660,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       case "UF":
         // UF
         try {
-          return umgr.callUF(
+          return ufmgr.callUF(
               (FunctionDeclaration<? extends Formula>) Objects.requireNonNull(ufOperator),
               operands);
         } catch (Exception e) {
@@ -1687,7 +1687,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                   (BooleanFormula) operands.get(0), (BooleanFormula) operands.get(1));
             } else if (operands.stream().anyMatch(c -> c instanceof BitvectorFormula)) {
               BooleanFormula result =
-                  Objects.requireNonNull(bimgr)
+                  Objects.requireNonNull(bvmgr)
                       .equal(
                           (BitvectorFormula) operands.get(0), (BitvectorFormula) operands.get(1));
               return result;
@@ -1765,13 +1765,13 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     Formula key;
     Formula input = (Formula) visit(ctx.term());
     if (!inputParams.isEmpty()) {
-      ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnTypes, javaSorts));
+      ParserFormula temp = new ParserFormula(ufmgr.declareUF(variable, returnTypes, javaSorts));
       temp.setType("UF");
       temp.setReturnType(returnTypes);
       temp.setInputParams(javaSorts);
       variables.put(variable, temp);
       key =
-          umgr.callUF(
+          ufmgr.callUF(
               (FunctionDeclaration<? extends Formula>) variables.get(variable).javaSmt,
               inputParams);
     } else {
@@ -1825,7 +1825,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       variables.put(
           variableSymbol,
           new ParserFormula(
-              Objects.requireNonNull(bimgr)
+              Objects.requireNonNull(bvmgr)
                   .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
     } else if (sort.isFloatingPointType()) {
       variables.put(
@@ -1896,7 +1896,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (sorts.isRationalType()) {
       return Objects.requireNonNull(rmgr).makeVariable(variable);
     } else if (sorts.isBitvectorType()) {
-      return Objects.requireNonNull(bimgr)
+      return Objects.requireNonNull(bvmgr)
           .makeVariable(((FormulaType.BitvectorType) sorts).getSize(), variable);
     } else if (sorts.isArrayType()) {
       return Objects.requireNonNull(amgr)
@@ -1925,7 +1925,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (key instanceof RationalFormula) {
       return Objects.requireNonNull(rmgr).equal((RationalFormula) key, (RationalFormula) value);
     } else if (key instanceof BitvectorFormula) {
-      return Objects.requireNonNull(bimgr).equal((BitvectorFormula) key, (BitvectorFormula) value);
+      return Objects.requireNonNull(bvmgr).equal((BitvectorFormula) key, (BitvectorFormula) value);
     } else if (key instanceof ArrayFormula) {
       return Objects.requireNonNull(amgr)
           .equivalence(
@@ -1982,7 +1982,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         inputParams.add((FormulaType<?>) visit(ctx.sort(i)));
       }
     }
-    ParserFormula temp = new ParserFormula(umgr.declareUF(variable, returnType, inputParams));
+    ParserFormula temp = new ParserFormula(ufmgr.declareUF(variable, returnType, inputParams));
     temp.setType("UF");
     temp.setReturnType(returnType);
     temp.setInputParams(inputParams);

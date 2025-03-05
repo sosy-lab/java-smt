@@ -15,8 +15,8 @@ import static com.google.common.truth.TruthJUnit.assume;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 import org.sosy_lab.java_smt.utils.PrettyPrinter;
 import org.sosy_lab.java_smt.utils.PrettyPrinter.PrinterOption;
 

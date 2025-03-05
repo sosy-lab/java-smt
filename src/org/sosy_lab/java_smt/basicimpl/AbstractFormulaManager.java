@@ -472,6 +472,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
 

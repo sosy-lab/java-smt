@@ -131,6 +131,7 @@ public class Generator {
    * @param constraint JavaSMT constraint of type BooleanFormula that will be interpreted as
    *     SMT-LIB2
    */
+  // TODO: automatically call on toString() of formulas
   public static void assembleConstraint(BooleanFormula constraint) {
     String result = evaluateRecursive(constraint);
     List<FunctionEnvironment> uniqueRegisteredValues =

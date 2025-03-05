@@ -320,7 +320,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
   }
 
   @Test
-  public void testModulo() {
+  public void testBVRemainder() {
     // Does not work for CVC4 due to "BigInteger argument out of bounds"
     requireBitvectors();
 
@@ -328,8 +328,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
     BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
     BitvectorFormula f = bvmgr.makeBitvector(100, 0);
-    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.modulo(c, d, true));
-    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.modulo(e, f, false));
+    BooleanFormula constraint1 = bvmgr.equal(c, bvmgr.remainder(c, d, true));
+    BooleanFormula constraint3 = bvmgr.equal(e, bvmgr.remainder(e, f, false));
 
     Generator.assembleConstraint(constraint1);
     Generator.assembleConstraint(constraint3);
@@ -359,6 +359,8 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
                 || expectedResultMathsat5.equals(actualResult))
         .isTrue();
   }
+
+  // TODO: add smodulo test
 
   @Test
   public void testMultiply() {
@@ -789,7 +791,7 @@ public class BitVectorSMTLIB2GeneratorTest extends SolverBasedTest0.Parameterize
     BitvectorFormula f = bvmgr.makeBitvector(5, 0);
     BitvectorFormula term1 = bvmgr.add(a, b);
     BitvectorFormula term2 = bvmgr.divide(c, f, true);
-    BitvectorFormula term3 = bvmgr.modulo(a, c, true);
+    BitvectorFormula term3 = bvmgr.remainder(a, c, true);
     BitvectorFormula term4 = bvmgr.xor(b, f);
     BitvectorFormula term5 = bvmgr.subtract(term1, term2);
     BitvectorFormula term6 = bvmgr.and(term5, term3);

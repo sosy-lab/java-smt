@@ -148,9 +148,9 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     BitvectorFormula result = wrap(remainder(extractInfo(pNumber1), extractInfo(pNumber2), signed));
     if (Generator.isLoggingEnabled()) {
       if (signed) {
-        BitvectorGenerator.logBVSRemainder(result, pNumber1, pNumber2);
+        BitvectorGenerator.logBVSignedRemainder(result, pNumber1, pNumber2);
       } else {
-        BitvectorGenerator.logBVURemainder(result, pNumber1, pNumber2);
+        BitvectorGenerator.logBVUnsignedRemainder(result, pNumber1, pNumber2);
       }
     }
     return result;
@@ -167,7 +167,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
     BitvectorFormula result = wrap(smodulo(param1, param2));
     if (Generator.isLoggingEnabled()) {
-        BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
+      BitvectorGenerator.logBVSignedRemainder(result, pNumber1, pNumber2);
     }
     return result;
   }
@@ -430,16 +430,59 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     return result;
   }
 
+  protected abstract TFormulaInfo shiftLeft(TFormulaInfo pNumber, TFormulaInfo pToShift);
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, int pToRotate) {
+    checkArgument(pToRotate >= 0, "Can not rotate by a negative number %s.", pToRotate);
+    // TODO: add SMTLib2 layer independent of shift
+    return wrap(rotateLeftByConstant(extractInfo(pNumber), pToRotate));
+  }
+
+  protected TFormulaInfo rotateLeftByConstant(TFormulaInfo pNumber, int pToRotate) {
+    int length = getLength(wrap(pNumber));
+    int shift = pToRotate % length;
+    return extract(concat(pNumber, pNumber), length - 1 + shift, shift);
+  }
+
+  @Override
+  public BitvectorFormula rotateLeft(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    // TODO: add SMTLib2 layer independent of shift
+    return wrap(rotateLeft(extractInfo(pNumber), extractInfo(pToRotate)));
+  }
+
+  @SuppressWarnings("unused")
+  protected TFormulaInfo rotateLeft(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
+    int length = getLength(wrap(pNumber));
+    final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
+    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    return or(
+        shiftLeft(pNumber, toRotateInRange),
+        shiftRight(pNumber, subtract(lengthAsBv, toRotateInRange), false));
+
+    // The following approach would also work. However, some solvers are slower with it.
+    // return extract(
+    // shiftLeft(concat(pNumber, pNumber), extend(toRotateInRange, length, false)),
+    // 2 * length - 1,
+    // length);
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, int pToRotate) {
+    checkArgument(pToRotate >= 0, "Can not rotate by a negative number %s.", pToRotate);
+    // TODO: add SMTLib2 layer independent of shift
+    return wrap(rotateRightByConstant(extractInfo(pNumber), pToRotate));
+  }
+
   protected TFormulaInfo rotateRightByConstant(TFormulaInfo pNumber, int pToRotate) {
     int length = getLength(wrap(pNumber));
     int shift = pToRotate % length;
-    // TODO: add SMTLIb2 layer
     return extract(concat(pNumber, pNumber), 2 * length - 1 - shift, length - shift);
   }
 
   @Override
   public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
-    // TODO: add SMTLIb2 layer
+    // TODO: add SMTLib2 layer independent of shift
     return wrap(rotateRight(extractInfo(pNumber), extractInfo(pToRotate)));
   }
 
@@ -448,7 +491,6 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     int length = getLength(wrap(pNumber));
     final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
     final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
-    // TODO: add SMTLIb2 layer
     return or(
         shiftRight(pNumber, toRotateInRange, false),
         shiftLeft(pNumber, subtract(lengthAsBv, toRotateInRange)));

@@ -20,22 +20,22 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
     setDefault(FormulaType.BitvectorType.class, FormulaType.getBitvectorTypeWithSize(32));
     /*
-    ignoreClasses(
+      ignoreClasses(
 
-        cls ->
-            cls == BinaryModel.class
-                || cls == BitvectorGenerator.class
-                || cls == ArrayGenerator.class
-                || cls == FloatingPointGenerator.class
-                || cls == StringGenerator.class
-                || cls == UFGenerator.class
-                || cls == BooleanGenerator.class
-                || cls == GeneratorException.class
-                || cls == FunctionEnvironment.class
-                || cls == ModelException.class
-                || cls == Generator.class
-                || cls == NumeralGenerator.class);
+          cls ->
+              cls == BinaryModel.class
+                  || cls == BitvectorGenerator.class
+                  || cls == ArrayGenerator.class
+                  || cls == FloatingPointGenerator.class
+                  || cls == StringGenerator.class
+                  || cls == UFGenerator.class
+                  || cls == BooleanGenerator.class
+                  || cls == GeneratorException.class
+                  || cls == FunctionEnvironment.class
+                  || cls == ModelException.class
+                  || cls == Generator.class
+                  || cls == NumeralGenerator.class);
 
-  */
+    */
   }
 }

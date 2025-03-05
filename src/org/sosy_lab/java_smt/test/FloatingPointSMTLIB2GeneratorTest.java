@@ -8,10 +8,8 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.math.BigInteger;
 import java.util.Objects;
-import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -29,7 +27,6 @@ public class FloatingPointSMTLIB2GeneratorTest
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
     return newConfig.setOption("solver.generateSMTLIB2", String.valueOf(true));
   }
-
 
   @Test
   public void testMakeVariable() {

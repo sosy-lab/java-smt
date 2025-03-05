@@ -176,7 +176,7 @@ public class BitvectorGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
-  protected static void logBVSModulo(
+  protected static void logBVSignedRemainder(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkNotNull(result, "result cannot be null");
     checkNotNull(pNumber1, "pNumber1 cannot be null");
@@ -191,7 +191,7 @@ public class BitvectorGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.SKIP));
   }
 
-  protected static void logBVUModulo(
+  protected static void logBVUnsignedRemainder(
       BitvectorFormula result, BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
     checkNotNull(result, "result cannot be null");
     checkNotNull(pNumber1, "pNumber1 cannot be null");

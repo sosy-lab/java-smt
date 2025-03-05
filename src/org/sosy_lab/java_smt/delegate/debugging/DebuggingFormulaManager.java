@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -31,6 +32,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -272,5 +274,16 @@ public class DebuggingFormulaManager implements FormulaManager {
   public String unescape(String variableName) {
     debugging.assertThreadLocal();
     return delegate.unescape(variableName);
+  }
+
+  @Override
+  public BooleanFormula universalParseFromString(String pString)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    return delegate.universalParseFromString(pString);
+  }
+
+  @Override
+  public void dumpSMTLIB2() throws IOException {
+    delegate.dumpSMTLIB2();
   }
 }
