@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
+import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -26,6 +27,7 @@ import org.junit.runners.Parameterized;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.Model;
@@ -350,7 +352,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assume()
         .withMessage("Solver %s does not support arrays with integer index", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
 
     BitvectorFormula bv = bvmgr.makeBitvector(4, 3);
     ArrayFormula<IntegerFormula, BitvectorFormula> arr =
@@ -401,5 +403,279 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assertThatFormula(bvmgr.distinct(List.of(a, num3))).isSatisfiable();
     assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
     assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
+  }
+
+  @Test
+  public void bvIsZeroAfterShiftLeft() throws SolverException, InterruptedException {
+    BitvectorFormula one = bvmgr.makeBitvector(32, 1);
+
+    // unsigned char
+    BitvectorFormula a = bvmgr.makeVariable(8, "char_a");
+    BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
+    BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
+
+    // 'cast' a to unsigned int
+    a = bvmgr.extend(a, 32 - 8, false);
+    b = bvmgr.extend(b, 32 - 8, false);
+    a = bvmgr.or(a, one);
+    b = bvmgr.or(b, one);
+    a = bvmgr.extract(a, 7, 0);
+    b = bvmgr.extract(b, 7, 0);
+    a = bvmgr.extend(a, 32 - 8, false);
+    b = bvmgr.extend(b, 32 - 8, false);
+
+    a = bvmgr.shiftLeft(a, rightOp);
+    b = bvmgr.shiftLeft(b, rightOp);
+    a = bvmgr.extract(a, 7, 0);
+    b = bvmgr.extract(b, 7, 0);
+    BooleanFormula f = bmgr.not(bvmgr.equal(a, b));
+
+    assertThatFormula(f).isUnsatisfiable();
+  }
+
+  @Test
+  public void bvRotateByConstant() throws SolverException, InterruptedException {
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
+      BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
+      BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
+      BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
+      BitvectorFormula zeroA = bvmgr.concat(zero, a);
+      BitvectorFormula bZero = bvmgr.concat(b, zero);
+
+      // shift is small enough to be in range of the bitsize.
+      BitvectorFormula shift = bvmgr.makeBitvector(bitsize * 2, bitsize);
+
+      // rotating left and right is identity
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateLeft(bvmgr.rotateRight(a, 7), 7)))
+          .isTautological();
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateRight(bvmgr.rotateLeft(a, 7), 7)))
+          .isTautological();
+
+      // rotating twice by half is identity
+      assertThatFormula(
+              bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, bitsize), bitsize)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, bitsize), bitsize)))
+          .isTautological();
+
+      // rotating a half-zero variable is shifting
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateLeft(zeroA, bitsize), bvmgr.shiftLeft(zeroA, shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateRight(bZero, bitsize), bvmgr.shiftRight(bZero, shift, false)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void bvRotateByBV() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Princess is too slow for this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    for (int bitsize : new int[] {8, 13, 25, 31}) {
+      BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
+      BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
+      BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
+      BitvectorFormula zeroA = bvmgr.concat(zero, a);
+      BitvectorFormula bZero = bvmgr.concat(b, zero);
+
+      // shift is small enough to be in range of the bitsize.
+      BitvectorFormula shift = bvmgr.makeBitvector(bitsize * 2, bitsize);
+
+      // rotating left and right is identity
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateLeft(bvmgr.rotateRight(a, b), b)))
+          .isTautological();
+      assertThatFormula(bvmgr.equal(a, bvmgr.rotateRight(bvmgr.rotateLeft(a, b), b)))
+          .isTautological();
+
+      // rotating twice by half is identity
+      assertThatFormula(bvmgr.equal(zeroA, bvmgr.rotateLeft(bvmgr.rotateLeft(zeroA, shift), shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bZero, bvmgr.rotateRight(bvmgr.rotateRight(bZero, shift), shift)))
+          .isTautological();
+
+      // rotating a half-zero variable is shifting
+      assertThatFormula(bvmgr.equal(bvmgr.rotateLeft(zeroA, shift), bvmgr.shiftLeft(zeroA, shift)))
+          .isTautological();
+      assertThatFormula(
+              bvmgr.equal(bvmgr.rotateRight(bZero, shift), bvmgr.shiftRight(bZero, shift, false)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void bvIsIdenticalAfterFullRotation() throws SolverException, InterruptedException {
+    for (int bitsize : new int[] {2, 4, 8, 16, 32, 55}) {
+      BitvectorFormula number = bvmgr.makeVariable(bitsize, "NUM_ROT_" + bitsize);
+      for (int multiplier : new int[] {0, 1, 2, 5, 17, 37, 111, 1111}) {
+        int toRotate = multiplier * bitsize;
+        if (toRotate >= (1 << bitsize)) {
+          continue; // ignore numbers larger than bitsize
+        }
+        BitvectorFormula rot = bvmgr.makeBitvector(bitsize, toRotate);
+        assertThatFormula(bvmgr.equal(number, bvmgr.rotateLeft(number, rot))).isTautological();
+        assertThatFormula(bvmgr.equal(number, bvmgr.rotateRight(number, rot))).isTautological();
+      }
+    }
+  }
+
+  @Test
+  public void bvInRange() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    assertThatFormula(
+            bvmgr.equal(
+                bvmgr.add(bvmgr.makeBitvector(4, 15), bvmgr.makeBitvector(4, -8)),
+                bvmgr.makeBitvector(4, 7)))
+        .isTautological();
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void bvOutOfRange() {
+    for (int[] sizeAndValue : new int[][] {{4, 32}, {4, -9}, {8, 300}, {8, -160}}) {
+      try {
+        bvmgr.makeBitvector(sizeAndValue[0], sizeAndValue[1]);
+        assert_().fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+
+    for (int size : new int[] {4, 6, 8, 10, 16, 32}) {
+      // allowed values
+      bvmgr.makeBitvector(size, (1L << size) - 1);
+      bvmgr.makeBitvector(size, -(1L << (size - 1)));
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, 1L << size);
+        assert_().fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(size, -(1L << (size - 1)) - 1);
+        assert_().fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+
+    for (int size : new int[] {36, 40, 64, 65, 100, 128, 200, 250, 1000, 10000}) {
+      if (size > 64) {
+        assume()
+            .withMessage("Solver does not support large bitvectors")
+            .that(solverToUse())
+            .isNotEqualTo(Solvers.CVC4);
+      }
+
+      // allowed values
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE));
+      bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size - 1).negate());
+
+      // forbitten values
+      try {
+        bvmgr.makeBitvector(size, BigInteger.ONE.shiftLeft(size));
+        assert_().fail();
+      } catch (IllegalArgumentException expected) {
+      }
+      try {
+        bvmgr.makeBitvector(
+            size, BigInteger.ONE.shiftLeft(size - 1).negate().subtract(BigInteger.ONE));
+        assert_().fail();
+      } catch (IllegalArgumentException expected) {
+      }
+    }
+  }
+
+  @Test
+  @SuppressWarnings("CheckReturnValue")
+  public void bvITETest() {
+    BitvectorType bv8 = FormulaType.getBitvectorTypeWithSize(8);
+    BitvectorFormula x = bvmgr.makeVariable(bv8, "x");
+    bmgr.ifThenElse(bmgr.makeBoolean(true), x, x);
+  }
+
+  @Test
+  public void bvModulo() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula five = bvmgr.makeBitvector(8, 5);
+    BitvectorFormula three = bvmgr.makeBitvector(8, 3);
+    BitvectorFormula two = bvmgr.makeBitvector(8, 2);
+    BitvectorFormula one = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+    BitvectorFormula minusThree = bvmgr.makeBitvector(8, -3);
+    BitvectorFormula minusTwo = bvmgr.makeBitvector(8, -2);
+    BitvectorFormula minusOne = bvmgr.makeBitvector(8, -1);
+
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(ten, five), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(ten, three), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(ten, minusThree), minusTwo)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, five), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, three), two)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, minusThree), minusOne)).isTautological();
+  }
+
+  @Test
+  public void bvModuloByZero() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(zero, zero), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(ten, zero), ten)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, zero), minusTen)).isTautological();
+  }
+
+  @Test
+  public void bvRemainder() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula five = bvmgr.makeBitvector(8, 5);
+    BitvectorFormula three = bvmgr.makeBitvector(8, 3);
+    BitvectorFormula one = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+    BitvectorFormula minusThree = bvmgr.makeBitvector(8, -3);
+    BitvectorFormula minusOne = bvmgr.makeBitvector(8, -1);
+
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, five, true), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, three, true), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, minusThree, true), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, five, true), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, three, true), minusOne))
+        .isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, minusThree, true), minusOne))
+        .isTautological();
+
+    // in unsigned context, signed negative numbers are actually huge positive numbers.
+    // feel free to compute them by hand :-)
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, five, false), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, three, false), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, minusThree, false), ten)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, five, false), one)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, three, false), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, minusThree, false), minusTen))
+        .isTautological();
+  }
+
+  @Test
+  public void bvRemainderByZero() throws SolverException, InterruptedException {
+    BitvectorFormula ten = bvmgr.makeBitvector(8, 10);
+    BitvectorFormula zero = bvmgr.makeBitvector(8, 0);
+    BitvectorFormula minusTen = bvmgr.makeBitvector(8, -10);
+
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(zero, zero, true), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, zero, true), ten)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, zero, true), minusTen))
+        .isTautological();
+
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(zero, zero, false), zero)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(ten, zero, false), ten)).isTautological();
+    assertThatFormula(bvmgr.equal(bvmgr.remainder(minusTen, zero, false), minusTen))
+        .isTautological();
   }
 }

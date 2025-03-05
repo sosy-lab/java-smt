@@ -3,12 +3,15 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
 <FindBugsFilter>
+    <!-- Exceptions from constructors are not really a problem,
+         e.g., we inject configuration options and want to fail fast. -->
+    <Match><Bug pattern="CT_CONSTRUCTOR_THROW"/></Match>
     <!-- These checks are too pessimistic: https://github.com/spotbugs/spotbugs/issues/1601 -->
     <Match><Bug pattern="EI_EXPOSE_REP"/></Match>
     <Match><Bug pattern="EI_EXPOSE_REP2"/></Match>

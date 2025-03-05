@@ -9,12 +9,12 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth8.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
@@ -106,6 +106,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   private void unsatCoreTest0(BasicProverEnvironment<?> pe)
       throws InterruptedException, SolverException {
+    requireIntegers();
     pe.push();
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1)));
     pe.addConstraint(imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(2)));
@@ -125,7 +126,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, CVC4, CVC5);
+        .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
@@ -135,12 +136,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void unsatCoreWithAssumptionsTest() throws SolverException, InterruptedException {
+    requireIntegers();
     requireUnsatCore();
     assume()
         .withMessage(
             "Solver %s does not support unsat core generation over assumptions", solverToUse())
         .that(solverToUse())
-        .isNoneOf(PRINCESS, CVC4, CVC5);
+        .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
@@ -152,6 +154,43 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(res).isPresent();
       List<BooleanFormula> unsatCore = res.orElseThrow();
       assertThat(unsatCore).containsExactly(bmgr.not(selector));
+    }
+  }
+
+  @Test
+  public void testSatWithUnsatUnsatCoreOptions() throws InterruptedException, SolverException {
+    requireUnsatCore();
+    try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
+      checkSimpleQuery(prover);
+    }
+
+    requireUnsatCoreOverAssumptions();
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      checkSimpleQuery(prover);
+    }
+  }
+
+  private void checkSimpleQuery(ProverEnvironment pProver)
+      throws InterruptedException, SolverException {
+    BooleanFormula constraint = bmgr.implication(bmgr.makeVariable("a"), bmgr.makeVariable("b"));
+
+    {
+      pProver.push(constraint);
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
+    }
+
+    {
+      pProver.push();
+      pProver.addConstraint(constraint); // Z3 crashed here
+      assertThat(pProver.isUnsat()).isFalse();
+      pProver.pop();
     }
   }
 }

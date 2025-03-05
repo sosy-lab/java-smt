@@ -381,9 +381,14 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support unsat core generation", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.OPENSMT);
-    // FIXME: Disabled while testing Princess binary backend
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUnsatCoreOverAssumptions() {
+    assume()
+        .withMessage("Solver %s does not support unsat core generation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
   }
 
   protected void requireSubstitution() {
@@ -391,6 +396,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support formula substitution", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
+  }
+
+  protected void requireUserPropagators() {
+    assume()
+        .withMessage("Solver %s does not support user propagation", solverToUse())
+        .that(solverToUse())
+        .isEqualTo(Solvers.Z3);
   }
 
   /**

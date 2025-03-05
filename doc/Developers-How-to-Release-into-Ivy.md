@@ -118,9 +118,9 @@ We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a 
-file of your choice. The following command patches the OpenSMT2 API, generates Java bindings 
-with SWIG, builds the library, and packages it. 
+Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a
+file of your choice. The following command patches the OpenSMT2 API, generates Java bindings
+with SWIG, builds the library, and packages it.
 
 ```
 ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
@@ -132,7 +132,7 @@ Then upload the binaries to the Ivy repository using SVN as described in the mes
 
 We prefer to use our own Boolector binaries and Java bindings.
 Boolector's dependencies, mainly Minisat, requires GCC version 7 and does not yet compile with newer compilers.
-We prefer to directly build directly on Ubuntu 18.04, where gcc-7 is the default compiler.
+We prefer to build directly on Ubuntu 18.04, where gcc-7 is the default compiler.
 It should also be possible to set environment varables like CC=gcc-7 on newer systems.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
@@ -149,7 +149,36 @@ ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.2.2
 ```
 Our build script will automatically append the git-revision of Boolector, if available.
 
-Finally follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
+but in the normal system environment, where some testing can be applied by the developer before the commit.
+
+
+### Publishing Bitwuzla
+
+We prefer to use our own Bitwuzla binaries and SWIG-based Java bindings.
+We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and Meson are sufficiently up-to-date.
+For simple usage, we provide a Docker definition/environment under `/docker`,
+in which the following command can be run.
+
+To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla).
+Then execute the following command in the JavaSMT directory:
+```
+ant publish-bitwuzla \
+    -Dbitwuzla.path=$BITWUZLA_DIR -Dbitwuzla.customRev=$VERSION \
+    -Dbitwuzla.rebuildWrapper=$BOOL -Djdk-windows.path=$JNI_DIR
+```
+Example:
+```
+ant publish-bitwuzla \
+    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 \
+    -Dbitwuzla.rebuildWrapper=false -Djdk-windows.path=/dependencies/jdk-11/
+```
+The build-scripts Bitwuzla will download and build necessary dependencies like GMP automatically.
+Our build script will automatically append the git-revision of Bitwuzla, if available.
+The build-steps will produce a Linux and a Windows library and publish them.
+
+Finally, follow the instructions shown in the message at the end.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
 but in the normal system environment, where some testing can be applied by the developer before the commit.
 
@@ -220,7 +249,7 @@ git describe --tags
 
 Publish the solver binary from within JavaSMT (adjust all paths to your system!):
 ```
-ant publish-yices2 -Dyices2.path=../solver/yices2 -Dgmp.path=../solver/gmp-6.2.0 -Dgperf.path=../solver/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
+ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
 ```
 
 Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.

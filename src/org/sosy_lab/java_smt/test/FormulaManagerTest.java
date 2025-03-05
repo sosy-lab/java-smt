@@ -39,6 +39,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
+    requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -59,6 +60,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void testNoSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
+    requireIntegers();
     assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
@@ -176,6 +178,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void formulaEqualsAndHashCode() {
+    requireIntegers();
+
     // Solvers without integers (Boolector) get their own test below
     assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
     FunctionDeclaration<IntegerFormula> fb = fmgr.declareUF("f_b", IntegerType, IntegerType);

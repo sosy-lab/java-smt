@@ -15,7 +15,6 @@ import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -68,12 +67,6 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
       TFormulaInfo pArray, TFormulaInfo pIndex, TFormulaInfo pValue);
 
   @Override
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> type) throws GeneratorException {
-    return makeArray(pName, type.getIndexType(), type.getElementType());
-  }
-
-  @Override
   public <
           TI extends Formula,
           TE extends Formula,
@@ -91,8 +84,23 @@ public abstract class AbstractArrayFormulaManager<TFormulaInfo, TType, TEnv, TFu
     return result;
   }
 
+  @Override
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
+    final TFormulaInfo arrayConst =
+        internalMakeArray(pIndexType, pElementType, extractInfo(elseElem));
+    return getFormulaCreator().encapsulateArray(arrayConst, pIndexType, pElementType);
+  }
+
   protected abstract <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
       String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType);
+
+  protected abstract <TI extends Formula, TE extends Formula> TFormulaInfo internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, TFormulaInfo elseElem);
 
   @Override
   public <TI extends Formula> FormulaType<TI> getIndexType(ArrayFormula<TI, ?> pArray) {

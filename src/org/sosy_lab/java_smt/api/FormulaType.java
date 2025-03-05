@@ -8,6 +8,11 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -92,6 +97,7 @@ public abstract class FormulaType<T extends Formula> {
     }
   }
 
+  @SuppressWarnings("ClassInitializationDeadlock")
   public static final FormulaType<RationalFormula> RationalType =
       new NumeralType<>() {
 
@@ -111,6 +117,7 @@ public abstract class FormulaType<T extends Formula> {
         }
       };
 
+  @SuppressWarnings("ClassInitializationDeadlock")
   public static final FormulaType<IntegerFormula> IntegerType =
       new NumeralType<>() {
 
@@ -213,8 +220,10 @@ public abstract class FormulaType<T extends Formula> {
   @Immutable
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
-    private static final FloatingPointType SINGLE_PRECISION_FP_TYPE = new FloatingPointType(8, 23);
-    private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE = new FloatingPointType(11, 52);
+    private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
+        new FloatingPointType(SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE);
+    private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE =
+        new FloatingPointType(DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE);
 
     private final int exponentSize;
     private final int mantissaSize;

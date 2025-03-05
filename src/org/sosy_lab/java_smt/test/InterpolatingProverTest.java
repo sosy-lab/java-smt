@@ -260,7 +260,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
-        .isAnyOf(Solvers.Z3, Solvers.SMTINTERPOL, Solvers.PRINCESS);
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
   @Test
@@ -1050,11 +1050,11 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     BooleanFormula f1Internal1 =
         bmgr.and(
             bvmgr.lessThan(bv0, p, true),
-            bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false)),
+            bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false)),
             bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true));
 
     BooleanFormula f1Internal2 =
-        bvmgr.equal(bvmgr.modulo(p, bv4, false), bvmgr.modulo(bv0, bv4, false));
+        bvmgr.equal(bvmgr.remainder(p, bv4, false), bvmgr.remainder(bv0, bv4, false));
 
     BooleanFormula f1Internal3 = bvmgr.lessThan(bv0, bvmgr.add(p, bv8), true);
 
@@ -1183,5 +1183,83 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // and try to solve with the token
     assertThrows(
         IllegalArgumentException.class, () -> stack.getInterpolant(ImmutableList.of((T) p3)));
+  }
+
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
+  @Test
+  public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1));
+      assertThat(itps).isNotNull();
+    }
+  }
+
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
+  @Test
+  public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2));
+      assertThat(itps).isNotNull();
+    }
+  }
+
+  /*
+   * This tests that 2 formulas that are equal but not the same are treated that way by the
+   * interpolation procedure. (Asserting the 2 formulas on the stack should return 2 distinct itp
+   *  points, that are then treated as distinct itp points by the interpolation.)
+   */
+  @Test
+  public <T> void issue381InterpolationTest3() throws InterruptedException, SolverException {
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      var x = imgr.makeVariable("x");
+      var one = imgr.makeNumber(1);
+      var eq = imgr.equal(one, x);
+      var lt1 = imgr.lessThan(one, x);
+      var lt2 = imgr.lessThan(one, x);
+      assertThat(lt1).isEqualTo(lt2);
+
+      var eqT = prover.addConstraint(eq);
+      var ltT1 = prover.addConstraint(lt1);
+      var ltT2 = prover.addConstraint(lt2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(prover.isUnsat()).isTrue();
+
+      var itps = prover.getInterpolant(ImmutableList.of(eqT));
+      assertThat(itps).isNotNull();
+    }
   }
 }

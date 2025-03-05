@@ -1976,6 +1976,42 @@ SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_
 }
 
 
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = (uint32_t)jarg3;
+  result = (BoolectorNode *)boolector_rori(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result;
+  return jresult;
+}
+
+
+SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
+  jlong jresult = 0 ;
+  Btor *arg1 = (Btor *) 0 ;
+  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
+  uint32_t arg3 = 0 ;
+  BoolectorNode *result = 0 ;
+
+  (void)jenv;
+  (void)jcls;
+  arg1 = *(Btor **)&jarg1;
+  arg2 = *(BoolectorNode **)&jarg2;
+  arg3 = (uint32_t)jarg3;
+  result = (BoolectorNode *)boolector_roli(arg1,arg2,arg3);
+  *(BoolectorNode **)&jresult = result;
+  return jresult;
+}
+
+
 SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1sub(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jlong jarg3) {
   jlong jresult = 0 ;
   Btor *arg1 = (Btor *) 0 ;
@@ -3491,41 +3527,6 @@ SWIGEXPORT jint JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_b
 
   result = boolector_bitvec_sort_get_width(arg1,arg2);
   jresult = (jint)result;
-  return jresult;
-}
-
-
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1rori(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
-  jlong jresult = 0 ;
-  Btor *arg1 = (Btor *) 0 ;
-  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  uint32_t arg3 = 0 ;
-  BoolectorNode *result = 0 ;
-
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(Btor **)&jarg1;
-  arg2 = *(BoolectorNode **)&jarg2;
-  arg3 = (uint32_t)jarg3;
-  result = (BoolectorNode *)boolector_rori(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result;
-  return jresult;
-}
-
-SWIGEXPORT jlong JNICALL Java_org_sosy_1lab_java_1smt_solvers_boolector_BtorJNI_boolector_1roli(JNIEnv *jenv, jclass jcls, jlong jarg1, jlong jarg2, jint jarg3) {
-  jlong jresult = 0 ;
-  Btor *arg1 = (Btor *) 0 ;
-  BoolectorNode *arg2 = (BoolectorNode *) 0 ;
-  uint32_t arg3 = 0 ;
-  BoolectorNode *result = 0 ;
-
-  (void)jenv;
-  (void)jcls;
-  arg1 = *(Btor **)&jarg1;
-  arg2 = *(BoolectorNode **)&jarg2;
-  arg3 = (uint32_t)jarg3;
-  result = (BoolectorNode *)boolector_roli(arg1,arg2,arg3);
-  *(BoolectorNode **)&jresult = result;
   return jresult;
 }
 

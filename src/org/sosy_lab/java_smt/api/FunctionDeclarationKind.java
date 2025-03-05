@@ -33,9 +33,10 @@ public enum FunctionDeclarationKind {
   /** Distinct operator for a set of numeric formulas. */
   DISTINCT,
 
-  /** Store and select on arrays. */
+  /** Store and select on arrays, and constant initialization. */
   STORE,
   SELECT,
+  CONST,
 
   // Simple arithmetic,
   // they work across integers and rationals.
@@ -137,6 +138,9 @@ public enum FunctionDeclarationKind {
 
   /** Unsigned remainder over bitvectors. */
   BV_UREM,
+
+  /** Signed modulo over bitvectors. */
+  BV_SMOD,
 
   /** Multiplication over bitvectors. */
   BV_MUL,

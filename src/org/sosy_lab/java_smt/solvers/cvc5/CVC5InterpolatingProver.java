@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -30,8 +30,8 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
-    implements InterpolatingProverEnvironment<Term> {
+public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
+    implements InterpolatingProverEnvironment<String> {
 
   private final FormulaManager mgr;
   private final Set<ProverOptions> solverOptions;
@@ -65,16 +65,12 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  protected Term addConstraintImpl(BooleanFormula pConstraint) throws InterruptedException {
-    checkState(!closed);
-    Term t = creator.extractInfo(pConstraint);
-
-    super.addConstraintImpl(pConstraint);
-    return t; // t is not wrapped in the Abstract Class
+  protected String addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
+    return super.addConstraint0(constraint);
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Term> pFormulasOfA)
+  public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
     checkArgument(
@@ -83,7 +79,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
-    final Set<Term> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
+    final Set<Term> formulasOfA =
+        transformedImmutableSetCopy(pFormulasOfA, assertedTerms.peek()::get);
     final Set<Term> formulasOfB = Sets.difference(assertedFormulas, formulasOfA);
 
     Term itp = getCVC5Interpolation(formulasOfA, formulasOfB);
@@ -91,10 +88,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
   }
 
   @Override
-  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<Term>> partitions)
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
-    final ImmutableSet<Term> assertedConstraintIds = getAssertedConstraintIds();
+    final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitions.stream().allMatch(assertedConstraintIds::containsAll),
         "interpolation can only be done over previously asserted formulas.");
@@ -104,8 +101,14 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
     Term previousItp = solver.mkTrue();
     for (int i = 1; i < n; i++) {
       Collection<Term> formulasA =
-          ImmutableSet.<Term>builder().addAll(partitions.get(i - 1)).add(previousItp).build();
-      Collection<Term> formulasB = FluentIterable.concat(partitions.subList(i, n)).toSet();
+          FluentIterable.from(partitions.get(i - 1))
+              .transform(assertedTerms.peek()::get)
+              .append(previousItp)
+              .toSet();
+      Collection<Term> formulasB =
+          FluentIterable.concat(partitions.subList(i, n))
+              .transform(assertedTerms.peek()::get)
+              .toSet();
       Term itp = getCVC5Interpolation(formulasA, formulasB);
       itps.add(creator.encapsulateBoolean(itp));
       previousItp = itp;
@@ -115,7 +118,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<Term>
 
   @Override
   public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<Term>> partitionedFormulas, int[] startOfSubTree) {
+      List<? extends Collection<String>> partitionedFormulas, int[] startOfSubTree) {
     throw new UnsupportedOperationException(
         "directly receiving tree interpolants is not supported."
             + "Use another solver or another strategy for interpolants.");

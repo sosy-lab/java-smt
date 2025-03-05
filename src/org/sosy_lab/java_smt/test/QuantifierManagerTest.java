@@ -892,6 +892,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testExistsRestrictedRange() throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -925,6 +926,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testExistsRestrictedRangeWithoutInconclusiveSolvers()
       throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -948,6 +950,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testForallRestrictedRange() throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -982,6 +985,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testForallRestrictedRangeWithoutConclusiveSolvers()
       throws SolverException, InterruptedException {
+    requireIntegers();
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())

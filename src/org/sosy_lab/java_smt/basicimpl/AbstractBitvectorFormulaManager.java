@@ -142,24 +142,37 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
       TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
 
   @Override
-  public BitvectorFormula modulo(
+  public BitvectorFormula remainder(
       BitvectorFormula pNumber1, BitvectorFormula pNumber2, boolean signed) {
-    checkSameSize(pNumber1, pNumber2, "modulo");
-    TFormulaInfo param1 = extractInfo(pNumber1);
-    TFormulaInfo param2 = extractInfo(pNumber2);
-    BitvectorFormula result = wrap(modulo(param1, param2, signed));
+    checkSameSize(pNumber1, pNumber2, "rem");
+    BitvectorFormula result = wrap(remainder(extractInfo(pNumber1), extractInfo(pNumber2), signed));
     if (Generator.isLoggingEnabled()) {
       if (signed) {
-        BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
+        BitvectorGenerator.logBVSRemainder(result, pNumber1, pNumber2);
       } else {
-        BitvectorGenerator.logBVUModulo(result, pNumber1, pNumber2);
+        BitvectorGenerator.logBVURemainder(result, pNumber1, pNumber2);
       }
     }
     return result;
   }
 
-  protected abstract TFormulaInfo modulo(
+  protected abstract TFormulaInfo remainder(
       TFormulaInfo pParam1, TFormulaInfo pParam2, boolean signed);
+
+  @Override
+  public BitvectorFormula smodulo(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
+    checkSameSize(pNumber1, pNumber2, "smod");
+    TFormulaInfo param1 = extractInfo(pNumber1);
+    TFormulaInfo param2 = extractInfo(pNumber2);
+
+    BitvectorFormula result = wrap(smodulo(param1, param2));
+    if (Generator.isLoggingEnabled()) {
+        BitvectorGenerator.logBVSModulo(result, pNumber1, pNumber2);
+    }
+    return result;
+  }
+
+  protected abstract TFormulaInfo smodulo(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public BitvectorFormula multiply(BitvectorFormula pNumber1, BitvectorFormula pNumber2) {
@@ -393,15 +406,13 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
    */
   @Override
   public BitvectorFormula shiftRight(
-      BitvectorFormula pNumber, BitvectorFormula toShift, boolean signed) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(toShift);
-    BitvectorFormula result = wrap(shiftRight(param1, param2, signed));
+      BitvectorFormula pNumber, BitvectorFormula pToShift, boolean signed) {
+    BitvectorFormula result = wrap(shiftRight(extractInfo(pNumber), extractInfo(pToShift), signed));
     if (Generator.isLoggingEnabled()) {
       if (signed) {
-        BitvectorGenerator.logBVSShiftRight(result, pNumber, toShift);
+        BitvectorGenerator.logBVSShiftRight(result, pNumber, pToShift);
       } else {
-        BitvectorGenerator.logBVUShiftRight(result, pNumber, toShift);
+        BitvectorGenerator.logBVUShiftRight(result, pNumber, pToShift);
       }
     }
     return result;
@@ -412,22 +423,46 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
 
   @Override
   public BitvectorFormula shiftLeft(BitvectorFormula pNumber, BitvectorFormula toShift) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(toShift);
-    BitvectorFormula result = wrap(shiftLeft(param1, param2));
+    BitvectorFormula result = wrap(shiftLeft(extractInfo(pNumber), extractInfo(toShift)));
     if (Generator.isLoggingEnabled()) {
       BitvectorGenerator.logBVShiftLeft(result, pNumber, toShift);
     }
     return result;
   }
 
-  protected abstract TFormulaInfo shiftLeft(TFormulaInfo pExtract, TFormulaInfo pExtract2);
+  protected TFormulaInfo rotateRightByConstant(TFormulaInfo pNumber, int pToRotate) {
+    int length = getLength(wrap(pNumber));
+    int shift = pToRotate % length;
+    // TODO: add SMTLIb2 layer
+    return extract(concat(pNumber, pNumber), 2 * length - 1 - shift, length - shift);
+  }
+
+  @Override
+  public BitvectorFormula rotateRight(BitvectorFormula pNumber, BitvectorFormula pToRotate) {
+    // TODO: add SMTLIb2 layer
+    return wrap(rotateRight(extractInfo(pNumber), extractInfo(pToRotate)));
+  }
+
+  @SuppressWarnings("unused")
+  protected TFormulaInfo rotateRight(TFormulaInfo pNumber, TFormulaInfo pToRotate) {
+    int length = getLength(wrap(pNumber));
+    final TFormulaInfo lengthAsBv = makeBitvectorImpl(length, length);
+    final TFormulaInfo toRotateInRange = smodulo(pToRotate, lengthAsBv);
+    // TODO: add SMTLIb2 layer
+    return or(
+        shiftRight(pNumber, toRotateInRange, false),
+        shiftLeft(pNumber, subtract(lengthAsBv, toRotateInRange)));
+
+    // The following approach would also work. However, some solvers are slower with it.
+    // return extract(
+    // shiftRight(concat(pNumber, pNumber), extend(toRotateInRange, length, false), false),
+    // length - 1,
+    // 0);
+  }
 
   @Override
   public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
-    TFormulaInfo param1 = extractInfo(pNumber);
-    TFormulaInfo param2 = extractInfo(pAppend);
-    BitvectorFormula result = wrap(concat(param1, param2));
+    BitvectorFormula result = wrap(concat(extractInfo(pNumber), extractInfo(pAppend)));
     if (Generator.isLoggingEnabled()) {
       BitvectorGenerator.logConcat(result, pNumber, pAppend);
     }

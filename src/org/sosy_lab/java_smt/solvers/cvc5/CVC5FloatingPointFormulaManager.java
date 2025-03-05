@@ -17,6 +17,7 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -67,6 +68,23 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
+  protected Term makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    try {
+      final String signStr = signBit ? "1" : "0";
+      final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
+      final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+      final String bitvecForm = signStr + exponentStr + mantissaStr;
+
+      final Term bv =
+          solver.mkBitVector(type.getExponentSize() + type.getMantissaSize() + 1, bitvecForm, 2);
+      return solver.mkFloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bv);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException("You tried creating a invalid bitvector", e);
+    }
+  }
+
+  @Override
   protected Term makeNumberAndRound(String pN, FloatingPointType pType, Term pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
@@ -83,7 +101,9 @@ public class CVC5FloatingPointFormulaManager
               Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
               pType.getExponentSize(),
               pType.getMantissaSize() + 1);
-      return solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
+      Term term = solver.mkTerm(realToFp, pRoundingMode, solver.mkReal(rationalValue.toString()));
+      // simplification removes the cast from real to fp and return a bit-precise fp-number.
+      return solver.simplify(term);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid floating point with exponent size "
@@ -318,6 +338,11 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
+  protected Term remainder(Term pParam1, Term pParam2) {
+    return solver.mkTerm(Kind.FLOATINGPOINT_REM, pParam1, pParam2);
+  }
+
+  @Override
   protected Term assignment(Term pParam1, Term pParam2) {
     return solver.mkTerm(Kind.EQUAL, pParam1, pParam2);
   }
@@ -378,8 +403,29 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
-  protected Term fromIeeeBitvectorImpl(Term pNumber, FloatingPointType pTargetType) {
-    return solver.mkTerm(Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV, pNumber);
+  protected Term fromIeeeBitvectorImpl(Term bitvector, FloatingPointType pTargetType) {
+    int mantissaSize = pTargetType.getMantissaSize();
+    int exponentSize = pTargetType.getExponentSize();
+    int size = pTargetType.getTotalSize();
+    assert size == mantissaSize + exponentSize + 1;
+
+    Op signExtract;
+    Op exponentExtract;
+    Op mantissaExtract;
+    try {
+      signExtract = solver.mkOp(Kind.BITVECTOR_EXTRACT, size - 1, size - 1);
+      exponentExtract = solver.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSize);
+      mantissaExtract = solver.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSize - 1, 0);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector extract in term " + bitvector + ".", e);
+    }
+
+    Term sign = solver.mkTerm(signExtract, bitvector);
+    Term exponent = solver.mkTerm(exponentExtract, bitvector);
+    Term mantissa = solver.mkTerm(mantissaExtract, bitvector);
+
+    return solver.mkTerm(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
   }
 
   @Override

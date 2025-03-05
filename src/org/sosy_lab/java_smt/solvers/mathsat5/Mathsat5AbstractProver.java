@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_num_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_termination_callback;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_boolean_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_not;
@@ -59,7 +60,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected final Mathsat5SolverContext context;
   protected final long curEnv;
   private final long curConfig;
-  private final long terminationTest;
   protected final Mathsat5FormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
 
@@ -73,7 +73,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     creator = pCreator;
     curConfig = buildConfig(pOptions);
     curEnv = context.createEnvironment(curConfig);
-    terminationTest = context.addTerminationTest(curEnv);
     shutdownNotifier = pShutdownNotifier;
   }
 
@@ -109,7 +108,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       }
     }
     Preconditions.checkState(!closed);
-    return !msat_check_sat(curEnv);
+
+    final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
+    try {
+      return !msat_check_sat(curEnv);
+    } finally {
+      msat_free_termination_callback(hook);
+    }
   }
 
   @Override
@@ -117,7 +122,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
-    return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+
+    final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
+    try {
+      return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
+    } finally {
+      msat_free_termination_callback(hook);
+    }
   }
 
   private void checkForLiterals(Collection<BooleanFormula> formulas) {
@@ -223,7 +234,6 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public void close() {
     if (!closed) {
       msat_destroy_env(curEnv);
-      msat_free_termination_callback(terminationTest);
       msat_destroy_config(curConfig);
     }
     super.close();

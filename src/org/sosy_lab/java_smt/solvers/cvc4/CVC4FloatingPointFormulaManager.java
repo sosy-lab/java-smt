@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
+import edu.stanford.CVC4.BitVector;
+import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FloatingPoint;
@@ -82,15 +84,23 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
+  protected Expr makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    final String signStr = signBit ? "1" : "0";
+    final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
+    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+    final String bitvecStr = signStr + exponentStr + mantissaStr;
+    final BitVector bitVector = new BitVector(bitvecStr, 2);
+    final FloatingPoint fp =
+        new FloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bitVector);
+    return exprManager.mkConst(fp);
+  }
+
+  @Override
   protected Expr makeNumberAndRound(String pN, FloatingPointType pType, Expr pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
-        return negate(
-            exprManager.mkConst(
-                new FloatingPoint(
-                    getFPSize(pType),
-                    pRoundingMode.getConstRoundingMode(),
-                    Rational.fromDecimal(pN))));
+        return exprManager.mkConst(FloatingPoint.makeZero(getFPSize(pType), /* sign */ true));
       }
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
@@ -281,6 +291,11 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
+  protected Expr remainder(Expr pParam1, Expr pParam2) {
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_REM, pParam1, pParam2);
+  }
+
+  @Override
   protected Expr assignment(Expr pParam1, Expr pParam2) {
     return exprManager.mkExpr(Kind.EQUAL, pParam1, pParam2);
   }
@@ -341,8 +356,21 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr fromIeeeBitvectorImpl(Expr pNumber, FloatingPointType pTargetType) {
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, pNumber);
+  protected Expr fromIeeeBitvectorImpl(Expr bitvector, FloatingPointType pTargetType) {
+    int mantissaSize = pTargetType.getMantissaSize();
+    int exponentSize = pTargetType.getExponentSize();
+    int size = pTargetType.getTotalSize();
+    assert size == mantissaSize + exponentSize + 1;
+
+    Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
+    Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
+    Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
+
+    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, bitvector);
+    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, bitvector);
+    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, bitvector);
+
+    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
   }
 
   @Override

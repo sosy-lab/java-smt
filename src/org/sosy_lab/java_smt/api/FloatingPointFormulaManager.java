@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
@@ -40,6 +41,9 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula makeNumber(
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
 
   /**
    * Creates a variable with exactly the given name.
@@ -200,6 +204,13 @@ public interface FloatingPointFormulaManager {
       FloatingPointFormula number1,
       FloatingPointFormula number2,
       FloatingPointRoundingMode pFloatingPointRoundingMode);
+
+  /**
+   * remainder: x - y * n, where n in Z is nearest to x/y. The result can be negative even for two
+   * positive arguments, e.g. "rem(5, 4) == 1" and "rem(5, 6) == -1", as opposed to integer modulo
+   * operators.
+   */
+  FloatingPointFormula remainder(FloatingPointFormula dividend, FloatingPointFormula divisor);
 
   // ----------------- Numeric relations, return type BooleanFormula -----------------
 

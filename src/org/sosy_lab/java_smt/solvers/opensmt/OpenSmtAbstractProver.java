@@ -67,9 +67,17 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   protected static SMTConfig getConfigInstance(
-      OpenSMTOptions pSolverOptions, boolean interpolation) {
+      Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
+    config.setOption(
+        ":produce-models",
+        new SMTOption(
+            pOptions.contains(ProverOptions.GENERATE_MODELS)
+                || pOptions.contains(ProverOptions.GENERATE_ALL_SAT)));
+    config.setOption(
+        ":produce-unsat-cores",
+        new SMTOption(pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)));
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
     if (interpolation) {
       config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
@@ -264,19 +272,27 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException("OpenSMT does not support unsat core.");
+    Preconditions.checkState(!closed);
+    checkGenerateUnsatCores();
+    Preconditions.checkState(!changedSinceLastSatQuery);
+
+    ImmutableList.Builder<BooleanFormula> result = ImmutableList.builder();
+    for (PTRef r : osmtSolver.getUnsatCore()) {
+      result.add(creator.encapsulateBoolean(r));
+    }
+    return result.build();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support unsat core.");
+    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support unsat core.");
+    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
   }
 
   @Override

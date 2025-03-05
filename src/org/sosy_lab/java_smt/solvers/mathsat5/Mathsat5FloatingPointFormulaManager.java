@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_abs;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_bits_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_cast;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_div;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_equal;
@@ -45,6 +46,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
 import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -92,6 +94,18 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long makeNumberImpl(double pN, FloatingPointType pType, Long pRoundingMode) {
     return makeNumberImpl(Double.toString(pN), pType, pRoundingMode);
+  }
+
+  @Override
+  protected Long makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    final String signStr = signBit ? "1" : "0";
+    final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
+    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+    final String bitvecForm = signStr + exponentStr + mantissaStr;
+    final BigInteger bitvecValue = new BigInteger(bitvecForm, 2);
+    return msat_make_fp_bits_number(
+        mathsatEnv, bitvecValue.toString(), type.getExponentSize(), type.getMantissaSize());
   }
 
   @Override
@@ -246,6 +260,11 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long multiply(Long pNumber1, Long pNumber2, Long pRoundingMode) {
     return msat_make_fp_times(mathsatEnv, pRoundingMode, pNumber1, pNumber2);
+  }
+
+  @Override
+  protected Long remainder(Long pParam1, Long pParam2) {
+    throw new UnsupportedOperationException("MathSAT5 does not implement fp.rem");
   }
 
   @Override

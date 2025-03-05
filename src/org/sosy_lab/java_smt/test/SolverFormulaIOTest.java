@@ -114,8 +114,26 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula d = bmgr.and(c1, c2);
 
     String formDump = mgr.dumpFormula(d).toString();
-    assertThat(formDump).contains("(declare-fun |main::a| () Bool)");
-    assertThat(formDump).contains("(declare-fun b () Bool)");
+    checkVariableIsDeclared(formDump, "|main::a|", "Bool");
+    checkVariableIsDeclared(formDump, "b", "Bool");
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
+  }
+
+  @Test
+  public void varWithSpaceDumpTest() {
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula a = bmgr.makeVariable("main a");
+    BooleanFormula b = bmgr.makeVariable("b");
+    BooleanFormula c1 = bmgr.xor(a, b);
+    BooleanFormula c2 = bmgr.xor(a, b);
+    BooleanFormula d = bmgr.and(c1, c2);
+
+    String formDump = mgr.dumpFormula(d).toString();
+    checkVariableIsDeclared(formDump, "|main a|", "Bool");
+    checkVariableIsDeclared(formDump, "b", "Bool");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -144,8 +162,9 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     BooleanFormula branchComp = bmgr.or(branch1, branch2);
 
     String formDump = mgr.dumpFormula(branchComp).toString();
-    assertThat(formDump).contains("(declare-fun a () Bool)");
-    assertThat(formDump).contains("(declare-fun b () Bool)");
+
+    checkVariableIsDeclared(formDump, "a", "Bool");
+    checkVariableIsDeclared(formDump, "b", "Bool");
 
     // The serialization has to be parse-able.
     checkThatDumpIsParseable(formDump);
@@ -196,7 +215,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     String formDump = mgr.dumpFormula(formula).toString();
 
     // check that int variable is declared correctly + necessary assert that has to be there
-    assertThat(formDump).contains("(declare-fun a () (_ BitVec 8))");
+    checkVariableIsDeclared(formDump, "a", "(_ BitVec 8)");
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -259,6 +278,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
   }
 
@@ -271,6 +291,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseSmtinterpolSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
   }
 
@@ -283,6 +304,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
   }
 
@@ -295,12 +317,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
     requireParser();
+    requireIntegers();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
-  }
-
-  public void parseMathSatTestParseFirst3() throws SolverException, InterruptedException {
-    requireParser();
-    compareParseWithOrgParseFirst(MATHSAT_DUMP3, this::functionExprGen);
   }
 
   @Test
@@ -414,6 +432,14 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
+  private void checkVariableIsDeclared(String dump, String var, String type) {
+    try {
+      assertThat(dump).contains("(declare-fun " + var + " () " + type + ")");
+    } catch (AssertionError err) {
+      assertThat(dump).contains("(declare-const " + var + " " + type + ")");
+    }
+  }
+
   private void checkThatAssertIsInLastLine(String dump) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
@@ -450,6 +476,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   }
 
   private BooleanFormula redundancyExprGen() {
+    requireIntegers();
     IntegerFormula i1 = imgr.makeVariable("a");
     IntegerFormula i2 = imgr.makeVariable("b");
     IntegerFormula erg = imgr.makeVariable("c");

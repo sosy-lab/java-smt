@@ -15,7 +15,6 @@ import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
@@ -58,10 +57,14 @@ class SynchronizedArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
-  public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> makeArray(
-      String pName, ArrayFormulaType<TI, TE> pType) {
+  public <
+          TI extends Formula,
+          TE extends Formula,
+          FTI extends FormulaType<TI>,
+          FTE extends FormulaType<TE>>
+      ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE elseElem) {
     synchronized (sync) {
-      return delegate.makeArray(pName, pType);
+      return delegate.makeArray(pIndexType, pElementType, elseElem);
     }
   }
 

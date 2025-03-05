@@ -90,6 +90,8 @@ public class SudokuTest {
         return true;
       case BOOLECTOR:
       case CVC4:
+      case CVC5:
+      case OPENSMT:
       case YICES2:
         return IS_LINUX;
       case MATHSAT5:

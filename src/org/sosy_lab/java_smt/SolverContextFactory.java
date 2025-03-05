@@ -27,10 +27,12 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.Generator;
+import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.SolverLess.SolverLessContext;
+import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
@@ -61,6 +63,7 @@ public class SolverContextFactory {
     CVC5,
     YICES2,
     SOLVERLESS,
+    BITWUZLA,
   }
 
   @Option(secure = true, description = "Export solver queries in SmtLib format into a file.")
@@ -91,6 +94,9 @@ public class SolverContextFactory {
       secure = true,
       description = "Sequentialize all solver actions to allow concurrent access!")
   private boolean synchronize = false;
+
+  @Option(secure = true, description = "Apply additional checks to catch common user errors.")
+  private boolean useDebugMode = false;
 
   @Option(
       secure = true,
@@ -244,6 +250,9 @@ public class SolverContextFactory {
     if (synchronize) {
       context = new SynchronizedSolverContext(config, logger, shutdownNotifier, context);
     }
+    if (useDebugMode) {
+      context = new DebuggingSolverContext(solverToCreate, config, context);
+    }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
@@ -315,6 +324,10 @@ public class SolverContextFactory {
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
       case SOLVERLESS:
         return SolverLessContext.create();
+
+      case BITWUZLA:
+        return BitwuzlaSolverContext.create(
+            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       default:
         throw new AssertionError("no solver selected");

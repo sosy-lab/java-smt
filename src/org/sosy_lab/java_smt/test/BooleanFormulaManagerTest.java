@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -30,6 +30,24 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   @Before
   public void checkNotSolverless() {
     assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
+  }
+
+  @Test
+  public void testConstBoolean() {
+    assertThat(bmgr.isTrue(bmgr.makeBoolean(true))).isTrue();
+    assertThat(bmgr.isTrue(bmgr.makeBoolean(false))).isFalse();
+
+    assertThat(bmgr.isFalse(bmgr.makeBoolean(true))).isFalse();
+    assertThat(bmgr.isFalse(bmgr.makeBoolean(false))).isTrue();
+
+    assertThat(bmgr.isFalse(bmgr.makeVariable("some_constant"))).isFalse();
+  }
+
+  @Test
+  public void testNestedConst() {
+    requireIntegers();
+    assertThat(bmgr.ifThenElse(bmgr.makeVariable("a"), imgr.makeNumber(0), imgr.makeNumber(1)))
+        .isNotNull();
   }
 
   @Test
@@ -88,7 +106,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void testConjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
     requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(true);
-    Truth.assertThat(bmgr.toConjunctionArgs(input, false)).isEmpty();
+    assertThat(bmgr.toConjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
@@ -97,7 +115,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     requireIntegers();
     BooleanFormula input =
         bmgr.and(bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x")));
-    Truth.assertThat(bmgr.toConjunctionArgs(input, false))
+    assertThat(bmgr.toConjunctionArgs(input, false))
         .isEqualTo(
             ImmutableSet.of(
                 bmgr.makeVariable("a"), imgr.equal(imgr.makeNumber(1), imgr.makeVariable("x"))));
@@ -157,7 +175,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
               bmgr.or(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
     }
     requireVisitor();
-    Truth.assertThat(bmgr.toConjunctionArgs(input, true)).isEqualTo(comparisonSet);
+    assertThat(bmgr.toConjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.and(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
@@ -166,7 +184,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   public void testDisjunctionArgsExtractionEmpty() throws SolverException, InterruptedException {
     requireVisitor();
     BooleanFormula input = bmgr.makeBoolean(false);
-    Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEmpty();
+    assertThat(bmgr.toDisjunctionArgs(input, false)).isEmpty();
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
@@ -193,7 +211,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
               bvmgr.equal(bvmgr.makeBitvector(2, 1), bvmgr.makeVariable(2, "x")));
     }
     requireVisitor();
-    Truth.assertThat(bmgr.toDisjunctionArgs(input, false)).isEqualTo(comparisonSet);
+    assertThat(bmgr.toDisjunctionArgs(input, false)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toConjunctionArgs(input, false))).isEquivalentTo(input);
   }
 
@@ -250,7 +268,7 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
               bmgr.and(bmgr.makeVariable("e"), bmgr.makeVariable("f")));
     }
     requireVisitor();
-    Truth.assertThat(bmgr.toDisjunctionArgs(input, true)).isEqualTo(comparisonSet);
+    assertThat(bmgr.toDisjunctionArgs(input, true)).isEqualTo(comparisonSet);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, true))).isEquivalentTo(input);
     assertThatFormula(bmgr.or(bmgr.toDisjunctionArgs(input, false))).isEquivalentTo(input);
   }
@@ -271,42 +289,42 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula y = bmgr.makeVariable("y");
 
     // AND
-    Truth.assertThat(bmgr.and(tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.and(fals)).isEqualTo(fals);
-    Truth.assertThat(bmgr.and(x)).isEqualTo(x);
-    Truth.assertThat(bmgr.and()).isEqualTo(tru);
+    assertThat(bmgr.and(tru)).isEqualTo(tru);
+    assertThat(bmgr.and(fals)).isEqualTo(fals);
+    assertThat(bmgr.and(x)).isEqualTo(x);
+    assertThat(bmgr.and()).isEqualTo(tru);
 
-    Truth.assertThat(bmgr.and(tru, tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.and(tru, x)).isEqualTo(x);
-    Truth.assertThat(bmgr.and(fals, x)).isEqualTo(fals);
-    Truth.assertThat(bmgr.and(x, x)).isEqualTo(x);
+    assertThat(bmgr.and(tru, tru)).isEqualTo(tru);
+    assertThat(bmgr.and(tru, x)).isEqualTo(x);
+    assertThat(bmgr.and(fals, x)).isEqualTo(fals);
+    assertThat(bmgr.and(x, x)).isEqualTo(x);
 
-    Truth.assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.and(fals, fals, fals)).isEqualTo(fals);
-    Truth.assertThat(bmgr.and(fals, x, x)).isEqualTo(fals);
-    Truth.assertThat(bmgr.and(tru, x, tru)).isEqualTo(x);
+    assertThat(bmgr.and(tru, tru, tru)).isEqualTo(tru);
+    assertThat(bmgr.and(fals, fals, fals)).isEqualTo(fals);
+    assertThat(bmgr.and(fals, x, x)).isEqualTo(fals);
+    assertThat(bmgr.and(tru, x, tru)).isEqualTo(x);
 
-    Truth.assertThat(bmgr.and(tru, tru, x, fals, y, tru, x, y)).isEqualTo(fals);
+    assertThat(bmgr.and(tru, tru, x, fals, y, tru, x, y)).isEqualTo(fals);
 
     // recursive simplification needed
     // Truth.assertThat(bmgr.and(x, x, x, y, y)).isEqualTo(bmgr.and(x, y));
 
     // OR
-    Truth.assertThat(bmgr.or(tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(fals)).isEqualTo(fals);
-    Truth.assertThat(bmgr.or(x)).isEqualTo(x);
-    Truth.assertThat(bmgr.or()).isEqualTo(fals);
+    assertThat(bmgr.or(tru)).isEqualTo(tru);
+    assertThat(bmgr.or(fals)).isEqualTo(fals);
+    assertThat(bmgr.or(x)).isEqualTo(x);
+    assertThat(bmgr.or()).isEqualTo(fals);
 
-    Truth.assertThat(bmgr.or(tru, tru)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(tru, x)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(fals, x)).isEqualTo(x);
-    Truth.assertThat(bmgr.or(x, x)).isEqualTo(x);
+    assertThat(bmgr.or(tru, tru)).isEqualTo(tru);
+    assertThat(bmgr.or(tru, x)).isEqualTo(tru);
+    assertThat(bmgr.or(fals, x)).isEqualTo(x);
+    assertThat(bmgr.or(x, x)).isEqualTo(x);
 
-    Truth.assertThat(bmgr.or(fals, fals, fals)).isEqualTo(fals);
-    Truth.assertThat(bmgr.or(tru, x, x)).isEqualTo(tru);
-    Truth.assertThat(bmgr.or(fals, x, fals)).isEqualTo(x);
+    assertThat(bmgr.or(fals, fals, fals)).isEqualTo(fals);
+    assertThat(bmgr.or(tru, x, x)).isEqualTo(tru);
+    assertThat(bmgr.or(fals, x, fals)).isEqualTo(x);
 
-    Truth.assertThat(bmgr.or(fals, fals, x, tru, y, fals, x, y)).isEqualTo(tru);
+    assertThat(bmgr.or(fals, fals, x, tru, y, fals, x, y)).isEqualTo(tru);
   }
 
   @Test
@@ -329,15 +347,15 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula var4 = bmgr.makeVariable("var4");
 
     // simple tests
-    Truth.assertThat(bmgr.not(fTrue)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.not(fFalse)).isEqualTo(fTrue);
+    assertThat(bmgr.not(fTrue)).isEqualTo(fFalse);
+    assertThat(bmgr.not(fFalse)).isEqualTo(fTrue);
 
     // one nesting level
-    Truth.assertThat(bmgr.not(bmgr.not(var1))).isEqualTo(var1);
+    assertThat(bmgr.not(bmgr.not(var1))).isEqualTo(var1);
 
     // more nesting
     BooleanFormula f = bmgr.and(bmgr.or(var1, bmgr.not(var2), var3), bmgr.not(var4));
-    Truth.assertThat(bmgr.not(bmgr.not(f))).isEqualTo(f);
+    assertThat(bmgr.not(bmgr.not(f))).isEqualTo(f);
   }
 
   @Test
@@ -347,20 +365,20 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula var1 = bmgr.makeVariable("var1");
     BooleanFormula var2 = bmgr.makeVariable("var2");
 
-    Truth.assertThat(bmgr.and(fTrue, fTrue)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.and(fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(fTrue, fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(fTrue, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.and(fFalse, var1)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(var1, var1)).isEqualTo(var1);
+    assertThat(bmgr.and(fTrue, fTrue)).isEqualTo(fTrue);
+    assertThat(bmgr.and(fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.and(fTrue, fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.and(fTrue, var1)).isEqualTo(var1);
+    assertThat(bmgr.and(fFalse, var1)).isEqualTo(fFalse);
+    assertThat(bmgr.and(var1, var1)).isEqualTo(var1);
 
-    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, fTrue)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.and(fTrue, fFalse, fTrue)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(fTrue, fTrue, fTrue, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.and(fTrue, fFalse, fTrue, var1)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.and(fTrue, var1, fTrue, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.and(fTrue, var1, var2, fTrue, var1)).isEqualTo(bmgr.and(var1, var2));
+    assertThat(bmgr.and(fTrue, fTrue, fTrue, fTrue)).isEqualTo(fTrue);
+    assertThat(bmgr.and(fTrue, fFalse, fTrue)).isEqualTo(fFalse);
+    assertThat(bmgr.and(fTrue, fTrue, fTrue, fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.and(fTrue, fTrue, fTrue, var1)).isEqualTo(var1);
+    assertThat(bmgr.and(fTrue, fFalse, fTrue, var1)).isEqualTo(fFalse);
+    assertThat(bmgr.and(fTrue, var1, fTrue, var1)).isEqualTo(var1);
+    assertThat(bmgr.and(fTrue, var1, var2, fTrue, var1)).isEqualTo(bmgr.and(var1, var2));
   }
 
   @Test
@@ -370,20 +388,20 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula var1 = bmgr.makeVariable("var1");
     BooleanFormula var2 = bmgr.makeVariable("var2");
 
-    Truth.assertThat(bmgr.or(fTrue, fTrue)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.or(fTrue, fFalse)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fTrue, var1)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fFalse, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.or(var1, var1)).isEqualTo(var1);
+    assertThat(bmgr.or(fTrue, fTrue)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.or(fTrue, fFalse)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fTrue, var1)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fFalse, var1)).isEqualTo(var1);
+    assertThat(bmgr.or(var1, var1)).isEqualTo(var1);
 
-    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, fTrue)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fFalse, fFalse, fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, fFalse)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fFalse, fTrue, fFalse, var1)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.or(fFalse, fFalse, fFalse, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.or(fFalse, var1, fFalse, var1)).isEqualTo(var1);
-    Truth.assertThat(bmgr.or(fFalse, var1, var2, fFalse, var1)).isEqualTo(bmgr.or(var1, var2));
+    assertThat(bmgr.or(fFalse, fTrue, fFalse, fTrue)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fFalse, fFalse, fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.or(fFalse, fTrue, fFalse, fFalse)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fFalse, fTrue, fFalse, var1)).isEqualTo(fTrue);
+    assertThat(bmgr.or(fFalse, fFalse, fFalse, var1)).isEqualTo(var1);
+    assertThat(bmgr.or(fFalse, var1, fFalse, var1)).isEqualTo(var1);
+    assertThat(bmgr.or(fFalse, var1, var2, fFalse, var1)).isEqualTo(bmgr.or(var1, var2));
   }
 
   @Test
@@ -393,12 +411,12 @@ public class BooleanFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula var1 = bmgr.makeVariable("var1");
     BooleanFormula var2 = bmgr.makeVariable("var2");
 
-    Truth.assertThat(bmgr.ifThenElse(fTrue, var1, var2)).isEqualTo(var1);
-    Truth.assertThat(bmgr.ifThenElse(fFalse, var1, var2)).isEqualTo(var2);
-    Truth.assertThat(bmgr.ifThenElse(var1, var2, var2)).isEqualTo(var2);
-    Truth.assertThat(bmgr.ifThenElse(var1, fTrue, fTrue)).isEqualTo(fTrue);
-    Truth.assertThat(bmgr.ifThenElse(var1, fFalse, fFalse)).isEqualTo(fFalse);
-    Truth.assertThat(bmgr.ifThenElse(var1, fTrue, fFalse)).isEqualTo(var1);
-    Truth.assertThat(bmgr.ifThenElse(var1, fFalse, fTrue)).isEqualTo(bmgr.not(var1));
+    assertThat(bmgr.ifThenElse(fTrue, var1, var2)).isEqualTo(var1);
+    assertThat(bmgr.ifThenElse(fFalse, var1, var2)).isEqualTo(var2);
+    assertThat(bmgr.ifThenElse(var1, var2, var2)).isEqualTo(var2);
+    assertThat(bmgr.ifThenElse(var1, fTrue, fTrue)).isEqualTo(fTrue);
+    assertThat(bmgr.ifThenElse(var1, fFalse, fFalse)).isEqualTo(fFalse);
+    assertThat(bmgr.ifThenElse(var1, fTrue, fFalse)).isEqualTo(var1);
+    assertThat(bmgr.ifThenElse(var1, fFalse, fTrue)).isEqualTo(bmgr.not(var1));
   }
 }
