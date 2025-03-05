@@ -17,6 +17,8 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
+//TODO: Correct parsing of the proof terms is missing, i.e. creation of nodes in the DAG and
+// parsing annotations. Add relevant javadocs
 public class ProofTermParser {
 
   private final ResolutionProofDAG proofDag;

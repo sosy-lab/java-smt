@@ -194,6 +194,49 @@ public class SmtInterpolProofsTest {
     }
   }
 
+  @Test
+  public void testSmtInterpolProof() throws Exception {
+    // Arrange: parse constraints as in the SmtInterpolProofsTest.
+    String constraint1 = "(set-logic QF_UF)\n"
+        + "(declare-fun q1 () Bool)\n"
+        + "(declare-fun q2 () Bool)\n"
+        + "(assert (or (not q1) q2))";
+    String constraint2 = "(assert q1)";
+    String constraint3 = "(assert (not q2))";
+
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+
+    // Create a prover with proof and model generation enabled.
+    SmtInterpolTheoremProver prover =
+        (SmtInterpolTheoremProver) context.newProverEnvironment0(
+            ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
+    SMTInterpol smtInterpol = (SMTInterpol) prover.env;
+    try {
+      // Act: add constraints and check unsat.
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
+      assertTrue(prover.isUnsat());
+
+      // Retrieve the proof term from SMTInterpol.
+      Term proofTerm = smtInterpol.getProof();
+      assertNotNull(proofTerm);
+
+      Term proof = prover.smtInterpolGetProof();
+      assertThat(proof).isNotNull();
+
+
+      //String proofStr = proof.toString();
+      //System.out.println(proofStr);
+      System.out.println(proof);
+
+      // Optionally, additional assertions on the dag structure can be added here.
+    } finally {
+      prover.close();
+    }
+  }
+
   public static Object invokeGetProofMode(SMTInterpol instance) throws Exception {
     Method getProofModeMethod = SMTInterpol.class.getDeclaredMethod("getProofMode");
     getProofModeMethod.setAccessible(true);

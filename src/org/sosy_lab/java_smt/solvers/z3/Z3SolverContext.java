@@ -50,11 +50,13 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
+  private static boolean GENERATE_PROOFS = false;
 
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
 
-    @Option(secure = true, description = "Require proofs from SMT solver")
+    @Option(secure = true, description = "Require proofs from SMT solver",
+    values = {"true", "false"})
     boolean requireProofs = false;
 
     @Option(
@@ -143,6 +145,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     long cfg = Native.mkConfig();
     if (extraOptions.requireProofs) {
       Native.setParamValue(cfg, "PROOF", "true");
+      GENERATE_PROOFS = true;
     }
     Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
     Native.globalParamSet("model.compact", "false");
@@ -277,6 +280,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
       Native.closeLog();
       Native.delContext(context);
     }
+  }
+
+  public boolean getGenerateProofs() {
+    return GENERATE_PROOFS;
   }
 
   @Override

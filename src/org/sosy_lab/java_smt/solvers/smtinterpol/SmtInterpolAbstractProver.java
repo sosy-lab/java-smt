@@ -238,6 +238,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     return proofDAG;
   }
 
+  //TODO: Delete this method
   protected Term smtInterpolGetProof() {
     return env.getProof();
   }
