@@ -26,7 +26,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
  * individual Generators.
  */
 @SuppressFBWarnings
-//this warning is ignored, because Spotbugs fears that the internal structure of the Generator
+// this warning is ignored, because Spotbugs fears that the internal structure of the Generator
 // is revealed (because the get-functions return the instance variable instead of copies).
 // TODO Rewrite Generator as a delegate. Or at least make the methods non-static.
 // TODO How to split up this class to support multiple provers per context?
