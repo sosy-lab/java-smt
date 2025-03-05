@@ -40,7 +40,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
-      NonLinearArithmetic pNonLinearArithmetic, LogManager pLogger)
+      NonLinearArithmetic pNonLinearArithmetic,
+      LogManager pLogger)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
         new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);

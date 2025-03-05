@@ -143,7 +143,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
-      Options pOptions, LogManager pLogger) {
+      Options pOptions,
+      LogManager pLogger) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
@@ -158,7 +159,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       @Nullable PathCounterTemplate solverLogfile,
       long randomSeed,
       FloatingPointRoundingMode pFloatingPointRoundingMode,
-      Consumer<String> pLoader,LogManager pLogger)
+      Consumer<String> pLoader,
+      LogManager pLogger)
       throws InvalidConfigurationException {
     loadLibrary(pLoader);
 

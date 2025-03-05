@@ -28,7 +28,7 @@ public class UltimateEliminatorWrapper {
   private final Script interpol;
   LogManager log;
 
-  public UltimateEliminatorWrapper(LogManager pLog){
+  public UltimateEliminatorWrapper(LogManager pLog) {
     provider =
         org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
             .createUltimateServiceProviderMock();
@@ -40,20 +40,19 @@ public class UltimateEliminatorWrapper {
     log = pLog;
   }
 
-  public Term simplify(Term pTerm){
+  public Term simplify(Term pTerm) {
     return ultimateEliminator.simplify(pTerm);
   }
 
-  public Term parse(String pString){
+  public Term parse(String pString) {
     return UltimateEliminatorParser.parseImpl(pString, log, ultimateEliminator);
   }
 
-  public Appender dumpFormula(Term pFormula){
+  public Appender dumpFormula(Term pFormula) {
     return UltimateEliminatorParser.dumpFormula(pFormula);
   }
 
-  public UltimateEliminator getUltimateEliminator(){
+  public UltimateEliminator getUltimateEliminator() {
     return ultimateEliminator;
   }
-
 }

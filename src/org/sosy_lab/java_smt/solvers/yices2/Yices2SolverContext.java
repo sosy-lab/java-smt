@@ -50,7 +50,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
-      Consumer<String> pLoader, LogManager pLogger) {
+      Consumer<String> pLoader,
+      LogManager pLogger) {
 
     pLoader.accept("yices2j");
 
