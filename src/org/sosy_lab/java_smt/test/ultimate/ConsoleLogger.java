@@ -39,7 +39,7 @@ import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 public final class ConsoleLogger implements ILogger {
 
   private LogLevel mLevel;
-  private ILogFunction[] mLevelToFunction = new ILogFunction[LogLevel.values().length];
+  private final ILogFunction[] mLevelToFunction = new ILogFunction[LogLevel.values().length];
 
   public ConsoleLogger() {
     setLevel(LogLevel.DEBUG);
