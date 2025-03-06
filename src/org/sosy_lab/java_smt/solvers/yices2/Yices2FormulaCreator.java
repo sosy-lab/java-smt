@@ -258,6 +258,8 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         return pVisitor.visitConstant(pFormula, convertValue(pF, pF));
       case YICES_UNINTERPRETED_TERM:
         return pVisitor.visitFreeVariable(pFormula, yices_get_term_name(pF));
+      case YICES_VARIABLE:
+        return pVisitor.visitBoundVariable(pFormula, 0);
       default:
         return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
     }
