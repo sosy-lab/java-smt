@@ -20,7 +20,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -42,7 +41,7 @@ public class Mathsat5QuantifiedFormulaManager
   }
 
   @Override
-  protected Long eliminateQuantifiersUltimateEliminator(Long pExtractInfo, ProverOptions pOptions)
+  protected Long eliminateQuantifiersUltimateEliminator(Long pExtractInfo)
       throws UnsupportedOperationException {
 
     Mathsat5FormulaManager formulaManager = (Mathsat5FormulaManager) getFormulaManager();

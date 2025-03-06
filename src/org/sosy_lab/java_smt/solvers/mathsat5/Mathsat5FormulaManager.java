@@ -69,8 +69,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
 
   @Override
   public String dumpFormulaImpl(final Long f) {
-    assert getFormulaCreator().getFormulaType(f) instanceof FormulaType
-        : "Only Formulas may be dumped";
+    assert getFormulaCreator().getFormulaType(f) != null : "Only Formulas may be dumped";
     return msat_to_smtlib2(getEnvironment(), f);
   }
 

@@ -66,6 +66,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
             bitvectorTheory,
             arrayTheory,
             quantifierTheory);
+    quantifierTheory.setFmgr(manager);
     return new PrincessSolverContext(manager, creator);
   }
 

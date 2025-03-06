@@ -58,7 +58,8 @@ public interface SolverContext extends AutoCloseable {
     /** Whether the solver should enable quantifier eliminiation via UltimateEliminator. */
     SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION,
 
-    /** Whether the solver should eliminiate the quantifier via UltimateEliminator before inserting
+    /**
+     * Whether the solver should eliminiate the quantifier via UltimateEliminator before inserting
      * it to the native quantified formula.
      */
     SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE

@@ -13,7 +13,6 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
   private ProverOptions option;
-  private Optional<AbstractFormulaManager> fmgr;
+  private Optional<AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>> fmgr;
 
   private final UltimateEliminatorWrapper ultimateEliminatorWrapper;
 
@@ -51,26 +50,23 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws InterruptedException, SolverException, UnsupportedOperationException {
     if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
-        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF), option));
+        System.out.println("Eliminating quantifiers via UltimateEliminator.");
+        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF)));
       } catch (UnsupportedOperationException e) {
         System.out.println(
-            "Solver does not support parsing yet. Falling back to native "
+            "Solver does not support eliminating via UltimateEliminator yet. Falling back to "
+                + "native "
                 + "quantifier elimination.");
         return wrap(eliminateQuantifiers(extractInfo(pF)));
       } catch (IOException e) {
         System.out.println(
-            "Independent quantifier elimination via Ultimate failed. Falling back to native "
+            "Independent quantifier elimination via UltimateEliminator failed. Falling back to "
+                + "native "
                 + "quantifier elimination.");
         return wrap(eliminateQuantifiers(extractInfo(pF)));
       }
     }
     return wrap(eliminateQuantifiers(extractInfo(pF)));
-  }
-
-  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(
-      TFormulaInfo pExtractInfo, ProverOptions pOptions)
-      throws UnsupportedOperationException, IOException {
-    throw new UnsupportedOperationException();
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(TFormulaInfo pExtractInfo)
@@ -87,11 +83,14 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     if (option != null
         && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
       try {
+        System.out.println(
+            "Eliminating quantifiers via UltimateEliminator before formula creation.");
         return mkWithoutQuantifier(
             q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody));
       } catch (IOException e) {
         System.out.println(
-            "Independent quantifier elimination via Ultimate before formula creation " + "failed.");
+            "Independent quantifier elimination via UltimateEliminator before formula creation "
+                + "failed.");
       }
     }
     return wrap(
@@ -104,32 +103,27 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   private BooleanFormula mkWithoutQuantifier(
       Quantifier pQ, List<TFormulaInfo> pVariables, TFormulaInfo pBody) throws IOException {
     int quantifier;
-    if (pQ == Quantifier.EXISTS) {
-      quantifier = Script.EXISTS;
-    } else {
-      quantifier = Script.FORALL;
-    }
 
     String form = fmgr.get().dumpFormulaImpl(pBody);
     Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
-    List<TermVariable> boundVars = new ArrayList<>();
+    List<String> nameList = new ArrayList<>();
+    List<Sort> sortList = new ArrayList<>();
 
     for (TFormulaInfo var : pVariables) {
       String dumpedVar = fmgr.get().dumpFormulaImpl(var);
       Term ultimateVar = getUltimateEliminatorWrapper().parse(dumpedVar);
       Sort varType = ultimateVar.getSort();
       String varName = ((ApplicationTerm) ultimateVar).getFunction().getName();
-      TermVariable tv =
-          getUltimateEliminatorWrapper().getUltimateEliminator().variable(varName, varType);
-      boundVars.add(tv);
+      if(varName!=null && varType!=null) {
+        sortList.add(varType);
+        nameList.add(varName);
+      }
     }
-    Term quantifiedFormula =
-        getUltimateEliminatorWrapper()
-            .getUltimateEliminator()
-            .quantifier(
-                quantifier, boundVars.toArray(new TermVariable[0]), ultimateBody, (Term[]) null);
+    String ultimateFormula = buildUltimateEliminatorFormula(pQ, nameList, sortList, ultimateBody);
 
-    Term resultFormula = getUltimateEliminatorWrapper().simplify(quantifiedFormula);
+    Term parsedResult = getUltimateEliminatorWrapper().parse(ultimateFormula);
+    Term resultFormula = getUltimateEliminatorWrapper().simplify(parsedResult);
+
     BooleanFormula result =
         fmgr.get().parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
     return result;
@@ -156,7 +150,22 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return fmgr.get();
   }
 
-  public void setFmgr(AbstractFormulaManager pFmgr) {
+  public void setFmgr(AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pFmgr) {
     fmgr = Optional.of(pFmgr);
+  }
+
+  private String buildUltimateEliminatorFormula(
+      Quantifier pQ, List<String> pNameList, List<Sort> pSortList, Term pUltimateBody) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("(assert (").append(pQ.toString().toLowerCase()).append(" (");
+    if (!pNameList.isEmpty()) {
+      for (int i = 0; i < pNameList.size(); i++) {
+        sb.append("(").append(pNameList.get(i)).append(" ").append(pSortList.get(i)).append(")");
+      }
+    }
+    sb.append(") ");
+    sb.append(pUltimateBody);
+    sb.append(" ))");
+    return sb.toString();
   }
 }

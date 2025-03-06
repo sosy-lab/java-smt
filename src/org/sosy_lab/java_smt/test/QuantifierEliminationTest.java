@@ -27,6 +27,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   public void testSolverIndependentQuantifierEliminationWithUltimateEliminator()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireQuantifiers();
 
     assume()
         .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
@@ -57,6 +58,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
       throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
+    requireQuantifiers();
 
     assume()
         .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
@@ -87,6 +89,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
       throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
+    requireQuantifiers();
 
     assume()
         .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
