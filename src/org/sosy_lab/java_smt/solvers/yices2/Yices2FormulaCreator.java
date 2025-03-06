@@ -82,6 +82,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_divisio
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_floor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_by_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_imod;
@@ -90,7 +91,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_typ
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_int_atom;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_ite;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uninterpreted_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
@@ -101,6 +103,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_ar
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_index;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
@@ -121,9 +124,11 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_xor;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Table;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -155,6 +160,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           YICES_VARIABLE,
           YICES_UNINTERPRETED_TERM);
 
+  /**
+   * Maps a name and a free variable or function type to a concrete formula node. We allow only 1
+   * type per var name, meaning there is only 1 column per row!
+   */
+  private final Table<String, Integer, Integer> formulaCache = HashBasedTable.create();
+
   protected Yices2FormulaCreator() {
     super(null, yices_bool_type(), yices_int_type(), yices_real_type(), null, null);
   }
@@ -176,7 +187,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   @Override
   public Integer makeVariable(Integer pType, String pVarName) {
-    return yices_named_variable(pType, pVarName);
+    return createNamedVariable(pType, pVarName);
   }
 
   @Override
@@ -246,6 +257,60 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         String.format(
             "Unknown formula type '%s' for formula '%s'",
             yices_type_to_string(yices_type_of_term(pFormula)), yices_term_to_string(pFormula)));
+  }
+
+  /** Creates a named, free variable. Might retrieve it from the cache if created prior. */
+  protected int createNamedVariable(int type, String name) {
+    Integer maybeFormula = formulaCache.get(name, type);
+    if (maybeFormula != null) {
+      return maybeFormula;
+    }
+    if (formulaCache.containsRow(name)) {
+      throw new IllegalArgumentException(
+          "Symbol " + name + " already used for a variable of type " + formulaCache.row(name));
+    }
+    int var = yices_new_uninterpreted_term(type);
+    // Names in Yices2 behave like a stack. The last variable named is retrieved when asking for
+    // a term with a specific name. Since we substitute free vars with bound for quantifiers,
+    // this sometimes mixes them up, hence we track them ourselves.
+    yices_set_term_name(var, name);
+    formulaCache.put(name, type, var);
+    return var;
+  }
+
+  protected int createBoundVariableFromFreeVariable(int unboundVar) {
+    int type = yices_type_of_term(unboundVar);
+    String name = yices_get_term_name(unboundVar);
+
+    int termFromName = yices_get_term_by_name(name);
+    if (termFromName != -1) {
+      int termFromNameType = yices_type_of_term(termFromName);
+      if (type == termFromNameType) {
+        int constructor = yices_term_constructor(termFromName);
+        if (constructor == YICES_VARIABLE) {
+          // Already a bound var
+          return termFromName;
+        }
+      } else {
+        throw new IllegalArgumentException(
+            String.format(
+                "Can't create variable with name '%s' and type '%s' "
+                    + "as it would omit a variable with type '%s'",
+                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
+      }
+    }
+    // reset term name binding
+    // TODO: add yices_remove_term_name();
+    int bound = yices_new_variable(type);
+    // Names in Yices2 behave like a stack. The last variable named is retrieved when asking for
+    // a term with a specific name. Since we substitute free vars with bound for quantifiers,
+    // this sometimes mixes them up, hence we track them ourselves.
+    // This overrides the naming, but the old is cached.
+    // Meaning that if we remove the new name, the old term gets its name back.
+    // Since we just want to retrieve the same var for the quantifier we are currently building,
+    // this is fine.
+    yices_set_term_name(bound, name);
+    return bound;
   }
 
   @Override
@@ -714,7 +779,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     } else {
       yicesFuncType = yices_function_type(size, argTypeArray, pReturnType);
     }
-    int uf = yices_named_variable(yicesFuncType, pName);
+    int uf = createNamedVariable(yicesFuncType, pName);
     return uf;
   }
 
