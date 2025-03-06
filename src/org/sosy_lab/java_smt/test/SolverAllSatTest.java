@@ -251,6 +251,11 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
     assertThat(env.isUnsat()).isFalse();
 
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     TestAllSatCallback callback = new TestAllSatCallback();
 
     assertThat(env.allSat(callback, ImmutableList.of(pred1, pred3))).isEqualTo(EXPECTED_RESULT);

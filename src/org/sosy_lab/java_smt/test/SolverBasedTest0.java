@@ -242,7 +242,7 @@ public abstract class SolverBasedTest0 {
   }
 
   @SuppressWarnings("unused")
-  protected final void requireQuantifierElimination() throws SolverException, InterruptedException {
+  protected final void requireQuantifierElimination() {
     requireQuantifiers();
     assume()
         .withMessage("Solver %s does not support quantifier elimination", solverToUse())
