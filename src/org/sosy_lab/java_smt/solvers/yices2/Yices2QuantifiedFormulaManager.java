@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yicesBoundVariableFromUnbound;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
@@ -31,8 +30,7 @@ public class Yices2QuantifiedFormulaManager
   @Override
   protected Integer eliminateQuantifiers(Integer pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Yices does not support eliminating Quantifiers.");
+    throw new UnsupportedOperationException("Yices2 does not support quantifier elimination.");
   }
 
   @Override
@@ -43,7 +41,8 @@ public class Yices2QuantifiedFormulaManager
     } else {
       List<Integer> yicesVars = new ArrayList<>();
       for (int var : pVars) {
-        yicesVars.add(yicesBoundVariableFromUnbound(var));
+        yicesVars.add(
+            ((Yices2FormulaCreator) formulaCreator).createBoundVariableFromFreeVariable(var));
       }
       int substBody = pBody;
       substBody =

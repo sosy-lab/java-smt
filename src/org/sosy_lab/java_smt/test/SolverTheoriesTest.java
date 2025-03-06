@@ -635,6 +635,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
 
     IntegerFormula var_B = imgr.makeVariable("b");
     IntegerFormula var_C = imgr.makeVariable("c");
@@ -659,6 +660,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
 
     IntegerFormula i1 = imgr.makeVariable("i@1");
     IntegerFormula j1 = imgr.makeVariable("j@1");
