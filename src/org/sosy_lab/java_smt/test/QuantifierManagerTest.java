@@ -836,7 +836,6 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // quantifier-free equivalent: x = 1 | x = 3
     //                      or     extract_0_0 x = 1
 
-
     int i = index.getFreshId();
     int width = 2;
 
