@@ -178,7 +178,16 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula makeNumber(
       BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
-    return wrap(makeNumberImpl(exponent, mantissa, signBit, type));
+    FloatingPointFormula result = wrap(makeNumberImpl(exponent, mantissa, signBit, type));
+    int sign = signBit ? 1 : 0;
+    if (Generator.isLoggingEnabled()) {
+      FloatingPointGenerator.logMakeFloatingPoint(
+          result,
+          type.getExponentSize(),
+          type.getMantissaSize(),
+          String.valueOf(sign + exponent.intValue() + mantissa.intValue()));
+    }
+    return result;
   }
 
   protected abstract TFormulaInfo makeNumberImpl(

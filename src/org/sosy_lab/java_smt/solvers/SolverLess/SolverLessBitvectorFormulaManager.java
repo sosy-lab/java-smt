@@ -60,8 +60,14 @@ public class SolverLessBitvectorFormulaManager
   }
 
   @Override
-  protected SMTLIB2Formula modulo(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
-    return new SMTLIB2Formula(Math.max(pParam1.getBitvectorLength(), pParam2.getBitvectorLength()));
+  protected SMTLIB2Formula remainder(
+      SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, boolean signed) {
+    return new SMTLIB2Formula(pParam1.getBitvectorLength());
+  }
+
+  @Override
+  protected SMTLIB2Formula smodulo(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return new SMTLIB2Formula(pParam1.getBitvectorLength());
   }
 
   @Override

@@ -6,6 +6,7 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -45,6 +46,12 @@ public class SolverLessFloatingPointFormulaManager
                 pFloatingPointRoundingMode.getFormulaType().getRoundingMode()));
     formula.setRepresentation(binaryRepresentation);
     return formula;
+  }
+
+  @Override
+  protected SMTLIB2Formula makeNumberImpl(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    return new SMTLIB2Formula(exponent.intValue(), mantissa.intValue());
   }
 
   @Override
@@ -262,6 +269,11 @@ public class SolverLessFloatingPointFormulaManager
   protected SMTLIB2Formula multiply(
       SMTLIB2Formula pParam1, SMTLIB2Formula pParam2, SMTLIB2Formula pFloatingPointRoundingMode) {
     return new SMTLIB2Formula(pParam1.getExponent(), pParam1.getMantissa());
+  }
+
+  @Override
+  protected SMTLIB2Formula remainder(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
+    return null;
   }
 
   @Override

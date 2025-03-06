@@ -59,6 +59,14 @@ public class SolverLessArrayFormulaManager
   }
 
   @Override
+  protected <TI extends Formula, TE extends Formula> SMTLIB2Formula internalMakeArray(
+      FormulaType<TI> pIndexType, FormulaType<TE> pElementType, SMTLIB2Formula elseElem) {
+    return new SMTLIB2Formula(
+        SMTLIB2Formula.getDummyFormulaFromObject(pIndexType),
+        SMTLIB2Formula.getDummyFormulaFromObject(pElementType));
+  }
+
+  @Override
   protected SMTLIB2Formula equivalence(SMTLIB2Formula pArray1, SMTLIB2Formula pArray2) {
     return new SMTLIB2Formula(pArray1.equals(pArray2));
   }

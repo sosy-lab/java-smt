@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.basicimpl.BinaryModel;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
-@SuppressWarnings({"checkstyle:linelength", "AlmostJavadoc"})
+@SuppressWarnings({"checkstyle:linelength"})
 public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
@@ -1660,10 +1660,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
 
     BitvectorFormula c = Objects.requireNonNull(bvmgr).makeBitvector(12, -10);
     BitvectorFormula d = bvmgr.makeBitvector(12, 20);
-    BitvectorFormula e = bvmgr.makeBitvector(100, 263255254);
-    BitvectorFormula f = bvmgr.makeBitvector(100, 0);
     BooleanFormula expectedResult = bvmgr.equal(c, bvmgr.smodulo(c, d));
-
     Generator.assembleConstraint(expectedResult);
 
     assertThat(actualResult).isEqualTo(expectedResult);
