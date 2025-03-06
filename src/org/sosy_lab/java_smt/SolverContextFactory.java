@@ -298,8 +298,7 @@ public class SolverContextFactory {
         return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader, logger);
 
       case BOOLECTOR:
-        return BoolectorSolverContext.create(
-            config, shutdownNotifier, logfile, randomSeed, loader, logger);
+        return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       case BITWUZLA:
         return BitwuzlaSolverContext.create(

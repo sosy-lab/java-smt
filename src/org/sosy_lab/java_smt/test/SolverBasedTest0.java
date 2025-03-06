@@ -241,6 +241,15 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  @SuppressWarnings("unused")
+  protected final void requireQuantifierElimination() {
+    requireQuantifiers();
+    assume()
+        .withMessage("Solver %s does not support quantifier elimination", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA);
+  }
+
   /** Skip test if the solver does not support arrays. */
   protected /*final*/ void requireArrays() {
     assume()

@@ -37,23 +37,19 @@ public class Yices2QuantifiedFormulaManager
   @Override
   protected Integer eliminateQuantifiers(Integer pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Yices does not support eliminating Quantifiers.");
+    throw new UnsupportedOperationException("Yices2 does not support quantifier elimination.");
   }
 
   @Override
   public Integer mkQuantifier(Quantifier pQ, List<Integer> pVars, Integer pBody) {
-    /*
-     * TODO Yices needs variables constructed using yices_new_variable(), but variables passed in
-     * pVars are constructed with yices_new uninterpreted_term(). Need to construct the correct
-     * variable type from the variables in pVars and map between them.
-     */
+    // Quantifier support is very limited in Yices2
     if (pVars.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for Quantifier.");
     } else {
       List<Integer> yicesVars = new ArrayList<>();
       for (int var : pVars) {
-        yicesVars.add(((Yices2FormulaCreator) formulaCreator).makeVariable(var));
+        yicesVars.add(
+            ((Yices2FormulaCreator) formulaCreator).createBoundVariableFromFreeVariable(var));
       }
       int substBody = pBody;
       substBody =
@@ -63,11 +59,10 @@ public class Yices2QuantifiedFormulaManager
       int[] terms = Ints.toArray(yicesVars);
       if (pQ == Quantifier.FORALL) {
         return yices_forall(terms.length, terms, substBody);
-      } else if (pQ == Quantifier.EXISTS) {
+      } else {
         return yices_exists(terms.length, terms, substBody);
       }
     }
-    return null;
   }
 
   @Override

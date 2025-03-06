@@ -867,6 +867,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -883,6 +887,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -897,6 +905,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = bmgr.not(imgr.equal(imgr.makeNumber(1), x));
@@ -972,6 +984,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
     // Z3 returns UNKNOWN as its quantifiers can not handle this.
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
@@ -990,6 +1006,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
     // Z3 returns UNKNOWN as its quantifiers can not handle this.
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
@@ -1180,6 +1200,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -1193,6 +1215,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
     BooleanFormula f = qmgr.exists(quantifiedVars, body);
@@ -1206,6 +1230,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
     BooleanFormula f = qmgr.exists(quantifiedVars, body);

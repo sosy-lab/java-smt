@@ -93,6 +93,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(qmgr.forall(v, rmgr.lessOrEquals(rmgr.floor(v), v))).isTautological();
   }
@@ -101,6 +106,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers
     assertThatFormula(qmgr.forall(v, rmgr.lessThan(rmgr.floor(v), v))).isUnsatisfiable();
