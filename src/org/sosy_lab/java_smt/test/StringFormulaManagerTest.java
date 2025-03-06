@@ -1425,6 +1425,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
     requireVariableStringLiterals();
 
+    assume()
+        .withMessage("Regression from Z3 4.13.4 to 4.14.0")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3);
+
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
     StringFormula prefix = smgr.makeVariable("prefix");

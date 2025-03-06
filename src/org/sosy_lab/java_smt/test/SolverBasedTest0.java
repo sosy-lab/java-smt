@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -238,6 +239,19 @@ public abstract class SolverBasedTest0 {
             solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  protected final void requireFPToBitvector() {
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .that(solverToUse())
+          .isNull();
+    }
   }
 
   /** Skip test if the solver does not support quantifiers. */
