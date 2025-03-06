@@ -47,15 +47,15 @@ import java.util.Collections;
  * This class mocks {@link IProgramExecution}. It can be used in JUnit tests.
  *
  * @author Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
- * @param <TE> TraceElementClazz
+ * @param <T> TraceElementClazz
  * @param <E> ExprClazz
  */
-final class ProgramExecutionMock<TE, E> implements IProgramExecution<TE, E> {
+final class ProgramExecutionMock<T, E> implements IProgramExecution<T, E> {
 
   private final Class<E> mExprClazz;
-  private final Class<TE> mTraceElementClazz;
+  private final Class<T> mTraceElementClazz;
 
-  public ProgramExecutionMock(final Class<E> exprClazz, final Class<TE> traceElementClazz) {
+  ProgramExecutionMock(final Class<E> exprClazz, final Class<T> traceElementClazz) {
     mExprClazz = exprClazz;
     mTraceElementClazz = traceElementClazz;
   }
@@ -66,7 +66,7 @@ final class ProgramExecutionMock<TE, E> implements IProgramExecution<TE, E> {
   }
 
   @Override
-  public AtomicTraceElement<TE> getTraceElement(final int index) {
+  public AtomicTraceElement<T> getTraceElement(final int index) {
     throw new IndexOutOfBoundsException();
   }
 
@@ -86,7 +86,7 @@ final class ProgramExecutionMock<TE, E> implements IProgramExecution<TE, E> {
   }
 
   @Override
-  public Class<TE> getTraceElementClass() {
+  public Class<T> getTraceElementClass() {
     return mTraceElementClazz;
   }
 
@@ -96,7 +96,7 @@ final class ProgramExecutionMock<TE, E> implements IProgramExecution<TE, E> {
   }
 
   @Override
-  public IBacktranslationValueProvider<TE, E> getBacktranslationValueProvider() {
+  public IBacktranslationValueProvider<T, E> getBacktranslationValueProvider() {
     return new NoBacktranslationValueProvider<>();
   }
 }

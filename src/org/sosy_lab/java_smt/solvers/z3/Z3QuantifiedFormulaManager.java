@@ -17,7 +17,6 @@ import java.util.List;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
-import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
 class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 
@@ -64,7 +63,7 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Long result =
-        formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
+        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
     return result;
   }
 }

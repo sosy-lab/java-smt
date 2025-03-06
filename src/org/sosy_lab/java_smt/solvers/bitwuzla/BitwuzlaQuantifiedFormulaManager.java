@@ -21,7 +21,6 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
-import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
 public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
@@ -46,7 +45,7 @@ public class BitwuzlaQuantifiedFormulaManager
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Term result =
-        formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
+        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
     return result;
   }
 

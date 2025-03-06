@@ -18,7 +18,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
 public class CVC5QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Solver, Term> {
@@ -65,7 +64,7 @@ public class CVC5QuantifiedFormulaManager
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Term result =
-        formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
+        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
     return result;
   }
 

@@ -10,12 +10,12 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -102,8 +102,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   private BooleanFormula mkWithoutQuantifier(
       Quantifier pQ, List<TFormulaInfo> pVariables, TFormulaInfo pBody) throws IOException {
-    int quantifier;
-
     String form = fmgr.get().dumpFormulaImpl(pBody);
     Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
     List<String> nameList = new ArrayList<>();
@@ -114,7 +112,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Term ultimateVar = getUltimateEliminatorWrapper().parse(dumpedVar);
       Sort varType = ultimateVar.getSort();
       String varName = ((ApplicationTerm) ultimateVar).getFunction().getName();
-      if(varName!=null && varType!=null) {
+      if (varName != null && varType != null) {
         sortList.add(varType);
         nameList.add(varName);
       }
@@ -157,7 +155,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   private String buildUltimateEliminatorFormula(
       Quantifier pQ, List<String> pNameList, List<Sort> pSortList, Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
-    sb.append("(assert (").append(pQ.toString().toLowerCase()).append(" (");
+    sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
     if (!pNameList.isEmpty()) {
       for (int i = 0; i < pNameList.size(); i++) {
         sb.append("(").append(pNameList.get(i)).append(" ").append(pSortList.get(i)).append(")");

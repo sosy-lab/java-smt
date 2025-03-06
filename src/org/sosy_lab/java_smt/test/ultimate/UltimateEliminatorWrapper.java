@@ -32,7 +32,6 @@ public class UltimateEliminatorWrapper {
     provider =
         org.sosy_lab.java_smt.test.ultimate.UltimateServiceProviderMock
             .createUltimateServiceProviderMock();
-    ;
     iLogger = provider.getLoggingService().getControllerLogger();
     interpol = new SMTInterpol();
     ultimateEliminator = new UltimateEliminator(provider, iLogger, interpol);

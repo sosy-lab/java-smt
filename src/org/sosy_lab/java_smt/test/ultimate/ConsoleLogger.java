@@ -84,11 +84,11 @@ public final class ConsoleLogger implements ILogger {
     return queryLevel.compareTo(mLevel) >= 0;
   }
 
-  private static interface ILogFunction {
+  private interface ILogFunction {
 
-    void log(final Object msg);
+    void log(Object msg);
 
-    void log(final Object msg, Throwable t);
+    void log(Object msg, Throwable t);
   }
 
   private static final class Log implements ILogFunction {

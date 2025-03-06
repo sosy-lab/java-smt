@@ -22,7 +22,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
 public class Yices2QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Integer, Integer, Long, Integer> {
@@ -79,7 +78,7 @@ public class Yices2QuantifiedFormulaManager
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Integer result =
-        formulaManager.parseImpl(UltimateEliminatorParser.dumpFormula(formula).toString());
+        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
     return result;
   }
 
