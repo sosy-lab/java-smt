@@ -185,6 +185,9 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     pSolver.setOption("seed", String.valueOf(randomSeed));
     pSolver.setOption("output-language", "smtlib2");
 
+    // Enable support for arbitrary size floating-point formats
+    pSolver.setOption("fp-exp", "true");
+
     for (Entry<String, String> option : furtherOptions.entrySet()) {
       pSolver.setOption(option.getKey(), option.getValue());
     }
