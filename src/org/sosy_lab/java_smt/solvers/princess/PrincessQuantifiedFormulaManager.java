@@ -19,6 +19,8 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
 import ap.types.Sort;
+import de.uni_freiburg.informatik.ultimate.logic.Term;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
@@ -66,5 +68,17 @@ class PrincessQuantifiedFormulaManager
       throws SolverException, InterruptedException {
     checkArgument(formula instanceof IFormula);
     return env.elimQuantifiers((IFormula) formula);
+  }
+
+  @Override
+  protected IExpression eliminateQuantifiersUltimateEliminator(IExpression pExtractInfo)
+      throws UnsupportedOperationException, IOException {
+    PrincessFormulaManager formulaManager = (PrincessFormulaManager) getFormulaManager();
+    Term formula =
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
+    formula = getUltimateEliminatorWrapper().simplify(formula);
+    IExpression result =
+        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
+    return result;
   }
 }
