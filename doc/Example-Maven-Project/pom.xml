@@ -190,7 +190,7 @@ SPDX-License-Identifier: Apache-2.0
       <classifier>libcvc4parser</classifier>
     </dependency>
 
-    <!-- CVC5 has six dependencies (on Linux) -->
+    <!-- CVC5 has two dependencies (on Linux) -->
     <dependency>
       <groupId>org.sosy-lab</groupId>
       <artifactId>javasmt-solver-cvc5</artifactId>
@@ -203,35 +203,7 @@ SPDX-License-Identifier: Apache-2.0
       <artifactId>javasmt-solver-cvc5</artifactId>
       <version>${cvc5.version}</version>
       <type>so</type>
-      <classifier>libcvc5</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
       <classifier>libcvc5jni</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libcvc5parser</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libpoly</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-cvc5</artifactId>
-      <version>${cvc5.version}</version>
-      <type>so</type>
-      <classifier>libpolyxx</classifier>
     </dependency>
 
     <!-- Yices2 has two dependencies (on Linux) -->
@@ -434,42 +406,14 @@ SPDX-License-Identifier: Apache-2.0
                 <destFileName>libcvc4parser.so</destFileName>
               </artifactItem>
 
-              <!-- CVC5 has six dependencies (on Linux),
+              <!-- CVC5 has two dependencies (on Linux),
                    and renaming the JAR file is not required -->
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libcvc5</classifier>
-                <destFileName>libcvc5.so</destFileName>
-              </artifactItem>
               <artifactItem>
                 <groupId>org.sosy-lab</groupId>
                 <artifactId>javasmt-solver-cvc5</artifactId>
                 <type>so</type>
                 <classifier>libcvc5jni</classifier>
                 <destFileName>libcvc5jni.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libcvc5parser</classifier>
-                <destFileName>libcvc5parser.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libpoly</classifier>
-                <destFileName>libpoly.so</destFileName>
-              </artifactItem>
-              <artifactItem>
-                <groupId>org.sosy-lab</groupId>
-                <artifactId>javasmt-solver-cvc5</artifactId>
-                <type>so</type>
-                <classifier>libpolyxx</classifier>
-                <destFileName>libpolyxx.so</destFileName>
               </artifactItem>
 
               <!-- Yices2 has two dependencies (on Linux),

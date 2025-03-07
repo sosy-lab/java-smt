@@ -11,9 +11,8 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 <ivy-module version="2.0"
-    xmlns:e="http://ant.apache.org/ivy/extra"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
     <info organisation="org.sosy_lab" module="javasmt-solver-cvc5">
       <license name="Modified BSD License" url="https://github.com/cvc5/cvc5/blob/master/COPYING"/>
         <description>
@@ -28,10 +27,6 @@ SPDX-License-Identifier: Apache-2.0
 
     <publications defaultconf="solver-cvc5">
         <artifact name="libcvc5jni"    conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="libcvc5"       conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="libcvc5parser" conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="libpolyxx"     conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="libpoly"       conf="solver-cvc5" type="shared-object" ext="so"/>
         <artifact name="cvc5"          conf="solver-cvc5" />
     </publications>
 
