@@ -75,15 +75,11 @@ public class CVC5FloatingPointFormulaManager
   protected Term makeNumberImpl(
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     try {
-      final String signStr = sign.isNegative() ? "1" : "0";
-      final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
-      final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
-      final String bitvecForm = signStr + exponentStr + mantissaStr;
+      return termManager.mkFloatingPoint(
+          termManager.mkBitVector(1, sign == Sign.NEGATIVE ? 1 : 0),
+          termManager.mkBitVector(type.getExponentSize(), exponent.toString(16), 16),
+          termManager.mkBitVector(type.getMantissaSize(), mantissa.toString(16), 16));
 
-      final Term bv =
-          termManager.mkBitVector(
-              type.getExponentSize() + type.getMantissaSize() + 1, bitvecForm, 2);
-      return termManager.mkFloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bv);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("You tried creating a invalid bitvector", e);
     }
