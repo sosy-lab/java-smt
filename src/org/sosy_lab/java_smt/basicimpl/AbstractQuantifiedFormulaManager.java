@@ -9,8 +9,6 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.collect.Lists;
-import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,6 +22,8 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -50,19 +50,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws InterruptedException, SolverException, UnsupportedOperationException {
     if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
-        System.out.println("Eliminating quantifiers via UltimateEliminator.");
         return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF)));
-      } catch (UnsupportedOperationException e) {
-        System.out.println(
-            "Solver does not support eliminating via UltimateEliminator yet. Falling back to "
-                + "native "
-                + "quantifier elimination.");
-        return wrap(eliminateQuantifiers(extractInfo(pF)));
-      } catch (IOException e) {
-        System.out.println(
-            "Independent quantifier elimination via UltimateEliminator failed. Falling back to "
-                + "native "
-                + "quantifier elimination.");
+      } catch (UnsupportedOperationException | IOException e) {
         return wrap(eliminateQuantifiers(extractInfo(pF)));
       }
     }
@@ -83,14 +72,10 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     if (option != null
         && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
       try {
-        System.out.println(
-            "Eliminating quantifiers via UltimateEliminator before formula creation.");
-        return mkWithoutQuantifier(
-            q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody));
+        return mkWithoutQuantifier(q, pVariables, pBody);
       } catch (IOException e) {
-        System.out.println(
-            "Independent quantifier elimination via UltimateEliminator before formula creation "
-                + "failed.");
+        return wrap(
+            mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
       }
     }
     return wrap(
@@ -99,33 +84,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
-
-  private BooleanFormula mkWithoutQuantifier(
-      Quantifier pQ, List<TFormulaInfo> pVariables, TFormulaInfo pBody) throws IOException {
-    String form = fmgr.get().dumpFormulaImpl(pBody);
-    Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
-    List<String> nameList = new ArrayList<>();
-    List<Sort> sortList = new ArrayList<>();
-
-    for (TFormulaInfo var : pVariables) {
-      String dumpedVar = fmgr.get().dumpFormulaImpl(var);
-      Term ultimateVar = getUltimateEliminatorWrapper().parse(dumpedVar);
-      Sort varType = ultimateVar.getSort();
-      String varName = ((ApplicationTerm) ultimateVar).getFunction().getName();
-      if (varName != null && varType != null) {
-        sortList.add(varType);
-        nameList.add(varName);
-      }
-    }
-    String ultimateFormula = buildUltimateEliminatorFormula(pQ, nameList, sortList, ultimateBody);
-
-    Term parsedResult = getUltimateEliminatorWrapper().parse(ultimateFormula);
-    Term resultFormula = getUltimateEliminatorWrapper().simplify(parsedResult);
-
-    BooleanFormula result =
-        fmgr.get().parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
-    return result;
-  }
 
   @Override
   public ProverOptions getOption() {
@@ -152,8 +110,57 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     fmgr = Optional.of(pFmgr);
   }
 
+  private BooleanFormula mkWithoutQuantifier(
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
+    List<String> nameList = new ArrayList<>();
+    List<String> sortList = new ArrayList<>();
+
+    String form = fmgr.get().dumpFormulaImpl(extractInfo(pBody));
+    Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
+    for (Formula var : pVariables) {
+      formulaCreator.visit(
+          var,
+          new DefaultFormulaVisitor<>() {
+            @Override
+            protected TraversalProcess visitDefault(Formula f) {
+              return TraversalProcess.CONTINUE;
+            }
+
+            @Override
+            public TraversalProcess visitFreeVariable(Formula f, String name) {
+              nameList.add(name);
+              String sort = "";
+              if (fmgr.get().getFormulaType(f).toString().contains("Array")) {
+                sort = "(" + fmgr.get().getFormulaType(f) + ")";
+              } else {
+                sort = fmgr.get().getFormulaType(f).toString();
+              }
+              sortList.add(mapTypeToUltimateSort(sort));
+              return TraversalProcess.CONTINUE;
+            }
+          });
+    }
+    String ultimateFormula = buildUltimateEliminatorFormula(q, nameList, sortList, ultimateBody);
+
+    Term parsedResult = getUltimateEliminatorWrapper().parse(ultimateFormula);
+    Term resultFormula = getUltimateEliminatorWrapper().simplify(parsedResult);
+
+    BooleanFormula result =
+        fmgr.get().parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
+    return result;
+  }
+
+  private String mapTypeToUltimateSort(String pSort) {
+    return pSort
+        .replace("<", " ")
+        .replace(">", "")
+        .replace(",", " ")
+        .replace("Integer", "Int")
+        .replace("Boolean", "Bool");
+  }
+
   private String buildUltimateEliminatorFormula(
-      Quantifier pQ, List<String> pNameList, List<Sort> pSortList, Term pUltimateBody) {
+      Quantifier pQ, List<String> pNameList, List<String> pSortList, Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
     sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
     if (!pNameList.isEmpty()) {
