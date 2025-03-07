@@ -124,6 +124,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     // The TermManager is the central class for creating expressions/terms/formulae.
     // We keep this instance available until the whole context is closed.
     TermManager termManager = new TermManager();
+
+    // Create a new solver instance
+    // We'll use this instance in some of the formula managers for simplifying terms and declaring
+    // datatypes. The actual solving is done on a different instance that is created by
+    // newProverEnvironment()
     Solver newSolver = new Solver(termManager);
 
     try {
