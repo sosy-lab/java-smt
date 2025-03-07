@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_S
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_FORALL_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_POWER_PRODUCT;
@@ -42,8 +43,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
@@ -55,10 +58,12 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_thread_safe;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uninterpreted_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
@@ -599,6 +604,26 @@ public class Yices2NativeApiTest {
     assertThat(component[0]).isEqualTo(bv2);
     assertThat(component[1]).isEqualTo(2);
     assertThat(yices_term_constructor(yices_bvpower(component[0], component[1]))).isGreaterThan(0);
+  }
+
+  @Test
+  public void isThreadSafe() {
+    // TODO: this explains why our concurrency tests fail ;D FIX!
+    assertThat(yices_is_thread_safe()).isEqualTo(0);
+  }
+
+  @Test
+  public void quantifierTest() {
+    int boundVar = yices_new_variable(yices_int_type());
+    int eleven = yices_int32(11);
+    int body = yices_eq(eleven, boundVar);
+
+    int forall = yices_forall(1, new int[] {boundVar}, body);
+    int exists = yices_exists(1, new int[] {boundVar}, body);
+
+    assertThat(yices_term_constructor(forall)).isEqualTo(YICES_FORALL_TERM);
+    assertThat(yices_term_constructor(exists)).isEqualTo(YICES_NOT_TERM);
+    assertThat(yices_term_constructor(yices_term_child(exists, 0))).isEqualTo(YICES_FORALL_TERM);
   }
 
   /**
