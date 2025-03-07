@@ -99,7 +99,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
-    pLoader.accept("cvc5jni");
+    pLoader.accept("cvc5j");
 
     // disable CVC5's own loading mechanism,
     // see io.github.cvc5.Util#loadLibraries and https://github.com/cvc5/cvc5/pull/9047

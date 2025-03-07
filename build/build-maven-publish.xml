@@ -233,7 +233,7 @@ SPDX-License-Identifier: Apache-2.0
         <generate-solver-pom-file/>
         <!-- then publish the files -->
         <stage-solver-file filename="cvc5" fileending="jar"/>
-        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni" fileending="so"/>
+        <stage-solver-file filename="libcvc5j" classifier="libcvc5j" fileending="so"/>
     </target>
 
     <!--
