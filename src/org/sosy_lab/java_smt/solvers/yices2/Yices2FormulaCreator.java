@@ -282,6 +282,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     int type = yices_type_of_term(unboundVar);
     String name = yices_get_term_name(unboundVar);
 
+    // Search for recently created bound variables and re-use it
+    // (Names work like a stack in Yices2. If we associate a term with a name, we get that term
+    // if we ask yices_get_term_by_name(). However, if we create bound variables, we associate
+    // them with the same name as the free variable (so that it has the same name). This pushes the
+    // name stack, and we get the bound var when asking yices_get_term_by_name(). We want to
+    // re-use the bound variables here, but never the free ones.)
     int termFromName = yices_get_term_by_name(name);
     if (termFromName != -1) {
       int termFromNameType = yices_type_of_term(termFromName);
