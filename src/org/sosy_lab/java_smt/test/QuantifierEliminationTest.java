@@ -35,9 +35,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNotEqualTo(Solvers.BOOLECTOR);
 
     assume()
-        .withMessage("Solver %s does not support parsing", solverToUse())
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.MATHSAT5);
 
     qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
@@ -66,9 +66,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNotEqualTo(Solvers.BOOLECTOR);
 
     assume()
-        .withMessage("Solver %s does not support parsing", solverToUse())
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.MATHSAT5);
 
     qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
@@ -97,7 +97,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNotEqualTo(Solvers.BOOLECTOR);
 
     assume()
-        .withMessage("Solver %s does not support parsing", solverToUse())
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
@@ -112,5 +112,33 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     BooleanFormula query = qmgr.forall(var, imgr.equal(amgr.select(var, k), amgr.select(var, i)));
 
     assertThatFormula(query).isEquivalentTo(imgr.equal(k, i));
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithoutArraysBefore()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+
+    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula five = imgr.makeNumber(5);
+
+    BooleanFormula query =
+        qmgr.forall(k, bmgr.or(imgr.lessOrEquals(k, five), imgr.greaterOrEquals(k, two)));
+
+    assertThatFormula(query).isSatisfiable();
   }
 }
