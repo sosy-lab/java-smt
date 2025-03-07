@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_POWER_PRODUCT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
@@ -90,14 +91,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
@@ -198,26 +196,23 @@ public class Yices2NativeApiTest {
     assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = IllegalArgumentException.class)
   public void rationalError() {
-    int rat = yices_rational32(1, 0);
-    System.out.println(rat); // "use" variable
+    yices_rational32(1, 0);
   }
 
-  // TODO: what is this test supposed to be doing? And remove print.
-  @Ignore
   @Test
   public void negativeRationalError() {
     // TODO negative unsigned integer causes no error. Need to ensure positive value before
-    int rat = yices_rational32(1, -5);
-    System.out.println(rat); // "use" variable
+    assertThat(yices_rational32(1, -5)).isGreaterThan(0);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = IllegalArgumentException.class)
   public void wrongType() {
     int one = yices_int32(1);
-    int bitsize = yices_term_bitsize(one);
-    System.out.println(bitsize); // "use" variable
+    yices_term_bitsize(one);
   }
 
   @Test
@@ -472,8 +467,6 @@ public class Yices2NativeApiTest {
     assertThat(yices_term_constructor(mul)).isEqualTo(YICES_ARITH_CONST);
   }
 
-  // TODO: what is this test supposed to be doing? And remove print.
-  @Ignore
   @Test
   public void sumComponents() {
     int three = yices_int32(3);
@@ -482,84 +475,99 @@ public class Yices2NativeApiTest {
     int[] oneX = {three, x};
     int sumOneX = yices_sum(2, oneX);
     for (int i = 0; i < yices_term_num_children(sumOneX); i++) {
-      System.out.println(yices_term_to_string(sumOneX));
-      System.out.println(Arrays.toString(yices_sum_component(sumOneX, i)));
+      assertThat(yices_term_to_string(sumOneX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumOneX, i))).isNotNull();
     }
     int[] twoX = {three, x, x};
     int sumTwoX = yices_sum(3, twoX);
     for (int i = 0; i < yices_term_num_children(sumTwoX); i++) {
-      System.out.println(yices_term_to_string(sumTwoX));
-      System.out.println(Arrays.toString(yices_sum_component(sumTwoX, i)));
+      assertThat(yices_term_to_string(sumTwoX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumTwoX, i))).isNotNull();
     }
     int[] twoThrees = {three, x, three};
     int sumTwoThrees = yices_sum(3, twoThrees);
     for (int i = 0; i < yices_term_num_children(sumTwoThrees); i++) {
-      System.out.println(yices_term_to_string(sumTwoThrees));
-      System.out.println(Arrays.toString(yices_sum_component(sumTwoThrees, i)));
+      assertThat(yices_term_to_string(sumTwoThrees)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumTwoThrees, i))).isNotNull();
     }
     int xTimesRational = yices_mul(rat, x);
     int[] ratSum = {three, xTimesRational};
     int sumRatX = yices_sum(2, ratSum);
     for (int i = 0; i < yices_term_num_children(sumRatX); i++) {
-      System.out.println(yices_term_to_string(sumRatX));
-      System.out.println(Arrays.toString(yices_sum_component(sumRatX, i)));
+      assertThat(yices_term_to_string(sumRatX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumRatX, i))).isNotNull();
     }
   }
 
-  // TODO: what is this test supposed to be doing? And remove print.
-  @Ignore
   @Test
   public void bvSumComponents() {
-    int bv1 = yices_parse_bvbin("00101");
+    String bv1StringValue = "00101";
+    int bv1 = yices_parse_bvbin(bv1StringValue);
     int bv5type = yices_bv_type(5);
     int x = yices_named_variable(bv5type, "x");
     int negativeX = yices_bvmul(yices_bvconst_minus_one(5), x);
     int add = yices_bvadd(bv1, negativeX);
-    for (int i = 0; i < yices_term_num_children(add); i++) {
-      System.out.println(yices_term_to_string(add));
-      int[] component = yices_bvsum_component(add, i, yices_term_bitsize(add));
-      String value =
-          Joiner.on("")
-              .join(
-                  Lists.reverse(
-                      Ints.asList(Arrays.copyOfRange(component, 0, component.length - 1))));
-      int term = component[component.length - 1];
-      System.out.println("Value of coefficient: " + value);
-      System.out.println("Coefficient as BigInt: " + new BigInteger(value, 2));
-      System.out.println("Term id: " + term);
-    }
+    assertThat(yices_term_num_children(add)).isEqualTo(2);
+    assertThat(yices_term_to_string(add)).isNotNull();
+
+    int[] component1 = yices_bvsum_component(add, 0, yices_term_bitsize(add));
+    String value1 =
+        Joiner.on("")
+            .join(
+                Lists.reverse(
+                    Ints.asList(Arrays.copyOfRange(component1, 0, component1.length - 1))));
+    int term1 = component1[component1.length - 1];
+    // Value of coefficient
+    assertThat(value1).isEqualTo(bv1StringValue);
+    // Coefficient as BigInt
+    assertThat(new BigInteger(value1, 2)).isEqualTo(BigInteger.valueOf(5));
+    // Term id is NULL (-1) for i = 0
+    assertThat(term1).isEqualTo(-1);
+
+    int[] component2 = yices_bvsum_component(add, 1, yices_term_bitsize(add));
+    String value2 =
+        Joiner.on("")
+            .join(
+                Lists.reverse(
+                    Ints.asList(Arrays.copyOfRange(component2, 0, component2.length - 1))));
+    int term2 = component2[component2.length - 1];
+    // Value of coefficient (-1 == 11111)
+    assertThat(value2).isEqualTo("11111");
+    // Coefficient as BigInt (31 because it has no sign bit, and -1 is max for bv)
+    assertThat(new BigInteger(value2, 2)).isEqualTo(BigInteger.valueOf(31));
+    // Term id is NULL (-1) for i = 0
+    assertThat(term2).isEqualTo(x);
   }
 
-  // TODO: what is this test supposed to be doing? And remove print.
-  @Ignore
-  @Test
+  @Test(expected = IllegalArgumentException.class)
   public void bvExtensionStructureTest() {
+    int initialSize = 5;
     int extendBy = 5;
-    int x = yices_named_variable(yices_bv_type(5), "x");
-    List<Integer> terms = new ArrayList<>();
-    terms.add(yices_sign_extend(x, extendBy));
-    terms.add(yices_sign_extend(x, extendBy));
-    terms.add(yices_zero_extend(x, extendBy));
-    terms.add(yices_zero_extend(x, extendBy));
-    for (int t : terms) {
-      System.out.println("--------BEGIN-------");
-      System.out.println(yices_term_to_string(t));
-      for (int i = 0; i < yices_term_num_children(t); i++) {
-        System.out.println(yices_term_to_string(yices_term_child(t, i)));
-      }
-      int bv = yices_proj_arg(yices_term_child(t, 0));
-      int bvSize = yices_term_bitsize(bv);
-      int extendedBy = yices_term_num_children(t) - bvSize;
-      System.out.println("Extended by: " + extendedBy);
-      if (extendedBy != 0) {
-        if (yices_term_child(t, bvSize) == yices_false()) {
-          System.out.println("Zero-Extend");
-        } else {
-          System.out.println("Sign-extend");
-        }
-      }
-      System.out.println("--------END-------");
-    }
+    int x = yices_named_variable(yices_bv_type(initialSize), "x");
+    int signExtendedX = yices_sign_extend(x, extendBy);
+    int zeroExtendedX = yices_zero_extend(x, extendBy);
+
+    assertThat(yices_term_to_string(x)).isNotNull();
+    assertThat(yices_term_num_children(x)).isEqualTo(0);
+    assertThat(yices_term_num_children(signExtendedX)).isEqualTo(initialSize + extendBy);
+    assertThat(yices_term_to_string(signExtendedX)).isNotNull();
+    assertThat(yices_term_num_children(zeroExtendedX)).isEqualTo(initialSize + extendBy);
+    assertThat(yices_term_to_string(zeroExtendedX)).isNotNull();
+
+    int bvSignExt = yices_proj_arg(yices_term_child(signExtendedX, 0));
+    int bvSizeSignExt = yices_term_bitsize(bvSignExt);
+    int extendedBySignExt = yices_term_num_children(signExtendedX) - bvSizeSignExt;
+    assertThat(extendedBySignExt).isEqualTo(extendBy);
+
+    int bvZeroExt = yices_proj_arg(yices_term_child(zeroExtendedX, 0));
+    int bvSizeZeroExt = yices_term_bitsize(bvZeroExt);
+    int extendedByZeroExt = yices_term_num_children(zeroExtendedX) - bvSizeZeroExt;
+    assertThat(extendedByZeroExt).isEqualTo(extendBy);
+
+    assertThat(yices_term_child(zeroExtendedX, bvSizeZeroExt)).isEqualTo(yices_false());
+    assertThat(yices_term_child(signExtendedX, bvSizeSignExt)).isNotEqualTo(yices_false());
+
+    yices_proj_arg(yices_term_child(x, 0)); // throws
   }
 
   @Test
@@ -580,18 +588,17 @@ public class Yices2NativeApiTest {
     assertThat(constructor).isEqualTo(YICES_BV_SUM);
   }
 
-  // TODO: what is this test supposed to be doing? And remove print.
-  @Ignore
   @Test
   public void bvMul() {
     int type = yices_bv_type(5);
     int bv2 = yices_named_variable(type, "x");
     int mul = yices_bvmul(bv2, bv2);
-    System.out.println(yices_term_constructor(mul));
+    assertThat(yices_term_constructor(mul)).isEqualTo(YICES_POWER_PRODUCT);
+    // bv2 + bv2 == bv2²
     int[] component = yices_product_component(mul, 0);
-    System.out.println(component[0]);
-    System.out.println(component[1]);
-    System.out.println(yices_term_constructor(yices_bvpower(component[0], component[1])));
+    assertThat(component[0]).isEqualTo(bv2);
+    assertThat(component[1]).isEqualTo(2);
+    assertThat(yices_term_constructor(yices_bvpower(component[0], component[1]))).isGreaterThan(0);
   }
 
   /**
