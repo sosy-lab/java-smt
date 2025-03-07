@@ -297,6 +297,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           // Already a bound var
           return termFromName;
         }
+        // Fall-through to creation of new bound variable
       } else {
         throw new IllegalArgumentException(
             String.format(
