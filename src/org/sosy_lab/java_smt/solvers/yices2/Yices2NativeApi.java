@@ -610,7 +610,15 @@ public class Yices2NativeApi {
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);
 
   // TODO can return up to UINT32_MAX ?
-  /** Returns an array in the form [term,power]. */
+  //  Daniel: we cast the uint return of exp to signed int (jint), this is obviously wrong!
+  /**
+   * Returns an array of size 2 in the form [term,exp] for the term and exponent at index i and
+   * checks automatically for errors (original function return) and throws IllegalArgumentException
+   * for return value -1. Original API: int32_t yices_product_component(term_t t, int32_t i, term_t
+   * *term, uint32_t *exp) Component of a power product. A product t is of the form t0^d0 × … ×
+   * tn^dn. This function stores the term ti into *term and the exponent di into *exp. The function
+   * returns -1 if t is not a product or if the index i is too large. It returns 0 otherwise.
+   */
   public static native int[] yices_product_component(int t, int i);
 
   /*
