@@ -14,7 +14,6 @@ import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,11 +32,13 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   public void setup() {
     Generator.setIsLoggingEnabled(true);
   }
+
   @After
   public void teardown() {
     Generator.setIsLoggingEnabled(false);
     Generator.resetGenerator();
   }
+
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig = super.createTestConfigBuilder();
