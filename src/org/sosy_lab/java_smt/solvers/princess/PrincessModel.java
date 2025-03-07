@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static org.sosy_lab.java_smt.solvers.princess.PrincessAbstractProver.callWithoutSystemErrStream;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
@@ -69,7 +70,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    scala.collection.Map<IExpression, IExpression> interpretation = model.interpretation();
+    scala.collection.Map<IExpression, IExpression> interpretation =
+        callWithoutSystemErrStream(model::interpretation);
 
     // get abbreviations, we do not want to export them.
     Set<Predicate> abbrevs = new LinkedHashSet<>();
@@ -303,8 +305,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       ITerm term = (ITerm) expr;
       ITerm var = api.createConstant(newVariable, getSort(term));
       api.addAssertion(var.$eq$eq$eq(term));
-      api.checkSat(true);
-      ITerm value = simplifyRational(api.evalToTerm(var));
+      callWithoutSystemErrStream(() -> api.checkSat(true));
+      ITerm value = simplifyRational(callWithoutSystemErrStream(() -> api.evalToTerm(var)));
       api.pop();
       prover.addEvaluatedTerm(value.$eq$eq$eq(term));
       return value;
@@ -312,7 +314,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
       IFormula formula = (IFormula) expr;
       IFormula var = api.createBooleanVariable(newVariable);
       api.addAssertion(var.$less$eq$greater(formula));
-      api.checkSat(true);
+      callWithoutSystemErrStream(() -> api.checkSat(true));
       IFormula value = IBoolLit$.MODULE$.apply(api.eval(var));
       api.pop();
       prover.addEvaluatedTerm(value.$less$eq$greater(formula));
