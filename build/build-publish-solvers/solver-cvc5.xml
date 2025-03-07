@@ -16,13 +16,13 @@ SPDX-License-Identifier: Apache-2.0
     <import file="macros.xml"/>
 
     <!-- Build options for CVC5, Reasoning:
-          - 'auto-download' loads all dependencies automatically,
+          - 'production' enable optimization, disables assertions and tracing,
+          - 'static' build libcvc5 and all dependencies statically,
+          - 'java-bindings' build the JNI bindings,
+          - 'auto-download' load all dependencies automatically,
           - 'statistics' for the new statistics stuff,
-          - 'prefix' because i don't want it to use system installed or install systemwide,
-          - 'fPIC' for position-independent code, required for shared libraries.
-          The full cmdline for building CVC5 is (note the double-dashes!):
-            ./configure.sh production - -java-bindings - -auto-download - -statistics - -prefix=$WORKSPACE/cvc5-main/build/install -DVAR=fPIC
-          Theoretically CVC5s performance should be improveable by using -best (uses the best
+          - 'prefix' because I don't want it to use system installed or install system-wide,
+          Theoretically CVC5s performance should be improvable by using -best (uses the best
           known general performance/dependencies) but this can not be combined with auto-download.
     -->
     <!-- SECTION: Publishing CVC5
@@ -60,12 +60,12 @@ SPDX-License-Identifier: Apache-2.0
 
         <echo message="Configuring and building CVC5 in version '${cvc5.version}'"/>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <!--<arg value="production"/>-->
+            <arg value="production"/>
+            <arg value="--static"/>
             <arg value="--java-bindings"/>
             <arg value="--auto-download"/>
             <arg value="--statistics"/>
             <arg value="--prefix=${cvc5.path}/build/install"/>
-            <arg value="-DVAR=fPIC"/>
         </exec>
         <exec executable="make" dir="${cvc5.path}/build/" failonerror="true">
             <arg value="-j4" />
@@ -79,67 +79,13 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- copy library files into directory to be published for IVY -->
         <echo message="Copying artifact files into current directory"/>
-        <copy file="${cvc5.path}/build/src/libcvc5.so" tofile="libcvc5-${cvc5.version}.so"/>
-        <copy file="${cvc5.path}/build/src/parser/libcvc5parser.so" tofile="libcvc5parser-${cvc5.version}.so"/>
         <copy file="${cvc5.path}/build/src/api/java/libcvc5jni.so" tofile="libcvc5jni-${cvc5.version}.so"/>
         <copy file="${cvc5.jar}" tofile="cvc5-${cvc5.version}.jar"/>
-        <copy file="${cvc5.path}/build/deps/lib/libpolyxx.so" tofile="libpolyxx-${cvc5.version}.so"/>
-        <copy file="${cvc5.path}/build/deps/lib/libpoly.so" tofile="libpoly-${cvc5.version}.so"/>
 
         <!-- remove unneeded symbols -->
         <echo message="Strip unneeded symbols"/>
         <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libcvc5-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
             <arg value="libcvc5jni-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libcvc5parser-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libpoly-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
-
-        <!-- fix RPATH and library dependencies -->
-        <echo message="Fixing library path for all artifact libraries"/>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libcvc5-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
-            <arg value="--replace-needed"/><arg value="libcvc5parser.so.1"/><arg value="libcvc5parser.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="libcvc5jni-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="libcvc5parser-${cvc5.version}.so"/>
-        </exec>
-        <!-- patchelf finds two dependencies and needs to be called twice for libpolyxx.so -->
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libpoly-${cvc5.version}.so"/>
         </exec>
     </target>
 
