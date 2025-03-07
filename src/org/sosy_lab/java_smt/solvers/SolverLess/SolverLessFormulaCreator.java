@@ -155,14 +155,15 @@ public class SolverLessFormulaCreator
 
     return super.extractInfo(pT);
   }
+
   @Override
   public void extractVariablesAndUFs(
       final SMTLIB2Formula pFormula,
       final boolean extractUF,
       final BiConsumer<String, SMTLIB2Formula> pConsumer) {
-    super.extractVariablesAndUFs((Formula) pFormula, extractUF, (name, f) -> pConsumer.accept(name, (SMTLIB2Formula) f));
+    super.extractVariablesAndUFs(
+        (Formula) pFormula, extractUF, (name, f) -> pConsumer.accept(name, (SMTLIB2Formula) f));
   }
-
 
   public static int extractBitvectorLengthFromString(String representation) {
     if (representation.startsWith("Bitvector<") && representation.endsWith(">")) {

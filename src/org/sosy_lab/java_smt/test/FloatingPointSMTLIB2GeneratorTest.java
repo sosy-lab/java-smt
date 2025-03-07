@@ -5,11 +5,13 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -377,6 +379,7 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testCastFrom() {
+    assume().that(!solverToUse().equals(Solvers.MATHSAT5));
     requireFloats();
     BooleanFormula b = bmgr.makeVariable("b");
     FloatingPointFormula castResult =

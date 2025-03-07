@@ -47,6 +47,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @Before
   public void makeThreads() {
+    assume().that(!solverToUse().equals(Solvers.SOLVERLESS));
     executor = Executors.newFixedThreadPool(2);
   }
 

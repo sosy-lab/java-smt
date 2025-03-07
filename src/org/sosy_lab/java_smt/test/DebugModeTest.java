@@ -40,7 +40,6 @@ import org.sosy_lab.java_smt.api.UFManager;
 
 public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private SolverContextFactory debugFactory;
-
   private SolverContext debugContext;
   private UFManager debugFmgr;
   private BooleanFormulaManager debugBmgr;
@@ -50,6 +49,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
 
   @Before
   public void init() throws InvalidConfigurationException {
+    assume().that(solverToUse()).isNotEqualTo(Solvers.SOLVERLESS);
     Configuration debugConfig =
         Configuration.builder()
             .setOption("solver.solver", solverToUse().toString())

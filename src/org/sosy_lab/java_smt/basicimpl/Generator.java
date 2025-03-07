@@ -135,6 +135,9 @@ public class Generator {
    */
   // TODO: automatically call on toString() of formulas
   public static void assembleConstraint(BooleanFormula constraint) {
+    if(!isLoggingEnabled()){
+      throw new GeneratorException("Logging is not enabled");
+    }
     String result = evaluateRecursive(constraint);
     List<FunctionEnvironment> uniqueRegisteredValues =
         registeredVariables.stream().distinct().collect(Collectors.toList());
