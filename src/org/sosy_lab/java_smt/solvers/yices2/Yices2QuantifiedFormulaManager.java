@@ -17,7 +17,6 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -26,12 +25,9 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 public class Yices2QuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Integer, Integer, Long, Integer> {
 
-  private Optional<Yices2FormulaManager> fmgr;
-
   protected Yices2QuantifiedFormulaManager(
       FormulaCreator<Integer, Integer, Long, Integer> pCreator, LogManager pLogger) {
     super(pCreator, pLogger);
-    fmgr = Optional.empty();
   }
 
   @Override
@@ -68,16 +64,12 @@ public class Yices2QuantifiedFormulaManager
   @Override
   protected Integer eliminateQuantifiersUltimateEliminator(Integer pExtractInfo)
       throws UnsupportedOperationException, IOException {
-    Yices2FormulaManager formulaManager = fmgr.get();
+    Yices2FormulaManager formulaManager = (Yices2FormulaManager) getFormulaManager();
     Term formula =
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
     formula = getUltimateEliminatorWrapper().simplify(formula);
     Integer result =
         formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
     return result;
-  }
-
-  public void setFormulaManager(Yices2FormulaManager pFmgr) {
-    fmgr = Optional.of(pFmgr);
   }
 }

@@ -85,6 +85,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             quantifierManager);
+    quantifierManager.setFmgr(manager);
     return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
   }
 
