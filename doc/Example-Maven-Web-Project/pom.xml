@@ -204,7 +204,7 @@ SPDX-License-Identifier: Apache-2.0
       <artifactId>javasmt-solver-cvc5</artifactId>
       <version>${cvc5.version}</version>
       <type>so</type>
-      <classifier>libcvc5jni</classifier>
+      <classifier>libcvc5j</classifier>
     </dependency>
 
     <!-- Yices2 has two dependencies (on Linux) -->
@@ -293,7 +293,7 @@ SPDX-License-Identifier: Apache-2.0
                   <include>libcvc4jni.so</include>
                   <include>libcvc4parser.so</include>
                   <include>libyices2j.so</include>
-                  <include>libcvc5jni.so</include>
+                  <include>libcvc5j.so</include>
                   <include>libyices2j.so</include>
                   <include>libopensmtj.so</include>
                 </includes>
@@ -454,8 +454,8 @@ SPDX-License-Identifier: Apache-2.0
               <groupId>org.sosy-lab</groupId>
               <artifactId>javasmt-solver-cvc5</artifactId>
               <type>so</type>
-              <classifier>libcvc5jni</classifier>
-              <destFileName>libcvc5jni.so</destFileName>
+              <classifier>libcvc5j</classifier>
+              <destFileName>libcvc5j.so</destFileName>
             </artifactItem>
 
             <!-- Yices2 has two dependencies (on Linux),

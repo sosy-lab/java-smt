@@ -26,8 +26,8 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-cvc5">
-        <artifact name="libcvc5jni"    conf="solver-cvc5" type="shared-object" ext="so"/>
-        <artifact name="cvc5"          conf="solver-cvc5" />
+        <artifact name="libcvc5j" conf="solver-cvc5" type="shared-object" ext="so"/>
+        <artifact name="cvc5" conf="solver-cvc5"/>
     </publications>
 
     <dependencies></dependencies>
