@@ -174,7 +174,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
    *
    * @throws CVC5ApiRecoverableException from native code.
    */
-  private static void setSolverOptions(
+  static void setSolverOptions(
       Solver pSolver, int randomSeed, ImmutableMap<String, String> furtherOptions)
       throws CVC5ApiRecoverableException {
     pSolver.setOption("seed", String.valueOf(randomSeed));
@@ -183,20 +183,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     for (Entry<String, String> option : furtherOptions.entrySet()) {
       pSolver.setOption(option.getKey(), option.getValue());
     }
-
-    // Set Strings option to enable all String features (such as lessOrEquals).
-    // This should not have any effect for non-string theories.
-    // pSolver.setOption("strings-exp", "true");
-
-    // pSolver.setOption("finite-model-find", "true");
-    // pSolver.setOption("sets-ext", "true");
-
-    // pSolver.setOption("produce-models", "true");
-    // pSolver.setOption("produce-unsat-cores", "true");
-
-    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
-    // formulas only.
-    // Note: with solver.getOptionNames() you can get all options
   }
 
   @Override
