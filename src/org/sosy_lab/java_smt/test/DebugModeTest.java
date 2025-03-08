@@ -95,8 +95,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @SuppressWarnings("resource")
   @Test
   public void nonLocalThreadTest() {
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     ExecutorService exec = Executors.newSingleThreadExecutor();
     Future<?> result =
@@ -141,9 +140,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void noSharedFormulasTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
     requireIntegers();
-
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     try (SolverContext newContext = debugFactory.generateContext()) {
       BooleanFormulaManager newBmgr = newContext.getFormulaManager().getBooleanFormulaManager();
@@ -175,9 +172,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void noSharedDeclarationsTest() throws InvalidConfigurationException {
     requireIntegers();
-
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     try (SolverContext newContext = debugFactory.generateContext()) {
       UFManager newFmgr = newContext.getFormulaManager().getUFManager();
