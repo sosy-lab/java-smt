@@ -38,18 +38,6 @@ public class BitwuzlaQuantifiedFormulaManager
   }
 
   @Override
-  protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
-      throws UnsupportedOperationException {
-    BitwuzlaFormulaManager formulaManager = (BitwuzlaFormulaManager) getFormulaManager();
-    de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
-    formula = getUltimateEliminatorWrapper().simplify(formula);
-    Term result =
-        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
-    return result;
-  }
-
-  @Override
   public Term mkQuantifier(Quantifier q, List<Term> vars, Term body) {
     checkArgument(
         !vars.isEmpty(), "The list of bound variables for a quantifier may not be empty.");

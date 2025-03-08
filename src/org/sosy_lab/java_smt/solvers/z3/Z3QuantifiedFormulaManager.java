@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -53,17 +52,5 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
     // One might want to run the tactic "ctx-solver-simplify" on the result.
 
     return z3FormulaCreator.applyTactics(z3context, pExtractInfo, "qe-light", "qe");
-  }
-
-  @Override
-  protected Long eliminateQuantifiersUltimateEliminator(Long pExtractInfo)
-      throws UnsupportedOperationException {
-    Z3FormulaManager formulaManager = (Z3FormulaManager) getFormulaManager();
-    Term formula =
-        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
-    formula = getUltimateEliminatorWrapper().simplify(formula);
-    Long result =
-        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
-    return result;
   }
 }

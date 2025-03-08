@@ -32,6 +32,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     implements QuantifiedFormulaManager {
   private ProverOptions option;
   private Optional<AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>> fmgr;
+  private final LogManager logger;
 
   private final UltimateEliminatorWrapper ultimateEliminatorWrapper;
 
@@ -39,6 +40,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator, LogManager pLogger) {
     super(pCreator);
     ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
+    logger = pLogger;
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -50,7 +52,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       throws InterruptedException, SolverException, UnsupportedOperationException {
     if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
-        return wrap(eliminateQuantifiersUltimateEliminator(extractInfo(pF)));
+        return wrap(eliminateQuantifiersUltimateEliminator(pF));
       } catch (UnsupportedOperationException | IOException e) {
         return wrap(eliminateQuantifiers(extractInfo(pF)));
       }
@@ -58,9 +60,14 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return wrap(eliminateQuantifiers(extractInfo(pF)));
   }
 
-  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(TFormulaInfo pExtractInfo)
+  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo)
       throws UnsupportedOperationException, IOException {
-    throw new UnsupportedOperationException();
+    FormulaManager formulaManager = getFormulaManager();
+    Term formula =
+        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormula(pExtractInfo).toString());
+    formula = getUltimateEliminatorWrapper().simplify(formula);
+    return extractInfo(
+        formulaManager.parse(getUltimateEliminatorWrapper().dumpFormula(formula).toString()));
   }
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
@@ -129,7 +136,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             @Override
             public TraversalProcess visitFreeVariable(Formula f, String name) {
               nameList.add(name);
-              String sort = "";
+              String sort;
               if (fmgr.get().getFormulaType(f).toString().contains("Array")) {
                 sort = "(" + fmgr.get().getFormulaType(f) + ")";
               } else {

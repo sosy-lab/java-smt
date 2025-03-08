@@ -13,8 +13,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
 
 import com.google.common.primitives.Ints;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
@@ -59,17 +57,5 @@ public class Yices2QuantifiedFormulaManager
         return yices_exists(terms.length, terms, substBody);
       }
     }
-  }
-
-  @Override
-  protected Integer eliminateQuantifiersUltimateEliminator(Integer pExtractInfo)
-      throws UnsupportedOperationException, IOException {
-    Yices2FormulaManager formulaManager = (Yices2FormulaManager) getFormulaManager();
-    Term formula =
-        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
-    formula = getUltimateEliminatorWrapper().simplify(formula);
-    Integer result =
-        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
-    return result;
   }
 }

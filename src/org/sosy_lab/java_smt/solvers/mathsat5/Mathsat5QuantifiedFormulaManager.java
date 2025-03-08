@@ -12,12 +12,9 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exists;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_forall;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
 
-import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -38,22 +35,6 @@ public class Mathsat5QuantifiedFormulaManager
   @Override
   protected Long eliminateQuantifiers(Long input) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  protected Long eliminateQuantifiersUltimateEliminator(Long pExtractInfo)
-      throws UnsupportedOperationException {
-
-    Mathsat5FormulaManager formulaManager = (Mathsat5FormulaManager) getFormulaManager();
-    Term formula =
-        getUltimateEliminatorWrapper()
-            .parse(
-                formulaManager.dumpFormulaImplExt(
-                    pExtractInfo, msat_decl_get_name(msat_term_get_decl(pExtractInfo))));
-    formula = getUltimateEliminatorWrapper().simplify(formula);
-    Long result =
-        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
-    return result;
   }
 
   @Override

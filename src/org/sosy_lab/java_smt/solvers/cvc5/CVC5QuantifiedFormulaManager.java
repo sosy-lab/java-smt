@@ -55,19 +55,6 @@ public class CVC5QuantifiedFormulaManager
     }
   }
 
-  @Override
-  protected Term eliminateQuantifiersUltimateEliminator(Term pExtractInfo)
-      throws UnsupportedOperationException {
-
-    CVC5FormulaManager formulaManager = (CVC5FormulaManager) getFormulaManager();
-    de.uni_freiburg.informatik.ultimate.logic.Term formula =
-        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormulaImpl(pExtractInfo));
-    formula = getUltimateEliminatorWrapper().simplify(formula);
-    Term result =
-        formulaManager.parseImpl(getUltimateEliminatorWrapper().dumpFormula(formula).toString());
-    return result;
-  }
-
   /*
    * Makes the quantifier entered in CVC4/CVC5. Note that CVC4/CVC5 uses bound variables in
    * quantified formulas instead of the normal free vars. We create a bound copy for every var
