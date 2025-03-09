@@ -1,16 +1,4 @@
 /*
- * This file is part of JavaSMT,
- * an API wrapper for a collection of SMT solvers:
- * https://github.com/sosy-lab/java-smt
- *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
-package org.sosy_lab.java_smt.test.ultimate;
-
-/*
  * Copyright (C) 2016 Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
  * Copyright (C) 2016 University of Freiburg
  *
@@ -36,6 +24,8 @@ package org.sosy_lab.java_smt.test.ultimate;
  * licensors of the ULTIMATE JUnit Helper Library grant you additional permission
  * to convey the resulting work.
  */
+
+package org.sosy_lab.java_smt.test.ultimate;
 
 import de.uni_freiburg.informatik.ultimate.core.lib.results.NoBacktranslationValueProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.AtomicTraceElement;

@@ -1,5 +1,3 @@
-package org.sosy_lab.java_smt.test.ultimate;
-
 /*
  * Copyright (C) 2014-2015 Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
  * Copyright (C) 2019 Claus Schätzle (schaetzc@tf.uni-freiburg.de)
@@ -27,6 +25,8 @@ package org.sosy_lab.java_smt.test.ultimate;
  * licensors of the ULTIMATE UnitTest Library grant you additional permission
  * to convey the resulting work.
  */
+
+package org.sosy_lab.java_smt.test.ultimate;
 
 import de.uni_freiburg.informatik.ultimate.core.model.services.ILogger;
 

@@ -38,6 +38,11 @@ import org.sosy_lab.common.log.LogManager;
 
 public class UltimateEliminatorParser {
 
+  private UltimateEliminatorParser() {
+    // Utility class
+  }
+  ;
+
   public static Appender dumpFormula(final Term formula) {
     return new Appenders.AbstractAppender() {
 

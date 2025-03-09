@@ -11,8 +11,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import org.junit.Test;
@@ -204,8 +204,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersAbort()
-      throws SolverException, InterruptedException, IOException {
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersAbort() {
     requireIntegers();
     requireQuantifiers();
 
@@ -249,9 +248,10 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    assertTrue(
-        exception instanceof UnsupportedOperationException
-            || expectedMessage.contains(exception.getMessage()));
+    assertEquals(
+        true,
+        (exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage())));
   }
 
   @Test
@@ -293,9 +293,10 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    assertTrue(
-        exception instanceof UnsupportedOperationException
-            || expectedMessage.contains(exception.getMessage()));
+    assertEquals(
+        true,
+        (exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage())));
   }
 
   @Test
@@ -371,8 +372,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void
-      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarningException()
-          throws SolverException, InterruptedException, IOException {
+      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarningException() {
     requireIntegers();
     requireQuantifiers();
 
@@ -414,8 +414,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    assertTrue(
-        exception instanceof UnsupportedOperationException
-            || expectedMessage.contains(exception.getMessage()));
+    assertEquals(
+        true,
+        (exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage())));
   }
 }
