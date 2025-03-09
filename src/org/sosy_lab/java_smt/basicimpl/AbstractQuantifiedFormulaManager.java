@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -51,7 +51,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   @Override
-  public BooleanFormula eliminateQuantifiers(@Nonnull BooleanFormula pF)
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException, IOException {
     if (options != null
         && Arrays.asList(options)
@@ -84,17 +84,17 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
     try {
       return wrap(eliminateQuantifiers(extractInfo(pF)));
-    } catch (Exception e) {
+    } catch (Exception e1) {
       if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
         logger.logException(
             Level.WARNING,
-            e,
+            e1,
             "Default quantifier elimination failed. Switching to UltimateEliminator");
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (IOException pE) {
-          logger.logException(Level.SEVERE, e, "UltimateEliminator also failed.");
-          throw pE; // TODO is this the correct way to abort?
+        } catch (IOException e2) {
+          logger.logException(Level.SEVERE, e2, "UltimateEliminator also failed.");
+          throw e2; // TODO is this the correct way to abort?
         }
       }
 
@@ -102,17 +102,17 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (IOException pE) {
-          logger.logException(Level.SEVERE, e, "Quantifier elimination failed.");
-          throw e; // TODO is this the correct way to abort?
+        } catch (IOException e3) {
+          logger.logException(Level.SEVERE, e3, "Quantifier elimination failed.");
+          throw e3; // TODO is this the correct way to abort?
         }
       } else {
         logger.logException(
             Level.SEVERE,
-            e,
+            e1,
             "Native quantifier elimination failed. Please adjust the "
                 + "option if you want to use the UltimateEliminator quantifier elimination");
-        throw e; // TODO is this the correct way to abort?
+        throw e1; // TODO is this the correct way to abort?
       }
     }
   }
@@ -168,7 +168,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     if (fmgr.isEmpty()) {
       throw new RuntimeException("FormulaManager is not set");
     }
-    return fmgr.get();
+    return fmgr.orElseThrow();
   }
 
   public void setFmgr(AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pFmgr) {
@@ -180,38 +180,19 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     List<String> nameList = new ArrayList<>();
     List<String> sortList = new ArrayList<>();
 
-    String form = fmgr.get().dumpFormulaImpl(extractInfo(pBody));
+    String form = fmgr.orElseThrow().dumpFormulaImpl(extractInfo(pBody));
     Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
     for (Formula var : pVariables) {
-      formulaCreator.visit(
-          var,
-          new DefaultFormulaVisitor<>() {
-            @Override
-            protected TraversalProcess visitDefault(Formula f) {
-              return TraversalProcess.CONTINUE;
-            }
-
-            @Override
-            public TraversalProcess visitFreeVariable(Formula f, String name) {
-              nameList.add(name);
-              String sort;
-              if (fmgr.get().getFormulaType(f).toString().contains("Array")) {
-                sort = "(" + fmgr.get().getFormulaType(f) + ")";
-              } else {
-                sort = fmgr.get().getFormulaType(f).toString();
-              }
-              sortList.add(mapTypeToUltimateSort(sort));
-              return TraversalProcess.CONTINUE;
-            }
-          });
+      populateNameAndSortList(var, nameList, sortList);
     }
-    String ultimateFormula = buildUltimateEliminatorFormula(q, nameList, sortList, ultimateBody);
+    String ultimateFormula = buildSmtlib2Formula(q, nameList, sortList, ultimateBody);
 
     Term parsedResult = getUltimateEliminatorWrapper().parse(ultimateFormula);
     Term resultFormula = getUltimateEliminatorWrapper().simplify(parsedResult);
 
     BooleanFormula result =
-        fmgr.get().parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
+        fmgr.orElseThrow()
+            .parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
     return result;
   }
 
@@ -224,7 +205,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         .replace("Boolean", "Bool");
   }
 
-  private String buildUltimateEliminatorFormula(
+  private String buildSmtlib2Formula(
       Quantifier pQ, List<String> pNameList, List<String> pSortList, Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
     sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
@@ -237,5 +218,33 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     sb.append(pUltimateBody);
     sb.append(" ))");
     return sb.toString();
+  }
+
+  private String getSortAsString(Formula pF) {
+    if (fmgr.orElseThrow().getFormulaType(pF) instanceof FormulaType.ArrayFormulaType) {
+      return "(" + fmgr.orElseThrow().getFormulaType(pF) + ")";
+    } else {
+      return fmgr.orElseThrow().getFormulaType(pF).toString();
+    }
+  }
+
+  private void populateNameAndSortList(Formula pF, List<String> nameList, List<String> sortList) {
+    formulaCreator.visit(
+        pF,
+        new DefaultFormulaVisitor<Object>() {
+
+          @Override
+          protected TraversalProcess visitDefault(Formula f) {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFreeVariable(Formula f, String name) {
+            nameList.add(name);
+            String sort = getSortAsString(f);
+            sortList.add(mapTypeToUltimateSort(sort));
+            return TraversalProcess.CONTINUE;
+          }
+        });
   }
 }
