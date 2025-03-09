@@ -20,6 +20,10 @@ import ap.parser.IFunction;
 import ap.parser.ITerm;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +33,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -89,7 +94,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     evaluatedTerms.clear();
-    final Value result = api.checkSat(true);
+
+    final Value result = callWithoutSystemErrStream(() -> api.checkSat(true));
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       wasLastSatCheckSat = true;
       evaluatedTerms.add(api.partialModelAsFormula());
@@ -183,7 +189,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * @throws SimpleAPIException if model can not be constructed.
    */
   private PartialModel partialModel() throws SimpleAPIException {
-    return api.partialModel();
+    return callWithoutSystemErrStream(api::partialModel);
   }
 
   @Override
@@ -197,7 +203,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     final List<BooleanFormula> result = new ArrayList<>();
-    final Set<Object> core = asJava(api.getUnsatCore());
+    final Set<Object> core = asJava(callWithoutSystemErrStream(api::getUnsatCore));
     for (Object partitionId : core) {
       result.add(partitions.peek().get(partitionId));
     }
@@ -276,6 +282,36 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     @Override
     public String toString() {
       return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
+    }
+  }
+
+  /**
+   * Princess uses Ostrich as internal library. Ostrich logs to `System.err`. We redirect this
+   * stream to the void to avoid cluttering the output.
+   *
+   * <p>Technical dept: `System.err` is a global static field, we redirect all logging. :-(
+   *
+   * @param fn the function to call
+   */
+  @SuppressWarnings(value = "IllegalInstantiation")
+  @CanIgnoreReturnValue
+  static <R> R callWithoutSystemErrStream(Supplier<R> fn) {
+    final PrintStream originalErrStream = System.err;
+    try (OutputStream nullOutput = new NullOutputStream();
+        PrintStream nullStream = new PrintStream(nullOutput, true, StandardCharsets.UTF_8)) {
+      System.setErr(nullStream);
+      return fn.get();
+    } catch (IOException ioException) {
+      throw new AssertionError(ioException);
+    } finally {
+      System.setErr(originalErrStream);
+    }
+  }
+
+  private static final class NullOutputStream extends OutputStream {
+    @Override
+    public void write(int b) {
+      // do nothing
     }
   }
 }
