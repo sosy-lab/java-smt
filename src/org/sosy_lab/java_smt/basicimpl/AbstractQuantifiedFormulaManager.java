@@ -231,7 +231,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   private void populateNameAndSortList(Formula pF, List<String> nameList, List<String> sortList) {
     formulaCreator.visit(
         pF,
-        new DefaultFormulaVisitor<Object>() {
+        new DefaultFormulaVisitor<TraversalProcess>() {
 
           @Override
           protected TraversalProcess visitDefault(Formula f) {

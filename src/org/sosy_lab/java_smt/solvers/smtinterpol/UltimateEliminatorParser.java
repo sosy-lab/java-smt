@@ -41,7 +41,6 @@ public class UltimateEliminatorParser {
   private UltimateEliminatorParser() {
     // Utility class
   }
-  ;
 
   public static Appender dumpFormula(final Term formula) {
     return new Appenders.AbstractAppender() {

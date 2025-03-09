@@ -233,11 +233,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     // Case: Unsupported quantifier elimination
     BooleanFormula unsupportedQuery = qmgr.forall(k, imgr.equal(k, i));
     Exception exception =
-        assertThrows(
-            Exception.class,
-            () -> {
-              qmgr.eliminateQuantifiers(unsupportedQuery);
-            });
+        assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(unsupportedQuery));
 
     String expectedMessage1 =
         "UltimateEliminator failed. Please adjust the option if you want to "
@@ -278,12 +274,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     // Case: Unsupported quantifier elimination
     BooleanFormula query = qmgr.forall(k, imgr.equal(k, i));
-    Exception exception =
-        assertThrows(
-            Exception.class,
-            () -> {
-              qmgr.eliminateQuantifiers(query);
-            });
+    Exception exception = assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(query));
 
     String expectedMessage1 =
         "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination";
