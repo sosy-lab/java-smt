@@ -29,7 +29,6 @@ variables:
 # Download dependencies and provide them to later stages
 build-dependencies:
   stage: dependencies
-  dependencies: []
   script: "ant build-dependencies"
   interruptible: true
   cache:
@@ -44,8 +43,11 @@ build-dependencies:
 
 
 # Build binaries and provide them to later stages
-.build: &build
+build:
   stage: build
+  parallel:
+    matrix:
+      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
   script: "ant $ANT_PROPS_BUILD jar"
   interruptible: true
   artifacts:
@@ -54,62 +56,49 @@ build-dependencies:
       - "*.jar"
       - "hs_err_pid*.log"
       - "core.*"
-
-build:jdk-11:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-11
-
-build:jdk-17:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
-
-build:jdk-21:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
-build:jdk-23:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
+  image: ${CI_REGISTRY_IMAGE}/test:$JDK_VERSION
 
 
 # For checks that need the binaries
-.binary_check: &binary_check
+.binary_check:
   stage: checks
   interruptible: true
 
 # For checks that only need the source code, not the binaries
-.source_check: &source_check
+.source_check:
   stage: checks
-  dependencies:
-    - build-dependencies
   needs:
     - build-dependencies
   interruptible: true
 
 
-.build-project-ecj: &build-project-ecj
-  <<: *source_check
-  script: "ant $ANT_PROPS_BUILD build-project-ecj"
+.build-project-ecj:
+  extends: .source_check
+  parallel:
+    matrix:
+      - JDK_VERSION: [jdk-17, jdk-21, jdk-23]
+  script:
+    - "uname -a"
+    - "ant $ANT_PROPS_BUILD build-project-ecj"
 
-build-project-ecj:jdk-17:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
+build-project-ecj:x86_64:
+  extends: .build-project-ecj
+  image:
+    name: ${CI_REGISTRY_IMAGE}/test:$JDK_VERSION
 
-build-project-ecj:jdk-21:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
-build-project-ecj:jdk-23:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
-
+build-project-ecj:arm64:
+  extends: .build-project-ecj
+  image:
+    name: ${CI_REGISTRY_IMAGE}/test:$JDK_VERSION
+    docker:
+      platform: linux/arm64
 
 check-format:
-  <<: *source_check
+  extends: .source_check
   script: "ant $ANT_PROPS_CHECKS format-source && git diff -s --exit-code"
 
 checkstyle:
-  <<: *source_check
+  extends: .source_check
   script:
     - "ant $ANT_PROPS_CHECKS checkstyle"
     - "ant $ANT_PROPS_CHECKS run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && test $(cat Checkstyle*xml | grep -vic audit) -eq 0"
@@ -119,37 +108,33 @@ checkstyle:
     when: on_failure
 
 javadoc:
-  <<: *binary_check
+  extends: .binary_check
   script: "ant $ANT_PROPS_CHECKS javadoc"
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
   artifacts:
     paths:
       - "Javadoc/"
 
 spotbugs:
-  <<: *binary_check
+  extends: .binary_check
   script:
     - 'ant $ANT_PROPS_CHECKS spotbugs'
     - 'test \! -f SpotBugs.html'
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
   artifacts:
     paths:
       - "SpotBugs.html"
     when: on_failure
 
-.unit-tests: &unit-tests
-  <<: *binary_check
-  script: "ant $ANT_PROPS_CHECKS unit-tests-coverage"
+.unit-tests:
+  extends: .binary_check
+  script:
+    - "uname -a"
+    - "ant $ANT_PROPS_CHECKS unit-tests-coverage"
   artifacts:
     paths:
       - "JUnit.html"
@@ -159,49 +144,65 @@ spotbugs:
     reports:
       junit: "junit/TESTS-TestSuites.xml"
 
-unit-tests:jdk-11:
-  <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-11
+.unit-tests:jdk-11:
+  extends: .unit-tests
   needs:
     - build-dependencies
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
+
+.unit-tests:jdk-17:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-17} ] } }
+
+.unit-tests:jdk-21:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-21} ] } }
+
+.unit-tests:jdk-23:
+  extends: .unit-tests
+  needs:
+    - build-dependencies
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-23} ] } }
+
+unit-tests:x86_64:jdk-11:
+  extends: .unit-tests:jdk-11
   image: ${CI_REGISTRY_IMAGE}/test:jdk-11
 
-unit-tests:jdk-17:
-  <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-17
-  needs:
-    - build-dependencies
-    - build:jdk-17
+unit-tests:x86_64:jdk-17:
+  extends: .unit-tests:jdk-17
   image: ${CI_REGISTRY_IMAGE}/test:jdk-17
 
-unit-tests:jdk-21:
-  <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-21
-  needs:
-    - build-dependencies
-    - build:jdk-21
+unit-tests:x86_64:jdk-21:
+  extends: .unit-tests:jdk-21
   image: ${CI_REGISTRY_IMAGE}/test:jdk-21
 
-unit-tests:jdk-23:
-  <<: *unit-tests
-  dependencies:
-    - build-dependencies
-    - build:jdk-23
-  needs:
-    - build-dependencies
-    - build:jdk-23
+unit-tests:x86_64:jdk-23:
+  extends: .unit-tests:jdk-23
   image: ${CI_REGISTRY_IMAGE}/test:jdk-23
+
+unit-tests:arm64:jdk-11:
+  extends: .unit-tests:jdk-11
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-11", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-17:
+  extends: .unit-tests:jdk-17
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-17", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-21:
+  extends: .unit-tests:jdk-21
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-21", docker: { platform: linux/arm64 } }
+
+unit-tests:arm64:jdk-23:
+  extends: .unit-tests:jdk-23
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-23", docker: { platform: linux/arm64 } }
 
 
 refaster:
-  <<: *source_check
+  extends: .source_check
   image: ${CI_REGISTRY_IMAGE}/test:jdk-11
   before_script:
     - 'test -d refaster || git clone https://gitlab.com/sosy-lab/software/refaster.git'
@@ -232,7 +233,6 @@ refaster:
 # check license declarations etc.
 reuse:
   stage: checks
-  dependencies: []
   needs: []
   image:
     name: fsfe/reuse:3
@@ -244,11 +244,8 @@ reuse:
 deploy-gh-pages:
   stage: deploy
   script: "build/deploy-gh-pages.sh"
-  dependencies:
-    - build:jdk-11
-    - javadoc
   needs:
-    - build:jdk-11
+    - { job: build, parallel: { matrix: [ {JDK_VERSION: jdk-11} ] } }
     - javadoc
   environment: deploy/gh-pages
   only:
@@ -261,42 +258,25 @@ deploy-gh-pages:
 
 
 # Build container images
-# following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 .build-docker:
   stage: images
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  variables:
-    EXTRA_ARGS: ""
+  image: "quay.io/podman/stable"
   script:
-    - mkdir -p /root/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE$IMAGE $EXTRA_ARGS
+    - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - podman build --userns=host --platform $DOCKER_PLATFORMS --manifest $IMAGE -f $DOCKERFILE
+    - podman tag $IMAGE $CI_REGISTRY_IMAGE/$IMAGE
+    - podman manifest inspect $IMAGE
+    - podman manifest push --all $CI_REGISTRY_IMAGE/$IMAGE
   only:
     - schedules
     - web
 
-build-docker:test:jdk-11:
+build-docker:test:
   extends: .build-docker
+  parallel:
+    matrix:
+      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
   variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-11
-    IMAGE: /test:jdk-11
-
-build-docker:test:jdk-17:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-17
-    IMAGE: /test:jdk-17
-
-build-docker:test:jdk-21:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-21
-    IMAGE: /test:jdk-21
-
-build-docker:test:jdk-23:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-23
-    IMAGE: /test:jdk-23
+    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
+    IMAGE: test:$JDK_VERSION
+    DOCKER_PLATFORMS: linux/amd64,linux/arm64
