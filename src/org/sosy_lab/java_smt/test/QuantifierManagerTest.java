@@ -14,6 +14,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -755,7 +756,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierElimination() throws InterruptedException, SolverException {
+  public void checkLIAQuantifierElimination()
+      throws InterruptedException, SolverException, IOException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
     requireIntegers();
@@ -773,7 +775,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierEliminationFail() throws InterruptedException, SolverException {
+  public void checkLIAQuantifierEliminationFail()
+      throws InterruptedException, SolverException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -799,7 +802,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierEliminationFail() throws InterruptedException, SolverException {
+  public void checkBVQuantifierEliminationFail()
+      throws InterruptedException, SolverException, IOException {
     // build formula: (exists x : arr[x] = 3) && (forall y: arr[y] = 2)
     // as there is no quantifier free equivalent, it should return the input formula.
     requireBitvectors();
@@ -829,7 +833,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierElimination() throws InterruptedException, SolverException {
+  public void checkBVQuantifierElimination()
+      throws InterruptedException, SolverException, IOException {
     requireBitvectors();
     requireQuantifierElimination();
     // build formula: exists y : bv[2]. x * y = 1
@@ -851,7 +856,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
   /** Quant elim test based on a crash in Z3. */
   @Test
-  public void checkBVQuantifierElimination2() throws InterruptedException, SolverException {
+  public void checkBVQuantifierElimination2()
+      throws InterruptedException, SolverException, IOException {
     requireBitvectors();
     requireQuantifierElimination();
 

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -20,7 +21,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
-  private ProverOptions option;
+  private ProverOptions[] option;
 
   public DebuggingQuantifiedFormulaManager(
       QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
@@ -43,7 +44,7 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException {
+      throws InterruptedException, SolverException, IOException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(pF);
     BooleanFormula result = delegate.eliminateQuantifiers(pF);
@@ -52,12 +53,12 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
   }
 
   @Override
-  public ProverOptions getOption() {
+  public ProverOptions[] getOptions() {
     return option;
   }
 
   @Override
-  public void setOption(ProverOptions opt) {
+  public void setOptions(ProverOptions... opt) {
     option = opt;
   }
 }

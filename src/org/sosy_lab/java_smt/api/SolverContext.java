@@ -62,7 +62,22 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should eliminiate the quantifier via UltimateEliminator before inserting
      * it to the native quantified formula.
      */
-    SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE
+    SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier elimination if the current
+     * elimination method fails. The solver will log a warning in this case.
+     */
+    QUANTIFIER_ELIMINATION_FALLBACK,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier elimination if the current
+     * elimination method fails. The solver will not log a warning in this case.
+     */
+    QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+
+    /** Whether the solver should abort the quantifier elimination in the case it fails. */
+    QUANTIFIER_ELIMINATION_NO_FALLBACK,
   }
 
   /**

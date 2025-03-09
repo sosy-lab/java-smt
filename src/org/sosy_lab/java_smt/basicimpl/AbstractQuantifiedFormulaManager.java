@@ -8,13 +8,17 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.logging.Level;
+import javax.annotation.Nonnull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -30,7 +34,7 @@ import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
-  private ProverOptions option;
+  private ProverOptions[] options;
   private Optional<AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>> fmgr;
   private final LogManager logger;
 
@@ -48,16 +52,70 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   @Override
-  public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException, UnsupportedOperationException {
-    if (option != null && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
+  public BooleanFormula eliminateQuantifiers(@Nonnull BooleanFormula pF)
+      throws InterruptedException, SolverException, IOException {
+    if (options != null
+        && Arrays.asList(options)
+            .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
         return wrap(eliminateQuantifiersUltimateEliminator(pF));
-      } catch (UnsupportedOperationException | IOException e) {
-        return wrap(eliminateQuantifiers(extractInfo(pF)));
+      } catch (UnsupportedOperationException | IOException | IllegalArgumentException e) {
+        if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+          logger.logException(
+              Level.WARNING,
+              e,
+              "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination");
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
+        }
+
+        if (Arrays.asList(options)
+            .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
+        } else {
+          logger.logException(
+              Level.SEVERE,
+              e,
+              "UltimateEliminator failed. Please adjust the "
+                  + "option if you want to use the native quantifier elimination");
+
+          throw e; // TODO is this the correct way to abort?
+        }
       }
     }
-    return wrap(eliminateQuantifiers(extractInfo(pF)));
+
+    try {
+      return wrap(eliminateQuantifiers(extractInfo(pF)));
+    } catch (Exception e) {
+      if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+        logger.logException(
+            Level.WARNING,
+            e,
+            "Default quantifier elimination failed. Switching to UltimateEliminator");
+        try {
+          return wrap(eliminateQuantifiersUltimateEliminator(pF));
+        } catch (IOException pE) {
+          logger.logException(Level.SEVERE, e, "UltimateEliminator also failed.");
+          throw pE; // TODO is this the correct way to abort?
+        }
+      }
+
+      if (Arrays.asList(options)
+          .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
+        try {
+          return wrap(eliminateQuantifiersUltimateEliminator(pF));
+        } catch (IOException pE) {
+          logger.logException(Level.SEVERE, e, "Quantifier elimination failed.");
+          throw e; // TODO is this the correct way to abort?
+        }
+      } else {
+        logger.logException(
+            Level.SEVERE,
+            e,
+            "Native quantifier elimination failed. Please adjust the "
+                + "option if you want to use the UltimateEliminator quantifier elimination");
+        throw e; // TODO is this the correct way to abort?
+      }
+    }
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo)
@@ -76,8 +134,9 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
-    if (option != null
-        && option.equals(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
+    if (options != null
+        && Arrays.asList(options)
+            .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
       } catch (IOException e) {
@@ -93,13 +152,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 
   @Override
-  public ProverOptions getOption() {
-    return option;
+  public ProverOptions[] getOptions() {
+    return options;
   }
 
   @Override
-  public void setOption(ProverOptions opt) {
-    option = opt;
+  public void setOptions(ProverOptions... opt) {
+    options = opt;
   }
 
   public UltimateEliminatorWrapper getUltimateEliminatorWrapper() {

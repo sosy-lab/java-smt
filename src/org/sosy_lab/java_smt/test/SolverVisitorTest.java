@@ -17,6 +17,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -1197,7 +1198,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithTrue()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
@@ -1212,7 +1213,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithFalse()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
@@ -1227,7 +1228,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testTransformationInsideQuantifiersWithVariable()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
