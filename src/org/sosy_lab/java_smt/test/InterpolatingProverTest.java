@@ -887,8 +887,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThat(itp).hasSize(5);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -898,11 +898,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -912,11 +914,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -926,11 +930,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -940,11 +945,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -954,11 +960,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -968,7 +975,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0}));
   }
 
   @Test

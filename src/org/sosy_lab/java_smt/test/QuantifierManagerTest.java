@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
@@ -742,7 +743,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     assertThat(boundVars).hasSize(1);
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testEmpty() {
 
     assume()
@@ -751,8 +752,9 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .isNotEqualTo(Solvers.PRINCESS);
 
     // An empty list of quantified variables throws an exception.
-    @SuppressWarnings("unused")
-    BooleanFormula quantified = qmgr.exists(ImmutableList.of(), bmgr.makeVariable("b"));
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> qmgr.exists(ImmutableList.of(), bmgr.makeVariable("b")));
   }
 
   @Test
