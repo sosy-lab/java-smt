@@ -11,7 +11,10 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
+import java.io.IOException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -25,7 +28,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testSolverIndependentQuantifierEliminationWithUltimateEliminator()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireQuantifiers();
 
@@ -39,7 +42,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.MATHSAT5);
 
-    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
@@ -55,7 +58,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testSolverIndependentQuantifierEliminationWithUltimateEliminatorWithArray()
-      throws SolverException, InterruptedException {
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireArrays();
     requireQuantifiers();
@@ -70,7 +73,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.MATHSAT5);
 
-    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
@@ -101,7 +104,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
@@ -130,7 +133,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
 
-    qmgr.setOption(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula two = imgr.makeNumber(2);
@@ -140,5 +143,279 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         qmgr.forall(k, bmgr.or(imgr.lessOrEquals(k, five), imgr.greaterOrEquals(k, two)));
 
     assertThatFormula(query).isSatisfiable();
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersBefore()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    BooleanFormula query =
+        qmgr.forall(
+            x,
+            bmgr.or(imgr.greaterOrEquals(x, zero), qmgr.forall(y, imgr.greaterOrEquals(y, zero))));
+
+    assertThatFormula(query).isUnsatisfiable();
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersNoFallback()
+      throws SolverException, InterruptedException, IOException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.MATHSAT5, Solvers.YICES2);
+
+    qmgr.setOptions(
+        ProverOptions.QUANTIFIER_ELIMINATION_NO_FALLBACK,
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    // Case: Unsupported quantifier elimination
+    BooleanFormula unsupportedQuery = qmgr.forall(k, imgr.equal(k, i));
+    assertThatFormula(qmgr.eliminateQuantifiers(unsupportedQuery)).isUnsatisfiable();
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersAbort()
+      throws SolverException, InterruptedException, IOException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
+
+    assume()
+        .withMessage(
+            "Solver %s does not support parseable dumping format for UltimateEliminator " + "yet",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    // Case: Unsupported quantifier elimination
+    BooleanFormula unsupportedQuery = qmgr.forall(k, imgr.equal(k, i));
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () -> {
+              qmgr.eliminateQuantifiers(unsupportedQuery);
+            });
+
+    String expectedMessage1 =
+        "UltimateEliminator failed. Please adjust the option if you want to "
+            + "use the default quantifier elimination";
+
+    String expectedMessage2 =
+        "printing without use-defines is not supported for quantified formulas";
+
+    String expectedMessage = expectedMessage1 + expectedMessage2;
+
+    assertTrue(
+        exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage()));
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackException() {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5, Solvers.CVC4);
+
+    qmgr.setOptions(
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    // Case: Unsupported quantifier elimination
+    BooleanFormula query = qmgr.forall(k, imgr.equal(k, i));
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () -> {
+              qmgr.eliminateQuantifiers(query);
+            });
+
+    String expectedMessage1 =
+        "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination";
+
+    String expectedMessage2 =
+        "printing without use-defines is not supported for quantified formulas";
+
+    String expectedMessage = expectedMessage1 + expectedMessage2;
+
+    assertTrue(
+        exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage()));
+  }
+
+  @Test
+  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallback()
+      throws SolverException, IOException, InterruptedException {
+    requireIntegers();
+    requireQuantifiers();
+    requireArrays();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.Z3);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+
+    qmgr.setOptions(
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula xx = imgr.makeVariable("x");
+    IntegerFormula yy = imgr.makeVariable("y");
+    BooleanFormula f =
+        qmgr.forall(
+            xx,
+            bmgr.or(
+                imgr.lessThan(xx, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+    assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
+  }
+
+  @Test
+  public void
+      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarning()
+          throws SolverException, InterruptedException, IOException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.MATHSAT5, Solvers.YICES2);
+
+    qmgr.setOptions(
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula xx = imgr.makeVariable("x");
+    IntegerFormula yy = imgr.makeVariable("y");
+    BooleanFormula f =
+        qmgr.forall(
+            xx,
+            bmgr.or(
+                imgr.lessThan(xx, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
+    BooleanFormula qFreeF = qmgr.eliminateQuantifiers(f);
+    assertThatFormula(qFreeF).isEquivalentTo(imgr.lessThan(imgr.makeNumber(2), yy));
+  }
+
+  @Test
+  public void
+      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarningException()
+          throws SolverException, InterruptedException, IOException {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5, Solvers.CVC4);
+
+    qmgr.setOptions(
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+
+    IntegerFormula xx = imgr.makeVariable("x");
+    IntegerFormula yy = imgr.makeVariable("y");
+    BooleanFormula f =
+        qmgr.forall(
+            xx,
+            bmgr.or(
+                imgr.lessThan(xx, imgr.makeNumber(5)),
+                imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
+
+    Exception exception =
+        assertThrows(
+            Exception.class,
+            () -> {
+              qmgr.eliminateQuantifiers(f);
+            });
+
+    String expectedMessage1 =
+        "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination";
+
+    String expectedMessage2 =
+        "printing without use-defines is not supported for quantified formulas";
+
+    String expectedMessage = expectedMessage1 + expectedMessage2;
+
+    assertTrue(
+        exception instanceof UnsupportedOperationException
+            || expectedMessage.contains(exception.getMessage()));
   }
 }

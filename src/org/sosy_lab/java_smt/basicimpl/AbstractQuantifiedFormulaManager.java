@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
