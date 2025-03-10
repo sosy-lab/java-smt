@@ -277,26 +277,11 @@ deploy-gh-pages:
     - schedules
     - web
 
-build-docker:test:jdk-11:
+build-docker:test:
   extends: .build-docker
+  parallel:
+    matrix:
+      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
   variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-11
-    IMAGE: /test:jdk-11
-
-build-docker:test:jdk-17:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-17
-    IMAGE: /test:jdk-17
-
-build-docker:test:jdk-21:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-21
-    IMAGE: /test:jdk-21
-
-build-docker:test:jdk-23:
-  extends: .build-docker
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.jdk-23
-    IMAGE: /test:jdk-23
+    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
+    IMAGE: /test:$JDK_VERSION
