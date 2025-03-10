@@ -237,26 +237,93 @@ deploy-gh-pages:
 
 # Build container images
 # following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
-.build-docker:
+.build-docker: &build-docker
   stage: images
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
   variables:
     EXTRA_ARGS: ""
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE$IMAGE $EXTRA_ARGS
+    - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE/$IMAGE $EXTRA_ARGS
   only:
     - schedules
     - web
 
-build-docker:test:
+build-docker:x86_64:
+  <<: *build-docker
+  parallel:
+    matrix:
+      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables:
+    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
+    IMAGE: test:$JDK_VERSION-x86_64
+
+build-docker:arm64:
+  <<: *build-docker
+  parallel:
+    matrix:
+      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+    docker:
+      platform: linux/arm64
+  variables:
+    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
+    IMAGE: test:$JDK_VERSION-arm64
+
+# merge existing images iinto one multi-platform image.
+# https://arborxr.com/blog/developers-journal-building-unprivileged-multi-arch-images-with-kaniko-and-gitlab-ci/
+docker-manifest:test:
+  stage: images
+  image:
+    name: mplatform/manifest-tool
+    entrypoint: [""]
+  needs:
+    - build-docker:x86_64
+    - build-docker:arm64
+  parallel:
+    matrix:
+      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
+  script:
+    - |
+      manifest-tool
+        --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD push from-args \
+        --platforms linux/amd64 \
+        --template $CI_REGISTRY_IMAGE/test:$JDK_VERSION-x86_64 \
+        --platforms linux/arm64 \
+        --template $CI_REGISTRY_IMAGE/test:$JDK_VERSION-arm64 \
+        --target $CI_REGISTRY_IMAGE/test:$JDK_VERSION
+  only:
+    - schedules
+    - web
+
+# Build container images for multiple architectures directly with podman.
+.build-docker-simple:
+  stage: images
+  image: quay.io/podman/stable
+  script:
+    - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - podman build --userns=host --platform $DOCKER_PLATFORMS --manifest $IMAGE -f $DOCKERFILE
+    - podman tag $IMAGE $CI_REGISTRY_IMAGE/$IMAGE
+    - podman manifest inspect $IMAGE
+    - podman manifest push --all $CI_REGISTRY_IMAGE/$IMAGE
+  only:
+    - schedules
+    - web
+
+# disabled job (it has a point "." in front of its name)
+# TODO: Sadly this does not work with the current version of Gitlab Runner due to insufficient
+#       privileges for the executed podman commands. They might need a privileged container.
+.build-docker-simple:test:
   extends: .build-docker
   parallel:
     matrix:
       - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
   variables:
     DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
-    IMAGE: /test:$JDK_VERSION
+    IMAGE: test:$JDK_VERSION
+    DOCKER_PLATFORMS: linux/amd64,linux/arm64
