@@ -32,7 +32,6 @@ public class PrincessStringFormulaManager
 
   @Override
   protected IExpression makeStringImpl(String value) {
-    value = unescapeUnicodeForSmtlib(value);
     checkArgument(!containsSurrogatePair(value), "Princess does not support surrogate pairs.");
     IExpression strExpr = PrincessEnvironment.stringTheory.string2Term(value);
     return getFormulaCreator().getEnv().simplify(strExpr); // simplify MOD in chars
