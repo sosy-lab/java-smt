@@ -47,7 +47,7 @@ public class FloatingPointGenerator {
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, inputParams, functionToString, Keyword.FLOATING_POINT);
     newEntry.floatingPointExponent = type.getExponentSize();
-    newEntry.floatingPointMantissa = type.getMantissaSize();
+    newEntry.floatingPointMantissa = type.getMantissaSize() + 1;
     Generator.getExecutedAggregator().add(newEntry);
   }
 
@@ -62,15 +62,15 @@ public class FloatingPointGenerator {
   }
 
   protected static void logMakeNaN(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ NaN " + type.getExponentSize() + " " + type.getMantissaSize() + ")");
+    logSimple(result, "(_ NaN " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
   }
 
   protected static void logMakePlusInfinity(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ +oo " + type.getExponentSize() + " " + type.getMantissaSize() + ")");
+    logSimple(result, "(_ +oo " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
   }
 
   protected static void logMakeMinusInfinity(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ -oo " + type.getExponentSize() + " " + type.getMantissaSize() + ")");
+    logSimple(result, "(_ -oo " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
   }
 
   protected static void logFPAdd(
@@ -308,7 +308,7 @@ public class FloatingPointGenerator {
     inputParams.add(number);
     inputParams.add(roundingMode);
     inputParams.add(String.valueOf(type.getExponentSize()));
-    inputParams.add(String.valueOf(type.getMantissaSize()));
+    inputParams.add(String.valueOf(type.getMantissaSize() + 1));
     Function<List<Object>, String> functionToString =
         getListStringFunctionForCast(number, inputParams);
     Generator.getExecutedAggregator()
@@ -320,7 +320,7 @@ public class FloatingPointGenerator {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     inputParams.add(String.valueOf(type.getExponentSize()));
-    inputParams.add(String.valueOf(type.getMantissaSize()));
+    inputParams.add(String.valueOf(type.getMantissaSize() + 1));
     Function<List<Object>, String> functionToString =
         getListStringFunctionForCast(number, inputParams);
     Generator.getExecutedAggregator()
@@ -352,7 +352,7 @@ public class FloatingPointGenerator {
                     + ")"
                     + " "
                     + inPlaceInputParams.get(1)
-                    + ") "
+                    + " "
                     + inPlaceInputParams.get(0)
                     + ")";
       }
@@ -373,9 +373,9 @@ public class FloatingPointGenerator {
             inPlaceInputParams ->
                 "((_ to_fp "
                     + inPlaceInputParams.get(1)
-                    + " "
-                    + inPlaceInputParams.get(2)
                     + ") "
+                    + inPlaceInputParams.get(2)
+                    + " "
                     + inPlaceInputParams.get(0)
                     + ")";
       }
@@ -386,7 +386,9 @@ public class FloatingPointGenerator {
   protected static void logFromIeeeBitvector(
       FloatingPointFormula result, BitvectorFormula number, FloatingPointType type) {
     logUnaryOp(
-        result, "((_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + ")", number);
+        result,
+        "(_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")",
+        number);
   }
 
   private static void logUnaryOp(Object result, String op, Object n) {

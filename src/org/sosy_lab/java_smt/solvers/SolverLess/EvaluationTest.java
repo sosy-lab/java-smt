@@ -27,7 +27,8 @@ public class EvaluationTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return Solvers.SOLVERLESS;
   }
-//TODO STRING FORMAT BEI NUMERALGENERATOR MACHEN WIE BEI STRINGGENERATOR DANN GEHTS!
+
+  // TODO STRING FORMAT BEI NUMERALGENERATOR MACHEN WIE BEI STRINGGENERATOR DANN GEHTS!
   @Before
   public void setUp() {
     Generator.setIsLoggingEnabled(true);
@@ -104,11 +105,13 @@ public class EvaluationTest extends SolverBasedTest0 {
       return false;
     }
   }
+
   public void runTestWithAPIConstraint(BooleanFormula constraint)
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    if(!Generator.isLoggingEnabled()){
-      throw new InvalidConfigurationException("Logging must be enabled to run this test!"
-          + "Also make sure that it was enabled while creating the constraint!");
+    if (!Generator.isLoggingEnabled()) {
+      throw new InvalidConfigurationException(
+          "Logging must be enabled to run this test!"
+              + "Also make sure that it was enabled while creating the constraint!");
     }
     Generator.assembleConstraint(constraint);
     String x = String.valueOf(Generator.getLines());
@@ -172,7 +175,7 @@ public class EvaluationTest extends SolverBasedTest0 {
             + "(assert (fp.eq b (fp #b0 #b10000010 #b01000000000000000000000)))\n" // b = 10.0 as FP
             + "(assert (fp.eq (fp.add RNE a b) c))\n" // c = a + b
             + "(assert (fp.eq c (fp #b0 #b10000011 #b01000000000000000000000)))\n"; // c = 20.0 as
-                                                                                    // FP
+    // FP
     runTest(x);
   }
 }

@@ -274,8 +274,9 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     @Override
-    public String toSMTLIBString() {
-      return "(_ FloatingPoint " + exponentSize + " " + mantissaSize + ")";
+    public String toSMTLIBString() { // SMTLIB2 ALWAYS CONSIDERS SIGN BIT IN THE MANTISSA SIZE!
+      // returning (_ FloatingPoint 8 23) for single precision is incorrect.
+      return "(_ FloatingPoint " + exponentSize + " " + mantissaSize + 1 + ")";
     }
   }
 

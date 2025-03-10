@@ -67,15 +67,14 @@ QuotedSymbol:
 
 FLOATING_POINT_SORT
     : '(_ FloatingPoint' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
-    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
     | ShortFloats
-    | '(_ ' [+-]'oo' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
-    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
-    | '(_ NaN' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
     ;
 
 FLOATING_POINT_NUMBER
-    : '(fp#b' [01]+ '#b' [01]+ '#b' [01]+ ')'
+    : '(fp' FloatSpaceChar Binary FloatSpaceChar Binary FloatSpaceChar Binary ')'
+    | '(_ ' [+-]'oo' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | '(_ NaN' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
     ;
 
 TO_FP_EXPR
@@ -740,7 +739,7 @@ match_case
 term
     : spec_constant                                                   #term_spec_const
     | qual_identifer                                                  #term_qual_id
-    | to_fp_expr #term_fp_cast
+    | to_fp_expr                                                      #term_fp_cast
     | ParOpen qual_identifer term+ ParClose                           #multiterm
     | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose     #term_let
     | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose   #term_forall

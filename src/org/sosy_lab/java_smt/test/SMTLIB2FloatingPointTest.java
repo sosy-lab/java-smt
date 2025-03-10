@@ -54,13 +54,13 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   public void testMakeFloatingPoint()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq a ((_ to_fp 8 23) 10.0)))\n"
-            + "(assert (fp.eq b ((_ to_fp 8 23) 10.0)))\n"
-            + "(assert (fp.eq c ((_ to_fp 8 23) 20.0)))\n"
-            + "(assert (fp.eq (fp.add a b) c))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a ((_ to_fp 8 24) RNE 10.0)))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE 10.0)))\n"
+            + "(assert (fp.eq c ((_ to_fp 8 24) RNE 20.0)))\n"
+            + "(assert (fp.eq (fp.add RNE a b) c))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     Generator.assembleConstraint(actualResult);
     FloatingPointFormula a =
@@ -90,7 +90,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     System.out.println(Generator.getLines());
     BooleanFormula expectedResult = bmgr.and(constraint1, constraint2, constraint3, constraint4);
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   private final FormulaType.FloatingPointType fpType =
@@ -100,11 +100,11 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   public void testMakeFloatingPointFromDouble()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     String smtInput =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq a ((_ to_fp 8 23) RNE 10.0)))\n"
-            + "(assert (fp.eq b ((_ to_fp 8 23) RNE 10.0)))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a ((_ to_fp 8 24) RNE 10.0)))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE 10.0)))\n"
             + "(assert (fp.eq (fp.add RNE a b) c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(smtInput);
@@ -120,18 +120,18 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
             fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
     Generator.assembleConstraint(actualResult);
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testMakeFloatingPointFromRational()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     String smtInput =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq a ((_ to_fp 8 23) RNE 3/2)))\n"
-            + "(assert (fp.eq b ((_ to_fp 8 23) RNE 3/2)))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a ((_ to_fp 8 24) RNE 3/2)))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE 3/2)))\n"
             + "(assert (fp.eq (fp.add RNE a b) c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(smtInput);
@@ -153,19 +153,19 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
             fpmgr.equalWithFPSemantics(c, fpmgr.add(a, b)));
     Generator.assembleConstraint(actualResult);
     assertThat(actualResult).isNotNull();
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testMakeFloatingPointFromBigDecimal()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     String smtInput =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq a ((_ to_fp 8 23) RNE 3.14159)))\n"
-            + "(assert (fp.eq b ((_ to_fp 8 23) RNE 3.14159)))\n"
-            + "(assert (fp.eq c ((_ to_fp 8 23) RNE 6.28318)))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a ((_ to_fp 8 24) RNE 3.14159)))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE 3.14159)))\n"
+            + "(assert (fp.eq c ((_ to_fp 8 24) RNE 6.28318)))\n"
             + "(assert (fp.eq (fp.add RNE a b) c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(smtInput);
@@ -189,11 +189,11 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   public void testMakeFloatingPointFromString()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
     String smtInput =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq a ((_ to_fp 8 23) RNE \"2.71828\")))\n"
-            + "(assert (fp.eq b ((_ to_fp 8 23) RNE \"2.71828\")))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a ((_ to_fp 8 24) RNE \"2.71828\")))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE \"2.71828\")))\n"
             + "(assert (fp.eq (fp.add RNE a b) c))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(smtInput);
@@ -216,8 +216,8 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq a b))\n";
 
     checkAndCreate(x);
@@ -233,7 +233,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -241,10 +241,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a  (_ FloatingPoint 8 23))\n"
-            + "(declare-const b  (_ FloatingPoint 8 23))\n"
-            + "(declare-const c  (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.add RNE a b)))\n";
+        "(declare-const a  (_ FloatingPoint 8 24))\n"
+            + "(declare-const b  (_ FloatingPoint 8 24))\n"
+            + "(declare-const c  (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.add RNE a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -259,27 +259,31 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
+
   @Test
   public void testDeclareFloatingPointsWithBits()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireFloats();
     String x =
-        "(declare const a (_ FloatingPoint 8 23))\n"
-            + "(declare const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c  (_ FloatingPoint 8 23))\n"
-            + "(assert (= a (fp #b0 #10000010 #01000000000000000000000)))\n"
-            + "(assert (= b (fp #b0 #10000010 #01000000000000000000000)))\n"
-            + "(assert (= c (fp.add RNE a b)))\n";
+        "(declare const a (_ FloatingPoint 8 24))\n"
+            + "(declare const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c  (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a (fp #b0 #10000010 #01000000000000000000000)))\n"
+            + "(assert (fp.eq b (fp #b0 #10000010 #01000000000000000000000)))\n"
+            + "(assert (fp.eq c (fp.add RNE a b)))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-    FloatingPointFormula a = fpmgr.makeNumber(10.0, FormulaType.getFloatingPointType(8, 23));
-    FloatingPointFormula b = fpmgr.makeNumber(10.0, FormulaType.getFloatingPointType(8, 23));
-    FloatingPointFormula c = fpmgr.makeVariable("c", FormulaType.getFloatingPointType(8, 23));
-    BooleanFormula expectedResult = fpmgr.equalWithFPSemantics(fpmgr.add(a,b), c);
+    FloatingPointFormula a =
+        fpmgr.makeNumber(10.0, FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula b =
+        fpmgr.makeNumber(10.0, FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula c =
+        fpmgr.makeVariable("c", FormulaType.getSinglePrecisionFloatingPointType());
+    BooleanFormula expectedResult = fpmgr.equalWithFPSemantics(fpmgr.add(a, b), c);
     Generator.assembleConstraint(actualResult);
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -288,22 +292,22 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     requireFloats();
     requireBitvectors();
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(assert (= b ((_ to_fp 8 23) RNE #b00000000000000000000000000000000)))\n"
-            + "(fp.eq a b)\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq b ((_ to_fp 8 24) RNE #b00000000000000000000000000000000)))\n"
+            + "(assert (fp.eq a b))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     FloatingPointFormula a =
         fpmgr.makeVariable("a", FormulaType.getSinglePrecisionFloatingPointType());
-    BitvectorFormula bitvector = bvmgr.makeBitvector(32, 12345);
+    BitvectorFormula bitvector =
+        bvmgr.makeBitvector(32, new BigInteger("00000000000000000000000000000000", 2));
     FloatingPointFormula b =
         fpmgr.fromIeeeBitvector(bitvector, FormulaType.getSinglePrecisionFloatingPointType());
     Generator.assembleConstraint(actualResult);
-    BooleanFormula constraint = fpmgr.equalWithFPSemantics(a, b);
-    BooleanFormula expectedResult = constraint;
+    BooleanFormula expectedResult = fpmgr.equalWithFPSemantics(a, b);
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -324,7 +328,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -343,7 +347,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -372,7 +376,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -391,7 +395,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -399,10 +403,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.mul RNE a b)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.mul RNE a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -417,7 +421,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -425,10 +429,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.sub RNE a b)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.sub RNE a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -443,7 +447,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -451,10 +455,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.div RNE a b)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.div RNE a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -469,7 +473,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -477,9 +481,9 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(assert (= b (fp.neg a)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq b (fp.neg a)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -492,7 +496,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -500,9 +504,9 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(assert (= b (fp.abs a)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq b (fp.abs a)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -515,7 +519,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -523,10 +527,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.max a b)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.max a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -540,7 +544,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -548,10 +552,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
-            + "(assert (= c (fp.min a b)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq c (fp.min a b)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -565,7 +569,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
@@ -573,9 +577,9 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
     String x =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(assert (= b (fp.sqrt RNE a)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq b (fp.sqrt RNE a)))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -588,40 +592,53 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testFloatingPointInfinity()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
-    String x = "(declare-const inf (_ FloatingPoint 8 23))\n" + "(assert (= inf (_ +oo 8 23)))\n";
+    String x =
+        "(declare-const inf (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq inf (_ +oo 8 "
+            + "24)))"
+            + "\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    FloatingPointFormula inf = fpmgr.makePlusInfinity(FormulaType.getFloatingPointType(8, 23));
+    FloatingPointFormula inf =
+        fpmgr.makeVariable("inf", FormulaType.getSinglePrecisionFloatingPointType());
 
-    BooleanFormula constraint = fpmgr.isInfinity(inf);
+    BooleanFormula constraint =
+        fpmgr.equalWithFPSemantics(
+            inf, fpmgr.makePlusInfinity(FormulaType.getSinglePrecisionFloatingPointType()));
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 
   @Test
   public void testFloatingPointNaN()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
 
-    String x = "(declare-const nan (_ FloatingPoint 8 23))\n" + "(assert (= nan (_ NaN 8 23)))\n";
+    String x =
+        "(declare-const nan (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq nan (_ NaN 8 "
+            + "24)))"
+            + "\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    FloatingPointFormula nan = fpmgr.makeNaN(FormulaType.getFloatingPointType(8, 23));
+    FloatingPointFormula nan = fpmgr.makeVariable("nan", FormulaType.getFloatingPointType(8, 23));
 
-    BooleanFormula constraint = fpmgr.isNaN(nan);
+    BooleanFormula constraint =
+        fpmgr.equalWithFPSemantics(
+            nan, fpmgr.makeNaN(FormulaType.getSinglePrecisionFloatingPointType()));
     Generator.assembleConstraint(actualResult);
     BooleanFormula expectedResult = constraint;
     Generator.assembleConstraint(expectedResult);
-    assertThat(expectedResult).isEqualTo(actualResult);
+    assertThat(actualResult).isEqualTo(expectedResult);
   }
 }

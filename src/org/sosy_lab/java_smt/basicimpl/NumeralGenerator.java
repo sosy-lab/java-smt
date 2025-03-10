@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
