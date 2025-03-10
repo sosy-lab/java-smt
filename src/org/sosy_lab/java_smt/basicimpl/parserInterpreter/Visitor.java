@@ -18,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -33,6 +35,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.Model;
@@ -58,13 +61,16 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Multisor
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.MultitermContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Qual_id_sortContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Resp_get_modelContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.SortContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Sort_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_exclamContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_existsContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_forallContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_fp_castContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_letContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_qual_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_spec_constContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.To_fp_exprContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
 
@@ -73,11 +79,11 @@ import scala.Tuple2;
  * form of action in order to transform the parsed SMT-LIB2 into JavaSMT.
  */
 @SuppressWarnings({
-  "CheckReturnValue",
-  "unchecked",
-  "NonApiType",
-  "StringSplitter",
-  "UnnecessaryParentheses"
+    "CheckReturnValue",
+    "unchecked",
+    "NonApiType",
+    "StringSplitter",
+    "UnnecessaryParentheses"
 })
 public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
@@ -95,7 +101,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   // TODO They are declarations!
   private final Map<String, ParserFormula> letVariables = new HashMap<>();
 
-  /** saves each 'assert' statement interpreted as a BooleanFormula object as an entry. */
+  /**
+   * saves each 'assert' statement interpreted as a BooleanFormula object as an entry.
+   */
   // TODO Here we collect the formulas
   private final List<BooleanFormula> constraints = new ArrayList<>();
 
@@ -121,7 +129,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     return assignments;
   }
 
-  /** is set to 'true' if a node 'model' is encountered. */
+  /**
+   * is set to 'true' if a node 'model' is encountered.
+   */
   private boolean isModel = false;
 
   // TODO Does the visitor use its own solver instance, or should the formulas be added to an
@@ -192,12 +202,12 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    */
   private static List<String> getAllAllowedFPBeginningsWithInts() {
     List<String> beginnings = new ArrayList<>();
-    beginnings.add("(_FloatingPoint");
-    beginnings.add("(_+oo");
-    beginnings.add("(_-oo");
-    beginnings.add("(_+zero");
-    beginnings.add("(_-zero");
-    beginnings.add("(_NaN");
+    beginnings.add("(_ FloatingPoint");
+    beginnings.add("(_ +oo");
+    beginnings.add("(_ -oo");
+    beginnings.add("(_ +zero");
+    beginnings.add("(_ -zero");
+    beginnings.add("(_ NaN");
     return beginnings;
   }
 
@@ -209,15 +219,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    */
   private static List<String> getAllAllowedFPBeginningsWithoutInts() {
     List<String> beginnings = new ArrayList<>();
-    beginnings.add("Float");
-    beginnings.add("(fp #b");
+    beginnings.add("Float16");
+    beginnings.add("Float32");
+    beginnings.add("Float64");
+    beginnings.add("Float128");
     return beginnings;
   }
 
   /**
    * Checks if the beginning of the String matches one from a list.
    *
-   * @param checkedString String which beginning should be checked
+   * @param checkedString      String which beginning should be checked
    * @param listWithBeginnings ArrayList with the Strings that could match the checkedString
    * @return true if at least one item of the list matches the beginning of the String
    */
@@ -269,7 +281,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     if (beginningMatchesList(type, getAllAllowedFPBeginningsWithoutInts())) {
       if (type.startsWith("Float16")) {
         int exponent = 5;
-        int mantissa = 11;
+        int mantissa = 10;
         return FormulaType.getFloatingPointType(exponent, mantissa);
       }
       if (type.startsWith("Float32")) {
@@ -280,87 +292,11 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       }
       if (type.startsWith("Float128")) {
         int exponent = 15;
-        int mantissa = 113;
+        int mantissa = 112;
         return FormulaType.getFloatingPointType(exponent, mantissa);
       }
     }
     throw new ParserException("Invalid Floating Point Format: " + type);
-  }
-
-  /**
-   * This method detects all allowed ways to declare a floating-point in smt2. It extracts the
-   * exponent and mantissa (in case of bitvectors the significant too) and creates a ParserFormula
-   * Object with the give information.
-   *
-   * @param operand String from the tree branch (ANTLR)
-   * @return ParserFormula Object containing the Floating-Point
-   */
-  private ParserFormula createParserFormulaForFP(String operand) {
-    if (beginningMatchesList(operand, getAllAllowedFPBeginningsWithInts())) {
-      try {
-        String[] parts = operand.split(" ");
-        int exponent = Integer.parseInt(parts[2]);
-        int mantissa = Integer.parseInt(parts[3].replace(")", ""));
-        return new ParserFormula(
-            Objects.requireNonNull(fpmgr)
-                .makeNumber(operand, FormulaType.getFloatingPointType(exponent, mantissa)));
-      } catch (Exception e) {
-        throw new ParserException("Invalid FloatingPoint format: " + operand, e);
-      }
-    }
-
-    if (beginningMatchesList(operand, getAllAllowedFPBeginningsWithoutInts())) {
-      if (operand.startsWith("(Float16")) {
-        int exponent = 5;
-        int mantissa = 11;
-        return new ParserFormula(
-            Objects.requireNonNull(fpmgr)
-                .makeNumber(operand, FormulaType.getFloatingPointType(exponent, mantissa)));
-      } else if (operand.startsWith("(Float32")) {
-        return new ParserFormula(
-            Objects.requireNonNull(fpmgr)
-                .makeNumber(operand, FormulaType.getSinglePrecisionFloatingPointType()));
-      } else if (operand.startsWith("(Float64")) {
-        return new ParserFormula(
-            Objects.requireNonNull(fpmgr)
-                .makeNumber(operand, FormulaType.getDoublePrecisionFloatingPointType()));
-      } else if (operand.startsWith("(Float128")) {
-        int exponent = 15;
-        int mantissa = 113;
-        return new ParserFormula(
-            Objects.requireNonNull(fpmgr)
-                .makeNumber(operand, FormulaType.getFloatingPointType(exponent, mantissa)));
-      } else if (operand.startsWith("(fp")) {
-        try {
-          String[] parts = operand.split(" ");
-          String signPart = parts[1]; // (_ BitVec 1)
-          String exponentPart = parts[2]; // (_ BitVec eb)
-          String mantissaPart = parts[3]; // (_ BitVec man)
-
-          int sign = parseBitVec(signPart);
-          int exponent = parseBitVec(exponentPart);
-          int mantissa = parseBitVec(mantissaPart.replace(")", ""));
-
-          BitvectorFormula signFormula = bvmgr.makeBitvector(1, sign);
-          BitvectorFormula exponentFormula =
-              bvmgr.makeBitvector(getBitVecSize(exponentPart), exponent);
-          BitvectorFormula mantissaFormula =
-              bvmgr.makeBitvector(getBitVecSize(mantissaPart), mantissa);
-
-          FloatingPointFormula fpFormula =
-              fpmgr.fromIeeeBitvector(
-                  bvmgr.concat(signFormula, bvmgr.concat(exponentFormula, mantissaFormula)),
-                  FormulaType.getFloatingPointType(
-                      getBitVecSize(exponentPart), getBitVecSize(mantissaPart)));
-
-          return new ParserFormula(fpFormula);
-        } catch (Exception e) {
-          throw new ParserException("Invalid FloatingPoint format: " + operand, e);
-        }
-      }
-    }
-
-    throw new ParserException("Invalid Floating Point Format: " + operand);
   }
 
   private ParserFormula createParserFormulaForString(String operand) {
@@ -372,19 +308,70 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     // TODO: Do I need extra handling if a String contains a escape sequence like double ""?
   }
 
-  private static int parseBitVec(String bitVecPart) {
-    if (!bitVecPart.startsWith("(_ BitVec")) {
-      throw new IllegalArgumentException("Invalid BitVec format: " + bitVecPart);
+  private int parseBitVectorToInt(String bitVec) {
+    if (bitVec.startsWith("#b")) {
+      return Integer.parseInt(bitVec.substring(2), 2);
+    } else if (bitVec.startsWith("#x")) {
+      return Integer.parseInt(bitVec.substring(2), 16);
+    } else {
+      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
     }
-    String bitValue = bitVecPart.split(" ")[2].replace(")", "");
-    return Integer.parseInt(bitValue);
   }
 
-  private static int getBitVecSize(String bitVecPart) {
-    if (!bitVecPart.startsWith("(_ BitVec")) {
-      throw new IllegalArgumentException("Invalid BitVec format: " + bitVecPart);
+  private long parseBitVectorToLong(String bitVec) {
+    if (bitVec.startsWith("#b")) {
+      return Long.parseLong(bitVec.substring(2), 2);
+    } else if (bitVec.startsWith("#x")) {
+      return Long.parseLong(bitVec.substring(2), 16);
+    } else {
+      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
     }
-    return Integer.parseInt(bitVecPart.split(" ")[2].replace(")", ""));
+  }
+
+  private int getBitVecSize(String bitVec) {
+    if (bitVec.startsWith("#b")) {
+      return bitVec.length() - 2;
+    } else if (bitVec.startsWith("#x")) {
+      return (bitVec.length() - 2) * 4;
+    } else {
+      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
+    }
+  }
+
+  private double convertToDouble(
+      int sign,
+      int exponent,
+      long mantissa,
+      int exponentSize,
+      int mantissaSize) {
+    int bias = (int) (Math.pow(2, exponentSize - 1) - 1);
+    int unbiasedExponent = exponent - bias;
+
+    double normalizedMantissa = 1.0 + (mantissa / Math.pow(2, mantissaSize));
+
+    double result = normalizedMantissa * Math.pow(2, unbiasedExponent);
+    return (sign == 1) ? -result : result;
+  }
+
+
+  private BitvectorFormula parseBitVector(String bitVec) {
+    if (!bitVec.startsWith("#b")) {
+      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
+    }
+    String binaryValue = bitVec.substring(2);
+    int bitSize = binaryValue.length();
+    int value = Integer.parseInt(binaryValue, 2);
+    return Objects.requireNonNull(bvmgr).makeBitvector(bitSize, value);
+  }
+
+  private BitvectorFormula parseHexVector(String hexVec) {
+    if (!hexVec.startsWith("#x")) {
+      throw new IllegalArgumentException("Invalid HexVector format: " + hexVec);
+    }
+    String hexValue = hexVec.substring(2);
+    int bitSize = hexValue.length() * 4;
+    BigInteger value = new BigInteger(hexValue, 16);
+    return Objects.requireNonNull(bvmgr).makeBitvector(bitSize, value);
   }
 
   /**
@@ -519,6 +506,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   @Override
   public Object visitTerm_spec_const(Term_spec_constContext ctx) {
     String operand = ctx.getText();
+
     if (variables.containsKey(operand)) {
       return variables.get(operand).javaSmt;
     } else if (getNumericType(operand).equals("Integer")
@@ -530,26 +518,79 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         || getNumericType(operand).equals("Float")) {
       variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
       return variables.get(operand).javaSmt;
-    } else if (beginningMatchesList(operand, getAllAllowedFPBeginnigs())) {
-      variables.put(operand, createParserFormulaForFP(operand));
-      return variables.get(operand).javaSmt;
+    } else if (operand.startsWith("(fp#b")) {
+      Pattern pattern = Pattern.compile("\\(fp(#b[01]+)(#b[01]+)(#b[01]+)\\)");
+      Matcher matcher = pattern.matcher(operand);
+
+      if (!matcher.matches()) {
+        throw new ParserException("Invalid FloatingPoint format: " + operand);
+      }
+      String signBitStr = matcher.group(1);
+      String exponentStr = matcher.group(2);
+      String mantissaStr = matcher.group(3);
+      int signBit = parseBitVectorToInt(signBitStr);
+      int exponent = parseBitVectorToInt(exponentStr);
+      long mantissa = parseBitVectorToLong(mantissaStr);
+      int exponentSize = getBitVecSize(exponentStr);
+      int mantissaSize = getBitVecSize(mantissaStr);
+      double doubleValue = convertToDouble(signBit, exponent, mantissa, exponentSize, mantissaSize);
+      FloatingPointFormula fp = fpmgr.makeNumber(
+          doubleValue, FormulaType.getFloatingPointType(exponentSize, mantissaSize));
+      return fp;
     } else if (operand.startsWith("\"")) {
-      variables.put(operand, createParserFormulaForString(operand));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
-      String binVal = Iterables.get(Splitter.on('b').split(operand), 1);
-      int index = binVal.length();
-      int value = Integer.parseInt(binVal, 2);
-      return Objects.requireNonNull(bvmgr).makeBitvector(index, value);
+      return parseBitVector(operand);
     } else if (operand.startsWith("#x")) {
-      String hexVal = Iterables.get(Splitter.on('x').split(operand), 1);
-      int index = (hexVal.length() * 4);
-      BigInteger value = new BigInteger(hexVal, 16);
-      return Objects.requireNonNull(bvmgr).makeBitvector(index, value);
+      return parseHexVector(operand);
     } else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
   }
+  public Object parseValues(String operand) {
+    if (variables.containsKey(operand)) {
+      return variables.get(operand).javaSmt;
+    } else if (getNumericType(operand).equals("Integer")
+        || getNumericType(operand).equals("Long")
+        || getNumericType(operand).equals("BigInteger")) {
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(imgr).makeNumber(operand)));
+      return variables.get(operand).javaSmt;
+    } else if (getNumericType(operand).equals("Double")
+        || getNumericType(operand).equals("Float")) {
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(rmgr).makeNumber(operand)));
+      return variables.get(operand).javaSmt;
+    } else if (operand.startsWith("(fp#b")) {
+      Pattern pattern = Pattern.compile("\\(fp(#b[01]+)(#b[01]+)(#b[01]+)\\)");
+      Matcher matcher = pattern.matcher(operand);
+
+      if (!matcher.matches()) {
+        throw new ParserException("Invalid FloatingPoint format: " + operand);
+      }
+      String signBitStr = matcher.group(1);
+      String exponentStr = matcher.group(2);
+      String mantissaStr = matcher.group(3);
+      int signBit = parseBitVectorToInt(signBitStr);
+      int exponent = parseBitVectorToInt(exponentStr);
+      long mantissa = parseBitVectorToLong(mantissaStr);
+      int exponentSize = getBitVecSize(exponentStr);
+      int mantissaSize = getBitVecSize(mantissaStr);
+      double doubleValue = convertToDouble(signBit, exponent, mantissa, exponentSize, mantissaSize);
+      FloatingPointFormula fp = fpmgr.makeNumber(
+          doubleValue, FormulaType.getFloatingPointType(exponentSize, mantissaSize));
+      variables.put(operand, new ParserFormula(fp));
+      return fp;
+    } else if (operand.startsWith("\"")) {
+      variables.put(operand, createParserFormulaForString(operand));
+      return variables.get(operand).javaSmt;
+    } else if (operand.startsWith("#b")) {
+      return parseBitVector(operand);
+    } else if (operand.startsWith("#x")) {
+      return parseHexVector(operand);
+    } else {
+      throw new ParserException("Operand " + operand + " is unknown.");
+    }
+  }
+
 
   @Override
   public Object visitTerm_qual_id(Term_qual_idContext ctx) {
@@ -590,7 +631,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   /**
    * gets the operands used in a nested term.
    *
-   * @param ctx current MultitermContext
+   * @param ctx      current MultitermContext
    * @param operands List of the operands transformed to Formula objects
    */
   public void getOperands(MultitermContext ctx, List<Formula> operands) {
@@ -694,6 +735,23 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       case "+":
         // numeral operators
         if (!operands.isEmpty()) {
+          if (operands.size() == 2) {
+            try {
+              if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
+                List<NumeralFormula> numeralOperands =
+                    operands.stream().map(e -> (NumeralFormula) e).collect(Collectors.toList());
+                return Objects.requireNonNull(rmgr)
+                    .add(numeralOperands.get(0), numeralOperands.get(1));
+              } else {
+                List<IntegerFormula> integerOperands =
+                    operands.stream().map(e -> (IntegerFormula) e).collect(Collectors.toList());
+                return Objects.requireNonNull(imgr)
+                    .add(integerOperands.get(0), integerOperands.get(1));
+              }
+            } catch (Exception e) {
+              throw new ParserException("Operands for " + operator + " need to be of numeral type");
+            }
+          }
           try {
             if (operands.stream().anyMatch(c -> c instanceof RationalFormula)) {
               List<NumeralFormula> numeralOperands =
@@ -1300,12 +1358,12 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                       .makeArray(
                           "(as const (Array "
                               + getArrayStrings(
-                                  ((FormulaType.ArrayFormulaType<?, ?>)
-                                          Objects.requireNonNull(sort))
-                                      .getIndexType())
+                              ((FormulaType.ArrayFormulaType<?, ?>)
+                                  Objects.requireNonNull(sort))
+                                  .getIndexType())
                               + " "
                               + getArrayStrings(
-                                  ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
+                              ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())
                               + ") "
                               + operands.get(0)
                               + ")",
@@ -1815,48 +1873,145 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     }
   }
 
+  public ParserFormula checkAndHandleFloatingPoints(String sortText, String variableSymbol) {
+    ParserFormula result = null;
+
+    if (beginningMatchesList(sortText, getAllAllowedFPBeginningsWithInts())) {
+      int exponent;
+      int mantissa;
+      String[] parts = sortText.split(" ");
+
+      if (parts.length >= 4) {
+        try {
+          exponent = Integer.parseInt(parts[parts.length - 2]);
+          mantissa = Integer.parseInt(parts[parts.length - 1].replace(")", ""));
+        } catch (NumberFormatException e) {
+          throw new IllegalArgumentException("Ungültiges FloatingPoint-Format: " + sortText, e);
+        }
+      } else {
+        throw new IllegalArgumentException("Ungültiges Format: " + sortText);
+      }
+
+      result = new ParserFormula(
+          Objects.requireNonNull(fpmgr)
+              .makeVariable(variableSymbol, FormulaType.getFloatingPointType(exponent, mantissa))
+      );
+    } else if (getAllAllowedFPBeginningsWithoutInts().contains(sortText)) {
+      switch (sortText) {
+        case "Float16":
+          result = new ParserFormula(
+              Objects.requireNonNull(fpmgr)
+                  .makeVariable(variableSymbol, FormulaType.getFloatingPointType(5, 10))
+          );
+          break;
+        case "Float32":
+          result = new ParserFormula(
+              Objects.requireNonNull(fpmgr)
+                  .makeVariable(variableSymbol, FormulaType.getSinglePrecisionFloatingPointType())
+          );
+          break;
+        case "Float64":
+          result = new ParserFormula(
+              Objects.requireNonNull(fpmgr)
+                  .makeVariable(variableSymbol, FormulaType.getDoublePrecisionFloatingPointType())
+          );
+          break;
+        case "Float128":
+          result = new ParserFormula(
+              Objects.requireNonNull(fpmgr)
+                  .makeVariable(variableSymbol, FormulaType.getFloatingPointType(15, 112))
+          );
+          break;
+      }
+    }
+    return result;
+  }
+
+
+  @Override
+  public Object visitTo_fp_expr(To_fp_exprContext ctx) {
+    int exponent = -1;
+    int mantissa = -1;
+    String roundingMode = null;
+    String value = null;
+
+    String fpExpr = ctx.getText();
+
+    Pattern pattern = Pattern.compile("\\(_ to_fp (\\d+) (\\d+)\\)");
+    Matcher matcher = pattern.matcher(fpExpr);
+
+    if (matcher.find()) {
+      exponent = Integer.parseInt(matcher.group(1));
+      mantissa = Integer.parseInt(matcher.group(2));
+    } else{
+      throw new ParserException("Illegal Floating Point conversion: "+ ctx.getText());
+    }
+    ParserFormula result;
+    if(ctx.term().size()==2){
+      Smtlibv2Parser.TermContext firstTerm = ctx.term(0);
+      roundingMode = firstTerm.getText();
+      Smtlibv2Parser.TermContext valueTerm = ctx.term(1);
+      value = valueTerm.getText();
+      Formula source = (Formula) parseValues(value);
+      result = new ParserFormula(fpmgr.castFrom(source, false,
+          FloatingPointType.getFloatingPointType(exponent, mantissa), parseRoundingModesToJavaSMTFormat(roundingMode)));
+      variables.put(fpExpr, result);
+      return visitChildren(ctx);
+    }else if (ctx.term().size()==1){
+      Smtlibv2Parser.TermContext valueTerm = ctx.term(0);
+      value = valueTerm.getText();
+      Formula source = (Formula) parseValues(value);
+      result = new ParserFormula(fpmgr.castFrom(source, false,
+          FloatingPointType.getFloatingPointType(exponent, mantissa)));
+      variables.put(fpExpr, result);
+      return visitChildren(ctx);
+    }else{
+      throw new ParserException("Illegal Floating Point conversion: "+ ctx.getText());
+    }
+  }
+
   @Override
   public Object visitCmd_declareConst(Cmd_declareConstContext ctx) {
     String variableSymbol = ctx.symbol().getText();
-    FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
+    String sortText = ctx.sort().getText();
+      FormulaType<?> sort = (FormulaType<?>) visit(ctx.sort());
 
-    if (sort.isBooleanType()) {
-      variables.put(variableSymbol, new ParserFormula(bmgr.makeVariable(variableSymbol)));
-    } else if (sort.isIntegerType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(Objects.requireNonNull(imgr).makeVariable(variableSymbol)));
-    } else if (sort.isRationalType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(Objects.requireNonNull(rmgr).makeVariable(variableSymbol)));
-    } else if (sort.isBitvectorType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(
-              Objects.requireNonNull(bvmgr)
-                  .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
-    } else if (sort.isFloatingPointType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(
-              Objects.requireNonNull(fpmgr)
-                  .makeVariable(variableSymbol, (FormulaType.FloatingPointType) sort)));
-
-    } else if (sort.isStringType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(Objects.requireNonNull(smgr).makeVariable(variableSymbol)));
-    } else if (sort.isArrayType()) {
-      variables.put(
-          variableSymbol,
-          new ParserFormula(
-              Objects.requireNonNull(amgr)
-                  .makeArray(
-                      variableSymbol,
-                      ((FormulaType.ArrayFormulaType<?, ?>) sort).getIndexType(),
-                      ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())));
-    }
+      if (sort.isBooleanType()) {
+        variables.put(variableSymbol, new ParserFormula(bmgr.makeVariable(variableSymbol)));
+      } else if (sort.isIntegerType()) {
+        variables.put(
+            variableSymbol,
+            new ParserFormula(Objects.requireNonNull(imgr).makeVariable(variableSymbol)));
+      } else if (sort.isRationalType()) {
+        variables.put(
+            variableSymbol,
+            new ParserFormula(Objects.requireNonNull(rmgr).makeVariable(variableSymbol)));
+      } else if (sort.isBitvectorType()) {
+        variables.put(
+            variableSymbol,
+            new ParserFormula(
+                Objects.requireNonNull(bvmgr)
+                    .makeVariable(((FormulaType.BitvectorType) sort).getSize(), variableSymbol)));
+      }else if (sort.isFloatingPointType()){
+        variables.put(
+            variableSymbol,
+            new ParserFormula(Objects.requireNonNull(fpmgr).makeVariable(variableSymbol,
+                (FormulaType.FloatingPointType) sort)));
+      }
+      else if (sort.isStringType()) {
+        variables.put(
+            variableSymbol,
+            new ParserFormula(Objects.requireNonNull(smgr).makeVariable(variableSymbol)));
+      } else if (sort.isArrayType()) {
+        variables.put(
+            variableSymbol,
+            new ParserFormula(
+                Objects.requireNonNull(amgr)
+                    .makeArray(
+                        variableSymbol,
+                        ((FormulaType.ArrayFormulaType<?, ?>) sort).getIndexType(),
+                        ((FormulaType.ArrayFormulaType<?, ?>) sort).getElementType())));
+      }
     return visitChildren(ctx);
   }
 
@@ -1892,7 +2047,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    * creates a Formula object to use as the key in ValueAssignments for model from the given
    * FormulaType.
    *
-   * @param sorts FormulaType of the value in ValueAssignments
+   * @param sorts    FormulaType of the value in ValueAssignments
    * @param variable String representation of the key in ValueAssignments
    * @return Formula matching the given FormulaType 'sorts'
    */
@@ -1922,7 +2077,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    * Assembles a BooleanFormula for the ValueAssignment field 'formula' by applying
    * BooleanFormulaManager.equivalence() to key Formula and value Formula.
    *
-   * @param key Variable name as Formula
+   * @param key   Variable name as Formula
    * @param value Variable value as Formula
    * @return Equivalence of key and value
    */

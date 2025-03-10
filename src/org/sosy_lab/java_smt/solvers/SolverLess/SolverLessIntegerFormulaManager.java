@@ -46,7 +46,6 @@ public class SolverLessIntegerFormulaManager
 
   @Override
   protected SMTLIB2Formula makeVariableImpl(String i) {
-
     SMTLIB2Formula result = new SMTLIB2Formula(new DummyType(DummyType.Type.INTEGER));
     result.setName(i);
     return result;

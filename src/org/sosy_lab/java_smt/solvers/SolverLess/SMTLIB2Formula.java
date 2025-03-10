@@ -262,7 +262,7 @@ public class SMTLIB2Formula
         break;
       case INTEGER:
       case RATIONAL:
-        this.representation = value;
+          this.representation = value;
         break;
       case STRING:
         this.representation = "String";

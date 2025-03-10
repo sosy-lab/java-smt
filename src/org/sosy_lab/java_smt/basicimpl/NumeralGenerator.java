@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class NumeralGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, varType));
   }
 
-  protected static void logAdd(Object result, Object pNumber1, Object pNumber2) {
+  protected static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);

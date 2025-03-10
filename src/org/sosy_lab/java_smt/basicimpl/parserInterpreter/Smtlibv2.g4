@@ -65,6 +65,24 @@ QuotedSymbol:
     ;
 
 
+FLOATING_POINT_SORT
+    : '(_ FloatingPoint' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | ShortFloats
+    | '(_ ' [+-]'oo' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    | '(_ NaN' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    ;
+
+FLOATING_POINT_NUMBER
+    : '(fp#b' [01]+ '#b' [01]+ '#b' [01]+ ')'
+    ;
+
+TO_FP_EXPR
+    : '((_ to_fp' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    ;
+
+
 // Predefined Symbols
 
 PS_Not
@@ -253,6 +271,10 @@ GRW_Par
 GRW_String
     : 'string'
     ;
+GRW_FloatingPoint
+    : '_ FloatingPoint'
+    ;
+
 
 Numeral
     : '0'
@@ -270,48 +292,6 @@ HexDecimal
 Decimal
     : Numeral '.' '0'* Numeral
     ;
-
-NumeralExponentsWithSpace
-: Space Numeral Space Numeral
-      ;
-
-
-FloatingPointShortVariant //support for the official short variant e.g: (Float128 0)
-    : ParOpen ShortFloats ParClose
-    ;
-
-NumeralFloatingPoint //standard like (_ FloatingPoint 5 11)
-    : ParOpen GRW_Underscore  'FloatingPoint' NumeralExponentsWithSpace
-    ParClose
-    ;
-
-BinaryFloatingPoint // support for formats like: (fp #b0 #b10000 #b1100)
-    : ParOpen 'fp' Space Binary Space Binary Space Binary ParClose
-    ;
-
-FloatingPointPlusOrMinusInfinity //  Plus and Minus Infinity : e.g. ((_ +oo eb sb) (_
-// FloatingPoint eb
-// sb))
-    : ParOpen GRW_Underscore Space [+-]'oo' NumeralExponentsWithSpace
-    ParClose
-    ;
-
-FloatingPointPlusOrMinusZero // Plus and Minus Zero : ((_ +zero eb sb) (_ FloatingPoint eb sb))
-    :ParOpen GRW_Underscore Space [+-]'zero' NumeralExponentsWithSpace ParClose
-    ;
-
-NotANumberFloatingPoint // e.g.   ((_ NaN eb sb) (_ FloatingPoint eb sb))
-    : ParOpen GRW_Underscore Space 'NaN' NumeralExponentsWithSpace ParClose
-    ;
-
-
-FloatingPoint //(_ FloatingPoint eb sb)  where eb and sb are numerals greater than 1
-     : NumeralFloatingPoint
-     | FloatingPointShortVariant
-     | BinaryFloatingPoint
-     | FloatingPointPlusOrMinusInfinity
-     | NotANumberFloatingPoint
-     ;
 
 
 fragment HexDigit
@@ -397,6 +377,11 @@ fragment WhiteSpaceChar
 fragment Space
     : '\u0020'
     ;
+fragment FloatSpaceChar
+    : [ \t\r\n]
+    | WhiteSpaceChar
+    ;
+
 
 // Lexer Rules End
 
@@ -637,10 +622,6 @@ predefKeyword
 
 
 
-symbol
-    : simpleSymbol                                                  #simpsymb
-    | quotedSymbol                                                  #quotsymb
-    ;
 
 numeral
     : Numeral
@@ -662,13 +643,21 @@ string
     : String
     ;
 
-floatingpoint
-    : FloatingPoint
+
+to_fp_expr
+    : TO_FP_EXPR term ')'
+    | TO_FP_EXPR term term ')'
     ;
+
 
 keyword
     : predefKeyword                                                   #pre_key
     | Colon simpleSymbol                                              #key_simsymb
+    ;
+
+symbol
+    : simpleSymbol                                                  #simpsymb
+    | quotedSymbol                                                  #quotsymb
     ;
 
 // S-expression
@@ -679,7 +668,7 @@ spec_constant
     | hexadecimal                                                     #spec_constant_hex
     | binary                                                          #spec_constant_bin
     | string                                                          #spec_constant_string
-    | floatingpoint                                                   #spec_constant_floating_point
+    | FLOATING_POINT_NUMBER #spec_constant_fp
     ;
 
 
@@ -718,8 +707,9 @@ attribute
 // Sorts
 
 sort
-    : identifier                                                      #sort_id
-    | ParOpen identifier sort+ ParClose                               #multisort
+    : FLOATING_POINT_SORT #sortfp
+    | identifier #sort_id
+    | ParOpen identifier sort+ ParClose #multisort
     ;
 
 
@@ -750,6 +740,7 @@ match_case
 term
     : spec_constant                                                   #term_spec_const
     | qual_identifer                                                  #term_qual_id
+    | to_fp_expr #term_fp_cast
     | ParOpen qual_identifer term+ ParClose                           #multiterm
     | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose     #term_let
     | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose   #term_forall

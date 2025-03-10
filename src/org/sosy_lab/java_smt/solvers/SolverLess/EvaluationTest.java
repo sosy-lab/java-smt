@@ -27,7 +27,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   protected Solvers solverToUse() {
     return Solvers.SOLVERLESS;
   }
-
+//TODO STRING FORMAT BEI NUMERALGENERATOR MACHEN WIE BEI STRINGGENERATOR DANN GEHTS!
   @Before
   public void setUp() {
     Generator.setIsLoggingEnabled(true);
@@ -104,10 +104,22 @@ public class EvaluationTest extends SolverBasedTest0 {
       return false;
     }
   }
+  public void runTestWithAPIConstraint(BooleanFormula constraint)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    if(!Generator.isLoggingEnabled()){
+      throw new InvalidConfigurationException("Logging must be enabled to run this test!"
+          + "Also make sure that it was enabled while creating the constraint!");
+    }
+    Generator.assembleConstraint(constraint);
+    String x = String.valueOf(Generator.getLines());
+    runTest(x);
+    Generator.resetGenerator();
+  }
 
   @Test
   public void testWithIntegers()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireIntegers();
     String example =
         "(set-logic QF_LIA)\n"
             + "(declare-const x Int)\n"
@@ -122,6 +134,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   @Test
   public void testWithStrings()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
     String example =
         "(set-logic QF_S)\n"
             + "(declare-const x String)\n"
@@ -136,6 +149,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   @Test
   public void testMakeFloatingPoint()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    requireFloats();
     String x =
         "(declare-const a (_ FloatingPoint 8 24))\n"
             + "(declare-const b (_ FloatingPoint 8 24))\n"
@@ -149,6 +163,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   @Test
   public void testMakeFloatingPointWithBitvectors()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    requireBitvectors();
     String x =
         "(declare-const a (_ FloatingPoint 8 24))\n"
             + "(declare-const b (_ FloatingPoint 8 24))\n"
