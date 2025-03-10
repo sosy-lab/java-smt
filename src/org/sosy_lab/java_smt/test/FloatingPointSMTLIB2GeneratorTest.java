@@ -44,8 +44,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq a b))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -75,11 +75,11 @@ public class FloatingPointSMTLIB2GeneratorTest
             c, fpmgr.makeNumber(25.0, FormulaType.getSinglePrecisionFloatingPointType()));
     BooleanFormula constraint = fpmgr.equalWithFPSemantics(fpmgr.add(a, b), c);
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq a (fp #b0 #b10000010 #b01000000000000000000000)))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq b (fp #b0 #b10000010 #b11100000000000000000000)))\n"
-            + "(declare-const c (_ FloatingPoint 8 23))\n"
+            + "(declare-const c (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq c (fp #b0 #b10000011 #b10010000000000000000000)))\n"
             + "(assert (fp.eq (fp.add a b) c))\n";
     Generator.assembleConstraint(assign1);
@@ -107,9 +107,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.add a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -132,9 +132,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.sub a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -157,9 +157,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.div a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -182,9 +182,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.mul a b) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -205,8 +205,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.sqrt a) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -225,7 +225,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.isNaN a))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n" + "(assert (fp.isNaN a))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -243,7 +243,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.isZero a))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n" + "(assert (fp.isZero a))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -263,9 +263,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const max (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const max (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.max a b) max))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -286,9 +286,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
-            + "(declare-const b (_ FloatingPoint 8 23))\n"
-            + "(declare-const min (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(declare-const b (_ FloatingPoint 8 24))\n"
+            + "(declare-const min (_ FloatingPoint 8 24))\n"
             + "(assert (fp.eq (fp.min a b) min))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -309,8 +309,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const plusInfinity (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq plusInfinity (_ +oo 8 23)))\n";
+        "(declare-const plusInfinity (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq plusInfinity (_ +oo 8 24)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -331,8 +331,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const minusInfinity (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq minusInfinity (_ -oo 8 23)))\n";
+        "(declare-const minusInfinity (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq minusInfinity (_ -oo 8 24)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -351,7 +351,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const nan (_ FloatingPoint 8 23))\n" + "(assert (fp.eq nan (_ NaN 8 23)))\n";
+        "(declare-const nan (_ FloatingPoint 8 24))\n" + "(assert (fp.eq nan (_ NaN 8 24)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -370,7 +370,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n"
+        "(declare-const a (_ FloatingPoint 8 24))\n"
             + "(declare-const castResult (_ BitVec 32))\n"
             + "(assert (= ((_ fp.to_sbv 32) a) castResult))\n";
 
@@ -379,7 +379,9 @@ public class FloatingPointSMTLIB2GeneratorTest
 
   @Test
   public void testCastFrom() {
-    assume().that(!solverToUse().equals(Solvers.MATHSAT5));
+    assume()
+        .withMessage("Bitwuzla doesn't support boolean casting")
+        .that(!solverToUse().equals(Solvers.BITWUZLA));
     requireFloats();
     BooleanFormula b = bmgr.makeVariable("b");
     FloatingPointFormula castResult =
@@ -393,9 +395,9 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const result (_ FloatingPoint 8 23))\n"
+        "(declare-const result (_ FloatingPoint 8 24))\n"
             + "(declare-const b Bool)\n"
-            + "(assert (fp.eq result ((_ to_fp 8 23) b)))\n";
+            + "(assert (fp.eq result ((_ to_fp 8 24) b)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -417,8 +419,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const result (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq (((_ to_fp 8 23) #b00000000000000000000000000000000) result))\n";
+        "(declare-const result (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq ((_ to_fp 8 24) #b00000000000000000000000000000000) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -440,8 +442,8 @@ public class FloatingPointSMTLIB2GeneratorTest
 
     String expectedResult =
         "(declare-const bv (_ BitVec 32))\n"
-            + "(declare-const result (_ FloatingPoint 8 23))\n"
-            + "(assert (fp.eq (((_ to_fp 8 23) bv) result))\n";
+            + "(declare-const result (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq ((_ to_fp 8 24) bv) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
@@ -459,7 +461,7 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 23))\n" + "(assert (fp.eq a (fp.round RNE a)))\n";
+        "(declare-const a (_ FloatingPoint 8 24))\n" + "(assert (fp.eq a (fp.round RNE a)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

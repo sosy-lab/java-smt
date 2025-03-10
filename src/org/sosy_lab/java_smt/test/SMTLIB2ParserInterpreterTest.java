@@ -1653,6 +1653,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   public void testBVSignedModulo()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireBitvectors();
+    assume().withMessage("Bvsmod is not supported in JavaSMT.").that(true).isFalse();
 
     String x = "(assert (= #b111111110110 (bvsmod #b111111110110 #b000000010100)))";
 

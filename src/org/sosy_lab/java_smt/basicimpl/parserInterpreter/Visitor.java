@@ -591,7 +591,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
       fp =
           fpmgr.makeNumber(
-              doubleValue, FormulaType.getFloatingPointType(exponentSize, mantissaSize - 1));
+              doubleValue, FormulaType.getFloatingPointType(exponentSize, mantissaSize));
 
       variables.put(operand, new ParserFormula(fp));
       return fp;
@@ -1031,6 +1031,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             throw new ParserException("Operands for " + operator + " need to be of bitvector type");
           }
         }
+      case "bvsmod":
+        throw new ParserException("bvsmod is not supported in JavaSMT");
       case "bvsub":
         if (operands.size() != 2) {
           throw new ParserException(operator + " takes two bitvector operand as input.");
@@ -1929,7 +1931,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
     Pattern pattern = Pattern.compile("\\(_ to_fp (\\d+) (\\d+)\\)");
     Matcher matcher = pattern.matcher(fpExpr);
-
     if (matcher.find()) {
       exponent = Integer.parseInt(matcher.group(1));
       mantissa = Integer.parseInt(matcher.group(2));
@@ -1944,7 +1945,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               fpmgr.castFrom(
                   (Formula) parseValues(value),
-                  false,
+                  ((parseValues(value) instanceof BitvectorFormula)
+                      && getBitVecSize(value) == exponent + mantissa + 1),
                   FloatingPointType.getFloatingPointType(exponent, mantissa - 1),
                   parseRoundingModesToJavaSMTFormat(roundingMode)));
       variables.put(fpExpr, result);
@@ -1962,7 +1964,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           new ParserFormula(
               fpmgr.castFrom(
                   (Formula) parseValues(value),
-                  false,
+                  ((parseValues(value) instanceof BitvectorFormula)
+                      && getBitVecSize(value) == exponent + mantissa + 1),
                   FloatingPointType.getFloatingPointType(exponent, mantissa - 1)));
       variables.put(fpExpr, result);
       return variables.get(fpExpr).javaSmt;

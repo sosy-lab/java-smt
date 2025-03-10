@@ -62,15 +62,18 @@ public class FloatingPointGenerator {
   }
 
   protected static void logMakeNaN(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ NaN " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
+    logSimple(
+        result, "(_ NaN " + type.getExponentSize() + " " + (type.getMantissaSize() + 1) + ")");
   }
 
   protected static void logMakePlusInfinity(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ +oo " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
+    logSimple(
+        result, "(_ +oo " + type.getExponentSize() + " " + (type.getMantissaSize() + 1) + ")");
   }
 
   protected static void logMakeMinusInfinity(FloatingPointFormula result, FloatingPointType type) {
-    logSimple(result, "(_ -oo " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")");
+    logSimple(
+        result, "(_ -oo " + type.getExponentSize() + " " + (type.getMantissaSize() + 1) + ")");
   }
 
   protected static void logFPAdd(
@@ -373,9 +376,9 @@ public class FloatingPointGenerator {
             inPlaceInputParams ->
                 "((_ to_fp "
                     + inPlaceInputParams.get(1)
-                    + ") "
-                    + inPlaceInputParams.get(2)
                     + " "
+                    + inPlaceInputParams.get(2)
+                    + ") "
                     + inPlaceInputParams.get(0)
                     + ")";
       }
@@ -387,7 +390,7 @@ public class FloatingPointGenerator {
       FloatingPointFormula result, BitvectorFormula number, FloatingPointType type) {
     logUnaryOp(
         result,
-        "(_ to_fp " + type.getExponentSize() + " " + type.getMantissaSize() + 1 + ")",
+        "(_ to_fp " + type.getExponentSize() + " " + (type.getMantissaSize() + 1) + ")",
         number);
   }
 

@@ -71,7 +71,9 @@ FLOATING_POINT_SORT
     ;
 
 FLOATING_POINT_NUMBER
-    : '(fp' FloatSpaceChar Binary FloatSpaceChar Binary FloatSpaceChar Binary ')'
+    : '(fp' FloatSpaceChar (Binary | HexDecimal)
+     FloatSpaceChar (Binary | HexDecimal)
+     FloatSpaceChar (Binary | HexDecimal) ')'
     | '(_ ' [+-]'oo' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
     | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
     | '(_ NaN' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
