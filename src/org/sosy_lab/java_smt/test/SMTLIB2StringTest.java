@@ -114,7 +114,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     IntegerFormula lengthResult = smgr.length(a);
 
     BooleanFormula constraint = imgr.equal(len, lengthResult);
-    assertThat(expectedResult).isEqualTo(constraint);
+    assertThat(constraint).isEqualTo(expectedResult);
   }
 
   @Test

@@ -244,7 +244,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
    * @return matching FormulaType
    */
   public static FormulaType<?> parseToBitVecFormulaTypeIfMatching(String type) {
-    String bvSize = "";
+    String bvSize;
     if (type.startsWith("(_BitVec")) {
       bvSize = Iterables.get(Splitter.on("_BitVec").split(type), 1);
       bvSize = Iterables.get(Splitter.on(')').split(bvSize), 0);
@@ -569,7 +569,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         Pattern.compile(
             "\\(fp (#b[01]+|#x[0-9A-Fa-f]+) (#b[01]+|#x[0-9A-Fa-f]+) (#b[01]+|#x[0-9A-Fa-f]+)\\)");
     Matcher matcher = pattern.matcher(operand);
-    Pattern specialPattern = Pattern.compile("\\(\\_ (NaN|[+-]?oo|[+-]?zero) (\\d+) (\\d+)\\)");
+    Pattern specialPattern = Pattern.compile("\\(_ (NaN|[+-]?oo|[+-]?zero) (\\d+) (\\d+)\\)");
     Matcher specialMatcher = specialPattern.matcher(operand);
     if (!matcher.matches() && !specialMatcher.matches()) {
       throw new ParserException("Invalid FloatingPoint format: " + operand);
@@ -1947,7 +1947,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                   (Formula) parseValues(value),
                   ((parseValues(value) instanceof BitvectorFormula)
                       && getBitVecSize(value) == exponent + mantissa + 1),
-                  FloatingPointType.getFloatingPointType(exponent, mantissa - 1),
+                  FormulaType.getFloatingPointType(exponent, mantissa - 1),
                   parseRoundingModesToJavaSMTFormat(roundingMode)));
       variables.put(fpExpr, result);
       return variables.get(fpExpr).javaSmt;
@@ -1957,7 +1957,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             new ParserFormula(
                 fpmgr.fromIeeeBitvector(
                     parseBitVector(ctx.term(0).getText()),
-                    FloatingPointType.getFloatingPointType(exponent, mantissa - 1)));
+                    FormulaType.getFloatingPointType(exponent, mantissa - 1)));
+        variables.put(fpExpr, result);
+        return variables.get(fpExpr).javaSmt;
       }
       value = ctx.term(0).getText();
       result =
@@ -1966,7 +1968,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                   (Formula) parseValues(value),
                   ((parseValues(value) instanceof BitvectorFormula)
                       && getBitVecSize(value) == exponent + mantissa + 1),
-                  FloatingPointType.getFloatingPointType(exponent, mantissa - 1)));
+                  FormulaType.getFloatingPointType(exponent, mantissa - 1)));
       variables.put(fpExpr, result);
       return variables.get(fpExpr).javaSmt;
     } else {

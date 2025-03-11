@@ -302,12 +302,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testDeclareFloatingPointsWithBitVectors()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume()
-        .withMessage(
-            "Each solver has a very different way of handling this."
-                + "This method is therefore only tested on Solverless")
-        .that(solverToUse().equals(Solvers.SOLVERLESS))
-        .isTrue();
     requireFloats();
     requireBitvectors();
     String x =

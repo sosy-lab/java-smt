@@ -17,7 +17,6 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 @SuppressWarnings({"StringCaseLocaleUsage", "rawtypes", "Immutable"})
-// @Immutable
 public class SMTLIB2Formula
     implements Formula,
         BitvectorFormula,

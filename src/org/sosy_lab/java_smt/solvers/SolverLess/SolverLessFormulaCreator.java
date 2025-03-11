@@ -10,7 +10,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -154,15 +153,6 @@ public class SolverLessFormulaCreator
     }
 
     return super.extractInfo(pT);
-  }
-
-  @Override
-  public void extractVariablesAndUFs(
-      final SMTLIB2Formula pFormula,
-      final boolean extractUF,
-      final BiConsumer<String, SMTLIB2Formula> pConsumer) {
-    super.extractVariablesAndUFs(
-        (Formula) pFormula, extractUF, (name, f) -> pConsumer.accept(name, (SMTLIB2Formula) f));
   }
 
   public static int extractBitvectorLengthFromString(String representation) {
