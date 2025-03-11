@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
-@SuppressWarnings("StringSplitter")
+@SuppressWarnings({"StringSplitter", "overloads"})
 public class SolverLessFormulaCreator
     extends FormulaCreator<SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 

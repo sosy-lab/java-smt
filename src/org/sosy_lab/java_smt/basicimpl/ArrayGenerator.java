@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -89,7 +90,8 @@ public class ArrayGenerator {
       String pName,
       FormulaType<?> pIndexType,
       FormulaType<?> pElementType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pName, pIndexType, pElementType));
+    Generator.throwExceptionWhenParameterIsNull(
+        ImmutableList.of(result, pName, pIndexType, pElementType));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pName);
     Function<List<Object>, String> functionToString =
@@ -103,7 +105,7 @@ public class ArrayGenerator {
 
   protected static void logArrayEquivalence(
       Object result, ArrayFormula<?, ?> pArray1, ArrayFormula<?, ?> pArray2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray1, pArray2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pArray1, pArray2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pArray1);
     inputParams.add(pArray2);
@@ -115,7 +117,7 @@ public class ArrayGenerator {
   }
 
   protected static void logSelect(Object result, ArrayFormula<?, ?> pArray, Formula pIndex) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray, pIndex));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pArray, pIndex));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pArray);
     inputParams.add(pIndex);
@@ -128,7 +130,7 @@ public class ArrayGenerator {
 
   protected static void logStore(
       Object result, ArrayFormula<?, ?> pArray, Formula pIndex, Formula pValue) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray, pIndex, pValue));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pArray, pIndex, pValue));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pArray);
     inputParams.add(pIndex);

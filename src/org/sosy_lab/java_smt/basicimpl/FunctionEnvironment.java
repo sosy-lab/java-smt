@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
@@ -59,12 +60,12 @@ public class FunctionEnvironment {
   }
 
   public void setExpressionType(Keyword pExpressionType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pExpressionType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pExpressionType));
     expressionType = pExpressionType;
   }
 
   public void setResult(Object pResult) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pResult));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pResult));
     result = pResult;
   }
 
@@ -73,7 +74,7 @@ public class FunctionEnvironment {
   }
 
   public void setInputParams(List<Object> pInputParams) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pInputParams));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pInputParams));
     inputParams = pInputParams;
   }
 
@@ -82,17 +83,17 @@ public class FunctionEnvironment {
   }
 
   public void setFunctionToString(Function<List<Object>, String> pFunctionToString) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pFunctionToString));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pFunctionToString));
     functionToString = pFunctionToString;
   }
 
   public void setArrayIndexType(String pArrayIndexType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pArrayIndexType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pArrayIndexType));
     arrayIndexType = pArrayIndexType;
   }
 
   public void setArrayValueType(String pArrayValueType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pArrayValueType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pArrayValueType));
     arrayValueType = pArrayValueType;
   }
 
@@ -101,7 +102,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFName(String pUFName) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pUFName));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pUFName));
     ufName = pUFName;
   }
 
@@ -118,7 +119,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFInputType(String pUFInputType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pUFInputType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pUFInputType));
     ufInputType = pUFInputType;
   }
 
@@ -127,7 +128,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFOutputType(String pUFOutputType) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(pUFOutputType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(pUFOutputType));
     ufOutputType = pUFOutputType;
   }
 }

@@ -57,7 +57,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   /** Send the query to the Princess binary and store the result. */
   public void runBinary(String input) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(input));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(input));
     // FIXME: This method is called twice, once for isUnsat and once to get the model.
     //  Instead of running the solver twice we should cache the result.
 

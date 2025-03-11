@@ -24,7 +24,7 @@ public class UFGenerator {
   private UFGenerator() {}
 
   protected static String checkUFInputType(ImmutableList<FormulaType<?>> args) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(args));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(args));
     StringBuilder inputArgs = new StringBuilder("(");
     for (FormulaType<?> arg : args) {
       if (arg.isArrayType()) {
@@ -51,7 +51,7 @@ public class UFGenerator {
   }
 
   protected static String checkUFOutputType(FormulaType<?> out) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(out));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(out));
     if (out.isArrayType()) {
       return "(Array "
           + checkUFOutputType(((ArrayFormulaType<?, ?>) out).getIndexType())
@@ -73,7 +73,8 @@ public class UFGenerator {
 
   protected static <T extends Formula> void logMakeFun(
       Object result, String pName, FormulaType<T> pReturnType, List<FormulaType<?>> pArgTypes) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pName, pReturnType, pArgTypes));
+    Generator.throwExceptionWhenParameterIsNull(
+        ImmutableList.of(result, pName, pReturnType, pArgTypes));
     List<Object> inputParams = new ArrayList<>();
 
     inputParams.add(pName);
@@ -94,7 +95,7 @@ public class UFGenerator {
 
   protected static <T extends Formula> void logCallFun(
       Object result, FunctionDeclaration<T> funcType, List<? extends Formula> pArgs) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, funcType, pArgs));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, funcType, pArgs));
 
     List<Object> inputParams = new ArrayList<>(pArgs);
     Function<List<Object>, String> functionToString =
@@ -123,7 +124,7 @@ public class UFGenerator {
 
   protected static <T extends Formula> void logCallFun(
       Object result, FunctionDeclaration<T> funcType, Formula... args) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, funcType, args));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, funcType, args));
 
     List<Object> inputParams = new ArrayList<>(Arrays.asList(args));
     Function<List<Object>, String> functionToString =

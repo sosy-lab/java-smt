@@ -28,7 +28,7 @@ public class FloatingPointGenerator {
 
   protected static void logMakeFloatingPoint(
       Object result, int exponent, int mantissa, String value) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, value));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, value));
     List<Object> inputParams = new ArrayList<>();
     String output =
         SolverLessFloatingPointFormulaManager.makeNumberAndRoundStatic(
@@ -41,7 +41,7 @@ public class FloatingPointGenerator {
 
   protected static void logMakeFloatingPointVariable(
       FloatingPointFormula result, FloatingPointType type, String var) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, var));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, var));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(var);
     Function<List<Object>, String> functionToString =
@@ -212,7 +212,8 @@ public class FloatingPointGenerator {
       String roundingMode,
       FormulaType<?> targetType,
       boolean signed) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number, targetType, roundingMode));
+    Generator.throwExceptionWhenParameterIsNull(
+        ImmutableList.of(result, number, targetType, roundingMode));
     String command;
     if (targetType.isIntegerType() || targetType.isRationalType() || targetType.isBitvectorType()) {
       if (targetType.isBitvectorType()) {
@@ -266,7 +267,7 @@ public class FloatingPointGenerator {
 
   protected static void logFPCastTo(
       Formula result, FloatingPointFormula number, FormulaType<?> targetType, boolean signed) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number, targetType));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, number, targetType));
     String command;
     if (targetType.isIntegerType() || targetType.isRationalType() || targetType.isBitvectorType()) {
       if (targetType.isBitvectorType()) {
@@ -311,7 +312,8 @@ public class FloatingPointGenerator {
 
   protected static void logFPCastFrom(
       FloatingPointFormula result, Formula number, FloatingPointType type, String roundingMode) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number, type, roundingMode));
+    Generator.throwExceptionWhenParameterIsNull(
+        ImmutableList.of(result, number, type, roundingMode));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     inputParams.add(roundingMode);
@@ -325,7 +327,7 @@ public class FloatingPointGenerator {
 
   protected static void logFPCastFrom(
       FloatingPointFormula result, Formula number, FloatingPointType type) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number, type));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, number, type));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     inputParams.add(String.valueOf(type.getExponentSize()));
@@ -338,7 +340,7 @@ public class FloatingPointGenerator {
 
   private static Function<List<Object>, String> getListStringFunctionForCast(
       Formula number, List<Object> inputParams) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(number, inputParams));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(number, inputParams));
     if (inputParams.size() == 4) {
       Function<List<Object>, String> functionToString;
       if (number instanceof BitvectorFormula) {
@@ -402,39 +404,39 @@ public class FloatingPointGenerator {
   }
 
   private static void logUnaryOp(Object result, String op, Object n) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, op, n));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, op, n));
     List<Object> inputParams = ImmutableList.of(n);
     logOperation(result, inputParams, "(" + op + " %s)", Keyword.SKIP);
   }
 
   private static void logUnaryOpWithMode(Object result, String op, String mode, Object n) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, op, mode, n));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, op, mode, n));
     List<Object> inputParams = ImmutableList.of(mode, n);
     logOperation(result, inputParams, "(" + op + " %s %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOp(Object result, String op, Object num1, Object num2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, op, num1, num2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, op, num1, num2));
     List<Object> inputParams = ImmutableList.of(num1, num2);
     logOperation(result, inputParams, "(" + op + " %s %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOpWithMode(
       Object result, String op, String mode, Object num1, Object num2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, op, mode, num1, num2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, op, mode, num1, num2));
     List<Object> inputParams = ImmutableList.of(mode, num1, num2);
     logOperation(result, inputParams, "(" + op + " %s %s %s)", Keyword.SKIP);
   }
 
   private static void logSimple(Object result, String expr) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, expr));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, expr));
     List<Object> inputParams = new ArrayList<>();
     logOperation(result, inputParams, expr, Keyword.SKIP);
   }
 
   private static void logOperation(
       Object result, List<Object> params, String format, Keyword keyword) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, params, format, keyword));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, params, format, keyword));
     Function<List<Object>, String> functionToString =
         inputs -> String.format(format, inputs.toArray());
     Generator.getExecutedAggregator()

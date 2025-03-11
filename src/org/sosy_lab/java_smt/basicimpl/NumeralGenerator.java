@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class NumeralGenerator {
    * @param number the value of the number as String.
    */
   protected static void logMakeNumber(Object result, String number) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, number));
     List<Object> inputParams = new ArrayList<>();
     Function<List<Object>, String> functionToString;
     if (result instanceof IntegerFormula && new BigInteger(number).signum() == -1) {
@@ -43,7 +44,7 @@ public class NumeralGenerator {
   }
 
   protected static void logMakeIntVariable(Object result, String pVar) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pVar));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pVar));
     Keyword varType;
     if (result instanceof IntegerFormula) {
       varType = Keyword.INT;
@@ -59,7 +60,7 @@ public class NumeralGenerator {
   }
 
   protected static void logAdd(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -71,7 +72,7 @@ public class NumeralGenerator {
   }
 
   protected static void logEqual(Object result, NumeralFormula pNumber1, NumeralFormula pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -83,7 +84,7 @@ public class NumeralGenerator {
   }
 
   protected static void logNegate(Object result, NumeralFormula pBits) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pBits));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> functionToString =
@@ -93,7 +94,7 @@ public class NumeralGenerator {
   }
 
   protected static void logSum(Object result, List<?> operands) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, operands));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, operands));
     List<Object> inputParams = new ArrayList<>();
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
@@ -114,7 +115,7 @@ public class NumeralGenerator {
   }
 
   protected static void logSubtract(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -126,7 +127,7 @@ public class NumeralGenerator {
   }
 
   protected static void logDivide(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -138,7 +139,7 @@ public class NumeralGenerator {
   }
 
   protected static void logModulo(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -150,7 +151,7 @@ public class NumeralGenerator {
   }
 
   protected static void logMultiply(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -162,7 +163,7 @@ public class NumeralGenerator {
   }
 
   protected static void logDistinct(Object result, List<?> operands) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, operands));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, operands));
     List<Object> inputParams = new ArrayList<>();
     for (Object pOperand : operands) {
       inputParams.add(pOperand.toString());
@@ -183,7 +184,7 @@ public class NumeralGenerator {
   }
 
   protected static void logGreaterThan(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -195,7 +196,7 @@ public class NumeralGenerator {
   }
 
   protected static void logGreaterOrEquals(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -207,7 +208,7 @@ public class NumeralGenerator {
   }
 
   protected static void logLessThan(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -219,7 +220,7 @@ public class NumeralGenerator {
   }
 
   protected static void logLessOrEquals(Object result, Object pNumber1, Object pNumber2) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, pNumber1, pNumber2));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pNumber1, pNumber2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pNumber1);
     inputParams.add(pNumber2);
@@ -231,7 +232,7 @@ public class NumeralGenerator {
   }
 
   protected static void logFloor(Object result, Object number) {
-    Generator.throwExceptionWhenParameterIsNull(List.of(result, number));
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, number));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(number);
     Function<List<Object>, String> functionToString =
