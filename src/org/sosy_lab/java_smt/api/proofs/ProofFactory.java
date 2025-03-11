@@ -16,11 +16,11 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
 public class ProofFactory {
-  public static ProofNode<ResAxiom> createSourceNode(ResAxiom rule, Formula formula) {
+  public static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
     return new SourceProofNode(rule, formula);
   }
 
-  public static ProofNode<ResAxiom> createResolutionNode(Formula formula, Formula pivot) {
+  public static ProofNode createResolutionNode(Formula formula, Formula pivot) {
     return new ResolutionProofNode(formula, pivot);
   }
 }

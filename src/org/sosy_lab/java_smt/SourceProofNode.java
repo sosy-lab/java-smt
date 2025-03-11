@@ -15,8 +15,8 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
-public class SourceProofNode extends AbstractProofNode<ResAxiom>
-    implements ProofNode<ResAxiom> {
+public class SourceProofNode extends AbstractProofNode
+    implements ProofNode {
 
 
   public SourceProofNode(ResAxiom rule, Formula formula) {

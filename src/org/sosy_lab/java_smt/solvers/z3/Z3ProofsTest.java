@@ -3,10 +3,12 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.*;
 
-import static com.google.common.truth.Truth.assertThat;
+
+import static org.junit.Assert.assertTrue;
 
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Solver;
+
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Set;
@@ -18,13 +20,13 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory;
+
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
-import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
+
 
 public class Z3ProofsTest {
 
@@ -62,33 +64,22 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void testGetProofExpr() throws SolverException, InterruptedException {
+  public void testTraverseProof() throws SolverException, InterruptedException {
     //example from the 2022 paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
-    BooleanFormula notQ1OrQ2 = bmgr.or(bmgr.not(q1), q2);
-    BooleanFormula q1True = bmgr.equivalence(q1, bmgr.makeTrue());
-    BooleanFormula q2False = bmgr.equivalence(q2, bmgr.makeFalse());
 
     Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
     try {
       System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(notQ1OrQ2);
-      prover.addConstraint(q1True);
-      prover.addConstraint(q2False);
-      assertThat(prover.isUnsat()).isTrue();
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
+      assertTrue(prover.isUnsat());
 
-      Context z3Context = createContextWithRawPointer(mgr.getFormulaCreator().getEnv());
-      Solver solver = z3Context.mkSolver();
-      //solver.
-
-      //Expr<?> proof = solver.getProof();
-      //assertThat(proof).isNotNull();
+      long proof = prover.getZ3Proof();
 
 
-      //String proofStr = proof.toString();
-      //System.out.println(proofStr);
-      //System.out.println(proof);
     } finally {
       prover.close();
     }
@@ -132,6 +123,39 @@ public class Z3ProofsTest {
 
       Expr<?> proof = solver.getProof();
       System.out.println("proof: " + proof);
+      System.out.println(Version.getFullVersion());
+    } finally {
+      ctx.close();
+    }
+  }
+
+  public void encapsulateTest() {
+    HashMap<String, String> cfg = new HashMap<>();
+    cfg.put("proof", "true");
+    Context ctx = new Context(cfg);
+    try {
+      // Create boolean variables
+      BoolExpr q1 = ctx.mkBoolConst("q1");
+      BoolExpr q2 = ctx.mkBoolConst("q2");
+
+      // Create solver
+      Solver solver = ctx.mkSolver();
+
+      // Assert (or (not q1) q2)
+      solver.add(ctx.mkOr(ctx.mkNot(q1), q2));
+
+      // Assert q1
+      solver.add(q1);
+
+      // Assert (not q2)
+      solver.add(ctx.mkNot(q2));
+
+      Status status = solver.check();
+
+      System.out.println("Unsat: " + (status == Status.UNSATISFIABLE));
+
+      //Formula proof = Native.solverGetProof(ctx.nCtx(), );
+     // System.out.println("proof: " + proof);
       System.out.println(Version.getFullVersion());
     } finally {
       ctx.close();

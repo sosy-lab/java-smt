@@ -23,23 +23,14 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ProofRules;
 
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode.Antecedent;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.SourceAnnotation;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.theory.cclosure.CCAnnotation;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.theory.linar.EQAnnotation;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.theory.linar.LAAnnotation;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.theory.quant.QuantAnnotation;
-import java.util.Map;
-import org.sosy_lab.java_smt.ResProofRule;
-import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDAG;
 import org.sosy_lab.java_smt.ResolutionProofNode;
-import org.sosy_lab.java_smt.SourceProofNode;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
 
-class SmtInterpolProofNode extends AbstractProofNode<String> {
+class SmtInterpolProofNode extends AbstractProofNode {
   static class ResolutionProofDAGBuilder {
     private final SmtInterpolFormulaCreator creator;
     private Theory theory;
@@ -85,11 +76,11 @@ class SmtInterpolProofNode extends AbstractProofNode<String> {
       }
       dag.addNode(node.getTransformed());
       if (node.getLeft() != null) {
-        dag.addEdge(node.getTransformed(), node.getLeft().getTransformed());
+        dag.addEdge(node.getTransformed().getId(), node.getLeft().getTransformed().getId());
         addDagEdges(node.getLeft(), dag);
       }
       if (node.getRight() != null) {
-        dag.addEdge(node.getTransformed(), node.getRight().getTransformed());
+        dag.addEdge(node.getTransformed().getId(), node.getRight().getTransformed().getId());
         addDagEdges(node.getRight(), dag);
       }
     }
@@ -123,7 +114,7 @@ class SmtInterpolProofNode extends AbstractProofNode<String> {
   private org.sosy_lab.java_smt.api.proofs.ProofNode transformed;
 
 
-  protected SmtInterpolProofNode(String rule, Formula formula) {
+  protected SmtInterpolProofNode(ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 

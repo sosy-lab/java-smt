@@ -10,25 +10,17 @@
 
 package org.sosy_lab.java_smt;
 
-import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
-import de.uni_freiburg.informatik.ultimate.logic.Script;
-import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.dpll.Clause;
-import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode;
 import java.util.Map;
-import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.smtinterpol.ProofTermParser;
 
-public class ResolutionProofDAG extends AbstractProofDAG<ResAxiom> {
+public class ResolutionProofDAG extends AbstractProofDAG {
 
   public ResolutionProofDAG() {
     super();
@@ -57,7 +49,7 @@ public class ResolutionProofDAG extends AbstractProofDAG<ResAxiom> {
    * @param dag          the proof DAG being constructed
    * @param parentClause the clause from the parent annotation (if available)
    */
-  private static void traverseTerm(Term term, ResolutionProofDAG dag, ProofNode<ResAxiom> parentClause) {
+  private static void traverseTerm(Term term, ResolutionProofDAG dag, ProofNode parentClause) {
     if (term instanceof AnnotatedTerm) {
       AnnotatedTerm annotatedTerm = (AnnotatedTerm) term;
       for (Annotation annotation : annotatedTerm.getAnnotations()) {
@@ -82,17 +74,17 @@ public class ResolutionProofDAG extends AbstractProofDAG<ResAxiom> {
 
 
   @Override
-  public void addNode(ProofNode<ResAxiom> node) {
+  public void addNode(ProofNode node) {
     super.addNode(node);
   }
 
   @Override
-  public ProofNode<ResAxiom> getNode(int nodeId) {
+  public ProofNode getNode(int nodeId) {
     return super.getNode(nodeId);
   }
 
   @Override
-  public void addEdge(ProofNode<ResAxiom> parentNodeId, ProofNode<ResAxiom> childNodeId) {
+  public void addEdge(int parentNodeId, int childNodeId) {
     super.addEdge(parentNodeId, childNodeId);
   }
 }

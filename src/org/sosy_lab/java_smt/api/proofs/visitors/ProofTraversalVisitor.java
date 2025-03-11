@@ -15,21 +15,21 @@ import java.util.Set;
 import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
-public class ProofTraversalVisitor<R> implements ProofVisitor<R> {
-  private final Set<ProofNode<R>> visited = new HashSet<>();
+public class ProofTraversalVisitor implements ProofVisitor {
+  private final Set<ProofNode> visited = new HashSet<>();
 
   @Override
-  public void visitNode(ProofNode<R> node) {
+  public void visitNode(ProofNode node) {
     if (visited.add(node)) {
-      for (ProofNode<R> child : node.getChildren()) {
+      for (ProofNode child : node.getChildren()) {
         visitNode(child);
       }
     }
   }
 
   @Override
-  public void visitDAG(ProofDAG<R> dag) {
-    for (ProofNode<R> node : dag.getNodes()) {
+  public void visitDAG(ProofDAG dag) {
+    for (ProofNode node : dag.getNodes()) {
       if (!visited.contains(node)) {
         visitNode(node);
       }

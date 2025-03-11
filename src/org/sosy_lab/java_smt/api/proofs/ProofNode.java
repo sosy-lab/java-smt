@@ -20,11 +20,12 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  *
  * @author Gabriel Carpio
  */
-public interface ProofNode<R> {
-  List<ProofNode<R>> getChildren();
-  void addChild(ProofNode<R> child);
+public interface ProofNode {
+  List<ProofNode> getChildren();
+  void addChild(ProofNode child);
   boolean isSource();
   boolean isSink();
-  void accept(ProofVisitor<R> visitor);
+  void accept(ProofVisitor visitor);
   Formula getFormula();
+  int getId();
 }

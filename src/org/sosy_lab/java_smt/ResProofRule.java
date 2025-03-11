@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt;
 
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
+
 /**
  * A proof rule in the proof DAG of the internal proof format of JavaSMT.
  *
@@ -20,7 +22,7 @@ public class ResProofRule {
   /**
    * Any operation that proves a term.
    */
-  public enum ResAxiom {
+  public enum ResAxiom implements ProofRule {
     //Resolution Rule
     RESOLUTION("res", "(res t proof1 proof2)"),
 
@@ -104,19 +106,19 @@ public class ResProofRule {
         "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))");
 
     private final String name;
-    private final String clause;
+    private final String formula;
 
-    ResAxiom(String name, String clause) {
-      this.name = name;
-      this.clause = clause;
+    ResAxiom(String pName, String pFormula) {
+      name = pName;
+      formula = pFormula;
     }
 
     public String getName() {
       return name;
     }
 
-    public String getClause() {
-      return clause;
+    public String getFormula() {
+      return formula;
     }
   }
 
@@ -126,7 +128,7 @@ public class ResProofRule {
    * @param name The name of the proof rule.
    * @return The matching ProofRule, or null if not found.
    */
-  public static ResAxiom getRuleByName(String name) {
+  public static ResAxiom getResAxiomRuleByName(String name) {
     for (ResAxiom rule : ResAxiom.values()) {
       if (rule.getName().equalsIgnoreCase(name)) {
         return rule;
@@ -135,13 +137,4 @@ public class ResProofRule {
     throw new IllegalArgumentException("Rule not found or not specified: " + name);
   }
 
-  /**
-   * Prints all proof rules for debugging or inspection.
-   */
-  public static void printAllRules() {
-    System.out.println("Available Proof Rules:");
-    for (ResAxiom rule : ResAxiom.values()) {
-      System.out.println(rule.getName() + ": " + rule.getClause());
-    }
-  }
 }

@@ -217,12 +217,12 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public ProofDAG<ResAxiom> getProof() {
+  public ProofDAG getProof() {
     checkState(!closed);
     checkGenerateProofs();
 
     final Term proof;
-    final ProofDAG<ResAxiom> proofDAG;
+    final ProofDAG proofDAG;
     try {
       proof = env.getProof();
       proofDAG = ResolutionProofDAG.fromTerm(proof, mgr, annotatedTerms.peek());

@@ -8,14 +8,11 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import java.util.HashMap;
 import java.util.Map;
-import org.sosy_lab.java_smt.ResProofRule;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDAG;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 //TODO: Correct parsing of the proof terms is missing, i.e. creation of nodes in the DAG and
 // parsing annotations. Add relevant javadocs
@@ -24,7 +21,7 @@ public class ProofTermParser {
   private final ResolutionProofDAG proofDag;
   private final Map<String, BooleanFormula> annotatedTerms;
   private final Map<String, Term> letBindings = new HashMap<>();
-  private final Map<Term, ProofNode<ResAxiom>> termToNode = new HashMap<>();
+  private final Map<Term, ProofNode> termToNode = new HashMap<>();
   private final FormulaManager mgr;
 
   public ProofTermParser(Map<String, BooleanFormula> pAnnotatedTerms, FormulaManager pMgr) {
@@ -39,7 +36,7 @@ public class ProofTermParser {
       FormulaManager pManager,
       Map<String, BooleanFormula> pAnnotatedTerms) {
     ProofTermParser parser = new ProofTermParser(pAnnotatedTerms, pManager);
-    ProofNode<ResProofRule.ResAxiom> rootNode = parser.parseProofTerm(proof);
+    ProofNode rootNode = parser.parseProofTerm(proof);
     if (rootNode != null) {
       parser.proofDag.addNode(rootNode);
     }
@@ -47,12 +44,12 @@ public class ProofTermParser {
   }
 
 
-  public ProofNode<ResAxiom> parseProofTerm(Term term) {
+  public ProofNode parseProofTerm(Term term) {
     if (termToNode.containsKey(term)) {
       return termToNode.get(term);
     }
 
-    ProofNode<ResAxiom> node = null;
+    ProofNode node = null;
 
     if (term instanceof AnnotatedTerm) {
       node = parseAnnotatedTerm((AnnotatedTerm) term);
@@ -69,32 +66,32 @@ public class ProofTermParser {
     return node;
   }
 
-  private ProofNode<ResAxiom> parseAnnotatedTerm(AnnotatedTerm term) {
+  private ProofNode parseAnnotatedTerm(AnnotatedTerm term) {
     for (Annotation annotation : term.getAnnotations()) {
       if (annotation.getKey().equals(":proves") || annotation.getKey().equals(":rup")
           || annotation.getKey().equals(":input")) {
         Term formulaTerm = extractFormulaFromAnnotation(annotation);
         BooleanFormula formula = getBooleanFormulaFromTerm(formulaTerm);
-        ProofNode<ResAxiom> node = createSourceNode(ResAxiom.RESOLUTION, formula);
+        ProofNode node = createSourceNode(ResAxiom.RESOLUTION, formula);
         return node;
       }
     }
     return parseProofTerm(term.getSubterm());
   }
 
-  private ProofNode<ResAxiom> parseApplicationTerm(ApplicationTerm term) {
+  private ProofNode parseApplicationTerm(ApplicationTerm term) {
     String funcName = term.getFunction().getName();
     Term[] params = term.getParameters();
 
     if (funcName.equals("..res") && params.length >= 3) {
       Term clauseTerm = params[0];
       BooleanFormula formula = getBooleanFormulaFromTerm(clauseTerm);
-      ProofNode<ResAxiom> resNode = createSourceNode(ResAxiom.RESOLUTION, formula);
+      ProofNode resNode = createSourceNode(ResAxiom.RESOLUTION, formula);
 
       for (int i = 1; i < params.length; i++) {
-        ProofNode<ResAxiom> childNode = parseProofTerm(params[i]);
+        ProofNode childNode = parseProofTerm(params[i]);
         if (childNode != null) {
-          proofDag.addEdge(resNode, childNode);
+          proofDag.addEdge(resNode.getId(), childNode.getId());
         }
       }
       return resNode;
@@ -118,7 +115,7 @@ public class ProofTermParser {
       }
     }
 
-    ProofNode<ResAxiom> lastNode = null;
+    ProofNode lastNode = null;
     for (Term param : params) {
       lastNode = parseProofTerm(param);
     }
@@ -126,7 +123,7 @@ public class ProofTermParser {
     return lastNode;
   }
 
-  private ProofNode<ResAxiom> parseLetTerm(LetTerm term) {
+  private ProofNode parseLetTerm(LetTerm term) {
     Map<String, Term> oldBindings = new HashMap<>(letBindings);
     TermVariable[] vars = term.getVariables();
     Term[] values = term.getValues();
@@ -135,7 +132,7 @@ public class ProofTermParser {
       letBindings.put(vars[i].getName(), values[i]);
     }
 
-    ProofNode<ResAxiom> result = parseProofTerm(term.getSubTerm());
+    ProofNode result = parseProofTerm(term.getSubTerm());
     letBindings.clear();
     letBindings.putAll(oldBindings);
 
@@ -169,8 +166,8 @@ public class ProofTermParser {
     return ((SmtInterpolFormulaManager) mgr).encapsulateBooleanFormula(term);
   }
 
-  private ProofNode<ResAxiom> createSourceNode(ResAxiom rule, BooleanFormula formula) {
-    ProofNode<ResAxiom> node = new org.sosy_lab.java_smt.SourceProofNode(rule, formula);
+  private ProofNode createSourceNode(ResAxiom rule, BooleanFormula formula) {
+    ProofNode node = new org.sosy_lab.java_smt.SourceProofNode(rule, formula);
     proofDag.addNode(node);
     return node;
   }

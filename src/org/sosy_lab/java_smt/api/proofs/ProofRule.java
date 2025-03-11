@@ -8,12 +8,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.api.proofs.visitors;
+package org.sosy_lab.java_smt.api.proofs;
 
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+public interface ProofRule {
 
-public interface ProofVisitor {
-  void visitNode(ProofNode node);
-  void visitDAG(ProofDAG dag);
+  String getName();
+
+  String getFormula();
 }

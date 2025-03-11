@@ -11,13 +11,12 @@
 package org.sosy_lab.java_smt.api.proofs;
 
 import java.util.Collection;
-import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
-public interface ProofDAG<R> {
-  void addNode(ProofNode<R> node);
-  ProofNode<R> getNode(int nodeId);
-  void addEdge(ProofNode<R> parentNodeId, ProofNode<R> childNodeId);
-  Collection<ProofNode<R>> getNodes();
-  void accept(ProofVisitor<R> visitor); // To allow traversal of the entire DAG
+public interface ProofDAG {
+  void addNode(ProofNode node);
+  ProofNode getNode(int nodeId);
+  void addEdge(int parentNodeId, int childNodeId);
+  Collection<ProofNode> getNodes();
+  void accept(ProofVisitor visitor); // To allow traversal of the entire DAG
 }

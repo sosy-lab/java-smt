@@ -12,8 +12,10 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
 /**
@@ -21,15 +23,18 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  *
  * @author Gabriel Carpio
  */
-public abstract class AbstractProofNode<R> implements ProofNode<R> {
-  private final List<ProofNode<R>> children;
-  private final R rule;
-  private final Formula formula;
+public abstract class AbstractProofNode implements ProofNode {
+  private final List<ProofNode> children;
+  private ProofRule rule;
+  private Formula formula;
+  private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+  private final int id;
 
-  protected AbstractProofNode(R rule, Formula formula) {
+  protected AbstractProofNode(ProofRule rule, Formula formula) {
     this.rule = rule;
     this.formula = formula;
     children = new ArrayList<>();
+    id = idGenerator.getFreshId();
   }
 
   @Override
@@ -38,16 +43,16 @@ public abstract class AbstractProofNode<R> implements ProofNode<R> {
   }
 
   @Override
-  public List<ProofNode<R>> getChildren() {
+  public List<ProofNode> getChildren() {
     return Collections.unmodifiableList(children);
   }
 
   @Override
-  public void addChild(ProofNode<R> child) {
+  public void addChild(ProofNode child) {
     children.add(child);
   }
 
-  public R getRule() {
+  public ProofRule getRule() {
     return rule;
   }
 
@@ -62,7 +67,20 @@ public abstract class AbstractProofNode<R> implements ProofNode<R> {
   }
 
   @Override
-  public void accept(ProofVisitor<R> visitor) {
+  public void accept(ProofVisitor visitor) {
     visitor.visitNode(this);
+  }
+
+  @Override
+  public int getId() {
+    return id;
+  }
+
+  public void setRule(ProofRule rule) {
+    this.rule = rule;
+  }
+
+  public void setFormula(Formula pFormula) {
+    formula = pFormula;
   }
 }

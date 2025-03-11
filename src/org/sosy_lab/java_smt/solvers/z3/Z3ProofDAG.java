@@ -8,12 +8,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.api.proofs.visitors;
+package org.sosy_lab.java_smt.solvers.z3;
 
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
-public interface ProofVisitor {
-  void visitNode(ProofNode node);
-  void visitDAG(ProofDAG dag);
+import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
+
+
+public class Z3ProofDAG extends AbstractProofDAG {
+
 }

@@ -21,10 +21,12 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
+import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -144,6 +146,24 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     } catch (Z3Exception e) {
       throw creator.handleZ3ExceptionAsRuntimeException(e);
     }
+  }
+
+  @Override
+  public ProofDAG getProof() {
+    return null;
+  }
+
+  Formula getZ3ProofAsFormula(){
+    long proof = Native.solverGetProof(z3context, z3solver);
+    return creator.encapsulate(creator.getFormulaType(proof), proof);
+  }
+
+  long getZ3Proof(){
+    return Native.solverGetProof(z3context, z3solver);
+  }
+
+  long getZ3solver(){
+        return z3solver;
   }
 
   @Override

@@ -154,7 +154,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. Should
    * only be called after {@link #isUnsat()} returned <code>true</code>.
    */
-  default <R> ProofDAG<R> getProof() {
+  default ProofDAG getProof() {
     try {
       throw new UnsupportedOperationException("Proof generation isn't enabled.");
     } catch (UnsupportedOperationException e) {

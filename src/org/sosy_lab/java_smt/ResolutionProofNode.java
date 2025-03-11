@@ -12,11 +12,12 @@ package org.sosy_lab.java_smt;
 
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
-public class ResolutionProofNode extends AbstractProofNode<ResAxiom>
-    implements ProofNode<ResAxiom> {
+public class ResolutionProofNode extends AbstractProofNode
+    implements ProofNode {
 
   private final Formula pivot;
 
@@ -35,7 +36,7 @@ public class ResolutionProofNode extends AbstractProofNode<ResAxiom>
     return pivot;
   }
 
-  public ResAxiom getRule() {
+  public ProofRule getRule() {
     return super.getRule();
   }
 }
