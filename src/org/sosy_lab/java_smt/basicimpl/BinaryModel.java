@@ -21,6 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -90,7 +91,16 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
       StringBuilder output = new StringBuilder();
       try (InputStream is = process.getInputStream()) {
         // Wait until the process has finished and throw an exception if an error occurred
-        assert process.waitFor() == 0; // TODO: Add an better error message
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+          try (BufferedReader errorReader =
+              new BufferedReader(
+                  new InputStreamReader(process.getErrorStream(), Charset.defaultCharset()))) {
+            String errorMessage = errorReader.lines().collect(Collectors.joining("\n"));
+            throw new IllegalStateException(
+                "Process failed with exit code " + exitCode + ": " + errorMessage);
+          }
+        }
 
         try (InputStreamReader isr = new InputStreamReader(is, Charset.defaultCharset())) {
           try (BufferedReader br = new BufferedReader(isr)) {

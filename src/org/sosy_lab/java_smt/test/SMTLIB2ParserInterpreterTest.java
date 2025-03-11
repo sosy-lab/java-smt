@@ -3382,10 +3382,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelBool()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume()
-        .withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false)
-        .isTrue();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
     String a =
@@ -3489,10 +3485,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayInt()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume()
-        .withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false)
-        .isTrue();
     requireIntegers();
     requireArrays();
     requireArrayModel();
@@ -3634,10 +3626,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayBool()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume()
-        .withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false)
-        .isTrue();
     requireArrays();
     requireArrayModel();
     clearGenerator();
@@ -3694,10 +3682,6 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayArray()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume()
-        .withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false)
-        .isTrue();
     requireArrays();
     requireArrayModel();
     clearGenerator();
