@@ -25,6 +25,7 @@ public class ArrayGenerator {
   private ArrayGenerator() {}
 
   private static String checkArrayElementSort(FormulaType<?> pElementType) {
+    checkNotNull(pElementType, "pElementType cannot be null");
     if (pElementType.isIntegerType()) {
       return "Int";
     } else if (pElementType.isBooleanType()) {
@@ -54,6 +55,7 @@ public class ArrayGenerator {
   }
 
   private static String checkArrayIndexSort(FormulaType<?> pIndexType) {
+    checkNotNull(pIndexType, "pIndexType cannot be null");
     if (pIndexType.isIntegerType()) {
       return "Int";
     } else if (pIndexType.isBooleanType()) {
@@ -87,10 +89,7 @@ public class ArrayGenerator {
       String pName,
       FormulaType<?> pIndexType,
       FormulaType<?> pElementType) {
-    checkNotNull(result, "result cannot be null");
-    checkNotNull(pName, "pName cannot be null");
-    checkNotNull(pIndexType, "pIndexType cannot be null");
-    checkNotNull(pElementType, "pElementType cannot be null");
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pName, pIndexType, pElementType));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pName);
     Function<List<Object>, String> functionToString =
@@ -104,10 +103,8 @@ public class ArrayGenerator {
 
   protected static void logArrayEquivalence(
       Object result, ArrayFormula<?, ?> pArray1, ArrayFormula<?, ?> pArray2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray1, pArray2));
     List<Object> inputParams = new ArrayList<>();
-    checkNotNull(result, "result cannot be null");
-    checkNotNull(pArray1, "pName cannot be null");
-    checkNotNull(pArray2, "pIndexType cannot be null");
     inputParams.add(pArray1);
     inputParams.add(pArray2);
     Function<List<Object>, String> functionToString =
@@ -118,10 +115,8 @@ public class ArrayGenerator {
   }
 
   protected static void logSelect(Object result, ArrayFormula<?, ?> pArray, Formula pIndex) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray, pIndex));
     List<Object> inputParams = new ArrayList<>();
-    checkNotNull(result, "result cannot be null");
-    checkNotNull(pArray, "pName cannot be null");
-    checkNotNull(pIndex, "pIndexType cannot be null");
     inputParams.add(pArray);
     inputParams.add(pIndex);
     Function<List<Object>, String> functionToString =
@@ -133,11 +128,8 @@ public class ArrayGenerator {
 
   protected static void logStore(
       Object result, ArrayFormula<?, ?> pArray, Formula pIndex, Formula pValue) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pArray, pIndex, pValue));
     List<Object> inputParams = new ArrayList<>();
-    checkNotNull(result, "result cannot be null");
-    checkNotNull(pArray, "pName cannot be null");
-    checkNotNull(pIndex, "pIndexType cannot be null");
-    checkNotNull(pValue, "pValue cannot be null!");
     inputParams.add(pArray);
     inputParams.add(pIndex);
     inputParams.add(pValue);

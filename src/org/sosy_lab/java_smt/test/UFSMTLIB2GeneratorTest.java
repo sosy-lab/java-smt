@@ -9,11 +9,13 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.util.ArrayList;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -62,6 +64,10 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareUFBooleanEmptyInput() {
     requireBooleanUFs();
     requireNoArgumentsInUFs();
+    assume()
+        .withMessage("Bitwuzla does not support 0 arity UFs")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
     FunctionDeclaration<BooleanFormula> a = fmgr.declareUF("a", FormulaType.BooleanType);
     FunctionDeclaration<BooleanFormula> b = fmgr.declareUF("b", FormulaType.BooleanType);
 
@@ -250,6 +256,10 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareUFBitvectorsEmptyInput() {
     requireBitvectors();
     requireNoArgumentsInUFs();
+    assume()
+        .withMessage("Bitwuzla does not support 0 arity UFs")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
     FunctionDeclaration<BitvectorFormula> a =
         fmgr.declareUF("a", FormulaType.getBitvectorTypeWithSize(4));
     FunctionDeclaration<BitvectorFormula> b =
@@ -392,6 +402,10 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFBooleanEmptyInput() {
     requireBooleanUFs();
     requireNoArgumentsInUFs();
+    assume()
+        .withMessage("Bitwuzla does not support 0 arity UFs")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
     BooleanFormula a = fmgr.declareAndCallUF("a", FormulaType.BooleanType);
     BooleanFormula b = fmgr.declareAndCallUF("b", FormulaType.BooleanType);
 
@@ -526,6 +540,10 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
   public void testDeclareAndCallUFBitvectorsEmptyInput() {
     requireBitvectors();
     requireNoArgumentsInUFs();
+    assume()
+        .withMessage("Bitwuzla does not support 0 arity UFs")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
     BitvectorFormula a = fmgr.declareAndCallUF("a", FormulaType.getBitvectorTypeWithSize(4));
     BitvectorFormula b = fmgr.declareAndCallUF("b", FormulaType.getBitvectorTypeWithSize(4));
 

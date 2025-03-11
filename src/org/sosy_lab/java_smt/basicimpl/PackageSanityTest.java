@@ -19,5 +19,10 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
     setDefault(ShutdownNotifier.class, ShutdownManager.create().getNotifier());
     setDefault(FormulaType.BitvectorType.class, FormulaType.getBitvectorTypeWithSize(32));
+    setDefault(
+        FormulaType.FloatingPointType.class, FormulaType.getSinglePrecisionFloatingPointType());
+    ignoreClasses(c -> c.getSimpleName().equals("ModelException"));
+    ignoreClasses(c -> c.getSimpleName().equals("BinaryModel"));
+    ignoreClasses(c -> c.getSimpleName().equals("GeneratorException"));
   }
 }

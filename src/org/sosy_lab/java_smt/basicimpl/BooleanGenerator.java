@@ -19,6 +19,7 @@ public class BooleanGenerator {
   private BooleanGenerator() {}
 
   protected static void logMakeVariable(Object result, String pVar) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pVar));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -28,6 +29,7 @@ public class BooleanGenerator {
   }
 
   protected static void logMakeTrue(Object result, String pVar) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pVar));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -37,6 +39,7 @@ public class BooleanGenerator {
   }
 
   protected static void logMakeFalse(Object result, String pVar) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pVar));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -46,6 +49,7 @@ public class BooleanGenerator {
   }
 
   protected static void logNot(Object result, BooleanFormula pBits) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits);
     Function<List<Object>, String> functionToString =
@@ -55,6 +59,7 @@ public class BooleanGenerator {
   }
 
   protected static void logOr(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, pBits2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -66,7 +71,7 @@ public class BooleanGenerator {
   }
 
   protected static void logOr(Object result, Collection<BooleanFormula> pBits1) {
-
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1));
     List<Object> inputParams = new ArrayList<>(pBits1);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
@@ -85,6 +90,7 @@ public class BooleanGenerator {
   }
 
   protected static void logAnd(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, pBits2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -96,6 +102,7 @@ public class BooleanGenerator {
   }
 
   protected static void logAnd(Object result, Collection<BooleanFormula> pBits1) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1));
     List<Object> inputParams = new ArrayList<>(pBits1);
     Function<List<Object>, String> functionToString =
         inPlaceInputParams -> {
@@ -115,6 +122,7 @@ public class BooleanGenerator {
   }
 
   protected static void logXor(Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, pBits2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -127,6 +135,7 @@ public class BooleanGenerator {
 
   protected static void logEquivalence(
       Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, pBits2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -139,6 +148,7 @@ public class BooleanGenerator {
 
   protected static void logImplication(
       Object result, BooleanFormula pBits1, BooleanFormula pBits2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, pBits2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(pBits2);
@@ -150,6 +160,7 @@ public class BooleanGenerator {
   }
 
   protected static void logIfThenElse(Object result, BooleanFormula pBits1, Object f1, Object f2) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pBits1, f1, f2));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pBits1);
     inputParams.add(f1);

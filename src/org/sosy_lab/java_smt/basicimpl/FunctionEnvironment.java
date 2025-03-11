@@ -34,7 +34,8 @@ public class FunctionEnvironment {
       List<Object> pInputParams,
       Function<List<Object>, String> pFunctionToString,
       Keyword pKeyword) {
-
+    Generator.throwExceptionWhenParameterIsNull(
+        List.of(pResult, pInputParams, pFunctionToString, pKeyword));
     result = pResult;
     inputParams = pInputParams;
     functionToString = pFunctionToString;
@@ -58,10 +59,12 @@ public class FunctionEnvironment {
   }
 
   public void setExpressionType(Keyword pExpressionType) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pExpressionType));
     expressionType = pExpressionType;
   }
 
   public void setResult(Object pResult) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pResult));
     result = pResult;
   }
 
@@ -70,6 +73,7 @@ public class FunctionEnvironment {
   }
 
   public void setInputParams(List<Object> pInputParams) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pInputParams));
     inputParams = pInputParams;
   }
 
@@ -78,14 +82,17 @@ public class FunctionEnvironment {
   }
 
   public void setFunctionToString(Function<List<Object>, String> pFunctionToString) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pFunctionToString));
     functionToString = pFunctionToString;
   }
 
   public void setArrayIndexType(String pArrayIndexType) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pArrayIndexType));
     arrayIndexType = pArrayIndexType;
   }
 
   public void setArrayValueType(String pArrayValueType) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pArrayValueType));
     arrayValueType = pArrayValueType;
   }
 
@@ -94,6 +101,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFName(String pUFName) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pUFName));
     ufName = pUFName;
   }
 
@@ -110,6 +118,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFInputType(String pUFInputType) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pUFInputType));
     ufInputType = pUFInputType;
   }
 
@@ -118,6 +127,7 @@ public class FunctionEnvironment {
   }
 
   public void setUFOutputType(String pUFOutputType) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(pUFOutputType));
     ufOutputType = pUFOutputType;
   }
 }

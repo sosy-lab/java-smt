@@ -20,6 +20,7 @@ public class StringGenerator {
   private StringGenerator() {}
 
   protected static void logMakeString(Object result, String value) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, value));
     List<Object> params = new ArrayList<>();
     params.add(value);
     String format = "\"%s\"";
@@ -31,6 +32,7 @@ public class StringGenerator {
   }
 
   protected static void logMakeVariable(Object result, String pVar) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, pVar));
     List<Object> inputParams = new ArrayList<>();
     inputParams.add(pVar);
     Function<List<Object>, String> functionToString =
@@ -40,6 +42,7 @@ public class StringGenerator {
   }
 
   protected static void logConcat(Object result, List<StringFormula> parts) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, parts));
     List<Object> inputParams = new ArrayList<>(parts);
     String format = "(str.++";
     for (int i = 0; i < parts.size(); i++) {
@@ -206,6 +209,7 @@ public class StringGenerator {
 
   private static void logOperation(
       Object result, List<Object> params, String format, Keyword keyword) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(result, params, format, keyword));
     long placeholders = format.chars().filter(ch -> ch == '%').count();
     if (params.size() != placeholders) {
       throw new IllegalArgumentException(

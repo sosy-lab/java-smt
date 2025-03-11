@@ -77,6 +77,7 @@ public class Generator {
   }
 
   protected static void writeToFile(String line, String fileName) throws IOException {
+    throwExceptionWhenParameterIsNull(List.of(line, fileName));
     try {
       try (Writer fileWriter =
           Files.newBufferedWriter(Path.of(fileName), Charset.defaultCharset())) {
@@ -103,6 +104,7 @@ public class Generator {
    * @return SMT-LIB2 String that is equivalent to Formula or String input
    */
   protected static String evaluateRecursive(Object constraint) {
+    throwExceptionWhenParameterIsNull(List.of(constraint));
     if (constraint instanceof String) {
       // Constants
       return (String) constraint;
@@ -135,6 +137,7 @@ public class Generator {
    */
   // TODO: automatically call on toString() of formulas
   public static void assembleConstraint(BooleanFormula constraint) {
+    throwExceptionWhenParameterIsNull(List.of(constraint));
     if (!isLoggingEnabled()) {
       throw new GeneratorException("Logging is not enabled");
     }
@@ -258,5 +261,13 @@ public class Generator {
     lines = new StringBuilder();
     executedAggregator.clear();
     registeredVariables.clear();
+  }
+
+  public static void throwExceptionWhenParameterIsNull(List<Object> x) {
+    for (Object o : x) {
+      if (o == null) {
+        throw new NullPointerException("Parameters must not be null");
+      }
+    }
   }
 }

@@ -19,6 +19,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -56,6 +57,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
 
   /** Send the query to the Princess binary and store the result. */
   public void runBinary(String input) {
+    Generator.throwExceptionWhenParameterIsNull(List.of(input));
     // FIXME: This method is called twice, once for isUnsat and once to get the model.
     //  Instead of running the solver twice we should cache the result.
 
@@ -116,6 +118,7 @@ public class BinaryModel extends AbstractModel<IExpression, Sort, PrincessEnviro
   }
 
   private List<ValueAssignment> parseModel(String output) {
+    Generator.throwExceptionWhenParameterIsNull(Collections.singletonList(output));
     Smtlibv2Lexer lexer = new Smtlibv2Lexer(CharStreams.fromString(output));
     Smtlibv2Parser parser = new Smtlibv2Parser(new CommonTokenStream(lexer));
     Visitor visitor = new Visitor(mgr);

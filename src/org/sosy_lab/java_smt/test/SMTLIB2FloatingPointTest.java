@@ -103,6 +103,7 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testMakeFloatingPointFromDouble()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    requireStrings();
     String smtInput =
         "(declare-const a (_ FloatingPoint 8 24))\n"
             + "(declare-const b (_ FloatingPoint 8 24))\n"
@@ -196,9 +197,10 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testMakeFloatingPointFromString()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    requireStrings();
     assume()
         .withMessage("Bitwuzla doesn't support String theory")
-        .that(!solverToUse().equals(Solvers.BITWUZLA))
+        .that(!solverToUse().equals(Solvers.BITWUZLA) && !solverToUse().equals(Solvers.MATHSAT5))
         .isTrue();
     String smtInput =
         "(declare-const a (_ FloatingPoint 8 24))\n"

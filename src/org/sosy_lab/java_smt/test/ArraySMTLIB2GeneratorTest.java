@@ -172,6 +172,10 @@ public class ArraySMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testMakeArrayBooleans() {
+    assume()
+        .withMessage("Bitwuzla doesn't support booleans in arrays")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
     requireArrays();
     requireBooleanArgumentArrays();
     requireAllSortArrays();

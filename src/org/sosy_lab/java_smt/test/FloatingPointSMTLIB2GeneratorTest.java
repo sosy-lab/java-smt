@@ -380,8 +380,9 @@ public class FloatingPointSMTLIB2GeneratorTest
   @Test
   public void testCastFrom() {
     assume()
-        .withMessage("Bitwuzla doesn't support boolean casting")
-        .that(!solverToUse().equals(Solvers.BITWUZLA));
+        .withMessage("Bitwuzla and Mathsat5 do not support boolean casting")
+        .that(!solverToUse().equals(Solvers.BITWUZLA) && !solverToUse().equals(Solvers.MATHSAT5))
+        .isTrue();
     requireFloats();
     BooleanFormula b = bmgr.makeVariable("b");
     FloatingPointFormula castResult =
