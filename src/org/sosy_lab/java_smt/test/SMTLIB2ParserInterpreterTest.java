@@ -3431,8 +3431,10 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelBitvector()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false).isTrue();
+    assume()
+        .withMessage("Test is being ingored, because BinaryModel is broken.")
+        .that(false)
+        .isTrue();
     requireBitvectors();
     clearGenerator();
     assume().that(solverToUse()).isEqualTo(Solvers.PRINCESS);
@@ -3540,8 +3542,10 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
   @Test
   public void testModelArrayBitVec()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    assume().withMessage("Test is being ingored, because BinaryModel is broken.")
-        .that(false).isTrue();
+    assume()
+        .withMessage("Test is being ingored, because BinaryModel is broken.")
+        .that(false)
+        .isTrue();
     requireArrays();
     requireBitvectors();
     clearGenerator();

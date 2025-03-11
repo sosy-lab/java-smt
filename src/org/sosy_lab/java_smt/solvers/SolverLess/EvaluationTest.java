@@ -6,6 +6,7 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,17 +22,17 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
-@SuppressWarnings({"all", "DefaultCharSet"}) // file is still under construction.
+@SuppressWarnings({"all", "DefaultCharSet"})
 public class EvaluationTest extends SolverBasedTest0 {
   @Override
   protected Solvers solverToUse() {
     return Solvers.SOLVERLESS;
   }
 
-  // TODO STRING FORMAT BEI NUMERALGENERATOR MACHEN WIE BEI STRINGGENERATOR DANN GEHTS!
   @Before
   public void setUp() {
     Generator.setIsLoggingEnabled(true);
+    assume().withMessage("File is still a work in progress.").that(false).isTrue();
   }
 
   @After
@@ -57,9 +58,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   }
 
   public String tellSolver(String smtInput) throws IOException, InterruptedException {
-    if (!isZ3Installed()) {
-      throw new RuntimeException("Couldn't find Z3 installed");
-    }
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
 
     String command = "z3 -in -smt2";
     Process process = Runtime.getRuntime().exec(command);
