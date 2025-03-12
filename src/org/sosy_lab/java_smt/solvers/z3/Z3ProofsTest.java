@@ -24,7 +24,9 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 
@@ -64,12 +66,15 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void testTraverseProof() throws SolverException, InterruptedException {
+  public void printParsedProofTest() throws SolverException, InterruptedException {
     //example from the 2022 paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
+    //Z3TheoremProver prover =
+    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
+    //    .GENERATE_UNSAT_CORE));
     try {
       System.out.println("proofs enabled: " + context.getGenerateProofs());
       prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
@@ -78,6 +83,11 @@ public class Z3ProofsTest {
       assertTrue(prover.isUnsat());
 
       long proof = prover.getZ3Proof();
+      Z3ProofParser parser = new Z3ProofParser(mgr.getEnvironment(), prover.getZ3solver(),
+          (Z3FormulaCreator) mgr.getFormulaCreator(), prover );
+      Z3ProofNode root = parser.fromAST(proof);
+
+      System.out.println(root.Z3ProofAsString());
 
 
     } finally {
@@ -96,7 +106,7 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void Z3ProofTest() {
+  public void printZ3ProofAstTest() {
     HashMap<String, String> cfg = new HashMap<>();
     cfg.put("proof", "true");
     Context ctx = new Context(cfg);
@@ -129,37 +139,5 @@ public class Z3ProofsTest {
     }
   }
 
-  public void encapsulateTest() {
-    HashMap<String, String> cfg = new HashMap<>();
-    cfg.put("proof", "true");
-    Context ctx = new Context(cfg);
-    try {
-      // Create boolean variables
-      BoolExpr q1 = ctx.mkBoolConst("q1");
-      BoolExpr q2 = ctx.mkBoolConst("q2");
-
-      // Create solver
-      Solver solver = ctx.mkSolver();
-
-      // Assert (or (not q1) q2)
-      solver.add(ctx.mkOr(ctx.mkNot(q1), q2));
-
-      // Assert q1
-      solver.add(q1);
-
-      // Assert (not q2)
-      solver.add(ctx.mkNot(q2));
-
-      Status status = solver.check();
-
-      System.out.println("Unsat: " + (status == Status.UNSATISFIABLE));
-
-      //Formula proof = Native.solverGetProof(ctx.nCtx(), );
-     // System.out.println("proof: " + proof);
-      System.out.println(Version.getFullVersion());
-    } finally {
-      ctx.close();
-    }
-  }
 }
 

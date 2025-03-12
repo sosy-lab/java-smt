@@ -43,10 +43,11 @@ public class Z3ProofParser {
 
     Native.incRef(z3context, proof);
     long sort = Native.getSort(z3context, proof);
+    long sortKind = Native.getSortKind(z3context, sort);
     int declKind = Native.getDeclKind(z3context,
         Native.getAppDecl(z3context, proof));
     int numArgs = Native.getAppNumArgs(z3context, proof);
-    Z3_sort_kind sort_kind = Z3_sort_kind.fromInt((int) sort);
+    Z3_sort_kind sort_kind = Z3_sort_kind.fromInt((int) sortKind);
     Formula formula;
     Z3ProofRule proofRule;
 
@@ -169,18 +170,19 @@ public class Z3ProofParser {
     }
   }
 
-  @Nullable
-  private Formula getFromStoredConstraints(long proof) {
-    String varName = Native.astToString(z3context, proof);
-    if (prover.getStoredConstraints().peek().containsKey(varName)) {
-      return prover.getStoredConstraints().peek().get(varName);
-    } else {
-      return null;
-    }
-  }
+  //@Nullable
+  //private Formula getFromStoredConstraints(long proof) {
+  //  String varName = Native.astToString(z3context, proof);
+  //  if (prover.getStoredConstraints().peek().containsKey(varName)) {
+  //    return prover.getStoredConstraints().peek().get(varName);
+  //  } else {
+  //   return null;
+  // }
+  // }
 
   private Formula generateFormula(long proof) {
-    Formula formula = getFromStoredConstraints(proof);
+    Formula formula = null;
+    //Formula formula = getFromStoredConstraints(proof);
     if (formula == null) {
       formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proof), proof);
     }
