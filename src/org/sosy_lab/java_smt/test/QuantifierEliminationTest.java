@@ -14,7 +14,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.truth.BooleanSubject;
 import java.io.IOException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -245,10 +244,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    BooleanSubject unused =
-        assertThat(
-            (exception instanceof UnsupportedOperationException)
-                || expectedMessage.contains(exception.getMessage()));
+    assertThat(
+        (exception instanceof UnsupportedOperationException)
+            || expectedMessage.contains(exception.getMessage()));
   }
 
   @Test
@@ -285,10 +283,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    BooleanSubject unused =
-        assertThat(
-            (exception instanceof UnsupportedOperationException)
-                || expectedMessage.contains(exception.getMessage()));
+    assertThat(
+        (exception instanceof UnsupportedOperationException)
+            || expectedMessage.contains(exception.getMessage()));
   }
 
   @Test
@@ -391,10 +388,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
                 imgr.lessThan(xx, imgr.makeNumber(5)),
                 imgr.lessThan(imgr.makeNumber(7), imgr.add(xx, yy))));
 
-    Exception exception =
-        assertThrows(
-            Exception.class,
-            () -> qmgr.eliminateQuantifiers(f));
+    Exception exception = assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(f));
 
     String expectedMessage1 =
         "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination";
@@ -404,9 +398,8 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
-    BooleanSubject unused =
-        assertThat(
-            (exception instanceof UnsupportedOperationException)
-                || expectedMessage.contains(exception.getMessage()));
+    assertThat(
+        (exception instanceof UnsupportedOperationException)
+            || expectedMessage.contains(exception.getMessage()));
   }
 }

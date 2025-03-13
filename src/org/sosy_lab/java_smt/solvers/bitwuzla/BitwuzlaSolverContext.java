@@ -143,8 +143,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
-      Options pOptions,
-      LogManager pLogger) {
+      Options pOptions) {
     super(pManager);
     manager = pManager;
     creator = pCreator;
@@ -190,7 +189,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
     quantifierTheory.setFmgr(manager);
 
-    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions, pLogger);
+    return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
   }
 
   @VisibleForTesting

@@ -50,65 +50,65 @@ import java.util.List;
  */
 final class BacktranslationServiceMock implements IBacktranslationService {
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <STE, TTE, SE, TE, SVL, TVL> void addTranslator(
       final ITranslator<STE, TTE, SE, TE, SVL, TVL> translator) {
     // does nothing
   }
 
-  @SuppressWarnings({"checkstyle:typename", "TypeParameterUnusedInFormals"})
+  @SuppressWarnings({"checkstyle:MethodTypeParameterName", "TypeParameterUnusedInFormals"})
   @Override
   public <SE, TE> TE translateExpression(
       final SE expression, final Class<SE> sourceExpressionClass) {
     return null;
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <SE> String translateExpressionToString(final SE expression, final Class<SE> clazz) {
     return "";
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <STE> List<?> translateTrace(final List<STE> trace, final Class<STE> clazz) {
     return ImmutableList.of();
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <STE> List<String> translateTraceToHumanReadableString(
       final List<STE> trace, final Class<STE> clazz) {
     return ImmutableList.of();
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <STE, SE> IProgramExecution<?, ?> translateProgramExecution(
       final IProgramExecution<STE, SE> programExecution) {
     return new ProgramExecutionMock<>(null, null);
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <SE> ProgramState<?> translateProgramState(final ProgramState<SE> programState) {
     return null;
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public <SE> String translateProgramStateToString(ProgramState<SE> programState) {
     return null;
   }
 
-  @SuppressWarnings({"checkstyle:typename", "unused"})
+  @SuppressWarnings({"checkstyle:MethodTypeParameterName", "unused"})
   @Override
   public <STE, SE> IBacktranslatedCFG<?, ?> translateCFG(final IBacktranslatedCFG<?, STE> cfg) {
     return null;
   }
 
-  @SuppressWarnings("checkstyle:typename")
+  @SuppressWarnings("checkstyle:MethodTypeParameterName")
   @Override
   public IBacktranslationService getTranslationServiceCopy() {
     return this;
