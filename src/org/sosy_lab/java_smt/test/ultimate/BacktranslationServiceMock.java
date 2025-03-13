@@ -1,4 +1,14 @@
 /*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  * Copyright (C) 2016 Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
  * Copyright (C) 2016 University of Freiburg
  *
@@ -27,12 +37,12 @@
 
 package org.sosy_lab.java_smt.test.ultimate;
 
+import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.core.model.services.IBacktranslationService;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.IBacktranslatedCFG;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.IProgramExecution;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.IProgramExecution.ProgramState;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.ITranslator;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -40,56 +50,65 @@ import java.util.List;
  */
 final class BacktranslationServiceMock implements IBacktranslationService {
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <STE, TTE, SE, TE, SVL, TVL> void addTranslator(
       final ITranslator<STE, TTE, SE, TE, SVL, TVL> translator) {
     // does nothing
   }
 
-  @SuppressWarnings("TypeParameterUnusedInFormals")
+  @SuppressWarnings({"checkstyle:typename", "TypeParameterUnusedInFormals"})
   @Override
   public <SE, TE> TE translateExpression(
       final SE expression, final Class<SE> sourceExpressionClass) {
     return null;
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <SE> String translateExpressionToString(final SE expression, final Class<SE> clazz) {
     return "";
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <STE> List<?> translateTrace(final List<STE> trace, final Class<STE> clazz) {
-    return Collections.emptyList();
+    return ImmutableList.of();
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <STE> List<String> translateTraceToHumanReadableString(
       final List<STE> trace, final Class<STE> clazz) {
-    return Collections.emptyList();
+    return ImmutableList.of();
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <STE, SE> IProgramExecution<?, ?> translateProgramExecution(
       final IProgramExecution<STE, SE> programExecution) {
     return new ProgramExecutionMock<>(null, null);
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <SE> ProgramState<?> translateProgramState(final ProgramState<SE> programState) {
     return null;
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public <SE> String translateProgramStateToString(ProgramState<SE> programState) {
     return null;
   }
 
+  @SuppressWarnings({"checkstyle:typename", "unused"})
   @Override
   public <STE, SE> IBacktranslatedCFG<?, ?> translateCFG(final IBacktranslatedCFG<?, STE> cfg) {
     return null;
   }
 
+  @SuppressWarnings("checkstyle:typename")
   @Override
   public IBacktranslationService getTranslationServiceCopy() {
     return this;

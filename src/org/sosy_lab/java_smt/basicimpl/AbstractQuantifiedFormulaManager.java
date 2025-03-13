@@ -58,7 +58,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
         return wrap(eliminateQuantifiersUltimateEliminator(pF));
-      } catch (UnsupportedOperationException | IOException | IllegalArgumentException e) {
+      } catch (UnsupportedOperationException | IllegalArgumentException e) {
         if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
           logger.logException(
               Level.WARNING,
@@ -92,7 +92,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             "Default quantifier elimination failed. Switching to UltimateEliminator");
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (IOException e2) {
+        } catch (Exception e2) {
           logger.logException(Level.SEVERE, e2, "UltimateEliminator also failed.");
           throw e2; // TODO is this the correct way to abort?
         }
@@ -102,7 +102,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (IOException e3) {
+        } catch (Exception e3) {
           logger.logException(Level.SEVERE, e3, "Quantifier elimination failed.");
           throw e3; // TODO is this the correct way to abort?
         }
@@ -118,7 +118,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo)
-      throws UnsupportedOperationException, IOException {
+      throws UnsupportedOperationException {
     FormulaManager formulaManager = getFormulaManager();
     Term formula =
         getUltimateEliminatorWrapper().parse(formulaManager.dumpFormula(pExtractInfo).toString());

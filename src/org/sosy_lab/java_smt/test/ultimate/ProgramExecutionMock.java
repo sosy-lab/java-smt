@@ -1,4 +1,14 @@
 /*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
  * Copyright (C) 2016 Daniel Dietsch (dietsch@informatik.uni-freiburg.de)
  * Copyright (C) 2016 University of Freiburg
  *
@@ -27,11 +37,11 @@
 
 package org.sosy_lab.java_smt.test.ultimate;
 
+import com.google.common.collect.ImmutableMap;
 import de.uni_freiburg.informatik.ultimate.core.lib.results.NoBacktranslationValueProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.AtomicTraceElement;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.IBacktranslationValueProvider;
 import de.uni_freiburg.informatik.ultimate.core.model.translation.IProgramExecution;
-import java.util.Collections;
 
 /**
  * This class mocks {@link IProgramExecution}. It can be used in JUnit tests.
@@ -67,7 +77,7 @@ final class ProgramExecutionMock<T, E> implements IProgramExecution<T, E> {
 
   @Override
   public ProgramState<E> getInitialProgramState() {
-    return new ProgramState<>(Collections.emptyMap(), null);
+    return new ProgramState<>(ImmutableMap.of(), null);
   }
 
   @Override

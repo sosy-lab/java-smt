@@ -36,7 +36,7 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
 import org.sosy_lab.common.log.LogManager;
 
-public class UltimateEliminatorParser {
+public final class UltimateEliminatorParser {
 
   private UltimateEliminatorParser() {
     // Utility class
