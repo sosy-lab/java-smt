@@ -136,7 +136,8 @@ public abstract class Mathsat5AbstractNativeApiTest {
    */
   @Test
   public void quantifierToSmtlib2() {
-    String expectedSMTLib2FormulaPattern = "Bool \\(forall \\(\\(x Int\\)\\) \\(\\.def_\\d{2} x\\)\\)";
+    String expectedSMTLib2FormulaPattern =
+        "Bool \\(forall \\(\\(x Int\\)\\) \\(\\.def_\\d{2} x\\)\\)";
     String expectedSMTLib2Def = "((x Int)) Bool (= x 1)";
 
     long type = msat_get_integer_type(env);
