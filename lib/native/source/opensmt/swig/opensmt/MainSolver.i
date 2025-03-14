@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore sstat::sstat();
 %ignore sstat::sstat(lbool l);
 %ignore sstat::sstat(int v);
@@ -69,21 +70,38 @@
 %ignore MainSolver::insertFormula(PTRef, char**);
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
+
+// TODO Assertion API was added recently. We could use it by converting the result to a std::vector
+%ignore MainSolver::getCurrentAssertions() const;
+%ignore MainSolver::getCurrentAssertionsView() const;
+%ignore MainSolver::getAssertionsAtCurrentLevel() const;
+%ignore MainSolver::getAssertionsAtLevel(std::size_t) const;
+
+// TODO These were also added recently. Are they useful to us?
+%ignore MainSolver::printResolutionProofSMT2() const;
+%ignore MainSolver::printResolutionProofSMT2(std::ostream &) const;
+
 %ignore MainSolver::getUnsatCore() const;
 %ignore MainSolver::printFramesAsQuery() const;
+%ignore MainSolver::printCurrentAssertionsAsQuery() const;
+%ignore MainSolver::printCurrentAssertionsAsQuery(std::ostream &) const;
 %ignore MainSolver::solverEmpty() const;
 %ignore MainSolver::writeSolverState_smtlib2(const char*, char**) const;
+%ignore MainSolver::getTermNames() const;
+%ignore MainSolver::getTermNames();
 %ignore MainSolver::getTermValue(PTRef) const;
 %ignore MainSolver::createTheory(Logic&, SMTConfig&);
 %extend MainSolver {
   %newobject getUnsatCore();
   std::vector<PTRef> getUnsatCore() {
     std::vector<PTRef> result;
-    for (PTRef r : $self->getUnsatCore()) {
+    auto core = $self->getUnsatCore();
+    for (PTRef r : core->getTerms()) {
       result.emplace_back(r);
     }
     return result;
   }
 }
+}
 
-%include "include/opensmt/MainSolver.h"
+%include "include/opensmt/api/MainSolver.h"

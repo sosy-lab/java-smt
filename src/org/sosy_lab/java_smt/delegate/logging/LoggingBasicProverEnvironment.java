@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -38,7 +39,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T push(BooleanFormula f) throws InterruptedException {
+  public @Nullable T push(BooleanFormula f) throws InterruptedException {
     logger.log(Level.FINE, "up to level " + level++);
     logger.log(Level.FINE, "formula pushed:", f);
     return wrapped.push(f);
@@ -51,7 +52,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     return wrapped.addConstraint(constraint);
   }
 

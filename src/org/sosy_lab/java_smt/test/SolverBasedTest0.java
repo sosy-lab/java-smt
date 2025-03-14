@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -216,6 +217,13 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireRationalFloor() {
+    assume()
+        .withMessage("Solver %s does not support floor for rationals", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.OPENSMT);
+  }
+
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
@@ -231,6 +239,19 @@ public abstract class SolverBasedTest0 {
             solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  protected final void requireFPToBitvector() {
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .that(solverToUse())
+          .isNull();
+    }
   }
 
   /** Skip test if the solver does not support quantifiers. */
@@ -426,7 +447,7 @@ public abstract class SolverBasedTest0 {
   public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
 
     @Parameters(name = "{0}")
-    public static Object[] getAllSolvers() {
+    public static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 

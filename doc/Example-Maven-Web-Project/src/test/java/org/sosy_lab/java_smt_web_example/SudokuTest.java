@@ -17,6 +17,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -165,6 +166,8 @@ public class SudokuTest {
   public void checkSudoku()
       throws InvalidConfigurationException, InterruptedException, SolverException {
     assumeTrue(isOperatingSystemSupported(solver));
+
+    logger.log(Level.INFO, "Executing " + solver + "...");
 
     context = SolverContextFactory.createSolverContext(config, logger, notifier, solver);
     Integer[][] grid = readGridFromString(input);

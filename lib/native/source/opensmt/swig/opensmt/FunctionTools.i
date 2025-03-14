@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore FunctionSignature;
 
 %ignore TemplateFunction::TemplateFunction ();
@@ -32,5 +33,6 @@
   }
 }
 %ignore TemplateFunction::updateBody (PTRef new_body);
+}
 
-%include "include/opensmt/FunctionTools.h"
+%include "include/opensmt/logics/FunctionTools.h"

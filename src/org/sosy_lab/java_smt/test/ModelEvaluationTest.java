@@ -51,7 +51,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Override
   protected ConfigurationBuilder createTestConfigBuilder() {
-    problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 100; // Princess is too slow.
+    problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 50; // Princess is too slow.
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
       builder.setOption("solver.mathsat5.furtherOptions", "model_generation=true");
@@ -147,9 +147,42 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
         Lists.newArrayList(null, bmgr.makeBoolean(defaultValue)));
   }
 
+  @SuppressWarnings("UnicodeEscape")
   @Test
   public void testGetStringsEvaluation() throws SolverException, InterruptedException {
     requireStrings();
+
+    // empty string
+    evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("")),
+        smgr.makeVariable("x"),
+        Lists.newArrayList(""),
+        Lists.newArrayList(smgr.makeString("")));
+
+    // normal string
+    evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello WORLD")),
+        smgr.makeVariable("x"),
+        Lists.newArrayList("hello WORLD"),
+        Lists.newArrayList(smgr.makeString("hello WORLD")));
+
+    // Unicode
+    evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello æ@€ \u1234 \\u{4321}")),
+        smgr.makeVariable("x"),
+        Lists.newArrayList("hello \u00e6@\u20ac \u1234 \u4321"),
+        Lists.newArrayList(smgr.makeString("hello \u00e6@\u20ac \u1234 \u4321")));
+
+    // TODO Z3 and CVC4 seem to break escaping on invalid Unicode Strings.
+    /*
+      evaluateInModel(
+        smgr.equal(smgr.makeVariable("x"), smgr.makeString("\\u")),
+        smgr.makeVariable("x"),
+        Lists.newArrayList("\\u"),
+        Lists.newArrayList(smgr.makeString("\\u")));
+    */
+
+    // foreign variable: x vs y
     evaluateInModel(
         smgr.equal(smgr.makeVariable("x"), smgr.makeString("hello")),
         smgr.makeVariable("y"),

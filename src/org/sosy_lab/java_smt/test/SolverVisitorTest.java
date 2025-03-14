@@ -489,7 +489,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(visitor.found).containsExactly(fp);
 
     ConstantsVisitor visitor2 = new ConstantsVisitor();
-    mgr.visit(fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getSign(), prec), visitor2);
+    mgr.visit(
+        fpmgr.makeNumber(fp.getExponent(), fp.getMantissa(), fp.getMathSign(), prec), visitor2);
     assertThat(visitor2.found).containsExactly(fp);
   }
 
@@ -736,6 +737,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     StringFormula z = smgr.makeString("zAsString");
     IntegerFormula offset = imgr.makeVariable("offset");
     IntegerFormula len = imgr.makeVariable("len");
+    IntegerFormula cp = imgr.makeVariable("cp");
 
     ImmutableList.Builder<StringFormula> formulas =
         ImmutableList.<StringFormula>builder()
@@ -744,6 +746,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.charAt(x, offset))
             .add(smgr.toStringFormula(offset))
             .add(smgr.concat(x, y, z));
+    if (solverToUse() != Solvers.PRINCESS) { // TODO Princess crashes with MatchError of IFunApp
+      formulas.add(smgr.fromCodePoint(cp));
+    }
     if (solverToUse() != Solvers.Z3) {
       formulas.add(smgr.replaceAll(x, y, z)); // unsupported in Z3
     }
@@ -753,6 +758,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       StringFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(smgr.equal(f, f2))).isUnsatisfiable();
+    }
+    {
+      IntegerFormula f = smgr.toCodePoint(y);
+      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
+      IntegerFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+      assertThat(f2).isEqualTo(f);
+      assertThatFormula(bmgr.not(imgr.equal(f, f2))).isUnsatisfiable();
     }
   }
 

@@ -2,7 +2,7 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -15,17 +15,22 @@ clone_depth: 1
 install:
   - ps: |
       Add-Type -AssemblyName System.IO.Compression.FileSystem
-      if (!(Test-Path -Path "C:\ant\apache-ant-1.10.15" )) {
-        (new-object System.Net.WebClient).DownloadFile(
-        'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip',
+      $antPath = "C:\ant\apache-ant-1.10.15"
+      if (!(Test-Path -Path $antPath)) {
+        echo "Downloading and extracting Apache Ant..."
+        (New-Object System.Net.WebClient).DownloadFile(
+          'https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip',
           'C:\ant-bin.zip'
         )
         [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\ant-bin.zip", "C:\ant")
       }
+  # Set environment variables
   - SET JAVA_HOME=C:\Program Files\Java\jdk17
   - SET PATH=C:\ant\apache-ant-1.10.15\bin;%JAVA_HOME%\bin;%PATH%
   - SET IVY_CACHE_DIR=C:\ivy
+  # Verify environment
   - echo %USERPROFILE%
+  - echo %JAVA_HOME%
   - echo %PATH%
   - java -version
 
@@ -34,45 +39,44 @@ build_script:
   # Windows does not allow symlinks, thus we need to copy native solver binaries
   # to make it available for JUnit tests.
   # See lib\native\x86_64-windows\README.md for details.
-  - copy lib\java\runtime-z3\x64\*dll lib\native\x86_64-windows\
-  - copy lib\java\runtime-mathsat\*dll lib\native\x86_64-windows\
-  - copy lib\java\runtime-bitwuzla\*dll lib\native\x86_64-windows\
+  - ps: |
+      echo "Copying native solver binaries..."
+      Copy-Item -Path "lib\java\runtime-z3\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
+      Copy-Item -Path "lib\java\runtime-mathsat\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
+      Copy-Item -Path "lib\java\runtime-bitwuzla\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
 
 test_script:
   - ant unit-tests
 
 on_finish:
   - ps: |
+      echo "Uploading JUnit test results..."
       $wc = New-Object 'System.Net.WebClient'
       $files = Get-ChildItem -Path ".\junit\TEST-*.xml" -Exclude "*VariableNames*"
       $url = "https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)"
-      foreach($file in $files){
-        echo $file.FullName
+      foreach ($file in $files) {
+        echo "Uploading $($file.FullName)..."
         $wc.UploadFile($url, $file.FullName)
       }
   - ps: |
-      $files = Get-ChildItem -Path ".\hs_err_pid*"
-      foreach($file in $files){
-        echo $file.FullName
-        Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+      echo "Uploading error files as artifacts..."
+      $errorFiles = Get-ChildItem -Path ".\hs_err_pid*"
+      foreach ($file in $errorFiles) {
+        echo "Uploading $($file.FullName)..."
+        Push-AppveyorArtifact $file.FullName -DeploymentName $file.Name
       }
   - ps: |
-      $files = Get-ChildItem -Path ".\replay_pid*"
-      foreach($file in $files){
-        echo $file.FullName
-        Push-AppveyorArtifact $file.FullName -DeploymentName $file.name
+      echo "Uploading replay files as artifacts..."
+      $replayFiles = Get-ChildItem -Path ".\replay_pid*"
+      foreach ($file in $replayFiles) {
+        echo "Uploading $($file.FullName)..."
+        Push-AppveyorArtifact $file.FullName -DeploymentName $file.Name
       }
   - ps: |
+      echo "Compressing and uploading JUnit HTML report..."
       7z a JUnit.html.zip JUnit.html
       Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
 
 cache:
   - C:\ant
   - C:\ivy
-
-notifications:
-  - provider: Email
-    to:
-      - java-smt-dev@googlegroups.com
-    on_build_success: false
-    on_build_status_changed: true

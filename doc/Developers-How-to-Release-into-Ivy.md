@@ -63,6 +63,11 @@ z3/                                 // <-- parent directory
  |-- z3-z3-4.13.3/                  // <-- sources directory used as 'z3.path'
 ```
 
+You can prepare the Z3 Java sources on an arbitrary system, as we only prepare 
+Java sources and JavaDoc for the bindings, but do no compile any native library.
+This only depends on a Python3 environment and Java 17 or later.
+For simple usage, we provide a Docker definition/environment under `/docker`, in which the following command can be run.
+
 In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
@@ -132,18 +137,57 @@ Finally, follow the instructions shown in the message at the end.
 
 ### Publishing OpenSMT
 
-We prefer/need to compile our own OpenSMT2 binaries and Java bindings.
+We prefer to use our own OpenSMT binaries and SWIG-based Java bindings.
+We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and GCC are sufficiently up-to-date.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-Download [OpenSMT](https://github.com/usi-verification-and-security/opensmt) using Git into a
-file of your choice. The following command patches the OpenSMT2 API, generates Java bindings
-with SWIG, builds the library, and packages it.
+Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
+- For linux-x64 in directory $GMP_DIR_LINUX_X64:
+  ```
+  ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat
+  make -j4
+  ```
+- For linux-arm64 in directory $GMP_DIR_LINUX_ARM64:
+  ```
+  ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat \
+  --host=aarch64-linux-gnu \
+  CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
+  make -j4
+  ```
 
+For linux-arm64, provide JNI headers in a reasonable LTS version.
+Download the zip archive from https://jdk.java.net/ and unpack it into $JDK_DIR_LINUX_ARM64
+(e.g., https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz).
+
+To publish OpenSMT, checkout the [OpenSMT repository](https://github.com/usi-verification-and-security/opensmt).
+Then execute the following command in the JavaSMT directory:
 ```
-ant publish-opensmt -Dopensmt.path=/workspace/opensmt -Dopensmt.customRev=2.5.2
+ant publish-opensmt \
+    -Dopensmt.path=$OPENSMT_DIR \
+    -Dopensmt.customRev=$VERSION \
+    -Dgmp-linux-x64.path=$GMP_DIR_LINUX_X64 \
+    -Dgmp-linux-arm64.path=$GMP_DIR_LINUX_ARM64 \
+    -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
-Then upload the binaries to the Ivy repository using SVN as described in the message on the screen.
+Example:
+```
+ant publish-opensmt \
+    -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
+    -Dopensmt.customRev=2.8.0-sosy0 \
+    -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+    -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
+    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2
+```
+The build scripts for OpenSMT ... :
+- run for about 20 minutes (we build everything from scratch, two times).
+- download Google-based test components (requires internet access).
+- append the git revision of Bitwuzla.
+- produce two Linux (x64 and arm64) libraries, and publish them.
+
+Finally, follow the instructions shown in the message at the end of the command.
+The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
+but in the normal system environment, where some testing can be applied by the developer before the commit.
 
 
 ### Publishing Boolector
@@ -165,9 +209,9 @@ Example:
 ```
 ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.2.2
 ```
-Our build script will automatically append the git-revision of Boolector, if available.
+Our build script will automatically append the git revision of Boolector, if available.
 
-Finally, follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
 but in the normal system environment, where some testing can be applied by the developer before the commit.
 
@@ -183,20 +227,28 @@ To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwu
 Then execute the following command in the JavaSMT directory:
 ```
 ant publish-bitwuzla \
-    -Dbitwuzla.path=$BITWUZLA_DIR -Dbitwuzla.customRev=$VERSION \
-    -Dbitwuzla.rebuildWrapper=$BOOL -Djdk-windows.path=$JNI_DIR
+     -Dbitwuzla.path=$BITWUZLA_DIR \
+     -Dbitwuzla.customRev=$VERSION \
+     -Dbitwuzla.rebuildWrapper=false \
+     -Djdk-windows.path=$JDK_DIR_WINDOWS \
+     -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
 Example:
 ```
 ant publish-bitwuzla \
-    -Dbitwuzla.path=../bitwuzla/ -Dbitwuzla.customRev=0.4.0 \
-    -Dbitwuzla.rebuildWrapper=false -Djdk-windows.path=/dependencies/jdk-11/
+    -Dbitwuzla.path=/workspace/solvers/bitwuzla/bitwuzla/ \
+    -Dbitwuzla.customRev=0.7.0-13 \
+    -Dbitwuzla.rebuildWrapper=false \
+    -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2/ \
+    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2/
 ```
-The build-scripts Bitwuzla will download and build necessary dependencies like GMP automatically.
-Our build script will automatically append the git-revision of Bitwuzla, if available.
-The build-steps will produce a Linux and a Windows library and publish them.
+The build scripts for Bitwuzla ... :
+- run for about 10 minutes (we build everything from scratch, three times).
+- download and build necessary dependencies like GMP automatically. 
+- append the git revision of Bitwuzla.
+- produce two Linux (x64 and arm64) libraries and one Windows (x64) library, and publish them.
 
-Finally, follow the instructions shown in the message at the end.
+Finally, follow the instructions shown in the message at the end of the command.
 The instructions for publication via SVN into the Ivy repository are not intended to be executed in the Docker environment,
 but in the normal system environment, where some testing can be applied by the developer before the commit.
 

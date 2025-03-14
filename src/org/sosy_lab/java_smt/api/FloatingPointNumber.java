@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
+import com.google.errorprone.annotations.InlineMe;
 import java.math.BigInteger;
 import java.util.BitSet;
 
@@ -27,21 +28,101 @@ public abstract class FloatingPointNumber {
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
   public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
 
-  /** Whether the number is positive (TRUE) or negative (FALSE). */
-  public abstract boolean getSign();
+  public enum Sign {
+    POSITIVE,
+    NEGATIVE;
 
-  /** The exponent of the floating-point number, given as numeric value. */
+    /**
+     * get the Sign for a flag.
+     *
+     * @param isNegative whether the sign is negative (TRUE) or positive (FALSE).
+     */
+    public static Sign of(boolean isNegative) {
+      return isNegative ? NEGATIVE : POSITIVE;
+    }
+
+    public boolean isNegative() {
+      return this == NEGATIVE;
+    }
+  }
+
+  /**
+   * The sign of the floating-point number.
+   *
+   * @return whether the number is positive (FALSE) or negative (TRUE).
+   */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  @InlineMe(
+      replacement = "this.getMathSign() == Sign.NEGATIVE",
+      imports = "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign")
+  public final boolean getSign() {
+    return getMathSign() == Sign.NEGATIVE;
+  }
+
+  /** The sign of the floating-point number, i.e. whether it is positive or negative. */
+  public abstract Sign getMathSign();
+
+  /**
+   * The exponent of the floating-point number, given as numeric value from binary representation.
+   * The number is unsigned (not negative) and includes a bias of 2^(exponentSize-1)-1 that is used
+   * in IEEE 754.
+   */
   public abstract BigInteger getExponent();
 
-  /** The mantissa (aka significand) of the floating-point number, given as numeric value. */
+  /**
+   * The mantissa (aka significand) of the floating-point number, given as numeric value from binary
+   * representation. The mantissa does not include the hidden bit that is used to denote normalized
+   * numbers in IEEE 754.
+   */
   public abstract BigInteger getMantissa();
 
   public abstract int getExponentSize();
 
   public abstract int getMantissaSize();
 
+  /**
+   * Get a floating-point number with the given sign, exponent, and mantissa.
+   *
+   * @param sign the sign-bit of the floating-point number as specified by IEEE 754, aka FALSE for
+   *     positive and TRUE for negative
+   * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
+   *     number, including a bias of 2^(exponentSize-1)-1
+   * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
+   *     number without hidden bit
+   * @param exponentSize the (maximum) size of the exponent in bits
+   * @param mantissaSize the (maximum) size of the mantissa in bits
+   * @see #of(Sign, BigInteger, BigInteger, int, int)
+   */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  @InlineMe(
+      replacement =
+          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize)",
+      imports = {
+        "org.sosy_lab.java_smt.api.FloatingPointNumber",
+        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign"
+      })
   public static FloatingPointNumber of(
       boolean sign, BigInteger exponent, BigInteger mantissa, int exponentSize, int mantissaSize) {
+    return of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSize);
+  }
+
+  /**
+   * Get a floating-point number with the given sign, exponent, and mantissa.
+   *
+   * @param sign the sign of the floating-point number
+   * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
+   *     number, including a bias of 2^(exponentSize-1)-1
+   * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
+   *     number without hidden bit
+   * @param exponentSize the (maximum) size of the exponent in bits
+   * @param mantissaSize the (maximum) size of the mantissa in bits
+   */
+  public static FloatingPointNumber of(
+      Sign sign, BigInteger exponent, BigInteger mantissa, int exponentSize, int mantissaSize) {
     Preconditions.checkArgument(exponent.bitLength() <= exponentSize);
     Preconditions.checkArgument(mantissa.bitLength() <= mantissaSize);
     Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
@@ -49,6 +130,14 @@ public abstract class FloatingPointNumber {
     return new AutoValue_FloatingPointNumber(sign, exponent, mantissa, exponentSize, mantissaSize);
   }
 
+  /**
+   * Get a floating-point number encoded as bitvector as defined by IEEE 754.
+   *
+   * @param bits the bit-representation of the floating-point number, consisting of sign bit,
+   *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering
+   * @param exponentSize the size of the exponent in bits
+   * @param mantissaSize the size of the mantissa in bits
+   */
   public static FloatingPointNumber of(String bits, int exponentSize, int mantissaSize) {
     Preconditions.checkArgument(0 < exponentSize);
     Preconditions.checkArgument(0 < mantissaSize);
@@ -61,19 +150,31 @@ public abstract class FloatingPointNumber {
         exponentSize,
         mantissaSize);
     Preconditions.checkArgument(bits.chars().allMatch(c -> c == '0' || c == '1'));
-    boolean sign = bits.charAt(0) == '1';
+    Sign sign = Sign.of(bits.charAt(0) == '1');
     BigInteger exponent = new BigInteger(bits.substring(1, 1 + exponentSize), 2);
     BigInteger mantissa =
         new BigInteger(bits.substring(1 + exponentSize, 1 + exponentSize + mantissaSize), 2);
     return of(sign, exponent, mantissa, exponentSize, mantissaSize);
   }
 
-  private boolean isSinglePrecision() {
+  /**
+   * Returns true if this floating-point number is an IEEE-754-2008 single precision type with 32
+   * bits length consisting of an 8 bit exponent, a 23 bit mantissa and a single sign bit.
+   *
+   * @return true for IEEE-754 single precision type, false otherwise.
+   */
+  public boolean isIEEE754SinglePrecision() {
     return getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
         && getMantissaSize() == SINGLE_PRECISION_MANTISSA_SIZE;
   }
 
-  private boolean isDoublePrecision() {
+  /**
+   * Returns true if this floating-point number is an IEEE-754-2008 double precision type with 64
+   * bits length consisting of an 11 bit exponent, a 52 bit mantissa and a single sign bit.
+   *
+   * @return true for IEEE-754 double precision type, false otherwise.
+   */
+  public boolean isIEEE754DoublePrecision() {
     return getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
         && getMantissaSize() == DOUBLE_PRECISION_MANTISSA_SIZE;
   }
@@ -81,7 +182,7 @@ public abstract class FloatingPointNumber {
   /** compute a representation as Java-based float value, if possible. */
   public float floatValue() {
     Preconditions.checkArgument(
-        isSinglePrecision(),
+        isIEEE754SinglePrecision(),
         "Can not represent floating point number %s as Java-based float value.",
         this);
     var bits = getBits();
@@ -91,10 +192,10 @@ public abstract class FloatingPointNumber {
   /** compute a representation as Java-based double value, if possible. */
   public double doubleValue() {
     Preconditions.checkArgument(
-        isSinglePrecision() || isDoublePrecision(),
+        isIEEE754SinglePrecision() || isIEEE754DoublePrecision(),
         "Can not represent floating point number %s as Java-based double value.",
         this);
-    if (isSinglePrecision()) {
+    if (isIEEE754SinglePrecision()) {
       // lets be nice to the user and automatically convert from single to double precision
       return floatValue();
     }
@@ -108,8 +209,8 @@ public abstract class FloatingPointNumber {
     var mantissa = getMantissa();
     var exponent = getExponent();
     var bits = new BitSet(1 + exponentSize + mantissaSize);
-    if (getSign()) {
-      bits.set(exponentSize + mantissaSize);
+    if (getMathSign().isNegative()) {
+      bits.set(exponentSize + mantissaSize); // if negative, set first bit to 1
     }
     for (int i = 0; i < exponentSize; i++) {
       bits.set(mantissaSize + i, exponent.testBit(i));

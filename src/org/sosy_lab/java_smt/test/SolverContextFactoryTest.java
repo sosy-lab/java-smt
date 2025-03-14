@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 /**
  * This JUnit test class is mainly intended for automated CI checks on different operating systems,
@@ -40,7 +41,7 @@ public class SolverContextFactoryTest {
 
   private static final String OS =
       StandardSystemProperty.OS_NAME.value().toLowerCase(Locale.getDefault()).replace(" ", "");
-  private static final boolean IS_WINDOWS = OS.startsWith("windows");
+  protected static final boolean IS_WINDOWS = OS.startsWith("windows");
   private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
 
@@ -50,7 +51,7 @@ public class SolverContextFactoryTest {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
-    return Solvers.values();
+    return ParameterizedSolverBasedTest0.getAllSolvers();
   }
 
   @Parameter(0)
@@ -93,9 +94,12 @@ public class SolverContextFactoryTest {
       case BOOLECTOR:
       case CVC4:
       case CVC5:
-      case OPENSMT:
       case YICES2:
         assume.that(IS_LINUX).isTrue();
+        return;
+      case OPENSMT:
+        assume.that(IS_LINUX).isTrue();
+        assume.that(isSufficientVersionOfLibcxx("opensmtj")).isTrue();
         return;
       case BITWUZLA:
         assume.that(IS_LINUX).isTrue();
@@ -141,6 +145,8 @@ public class SolverContextFactoryTest {
         return new String[] {"GLIBC_2.34", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "bitwuzlaj":
         return new String[] {"GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
+      case "opensmtj":
+        return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
         return new String[] {"GLIBC_2.33"};
       default:

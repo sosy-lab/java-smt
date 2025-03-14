@@ -22,7 +22,7 @@ which would automatically fetch `JavaSMT` and all of its dependencies.
 After the repository URL is configured, you only need to add the following dependency:
 
 ```xml
-<dependency org="org.sosy_lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
+<dependency org="org.sosy-lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
 ```
 
 #### Architecture specification

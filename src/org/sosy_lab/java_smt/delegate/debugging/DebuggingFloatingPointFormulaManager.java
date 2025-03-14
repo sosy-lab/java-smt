@@ -15,6 +15,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -100,9 +101,9 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
 
   @Override
   public FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     debugging.assertThreadLocal();
-    FloatingPointFormula result = delegate.makeNumber(exponent, mantissa, signBit, type);
+    FloatingPointFormula result = delegate.makeNumber(exponent, mantissa, sign, type);
     debugging.addFormulaTerm(result);
     return result;
   }

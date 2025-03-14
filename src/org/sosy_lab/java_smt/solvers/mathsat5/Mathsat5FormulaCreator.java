@@ -126,6 +126,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -576,7 +577,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int expWidth = Integer.parseInt(matcher.group(2));
     int mantWidth = Integer.parseInt(matcher.group(3));
 
-    boolean sign = bits.testBit(expWidth + mantWidth);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidth));
     BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
     BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
 
