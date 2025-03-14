@@ -207,6 +207,11 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
 
+    assume()
+        .withMessage("solver does not support quantifiers yet")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+
     if ("opt".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a partial model when using optimization")
