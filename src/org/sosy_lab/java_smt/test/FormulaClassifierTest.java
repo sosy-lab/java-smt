@@ -59,6 +59,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireArrays();
     requireIntegers();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("AUFLIA");
@@ -108,6 +112,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireIntegers();
     requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("LIA");
@@ -119,6 +127,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireQuantifiers();
     requireRationals();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (= (+ y y) zz)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("LRA");
@@ -133,6 +145,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireIntegers();
     requireRationals();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query =
         NUMERAL_VARS
             + BV_VARS
@@ -148,6 +164,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireQuantifiers();
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query =
         BOOL_VARS
             + BV_VARS
@@ -305,6 +325,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireRationals();
     requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -317,6 +341,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireNonlinear();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     classifier.visit(mgr.parse(query));
@@ -337,6 +365,10 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireParser();
     requireFloats();
     requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
     String query = "(declare-fun a () Float32) (assert (exists ((zz Float32)) (fp.eq a a)))";
     classifier.visit(mgr.parse(query));
     assertThat(classifier.toString()).isEqualTo("FP");

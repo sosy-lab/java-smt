@@ -223,6 +223,10 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   public void quantifierTest() {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

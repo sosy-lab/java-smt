@@ -97,6 +97,10 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(qmgr.forall(v, rmgr.lessOrEquals(rmgr.floor(v), v))).isTautological();
@@ -110,6 +114,10 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers

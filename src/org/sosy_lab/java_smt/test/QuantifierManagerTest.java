@@ -68,6 +68,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   @Before
   public void setUp() {
     requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
   }
 
   public void setUpLIA() {
