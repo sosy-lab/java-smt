@@ -299,6 +299,13 @@ except that Windows is not yet supported and the publishing command is simpler:
 ```
 ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
 ```
+Example:
+```
+ant publish-optimathsat \
+    -Dmathsat.path=/workspace/solvers/optimathsat/optimathsat-1.7.3-linux-64-bit \
+    -Dgmp.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
+    -Dmathsat.version=1.7.3-sosy0
+```
 
 
 ### Publishing Yices2
