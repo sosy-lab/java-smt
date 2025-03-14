@@ -1206,6 +1206,79 @@ TERM_ARRAY_OUTPUT_ARG(2)
 CALL2(msat_term*, get_unsat_core)
 RETURN_TERM_ARRAY(2)
 
+//Proof functions
+/*
+ * msat_proof_manager msat_get_proof_manager(msat_env e)
+ */
+DEFINE_FUNC(jproofManager, 1get_1proof_1manager) WITH_ONE_ARG(jenv)
+ENV_ARG(1)
+CALL1(msat_proof_manager, get_proof_manager)
+STRUCT_RETURN_WITH_ENV
+
+/*
+ * void msat_destroy_proof_manager(msat_proof_manager m)
+ */
+DEFINE_FUNC(void, 1destroy_1proof_1manager) WITH_ONE_ARG(jproofManager)
+MANAGER_ARG_VOID(1)
+VOID_CALL1(destroy_proof_manager)
+
+/*
+ * msat_proof msat_get_proof(msat_proof_manager m)
+ */
+DEFINE_FUNC(jproof, 1get_1proof) WITH_ONE_ARG(jproofManager)
+MANAGER_ARG(1)
+CALL1(msat_proof, get_proof)
+PROOF_RETURN
+
+/*
+ * size_t msat_proof_id(msat_proof p)
+ */
+DEFINE_FUNC(int, 1proof_1id) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(int, proof_id)
+INT_RETURN
+
+/*
+ * int msat_proof_is_term(msat_proof p)
+ */
+DEFINE_FUNC(int, 1proof_1is_1term) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(int, proof_is_term)
+BOOLEAN_RETURN
+
+/*
+ * msat_term msat_proof_get_term(msat_proof p)
+ */
+DEFINE_FUNC(jterm, 1proof_1get_1term) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(msat_term, proof_get_term)
+STRUCT_RETURN
+
+/*
+ * const char* msat_proof_get_name(msat_proof p)
+ */
+DEFINE_FUNC(string, 1proof_1get_1name) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(const char*, proof_get_name)
+PLAIN_CONST_STRING_RETURN
+
+/*
+ * size_t msat_proof_get_arity(msat_proof p)
+ */
+DEFINE_FUNC(int, 1proof_1get_1arity) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(size_t, proof_get_arity)
+INT_RETURN
+
+/*
+ * msat_proof msat_proof_get_child(msat_proof p, size_t i)
+ */
+DEFINE_FUNC(jproof, 1proof_1get_1child) WITH_TWO_ARGS(jproof, int)
+PROOF_ARG(1)
+SIMPLE_ARG(size_t, 2)
+CALL2(msat_proof, proof_get_child)
+PROOF_RETURN
+
 DEFINE_FUNC(jterm, 1simplify) WITH_FOUR_ARGS(jenv, jterm, jtermArray, int)
 ENV_ARG(1)
 TERM_ARG(2)

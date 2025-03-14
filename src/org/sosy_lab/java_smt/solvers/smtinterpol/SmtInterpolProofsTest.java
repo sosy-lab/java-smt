@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -39,6 +40,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
+@Ignore("prevent this class being executed as testcase by ant")
 public class SmtInterpolProofsTest {
 
   private SmtInterpolSolverContext context;

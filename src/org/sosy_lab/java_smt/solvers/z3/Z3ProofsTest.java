@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
@@ -29,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
-
+@Ignore("prevent this class being executed as testcase by ant")
 public class Z3ProofsTest {
 
   private Z3SolverContext context;

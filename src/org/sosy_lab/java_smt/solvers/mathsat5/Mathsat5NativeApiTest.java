@@ -17,13 +17,17 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model_value;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_unsat_core;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_asin;
@@ -43,11 +47,13 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_mode
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_pi;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
@@ -79,6 +85,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long cfg = msat_create_config();
 
     msat_set_option_checked(cfg, "model_generation", "true");
+    msat_set_option_checked(cfg, "proof_generation", "true");
     // msat_set_option_checked(cfg, "theory.la.split_rat_eq", "false");
 
     env = msat_create_env(cfg);
@@ -525,5 +532,29 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_assert_formula(env, msat_make_not(env, msat_make_equal(env, green, var)));
     assertThat(msat_check_sat(env)).isFalse();
     msat_pop_backtrack_point(env);
+  }
+
+  @Test
+  public void printProofTest() throws SolverException, InterruptedException {
+    //long config = msat_create_config();
+    //msat_set_option_checked(config, "proof_generation", "true");
+    //long env = msat_create_env(config);
+    long q1 = msat_from_smtlib2(env, "(set-logic QF_UF)\n" +
+        "(declare-fun q1 () Bool)\n" +
+        "(declare-fun q2 () Bool)\n" +
+        "(assert (or (not q1) q2))\n" +
+        "(assert q1)+\n" +
+        "(assert (not q2))");
+    msat_assert_formula(env, msat_make_not(env, q1));
+    System.out.println("sat: " + msat_check_sat(env));
+    long model = msat_get_model(env);
+    //assertThat(msat_check_sat(env)).isFalse();
+
+    //long pm = msat_get_proof_manager(env);
+    //long proof = msat_get_proof(pm);
+    //long termProof = msat_proof_get_term(proof);
+    //String res = msat_to_smtlib2(env, termProof);
+    //System.out.println("proof: " + res);
+    //msat_destroy_proof_manager(pm);
   }
 }
