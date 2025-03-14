@@ -99,7 +99,7 @@ if [ "$3" = "-optimathsat" ]; then
     SRC_FILES="$SRC_FILES optimization.c"
     OBJ_FILES="$OBJ_FILES optimization.o"
     OUT_FILE="liboptimathsat5j.so"
-    ADDITIONAL_FLAGS="-D INCLUDE_OPTIMATHSAT5_HEADER"
+    ADDITIONAL_FLAGS="-D BUILD_FOR_OPTIMATHSAT5"
 else
     if [ "$IS_MACOS" = true ]; then
         OUT_FILE="libmathsat5j.dylib"

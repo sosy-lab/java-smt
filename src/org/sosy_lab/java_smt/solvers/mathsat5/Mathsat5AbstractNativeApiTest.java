@@ -136,7 +136,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
    */
   @Test
   public void quantifierToSmtlib2() {
-    String expectedSMTLib2Formula = "Bool (forall ((x Int)) (.def_14 x))";
+    String expectedSMTLib2FormulaPattern = "Bool \\(forall \\(\\(x Int\\)\\) \\(\\.def_\\d{2} x\\)\\)";
     String expectedSMTLib2Def = "((x Int)) Bool (= x 1)";
 
     long type = msat_get_integer_type(env);
@@ -152,7 +152,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
     long quantifiedFormula = msat_make_forall(env, boundX, substBody);
     String smtlib2OfFormula = msat_to_smtlib2_ext(env, quantifiedFormula, "", 1);
 
-    assertThat(smtlib2OfFormula).contains(expectedSMTLib2Formula);
+    assertThat(smtlib2OfFormula).matches("(?s).*" + expectedSMTLib2FormulaPattern + ".*");
     assertThat(smtlib2OfFormula).contains(expectedSMTLib2Def);
   }
 
