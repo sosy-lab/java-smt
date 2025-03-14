@@ -245,8 +245,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
     assertThat(
-        (exception instanceof UnsupportedOperationException)
-            || expectedMessage.contains(exception.getMessage()));
+            (exception instanceof UnsupportedOperationException)
+                || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
   }
 
   @Test
@@ -284,8 +285,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
     assertThat(
-        (exception instanceof UnsupportedOperationException)
-            || expectedMessage.contains(exception.getMessage()));
+            (exception instanceof UnsupportedOperationException)
+                || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
   }
 
   @Test
@@ -399,7 +401,8 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     String expectedMessage = expectedMessage1 + expectedMessage2;
 
     assertThat(
-        (exception instanceof UnsupportedOperationException)
-            || expectedMessage.contains(exception.getMessage()));
+            (exception instanceof UnsupportedOperationException)
+                || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
   }
 }
