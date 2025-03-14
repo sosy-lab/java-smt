@@ -146,8 +146,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersBefore()
-      throws SolverException, InterruptedException {
+  public void testQuantElimBefore() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -176,8 +175,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersNoFallback()
-      throws SolverException, InterruptedException, IOException {
+  public void testQuantElimNoFallback() throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireQuantifiers();
 
@@ -204,7 +202,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersAbort() {
+  public void testQuantElimAbort() {
     requireIntegers();
     requireQuantifiers();
 
@@ -251,7 +249,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackException() {
+  public void testQuantElimFallbackException() {
     requireIntegers();
     requireQuantifiers();
 
@@ -291,8 +289,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallback()
-      throws SolverException, IOException, InterruptedException {
+  public void testQuantElimFallback() throws SolverException, IOException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
     requireArrays();
@@ -329,9 +326,8 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void
-      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarning()
-          throws SolverException, InterruptedException, IOException {
+  public void testQuantElimFallbackWithoutWarning()
+      throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireQuantifiers();
 
@@ -362,8 +358,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void
-      testSolverIndependentQuantifierEliminationWithMultipleQuantifiersFallbackWithoutWarningException() {
+  public void testQuantElimFallbackNoWarnException() {
     requireIntegers();
     requireQuantifiers();
 
