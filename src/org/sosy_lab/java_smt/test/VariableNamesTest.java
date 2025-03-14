@@ -369,6 +369,10 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameInQuantification() {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Solver %s does not support native quantification yet", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     for (String name : getAllNames()) {
 
@@ -425,6 +429,10 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameInNestedQuantification() {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Solver %s does not support native quantification yet", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     for (String name : getAllNames()) {
 
