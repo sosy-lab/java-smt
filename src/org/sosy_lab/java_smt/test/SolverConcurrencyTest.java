@@ -335,8 +335,8 @@ public class SolverConcurrencyTest {
       stack.push(finalFormula);
 
       assertWithMessage(
-          "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
-              + " thread.")
+              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
+                  + " thread.")
           .that(stack.isUnsat())
           .isTrue();
     }
@@ -585,10 +585,10 @@ public class SolverConcurrencyTest {
               stack.push(threadFormula);
 
               assertWithMessage(
-                  "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                      + "failed isUnsat() in thread with id: "
-                      + id
-                      + ".")
+                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                          + "failed isUnsat() in thread with id: "
+                          + id
+                          + ".")
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -615,7 +615,7 @@ public class SolverConcurrencyTest {
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     try (OptimizationProverEnvironment prover =
-             context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -745,8 +745,8 @@ public class SolverConcurrencyTest {
                 })
             .collect(Collectors.toList());
     assertWithMessage(
-        "Test %s failed with exception(s): %s",
-        testName, Joiner.on("\n").join(exceptionDetails))
+            "Test %s failed with exception(s): %s",
+            testName, Joiner.on("\n").join(exceptionDetails))
         .that(exceptionsList)
         .isEmpty();
   }
