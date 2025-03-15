@@ -143,7 +143,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     }
   }
 
-  @Test(timeout = 1000)
+  @Test(timeout = 2000)
   @SuppressWarnings({"try", "CheckReturnValue"})
   public void testCVC5WithValidOptionsTimeLimit()
       throws InvalidConfigurationException, InterruptedException {

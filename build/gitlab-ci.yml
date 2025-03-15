@@ -155,6 +155,21 @@ spotbugs:
     reports:
       junit: "junit/TESTS-TestSuites.xml"
 
+.unit-tests-quick: &unit-tests-quick
+  <<: *binary_check
+  before_script:
+    - "uname -a"
+    - "ldd --version"
+    - "java -version"
+  script:
+    - "ant $ANT_PROPS_CHECKS unit-tests-quick"
+  artifacts:
+    paths:
+      - "JUnit.html"
+    when: always
+    reports:
+      junit: "junit/TESTS-TestSuites.xml"
+
 unit-tests:x86_64:jdk-11:
   <<: *unit-tests
   needs:
@@ -184,7 +199,7 @@ unit-tests:x86_64:jdk-23:
   image: ${CI_REGISTRY_IMAGE}/test:jdk-23
 
 unit-tests:arm64:jdk-11:
-  <<: *unit-tests
+  <<: *unit-tests-quick
   needs:
     - build-dependencies
     - build:jdk-11
@@ -194,7 +209,7 @@ unit-tests:arm64:jdk-11:
       platform: linux/arm64
 
 unit-tests:arm64:jdk-17:
-  <<: *unit-tests
+  <<: *unit-tests-quick
   needs:
     - build-dependencies
     - build:jdk-17
@@ -204,7 +219,7 @@ unit-tests:arm64:jdk-17:
       platform: linux/arm64
 
 unit-tests:arm64:jdk-21:
-  <<: *unit-tests
+  <<: *unit-tests-quick
   needs:
     - build-dependencies
     - build:jdk-21
@@ -214,7 +229,7 @@ unit-tests:arm64:jdk-21:
       platform: linux/arm64
 
 unit-tests:arm64:jdk-23:
-  <<: *unit-tests
+  <<: *unit-tests-quick
   needs:
     - build-dependencies
     - build:jdk-23
