@@ -12,7 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -331,8 +335,8 @@ public class SolverConcurrencyTest {
       stack.push(finalFormula);
 
       assertWithMessage(
-              "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
-                  + " thread.")
+          "Test testFormulaTranslationWithConcurrentContexts() failed isUnsat() in the main"
+              + " thread.")
           .that(stack.isUnsat())
           .isTrue();
     }
@@ -581,10 +585,10 @@ public class SolverConcurrencyTest {
               stack.push(threadFormula);
 
               assertWithMessage(
-                      "Test continuousRunningThreadFormulaTransferTranslateTest() "
-                          + "failed isUnsat() in thread with id: "
-                          + id
-                          + ".")
+                  "Test continuousRunningThreadFormulaTransferTranslateTest() "
+                      + "failed isUnsat() in thread with id: "
+                      + id
+                      + ".")
                   .that(stack.isUnsat())
                   .isTrue();
 
@@ -611,7 +615,7 @@ public class SolverConcurrencyTest {
     IntegerFormulaManager imgr = mgr.getIntegerFormulaManager();
     BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
     try (OptimizationProverEnvironment prover =
-        context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+             context.newOptimizationProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula y = imgr.makeVariable("y");
@@ -729,9 +733,22 @@ public class SolverConcurrencyTest {
     } finally {
       threadPool.shutdownNow();
     }
-    assertWithMessage("Test %s failed with exception(s): %s", testName, exceptionsList)
-        .that(exceptionsList.isEmpty())
-        .isTrue();
+    List<String> exceptionDetails =
+        exceptionsList.stream()
+            .map(
+                ex -> {
+                  StringWriter sw = new StringWriter();
+                  @SuppressWarnings("checkstyle:IllegalInstantiation")
+                  PrintWriter pw = new PrintWriter(sw);
+                  ex.printStackTrace(pw);
+                  return sw.toString();
+                })
+            .collect(Collectors.toList());
+    assertWithMessage(
+        "Test %s failed with exception(s): %s",
+        testName, Joiner.on("\n").join(exceptionDetails))
+        .that(exceptionsList)
+        .isEmpty();
   }
 
   /** just a small lambda-compatible interface. */
