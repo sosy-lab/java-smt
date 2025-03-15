@@ -60,7 +60,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireIntegers();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (select arr x) (foo z))))";
@@ -113,7 +113,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireIntegers();
     requireQuantifiers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((z Int)) (= (+ x 1) 0)))";
@@ -128,7 +128,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireQuantifiers();
     requireRationals();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (= (+ y y) zz)))";
@@ -146,7 +146,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query =
@@ -165,7 +165,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireBitvectors();
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS); // Princess rewrites the formula
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query =
@@ -326,7 +326,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireRationals();
     requireQuantifiers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (+ y yy) (bar y))))";
@@ -342,7 +342,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireNonlinear();
     requireQuantifiers(); // TODO SMTInterpol fails when parsing this
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = NUMERAL_VARS + "(assert (exists ((zz Real)) (< (* y yy) (bar y))))";
@@ -366,7 +366,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
     requireFloats();
     requireQuantifiers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
     String query = "(declare-fun a () Float32) (assert (exists ((zz Float32)) (fp.eq a a)))";

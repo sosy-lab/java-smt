@@ -873,7 +873,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -897,7 +897,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -919,7 +919,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -937,7 +937,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireQuantifiers();
     requireIntegers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -955,7 +955,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireQuantifiers();
     requireIntegers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -983,7 +983,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireQuantifiers();
     requireIntegers();
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -1014,7 +1014,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -1040,7 +1040,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
@@ -1199,7 +1199,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
     assume()
-        .withMessage("Mathsat5 quantifier support is very limited at the moment")
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
         .that(solverToUse())
         .isNotEqualTo(Solvers.MATHSAT5);
 
