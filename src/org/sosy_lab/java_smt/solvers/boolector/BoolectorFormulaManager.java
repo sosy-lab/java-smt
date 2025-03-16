@@ -18,7 +18,6 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
       BoolectorUFManager pFunctionManager,
       BoolectorBooleanFormulaManager pBooleanManager,
       BoolectorBitvectorFormulaManager pBitvectorManager,
-      BoolectorQuantifiedFormulaManager pQuantifierManager,
       BoolectorArrayFormulaManager pArrayManager) {
     super(
         pFormulaCreator,
@@ -28,7 +27,7 @@ final class BoolectorFormulaManager extends AbstractFormulaManager<Long, Long, L
         null,
         pBitvectorManager,
         null,
-        pQuantifierManager,
+        null,
         pArrayManager,
         null,
         null,

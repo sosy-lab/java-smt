@@ -208,6 +208,7 @@ CALL4(msat_type, get_function_type)
 FREE_TYPE_ARRAY_ARG(2);
 TYPE_RETURN
 
+#ifndef BUILD_FOR_OPTIMATHSAT5
 /*
  * msat_type msat_get_enum_type(msat_env env, const char *name,
  *                              size_t domain_size, const char **domain);
@@ -221,6 +222,7 @@ CALL4(msat_type, get_enum_type)
 FREE_STRING_ARRAY_ARG(4);
 FREE_STRING_ARG(2);
 TYPE_RETURN
+#endif
 
 /*
  * int msat_is_bool_type(msat_env env, msat_type tp);
@@ -348,6 +350,7 @@ TYPE_ARG(2)
 CALL2(int, is_fp_roundingmode_type)
 BOOLEAN_RETURN
 
+#ifndef BUILD_FOR_OPTIMATHSAT5
 /*
  * int msat_is_enum_type(msat_env env, msat_type tp,
  *                       size_t *out_domain_size, msat_decl **out_domain);
@@ -396,6 +399,7 @@ CALL4(int, is_enum_type)
   out: msat_free(out_domain_tmp);
   return jretval;
 }
+#endif
 
 DEFINE_FUNC(jboolean, 1type_1equals) WITH_TWO_ARGS(jtype, jtype)
 TYPE_ARG(1)
@@ -708,6 +712,7 @@ TERM_ARG(3)
 CALL3(msat_term, make_fp_round_to_int)
 TERM_RETURN
 
+#ifndef BUILD_FOR_OPTIMATHSAT5
 DEFINE_FUNC(jterm, 1make_1fp_1to_1sbv) WITH_FOUR_ARGS(jenv, int, jterm, jterm)
 ENV_ARG(1)
 SIMPLE_ARG(size_t, 2)
@@ -723,6 +728,7 @@ TERM_ARG(3)
 TERM_ARG(4)
 CALL4(msat_term, make_fp_to_ubv)
 TERM_RETURN
+#endif
 
 DEFINE_FUNC(jterm, 1make_1fp_1as_1ieeebv) WITH_TWO_ARGS(jenv, jterm)
 ENV_ARG(1)
@@ -1037,8 +1043,16 @@ make_term_from_string(from_smtlib1, 1from_1smtlib1)
 make_term_from_string(from_smtlib2, 1from_1smtlib2)
 term_to_string(to_smtlib1, 1to_1smtlib1)
 term_to_string(to_smtlib2, 1to_1smtlib2)
-term_to_string(to_smtlib2_term, 1to_1smtlib2_term)
+term_to_string(to_smtlib2_term, 1to_1smtlib2_1term)
 
+DEFINE_FUNC(string, 1to_1smtlib2_1ext) WITH_FOUR_ARGS(jenv, jterm, string, int)
+ENV_ARG(1)
+TERM_ARG(2)
+STRING_ARG(3)
+SIMPLE_ARG(int, 4)
+CALL4(char *, to_smtlib2_ext)
+FREE_STRING_ARG(3)
+STRING_RETURN
 
 DEFINE_FUNC(jfailureCode, 1push_1backtrack_1point) WITH_ONE_ARG(jenv)
 ENV_ARG_VOID(1)
@@ -1369,9 +1383,11 @@ DEFINE_FUNC(string, 1get_1version) WITHOUT_ARGS
 CALL0(char *, get_version)
 PLAIN_STRING_RETURN
 
+#ifndef BUILD_FOR_OPTIMATHSAT5
 DEFINE_FUNC(string, 1get_1version_1id) WITHOUT_ARGS
 CALL0(const char *, get_version_id)
 PLAIN_CONST_STRING_RETURN
+#endif
 
 
 DEFINE_FUNC(object, 1named_1list_1from_1smtlib2) WITH_TWO_ARGS(jenv, string)
