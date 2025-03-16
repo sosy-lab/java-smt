@@ -12,8 +12,12 @@ import java.util.Set;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
@@ -21,7 +25,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   SolverContext solverContext;
   SolverContext differentSolverContext;
   private final List<BooleanFormula> constraints = new ArrayList<>();
-  private ProverEnvironment prover;
+  private final ProverEnvironment prover;
 
   public SolverlessProverEnvironment(SolverLessContext solverContext, Set<ProverOptions> pOptions) {
     try {
@@ -35,9 +39,8 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
     } catch (Exception e) {
       throw new RuntimeException("Problem creating solver differentSolverContext", e);
     }
-
     try {
-      prover = differentSolverContext.newProverEnvironment();
+      prover = differentSolverContext.newProverEnvironment(pOptions.toArray(new ProverOptions[0]));
     } catch (Exception e) {
       throw new RuntimeException("Problem creating solver differentSolverContext", e);
     }
@@ -69,11 +72,11 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
     for (BooleanFormula formula : constraints) {
       Generator.assembleConstraint(formula);
     }
-    String SMTLIB2 = Generator.getSMTLIB2String();
+    String smtlib2String = Generator.getSMTLIB2String();
     // GENERATED CONSTRAINTS
     BooleanFormula parsedFormula;
     try {
-      parsedFormula = solverContext.getFormulaManager().universalParseFromString(SMTLIB2);
+      parsedFormula = solverContext.getFormulaManager().universalParseFromString(smtlib2String);
     } catch (Exception e) {
       throw new ParserException("An Error occured while reparsing. ", e);
     }
@@ -86,7 +89,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Not supported.");
+    return prover.isUnsatWithAssumptions(assumptions);
   }
 
   @Override
@@ -102,7 +105,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Not supported.");
+    return prover.unsatCoreOverAssumptions(assumptions);
   }
 
   @Override
