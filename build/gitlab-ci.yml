@@ -297,7 +297,7 @@ deploy-gh-pages:
 
 # Build container images
 # following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
-.build-docker: &build-docker
+.build-docker:
   stage: images
   variables:
     EXTRA_ARGS: ""
@@ -305,15 +305,12 @@ deploy-gh-pages:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE/$IMAGE $EXTRA_ARGS
-  only:
-    - schedules
-    - web
+  # only:
+  #   - schedules
+  #   - web
 
-build-docker:x86_64:
-  <<: *build-docker
-  parallel:
-    matrix:
-      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+.build-docker:x86_64:
+  extends: .build-docker
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -321,11 +318,8 @@ build-docker:x86_64:
     DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
     IMAGE: test:$JDK_VERSION-x86_64
 
-build-docker:arm64:
-  <<: *build-docker
-  parallel:
-    matrix:
-      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+.build-docker:arm64:
+  extends: .build-docker
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -337,17 +331,11 @@ build-docker:arm64:
 
 # merge existing images into one multi-platform image.
 # https://arborxr.com/blog/developers-journal-building-unprivileged-multi-arch-images-with-kaniko-and-gitlab-ci/
-docker-manifest:test:
+.docker-manifest:
   stage: images
   image:
     name: mplatform/manifest-tool
     entrypoint: [""]
-  needs:
-    - build-docker:x86_64
-    - build-docker:arm64
-  parallel:
-    matrix:
-      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
   script:
     - |
       manifest-tool
@@ -360,6 +348,21 @@ docker-manifest:test:
   # only:
   #   - schedules
   #   - web
+
+build-docker:x86_64:jdk-11: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-11 } }
+build-docker:x86_64:jdk-17: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-17 } }
+build-docker:x86_64:jdk-21: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-21 } }
+build-docker:x86_64:jdk-23: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-23 } }
+
+build-docker:arm64:jdk-11: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-11 } }
+build-docker:arm64:jdk-17: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-17 } }
+build-docker:arm64:jdk-21: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-21 } }
+build-docker:arm64:jdk-23: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-23 } }
+
+docker-manifest:jdk-11: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-11, build-docker:arm64:jdk-11 ], variables: { JDK_VERSION: jdk-11 } }
+docker-manifest:jdk-17: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-17, build-docker:arm64:jdk-17 ], variables: { JDK_VERSION: jdk-17 } }
+docker-manifest:jdk-21: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-21, build-docker:arm64:jdk-21 ], variables: { JDK_VERSION: jdk-21 } }
+docker-manifest:jdk-23: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-23, build-docker:arm64:jdk-23 ], variables: { JDK_VERSION: jdk-23 } }
 
 # Build container images for multiple architectures directly with podman.
 .build-docker-simple:
