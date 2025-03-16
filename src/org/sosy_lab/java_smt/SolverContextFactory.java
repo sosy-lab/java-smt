@@ -122,6 +122,9 @@ public class SolverContextFactory {
   @Option(secure = true, description = "Run the solver binary instead of using the library.")
   private boolean useBinary = false;
 
+  @Option(secure = true, description = "Which Solver SolverLess should use to solve constraints")
+  private Solvers usedSolverBySolverLess = Solvers.Z3;
+
   private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
   private final Configuration config;
@@ -230,7 +233,7 @@ public class SolverContextFactory {
               solverToCreate));
     }
     if (solverToCreate.equals(Solvers.SOLVERLESS)) {
-      return SolverLessContext.create();
+      return SolverLessContext.create(usedSolverBySolverLess);
     }
     SolverContext context;
     try {
@@ -323,7 +326,7 @@ public class SolverContextFactory {
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
       case SOLVERLESS:
-        return SolverLessContext.create();
+        return SolverLessContext.create(usedSolverBySolverLess);
 
       case BITWUZLA:
         return BitwuzlaSolverContext.create(

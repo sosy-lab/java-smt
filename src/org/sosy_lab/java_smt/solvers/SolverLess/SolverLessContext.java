@@ -10,18 +10,24 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
+import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 
 public final class SolverLessContext extends AbstractSolverContext {
+
+  Solvers usedSolverForSMTSolving;
+  Z3SolverContext usedSolverForZ3Solving;
 
   private SolverLessContext(SolverLessFormulaManager pManager) {
     super(pManager);
   }
 
-  public static SolverLessContext create() {
+  public static SolverLessContext create(Solvers usedSolverForActualSMTSolving) {
     SolverLessFormulaCreator creator = new SolverLessFormulaCreator();
     SolverLessBooleanFormulaManager bmgr = new SolverLessBooleanFormulaManager(creator);
     SolverLessFormulaManager manager = new SolverLessFormulaManager(creator, bmgr);
-    return new SolverLessContext(manager);
+    SolverLessContext result = new SolverLessContext(manager);
+    result.setUsedSolverForSMTSolving(usedSolverForActualSMTSolving);
+    return result;
   }
 
   @Override
@@ -35,9 +41,17 @@ public final class SolverLessContext extends AbstractSolverContext {
     return Solvers.SOLVERLESS;
   }
 
+  public Solvers getUsedSolverForSMTSolving() {
+    return usedSolverForSMTSolving;
+  }
+
+  public void setUsedSolverForSMTSolving(Solvers pUsedSolverForSMTSolving) {
+    usedSolverForSMTSolving = pUsedSolverForSMTSolving;
+  }
+
   @Override
   public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    throw new UnsupportedOperationException("SolverLess does not support ProverEnvironment.");
+    return new SolverlessProverEnvironment(this, pOptions);
   }
 
   @Override
