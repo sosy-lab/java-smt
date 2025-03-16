@@ -50,8 +50,4 @@ public class UltimateEliminatorWrapper {
   public Appender dumpFormula(Term pFormula) {
     return UltimateEliminatorParser.dumpFormula(pFormula);
   }
-
-  public UltimateEliminator getUltimateEliminator() {
-    return ultimateEliminator;
-  }
 }
