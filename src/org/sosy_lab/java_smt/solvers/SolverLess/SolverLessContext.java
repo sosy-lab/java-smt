@@ -10,7 +10,6 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 
 public final class SolverLessContext extends AbstractSolverContext {
 
