@@ -295,6 +295,10 @@ deploy-gh-pages:
       - $GH_TOKEN == null # required for job
 
 
+.parallel_jdk_matrix:
+  matrix:
+    - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
+
 # Build container images
 # following this guideline: https://docs.gitlab.com/ee/ci/docker/using_kaniko.html
 .build-docker: &build-docker
@@ -311,9 +315,7 @@ deploy-gh-pages:
 
 build-docker:x86_64:
   <<: *build-docker
-  parallel:
-    matrix:
-      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+  parallel: !reference [ .parallel_jdk_matrix ]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -323,9 +325,7 @@ build-docker:x86_64:
 
 build-docker:arm64:
   <<: *build-docker
-  parallel:
-    matrix:
-      - JDK_VERSION: [ jdk-11, jdk-17, jdk-21, jdk-23 ]
+  parallel: !reference [ .parallel_jdk_matrix ]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -343,11 +343,11 @@ docker-manifest:test:
     name: mplatform/manifest-tool
     entrypoint: [""]
   needs:
-    - build-docker:x86_64
-    - build-docker:arm64
-  parallel:
-    matrix:
-      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
+    - job: build-docker:x86_64
+      parallel: !reference [ .parallel_jdk_matrix ]
+    - job: build-docker:arm64
+      parallel: !reference [ .parallel_jdk_matrix ]
+  parallel: !reference [ .parallel_jdk_matrix ]
   script:
     - |
       manifest-tool
