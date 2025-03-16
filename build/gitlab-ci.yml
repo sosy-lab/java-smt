@@ -335,7 +335,7 @@ build-docker:arm64:
     DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
     IMAGE: test:$JDK_VERSION-arm64
 
-# merge existing images iinto one multi-platform image.
+# merge existing images into one multi-platform image.
 # https://arborxr.com/blog/developers-journal-building-unprivileged-multi-arch-images-with-kaniko-and-gitlab-ci/
 docker-manifest:test:
   stage: images
@@ -357,9 +357,9 @@ docker-manifest:test:
         --platforms linux/arm64 \
         --template $CI_REGISTRY_IMAGE/test:$JDK_VERSION-arm64 \
         --target $CI_REGISTRY_IMAGE/test:$JDK_VERSION
-  only:
-    - schedules
-    - web
+  # only:
+  #   - schedules
+  #   - web
 
 # Build container images for multiple architectures directly with podman.
 .build-docker-simple:
@@ -379,7 +379,7 @@ docker-manifest:test:
 # TODO: Sadly this does not work with the current version of Gitlab Runner due to insufficient
 #       privileges for the executed podman commands. They might need a privileged container.
 .build-docker-simple:test:
-  extends: .build-docker
+  extends: .build-docker-simple
   parallel:
     matrix:
       - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
