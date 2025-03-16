@@ -14,13 +14,16 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="bin/"/>
 	<classpathentry kind="lib" path="lib/java/core/guava.jar" sourcepath="lib/java-contrib/guava-sources.jar"/>
+
 	<classpathentry kind="lib" path="lib/java/core/ultimate-model-checker-utils.jar" sourcepath="lib/java-contrib/ultimate-model-checker-utils-sources.jar"/>
+        <classpathentry kind="lib" path="lib/java/core/ultimate-core-rcp.jar" sourcepath="lib/java-contrib/ultimate-core-rcp-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-core.jar" sourcepath="lib/java-contrib/ultimate-core-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/core/ultimate-model.jar" sourcepath="lib/java-contrib/ultimate-model-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-library-smtlib.jar" sourcepath="lib/java-contrib/ultimate-library-smtlib-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-library-smtlib-utils.jar" sourcepath="lib/java-contrib/ultimate-library-smtlib-utils-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/ultimate-util.jar" sourcepath="lib/java-contrib/ultimate-util-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/core/ultimate-core-rcp.jar" sourcepath="lib/java-contrib/ultimate-core-rcp-sources.jar"/>
-	<classpathentry kind="lib" path="lib/java/core/ultimate-model.jar" sourcepath="lib/java-contrib/ultimate-model-sources.jar"/>
+
+
 	<classpathentry kind="lib" path="lib/java/test/guava-testlib.jar" sourcepath="lib/java-contrib/guava-testlib-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/truth.jar" sourcepath="lib/java-contrib/truth-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/test/junit.jar"/>
