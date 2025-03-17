@@ -47,11 +47,6 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   }
 
   @Override
-  public void pop() {
-    constraints.remove(constraints.size() - 1);
-  }
-
-  @Override
   public Void addConstraint(BooleanFormula constraint) {
     constraints.add(constraint);
     return null;
@@ -59,12 +54,24 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
 
   @Override
   public void push() throws InterruptedException {
-    constraints.add(constraints.get(constraints.size() - 1));
+    prover.push();
+    if (!constraints.isEmpty()) {
+      constraints.add(constraints.get(constraints.size() - 1));
+    }
+  }
+
+  @Override
+  public void pop() {
+    if (constraints.isEmpty()) {
+      throw new IllegalStateException("Cannot pop: Stack is already empty.");
+    }
+    prover.pop();
+    constraints.remove(constraints.size() - 1);
   }
 
   @Override
   public int size() {
-    return constraints.size();
+    return prover.size();
   }
 
   @Override
