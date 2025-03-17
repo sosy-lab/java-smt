@@ -75,9 +75,6 @@ public interface SolverContext extends AutoCloseable {
      * elimination method fails. The solver will not log a warning in this case.
      */
     QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
-
-    /** Whether the solver should abort the quantifier elimination in the case it fails. */
-    QUANTIFIER_ELIMINATION_NO_FALLBACK,
   }
 
   /**
