@@ -232,9 +232,6 @@ public class SolverContextFactory {
                   + "supported in binary mode.",
               solverToCreate));
     }
-    if (solverToCreate.equals(Solvers.SOLVERLESS)) {
-      return SolverLessContext.create(usedSolverBySolverLess);
-    }
     SolverContext context;
     try {
       context = generateContext0(solverToCreate);
@@ -260,7 +257,11 @@ public class SolverContextFactory {
       // statistics need to be the most outer wrapping layer.
       context = new StatisticsSolverContext(context);
     }
-    Generator.setIsLoggingEnabled(generateSMTLIB2);
+    if (solver==Solvers.SOLVERLESS) {
+      Generator.setIsLoggingEnabled(true);
+    }else{
+      Generator.setIsLoggingEnabled(generateSMTLIB2);
+    }
     return context;
   }
 

@@ -29,17 +29,17 @@ public class EvaluationTest extends SolverBasedTest0 {
     return Solvers.SOLVERLESS;
   }
 
-  @Before
-  public void setUp() {
-    Generator.setIsLoggingEnabled(true);
-    assume().withMessage("File is still a work in progress.").that(false).isTrue();
-  }
-
-  @After
-  public void tearDown() {
-    Generator.resetGenerator();
-    Generator.setIsLoggingEnabled(false);
-  }
+//  @Before
+//  public void setUp() {
+//    Generator.setIsLoggingEnabled(true);
+//    assume().withMessage("File is still a work in progress.").that(false).isTrue();
+//  }
+//
+//  @After
+//  public void tearDown() {
+//    Generator.resetGenerator();
+//    Generator.setIsLoggingEnabled(false);
+//  }
 
   public void runTest(String smtInput)
       throws IOException, InterruptedException, InvalidConfigurationException, SolverException {
