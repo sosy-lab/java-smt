@@ -45,7 +45,9 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-z3-x64" extends="core" description="only one solver included"/>
         <conf name="runtime-z3-arm64" extends="core" description="only one solver included"/>
         <conf name="runtime-cvc4" extends="core" description="only one solver included"/>
-        <conf name="runtime-cvc5" extends="core" description="only one solver included"/>
+        <conf name="runtime-cvc5" extends="runtime-cvc5-x64,runtime-cvc5-arm64" description="only one solver included"/>
+        <conf name="runtime-cvc5-x64" extends="core" description="only one solver included"/>
+        <conf name="runtime-cvc5-arm64" extends="core" description="only one solver included"/>
         <conf name="runtime-boolector" extends="core" description="only one solver included"/>
         <conf name="runtime-yices2" extends="core" description="only one solver included"/>
         <conf name="runtime-bitwuzla" extends="runtime-bitwuzla-x64,runtime-bitwuzla-arm64" description="only one solver included"/>
@@ -66,10 +68,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-x64-without-gpl"
-              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5,runtime-boolector,runtime-bitwuzla-x64"
+              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5-x64,runtime-boolector,runtime-bitwuzla-x64"
               description="all solvers for x64 architecture included, except those under GPL"/>
         <conf name="runtime-arm64-without-gpl"
-              extends="runtime-mathsat-arm64,runtime-opensmt-arm64,runtime-smtinterpol,runtime-princess,runtime-z3-arm64,runtime-bitwuzla-arm64"
+              extends="runtime-mathsat-arm64,runtime-opensmt-arm64,runtime-smtinterpol,runtime-princess,runtime-cvc5-arm64,runtime-z3-arm64,runtime-bitwuzla-arm64"
               description="all solvers for arm64 architecture included, except those under GPL"/>
 
         <!-- Dependencies needed for building or running tests. -->
@@ -191,7 +193,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.8.0-sosy0-ge831bf23" conf="runtime-opensmt-x64->solver-opensmt-x64; runtime-opensmt-arm64->solver-opensmt-arm64; contrib->sources,javadoc"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.3-sosy0" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="1.2.1-gdc565d916" conf="runtime-cvc5->solver-cvc5"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="latest-g4c241968d" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
         <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.7.0-13.1-g595512ae" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
 
