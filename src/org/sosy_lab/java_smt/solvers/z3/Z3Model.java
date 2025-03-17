@@ -54,28 +54,20 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   public ImmutableList<ValueAssignment> asList() throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
-
     try {
-      // Iterate through constants.
-      for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
-        long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
-        Native.incRef(z3context, keyDecl);
-        out.addAll(getConstAssignments(keyDecl));
-        Native.decRef(z3context, keyDecl);
+      ModelIterator iter = getModelIterator();
+      while (iter.hasNext()) {
+        out.add(iter.next());
       }
-
-      // Iterate through function applications.
-      for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
-        long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
-        Native.incRef(z3context, funcDecl);
-        if (!isInternalSymbol(funcDecl)) {
-          String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-          out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
-        }
-        Native.decRef(z3context, funcDecl);
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof Z3Exception) {
+        throw z3creator.handleZ3Exception((Z3Exception) e);
+      } else if (e.getCause() instanceof InterruptedException) {
+        throw (InterruptedException) e.getCause();
+      } else if (e.getCause() instanceof SolverException) {
+        throw (SolverException) e.getCause();
       }
-    } catch (Z3Exception e) {
-      throw z3creator.handleZ3Exception(e);
+      throw e;
     }
 
     return out.build();
@@ -420,6 +412,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     private int nestedEvaluationCacheIndex = 0;
     private Optional<List<ValueAssignment>> nestedEvaluationCache = Optional.empty();
 
+    private Optional<ValueAssignment> nextModelElement = Optional.empty();
+
     private Z3ModelIterator() {
       maxFuncIdx = Native.modelGetNumFuncs(z3context, model);
       maxConstIdx = Native.modelGetNumConsts(z3context, model);
@@ -427,15 +421,39 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
     @Override
     public boolean hasNext() {
-      return (nestedEvaluationCache.isPresent()
-              && nestedEvaluationCacheIndex < nestedEvaluationCache.orElseThrow().size())
-          || constIdx < maxConstIdx
-          || funcIdx < maxFuncIdx;
+      if (isClosed()) {
+        return false;
+      }
+      try {
+        if ((nestedEvaluationCache.isPresent()
+                && nestedEvaluationCacheIndex < nestedEvaluationCache.orElseThrow().size())
+            || constIdx < maxConstIdx
+            || funcIdx < maxFuncIdx) {
+          // Currently evaluating a nested expression or expecting another expression to be
+          // evaluated
+          // However, this might fail, so we get the next element here already, and abort if there
+          // is none.
+          nextModelElement = Optional.of(next());
+          return true;
+        }
+      } catch (NoSuchElementException e) {
+        // Do nothing
+        nextModelElement = Optional.empty();
+      }
+      return false;
     }
 
     @Override
     public ValueAssignment next() {
-      if (nestedEvaluationCache.isEmpty()
+      Preconditions.checkState(!isClosed());
+
+      if (nextModelElement.isPresent()) {
+        ValueAssignment initialNextModelElement = nextModelElement.orElseThrow();
+        nextModelElement = Optional.empty();
+        return initialNextModelElement;
+      }
+
+      while (nestedEvaluationCache.isEmpty()
           || nestedEvaluationCacheIndex >= nestedEvaluationCache.orElseThrow().size()) {
         try {
           try {
@@ -471,6 +489,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
             throw z3creator.handleZ3Exception(e);
           }
         } catch (SolverException | InterruptedException e) {
+          // TODO: handle or propagate
           throw new RuntimeException(e);
         }
       }
