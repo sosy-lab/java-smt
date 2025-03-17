@@ -28,16 +28,16 @@ Thus, we cannot check them into the repository. Please execute the following as 
 in the current directory `lib/native/x86_64-windows`:
 
 For Z3:
-- mklink libz3.dll ..\..\java\runtime-z3\x64\libz3.dll
-- mklink libz3java.dll ..\..\java\runtime-z3\x64\libz3java.dll
+- mklink libz3.dll ..\\..\\java\\runtime-z3\\x64\\libz3.dll
+- mklink libz3java.dll ..\\..\\java\\runtime-z3\\x64\\libz3java.dll
 
 For MathSAT5:
-- mklink mpir.dll ..\..\java\runtime-mathsat\mpir.dll
-- mklink mathsat.dll ..\..\java\runtime-mathsat\mathsat.dll
-- mklink mathsat5j.dll ..\..\java\runtime-mathsat\mathsat5j.dll
+- mklink mpir.dll ..\\..\\java\\runtime-mathsat\\mpir.dll
+- mklink mathsat.dll ..\\..\\java\\runtime-mathsat\\mathsat.dll
+- mklink mathsat5j.dll ..\\..\\java\\runtime-mathsat\\mathsat5j.dll
 
 For Bitwuzla:
-- mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll
+- mklink libbitwuzlaj.dll ..\\..\\java\\runtime-bitwuzla\\libbitwuzlaj.dll
 
 ### With a direct copy of the library:
 
@@ -46,20 +46,20 @@ those files from the `lib\java\runtime-*\` directory into the current directory 
 Please note that this copy process needs to be repeated after each update of a solver library via Ant/Ivy dependencies.
 
 For Z3:
-- copy ..\..\java\runtime-z3\x64\libz3.dll libz3.dll
-- copy ..\..\java\runtime-z3\x64\libz3java.dll libz3java.dll
+- copy ..\\..\\java\\runtime-z3\\x64\\libz3.dll libz3.dll
+- copy ..\\..\\java\\runtime-z3\\x64\\libz3java.dll libz3java.dll
 
 For MathSAT5:
-- copy ..\..\java\runtime-mathsat\mpir.dll mpir.dll
-- copy ..\..\java\runtime-mathsat\mathsat.dll mathsat.dll
-- copy ..\..\java\runtime-mathsat\mathsat5j.dll mathsat5j.dll
+- copy ..\\..\\java\\runtime-mathsat\\mpir.dll mpir.dll
+- copy ..\\..\\java\\runtime-mathsat\\mathsat.dll mathsat.dll
+- copy ..\\..\\java\\runtime-mathsat\\mathsat5j.dll mathsat5j.dll
 
 For Bitwuzla:
-- copy ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll libbitwuzlaj.dll
+- copy ..\\..\\java\\runtime-bitwuzla\\libbitwuzlaj.dll libbitwuzlaj.dll
 
 Or simply use a wildcard:
-- copy ..\..\java\runtime-*\*dll .\
-- copy ..\..\java\runtime-*\x64\*dll .\
+- copy ..\\..\\java\\runtime-*\\*dll .\\
+- copy ..\\..\\java\\runtime-*\\x64\\*dll .\\
 
 ## Additional dependencies:
 
