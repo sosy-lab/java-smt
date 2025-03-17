@@ -112,7 +112,7 @@ public final class UltimateEliminatorParser {
       throws IllegalArgumentException {
     FormulaCollectionScript parseScript =
         new FormulaCollectionScript(ue.getScriptIterator().next(), ue.getTheory());
-    LogProxy logProxy = new LogProxyForwarder(pLogger.withComponentName("SMTInterpol"));
+    LogProxy logProxy = new LogProxyForwarder(pLogger.withComponentName("UltimateEliminator"));
     final ParseEnvironment parseEnv =
         new ParseEnvironment(parseScript, new OptionMap(logProxy, true)) {
           @Override
