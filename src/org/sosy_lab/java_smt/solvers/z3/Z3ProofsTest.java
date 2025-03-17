@@ -154,6 +154,8 @@ public class Z3ProofsTest {
     pn.addChild(new Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
     pn.addChild(new Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
+    System.out.println(pn.Z3ProofAsString());
+
     ProofConverter pc = new ProofConverter(mgr);
 
     ProofNode res = pc.handleTrans(pn);

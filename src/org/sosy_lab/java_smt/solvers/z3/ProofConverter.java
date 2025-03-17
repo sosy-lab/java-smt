@@ -200,6 +200,7 @@ public class ProofConverter {
 
     BooleanFormula t1 = (BooleanFormula) node.getChildren().get(0).getFormula();
     BooleanFormula t2 = (BooleanFormula) node.getChildren().get(1).getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
 
     List<BooleanFormula> equivalenceOperands1 = extractEquivalenceOperands(t1);
     List<BooleanFormula> equivalenceOperands2 = extractEquivalenceOperands(t2);
@@ -207,9 +208,9 @@ public class ProofConverter {
     assert equivalenceOperands1.get(1).equals(equivalenceOperands2.get(0));
 
     BooleanFormula transRes =
-        bfm.equivalence(equivalenceOperands1.get(0), equivalenceOperands2.get(1));
+        formula;
     BooleanFormula transClause = bfm.or(bfm.not(t1),
-        bfm.not(t2), equivalenceOperands2.get(1));
+        bfm.not(t2), formula);
 
     SourceProofNode pn = new SourceProofNode(ResAxiom.TRANSITIVITY, transClause);
 
@@ -225,8 +226,7 @@ public class ProofConverter {
     transResNode.addChild(trnAnte2);
     trnAnte2.addChild(trnAnte2Ante);
     trnAnte2.addChild(pn);
-
-
+    
     return transResNode;
   }
 
