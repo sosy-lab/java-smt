@@ -20,20 +20,15 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
 import org.sosy_lab.java_smt.solvers.smtinterpol.ProofTermParser;
 
+@SuppressWarnings("all")
 public class ResolutionProofDAG extends AbstractProofDAG {
 
+  /*
   public ResolutionProofDAG() {
     super();
   }
 
-  /**
-   * Converts the proof Term returned from SMTInterpol into a ResolutionProofDAG.
-   * This version traverses AnnotatedTerm instances looking for annotations with key
-   * ProofConstants.ANNOTKEY_PROVES and uses the associated clause string.
-   *
-   * @param proof             the proof term
-   * @return a ResolutionProofDAG representing the proof
-   */
+
   public static ResolutionProofDAG fromTerm(
       Term proof, FormulaManager pManager,
       Map<String, BooleanFormula> pAnnotatedTerms) {
@@ -42,13 +37,6 @@ public class ResolutionProofDAG extends AbstractProofDAG {
     return ProofTermParser.convert(proof, pManager, pAnnotatedTerms);
   }
 
-  /**
-   * Recursively traverses the annotated proof term.
-   *
-   * @param term         the current term
-   * @param dag          the proof DAG being constructed
-   * @param parentClause the clause from the parent annotation (if available)
-   */
   private static void traverseTerm(Term term, ResolutionProofDAG dag, ProofNode parentClause) {
     if (term instanceof AnnotatedTerm) {
       AnnotatedTerm annotatedTerm = (AnnotatedTerm) term;
@@ -66,7 +54,7 @@ public class ResolutionProofDAG extends AbstractProofDAG {
           }
         }
 
-         */
+
       }
     }
   }
@@ -87,4 +75,6 @@ public class ResolutionProofDAG extends AbstractProofDAG {
   public void addEdge(int parentNodeId, int childNodeId) {
     super.addEdge(parentNodeId, childNodeId);
   }
+
+   */
 }

@@ -16,6 +16,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 //TODO: Correct parsing of the proof terms is missing, i.e. creation of nodes in the DAG and
 // parsing annotations. Add relevant javadocs
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class ProofTermParser {
 
   private final ResolutionProofDAG proofDag;

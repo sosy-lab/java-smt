@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 //TODO correctly document the formula strings
@@ -94,10 +93,12 @@ public enum Z3ProofRule implements ProofRule {
     this.formula = formula;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getFormula() {
     return formula;
   }

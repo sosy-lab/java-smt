@@ -29,7 +29,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
-
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 class SmtInterpolProofNode extends AbstractProofNode {
   static class ResolutionProofDAGBuilder {
     private final SmtInterpolFormulaCreator creator;
@@ -89,7 +89,7 @@ class SmtInterpolProofNode extends AbstractProofNode {
       if (node.getLeft() == null && node.getRight() == null) {
         throw new UnsupportedOperationException("Cannot process leaf node");
       } else {
-        ResolutionNode rn = (ResolutionNode) node.node;
+        ResolutionNode rn = (ResolutionNode) SmtInterpolProofNode.node;
         Antecedent[] antecedents = rn.getAntecedents();
         Literal pivot = antecedents[0].mPivot;
         node.transformed = new ResolutionProofNode(node.getFormula(),
@@ -198,7 +198,7 @@ class SmtInterpolProofNode extends AbstractProofNode {
   }
 
   private void setProofNode(ProofNode pNode) {
-    this.node = pNode;
+    node = pNode;
   }
 
   private static String getTermName(AnnotatedTerm pTerm) {

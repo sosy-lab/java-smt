@@ -534,23 +534,23 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_pop_backtrack_point(env);
   }
 
+  @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
   @Test
   public void printProofTest() throws SolverException, InterruptedException {
-    //long config = msat_create_config();
-    //msat_set_option_checked(config, "proof_generation", "true");
-    //long env = msat_create_env(config);
-    long q1 = msat_from_smtlib2(env, "(set-logic QF_UF)\n" +
+    long config = msat_create_config();
+    msat_set_option_checked(config, "proof_generation", "true");
+    long env = msat_create_env(config);
+    long q1 = msat_from_smtlib2(env,
         "(declare-fun q1 () Bool)\n" +
         "(declare-fun q2 () Bool)\n" +
         "(assert (or (not q1) q2))\n" +
         "(assert q1)+\n" +
         "(assert (not q2))");
-    msat_assert_formula(env, msat_make_not(env, q1));
-    System.out.println("sat: " + msat_check_sat(env));
-    long model = msat_get_model(env);
-    //assertThat(msat_check_sat(env)).isFalse();
+    msat_assert_formula(env, q1);
+    //long model = msat_get_model(env);
+    assertThat(msat_check_sat(env)).isFalse();
 
-    //long pm = msat_get_proof_manager(env);
+    long pm = msat_get_proof_manager(env);
     //long proof = msat_get_proof(pm);
     //long termProof = msat_proof_get_term(proof);
     //String res = msat_to_smtlib2(env, termProof);

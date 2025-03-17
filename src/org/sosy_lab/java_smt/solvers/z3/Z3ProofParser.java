@@ -16,9 +16,9 @@ import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.HashMap;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class Z3ProofParser {
   private final long z3context;
   private final long z3solver;
@@ -188,6 +188,7 @@ public class Z3ProofParser {
     }
     return formula;
   }
+
 }
 
 

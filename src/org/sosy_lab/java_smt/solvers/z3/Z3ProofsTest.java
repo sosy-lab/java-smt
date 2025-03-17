@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 @Ignore("prevent this class being executed as testcase by ant")
 public class Z3ProofsTest {
 
@@ -85,7 +86,7 @@ public class Z3ProofsTest {
 
       long proof = prover.getZ3Proof();
       Z3ProofParser parser = new Z3ProofParser(mgr.getEnvironment(), prover.getZ3solver(),
-          (Z3FormulaCreator) mgr.getFormulaCreator(), prover );
+          (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
       Z3ProofNode root = parser.fromAST(proof);
 
       System.out.println(root.Z3ProofAsString());
@@ -138,6 +139,28 @@ public class Z3ProofsTest {
     } finally {
       ctx.close();
     }
+  }
+
+  @Test
+  public void handleTransTest() {
+    BooleanFormula f1 = bmgr.makeVariable("f1");
+    BooleanFormula f2 = bmgr.makeVariable("f2");
+    BooleanFormula f3 = bmgr.makeVariable("f3");
+    BooleanFormula equiv1 = bmgr.equivalence(f1, f2);
+    BooleanFormula equiv2 = bmgr.equivalence(f2, f3);
+    BooleanFormula equiv3 = bmgr.equivalence(f1, f3);
+
+    Z3ProofNode pn = new Z3ProofNode(equiv3, Z3ProofRule.TRANSITIVITY);
+    pn.addChild(new Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
+    pn.addChild(new Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
+
+    ProofConverter pc = new ProofConverter(mgr);
+
+    ProofNode res = pc.handleTrans(pn);
+
+   pc.printProof(res, 0);
+
+
   }
 
 }

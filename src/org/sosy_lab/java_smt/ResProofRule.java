@@ -113,10 +113,12 @@ public class ResProofRule {
       formula = pFormula;
     }
 
+    @Override
     public String getName() {
       return name;
     }
 
+    @Override
     public String getFormula() {
       return formula;
     }
@@ -126,14 +128,21 @@ public class ResProofRule {
    * Retrieves a ProofRule by its name.
    *
    * @param name The name of the proof rule.
-   * @return The matching ProofRule, or null if not found.
+   * @return The matching ProofRule.
+   * @throws NullPointerException if the name is null.
+   * @throws IllegalArgumentException if the name does not match any rule.
    */
   public static ResAxiom getResAxiomRuleByName(String name) {
+    if (name == null) {
+      throw new NullPointerException("Rule name cannot be null");
+    }
+
     for (ResAxiom rule : ResAxiom.values()) {
       if (rule.getName().equalsIgnoreCase(name)) {
         return rule;
       }
     }
+
     throw new IllegalArgumentException("Rule not found or not specified: " + name);
   }
 

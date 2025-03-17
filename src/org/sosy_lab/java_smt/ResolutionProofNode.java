@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt;
 
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -22,9 +23,10 @@ public class ResolutionProofNode extends AbstractProofNode
   private final Formula pivot;
 
   public ResolutionProofNode(Formula formula, Formula pivot) {
-    super(ResAxiom.RESOLUTION, formula);
-    this.pivot = pivot;
+    super(ResAxiom.RESOLUTION, Objects.requireNonNull(formula, "Formula must not be null"));
+    this.pivot = Objects.requireNonNull(pivot, "Pivot must not be null");
   }
+
 
 
   @Override
@@ -36,6 +38,7 @@ public class ResolutionProofNode extends AbstractProofNode
     return pivot;
   }
 
+  @Override
   public ProofRule getRule() {
     return super.getRule();
   }

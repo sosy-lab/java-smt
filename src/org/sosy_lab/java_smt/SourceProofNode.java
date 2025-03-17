@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt;
 
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
@@ -20,7 +21,9 @@ public class SourceProofNode extends AbstractProofNode
 
 
   public SourceProofNode(ResAxiom rule, Formula formula) {
-    super(rule, formula);
+    super(
+        Objects.requireNonNull(rule, "Rule must not be null"),
+        Objects.requireNonNull(formula, "Formula must not be null"));
   }
 
 
