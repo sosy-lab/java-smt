@@ -12,14 +12,11 @@ package org.sosy_lab.java_smt.test.example;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertFalse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.Set;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,8 +30,6 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.solvers.SolverLess.SolverLessContext;
-import org.sosy_lab.java_smt.solvers.SolverLess.SolverlessProverEnvironment;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
 @SuppressWarnings({"all", "DefaultCharSet"})
@@ -45,7 +40,7 @@ public class EvaluationTest extends SolverBasedTest0 {
   }
 
   @Before
-  public void setUp(){
+  public void setUp() {
     assume().withMessage("This test is only for local usage.").that(true).isFalse();
   }
 
@@ -185,13 +180,14 @@ public class EvaluationTest extends SolverBasedTest0 {
     // FP
     runTest(x);
   }
+
   private ProverEnvironment proverEnv;
   private SolverContext solverContext;
   private IntegerFormulaManager ifm;
 
   @Test
-  public void testAddition() throws SolverException, InterruptedException,
-                               InvalidConfigurationException {
+  public void testAddition()
+      throws SolverException, InterruptedException, InvalidConfigurationException {
     solverContext = SolverContextFactory.createSolverContext(Solvers.SOLVERLESS);
     proverEnv = solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
     ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
@@ -204,6 +200,4 @@ public class EvaluationTest extends SolverBasedTest0 {
 
     assertThat(proverEnv.isUnsat()).isFalse();
   }
-
-
 }

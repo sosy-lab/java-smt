@@ -28,7 +28,6 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
 public class SolverlessProverEnvironment implements ProverEnvironment {
-  SolverContext solverContext;
   SolverContext differentSolverContext;
   private final List<BooleanFormula> constraints = new ArrayList<>();
   private final ProverEnvironment prover;
@@ -39,14 +38,13 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
         throw new InvalidConfigurationException(
             "Used Solver must not be SolverLess! SolverLess has no SMT-Solving capabilities.");
       }
-      Configuration config = Configuration.builder().setOption("solver.generateSMTLIB2",
-          String.valueOf(true)).build();
+      Configuration config =
+          Configuration.builder().setOption("solver.generateSMTLIB2", String.valueOf(true)).build();
       LogManager logger = BasicLogManager.create(config);
       ShutdownManager shutdown = ShutdownManager.create();
       differentSolverContext =
-          SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-              Solvers.Z3);
-      this.solverContext = solverContext;
+          SolverContextFactory.createSolverContext(
+              config, logger, shutdown.getNotifier(), Solvers.Z3);
     } catch (Exception e) {
       throw new RuntimeException("Problem creating solver differentSolverContext", e);
     }
@@ -92,7 +90,8 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
     // GENERATED CONSTRAINTS
     BooleanFormula parsedFormula;
     try {
-      parsedFormula = differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String);
+      parsedFormula =
+          differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String);
     } catch (Exception e) {
       throw new ParserException("An Error occured while reparsing. ", e);
     }
