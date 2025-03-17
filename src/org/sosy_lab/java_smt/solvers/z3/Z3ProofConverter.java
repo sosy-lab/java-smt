@@ -10,9 +10,10 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.MODUS_PONENS;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.transform.Source;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDAG;
 import org.sosy_lab.java_smt.ResolutionProofNode;
@@ -25,21 +26,19 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.solvers.z3.Z3ProofNode;
-import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
-public class ProofConverter {
+public class Z3ProofConverter {
 
   private final Z3FormulaManager formulaManager;
 
   private final BooleanFormulaManager bfm;
 
-  public ProofConverter(Z3FormulaManager creator) {
+  public Z3ProofConverter(Z3FormulaManager creator) {
     formulaManager = creator;
     bfm = formulaManager.getBooleanFormulaManager();
   }
@@ -103,7 +102,7 @@ public class ProofConverter {
     ResolutionProofDAG dag = new ResolutionProofDAG();
 
     for (Z3ProofNode z3Node : z3ProofNodes) {
-      if (z3Node.getRule() == Z3ProofRule.MODUS_PONENS) {
+      if (z3Node.getRule() == MODUS_PONENS) {
 
       } else {
         Formula formula = z3Node.getFormula();
@@ -196,7 +195,182 @@ public class ProofConverter {
     return extractor.getEquivalenceOperands();
   }
 
-  ProofNode handleTrans(Z3ProofNode node) {
+  ProofNode handleNode(Z3ProofNode node) {
+    Z3ProofRule rule = (Z3ProofRule) node.getRule();
+
+    switch (rule) {
+      case TRUE:
+        return handleTrue(node);
+
+      case ASSERTED:
+        return handleAsserted(node);
+
+      case GOAL:
+        return handleAsserted(node);
+
+      case MODUS_PONENS:
+        return handleModusPonens(node);
+
+      case REFLEXIVITY:
+        return handleReflexivity(node);
+
+      case SYMMETRY:
+        return handleSymmetry(node);
+
+      case TRANSITIVITY:
+        return handleTransitivity(node);
+
+      case TRANSITIVITY_STAR:
+        return handleTransitivityStar(node);
+
+      case MONOTONICITY:
+        return handleMonotonicity(node);
+
+      case QUANT_INTRO:
+        return handleQuantIntro(node);
+
+      case BIND:
+        return handleBind(node);
+
+      case DISTRIBUTIVITY:
+        return handleDistributivity(node);
+
+      case AND_ELIM:
+        return handleAndElim(node);
+
+      case NOT_OR_ELIM:
+        return handleNotOrElim(node);
+
+      case REWRITE:
+        return handleRewrite(node);
+
+      case REWRITE_STAR:
+        return handleRewriteStar(node);
+
+      case PULL_QUANT:
+        return handlePullQuant(node);
+
+      case PUSH_QUANT:
+        return handlePushQuant(node);
+
+      case ELIM_UNUSED_VARS:
+        return handleElimUnusedVars(node);
+
+      case DER:
+        return handleDer(node);
+
+      case QUANT_INST:
+        return handleQuantInst(node);
+
+      case HYPOTHESIS:
+        return handleHypothesis(node);
+
+      case LEMMA:
+        return handleLemma(node);
+
+      case UNIT_RESOLUTION:
+        return handleUnitResolution(node);
+
+      case IFF_TRUE:
+        return handleIffTrue(node);
+
+      case IFF_FALSE:
+        return handleIffFalse(node);
+
+      case COMMUTATIVITY:
+        return handleCommutativity(node);
+
+      case DEF_AXIOM:
+        return handleDefAxiom(node);
+
+      case ASSUMPTION_ADD:
+        return handleAssumptionAdd(node);
+
+      case LEMMA_ADD:
+        return handleLemmaAdd(node);
+
+      case REDUNDANT_DEL:
+        return handleRedundantDel(node);
+
+      case CLAUSE_TRAIL:
+        return handleClauseTrail(node);
+
+      case DEF_INTRO:
+        return handleDefIntro(node);
+
+      case APPLY_DEF:
+        return handleApplyDef(node);
+
+      case IFF_OEQ:
+        return handleIffOeq(node);
+
+      case NNF_POS:
+        return handleNnfPos(node);
+
+      case NNF_NEG:
+        return handleNnfNeg(node);
+
+      case SKOLEMIZE:
+        return handleSkolemize(node);
+
+      case MODUS_PONENS_OEQ:
+        return handleModusPonensOeq(node);
+
+      case TH_LEMMA:
+        return handleThLemma(node);
+
+      case HYPER_RESOLVE:
+        return handleHyperResolve(node);
+
+      case OPERATION:
+        return handleOperation(node);
+
+      default:
+        return handleDefault(node);
+    }
+  }
+
+  ProofNode handleTrue(Z3ProofNode node) {
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    SourceProofNode pn = new SourceProofNode(ResAxiom.TRUE_POSITIVE, formula);
+    return pn;
+  }
+
+  ProofNode handleAsserted(Z3ProofNode node) {
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    SourceProofNode pn = new SourceProofNode(ResAxiom.ASSUME, formula);
+    return pn;
+  }
+
+  ProofNode handleModusPonens(Z3ProofNode node) {
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula pivot = (BooleanFormula) node.getChildren().get(0).getFormula();
+    ResolutionProofNode pn = new ResolutionProofNode(formula, pivot);
+    ProofNode c1 = handleNode((Z3ProofNode) node.getChildren().get(0));
+    ProofNode c2 = handleNode((Z3ProofNode) node.getChildren().get(1));
+    return pn;
+  }
+
+  ProofNode handleReflexivity(Z3ProofNode node) {
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    SourceProofNode pn = new SourceProofNode(ResAxiom.REFLEXIVITY, formula);
+    return pn;
+  }
+
+  ProofNode handleSymmetry(Z3ProofNode node) {
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula pivot = (BooleanFormula) node.getChildren().get(0).getFormula();
+    BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
+
+    ResolutionProofNode pn = new ResolutionProofNode(formula, pivot);
+    SourceProofNode sn = new SourceProofNode(ResAxiom.SYMMETRY, snFormula);
+    pn.addChild(sn);
+    pn.addChild(handleNode((Z3ProofNode) node.getChildren().get(0)));
+    return pn;
+  }
+
+
+  ProofNode handleTransitivity(Z3ProofNode node) {
 
     BooleanFormula t1 = (BooleanFormula) node.getChildren().get(0).getFormula();
     BooleanFormula t2 = (BooleanFormula) node.getChildren().get(1).getFormula();
@@ -226,9 +400,155 @@ public class ProofConverter {
     transResNode.addChild(trnAnte2);
     trnAnte2.addChild(trnAnte2Ante);
     trnAnte2.addChild(pn);
-    
+
     return transResNode;
   }
+
+  ProofNode handleTransitivityStar(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleMonotonicity(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleQuantIntro(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleBind(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleDistributivity(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleAndElim(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleNotOrElim(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleRewrite(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleRewriteStar(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handlePullQuant(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleElimUnusedVars(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handlePushQuant(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleDer(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleQuantInst(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleHypothesis(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleLemma(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleUnitResolution(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleIffTrue(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleIffFalse(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleCommutativity(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleDefAxiom(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleAssumptionAdd(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleLemmaAdd(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleRedundantDel(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleClauseTrail(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleDefIntro(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleApplyDef(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleIffOeq(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleNnfPos(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleNnfNeg(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleSkolemize(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleModusPonensOeq(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleThLemma(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleHyperResolve(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleOperation(Z3ProofNode node) {
+    return null;
+  }
+
+  ProofNode handleDefault(Z3ProofNode node) {
+    return null;
+  }
+
+
 
   void printProof(ProofNode node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);

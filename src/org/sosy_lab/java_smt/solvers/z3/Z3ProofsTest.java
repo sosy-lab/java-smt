@@ -25,7 +25,6 @@ import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
@@ -156,9 +155,9 @@ public class Z3ProofsTest {
 
     System.out.println(pn.Z3ProofAsString());
 
-    ProofConverter pc = new ProofConverter(mgr);
+    Z3ProofConverter pc = new Z3ProofConverter(mgr);
 
-    ProofNode res = pc.handleTrans(pn);
+    ProofNode res = pc.handleTransitivity(pn);
 
    pc.printProof(res, 0);
 
