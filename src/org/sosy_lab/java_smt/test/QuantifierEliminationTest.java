@@ -80,8 +80,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testQuantifierEliminationWithoutUltimateEliminatorFallbackThrowsException()
-      throws SolverException, IOException, InterruptedException {
+  public void testQuantifierEliminationWithoutUltimateEliminatorFallbackThrowsException() {
     requireIntegers();
     requireQuantifiers();
 
@@ -107,8 +106,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void
-      testQuantifierEliminationWithoutUltimateEliminatorFallbackWithoutWarningThrowsException()
-          throws SolverException, IOException, InterruptedException {
+      testQuantifierEliminationWithoutUltimateEliminatorFallbackWithoutWarningThrowsException() {
     requireIntegers();
     requireQuantifiers();
 
@@ -194,8 +192,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testEliminationWithUltimateEliminatormkWithoutQuantifierThrowsException()
-      throws SolverException, InterruptedException, IOException {
+  public void testEliminationWithUltimateEliminatormkWithoutQuantifierThrowsException() {
     requireIntegers();
     requireArrays();
     requireQuantifiers();
