@@ -1,25 +1,40 @@
-// Copyright (C) 2007-2016  Dirk Beyer
-// SPDX-FileCopyrightText: 2025 2020 Dirk Beyer <https://www.sosy-lab.org>
-//
-// SPDX-License-Identifier: Apache-2.0
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-package org.sosy_lab.java_smt.solvers.SolverLess;
+package org.sosy_lab.java_smt.test.example;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertFalse;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
+import org.sosy_lab.java_smt.solvers.SolverLess.SolverLessContext;
+import org.sosy_lab.java_smt.solvers.SolverLess.SolverlessProverEnvironment;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
 @SuppressWarnings({"all", "DefaultCharSet"})
@@ -29,17 +44,10 @@ public class EvaluationTest extends SolverBasedTest0 {
     return Solvers.SOLVERLESS;
   }
 
-//  @Before
-//  public void setUp() {
-//    Generator.setIsLoggingEnabled(true);
-//    assume().withMessage("File is still a work in progress.").that(false).isTrue();
-//  }
-//
-//  @After
-//  public void tearDown() {
-//    Generator.resetGenerator();
-//    Generator.setIsLoggingEnabled(false);
-//  }
+  @Before
+  public void setUp(){
+    assume().withMessage("This test is only for local usage.").that(true).isFalse();
+  }
 
   public void runTest(String smtInput)
       throws IOException, InterruptedException, InvalidConfigurationException, SolverException {
@@ -177,4 +185,25 @@ public class EvaluationTest extends SolverBasedTest0 {
     // FP
     runTest(x);
   }
+  private ProverEnvironment proverEnv;
+  private SolverContext solverContext;
+  private IntegerFormulaManager ifm;
+
+  @Test
+  public void testAddition() throws SolverException, InterruptedException,
+                               InvalidConfigurationException {
+    solverContext = SolverContextFactory.createSolverContext(Solvers.SOLVERLESS);
+    proverEnv = solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
+    IntegerFormula a = ifm.makeVariable("a");
+    IntegerFormula b = ifm.makeVariable("b");
+    IntegerFormula sum = ifm.add(a, b);
+
+    BooleanFormula constraint = ifm.equal(sum, ifm.makeNumber(5));
+    proverEnv.addConstraint(constraint);
+
+    assertThat(proverEnv.isUnsat()).isFalse();
+  }
+
+
 }

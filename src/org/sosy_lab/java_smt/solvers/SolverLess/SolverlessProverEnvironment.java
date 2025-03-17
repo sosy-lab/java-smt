@@ -11,7 +11,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -35,8 +39,13 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
         throw new InvalidConfigurationException(
             "Used Solver must not be SolverLess! SolverLess has no SMT-Solving capabilities.");
       }
+      Configuration config = Configuration.builder().setOption("solver.generateSMTLIB2",
+          String.valueOf(true)).build();
+      LogManager logger = BasicLogManager.create(config);
+      ShutdownManager shutdown = ShutdownManager.create();
       differentSolverContext =
-          SolverContextFactory.createSolverContext(solverContext.getUsedSolverForSMTSolving());
+          SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
+              Solvers.Z3);
       this.solverContext = solverContext;
     } catch (Exception e) {
       throw new RuntimeException("Problem creating solver differentSolverContext", e);
@@ -79,11 +88,11 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
     for (BooleanFormula formula : constraints) {
       Generator.assembleConstraint(formula);
     }
-    String smtlib2String = Generator.getSMTLIB2String();
+    String smtlib2String = String.valueOf(Generator.getLines());
     // GENERATED CONSTRAINTS
     BooleanFormula parsedFormula;
     try {
-      parsedFormula = solverContext.getFormulaManager().universalParseFromString(smtlib2String);
+      parsedFormula = differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String);
     } catch (Exception e) {
       throw new ParserException("An Error occured while reparsing. ", e);
     }

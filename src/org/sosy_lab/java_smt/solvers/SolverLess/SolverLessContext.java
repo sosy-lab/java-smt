@@ -13,7 +13,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 
 public final class SolverLessContext extends AbstractSolverContext {
 
-  Solvers usedSolverForSMTSolving;
+  Solvers usedSolverForSMTSolving = Solvers.Z3;
 
   private SolverLessContext(SolverLessFormulaManager pManager) {
     super(pManager);
