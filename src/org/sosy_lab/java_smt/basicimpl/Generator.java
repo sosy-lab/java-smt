@@ -230,11 +230,11 @@ public class Generator {
   }
 
   protected static void logPop() {
-    lines.append("(pop 1)\n");
+    //    lines.append("(pop 1)\n");
   }
 
   protected static void logPush() {
-    lines.append("(push 1)\n");
+    //    lines.append("(push 1)\n");
   }
 
   /**
