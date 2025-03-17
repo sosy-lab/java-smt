@@ -4,6 +4,8 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,9 +64,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
 
   @Override
   public void pop() {
-    if (constraints.isEmpty()) {
-      throw new IllegalStateException("Cannot pop: Stack is already empty.");
-    }
+    checkState(!constraints.isEmpty(), "Cannot pop: Stack is already empty.");
     prover.pop();
     constraints.remove(constraints.size() - 1);
   }
