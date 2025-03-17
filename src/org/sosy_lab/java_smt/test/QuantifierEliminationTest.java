@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithUltimateEliminator()
+  public void testEliminationWithUltimateEliminator()
       throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireQuantifiers();
@@ -57,7 +57,83 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithUltimateEliminatorWithArray()
+  public void testQuantifierEliminationWithoutUltimateEliminatorNoFallbackThrowsException() {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.Z3, Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    // Formula: forall z, (z = x => z > y)
+    BooleanFormula query =
+        qmgr.forall(z, bmgr.implication(imgr.equal(z, x), imgr.greaterThan(z, y)));
+
+    Exception exception = assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(query));
+
+    assertThat((exception instanceof UnsupportedOperationException)).isTrue();
+  }
+
+  @Test
+  public void testQuantifierEliminationWithoutUltimateEliminatorFallbackThrowsException()
+      throws SolverException, IOException, InterruptedException {
+    requireIntegers();
+    requireQuantifiers();
+
+    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.Z3, Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    // Formula: forall z, (z = x => z > y)
+    BooleanFormula query =
+        qmgr.forall(z, bmgr.implication(imgr.equal(z, x), imgr.greaterThan(z, y)));
+
+    Exception exception = assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(query));
+
+    assertThat((exception instanceof IllegalArgumentException)).isTrue();
+  }
+
+  @Test
+  public void
+      testQuantifierEliminationWithoutUltimateEliminatorFallbackWithoutWarningThrowsException()
+          throws SolverException, IOException, InterruptedException {
+    requireIntegers();
+    requireQuantifiers();
+
+    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.Z3, Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula z = imgr.makeVariable("z");
+
+    // Formula: forall z, (z = x => z > y)
+    BooleanFormula query =
+        qmgr.forall(z, bmgr.implication(imgr.equal(z, x), imgr.greaterThan(z, y)));
+
+    Exception exception = assertThrows(Exception.class, () -> qmgr.eliminateQuantifiers(query));
+
+    assertThat((exception instanceof IllegalArgumentException)).isTrue();
+  }
+
+  @Test
+  public void testEliminationWithUltimateEliminatorWithArray()
       throws SolverException, InterruptedException, IOException {
     requireIntegers();
     requireArrays();
@@ -88,7 +164,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithUltimateEliminatormkWithoutQuantifier()
+  public void testEliminationWithUltimateEliminatormkWithoutQuantifier()
       throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
@@ -118,8 +194,37 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testSolverIndependentQuantifierEliminationWithoutArraysBefore()
-      throws SolverException, InterruptedException {
+  public void testEliminationWithUltimateEliminatormkWithoutQuantifierThrowsException()
+      throws SolverException, InterruptedException, IOException {
+    requireIntegers();
+    requireArrays();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not abort with given conditions", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.MATHSAT5, Solvers.Z3, Solvers.PRINCESS);
+
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    ArrayFormula<IntegerFormula, IntegerFormula> var =
+        amgr.makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
+
+    BooleanFormula query = qmgr.forall(var, imgr.equal(amgr.select(var, k), amgr.select(var, i)));
+
+    assertThat(query).isNotNull();
+  }
+
+  @Test
+  public void testEliminationWithoutArraysBefore() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -189,9 +294,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.MATHSAT5, Solvers.YICES2);
 
-    qmgr.setOptions(
-        ProverOptions.QUANTIFIER_ELIMINATION_NO_FALLBACK,
-        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
+    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");

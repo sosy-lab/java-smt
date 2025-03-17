@@ -44,6 +44,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     super(pCreator);
     ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
     logger = pLogger;
+    options = new ProverOptions[0];
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -138,7 +139,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
-      } catch (IOException e) {
+      } catch (IOException | UnsupportedOperationException e) {
         return wrap(
             mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
       }
