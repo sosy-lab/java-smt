@@ -32,12 +32,12 @@ For Z3:
 - mklink libz3java.dll ..\\..\\java\\runtime-z3\\x64\\libz3java.dll
 
 For MathSAT5:
-- mklink mpir.dll ..\\..\\java\\runtime-mathsat\\mpir.dll
-- mklink mathsat.dll ..\\..\\java\\runtime-mathsat\\mathsat.dll
-- mklink mathsat5j.dll ..\\..\\java\\runtime-mathsat\\mathsat5j.dll
+- mklink mpir.dll ..\\..\\java\\runtime-mathsat\\\x64\mpir.dll
+- mklink mathsat.dll ..\\..\\java\\runtime-mathsat\\x64\\mathsat.dll
+- mklink mathsat5j.dll ..\\..\\java\\runtime-mathsat\\x64\\mathsat5j.dll
 
 For Bitwuzla:
-- mklink libbitwuzlaj.dll ..\\..\\java\\runtime-bitwuzla\\libbitwuzlaj.dll
+- mklink libbitwuzlaj.dll ..\\..\\java\\runtime-bitwuzla\\x64\\libbitwuzlaj.dll
 
 ### With a direct copy of the library:
 
@@ -50,12 +50,12 @@ For Z3:
 - copy ..\\..\\java\\runtime-z3\\x64\\libz3java.dll libz3java.dll
 
 For MathSAT5:
-- copy ..\\..\\java\\runtime-mathsat\\mpir.dll mpir.dll
-- copy ..\\..\\java\\runtime-mathsat\\mathsat.dll mathsat.dll
-- copy ..\\..\\java\\runtime-mathsat\\mathsat5j.dll mathsat5j.dll
+- copy ..\\..\\java\\runtime-mathsat\\x64\\mpir.dll mpir.dll
+- copy ..\\..\\java\\runtime-mathsat\\x64\\mathsat.dll mathsat.dll
+- copy ..\\..\\java\\runtime-mathsat\\x64\\mathsat5j.dll mathsat5j.dll
 
 For Bitwuzla:
-- copy ..\\..\\java\\runtime-bitwuzla\\libbitwuzlaj.dll libbitwuzlaj.dll
+- copy ..\\..\\java\\runtime-bitwuzla\\x64\\libbitwuzlaj.dll libbitwuzlaj.dll
 
 Or simply use a wildcard:
 - copy ..\\..\\java\\runtime-*\\*dll .\\
