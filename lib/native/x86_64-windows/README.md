@@ -25,7 +25,7 @@ which are either to create symlinks or to copy the library files.
 Symbolic links allow for an automatic update as soon as a dependency is changed via Ant/Ivy.
 Windows does not allow user-space symlinks, but requires administrator rights to create them.
 Thus, we cannot check them into the repository. Please execute the following as administrator
-in the current directory `lib/native/x86_64-windows`:
+in the current directory `lib\native\x86_64-windows`:
 
 For Z3:
 - `mklink libz3.dll ..\..\java\runtime-z3\x64\libz3.dll`
@@ -42,7 +42,7 @@ For Bitwuzla:
 ### With a direct copy of the library:
 
 An alternative simple solution (without the need of administrator rights) is to copy over
-those files from the `lib\java\runtime-*\` directory into the current directory `lib/native/x86_64-windows`:
+those files from the `lib\java\runtime-*\` directory into the current directory `lib\native\x86_64-windows`:
 Please note that this copy process needs to be repeated after each update of a solver library via Ant/Ivy dependencies.
 
 For Z3:
