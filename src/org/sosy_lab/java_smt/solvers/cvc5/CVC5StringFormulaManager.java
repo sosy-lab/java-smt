@@ -140,17 +140,15 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
 
   @Override
   protected Term range(Term start, Term end) {
-    // Precondition: Both bounds must be single character Strings and the lower bound must be
-    // smaller or equal to the upper bound. Otherwise, return the empty language.
+    // Precondition: Both bounds must be single character Strings
+    // CVC5 already checks that the lower bound is smaller than the upper bound and returns the
+    // empty language otherwise.
     Term one = solver.mkInteger(1);
     Term cond =
         solver.mkTerm(
             Kind.AND,
-            lessOrEquals(start, end),
-            solver.mkTerm(
-                Kind.AND,
-                solver.mkTerm(Kind.EQUAL, length(start), one),
-                solver.mkTerm(Kind.EQUAL, length(end), one)));
+            solver.mkTerm(Kind.EQUAL, length(start), one),
+            solver.mkTerm(Kind.EQUAL, length(end), one));
     return solver.mkTerm(Kind.ITE, cond, solver.mkTerm(Kind.REGEXP_RANGE, start, end), noneImpl());
   }
 

@@ -171,15 +171,13 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm range(IExpression start, IExpression end) {
-    // Precondition: Both bounds must be single character Strings and the lower bound must be
-    // smaller or equal to the upper bound. Otherwise, return the empty language.
+    // Precondition: Both bounds must be single character Strings
+    // Princess already checks that the lower bound is smaller than the upper bound and returns the
+    // empty language otherwise.
     ITerm one = new IIntLit(IdealInt.apply(1));
     IFormula cond =
         new IBinFormula(
-            IBinJunctor.And(),
-            lessOrEquals(start, end),
-            new IBinFormula(
-                IBinJunctor.And(), length(start).$eq$eq$eq(one), length(end).$eq$eq$eq(one)));
+            IBinJunctor.And(), length(start).$eq$eq$eq(one), length(end).$eq$eq$eq(one));
     return new ITermITE(
         cond,
         new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq(start, end)),
