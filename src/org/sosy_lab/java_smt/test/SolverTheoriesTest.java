@@ -257,23 +257,17 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assertDivision(a, num3, numNeg4, aEqNeg10);
     assertDivision(a, numNeg3, num4, aEqNeg10);
 
-    switch (solverToUse()) {
-      case MATHSAT5: // modulo not supported
-        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
-        break;
-      default:
-        assertModulo(num10, num5, num0);
-        assertModulo(num10, num3, num1, aEq10);
-        assertModulo(numNeg10, num5, num0);
-        assertModulo(numNeg10, num3, num2);
-        assertModulo(numNeg10, numNeg3, num2);
+    assertModulo(num10, num5, num0);
+    assertModulo(num10, num3, num1, aEq10);
+    assertModulo(numNeg10, num5, num0);
+    assertModulo(numNeg10, num3, num2);
+    assertModulo(numNeg10, numNeg3, num2);
 
-        assertModulo(a, num5, num0, aEq10);
-        assertModulo(a, num3, num1, aEq10);
-        assertModulo(a, num5, num0, aEqNeg10);
-        assertModulo(a, num3, num2, aEqNeg10);
-        assertModulo(a, numNeg3, num2, aEqNeg10);
-    }
+    assertModulo(a, num5, num0, aEq10);
+    assertModulo(a, num3, num1, aEq10);
+    assertModulo(a, num5, num0, aEqNeg10);
+    assertModulo(a, num3, num2, aEqNeg10);
+    assertModulo(a, numNeg3, num2, aEqNeg10);
   }
 
   @Test
@@ -319,8 +313,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
         break;
-      case OPENSMT: // INFO
-      case MATHSAT5: // modulo not supported
+      case OPENSMT: // INFO: OpenSMT does not allow division by zero
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
       default:
@@ -364,11 +357,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case YICES2:
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(a, b, num0));
-        break;
-      case MATHSAT5: // modulo not supported
-        assertDivision(a, b, num5, aEq10, bEq2);
-        assertDivision(a, b, num5, aEqNeg10, bEqNeg2);
-        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
         break;
       default:
         assertDivision(a, b, num5, aEq10, bEq2);
