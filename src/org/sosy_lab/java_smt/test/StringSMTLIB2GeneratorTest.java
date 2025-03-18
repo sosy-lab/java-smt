@@ -177,7 +177,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const str String)\n" + "(assert (str.in_re str (re.from_str \".*test.*\")))\n";
+        "(declare-const str String)\n" + "(assert (str.in_re str (str.to_re \".*test.*\")))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
