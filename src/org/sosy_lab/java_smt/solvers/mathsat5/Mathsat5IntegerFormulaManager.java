@@ -70,6 +70,11 @@ class Mathsat5IntegerFormulaManager
   }
 
   @Override
+  protected Long modulo(Long pNumber1, Long pNumber2) {
+    return subtract(pNumber1, multiply(divide(pNumber1, pNumber2), pNumber2));
+  }
+
+  @Override
   protected Long modularCongruence(Long pNumber1, Long pNumber2, BigInteger pModulo) {
     return modularCongruence0(pNumber1, pNumber2, pModulo.toString());
   }
