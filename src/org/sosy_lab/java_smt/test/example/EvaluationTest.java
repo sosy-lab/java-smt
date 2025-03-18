@@ -41,7 +41,7 @@ public class EvaluationTest extends SolverBasedTest0 {
 
   @Before
   public void setUp() {
-    assume().withMessage("This test is only for local usage.").that(true).isFalse();
+    // assume().withMessage("This test is only for local usage.").that(true).isFalse();
   }
 
   public void runTest(String smtInput)
@@ -58,6 +58,24 @@ public class EvaluationTest extends SolverBasedTest0 {
     System.out.println(
         "Step 3: GIVE REGENERATED OUTPUT TO Z3\n" + reparsedAnswer + "-----------------------\n");
     assertThat(directZ3Output.startsWith("sat")).isEqualTo(reparsedAnswer.startsWith("sat"));
+  }
+
+  public void parseAndReparse(BooleanFormula constraint)
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    SolverContext solverContext = SolverContextFactory.createSolverContext(Solvers.SOLVERLESS);
+    ProverEnvironment proverEnv = solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    IntegerFormulaManager ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
+    IntegerFormula a = ifm.makeVariable("a");
+    IntegerFormula b = ifm.makeVariable("b");
+    IntegerFormula sum = ifm.add(a, b);
+
+    proverEnv.addConstraint(constraint);
+
+    assertThat(proverEnv.isUnsat()).isFalse();
+  }
+
+  public SolverContext getSolverLessContext() throws InvalidConfigurationException {
+    return SolverContextFactory.createSolverContext(Solvers.SOLVERLESS);
   }
 
   public String tellSolver(String smtInput) throws IOException, InterruptedException {
@@ -130,6 +148,7 @@ public class EvaluationTest extends SolverBasedTest0 {
             + "(declare-const x Int)\n"
             + "(declare-const y Int)\n"
             + "(declare-const z Int)\n"
+            + "(push 1)"
             + "(assert (= x 10))\n"
             + "(assert (= y 20))\n"
             + "(assert (= (+ x y) z))\n";
@@ -181,23 +200,16 @@ public class EvaluationTest extends SolverBasedTest0 {
     runTest(x);
   }
 
-  private ProverEnvironment proverEnv;
-  private SolverContext solverContext;
-  private IntegerFormulaManager ifm;
-
   @Test
   public void testAddition()
       throws SolverException, InterruptedException, InvalidConfigurationException {
-    solverContext = SolverContextFactory.createSolverContext(Solvers.SOLVERLESS);
-    proverEnv = solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-    ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
+    SolverContext solverContext = getSolverLessContext();
+    IntegerFormulaManager ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
     IntegerFormula a = ifm.makeVariable("a");
     IntegerFormula b = ifm.makeVariable("b");
     IntegerFormula sum = ifm.add(a, b);
 
     BooleanFormula constraint = ifm.equal(sum, ifm.makeNumber(5));
-    proverEnv.addConstraint(constraint);
-
-    assertThat(proverEnv.isUnsat()).isFalse();
+    parseAndReparse(constraint);
   }
 }

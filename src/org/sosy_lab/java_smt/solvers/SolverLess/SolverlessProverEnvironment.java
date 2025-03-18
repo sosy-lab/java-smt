@@ -53,12 +53,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   @Override
   public Void addConstraint(BooleanFormula constraint) {
     Generator.assembleConstraint(constraint); // formula is generated then reparsed and given to z3
-    String smtlib2String =
-        String.valueOf(Generator.getLines())
-            .replaceAll("(?m)^\\(push \\d+\\)\\s*", "") // removes push and pop lines
-            .replaceAll("(?m)^\\(pop \\d+\\)\\s*", "") // as it isn't supported by the parser
-            .replaceAll("\\s+", " ")
-            .trim();
+    String smtlib2String = String.valueOf(Generator.getLines());
     try {
       prover.addConstraint(
           differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String));
