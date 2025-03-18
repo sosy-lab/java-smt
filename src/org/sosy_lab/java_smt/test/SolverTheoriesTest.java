@@ -741,7 +741,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solver) {
       case MATHSAT5:
         // Mathsat5 has a different internal representation of the formula
-        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(18)_T(20)` b i)");
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(19)_T(21)` b i)");
         break;
       case BOOLECTOR:
         assume()
@@ -772,7 +772,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solver) {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_int` (`read_int_T(17)` multi i) i)");
+            .isEqualTo("(`read_int_int` (`read_int_T(18)` multi i) i)");
         break;
       case PRINCESS:
         assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
@@ -800,7 +800,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solver) {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
+            .isEqualTo("(`read_int_rat` (`read_int_T(18)` multi i) i)");
         break;
       case PRINCESS:
         assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
@@ -833,8 +833,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     switch (solver) {
       case MATHSAT5:
-        String readWrite = "(`read_int_T(18)` (`read_int_T(19)` multi i) i)";
-        assertThat(valueInMulti.toString()).isEqualTo(readWrite);
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_T(19)` (`read_int_T(20)` multi " + "i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
