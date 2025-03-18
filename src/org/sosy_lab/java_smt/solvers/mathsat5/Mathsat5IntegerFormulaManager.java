@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_divide;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_floor;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
@@ -17,6 +18,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_times;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
@@ -26,9 +28,15 @@ class Mathsat5IntegerFormulaManager
     extends Mathsat5NumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
+  // Reserved UF symbol for modulo(a,0)
+  private final long modZeroUF;
+
   Mathsat5IntegerFormulaManager(
       Mathsat5FormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
+    modZeroUF =
+        pCreator.declareUFImpl(
+            "_%0", pCreator.getIntegerType(), ImmutableList.of(pCreator.getIntegerType()));
   }
 
   @Override
@@ -71,7 +79,17 @@ class Mathsat5IntegerFormulaManager
 
   @Override
   protected Long modulo(Long pNumber1, Long pNumber2) {
-    return subtract(pNumber1, multiply(divide(pNumber1, pNumber2), pNumber2));
+    // The modulo can be calculated by the formula:
+    //   remainder = dividend - floor(dividend/divisor)*divisor
+    // However, this will fail if the divisor is zero as SMTLIB then allows the solver to return
+    // any value for the remainder. We solve this by first checking the divisor and returning an
+    // UF symbol "modZeroUF(dividend)" if it is zero. Otherwise, the formula is used to calculate
+    // the remainder.
+    return msat_make_term_ite(
+        mathsatEnv,
+        msat_make_equal(mathsatEnv, pNumber2, msat_make_int_number(mathsatEnv, 0)),
+        getFormulaCreator().callFunctionImpl(modZeroUF, ImmutableList.of(pNumber1)),
+        subtract(pNumber1, multiply(divide(pNumber1, pNumber2), pNumber2)));
   }
 
   @Override
