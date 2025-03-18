@@ -145,7 +145,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
         break;
     }
     if (Generator.isLoggingEnabled()) {
-      if(parts.size() != 2) {
+      if (parts.size() != 2) {
         throw new GeneratorException("SMTLIB2 only allows concat with exactly 2 operands!");
       }
       StringGenerator.logConcat(result, parts.get(0), parts.get(1));

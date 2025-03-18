@@ -521,7 +521,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (operand.startsWith("#x")) {
       variables.put(operand, new ParserFormula(parseHexVector(operand)));
       return variables.get(operand).javaSmt;
-    } else if (operand.equals("re.none")){
+    } else if (operand.equals("re.none")) {
       variables.put(operand, new ParserFormula(Objects.requireNonNull(smgr).none()));
       return variables.get(operand).javaSmt;
     } else if (operand.equals("re.all")) {
@@ -530,8 +530,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (operand.equals("re.allchar")) {
       variables.put(operand, new ParserFormula(Objects.requireNonNull(smgr).allChar()));
       return variables.get(operand).javaSmt;
-    }
-    else {
+    } else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
   }
@@ -1629,14 +1628,14 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         if (operands.size() != 2) {
           throw new ParserException("str.< requires exactly 2 operands.");
         }
-        return Objects.requireNonNull(smgr).lessThan((StringFormula) operands.get(0),
-            (StringFormula) operands.get(1));
+        return Objects.requireNonNull(smgr)
+            .lessThan((StringFormula) operands.get(0), (StringFormula) operands.get(1));
       case "str.<=":
         if (operands.size() != 2) {
           throw new ParserException("str.<= requires exactly 2 operands.");
         }
-        return Objects.requireNonNull(smgr).lessOrEquals((StringFormula) operands.get(0),
-            (StringFormula) operands.get(1));
+        return Objects.requireNonNull(smgr)
+            .lessOrEquals((StringFormula) operands.get(0), (StringFormula) operands.get(1));
       case "str.substr":
         if (operands.size() != 3) {
           throw new ParserException("str.substr requires exactly 3 operands.");
@@ -1725,8 +1724,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             .in((StringFormula) operands.get(0), (RegexFormula) operands.get(1));
       case "str.replace_re":
       case "str.replace_re_all":
-        throw new ParserException("str.replace_re_all and str.replace_re"
-            + " are not supported in JavaSMT");
+        throw new ParserException(
+            "str.replace_re_all and str.replace_re" + " are not supported in JavaSMT");
       case "re.none":
         if (!operands.isEmpty()) {
           throw new ParserException("re.none requires no operands");
@@ -2020,8 +2019,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       throw new ParserException("Illegal Regular Expression conversion: " + ctx1.getText());
     }
   }
-
-
 
   @Override
   public Object visitCmd_declareConst(Cmd_declareConstContext ctx) {

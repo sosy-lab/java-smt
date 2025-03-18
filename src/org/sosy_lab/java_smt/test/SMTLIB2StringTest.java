@@ -199,22 +199,23 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     assertThat(actualResult).isEqualTo(suffixResult);
   }
+
   @Test
   public void testStringRegexMatch()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireStrings();
-    String x =
-        "(declare-const a String)\n"
-            + "(assert (and (str.<= \"a\" a) (str.<= a \"z\")))\n";
+    String x = "(declare-const a String)\n" + "(assert (and (str.<= \"a\" a) (str.<= a \"z\")))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
     StringFormula a = smgr.makeVariable("a");
     BooleanFormula regexMatch =
-        bmgr.and(smgr.lessOrEquals(smgr.makeString("a"), a), smgr.lessOrEquals(a, smgr.makeString("z")));
+        bmgr.and(
+            smgr.lessOrEquals(smgr.makeString("a"), a), smgr.lessOrEquals(a, smgr.makeString("z")));
 
     assertThat(actualResult).isEqualTo(regexMatch);
   }
+
   @Test
   public void testRegexInRe()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
@@ -344,7 +345,8 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testRegexComplement()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireStrings();
-    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.comp (str.to_re \"a\"))))\n";
+    String x =
+        "(declare-const a String)\n" + "(assert (str.in_re a (re.comp (str.to_re \"a\"))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     StringFormula a = smgr.makeVariable("a");
@@ -405,9 +407,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testRegexRange()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireStrings();
-    String x =
-        "(declare-const a String)\n"
-            + "(assert (str.in_re a (re.range \"a\" \"z\")))\n";
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.range \"a\" \"z\")))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
@@ -417,5 +417,4 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     assertThat(actualResult).isEqualTo(regexMatch);
   }
-
 }

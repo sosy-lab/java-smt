@@ -161,7 +161,8 @@ public class StringGenerator {
     logOperation(result, ImmutableList.of(), "(re.allchar)", Keyword.SKIP);
   }
 
-  protected static void logRegexConcat(RegexFormula result, RegexFormula part1, RegexFormula part2) {
+  protected static void logRegexConcat(
+      RegexFormula result, RegexFormula part1, RegexFormula part2) {
     logBinaryOp(result, "re.++", part1, part2);
   }
 
