@@ -16,6 +16,7 @@ import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
@@ -198,4 +199,223 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     assertThat(actualResult).isEqualTo(suffixResult);
   }
+  @Test
+  public void testStringRegexMatch()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (and (str.<= \"a\" a) (str.<= a \"z\")))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    BooleanFormula regexMatch =
+        bmgr.and(smgr.lessOrEquals(smgr.makeString("a"), a), smgr.lessOrEquals(a, smgr.makeString("z")));
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+  @Test
+  public void testRegexInRe()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.++ (str.to_re \"a\") (str.to_re \"b\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexNone()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a re.none))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    BooleanFormula regexMatch = smgr.in(a, smgr.none());
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexAll()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a re.all))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    BooleanFormula regexMatch = smgr.in(a, smgr.all());
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexConcat()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.++ (str.to_re \"a\") (str.to_re \"b\")))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexUnion()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.union (str.to_re \"a\") (str.to_re \"b\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.union(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexClosure()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.* (str.to_re \"a\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.closure(smgr.makeRegex("a"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexAllChar()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a re.allchar))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    BooleanFormula regexMatch = smgr.in(a, smgr.allChar());
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexIntersection()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.inter (str.to_re \"a\") (str.to_re \"b\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexComplement()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.comp (str.to_re \"a\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.complement(smgr.makeRegex("a"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexDifference()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.diff (str.to_re \"a\") (str.to_re \"b\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.difference(smgr.makeRegex("a"), smgr.makeRegex("b"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexCross()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.+ (str.to_re \"a\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.cross(smgr.makeRegex("a"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexOptional()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.opt (str.to_re \"a\"))))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.optional(smgr.makeRegex("a"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testRegexRange()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const a String)\n"
+            + "(assert (str.in_re a (re.range \"a\" \"z\")))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+
+    StringFormula a = smgr.makeVariable("a");
+    RegexFormula regex = smgr.range(smgr.makeString("a"), smgr.makeString("z"));
+    BooleanFormula regexMatch = smgr.in(a, regex);
+
+    assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
 }

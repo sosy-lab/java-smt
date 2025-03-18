@@ -41,15 +41,9 @@ public class StringGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.STRING));
   }
 
-  protected static void logConcat(Object result, List<StringFormula> parts) {
-    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, parts));
-    List<Object> inputParams = new ArrayList<>(parts);
-    String format = "(str.++";
-    for (int i = 0; i < parts.size(); i++) {
-      format += " %s";
-    }
-    format += ")";
-    logOperation(result, inputParams, format, Keyword.SKIP);
+  protected static void logConcat(Object result, StringFormula part1, StringFormula part2) {
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, part1, part2));
+    logBinaryOp(result, "str.++", part1, part2);
   }
 
   protected static void logEqual(BooleanFormula result, StringFormula str1, StringFormula str2) {
@@ -150,8 +144,9 @@ public class StringGenerator {
   }
 
   protected static void logMakeRegex(RegexFormula result, String value) {
-    List<Object> inputParams = ImmutableList.of(value);
-    logOperation(result, inputParams, "(re.from_str \"%s\")", Keyword.SKIP);
+    String unquotedValue = value.replace("\"", "");
+    List<Object> inputParams = ImmutableList.of(unquotedValue);
+    logOperation(result, inputParams, "(str.to_re \"%s\")", Keyword.SKIP);
   }
 
   protected static void logRegexAll(RegexFormula result) {
@@ -166,8 +161,8 @@ public class StringGenerator {
     logOperation(result, ImmutableList.of(), "(re.allchar)", Keyword.SKIP);
   }
 
-  protected static void logRegexConcat(RegexFormula result, List<RegexFormula> parts) {
-    logOperation(result, new ArrayList<>(parts), "(re.++ %s %s)", Keyword.SKIP);
+  protected static void logRegexConcat(RegexFormula result, RegexFormula part1, RegexFormula part2) {
+    logBinaryOp(result, "re.++", part1, part2);
   }
 
   protected static void logRegexOptional(RegexFormula result, RegexFormula regex) {
@@ -218,9 +213,18 @@ public class StringGenerator {
               placeholders, params.size(), format));
     }
 
+    List<Object> sanitizedParams = new ArrayList<>();
+    for (Object param : params) {
+      if (param instanceof String) {
+        sanitizedParams.add(((String) param).replace("\"", ""));
+      } else {
+        sanitizedParams.add(param);
+      }
+    }
+
     Function<List<Object>, String> functionToString =
         inputs -> String.format(format, inputs.toArray());
     Generator.getExecutedAggregator()
-        .add(new FunctionEnvironment(result, params, functionToString, keyword));
+        .add(new FunctionEnvironment(result, sanitizedParams, functionToString, keyword));
   }
 }

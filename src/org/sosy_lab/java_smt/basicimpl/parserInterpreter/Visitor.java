@@ -73,6 +73,7 @@ import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_fp_
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_letContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_qual_idContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_spec_constContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Term_special_regexContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.To_fp_exprContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Var_bindingContext;
 import scala.Tuple2;
@@ -520,7 +521,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else if (operand.startsWith("#x")) {
       variables.put(operand, new ParserFormula(parseHexVector(operand)));
       return variables.get(operand).javaSmt;
-    } else {
+    } else if (operand.equals("re.none")){
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(smgr).none()));
+      return variables.get(operand).javaSmt;
+    } else if (operand.equals("re.all")) {
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(smgr).all()));
+      return variables.get(operand).javaSmt;
+    } else if (operand.equals("re.allchar")) {
+      variables.put(operand, new ParserFormula(Objects.requireNonNull(smgr).allChar()));
+      return variables.get(operand).javaSmt;
+    }
+    else {
       throw new ParserException("Operand " + operand + " is unknown.");
     }
   }
@@ -1615,9 +1626,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             .charAt((StringFormula) operands.get(0), (IntegerFormula) operands.get(1));
 
       case "str.<":
-        throw new UnsupportedOperationException("str.< is not supported in JavaSMT");
+        if (operands.size() != 2) {
+          throw new ParserException("str.< requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).lessThan((StringFormula) operands.get(0),
+            (StringFormula) operands.get(1));
       case "str.<=":
-        throw new UnsupportedOperationException("str.<= is not supported in JavaSMT");
+        if (operands.size() != 2) {
+          throw new ParserException("str.<= requires exactly 2 operands.");
+        }
+        return Objects.requireNonNull(smgr).lessOrEquals((StringFormula) operands.get(0),
+            (StringFormula) operands.get(1));
       case "str.substr":
         if (operands.size() != 3) {
           throw new ParserException("str.substr requires exactly 3 operands.");
@@ -1690,7 +1709,11 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         if (operands.size() != 1) {
           throw new ParserException("str.to_re requires exactly 1 operand.");
         }
-        return Objects.requireNonNull(smgr).makeRegex(operands.get(0).toString());
+        String value = operands.get(0).toString();
+        value = value.replace("\"", "");
+        return Objects.requireNonNull(smgr).makeRegex(value);
+      case "str.is_digit":
+        throw new ParserException("str.is_digit is not supported in JavaSMT");
       case "str.in_re":
         if (operands.size() != 2) {
           throw new ParserException("str.in_re requires exactly 2 operands.");
@@ -1700,6 +1723,10 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         return Objects.requireNonNull(smgr)
             .in((StringFormula) operands.get(0), (RegexFormula) operands.get(1));
+      case "str.replace_re":
+      case "str.replace_re_all":
+        throw new ParserException("str.replace_re_all and str.replace_re"
+            + " are not supported in JavaSMT");
       case "re.none":
         if (!operands.isEmpty()) {
           throw new ParserException("re.none requires no operands");
@@ -1716,7 +1743,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         return Objects.requireNonNull(smgr)
             .concat(operands.stream().map(o -> (RegexFormula) o).toArray(RegexFormula[]::new));
-
       case "re.union":
         if (operands.size() != 2) {
           throw new ParserException("re.union requires exactly two operand.");
@@ -1766,10 +1792,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         return Objects.requireNonNull(smgr)
             .range((StringFormula) operands.get(0), (StringFormula) operands.get(1));
-      case "re.^":
-        // TODO THINK OF A WAY OF IMPLEMENTING AS THE SYNTAX HAS EXTRA BRACKETS
-      case "re.loop":
-        throw new ParserException("re.^ and re.loop is not implemented yet.");
       case "UF":
         // UF
         try {
@@ -1975,6 +1997,31 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       throw new ParserException("Illegal Floating Point conversion: " + ctx.getText());
     }
   }
+
+  @Override
+  public Object visitTerm_special_regex(Term_special_regexContext ctx1) {
+    String regexExpr = ctx1.getText();
+
+    if (regexExpr.startsWith("((_ re.loop")) {
+      throw new ParserException("Loop is not supported in JavaSMT.");
+    }
+
+    Pattern powerPattern = Pattern.compile("\\(_ re.\\^ (\\d+)\\)");
+    Matcher powerMatcher = powerPattern.matcher(regexExpr);
+
+    if (powerMatcher.find()) {
+      int times = Integer.parseInt(powerMatcher.group(1));
+      RegexFormula e = smgr.makeRegex(ctx1.special_regex_operations().term().getText());
+      ParserFormula result = new ParserFormula(smgr.times(e, times));
+
+      variables.put(regexExpr, result);
+      return variables.get(regexExpr).javaSmt;
+    } else {
+      throw new ParserException("Illegal Regular Expression conversion: " + ctx1.getText());
+    }
+  }
+
+
 
   @Override
   public Object visitCmd_declareConst(Cmd_declareConstContext ctx) {

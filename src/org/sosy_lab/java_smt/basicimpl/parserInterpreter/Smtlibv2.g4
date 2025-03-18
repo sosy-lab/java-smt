@@ -66,24 +66,33 @@ QuotedSymbol:
 
 
 FLOATING_POINT_SORT
-    : '(_ FloatingPoint' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    : '(_ FloatingPoint' SpaceChar Numeral SpaceChar Numeral ')'
     | ShortFloats
     ;
 
 FLOATING_POINT_NUMBER
-    : '(fp' FloatSpaceChar (Binary | HexDecimal)
-     FloatSpaceChar (Binary | HexDecimal)
-     FloatSpaceChar (Binary | HexDecimal) ')'
-    | '(_ ' [+-]'oo' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
-    | '(_ ' [+-]'zero' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
-    | '(_ NaN' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    : '(fp' SpaceChar (Binary | HexDecimal)
+     SpaceChar (Binary | HexDecimal)
+     SpaceChar (Binary | HexDecimal) ')'
+    | '(_ ' [+-]'oo' SpaceChar Numeral SpaceChar Numeral ')'
+    | '(_ ' [+-]'zero' SpaceChar Numeral SpaceChar Numeral ')'
+    | '(_ NaN' SpaceChar Numeral SpaceChar Numeral ')'
+    ;
+REGEXVALUES
+    : 're.none'
+    | 're.allchar'
+    | 're.all'
     ;
 
 TO_FP_EXPR
-    : '((_ to_fp' FloatSpaceChar Numeral FloatSpaceChar Numeral ')'
+    : '((_ to_fp' SpaceChar Numeral SpaceChar Numeral ')'
     ;
-
-
+RE_TIMES_EXPR
+    : '((_ re.^' SpaceChar Numeral ')'
+    ;
+RE_LOOP_EXPR
+    : '((_ re.loop' SpaceChar Numeral SpaceChar Numeral ')'
+    ;
 // Predefined Symbols
 
 PS_Not
@@ -378,7 +387,7 @@ fragment WhiteSpaceChar
 fragment Space
     : '\u0020'
     ;
-fragment FloatSpaceChar
+fragment SpaceChar
     : [ \t\r\n]
     | WhiteSpaceChar
     ;
@@ -650,6 +659,10 @@ to_fp_expr
     | TO_FP_EXPR term term ')'
     ;
 
+special_regex_operations
+    : RE_LOOP_EXPR term ')'
+    | RE_TIMES_EXPR term
+    ;
 
 keyword
     : predefKeyword                                                   #pre_key
@@ -669,7 +682,8 @@ spec_constant
     | hexadecimal                                                     #spec_constant_hex
     | binary                                                          #spec_constant_bin
     | string                                                          #spec_constant_string
-    | FLOATING_POINT_NUMBER #spec_constant_fp
+    | FLOATING_POINT_NUMBER                                           #spec_constant_fp
+    | REGEXVALUES                                                     #spec_constant_regex
     ;
 
 
@@ -742,6 +756,7 @@ term
     : spec_constant                                                   #term_spec_const
     | qual_identifer                                                  #term_qual_id
     | to_fp_expr                                                      #term_fp_cast
+    | special_regex_operations                                        #term_special_regex
     | ParOpen qual_identifer term+ ParClose                           #multiterm
     | ParOpen GRW_Let ParOpen var_binding+ ParClose term ParClose     #term_let
     | ParOpen GRW_Forall ParOpen sorted_var+ ParClose term ParClose   #term_forall
