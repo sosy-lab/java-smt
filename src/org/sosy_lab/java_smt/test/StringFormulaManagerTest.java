@@ -1425,10 +1425,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
     requireVariableStringLiterals();
 
-    assume()
-        .withMessage("Regression from Z3 4.13.4 to 4.14.0")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+    // TODO: Z3 had a regression from Z3 4.13.4 to 4.14.0 in the first implication, running
+    //  indefinitely. We fixed this by reordering the arguments of the AND expression in the left
+    //  hand side of the implication. Check if this is persisting after 4.14.0 and possibly report.
 
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
@@ -1440,25 +1439,25 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // comes after the prefix is replaced
     assertThatFormula(
             bmgr.and(
-                smgr.prefix(prefix, original),
-                imgr.equal(
-                    smgr.length(prefix),
-                    smgr.indexOf(
-                        original,
-                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
-                        imgr.makeNumber(0))),
                 imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
                 imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
                 imgr.greaterThan(
                     smgr.length(
                         smgr.substring(original, smgr.length(prefix), smgr.length(original))),
                     imgr.makeNumber(0)),
+                imgr.equal(
+                    smgr.length(prefix),
+                    smgr.indexOf(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        imgr.makeNumber(0))),
                 smgr.equal(
                     replaced,
                     smgr.replace(
                         original,
                         smgr.substring(original, smgr.length(prefix), smgr.length(original)),
-                        replacement))))
+                        replacement)),
+                smgr.prefix(prefix, original)))
         .implies(
             smgr.equal(
                 replacement, smgr.substring(replaced, smgr.length(prefix), smgr.length(replaced))));
