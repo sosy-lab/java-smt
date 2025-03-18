@@ -4,12 +4,11 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import static com.google.common.base.Preconditions.checkState;
-
-import java.util.ArrayList;
+import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -25,11 +24,11 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
 public class SolverlessProverEnvironment implements ProverEnvironment {
   SolverContext differentSolverContext;
-  private final List<BooleanFormula> constraints = new ArrayList<>();
+  private final Queue<Runnable> operationQueue = new ArrayDeque<>();
+  private int fakeSize = 0;
   private final ProverEnvironment prover;
 
   public SolverlessProverEnvironment(SolverLessContext solverContext, Set<ProverOptions> pOptions) {
@@ -57,53 +56,71 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
 
   @Override
   public Void addConstraint(BooleanFormula constraint) {
-    constraints.add(constraint);
+    Generator.assembleConstraint(constraint); // formula is generated then reparsed and given to z3
+    String smtlib2String =
+        String.valueOf(Generator.getLines())
+            .replaceAll("(?m)^\\(push \\d+\\)\\s*", "") // removes push and pop lines
+            .replaceAll("(?m)^\\(pop \\d+\\)\\s*", "") // as it isn't supported by the parser
+            .replaceAll("\\s+", " ")
+            .trim();
+
+    operationQueue.add(
+        () -> {
+          try {
+            prover.addConstraint(
+                differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String));
+          } catch (Exception pE) {
+            throw new RuntimeException(pE);
+          }
+        });
     return null;
   }
 
   @Override
   public void push() throws InterruptedException {
-    prover.push();
-    if (!constraints.isEmpty()) {
-      constraints.add(constraints.get(constraints.size() - 1));
-    }
+    operationQueue.add(
+        () -> {
+          try {
+            prover.push();
+          } catch (Exception pE) {
+            throw new RuntimeException(pE);
+          }
+        });
+    fakeSize++;
   }
 
   @Override
   public void pop() {
-    checkState(!constraints.isEmpty(), "Cannot pop: Stack is already empty.");
-    prover.pop();
-    constraints.remove(constraints.size() - 1);
+    operationQueue.add(
+        () -> {
+          try {
+            prover.pop();
+          } catch (Exception pE) {
+            throw new RuntimeException(pE);
+          }
+        });
+    fakeSize = Math.max(0, fakeSize - 1);
   }
 
   @Override
   public int size() {
-    return prover.size();
+    return fakeSize;
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    for (BooleanFormula formula : constraints) {
-      Generator.assembleConstraint(formula);
+    while (!operationQueue.isEmpty()) {
+      operationQueue.poll().run();
     }
-    String smtlib2String = String.valueOf(Generator.getLines());
-    // GENERATED CONSTRAINTS
-    BooleanFormula parsedFormula;
-    try {
-      parsedFormula =
-          differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String);
-    } catch (Exception e) {
-      throw new ParserException("An Error occured while reparsing. ", e);
-    }
-    // REPARSED THEM
-    prover.addConstraint(parsedFormula);
     return prover.isUnsat();
-    // GIVEN THEM TO Z3
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
+    while (!operationQueue.isEmpty()) {
+      operationQueue.poll().run();
+    }
     return prover.isUnsatWithAssumptions(assumptions);
   }
 
@@ -114,12 +131,18 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
+    while (!operationQueue.isEmpty()) {
+      operationQueue.poll().run();
+    }
     return prover.getUnsatCore();
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    while (!operationQueue.isEmpty()) {
+      operationQueue.poll().run();
+    }
     return prover.unsatCoreOverAssumptions(assumptions);
   }
 
@@ -131,6 +154,9 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
+    while (!operationQueue.isEmpty()) {
+      operationQueue.poll().run();
+    }
     return prover.allSat(callback, important);
   }
 }
