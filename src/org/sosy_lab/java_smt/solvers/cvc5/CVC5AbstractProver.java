@@ -99,6 +99,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     // Set Strings option to enable all String features (such as lessOrEquals)
     pSolver.setOption("strings-exp", "true");
 
+    // Enable experimental array features
+    // Needed when array constants (= with default element) are used
+    pSolver.setOption("arrays-exp", "true");
+
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
     pSolver.setOption("full-saturate-quant", "true");
   }
