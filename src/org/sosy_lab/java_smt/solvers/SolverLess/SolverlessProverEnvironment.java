@@ -4,11 +4,9 @@
 
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Queue;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -27,8 +25,6 @@ import org.sosy_lab.java_smt.basicimpl.Generator;
 
 public class SolverlessProverEnvironment implements ProverEnvironment {
   SolverContext differentSolverContext;
-  private final Queue<Runnable> operationQueue = new ArrayDeque<>();
-  private int fakeSize = 0;
   private final ProverEnvironment prover;
 
   public SolverlessProverEnvironment(SolverLessContext solverContext, Set<ProverOptions> pOptions) {
@@ -63,64 +59,38 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
             .replaceAll("(?m)^\\(pop \\d+\\)\\s*", "") // as it isn't supported by the parser
             .replaceAll("\\s+", " ")
             .trim();
-
-    operationQueue.add(
-        () -> {
-          try {
-            prover.addConstraint(
-                differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String));
-          } catch (Exception pE) {
-            throw new RuntimeException(pE);
-          }
-        });
+    try {
+      prover.addConstraint(
+          differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String));
+    } catch (Exception e) {
+      throw new RuntimeException("Problem whilst parsing and reparsing", e);
+    }
     return null;
   }
 
   @Override
   public void push() throws InterruptedException {
-    operationQueue.add(
-        () -> {
-          try {
-            prover.push();
-          } catch (Exception pE) {
-            throw new RuntimeException(pE);
-          }
-        });
-    fakeSize++;
+    prover.push();
   }
 
   @Override
   public void pop() {
-    operationQueue.add(
-        () -> {
-          try {
-            prover.pop();
-          } catch (Exception pE) {
-            throw new RuntimeException(pE);
-          }
-        });
-    fakeSize = Math.max(0, fakeSize - 1);
+    prover.pop();
   }
 
   @Override
   public int size() {
-    return fakeSize;
+    return prover.size();
   }
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    while (!operationQueue.isEmpty()) {
-      operationQueue.poll().run();
-    }
     return prover.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    while (!operationQueue.isEmpty()) {
-      operationQueue.poll().run();
-    }
     return prover.isUnsatWithAssumptions(assumptions);
   }
 
@@ -131,32 +101,24 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    while (!operationQueue.isEmpty()) {
-      operationQueue.poll().run();
-    }
     return prover.getUnsatCore();
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    while (!operationQueue.isEmpty()) {
-      operationQueue.poll().run();
-    }
     return prover.unsatCoreOverAssumptions(assumptions);
   }
 
   @Override
   public void close() {
     prover.close();
+    differentSolverContext.close();
   }
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    while (!operationQueue.isEmpty()) {
-      operationQueue.poll().run();
-    }
     return prover.allSat(callback, important);
   }
 }
