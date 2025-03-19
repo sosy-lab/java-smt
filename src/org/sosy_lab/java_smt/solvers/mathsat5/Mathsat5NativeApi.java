@@ -1064,4 +1064,46 @@ final class Mathsat5NativeApi {
    * @param o msat_objective to push on the stack
    */
   public static native void msat_assert_objective(long e, long o);
+
+  // Returns a proof manager for the given environment.
+  // The manager must be destroyed by the user, with msat_destroy_proof_manager. In order to
+  // obtain a non-error result, the option "proof_generation" must be set to "true" in the
+  // configuration used for creating the environment.
+  //     env	The environment in which to operate.
+  // return:  A proof manager for the environment. MSAT_ERROR_PROOF_MANAGER can be used to check
+  //  whether an error occurred.
+
+  /**
+   * Returns a proof manager for the given environment. The manager must be destroyed by the user,
+   * with msat_destroy_proof_manager. In order to obtain a non-error result, the option
+   * "proof_generation" must be set to "true" in the configuration used for creating the
+   * environment.
+   *
+   * @param env The environment in which to operate.
+   * @return A proof manager for the environment. MSAT_ERROR_PROOF_MANAGER can be used to check
+   *     whether an error occurred.
+   */
+  public static native long msat_get_proof_manager(long env);
+
+  /** Get current proof from a manager. */
+  public static native long msat_get_proof(long proofMgr);
+
+  public static native int msat_proof_get_arity(long proof);
+
+  // Child is also a proof
+  public static native long msat_proof_get_child(long proof, int i);
+
+  public static native String msat_proof_get_name(long proof);
+
+  // Non-zero if term, 0 for no term
+  public static native boolean msat_proof_is_term(long proof);
+
+  // Term representation of the current proof
+  public static native long msat_proof_get_term(long proof);
+
+  // Can be used to check for the equality of proofs
+  public static native int msat_proof_id(long proof);
+
+  // Cleans up the proof manager and the associated proof
+  public static native void msat_destroy_proof_manager(long proofMgr);
 }
