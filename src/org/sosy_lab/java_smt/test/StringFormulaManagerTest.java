@@ -296,28 +296,19 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     // Check some corner cases:
     // StringFormulaManager.range("b", "a") should be empty
-    if (solver != Solvers.CVC4) {
-      // FIXME CVC4 expects that the lower bound is smaller or equal to the upper bound
-      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("b"), smgr.makeString("a"))))
-          .isUnsatisfiable();
-      assertThatFormula(smgr.in(var, smgr.range('b', 'a'))).isUnsatisfiable();
-    }
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("b"), smgr.makeString("a"))))
+        .isUnsatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('b', 'a'))).isUnsatisfiable();
 
     // Only 'singleton' Strings (= Strings with one character) are allowed:
     // StringFormulaManager.range("", "a") should be empty
-    if (solver != Solvers.CVC4) {
-      // FIXME CVC4 expects both bounds to be single character Strings
-      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString(""), smgr.makeString("a"))))
-          .isUnsatisfiable();
-    }
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString(""), smgr.makeString("a"))))
+        .isUnsatisfiable();
 
     // Try again with two characters:
     // StringFormulaManager.range("aa", "ab") should be empty
-    if (solver != Solvers.CVC4) {
-      // FIXME CVC4 expects both bounds to be single character Strings
-      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("aa"), smgr.makeString("ab"))))
-          .isUnsatisfiable();
-    }
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("aa"), smgr.makeString("ab"))))
+        .isUnsatisfiable();
 
     // Now use variables for the bounds:
     // StringFormulaManager.range(lower, "b") should be empty iff "b" < lower
