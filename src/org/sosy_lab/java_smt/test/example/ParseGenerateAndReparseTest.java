@@ -1,9 +1,11 @@
 package org.sosy_lab.java_smt.test.example;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 
 import java.io.IOException;
 import java.util.Locale;
+import org.junit.Test;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -17,7 +19,11 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class ParseGenerateAndReparseTest {
-
+  @Test
+  public void testGenerateAndReparse(){
+    assume().withMessage("Test file under construction")
+        .that(true).isFalse();
+  }
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
 
