@@ -30,21 +30,23 @@ final class PrincessFormulaManager
       PrincessUFManager pFunctionManager,
       PrincessBooleanFormulaManager pBooleanManager,
       PrincessIntegerFormulaManager pIntegerManager,
+      PrincessRationalFormulaManager pRationalManager,
       PrincessBitvectorFormulaManager pBitpreciseManager,
       PrincessArrayFormulaManager pArrayManager,
-      PrincessQuantifiedFormulaManager pQuantifierManager) {
+      PrincessQuantifiedFormulaManager pQuantifierManager,
+      PrincessStringFormulaManager pStringManager) {
     super(
         pCreator,
         pFunctionManager,
         pBooleanManager,
         pIntegerManager,
-        null,
+        pRationalManager,
         pBitpreciseManager,
         null,
         pQuantifierManager,
         pArrayManager,
         null,
-        null,
+        pStringManager,
         null);
     creator = pCreator;
   }

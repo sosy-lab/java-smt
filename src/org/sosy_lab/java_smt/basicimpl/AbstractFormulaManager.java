@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
@@ -358,7 +359,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic) throws InterruptedException {
+  public BooleanFormula applyTactic(BooleanFormula f, Tactic tactic)
+      throws InterruptedException, SolverException {
     switch (tactic) {
       case ACKERMANNIZATION:
         return applyUFEImpl(f);
@@ -373,12 +375,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     }
   }
 
-  /**
-   * Eliminate UFs from the given input formula.
-   *
-   * @throws InterruptedException Can be thrown by the native code.
-   */
-  protected BooleanFormula applyUFEImpl(BooleanFormula pF) throws InterruptedException {
+  /** Eliminate UFs from the given input formula. */
+  protected BooleanFormula applyUFEImpl(BooleanFormula pF) {
     return SolverUtils.ufElimination(this).eliminateUfs(pF);
   }
 
@@ -388,8 +386,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * <p>This is the light version that does not need to eliminate all quantifiers.
    *
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
-  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
 
     // Returning the untouched formula is valid according to QE_LIGHT contract.
     // TODO: substitution-based implementation.
@@ -401,8 +401,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    *
    * @param pF Input to apply the CNF transformation to.
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
-  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
 
     // TODO: generic implementation.
     throw new UnsupportedOperationException(
@@ -413,8 +415,10 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
    * Apply negation normal form (NNF) transformation to the given input formula.
    *
    * @throws InterruptedException Can be thrown by the native code.
+   * @throws SolverException Can be thrown by the native code.
    */
-  protected BooleanFormula applyNNFImpl(BooleanFormula input) throws InterruptedException {
+  protected BooleanFormula applyNNFImpl(BooleanFormula input)
+      throws InterruptedException, SolverException {
     return getBooleanFormulaManager().transformRecursively(input, new NNFVisitor(this));
   }
 

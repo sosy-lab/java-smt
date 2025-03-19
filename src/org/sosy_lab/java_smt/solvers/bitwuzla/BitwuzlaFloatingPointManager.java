@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -76,9 +77,9 @@ public class BitwuzlaFloatingPointManager
 
   @Override
   protected Term makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     Sort signSort = termManager.mk_bv_sort(1);
-    Term signTerm = termManager.mk_bv_value(signSort, signBit ? "1" : "0");
+    Term signTerm = termManager.mk_bv_value(signSort, sign.isNegative() ? "1" : "0");
 
     Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
     Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
@@ -96,26 +97,10 @@ public class BitwuzlaFloatingPointManager
   @Override
   protected Term makeNumberAndRound(
       String pN, FloatingPointType pType, Term pFloatingPointRoundingMode) {
-    // Convert input string to "canonical" format, that is without trailing zeroes, but at least
-    // one digit after the dot
-    String canonical = pN.replaceAll("(\\.[0-9]+?)0*$", "$1");
-    if (!canonical.contains(".")) {
-      canonical = canonical + ".0";
+    if (isNegativeZero(Double.valueOf(pN))) {
+      return termManager.mk_fp_neg_zero(mkFpaSort(pType));
     }
-
-    // Handle special cases
-    switch (canonical) {
-      case "-inf":
-        return termManager.mk_fp_neg_inf(mkFpaSort(pType));
-      case "-0.0":
-        return termManager.mk_fp_neg_zero(mkFpaSort(pType));
-      case "nan":
-        return termManager.mk_fp_nan(mkFpaSort(pType));
-      case "inf":
-        return termManager.mk_fp_pos_inf(mkFpaSort(pType));
-    }
-
-    String decimalString = new BigDecimal(canonical).toPlainString();
+    String decimalString = new BigDecimal(pN).toPlainString();
     return termManager.mk_fp_value(mkFpaSort(pType), pFloatingPointRoundingMode, decimalString);
   }
 

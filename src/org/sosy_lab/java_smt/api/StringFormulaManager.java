@@ -14,16 +14,23 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
 /**
- * Manager for dealing with string formulas. Functions come from
- * http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
+ * Manager for dealing with string formulas. Functions come from <a
+ * href="http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml">String theory in SMTLIB</a>.
  */
 public interface StringFormulaManager {
 
   /**
-   * Returns a {@link StringFormula} representing the given constant.
+   * Creates a {@link StringFormula} representing the given constant String.
    *
-   * @param value the string value the returned <code>Formula</code> should represent
-   * @return a Formula representing the given value
+   * <p>This method accepts plain Java Strings with Unicode characters from the Basic Multilingual
+   * Plane (BMP) (codepoints in range [0x00000, 0x2FFFF]). JavaSMT handles escaping internally, as
+   * some solvers follow the SMTLIB standard and escape Unicode characters with curly braces.
+   *
+   * <p>Additionally, you can use SMTLIB escaping like "\\u{1234}" to represent Unicode characters
+   * directly.
+   *
+   * @param value the string value the returned {@link StringFormula} should represent
+   * @return a {@link StringFormula} representing the given value
    */
   StringFormula makeString(String value);
 
@@ -71,9 +78,8 @@ public interface StringFormulaManager {
   IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex);
 
   /**
-   * Get a substring of length 1 from the given String.
-   *
-   * <p>The result is underspecified, if the index is out of bounds for the given String.
+   * Get a substring of length 1 from the given String if the given index is within bounds.
+   * Otherwise, returns an empty string.
    */
   StringFormula charAt(StringFormula str, IntegerFormula index);
 
@@ -231,4 +237,17 @@ public interface StringFormulaManager {
    * It returns the empty string <code>""</code> for negative numbers.
    */
   StringFormula toStringFormula(IntegerFormula number);
+
+  /**
+   * Returns an Integer formula representing the code point of the only character of the given
+   * String formula, if it represents a single character. Otherwise, returns -1.
+   */
+  IntegerFormula toCodePoint(StringFormula str);
+
+  /**
+   * Returns a String formula representing the single character with the given code point, if it is
+   * a valid Unicode code point within the Basic Multilingual Plane (BMP) (codepoints in range
+   * [0x00000, 0x2FFFF]). Otherwise, returns the empty string.
+   */
+  StringFormula fromCodePoint(IntegerFormula codePoint);
 }

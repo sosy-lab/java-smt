@@ -37,6 +37,10 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/runtime-princess/scala-library.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/princess-smt-parser_2.13.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/java-cup-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/automaton.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/org.sat4j.core.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/ostrich_2.13.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/ostrich-ecma2020-parser_2.13.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-z3/com.microsoft.z3.jar" sourcepath="lib/java-contrib/com.microsoft.z3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-cvc4/CVC4.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-cvc5/cvc5.jar"/>

@@ -250,7 +250,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     Options options = new Options();
     options.set(SAT_SOLVER, settings.getSatSolver().name().toLowerCase(Locale.getDefault()));
     options.set(SEED, (int) randomSeed);
-    options.set(REWRITE_LEVEL, 0); // Stop Bitwuzla from rewriting formulas in outputs
 
     return setFurtherOptions(options, settings.getFurtherOptions());
   }

@@ -85,6 +85,11 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("Solver %s does not support mixed integer-real arithmetic", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
+    // FIXME: Princess uses quantified variables for the rationals and returns AUFNIRA
+    assume()
+        .withMessage("Solver %s does not support mixed real-array arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     requireParser();
     requireArrays();
@@ -97,6 +102,13 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void test_QF_AUFNIRA() {
+    // FIXME: Princess uses quantified variables for the rationals and returns AUFNIRA (without the
+    //  "QF_" part)
+    assume()
+        .withMessage("Solver %s does not support mixed real-array arithmetic", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     requireParser();
     requireArrays();
     requireIntegers();

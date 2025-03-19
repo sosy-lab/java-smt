@@ -8,15 +8,16 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static org.junit.Assert.assertThrows;
+
 import org.junit.Test;
 
 /** Test that exception handling is set up properly. */
 public class ExceptionHandlerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  @Test(expected = Exception.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void testErrorHandling() {
     // Will exit(1) without an exception handler.
-    rmgr.makeNumber("not-a-number");
+    assertThrows(Exception.class, () -> rmgr.makeNumber("not-a-number"));
   }
 }

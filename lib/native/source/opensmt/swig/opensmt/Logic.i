@@ -6,10 +6,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
+
 // Override the exception handler for Logic.parse()
 // Any error thrown here should be recast as an IllegalArgumentException
-
-
 %exception Logic::parseFormula {
   try { $action }
   catch(std::exception& e) {
@@ -28,6 +28,8 @@
     return $null;
   }
 }
+
+%ignore Logic::TermMarks;
 
 %ignore Logic::propFormulasAppearingInUF;
 %ignore Logic::tk_val_uf_default;
@@ -262,10 +264,12 @@
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
 %ignore Logic::printSym (SymRef sr) const;
+%ignore Logic::getSortSize(SRef s) const;
 %ignore Logic::termSort (vec< PTRef > &v) const;
 %ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const;
 %ignore Logic::collectStats (PTRef, int &n_of_conn, int &n_of_eq, int &n_of_uf, int &n_of_if);
 %ignore Logic::typeCheck (SymRef sym, vec< PTRef > const &args, std::string &why) const;
 %ignore Logic::verbose () const;
+}
 
-%include "include/opensmt/Logic.h"
+%include "include/opensmt/logics/Logic.h"

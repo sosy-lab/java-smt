@@ -200,7 +200,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNesteQuantifierTest() {
+  public void ufEliminationNestedQuantifierTest() {
     requireIntegers();
     requireQuantifiers();
     assume()

@@ -25,7 +25,7 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
 
   @Override
   protected Long makeStringImpl(String pValue) {
-    return Native.mkString(z3context, pValue);
+    return Native.mkString(z3context, escapeUnicodeForSmtlib(pValue));
   }
 
   @Override
@@ -177,5 +177,15 @@ class Z3StringFormulaManager extends AbstractStringFormulaManager<Long, Long, Lo
   @Override
   protected Long toStringFormula(Long pParam) {
     return Native.mkIntToStr(z3context, pParam);
+  }
+
+  @Override
+  protected Long toCodePoint(Long pParam) {
+    return Native.mkStringToCode(z3context, pParam);
+  }
+
+  @Override
+  protected Long fromCodePoint(Long pParam) {
+    return Native.mkStringFromCode(z3context, pParam);
   }
 }

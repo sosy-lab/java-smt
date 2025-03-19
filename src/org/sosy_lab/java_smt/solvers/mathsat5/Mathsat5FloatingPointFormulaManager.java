@@ -47,6 +47,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -98,8 +99,8 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
-    final String signStr = signBit ? "1" : "0";
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
+    final String signStr = sign.isNegative() ? "1" : "0";
     final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
     final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
     final String bitvecForm = signStr + exponentStr + mantissaStr;

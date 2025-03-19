@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore SSymRef::SSymRef();
 %ignore SSymRef::operator= (uint32_t v);
 
@@ -89,5 +90,6 @@
 %ignore SortSymbolAllocator;
 
 %ignore SortAllocator;
+}
 
-%include "include/opensmt/SSort.h"
+%include "include/opensmt/sorts/SSort.h"

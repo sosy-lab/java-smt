@@ -773,6 +773,33 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
+  public void testNestedIntegerArray() {
+    requireArrays();
+    requireIntegers();
+
+    IntegerFormula _i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>> multi =
+        amgr.makeArray(
+            "multi",
+            FormulaType.IntegerType,
+            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+
+    IntegerFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_int` (`read_int_T(17)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
+    }
+  }
+
+  @Test
   public void testNestedRationalArray() {
     requireArrays();
     requireRationals();
@@ -791,6 +818,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case MATHSAT5:
         assertThat(valueInMulti.toString())
             .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -1107,15 +1137,15 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     }
   }
 
-  @Test(expected = Exception.class) // complement of above test case
+  @Test // complement of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
     bmgr.makeVariable("x");
     if (imgr != null) {
-      imgr.makeVariable("x");
+      assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
     } else if (bvmgr != null) {
-      bvmgr.makeVariable(8, "x");
+      assertThrows(IllegalArgumentException.class, () -> bvmgr.makeVariable(8, "x"));
     }
   }
 
@@ -1127,20 +1157,28 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
   }
 
-  @Test(expected = Exception.class) // complement of above test case
+  @Test // complement of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableAndUFWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
     bmgr.makeVariable("y");
-    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType));
   }
 
-  @Test(expected = Exception.class) // different ordering of above test case
+  @Test // different ordering of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnUFAndVariableWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
-    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
-    bmgr.makeVariable("y");
+    if (solverToUse() == Solvers.MATHSAT5) {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType));
+    } else {
+      fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+      assertThrows(IllegalArgumentException.class, () -> bmgr.makeVariable("y"));
+    }
   }
 
   @Test

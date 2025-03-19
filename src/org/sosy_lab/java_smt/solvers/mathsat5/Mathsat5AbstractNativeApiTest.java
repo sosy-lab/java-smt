@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
@@ -72,11 +73,10 @@ public abstract class Mathsat5AbstractNativeApiTest {
     assertThat(msat_get_fp_type_mant_width(env, type)).isEqualTo(23);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void fpExpWidthIllegal() {
     long type = msat_get_integer_type(env);
-    msat_get_fp_type_exp_width(env, type);
+    assertThrows(IllegalArgumentException.class, () -> msat_get_fp_type_exp_width(env, type));
   }
 
   @Test

@@ -27,6 +27,7 @@ import edu.stanford.CVC4.RoundingMode;
 import edu.stanford.CVC4.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -85,8 +86,8 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
-    final String signStr = signBit ? "1" : "0";
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
+    final String signStr = sign.isNegative() ? "1" : "0";
     final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
     final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
     final String bitvecStr = signStr + exponentStr + mantissaStr;

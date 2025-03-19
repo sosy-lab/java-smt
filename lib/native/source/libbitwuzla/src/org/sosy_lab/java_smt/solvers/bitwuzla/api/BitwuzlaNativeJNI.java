@@ -240,6 +240,7 @@ public class BitwuzlaNativeJNI {
   public final static native long Bitwuzla_get_assertions(long jarg1, Bitwuzla jarg1_);
   public final static native long Bitwuzla_get_unsat_assumptions(long jarg1, Bitwuzla jarg1_);
   public final static native long Bitwuzla_get_unsat_core(long jarg1, Bitwuzla jarg1_);
+  public final static native long Bitwuzla_simplify(long jarg1, Bitwuzla jarg1_, long jarg2, Term jarg2_);
   public final static native int Bitwuzla_check_sat__SWIG_0(long jarg1, Bitwuzla jarg1_, long jarg2, Vector_Term jarg2_);
   public final static native int Bitwuzla_check_sat__SWIG_1(long jarg1, Bitwuzla jarg1_);
   public final static native long Bitwuzla_get_value(long jarg1, Bitwuzla jarg1_, long jarg2, Term jarg2_);
