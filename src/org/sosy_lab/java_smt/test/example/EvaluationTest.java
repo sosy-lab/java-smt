@@ -17,9 +17,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import org.junit.Before;
+import java.util.Objects;
 import org.junit.Test;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -29,6 +33,8 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 import org.sosy_lab.java_smt.test.SolverBasedTest0;
 
@@ -39,24 +45,13 @@ public class EvaluationTest extends SolverBasedTest0 {
     return Solvers.SOLVERLESS;
   }
 
-  @Before
-  public void setUp() {
-    // assume().withMessage("This test is only for local usage.").that(true).isFalse();
-  }
-
-  public void runTest(String smtInput)
+  public void runTestOnLocalZ3Terminal(String smtInput)
       throws IOException, InterruptedException, InvalidConfigurationException, SolverException {
     String directZ3Output = tellSolver(smtInput);
-    System.out.println(
-        "Step 1: DIRECT OUTPUT FROM SOLVER Z3\n" + directZ3Output + "-----------------------\n");
     BooleanFormula parsed = mgr.universalParseFromString(smtInput);
     Generator.assembleConstraint(parsed);
     String reparsedOutput = String.valueOf(Generator.getLines());
-    System.out.println(
-        "Step 2: PARSED AND REGENERATED OUTPUT\n" + reparsedOutput + "-----------------------\n");
     String reparsedAnswer = tellSolver(reparsedOutput);
-    System.out.println(
-        "Step 3: GIVE REGENERATED OUTPUT TO Z3\n" + reparsedAnswer + "-----------------------\n");
     assertThat(directZ3Output.startsWith("sat")).isEqualTo(reparsedAnswer.startsWith("sat"));
   }
 
@@ -72,6 +67,39 @@ public class EvaluationTest extends SolverBasedTest0 {
     proverEnv.addConstraint(constraint);
 
     assertThat(proverEnv.isUnsat()).isFalse();
+  }
+
+  public void parsedAndReparsedMatchesDirectAPI(String smt2, Solvers solver)
+      throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
+    Configuration config =
+        Configuration.builder()
+            .setOption("solver.generateSMTLIB2", "true")
+            .setOption("solver.usedSolverBySolverLess", solver.toString().toLowerCase())
+            .build();
+    LogManager logger = BasicLogManager.create(config);
+    ShutdownManager shutdown = ShutdownManager.create();
+    SolverContext actualSolverContext =
+        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(), solver);
+
+    SolverContext solverLessContext =
+        SolverContextFactory.createSolverContext(
+            config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
+
+    ProverEnvironment actualSolverProverEnvironment =
+        actualSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    ProverEnvironment solverLessProverEnv =
+        solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    System.out.println(actualSolverContext.getSolverName());
+    actualSolverProverEnvironment.addConstraint(
+        actualSolverContext.getFormulaManager().universalParseFromString(smt2));
+    solverLessProverEnv.addConstraint(
+        solverLessContext.getFormulaManager().universalParseFromString(smt2));
+    boolean directSat = actualSolverProverEnvironment.isUnsat();
+    boolean reparsedSat = solverLessProverEnv.isUnsat();
+    // SolverLessProverEnvironment is
+    // built to
+    // parse and reparse the constraint
+    assertThat(directSat).isEqualTo(reparsedSat);
   }
 
   public SolverContext getSolverLessContext() throws InvalidConfigurationException {
@@ -126,38 +154,27 @@ public class EvaluationTest extends SolverBasedTest0 {
     }
   }
 
-  public void runTestWithAPIConstraint(BooleanFormula constraint)
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    if (!Generator.isLoggingEnabled()) {
-      throw new InvalidConfigurationException(
-          "Logging must be enabled to run this test!"
-              + "Also make sure that it was enabled while creating the constraint!");
-    }
-    Generator.assembleConstraint(constraint);
-    String x = String.valueOf(Generator.getLines());
-    runTest(x);
-    Generator.resetGenerator();
-  }
-
   @Test
   public void testWithIntegers()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
     requireIntegers();
     String example =
         "(set-logic QF_LIA)\n"
             + "(declare-const x Int)\n"
             + "(declare-const y Int)\n"
             + "(declare-const z Int)\n"
-            + "(push 1)"
             + "(assert (= x 10))\n"
             + "(assert (= y 20))\n"
             + "(assert (= (+ x y) z))\n";
-    runTest(example);
+    runTestOnLocalZ3Terminal(example);
+    parsedAndReparsedMatchesDirectAPI(example, Solvers.CVC5);
   }
 
   @Test
   public void testWithStrings()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
     requireStrings();
     String example =
         "(set-logic QF_S)\n"
@@ -167,12 +184,14 @@ public class EvaluationTest extends SolverBasedTest0 {
             + "(assert (= x \"Hello\"))\n"
             + "(assert (= y \" World\"))\n"
             + "(assert (= z (str.++ x y)))\n";
-    runTest(example);
+    runTestOnLocalZ3Terminal(example);
+    parsedAndReparsedMatchesDirectAPI(example, Solvers.Z3);
   }
 
   @Test
   public void testMakeFloatingPoint()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
     requireFloats();
     String x =
         "(declare-const a (_ FloatingPoint 8 24))\n"
@@ -181,12 +200,14 @@ public class EvaluationTest extends SolverBasedTest0 {
             + "(assert (fp.eq a ((_ to_fp 8 24) RNE 10.0)))\n"
             + "(assert (fp.eq b ((_ to_fp 8 24) RNE 10.0)))\n"
             + "(assert (fp.eq (fp.add RNE a b) c))\n";
-    runTest(x);
+    runTestOnLocalZ3Terminal(x);
+    parsedAndReparsedMatchesDirectAPI(x, Solvers.CVC5);
   }
 
   @Test
   public void testMakeFloatingPointWithBitvectors()
       throws SolverException, InterruptedException, IOException, InvalidConfigurationException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
     requireBitvectors();
     String x =
         "(declare-const a (_ FloatingPoint 8 24))\n"
@@ -197,12 +218,15 @@ public class EvaluationTest extends SolverBasedTest0 {
             + "(assert (fp.eq (fp.add RNE a b) c))\n" // c = a + b
             + "(assert (fp.eq c (fp #b0 #b10000011 #b01000000000000000000000)))\n"; // c = 20.0 as
     // FP
-    runTest(x);
+    runTestOnLocalZ3Terminal(x);
+    parsedAndReparsedMatchesDirectAPI(x, Solvers.CVC5);
   }
 
   @Test
-  public void testAddition()
+  public void testAdditionParseAndReparse()
       throws SolverException, InterruptedException, InvalidConfigurationException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
+    requireIntegers();
     SolverContext solverContext = getSolverLessContext();
     IntegerFormulaManager ifm = solverContext.getFormulaManager().getIntegerFormulaManager();
     IntegerFormula a = ifm.makeVariable("a");
@@ -211,5 +235,17 @@ public class EvaluationTest extends SolverBasedTest0 {
 
     BooleanFormula constraint = ifm.equal(sum, ifm.makeNumber(5));
     parseAndReparse(constraint);
+  }
+
+  @Test
+  public void testRegexParseAndReparse()
+      throws InvalidConfigurationException, SolverException, InterruptedException, IOException {
+    assume().withMessage("Z3 needs to be installed.").that(isZ3Installed()).isTrue();
+    requireStrings();
+    SolverContext solverContext = getSolverLessContext();
+    StringFormulaManager sfm = solverContext.getFormulaManager().getStringFormulaManager();
+    StringFormula str = Objects.requireNonNull(sfm).makeVariable("str");
+    BooleanFormula result = sfm.in(str, sfm.makeRegex(".*test.*"));
+    parseAndReparse(result);
   }
 }
