@@ -10,10 +10,10 @@
 
 package org.sosy_lab.java_smt.api.proofs.visitors;
 
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
+import org.sosy_lab.java_smt.api.proofs.ProofDag;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public interface ProofVisitor {
   void visitNode(ProofNode node);
-  void visitDAG(ProofDAG dag);
+  void visitDAG(ProofDag dag);
 }

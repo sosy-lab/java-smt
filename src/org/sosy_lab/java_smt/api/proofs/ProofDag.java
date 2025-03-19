@@ -13,7 +13,7 @@ package org.sosy_lab.java_smt.api.proofs;
 import java.util.Collection;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
-public interface ProofDAG {
+public interface ProofDag {
   void addNode(ProofNode node);
   ProofNode getNode(int nodeId);
   void addEdge(int parentNodeId, int childNodeId);

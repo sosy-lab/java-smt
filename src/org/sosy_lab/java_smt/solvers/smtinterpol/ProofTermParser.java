@@ -9,7 +9,7 @@ import de.uni_freiburg.informatik.ultimate.logic.TermVariable;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
-import org.sosy_lab.java_smt.ResolutionProofDAG;
+import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class ProofTermParser {
 
-  private final ResolutionProofDAG proofDag;
+  private final ResolutionProofDag proofDag;
   private final Map<String, BooleanFormula> annotatedTerms;
   private final Map<String, Term> letBindings = new HashMap<>();
   private final Map<Term, ProofNode> termToNode = new HashMap<>();
@@ -28,11 +28,11 @@ public class ProofTermParser {
   public ProofTermParser(Map<String, BooleanFormula> pAnnotatedTerms, FormulaManager pMgr) {
     annotatedTerms = pAnnotatedTerms;
     mgr = pMgr;
-    proofDag = new ResolutionProofDAG();
+    proofDag = new ResolutionProofDag();
   }
 
 
-  public static ResolutionProofDAG convert(
+  public static ResolutionProofDag convert(
       Term proof,
       FormulaManager pManager,
       Map<String, BooleanFormula> pAnnotatedTerms) {

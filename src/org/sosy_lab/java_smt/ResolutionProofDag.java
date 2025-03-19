@@ -10,18 +10,10 @@
 
 package org.sosy_lab.java_smt;
 
-import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
-import de.uni_freiburg.informatik.ultimate.logic.Annotation;
-import de.uni_freiburg.informatik.ultimate.logic.Term;
-import java.util.Map;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
-import org.sosy_lab.java_smt.solvers.smtinterpol.ProofTermParser;
+import org.sosy_lab.java_smt.basicimpl.AbstractProofDag;
 
 @SuppressWarnings("all")
-public class ResolutionProofDAG extends AbstractProofDAG {
+public class ResolutionProofDag extends AbstractProofDag {
 
   /*
   public ResolutionProofDAG() {

@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
-import org.sosy_lab.java_smt.ResolutionProofDAG;
+import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.SourceProofNode;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -102,8 +102,8 @@ public class Z3ToResoluteProofConverter {
    */
 
 
-   static ResolutionProofDAG convertToResolutionProofDAG(Z3ProofNode[] z3ProofNodes) {
-    ResolutionProofDAG dag = new ResolutionProofDAG();
+   static ResolutionProofDag convertToResolutionProofDAG(Z3ProofNode[] z3ProofNodes) {
+    ResolutionProofDag dag = new ResolutionProofDag();
 
     for (Z3ProofNode z3Node : z3ProofNodes) {
       if (z3Node.getRule() == MODUS_PONENS) {

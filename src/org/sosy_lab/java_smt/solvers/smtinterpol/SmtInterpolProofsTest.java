@@ -30,7 +30,7 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.ResolutionProofDAG;
+import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -183,8 +183,8 @@ public class SmtInterpolProofsTest {
 
       // Convert the retrieved proof term to a ResolutionProofDAG using the context's formula creator
       // and the asserted formulas.
-      ResolutionProofDAG dag =
-          (ResolutionProofDAG) prover.getProof();
+      ResolutionProofDag dag =
+          (ResolutionProofDag) prover.getProof();
       assertNotNull(dag);
 
       // Optionally, additional assertions on the dag structure can be added here.

@@ -23,7 +23,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ProofRules;
 
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode.Antecedent;
-import org.sosy_lab.java_smt.ResolutionProofDAG;
+import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -70,7 +70,7 @@ class SmtInterpolProofNode extends AbstractProofNode {
      */
 
     // Recursively adds nodes and edges from the tree to the dag.
-    private static void addDagEdges(SmtInterpolProofNode node, ResolutionProofDAG dag) {
+    private static void addDagEdges(SmtInterpolProofNode node, ResolutionProofDag dag) {
       if (node == null) {
         return;
       }
