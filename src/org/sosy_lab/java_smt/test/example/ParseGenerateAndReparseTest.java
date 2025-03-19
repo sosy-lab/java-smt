@@ -3,6 +3,7 @@ package org.sosy_lab.java_smt.test.example;
 import static com.google.common.truth.Truth.assertThat;
 
 import java.io.IOException;
+import java.util.Locale;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -31,7 +32,7 @@ public class ParseGenerateAndReparseTest {
     // Try to get the solver
     Solvers solver;
     try {
-      solver = Solvers.valueOf(solverName.toLowerCase());
+      solver = Solvers.valueOf(solverName.toLowerCase(Locale.ROOT));
     } catch (IllegalArgumentException e) {
       System.err.println("Invalid solver name: " + solverName);
       System.exit(1);
