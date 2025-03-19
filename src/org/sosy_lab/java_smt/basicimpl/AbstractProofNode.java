@@ -18,11 +18,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
-/**
- * A proof node in the proof DAG of a proof.
- *
- * @author Gabriel Carpio
- */
+
 public abstract class AbstractProofNode implements ProofNode {
   private final List<ProofNode> children;
   private ProofRule rule;

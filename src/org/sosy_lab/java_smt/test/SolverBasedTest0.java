@@ -129,6 +129,9 @@ public abstract class SolverBasedTest0 {
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
+    if (solverToUse() == Solvers.Z3) {
+      newConfig.setOption("solver.z3.requireProofs", "true");
+    }
     return newConfig;
   }
 
@@ -375,6 +378,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support user propagation", solverToUse())
         .that(solverToUse())
         .isEqualTo(Solvers.Z3);
+  }
+
+  protected void requireProofGeneration(){
+        assume()
+                .withMessage("Solver %s does not support proof generation", solverToUse())
+                .that(solverToUse())
+                .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA, Solvers.YICES2);
   }
 
   /**

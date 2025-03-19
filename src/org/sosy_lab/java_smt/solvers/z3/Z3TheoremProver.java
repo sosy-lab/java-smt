@@ -21,12 +21,11 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -149,21 +148,19 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public ProofDAG getProof() {
-    return null;
+  public ProofNode getProof() {
+    long proofAst = Native.solverGetProof(z3context, z3solver);
+    return new Z3ProofProcessor(z3context, z3solver, creator, this).fromAST(proofAst);
   }
 
-  Formula getZ3ProofAsFormula(){
-    long proof = Native.solverGetProof(z3context, z3solver);
-    return creator.encapsulate(creator.getFormulaType(proof), proof);
-  }
-
-  long getZ3Proof(){
+  // This method is used to get the Z3 proof as a long for testing exclusively
+  long getZ3Proof() {
     return Native.solverGetProof(z3context, z3solver);
   }
 
-  long getZ3solver(){
-        return z3solver;
+  // This method is used to get the Z3 solver object for testing exclusively
+  long getZ3solver() {
+    return z3solver;
   }
 
   @Override

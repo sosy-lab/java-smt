@@ -21,11 +21,31 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  * @author Gabriel Carpio
  */
 public interface ProofNode {
+
+  /**
+   * Get the children of the proof node.
+   */
   List<ProofNode> getChildren();
+
   void addChild(ProofNode child);
+
   boolean isSource();
+
   boolean isSink();
+
   void accept(ProofVisitor visitor);
+
+  /**
+   * Get the formula of the proof node.
+   *
+   * @return The formula of the proof node.
+   */
   Formula getFormula();
+
+  /**
+   * Get the id of the proof node.
+   *
+   * @return The id of the proof node.
+   */
   int getId();
 }

@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -83,7 +84,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
-        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+             context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -93,7 +94,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireOptimization();
     try (BasicProverEnvironment<?> pe =
-        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+             context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -123,7 +124,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
 
     try (ProverEnvironment pe =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }
@@ -138,7 +139,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
     try (ProverEnvironment pe =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");
@@ -160,12 +161,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE,
+                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
   }
@@ -185,6 +187,26 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       pProver.addConstraint(constraint); // Z3 crashed here
       assertThat(pProver.isUnsat()).isFalse();
       pProver.pop();
+    }
+  }
+
+  @Test
+  public void testGetProof() throws InterruptedException {
+    requireProofGeneration(); // Ensures proofs are supported
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      ProofNode proof = prover.getProof();
+      assertThat(proof).isNotNull();
+    } catch (SolverException pE) {
+      throw new RuntimeException(pE);
     }
   }
 }

@@ -282,7 +282,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
     }
   }
 
-  public boolean getGenerateProofs() {
+  //Method exlcusively used for testing
+  boolean getGenerateProofs() {
     return GENERATE_PROOFS;
   }
 

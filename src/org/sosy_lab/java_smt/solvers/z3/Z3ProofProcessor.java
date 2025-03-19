@@ -19,7 +19,7 @@ import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
-public class Z3ProofParser {
+ class Z3ProofProcessor {
   private final long z3context;
   private final long z3solver;
   private final Z3FormulaCreator formulaCreator;
@@ -27,7 +27,7 @@ public class Z3ProofParser {
   private final Map<Long, Z3ProofNode> parsed = new HashMap<>();
 
 
-  Z3ProofParser(
+  Z3ProofProcessor(
       long ctx, long solver, Z3FormulaCreator creator,
       Z3AbstractProver pProver) {
     z3context = ctx;

@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.MODUS_PONENS;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDAG;
@@ -30,15 +31,18 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Converts a Z3 proof to a RESOLUTE proof.
+ */
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
-public class Z3ProofConverter {
+public class Z3ToResoluteProofConverter {
 
   private final Z3FormulaManager formulaManager;
 
   private final BooleanFormulaManager bfm;
 
-  public Z3ProofConverter(Z3FormulaManager creator) {
+   Z3ToResoluteProofConverter(Z3FormulaManager creator) {
     formulaManager = creator;
     bfm = formulaManager.getBooleanFormulaManager();
   }
@@ -98,7 +102,7 @@ public class Z3ProofConverter {
    */
 
 
-  public static ResolutionProofDAG convertToResolutionProofDAG(Z3ProofNode[] z3ProofNodes) {
+   static ResolutionProofDAG convertToResolutionProofDAG(Z3ProofNode[] z3ProofNodes) {
     ResolutionProofDAG dag = new ResolutionProofDAG();
 
     for (Z3ProofNode z3Node : z3ProofNodes) {
@@ -405,7 +409,36 @@ public class Z3ProofConverter {
   }
 
   ProofNode handleTransitivityStar(Z3ProofNode node) {
-    return null;
+    BooleanFormula resPivot = null;
+     Collection<BooleanFormula> formulas = new ArrayList<>();
+     List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
+     int numChildren = node.getChildren().size();
+
+        for (int i = 0; i < numChildren; i++) {
+          Collection<BooleanFormula> newCollection = new ArrayList<>();
+          formulas.add(bfm.not((BooleanFormula) node.getChildren().get(i).getFormula()));
+          if (i == numChildren - 1) {
+            resPivot = (BooleanFormula) node.getChildren().get(i).getFormula();
+          }
+        }
+
+    assert resPivot != null;
+    ResolutionProofNode resNode = new ResolutionProofNode(node.getFormula(), resPivot);
+
+
+        formulas.add((BooleanFormula) node.getFormula());
+        BooleanFormula transitivityFormula = bfm.or(formulas);
+        SourceProofNode sn = new SourceProofNode(ResAxiom.TRANSITIVITY, transitivityFormula);
+
+        for (int i = 0; i < formulas.size()-2; i++){
+          //ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
+              //formulaList.get(i))
+        }
+
+
+
+
+    return resNode;
   }
 
   ProofNode handleMonotonicity(Z3ProofNode node) {

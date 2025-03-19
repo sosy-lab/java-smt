@@ -10,9 +10,18 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
+/**
+ * A proof rule from a given proof format.
+ */
 public interface ProofRule {
 
+  /**
+   * Get the name of the proof rule.
+   */
   String getName();
 
+  /**
+   * Get the formula of the proof rule.
+   */
   String getFormula();
 }

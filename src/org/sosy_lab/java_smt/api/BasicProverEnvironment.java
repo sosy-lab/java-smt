@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that
@@ -154,7 +154,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. Should
    * only be called after {@link #isUnsat()} returned <code>true</code>.
    */
-  default ProofDAG getProof() {
+  default ProofNode getProof() {
     try {
       throw new UnsupportedOperationException("Proof generation isn't enabled.");
     } catch (UnsupportedOperationException e) {
