@@ -30,8 +30,9 @@ public class Mathsat5ProofNode extends AbstractProofNode {
   private String asString(int indentLevel) {
     StringBuilder proof = new StringBuilder();
     String indent = "  ".repeat(indentLevel);
-
-    proof.append(indent).append("Formula: ").append(getFormula().toString()).append("\n");
+    if (getFormula() != null) {
+      proof.append(indent).append("Formula: ").append(getFormula().toString()).append("\n");
+    }
     proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
     proof.append(indent).append("No. Children: ").append(getChildren().size()).append("\n");
 

@@ -10,6 +10,9 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5FormulaManager.getMsatTerm;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof_manager;
 
 import com.google.common.base.Preconditions;
 import java.util.Map;
@@ -19,6 +22,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
@@ -42,5 +46,15 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;
+  }
+
+  @Override
+  public ProofNode getProof() {
+    ProofNode pn;
+    long pm = msat_get_proof_manager(curEnv);
+    Mathsat5ProofProcessor pp = new Mathsat5ProofProcessor(context, curEnv, creator, this);
+    pn = pp.fromMsatProof(msat_get_proof(pm));
+    msat_destroy_proof_manager(pm);
+    return pn;
   }
 }

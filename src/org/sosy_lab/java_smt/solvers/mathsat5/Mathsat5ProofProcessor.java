@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.solvers.mathsat5;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_child;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_name;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_is_term;
 
 import java.util.ArrayDeque;
@@ -57,7 +58,8 @@ public class Mathsat5ProofProcessor {
           }
         }
       } else {
-        // Process the node after all its children have been processed.
+        // Process the node after all its children have been processed. This should help to
+        // recreate the formula for the node correctly.
         stack.pop();
 
         // Generate the formula and proof rule.
@@ -83,7 +85,8 @@ public class Mathsat5ProofProcessor {
   private Formula generateFormula(long proof) {
     Formula formula = null;
     if (msat_proof_is_term(proof)) {
-      formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proof), proof);
+      long proofTerm = msat_proof_get_term(proof);
+      formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proofTerm), proofTerm);
     }
     return formula;
   }
