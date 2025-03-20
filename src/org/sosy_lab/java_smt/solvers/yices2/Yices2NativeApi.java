@@ -783,25 +783,6 @@ public final class Yices2NativeApi {
 
   public static native int yices_subst_term(int size, int[] from, int[] to, int t);
 
-  public static int yices_named_variable(int type, String name) {
-    int termFromName = yices_get_term_by_name(name);
-    if (termFromName != -1) {
-      int termFromNameType = yices_type_of_term(termFromName);
-      if (type == termFromNameType) {
-        return termFromName;
-      } else {
-        throw new IllegalArgumentException(
-            String.format(
-                "Can't create variable with name '%s' and type '%s' "
-                    + "as it would omit a variable with type '%s'",
-                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
-      }
-    }
-    int var = yices_new_uninterpreted_term(type);
-    yices_set_term_name(var, name);
-    return var;
-  }
-
   /**
    * @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise
    */

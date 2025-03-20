@@ -14,6 +14,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import java.util.ArrayList;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -23,9 +24,9 @@ public class CVC5QuantifiedFormulaManager
 
   private final Solver solver;
 
-  protected CVC5QuantifiedFormulaManager(FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator) {
-    super(pFormulaCreator);
-
+  protected CVC5QuantifiedFormulaManager(
+      FormulaCreator<Term, Sort, Solver, Term> pFormulaCreator, LogManager pLogger) {
+    super(pFormulaCreator, pLogger);
     solver = pFormulaCreator.getEnv();
   }
 

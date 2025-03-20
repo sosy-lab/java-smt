@@ -21,6 +21,7 @@ import ap.terfor.conjunctions.Quantifier.EX$;
 import ap.types.Sort;
 import java.util.ArrayList;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -32,9 +33,9 @@ class PrincessQuantifiedFormulaManager
   private final PrincessEnvironment env;
 
   PrincessQuantifiedFormulaManager(
-      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration>
-          pCreator) {
-    super(pCreator);
+      FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> pCreator,
+      LogManager pLogger) {
+    super(pCreator, pLogger);
     env = getFormulaCreator().getEnv();
   }
 

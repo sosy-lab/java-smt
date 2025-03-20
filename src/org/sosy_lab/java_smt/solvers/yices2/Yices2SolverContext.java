@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -49,7 +50,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public static Yices2SolverContext create(
       NonLinearArithmetic pNonLinearArithmetic,
       ShutdownNotifier pShutdownManager,
-      Consumer<String> pLoader) {
+      Consumer<String> pLoader,
+      LogManager pLogger) {
 
     pLoader.accept("yices2j");
 
@@ -72,9 +74,18 @@ public class Yices2SolverContext extends AbstractSolverContext {
         new Yices2IntegerFormulaManager(creator, pNonLinearArithmetic);
     Yices2RationalFormulaManager rationalTheory =
         new Yices2RationalFormulaManager(creator, pNonLinearArithmetic);
+    Yices2QuantifiedFormulaManager quantifierManager =
+        new Yices2QuantifiedFormulaManager(creator, pLogger);
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
-            creator, functionTheory, booleanTheory, integerTheory, rationalTheory, bitvectorTheory);
+            creator,
+            functionTheory,
+            booleanTheory,
+            integerTheory,
+            rationalTheory,
+            bitvectorTheory,
+            quantifierManager);
+    quantifierManager.setFmgr(manager);
     return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
   }
 

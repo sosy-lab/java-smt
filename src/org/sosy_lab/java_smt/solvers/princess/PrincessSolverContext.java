@@ -15,6 +15,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.io.PathCounterTemplate;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -39,7 +40,8 @@ public final class PrincessSolverContext extends AbstractSolverContext {
       ShutdownNotifier pShutdownNotifier,
       @Nullable PathCounterTemplate pLogfileTemplate,
       int pRandomSeed,
-      NonLinearArithmetic pNonLinearArithmetic)
+      NonLinearArithmetic pNonLinearArithmetic,
+      LogManager pLogger)
       throws InvalidConfigurationException {
     PrincessEnvironment env =
         new PrincessEnvironment(config, pLogfileTemplate, pShutdownNotifier, pRandomSeed);
@@ -56,7 +58,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
         new PrincessBitvectorFormulaManager(creator, booleanTheory);
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
-        new PrincessQuantifiedFormulaManager(creator);
+        new PrincessQuantifiedFormulaManager(creator, pLogger);
     PrincessStringFormulaManager stringTheory = new PrincessStringFormulaManager(creator);
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
@@ -69,6 +71,7 @@ public final class PrincessSolverContext extends AbstractSolverContext {
             arrayTheory,
             quantifierTheory,
             stringTheory);
+    quantifierTheory.setFmgr(manager);
     return new PrincessSolverContext(manager, creator);
   }
 

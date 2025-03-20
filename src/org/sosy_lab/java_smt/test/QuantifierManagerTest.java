@@ -66,6 +66,15 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
   @Before
+  public void setUp() {
+    requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+  }
+
+  @Before
   public void setUpLIA() {
     requireIntegers();
     requireArrays();
@@ -729,7 +738,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierElimination() throws InterruptedException, SolverException {
+  public void checkLIAQuantifierElimination()
+      throws InterruptedException, SolverException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
     requireIntegers();
@@ -746,7 +756,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierEliminationFail() throws InterruptedException, SolverException {
+  public void checkLIAQuantifierEliminationFail()
+      throws InterruptedException, SolverException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -770,7 +781,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierEliminationFail() throws InterruptedException, SolverException {
+  public void checkBVQuantifierEliminationFail()
+      throws InterruptedException, SolverException {
     // build formula: (exists x : arr[x] = 3) && (forall y: arr[y] = 2)
     // as there is no quantifier free equivalent, it should return the input formula.
     requireBitvectors();

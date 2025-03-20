@@ -16,7 +16,7 @@ import org.sosy_lab.common.log.LogManager;
 
 /** Implementation of {@link LogProxy} that forwards to {@link LogManager}. */
 @SuppressWarnings("FormatStringAnnotation")
-final class LogProxyForwarder implements LogProxy {
+public final class LogProxyForwarder implements LogProxy {
 
   private static final Level LEVEL_FATAL = Level.SEVERE;
 

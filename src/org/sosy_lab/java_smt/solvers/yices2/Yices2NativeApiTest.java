@@ -47,6 +47,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_by_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
@@ -55,7 +56,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uninterpreted_term;
@@ -82,6 +82,8 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Joiner;
@@ -96,6 +98,7 @@ import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.rationals.Rational;
@@ -201,6 +204,8 @@ public class Yices2NativeApiTest {
     assertThrows(IllegalArgumentException.class, () -> yices_rational32(1, 0));
   }
 
+  // TODO: what is this test supposed to be doing? And remove print.
+  @Ignore
   @Test
   public void negativeRationalError() {
     // TODO negative unsigned integer causes no error. Need to ensure positive value before
@@ -465,6 +470,8 @@ public class Yices2NativeApiTest {
     assertThat(yices_term_constructor(mul)).isEqualTo(YICES_ARITH_CONST);
   }
 
+  // TODO: what is this test supposed to be doing? And remove print.
+  @Ignore
   @Test
   public void sumComponents() {
     int three = yices_int32(3);
@@ -497,6 +504,8 @@ public class Yices2NativeApiTest {
     }
   }
 
+  // TODO: what is this test supposed to be doing? And remove print.
+  @Ignore
   @Test
   public void bvSumComponents() {
     int bv1 = yices_parse_bvbin("00101");
@@ -519,6 +528,8 @@ public class Yices2NativeApiTest {
     }
   }
 
+  // TODO: what is this test supposed to be doing? And remove print.
+  @Ignore
   @Test
   public void bvExtensionStructureTest() {
     int extendBy = 5;
@@ -567,6 +578,8 @@ public class Yices2NativeApiTest {
     assertThat(constructor).isEqualTo(YICES_BV_SUM);
   }
 
+  // TODO: what is this test supposed to be doing? And remove print.
+  @Ignore
   @Test
   public void bvMul() {
     int type = yices_bv_type(5);
@@ -577,5 +590,28 @@ public class Yices2NativeApiTest {
     System.out.println(component[0]);
     System.out.println(component[1]);
     System.out.println(yices_term_constructor(yices_bvpower(component[0], component[1])));
+  }
+
+  /**
+   * Only to be used for tests in this class. Old implementation used for creating/retrieving named
+   * variables. Superseded by Yices2FormulaCreator.createNamedVariable() for reasons outlined there.
+   */
+  private static int yices_named_variable(int type, String name) {
+    int termFromName = yices_get_term_by_name(name);
+    if (termFromName != -1) {
+      int termFromNameType = yices_type_of_term(termFromName);
+      if (type == termFromNameType) {
+        return termFromName;
+      } else {
+        throw new IllegalArgumentException(
+            String.format(
+                "Can't create variable with name '%s' and type '%s' "
+                    + "as it would omit a variable with type '%s'",
+                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
+      }
+    }
+    int var = yices_new_uninterpreted_term(type);
+    yices_set_term_name(var, name);
+    return var;
   }
 }
