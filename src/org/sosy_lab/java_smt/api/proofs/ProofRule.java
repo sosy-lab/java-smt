@@ -23,5 +23,7 @@ public interface ProofRule {
   /**
    * Get the formula of the proof rule.
    */
-  String getFormula();
+  default String getFormula() {
+    return "no formula available";
+  }
 }
