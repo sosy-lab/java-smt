@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
@@ -73,7 +72,7 @@ public interface QuantifiedFormulaManager {
    * @return New formula without quantifiers.
    */
   BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException, IOException;
+      throws InterruptedException, SolverException;
 
   ProverOptions[] getOptions();
 

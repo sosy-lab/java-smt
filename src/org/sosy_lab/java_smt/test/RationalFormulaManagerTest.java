@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Iterables;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -102,6 +104,15 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
     requireRationals();
     requireQuantifiers();
     requireRationalFloor();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers
     assertThatFormula(qmgr.forall(v, rmgr.lessThan(rmgr.floor(v), v))).isUnsatisfiable();
@@ -111,6 +122,14 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void visitFloorTest() {
     requireRationals();
     requireRationalFloor();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);

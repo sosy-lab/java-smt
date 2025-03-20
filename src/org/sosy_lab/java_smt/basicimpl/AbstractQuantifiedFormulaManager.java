@@ -53,7 +53,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     if (options != null
         && Arrays.asList(options)
             .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
@@ -78,7 +78,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
               "UltimateEliminator failed. Please adjust the "
                   + "option if you want to use the native quantifier elimination");
 
-          throw e; // TODO is this the correct way to abort?
+          throw e;
         }
       }
     }
@@ -95,7 +95,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
         } catch (Exception e2) {
           logger.logException(Level.SEVERE, e2, "UltimateEliminator also failed.");
-          throw e2; // TODO is this the correct way to abort?
+          throw e2;
         }
       }
 
@@ -105,7 +105,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
         } catch (Exception e3) {
           logger.logException(Level.SEVERE, e3, "Quantifier elimination failed.");
-          throw e3; // TODO is this the correct way to abort?
+          throw e3;
         }
       } else {
         logger.logException(
@@ -113,7 +113,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             e1,
             "Native quantifier elimination failed. Please adjust the "
                 + "option if you want to use the UltimateEliminator quantifier elimination");
-        throw e1; // TODO is this the correct way to abort?
+        throw e1;
       }
     }
   }

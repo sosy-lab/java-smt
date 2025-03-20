@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -44,7 +43,7 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
 
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
-      throws InterruptedException, SolverException, IOException {
+      throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(pF);
     BooleanFormula result = delegate.eliminateQuantifiers(pF);

@@ -74,6 +74,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     return msat_to_smtlib2(getEnvironment(), f);
   }
 
+  // TODO UltimateEliminator currently does not support Terms with definitions yet.
   public String dumpFormulaImplExt(final Long f, String name) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";

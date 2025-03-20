@@ -59,7 +59,6 @@ public final class PrincessSolverContext extends AbstractSolverContext {
     PrincessArrayFormulaManager arrayTheory = new PrincessArrayFormulaManager(creator);
     PrincessQuantifiedFormulaManager quantifierTheory =
         new PrincessQuantifiedFormulaManager(creator, pLogger);
-        new PrincessQuantifiedFormulaManager(creator);
     PrincessStringFormulaManager stringTheory = new PrincessStringFormulaManager(creator);
     PrincessFormulaManager manager =
         new PrincessFormulaManager(
