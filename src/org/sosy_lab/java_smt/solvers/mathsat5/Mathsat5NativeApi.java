@@ -1095,7 +1095,6 @@ final class Mathsat5NativeApi {
 
   public static native String msat_proof_get_name(long proof);
 
-  // Non-zero if term, 0 for no term
   public static native boolean msat_proof_is_term(long proof);
 
   // Term representation of the current proof

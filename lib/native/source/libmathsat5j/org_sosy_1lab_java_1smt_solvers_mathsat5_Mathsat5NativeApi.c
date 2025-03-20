@@ -158,10 +158,10 @@ PROOF_ARG(1)
 CALL1(const char *, proof_get_name)
 PLAIN_CONST_STRING_RETURN
 
-DEFINE_FUNC(int, 1proof_1is_1term) WITH_ONE_ARG(jproof)
+DEFINE_FUNC(jboolean, 1proof_1is_1term) WITH_ONE_ARG(jproof)
 PROOF_ARG(1)
 CALL1(int, proof_is_term)
-INT_RETURN
+BOOLEAN_RETURN
 
 DEFINE_FUNC(jterm, 1proof_1get_1term) WITH_ONE_ARG(jproof)
 PROOF_ARG(1)
