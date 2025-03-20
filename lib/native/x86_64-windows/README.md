@@ -39,6 +39,10 @@ For MathSAT5:
 For Bitwuzla:
 - `mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll`
 
+For CVC5:
+
+- mlink libcvc5j.dll ..\..\java\runtime-cvc5\x64\libcvcj.so
+
 ### With a direct copy of the library:
 
 An alternative simple solution (without the need of administrator rights) is to copy over
@@ -56,6 +60,10 @@ For MathSAT5:
 
 For Bitwuzla:
 - `copy ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll libbitwuzlaj.dll`
+
+For CVC5:
+
+- copy ..\..\java\runtime-cvc5\x64\libcvc5j.dll libcvc5j.dll
 
 Or simply use a wildcard:
 - `copy ..\..\java\runtime-*\*dll .\`

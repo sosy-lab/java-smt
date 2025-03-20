@@ -15,6 +15,7 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableMap;
 import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Solver;
+import io.github.cvc5.TermManager;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -72,6 +73,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
+  private final TermManager termManager;
   private final Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
@@ -82,6 +84,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       CVC5FormulaCreator pCreator,
       CVC5FormulaManager pManager,
       ShutdownNotifier pShutdownNotifier,
+      TermManager pTermManager,
       Solver pSolver,
       int pRandomSeed,
       CVC5Settings pSettings) {
@@ -89,13 +92,14 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
+    termManager = pTermManager;
     solver = pSolver;
     settings = pSettings;
   }
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
-    pLoader.accept("cvc5jni");
+    pLoader.accept("cvc5j");
 
     // disable CVC5's own loading mechanism,
     // see io.github.cvc5.Util#loadLibraries and https://github.com/cvc5/cvc5/pull/9047
@@ -117,9 +121,15 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
     loadLibrary(pLoader);
 
-    // This Solver is the central class for creating expressions/terms/formulae.
+    // The TermManager is the central class for creating expressions/terms/formulae.
     // We keep this instance available until the whole context is closed.
-    Solver newSolver = new Solver();
+    TermManager termManager = new TermManager();
+
+    // Create a new solver instance
+    // We'll use this instance in some of the formula managers for simplifying terms and declaring
+    // datatypes. The actual solving is done on a different instance that is created by
+    // newProverEnvironment()
+    Solver newSolver = new Solver(termManager);
 
     try {
       setSolverOptions(newSolver, randomSeed, settings.furtherOptionsMap);
@@ -127,7 +137,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(e.getMessage(), e);
     }
 
-    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(newSolver);
+    CVC5FormulaCreator pCreator = new CVC5FormulaCreator(termManager, newSolver);
 
     // Create managers
     CVC5UFManager functionTheory = new CVC5UFManager(pCreator);
@@ -161,7 +171,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             enumTheory);
 
     return new CVC5SolverContext(
-        pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
+        pCreator, manager, pShutdownNotifier, termManager, newSolver, randomSeed, settings);
   }
 
   /**
@@ -169,29 +179,18 @@ public final class CVC5SolverContext extends AbstractSolverContext {
    *
    * @throws CVC5ApiRecoverableException from native code.
    */
-  private static void setSolverOptions(
+  static void setSolverOptions(
       Solver pSolver, int randomSeed, ImmutableMap<String, String> furtherOptions)
       throws CVC5ApiRecoverableException {
     pSolver.setOption("seed", String.valueOf(randomSeed));
     pSolver.setOption("output-language", "smtlib2");
 
+    // Enable support for arbitrary size floating-point formats
+    pSolver.setOption("fp-exp", "true");
+
     for (Entry<String, String> option : furtherOptions.entrySet()) {
       pSolver.setOption(option.getKey(), option.getValue());
     }
-
-    // Set Strings option to enable all String features (such as lessOrEquals).
-    // This should not have any effect for non-string theories.
-    // pSolver.setOption("strings-exp", "true");
-
-    // pSolver.setOption("finite-model-find", "true");
-    // pSolver.setOption("sets-ext", "true");
-
-    // pSolver.setOption("produce-models", "true");
-    // pSolver.setOption("produce-unsat-cores", "true");
-
-    // Neither simplification, arith-rewrite-equalities, pb-rewrites provide rewrites of trivial
-    // formulas only.
-    // Note: with solver.getOptionNames() you can get all options
   }
 
   @Override
@@ -207,9 +206,10 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      solver.deletePointer();
       // Don't use Context.deletePointers(); as it deletes statically information from all
       // existing contexts, not only this one!
+      termManager.deletePointer();
+      solver.deletePointer();
       creator = null;
     }
   }
