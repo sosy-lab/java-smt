@@ -35,7 +35,7 @@ import java.util.Map;
  * Converts a Z3 proof to a RESOLUTE proof.
  */
 
-@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access","ModifiedButNotUsed"})
 public class Z3ToResoluteProofConverter {
 
   private final Z3FormulaManager formulaManager;
@@ -102,7 +102,7 @@ public class Z3ToResoluteProofConverter {
    */
 
 
-   static ResolutionProofDag convertToResolutionProofDAG(Z3ProofNode[] z3ProofNodes) {
+   static ResolutionProofDag convertToResolutionProofDag(Z3ProofNode[] z3ProofNodes) {
     ResolutionProofDag dag = new ResolutionProofDag();
 
     for (Z3ProofNode z3Node : z3ProofNodes) {
@@ -593,7 +593,7 @@ public class Z3ToResoluteProofConverter {
       System.out.println(indent + "No. Children: " + sourceNode.getChildren().size());
       int i = 0;
       for (ProofNode child : sourceNode.getChildren()) {
-        System.out.println(indent + "Child " + (++i) + ":");
+        System.out.println(indent + "Child " + ++i + ":");
         printProof(child, indentLevel + 1);
       }
     } else if (node instanceof ResolutionProofNode) {
@@ -604,7 +604,7 @@ public class Z3ToResoluteProofConverter {
       System.out.println(indent + "No. Children: " + resolutionNode.getChildren().size());
       int i = 0;
       for (ProofNode child : resolutionNode.getChildren()) {
-        System.out.println(indent + "Child " + (++i) + ":");
+        System.out.println(indent + "Child " + ++i + ":");
         printProof(child, indentLevel + 1);
       }
     } else {

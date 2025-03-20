@@ -113,7 +113,7 @@ public class Z3ProofsTest {
       ProofNode proof = prover.getProof();
       assertThat(proof).isNotNull();
 
-      System.out.println(((Z3ProofNode) proof).Z3ProofAsString());
+      System.out.println(((Z3ProofNode) proof).asString());
     } catch (SolverException pE) {
       throw new RuntimeException(pE);
     }
@@ -142,7 +142,7 @@ public class Z3ProofsTest {
           (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
       Z3ProofNode root = parser.fromAST(proof);
 
-      System.out.println(root.Z3ProofAsString());
+      System.out.println(root.asString());
 
 
     } finally {
@@ -173,7 +173,7 @@ public class Z3ProofsTest {
           (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
       Z3ProofNode root = parser.fromASTIterative(proof);
 
-      System.out.println(root.Z3ProofAsString());
+      System.out.println(root.asString());
 
 
     } finally {
@@ -211,7 +211,7 @@ public class Z3ProofsTest {
           (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
       Z3ProofNode nRroot = nrParser.fromASTIterative(proof);
 
-      assertEquals(root.Z3ProofAsString(), nRroot.Z3ProofAsString());
+      assertEquals(root.asString(), nRroot.asString());
 
 
     } finally {
@@ -264,7 +264,7 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void Z3handleTransTest() {
+  public void Z3handleTransitivityTest() {
     BooleanFormula f1 = bmgr.makeVariable("f1");
     BooleanFormula f2 = bmgr.makeVariable("f2");
     BooleanFormula f3 = bmgr.makeVariable("f3");
@@ -276,7 +276,7 @@ public class Z3ProofsTest {
     pn.addChild(new Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
     pn.addChild(new Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
-    System.out.println(pn.Z3ProofAsString());
+    System.out.println(pn.asString());
 
     Z3ToResoluteProofConverter pc = new Z3ToResoluteProofConverter(mgr);
 

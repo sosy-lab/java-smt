@@ -11,11 +11,11 @@ class Z3ProofNode extends AbstractProofNode {
     super(pProofRule, pFormula);
   }
 
-  String Z3ProofAsString() {
-    return Z3ProofAsString(0);
+  String asString() {
+    return asString(0);
   }
 
-  private String Z3ProofAsString(int indentLevel) {
+  private String asString(int indentLevel) {
     StringBuilder proof = new StringBuilder();
     String indent = "  ".repeat(indentLevel);
 
@@ -26,7 +26,7 @@ class Z3ProofNode extends AbstractProofNode {
     int i = 0;
     for (ProofNode child : getChildren()) {
       proof.append(indent).append("Child ").append(++i).append(":\n");
-      proof.append(((Z3ProofNode) child).Z3ProofAsString(indentLevel + 1));
+      proof.append(((Z3ProofNode) child).asString(indentLevel + 1));
     }
 
     return proof.toString();

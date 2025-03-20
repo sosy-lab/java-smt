@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.sosy_lab.common.NativeLibraries;
 
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 @Ignore
 public class CVC5ProofsTest {
   @BeforeClass

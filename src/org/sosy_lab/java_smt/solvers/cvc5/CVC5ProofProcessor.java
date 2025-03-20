@@ -10,5 +10,5 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-public class CVC5ProofParser {
+public class CVC5ProofProcessor {
 }

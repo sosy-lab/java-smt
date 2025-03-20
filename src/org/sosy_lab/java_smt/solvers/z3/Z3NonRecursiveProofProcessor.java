@@ -31,7 +31,6 @@ class Z3NonRecursiveProofProcessor {
   private final long z3solver;
   private final Z3FormulaCreator formulaCreator;
   private final Z3AbstractProver prover;
-  private final Map<Long, Z3ProofNode> parsed = new HashMap<>();
 
   Z3NonRecursiveProofProcessor(
       long ctx, long solver, Z3FormulaCreator creator,

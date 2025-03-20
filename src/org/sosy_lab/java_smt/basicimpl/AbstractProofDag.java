@@ -13,7 +13,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import org.sosy_lab.java_smt.api.proofs.ProofDAG;
+import org.sosy_lab.java_smt.api.proofs.ProofDag;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  *
  * @author Gabriel Carpio
  */
-public abstract class AbstractProofDAG implements ProofDAG {
+public abstract class AbstractProofDag implements ProofDag {
   private final Map<Integer, ProofNode> nodes = new HashMap<>();
   private int nodeIdCounter = 0;
 
