@@ -17,12 +17,15 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_constants;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_integer_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_model_value;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_enum_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_integer_type;
@@ -43,6 +46,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_mode
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_arity;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_child;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_name;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_id;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_is_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_set_option_checked;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
@@ -88,6 +96,56 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     const1 = msat_make_number(env, "1");
     long rationalType = msat_get_rational_type(env);
     var = msat_make_variable(env, "rat", rationalType);
+  }
+
+  @Test
+  public void proofTest() throws IllegalStateException, InterruptedException, SolverException {
+    long cfg = msat_create_config();
+
+    msat_set_option_checked(cfg, "proof_generation", "true");
+
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
+
+    const0 = msat_make_number(env, "0");
+    const1 = msat_make_number(env, "1");
+    long rationalType = msat_get_rational_type(env);
+    var = msat_make_variable(env, "rat", rationalType);
+
+    msat_push_backtrack_point(env);
+
+    msat_assert_formula(env, msat_make_equal(env, var, const0));
+    msat_assert_formula(env, msat_make_equal(env, var, const1));
+
+    // UNSAT
+    assertThat(msat_check_sat(env)).isFalse();
+
+    long proofMgr = msat_get_proof_manager(env);
+    long proof = msat_get_proof(proofMgr);
+
+    assertThat(msat_proof_is_term(proof)).isFalse();
+
+    assertThat(msat_proof_get_arity(proof)).isEqualTo(1);
+
+    String proofName = msat_proof_get_name(proof);
+    assertThat(proofName).isEqualTo("res-chain");
+
+    // Child is also a proof
+    long proofChild = msat_proof_get_child(proof, 0);
+    assertThat(msat_proof_get_name(proofChild)).isEqualTo("clause-hyp");
+    assertThat(msat_proof_is_term(proofChild)).isFalse();
+    assertThat(msat_proof_get_arity(proofChild)).isEqualTo(0);
+
+    // Can be used to check for the equality of proofs
+    int proofID = msat_proof_id(proof);
+    int proofChildID = msat_proof_id(proofChild);
+    assertThat(proofChildID).isNotEqualTo(proofID);
+
+    // TODO: test term representation of a proof
+    // long term = msat_proof_get_term(proofChild2);
+
+    // Cleans up the proof manager and the associated proof
+    msat_destroy_proof_manager(proofMgr);
   }
 
   /** x == 0 and sin(x) == 0 SAT; x == 1 and sin(x) == 0 UNSAT. */

@@ -310,6 +310,16 @@ typedef jlong jjenv;
 #define ENV_ARG_VOID(num) STRUCT_ARG_VOID(msat_env, num)
 #define ENV_RETURN STRUCT_RETURN
 
+typedef jlong jjproofmgr;
+#define PROOF_MGR_ARG(num) STRUCT_ARG(msat_proof_manager, num)
+#define PROOF_MGR_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof_manager, num)
+#define PROOF_MGR_RETURN STRUCT_RETURN
+
+typedef jlong jjproof;
+#define PROOF_ARG(num) STRUCT_ARG(msat_proof, num)
+#define PROOF_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof, num)
+#define PROOF_RETURN STRUCT_RETURN
+
 typedef jlong jjconf;
 #define CONF_ARG(num) STRUCT_ARG(msat_config, num)
 #define CONF_ARG_VOID(num) STRUCT_ARG_VOID(msat_config, num)
