@@ -136,7 +136,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     if (options != null
         && Arrays.asList(options)
-            .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE)) {
+            .contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
       } catch (IOException | UnsupportedOperationException e) {

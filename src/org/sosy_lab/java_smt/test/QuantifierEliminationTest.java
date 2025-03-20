@@ -177,7 +177,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.EXTERNAL_QUANTIFIER_CREATION);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
@@ -206,7 +206,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.MATHSAT5, Solvers.Z3, Solvers.PRINCESS);
 
-    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.EXTERNAL_QUANTIFIER_CREATION);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
@@ -234,7 +234,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
 
-    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.EXTERNAL_QUANTIFIER_CREATION);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula two = imgr.makeNumber(2);
@@ -261,7 +261,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
 
-    qmgr.setOptions(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION_BEFORE);
+    qmgr.setOptions(ProverOptions.EXTERNAL_QUANTIFIER_CREATION);
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
