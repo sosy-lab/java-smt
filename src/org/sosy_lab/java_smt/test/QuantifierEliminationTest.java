@@ -14,7 +14,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
-import java.io.IOException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -28,7 +27,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testEliminationWithUltimateEliminator()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -132,7 +131,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testEliminationWithUltimateEliminatorWithArray()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireIntegers();
     requireArrays();
     requireQuantifiers();
@@ -277,7 +276,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testQuantElimNoFallback() throws SolverException, InterruptedException, IOException {
+  public void testQuantElimNoFallback() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -389,7 +388,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testQuantElimFallback() throws SolverException, IOException, InterruptedException {
+  public void testQuantElimFallback() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
     requireArrays();
@@ -427,7 +426,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testQuantElimFallbackWithoutWarning()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 

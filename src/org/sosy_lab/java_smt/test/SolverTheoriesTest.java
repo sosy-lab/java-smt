@@ -15,7 +15,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -634,7 +633,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void quantifierEliminationTest1()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
@@ -660,7 +659,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   @Ignore
   public void quantifierEliminationTest2()
-      throws SolverException, InterruptedException, IOException {
+      throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
