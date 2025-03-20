@@ -66,6 +66,15 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private BooleanFormula bv_forall_x_a_at_x_eq_0;
 
   @Before
+  public void setUp() {
+    requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+  }
+
+  @Before
   public void setUpLIA() {
     requireIntegers();
     requireArrays();
