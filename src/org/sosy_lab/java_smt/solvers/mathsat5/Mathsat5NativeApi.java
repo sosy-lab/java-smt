@@ -710,9 +710,24 @@ final class Mathsat5NativeApi {
 
   public static native String msat_to_smtlib2(long e, long t);
 
-  // TODO: added but does not work due to java.lang.UnsatisfiedLinkError
-  public static native String msat_to_smtlib2_ext(long e, long t, String name, long u);
+  /**
+   * @param env The environment in which term is defined.
+   * @param term The term to convert.
+   * @param logic_name Name of the SMT-LIBv2 logic for the output. Can be empty string (not NULL as
+   *     in the MathSAT5 documentation!).
+   * @param use_defines If nonzero, the output will contain define-funs instead of let bindings.
+   * @return a string in SMT-LIB v2 format for the formula represented by term, or NULL in case of
+   *     errors. If not NULL, the returned string must be deallocated by the user with msat_free().
+   */
+  public static native String msat_to_smtlib2_ext(
+      long env, long term, String logic_name, long use_defines);
 
+  /**
+   * @param e The environment in which term is defined.
+   * @param t The term to print.
+   * @return a string in SMT-LIB v2 format for the given term, or NULL in case of errors. If not
+   *     NULL, the returned string must be deallocated by the user with msat_free().
+   */
   public static native String msat_to_smtlib2_term(long e, long t);
 
   public static native String msat_named_list_to_smtlib2(long e, NamedTermsWrapper w);
