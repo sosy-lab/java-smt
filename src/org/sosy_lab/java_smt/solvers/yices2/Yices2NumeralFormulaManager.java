@@ -24,6 +24,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_f
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_rational;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sub;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
@@ -104,8 +105,11 @@ abstract class Yices2NumeralFormulaManager<
 
   @Override
   public Integer distinctImpl(List<Integer> pNumbers) {
-    int[] numberTerms = Ints.toArray(pNumbers);
-    return yices_distinct(numberTerms.length, numberTerms);
+    if (pNumbers.size() < 2) {
+      return yices_true();
+    } else {
+      return yices_distinct(pNumbers.size(), Ints.toArray(pNumbers));
+    }
   }
 
   @Override

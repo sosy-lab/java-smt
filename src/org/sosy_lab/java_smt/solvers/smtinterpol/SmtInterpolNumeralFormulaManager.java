@@ -148,7 +148,11 @@ abstract class SmtInterpolNumeralFormulaManager<
 
   @Override
   public Term distinctImpl(List<Term> pNumbers) {
-    return env.term("distinct", pNumbers.toArray(new Term[0]));
+    if (pNumbers.size() < 2) {
+      return env.getTheory().mTrue;
+    } else {
+      return env.term("distinct", pNumbers.toArray(new Term[0]));
+    }
   }
 
   @Override
