@@ -45,7 +45,7 @@ public class ParseGenerateAndReparse {
     // Try to get the solver
     Solvers solver;
     try {
-      solver = Solvers.valueOf(solverName.toLowerCase(Locale.ROOT));
+      solver = Solvers.valueOf(solverName.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException e) {
       System.err.println("Invalid solver name: " + solverName);
       System.exit(1);
