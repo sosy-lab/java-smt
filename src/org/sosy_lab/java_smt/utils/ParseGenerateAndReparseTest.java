@@ -1,6 +1,7 @@
 package org.sosy_lab.java_smt.utils;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Locale;
@@ -29,7 +30,7 @@ public class ParseGenerateAndReparseTest {
     String smt2FilePath = args[0];
     String smt2;
     try {
-      smt2 = new String(Files.readAllBytes(Paths.get(smt2FilePath)));
+      smt2 = Files.readString(Paths.get(smt2FilePath), Charset.defaultCharset());;
     } catch (IOException e) {
       System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
       e.printStackTrace();
