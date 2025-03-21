@@ -1,11 +1,17 @@
-package org.sosy_lab.java_smt.test.example;
+/*
+ * This file is part of JavaSMT,
+ * an API wrapper for a collection of SMT solvers:
+ * https://github.com/sosy-lab/java-smt
+ *
+ * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
+package org.sosy_lab.java_smt.utils;
 
 import java.io.IOException;
 import java.util.Locale;
-import org.junit.Test;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -19,11 +25,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class ParseGenerateAndReparseTest {
-  @Test
-  public void testGenerateAndReparse(){
-    assume().withMessage("Test file under construction")
-        .that(true).isFalse();
-  }
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
 
@@ -78,8 +79,10 @@ public class ParseGenerateAndReparseTest {
     boolean z3Sat = z3proverEnv.isUnsat();
     boolean reparsedSat = solverLessProverEnv.isUnsat();
 
-    assertThat(z3Sat).isEqualTo(reparsedSat);
-
-    System.out.println("Test erfolgreich: " + z3Sat);
+    if (z3Sat == reparsedSat) {
+      System.out.println("Test erfolgreich: " + z3Sat);
+      System.exit(0);
+    }
+    System.exit(1);
   }
 }
