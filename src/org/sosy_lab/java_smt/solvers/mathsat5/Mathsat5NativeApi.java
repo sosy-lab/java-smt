@@ -814,13 +814,13 @@ final class Mathsat5NativeApi {
 
   public static native long msat_proof_id(long proof);
 
-  public static native int msat_proof_is_term(long proof);
+  public static native boolean msat_proof_is_term(long proof);
 
   public static native long msat_proof_get_term(long proof);
 
   public static native String msat_proof_get_name(long proof);
 
-  public static native long msat_proof_get_arity(long proof);
+  public static native int msat_proof_get_arity(long proof);
 
   public static native long msat_proof_get_child(long proof, long index);
 

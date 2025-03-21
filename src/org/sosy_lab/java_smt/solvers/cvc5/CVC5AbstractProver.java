@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Proof;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
@@ -36,6 +37,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -82,6 +84,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       pSolver.setOption("produce-unsat-cores", "true");
+    }
+    if (pOptions.contains(ProverOptions.GENERATE_PROOFS)) {
+        pSolver.setOption("produce-proofs", "true");
+      System.out.println("proofs enabled");
     }
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");
@@ -233,6 +239,17 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ProofNode getProof() {
+    Proof proof = solver.getProof()[0];
+    CVC5ProofProcessor pp = new CVC5ProofProcessor(creator, this);
+    try {
+      return pp.fromCVC5Proof(proof);
+    } catch (CVC5ApiException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   @Override

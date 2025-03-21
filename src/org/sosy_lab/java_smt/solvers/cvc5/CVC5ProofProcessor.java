@@ -21,13 +21,10 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class CVC5ProofProcessor {
-  private final CVC5SolverContext context;
   private final CVC5FormulaCreator formulaCreator;
   private final CVC5AbstractProver prover;
 
-  CVC5ProofProcessor(
-      CVC5SolverContext ctx, CVC5FormulaCreator creator, CVC5AbstractProver pProver) {
-    context = ctx;
+  CVC5ProofProcessor(CVC5FormulaCreator creator, CVC5AbstractProver pProver) {
     formulaCreator = creator;
     prover = pProver;
   }

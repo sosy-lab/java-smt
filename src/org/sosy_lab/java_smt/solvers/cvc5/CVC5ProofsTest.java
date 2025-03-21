@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
@@ -19,11 +20,25 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import java.util.Set;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sosy_lab.common.NativeLibraries;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
+
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class CVC5ProofsTest {
@@ -40,12 +55,34 @@ public class CVC5ProofsTest {
   private static TermManager tm;
   private static Sort booleanSort;
   private Solver solver;
+  private SolverContext context;
+  private CVC5FormulaManager mgr;
+  private CVC5BooleanFormulaManager bmgr;
 
   @Before
   public void init() throws CVC5ApiException {
     tm = new TermManager();
     booleanSort = tm.getBooleanSort();
     solver = createEnvironment();
+  }
+
+  @Before
+  public void setUpSolver() throws Exception {
+    Configuration config = Configuration.defaultConfiguration();
+    LogManager logger = BasicLogManager.create(config);
+    ShutdownManager shutdown = ShutdownManager.create();
+
+    context =
+        CVC5SolverContext.create(
+            logger,
+            config,
+            shutdown.getNotifier(),
+            42, // random seed value
+            NonLinearArithmetic.USE,
+            FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN,
+            NativeLibraries::loadLibrary);
+    mgr = (CVC5FormulaManager) context.getFormulaManager();
+    bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
   }
 
   private static Solver createEnvironment() throws CVC5ApiException {
@@ -63,6 +100,27 @@ public class CVC5ProofsTest {
     newSolver.setOption("produce-proofs", "true");
 
     return newSolver;
+  }
+
+  @Test
+  public void getProofTest() {
+    // example from the 2022 RESOLUTE paper
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS);
+    try {
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
+      assertTrue(prover.isUnsat());
+
+      ProofNode proof = prover.getProof();
+      assertThat(proof).isNotNull();
+    } catch (SolverException | InterruptedException pE) {
+      throw new RuntimeException(pE);
+    }
+
   }
 
   private void processProof(Proof proof, int depth, int childNumber) throws CVC5ApiException {
@@ -95,8 +153,8 @@ public class CVC5ProofsTest {
     // (assert q1)
     // (assert (not q2))
     Sort booleanSort = tm.getBooleanSort();
-    Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
-    Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
+    Term q1 = solver.declareFun("q1", new Sort[]{}, booleanSort);
+    Term q2 = solver.declareFun("q2", new Sort[]{}, booleanSort);
 
     solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
     solver.assertFormula(q1);
@@ -122,8 +180,8 @@ public class CVC5ProofsTest {
     // (assert q1)
     // (assert (not q2))
     Sort booleanSort = tm.getBooleanSort();
-    Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
-    Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
+    Term q1 = solver.declareFun("q1", new Sort[]{}, booleanSort);
+    Term q2 = solver.declareFun("q2", new Sort[]{}, booleanSort);
 
     solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
     solver.assertFormula(q1);
