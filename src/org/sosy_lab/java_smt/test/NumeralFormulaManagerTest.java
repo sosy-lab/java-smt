@@ -69,6 +69,13 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isUnsatisfiable();
   }
 
+  @Test
+  public void trivialDistinctTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    assertThatFormula(imgr.distinct(ImmutableList.of())).isTautological();
+    assertThatFormula(imgr.distinct(ImmutableList.of(imgr.makeVariable("a")))).isTautological();
+  }
+
   @SuppressWarnings("CheckReturnValue")
   @Test
   public void failOnInvalidStringInteger() {
