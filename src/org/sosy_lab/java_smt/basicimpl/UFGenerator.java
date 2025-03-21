@@ -13,10 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
@@ -42,7 +44,13 @@ public class UFGenerator {
         inputArgs.append("Int");
       } else if (arg.isRationalType()) {
         inputArgs.append("Real");
-      } else {
+      } else if (arg.isStringType()) {
+        return "String";
+      } else if (arg.isFloatingPointType()){
+        FloatingPointType type = (FloatingPointType) arg;
+        return "(_ FloatingPoint "+ type.getExponentSize() + " " + type.getExponentSize() + ")";
+      }
+      else {
         throw new GeneratorException(arg + " is not a known sort. ");
       }
     }
@@ -66,7 +74,13 @@ public class UFGenerator {
       return "Int";
     } else if (out.isRationalType()) {
       return "Real";
-    } else {
+    } else if (out.isStringType()) {
+      return "String";
+    } else if (out.isFloatingPointType()){
+      FloatingPointType type = (FloatingPointType) out;
+      return "(_ FloatingPoint "+ type.getExponentSize() + " " + type.getExponentSize() + ")";
+    }
+    else {
       throw new GeneratorException(out + " is not a known sort. ");
     }
   }
