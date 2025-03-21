@@ -8,16 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
+import ap.parser.IFormula;
 import ap.parser.IFunApp;
-import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.rationals.Rationals;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.function.BiFunction;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -120,35 +120,54 @@ public class PrincessRationalFormulaManager
     return Rationals.minus((ITerm) pNumber);
   }
 
+  /** Cast both arguments to <code>rational</code> and apply the operation */
+  private <RType> RType applyWithCast(BiFunction<ITerm, ITerm, RType> op, ITerm arg1, ITerm arg2) {
+    FormulaType<?> sort1 = getFormulaCreator().getFormulaType(arg1);
+    FormulaType<?> sort2 = getFormulaCreator().getFormulaType(arg2);
+
+    ITerm castArg1 = sort1.isIntegerType() ? Rationals.int2ring(arg1) : arg1;
+    ITerm castArg2 = sort2.isIntegerType() ? Rationals.int2ring(arg2) : arg2;
+
+    return op.apply(castArg1, castArg2);
+  }
+
   @Override
   protected ITerm add(IExpression pNumber1, IExpression pNumber2) {
-    return Rationals.plus((ITerm) pNumber1, (ITerm) pNumber2);
+    return applyWithCast(Rationals::plus, (ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   protected ITerm subtract(IExpression pNumber1, IExpression pNumber2) {
-    return Rationals.minus((ITerm) pNumber1, (ITerm) pNumber2);
+    return applyWithCast(Rationals::minus, (ITerm) pNumber1, (ITerm) pNumber2);
   }
 
   @Override
   protected IExpression multiply(IExpression number1, IExpression number2) {
-    FormulaType<?> sort1 = getFormulaCreator().getFormulaType(number1);
-    FormulaType<?> sort2 = getFormulaCreator().getFormulaType(number1);
-
-    IExpression result = Rationals.mul((ITerm) number1, (ITerm) number2);
-
-    if (result instanceof IIntLit && ((IIntLit) result).value().equals(IdealInt.apply(0))) {
-      // If the result is (integer) zero we may have lost our type
-      // Check the type of both arguments and convert the result back to rational if needed
-      if (sort1.isRationalType() || sort2.isRationalType()) {
-        result = Rationals.int2ring((IIntLit) result);
-      }
-    }
-    return result;
+    return applyWithCast(Rationals::mul, (ITerm) number1, (ITerm) number2);
   }
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
-    return Rationals.div((ITerm) number1, (ITerm) number2);
+    return applyWithCast(Rationals::div, (ITerm) number1, (ITerm) number2);
+  }
+
+  @Override
+  protected IFormula greaterThan(IExpression number1, IExpression number2) {
+    return applyWithCast(Rationals::gt, (ITerm) number1, (ITerm) number2);
+  }
+
+  @Override
+  protected IFormula greaterOrEquals(IExpression number1, IExpression number2) {
+    return applyWithCast(Rationals::geq, (ITerm) number1, (ITerm) number2);
+  }
+
+  @Override
+  protected IFormula lessThan(IExpression number1, IExpression number2) {
+    return applyWithCast(Rationals::lt, (ITerm) number1, (ITerm) number2);
+  }
+
+  @Override
+  protected IFormula lessOrEquals(IExpression number1, IExpression number2) {
+    return applyWithCast(Rationals::leq, (ITerm) number1, (ITerm) number2);
   }
 }
