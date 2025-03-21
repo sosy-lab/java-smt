@@ -380,11 +380,11 @@ public abstract class SolverBasedTest0 {
         .isEqualTo(Solvers.Z3);
   }
 
-  protected void requireProofGeneration(){
-        assume()
-                .withMessage("Solver %s does not support proof generation", solverToUse())
-                .that(solverToUse())
-                .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA, Solvers.YICES2);
+  protected void requireProofGeneration() {
+    assume()
+        .withMessage("Solver %s does not support proof generation", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA, Solvers.YICES2);
   }
 
   /**

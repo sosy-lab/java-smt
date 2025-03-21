@@ -10,10 +10,10 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
+import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.SourceProofNode;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
 public class ProofFactory {
   public static ProofNode createSourceNode(ResAxiom rule, Formula formula) {

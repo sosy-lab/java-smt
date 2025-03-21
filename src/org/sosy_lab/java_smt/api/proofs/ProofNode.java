@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
@@ -22,9 +21,7 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  */
 public interface ProofNode {
 
-  /**
-   * Get the children of the proof node.
-   */
+  /** Get the children of the proof node. */
   List<ProofNode> getChildren();
 
   void addChild(ProofNode child);

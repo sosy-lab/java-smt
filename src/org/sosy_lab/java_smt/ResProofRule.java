@@ -19,11 +19,9 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  */
 public class ResProofRule {
 
-  /**
-   * Any operation that proves a term.
-   */
+  /** Any operation that proves a term. */
   public enum ResAxiom implements ProofRule {
-    //Resolution Rule
+    // Resolution Rule
     RESOLUTION("res", "(res t proof1 proof2)"),
 
     ASSUME("assume", "(assume t)"),
@@ -102,7 +100,8 @@ public class ResProofRule {
     DT_TEST_CONS_PRIME("dt_test_cons_prime", "(~ ((_ is cons') (cons a1 ... an)))"),
     DT_EXHAUST("dt_exhaust", "((_ is cons1) x), ..., ((_ is consn) x)"),
     DT_ACYCLIC("dt_acyclic", "(~ (= (cons ... x ...) x))"),
-    DT_MATCH("dt_match",
+    DT_MATCH(
+        "dt_match",
         "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))");
 
     private final String name;
@@ -145,5 +144,4 @@ public class ResProofRule {
 
     throw new IllegalArgumentException("Rule not found or not specified: " + name);
   }
-
 }

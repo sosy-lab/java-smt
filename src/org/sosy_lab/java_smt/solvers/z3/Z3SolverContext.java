@@ -55,8 +55,10 @@ public final class Z3SolverContext extends AbstractSolverContext {
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
 
-    @Option(secure = true, description = "Require proofs from SMT solver",
-    values = {"true", "false"})
+    @Option(
+        secure = true,
+        description = "Require proofs from SMT solver",
+        values = {"true", "false"})
     boolean requireProofs = false;
 
     @Option(
@@ -282,7 +284,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     }
   }
 
-  //Method exlcusively used for testing
+  // Method exlcusively used for testing
   boolean getGenerateProofs() {
     return GENERATE_PROOFS;
   }

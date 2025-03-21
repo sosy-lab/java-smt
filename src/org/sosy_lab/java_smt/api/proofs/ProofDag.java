@@ -15,8 +15,12 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
 public interface ProofDag {
   void addNode(ProofNode node);
+
   ProofNode getNode(int nodeId);
+
   void addEdge(int parentNodeId, int childNodeId);
+
   Collection<ProofNode> getNodes();
+
   void accept(ProofVisitor visitor); // To allow traversal of the entire DAG
 }

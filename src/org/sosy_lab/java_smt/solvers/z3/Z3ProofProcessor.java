@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
@@ -19,17 +18,14 @@ import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
- class Z3ProofProcessor {
+class Z3ProofProcessor {
   private final long z3context;
   private final long z3solver;
   private final Z3FormulaCreator formulaCreator;
   private final Z3AbstractProver prover;
   private final Map<Long, Z3ProofNode> parsed = new HashMap<>();
 
-
-  Z3ProofProcessor(
-      long ctx, long solver, Z3FormulaCreator creator,
-      Z3AbstractProver pProver) {
+  Z3ProofProcessor(long ctx, long solver, Z3FormulaCreator creator, Z3AbstractProver pProver) {
     z3context = ctx;
     z3solver = solver;
     formulaCreator = creator;
@@ -44,8 +40,7 @@ import org.sosy_lab.java_smt.api.Formula;
     Native.incRef(z3context, proof);
     long sort = Native.getSort(z3context, proof);
     long sortKind = Native.getSortKind(z3context, sort);
-    int declKind = Native.getDeclKind(z3context,
-        Native.getAppDecl(z3context, proof));
+    int declKind = Native.getDeclKind(z3context, Native.getAppDecl(z3context, proof));
     int numArgs = Native.getAppNumArgs(z3context, proof);
     Z3_sort_kind sort_kind = Z3_sort_kind.fromInt((int) sortKind);
     Formula formula;
@@ -170,8 +165,8 @@ import org.sosy_lab.java_smt.api.Formula;
     }
   }
 
-  //@Nullable
-  //private Formula getFromStoredConstraints(long proof) {
+  // @Nullable
+  // private Formula getFromStoredConstraints(long proof) {
   //  String varName = Native.astToString(z3context, proof);
   //  if (prover.getStoredConstraints().peek().containsKey(varName)) {
   //    return prover.getStoredConstraints().peek().get(varName);
@@ -182,13 +177,10 @@ import org.sosy_lab.java_smt.api.Formula;
 
   private Formula generateFormula(long proof) {
     Formula formula = null;
-    //Formula formula = getFromStoredConstraints(proof);
+    // Formula formula = getFromStoredConstraints(proof);
     if (formula == null) {
       formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proof), proof);
     }
     return formula;
   }
-
 }
-
-

@@ -10,10 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDag;
 
-
-public class Z3ProofDag extends AbstractProofDag {
-
-}
+public class Z3ProofDag extends AbstractProofDag {}

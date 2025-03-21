@@ -14,7 +14,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
-//TODO: Correct parsing of the proof terms is missing, i.e. creation of nodes in the DAG and
+// TODO: Correct parsing of the proof terms is missing, i.e. creation of nodes in the DAG and
 // parsing annotations. Add relevant javadocs
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class ProofTermParser {
@@ -31,11 +31,8 @@ public class ProofTermParser {
     proofDag = new ResolutionProofDag();
   }
 
-
   public static ResolutionProofDag convert(
-      Term proof,
-      FormulaManager pManager,
-      Map<String, BooleanFormula> pAnnotatedTerms) {
+      Term proof, FormulaManager pManager, Map<String, BooleanFormula> pAnnotatedTerms) {
     ProofTermParser parser = new ProofTermParser(pAnnotatedTerms, pManager);
     ProofNode rootNode = parser.parseProofTerm(proof);
     if (rootNode != null) {
@@ -43,7 +40,6 @@ public class ProofTermParser {
     }
     return parser.proofDag;
   }
-
 
   public ProofNode parseProofTerm(Term term) {
     if (termToNode.containsKey(term)) {
@@ -69,7 +65,8 @@ public class ProofTermParser {
 
   private ProofNode parseAnnotatedTerm(AnnotatedTerm term) {
     for (Annotation annotation : term.getAnnotations()) {
-      if (annotation.getKey().equals(":proves") || annotation.getKey().equals(":rup")
+      if (annotation.getKey().equals(":proves")
+          || annotation.getKey().equals(":rup")
           || annotation.getKey().equals(":input")) {
         Term formulaTerm = extractFormulaFromAnnotation(annotation);
         BooleanFormula formula = getBooleanFormulaFromTerm(formulaTerm);

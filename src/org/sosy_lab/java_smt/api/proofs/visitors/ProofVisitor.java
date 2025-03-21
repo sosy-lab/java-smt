@@ -15,5 +15,6 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public interface ProofVisitor {
   void visitNode(ProofNode node);
+
   void visitDAG(ProofDag dag);
 }

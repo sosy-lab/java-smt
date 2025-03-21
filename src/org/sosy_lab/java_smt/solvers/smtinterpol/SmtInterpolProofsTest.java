@@ -52,13 +52,14 @@ public class SmtInterpolProofsTest {
     ShutdownManager shutdown = ShutdownManager.create();
 
     // Create new context with SMTInterpol
-    context = SmtInterpolSolverContext.create(
-        config,
-        logger,
-        shutdown.getNotifier(),
-        null, // no logfile
-        42,   // randomSeed
-        NonLinearArithmetic.USE);
+    context =
+        SmtInterpolSolverContext.create(
+            config,
+            logger,
+            shutdown.getNotifier(),
+            null, // no logfile
+            42, // randomSeed
+            NonLinearArithmetic.USE);
 
     // Get managers for creating formulas
     mgr = (SmtInterpolFormulaManager) context.getFormulaManager();
@@ -75,28 +76,27 @@ public class SmtInterpolProofsTest {
 
   @Test
   public void testGetProofTerm() throws SolverException, InterruptedException {
-    //example from the 2022 paper
+    // example from the 2022 paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
     BooleanFormula notQ1OrQ2 = bmgr.or(bmgr.not(q1), q2);
     BooleanFormula q1True = bmgr.equivalence(q1, bmgr.makeTrue());
     BooleanFormula q2False = bmgr.equivalence(q2, bmgr.makeFalse());
 
-    SmtInterpolTheoremProver prover = (SmtInterpolTheoremProver) context.newProverEnvironment0(
-        Set.of(ProverOptions.GENERATE_PROOFS));
+    SmtInterpolTheoremProver prover =
+        (SmtInterpolTheoremProver)
+            context.newProverEnvironment0(Set.of(ProverOptions.GENERATE_PROOFS));
     try {
       prover.addConstraint(notQ1OrQ2);
       prover.addConstraint(q1True);
       prover.addConstraint(q2False);
       assertThat(prover.isUnsat()).isTrue();
 
-
       Term proof = prover.smtInterpolGetProof();
       assertThat(proof).isNotNull();
 
-
-      //String proofStr = proof.toString();
-      //System.out.println(proofStr);
+      // String proofStr = proof.toString();
+      // System.out.println(proofStr);
       System.out.println(proof);
     } finally {
       prover.close();
@@ -105,26 +105,25 @@ public class SmtInterpolProofsTest {
 
   @Test
   public void testGetProofClause() throws Exception {
-    //example from the 2022 paper
-    String constraint1 = "(set-logic QF_UF)\n" +
-        "(declare-fun q1 () Bool)\n" +
-        "(declare-fun q2 () Bool)\n" +
-        "(assert (or (not q1) q2))";
+    // example from the 2022 paper
+    String constraint1 =
+        "(set-logic QF_UF)\n"
+            + "(declare-fun q1 () Bool)\n"
+            + "(declare-fun q2 () Bool)\n"
+            + "(assert (or (not q1) q2))";
     String constraint2 = "(assert q1)";
     String constraint3 = "(assert (not q2))";
 
+    BooleanFormula formula1 = context.getFormulaManager().parse(constraint1);
 
-    BooleanFormula formula1 =
-        context.getFormulaManager().parse(constraint1);
+    BooleanFormula formula2 = context.getFormulaManager().parse(constraint2);
 
-    BooleanFormula formula2 =
-        context.getFormulaManager().parse(constraint2);
+    BooleanFormula formula3 = context.getFormulaManager().parse(constraint3);
 
-    BooleanFormula formula3 =
-        context.getFormulaManager().parse(constraint3);
-
-    SmtInterpolTheoremProver prover = (SmtInterpolTheoremProver) context.newProverEnvironment0(
-        Set.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
+    SmtInterpolTheoremProver prover =
+        (SmtInterpolTheoremProver)
+            context.newProverEnvironment0(
+                Set.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
 
     SMTInterpol smtinterpol = (SMTInterpol) prover.env;
     try {
@@ -139,8 +138,7 @@ public class SmtInterpolProofsTest {
 
       assertThat(proof).isNotNull();
 
-
-      //String proofStr = proof.toString();
+      // String proofStr = proof.toString();
       System.out.println(invokeGetProofMode(smtinterpol).toString());
       System.out.println(proof.toTerm(smtinterpol.getTheory()));
       System.out.println(proof);
@@ -154,10 +152,11 @@ public class SmtInterpolProofsTest {
   @Test
   public void testProofTermParserIntegration() throws Exception {
     // Arrange: parse constraints as in the SmtInterpolProofsTest.
-    String constraint1 = "(set-logic QF_UF)\n"
-        + "(declare-fun q1 () Bool)\n"
-        + "(declare-fun q2 () Bool)\n"
-        + "(assert (or (not q1) q2))";
+    String constraint1 =
+        "(set-logic QF_UF)\n"
+            + "(declare-fun q1 () Bool)\n"
+            + "(declare-fun q2 () Bool)\n"
+            + "(assert (or (not q1) q2))";
     String constraint2 = "(assert q1)";
     String constraint3 = "(assert (not q2))";
 
@@ -167,8 +166,9 @@ public class SmtInterpolProofsTest {
 
     // Create a prover with proof and model generation enabled.
     SmtInterpolTheoremProver prover =
-        (SmtInterpolTheoremProver) context.newProverEnvironment0(
-            ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
+        (SmtInterpolTheoremProver)
+            context.newProverEnvironment0(
+                ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
     SMTInterpol smtInterpol = (SMTInterpol) prover.env;
     try {
       // Act: add constraints and check unsat.
@@ -181,10 +181,10 @@ public class SmtInterpolProofsTest {
       Term proofTerm = smtInterpol.getProof();
       assertNotNull(proofTerm);
 
-      // Convert the retrieved proof term to a ResolutionProofDAG using the context's formula creator
+      // Convert the retrieved proof term to a ResolutionProofDAG using the context's formula
+      // creator
       // and the asserted formulas.
-      ResolutionProofDag dag =
-          (ResolutionProofDag) prover.getProof();
+      ResolutionProofDag dag = (ResolutionProofDag) prover.getProof();
       assertNotNull(dag);
 
       // Optionally, additional assertions on the dag structure can be added here.
@@ -196,10 +196,11 @@ public class SmtInterpolProofsTest {
   @Test
   public void testSmtInterpolProof() throws Exception {
     // Arrange: parse constraints as in the SmtInterpolProofsTest.
-    String constraint1 = "(set-logic QF_UF)\n"
-        + "(declare-fun q1 () Bool)\n"
-        + "(declare-fun q2 () Bool)\n"
-        + "(assert (or (not q1) q2))";
+    String constraint1 =
+        "(set-logic QF_UF)\n"
+            + "(declare-fun q1 () Bool)\n"
+            + "(declare-fun q2 () Bool)\n"
+            + "(assert (or (not q1) q2))";
     String constraint2 = "(assert q1)";
     String constraint3 = "(assert (not q2))";
 
@@ -208,8 +209,9 @@ public class SmtInterpolProofsTest {
 
     // Create a prover with proof and model generation enabled.
     SmtInterpolTheoremProver prover =
-        (SmtInterpolTheoremProver) context.newProverEnvironment0(
-            ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
+        (SmtInterpolTheoremProver)
+            context.newProverEnvironment0(
+                ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
     SMTInterpol smtInterpol = (SMTInterpol) prover.env;
     try {
       // Act: add constraints and check unsat.
@@ -225,9 +227,8 @@ public class SmtInterpolProofsTest {
       Term proof = prover.smtInterpolGetProof();
       assertThat(proof).isNotNull();
 
-
-      //String proofStr = proof.toString();
-      //System.out.println(proofStr);
+      // String proofStr = proof.toString();
+      // System.out.println(proofStr);
       System.out.println(proof);
 
       // Optionally, additional assertions on the dag structure can be added here.
@@ -241,7 +242,4 @@ public class SmtInterpolProofsTest {
     getProofModeMethod.setAccessible(true);
     return getProofModeMethod.invoke(instance);
   }
-
-
-
 }

@@ -31,5 +31,4 @@ class Z3ProofNode extends AbstractProofNode {
 
     return proof.toString();
   }
-
 }

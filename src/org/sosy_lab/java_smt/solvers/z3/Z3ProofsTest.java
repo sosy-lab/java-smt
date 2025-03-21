@@ -1,16 +1,12 @@
-
 package org.sosy_lab.java_smt.solvers.z3;
-
-import com.microsoft.z3.*;
-
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.microsoft.z3.*;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Solver;
-
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Set;
@@ -23,10 +19,8 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
-
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
@@ -48,16 +42,16 @@ public class Z3ProofsTest {
     ShutdownManager shutdown = ShutdownManager.create();
 
     // Create new context with SMTInterpol
-    context = Z3SolverContext.create(
-        logger,
-        config,
-        shutdown.getNotifier(),
-        null,  // no logfile
-        42,    // random seed value
-        FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN,
-        NonLinearArithmetic.USE,
-        NativeLibraries::loadLibrary
-    );
+    context =
+        Z3SolverContext.create(
+            logger,
+            config,
+            shutdown.getNotifier(),
+            null, // no logfile
+            42, // random seed value
+            FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN,
+            NonLinearArithmetic.USE,
+            NativeLibraries::loadLibrary);
     mgr = (Z3FormulaManager) context.getFormulaManager();
     bmgr = (Z3BooleanFormulaManager) mgr.getBooleanFormulaManager();
   }
@@ -71,12 +65,12 @@ public class Z3ProofsTest {
 
   @Test
   public void getProofTest() throws InterruptedException {
-    //example from the 2022 RESOLUTE paper
+    // example from the 2022 RESOLUTE paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     ProverEnvironment prover = context.newProverEnvironment0(Set.of());
-    //Z3TheoremProver prover =
+    // Z3TheoremProver prover =
     //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
     //    .GENERATE_UNSAT_CORE));
     try {
@@ -95,12 +89,12 @@ public class Z3ProofsTest {
 
   @Test
   public void printProofTest() throws InterruptedException {
-    //example from the 2022 RESOLUTE paper
+    // example from the 2022 RESOLUTE paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     ProverEnvironment prover = context.newProverEnvironment0(Set.of());
-    //Z3TheoremProver prover =
+    // Z3TheoremProver prover =
     //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
     //    .GENERATE_UNSAT_CORE));
     try {
@@ -121,12 +115,12 @@ public class Z3ProofsTest {
 
   @Test
   public void internalPrintProcessedProofTest() throws SolverException, InterruptedException {
-    //example from the 2022 RESOLUTE paper
+    // example from the 2022 RESOLUTE paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    //Z3TheoremProver prover =
+    // Z3TheoremProver prover =
     //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
     //    .GENERATE_UNSAT_CORE));
     try {
@@ -137,13 +131,15 @@ public class Z3ProofsTest {
       assertTrue(prover.isUnsat());
 
       long proof = prover.getZ3Proof();
-      Z3ProofProcessor
-          parser = new Z3ProofProcessor(mgr.getEnvironment(), prover.getZ3solver(),
-          (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
+      Z3ProofProcessor parser =
+          new Z3ProofProcessor(
+              mgr.getEnvironment(),
+              prover.getZ3solver(),
+              (Z3FormulaCreator) mgr.getFormulaCreator(),
+              prover);
       Z3ProofNode root = parser.fromAST(proof);
 
       System.out.println(root.asString());
-
 
     } finally {
       prover.close();
@@ -152,12 +148,12 @@ public class Z3ProofsTest {
 
   @Test
   public void nonRecursivePrintParsedProofTest() throws SolverException, InterruptedException {
-    //example from the 2022 RESOLUTE paper
+    // example from the 2022 RESOLUTE paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    //Z3TheoremProver prover =
+    // Z3TheoremProver prover =
     //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
     //    .GENERATE_UNSAT_CORE));
     try {
@@ -168,13 +164,15 @@ public class Z3ProofsTest {
       assertTrue(prover.isUnsat());
 
       long proof = prover.getZ3Proof();
-      Z3NonRecursiveProofProcessor
-          parser = new Z3NonRecursiveProofProcessor(mgr.getEnvironment(), prover.getZ3solver(),
-          (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
+      Z3NonRecursiveProofProcessor parser =
+          new Z3NonRecursiveProofProcessor(
+              mgr.getEnvironment(),
+              prover.getZ3solver(),
+              (Z3FormulaCreator) mgr.getFormulaCreator(),
+              prover);
       Z3ProofNode root = parser.fromASTIterative(proof);
 
       System.out.println(root.asString());
-
 
     } finally {
       prover.close();
@@ -184,12 +182,12 @@ public class Z3ProofsTest {
   @Test
   public void compareRecursiveAndNonRecursiveOutputsTest()
       throws SolverException, InterruptedException {
-    //example from the 2022 RESOLUTE paper
+    // example from the 2022 RESOLUTE paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
     Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    //Z3TheoremProver prover =
+    // Z3TheoremProver prover =
     //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
     //    .GENERATE_UNSAT_CORE));
     try {
@@ -201,18 +199,23 @@ public class Z3ProofsTest {
 
       long proof = prover.getZ3Proof();
 
-      Z3ProofProcessor
-          parser = new Z3ProofProcessor(mgr.getEnvironment(), prover.getZ3solver(),
-          (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
+      Z3ProofProcessor parser =
+          new Z3ProofProcessor(
+              mgr.getEnvironment(),
+              prover.getZ3solver(),
+              (Z3FormulaCreator) mgr.getFormulaCreator(),
+              prover);
       Z3ProofNode root = parser.fromAST(proof);
 
-      Z3NonRecursiveProofProcessor
-          nrParser = new Z3NonRecursiveProofProcessor(mgr.getEnvironment(), prover.getZ3solver(),
-          (Z3FormulaCreator) mgr.getFormulaCreator(), prover);
+      Z3NonRecursiveProofProcessor nrParser =
+          new Z3NonRecursiveProofProcessor(
+              mgr.getEnvironment(),
+              prover.getZ3solver(),
+              (Z3FormulaCreator) mgr.getFormulaCreator(),
+              prover);
       Z3ProofNode nRroot = nrParser.fromASTIterative(proof);
 
       assertEquals(root.asString(), nRroot.asString());
-
 
     } finally {
       prover.close();
@@ -283,9 +286,5 @@ public class Z3ProofsTest {
     ProofNode res = pc.handleTransitivity(pn);
 
     pc.printProof(res, 0);
-
-
   }
-
 }
-

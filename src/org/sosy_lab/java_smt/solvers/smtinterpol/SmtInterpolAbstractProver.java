@@ -225,7 +225,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     final ProofDag proofDAG;
     try {
       proof = env.getProof();
-      //proofDAG = ResolutionProofDAG.fromTerm(proof, mgr, annotatedTerms.peek());
+      // proofDAG = ResolutionProofDAG.fromTerm(proof, mgr, annotatedTerms.peek());
     } catch (SMTLIBException e) {
       if (e.getMessage().contains("Context is inconsistent")) {
         throw new IllegalStateException("Cannot get proof from satisfiable environment", e);
@@ -234,11 +234,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       }
     }
 
-    //ResolutionProofDAG proofDag = fromSmtInterpol(proof, creator, getAssertedFormulas());
+    // ResolutionProofDAG proofDag = fromSmtInterpol(proof, creator, getAssertedFormulas());
     return null;
   }
 
-  //TODO: Delete this method
+  // TODO: Delete this method
   protected Term smtInterpolGetProof() {
     return env.getProof();
   }

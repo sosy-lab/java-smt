@@ -11,21 +11,18 @@
 package org.sosy_lab.java_smt;
 
 import java.util.Objects;
+import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
-import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 
-public class SourceProofNode extends AbstractProofNode
-    implements ProofNode {
-
+public class SourceProofNode extends AbstractProofNode implements ProofNode {
 
   public SourceProofNode(ResAxiom rule, Formula formula) {
     super(
         Objects.requireNonNull(rule, "Rule must not be null"),
         Objects.requireNonNull(formula, "Formula must not be null"));
   }
-
 
   @Override
   public boolean isSource() {

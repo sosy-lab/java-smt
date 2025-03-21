@@ -20,7 +20,6 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.dpll.Literal;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.LeafNode;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ProofNode;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ProofRules;
-
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.proof.ResolutionNode.Antecedent;
 import org.sosy_lab.java_smt.ResolutionProofDag;
@@ -92,8 +91,9 @@ class SmtInterpolProofNode extends AbstractProofNode {
         ResolutionNode rn = (ResolutionNode) SmtInterpolProofNode.node;
         Antecedent[] antecedents = rn.getAntecedents();
         Literal pivot = antecedents[0].mPivot;
-        node.transformed = new ResolutionProofNode(node.getFormula(),
-            creator.encapsulateBoolean(pivot.getSMTFormula(theory)));
+        node.transformed =
+            new ResolutionProofNode(
+                node.getFormula(), creator.encapsulateBoolean(pivot.getSMTFormula(theory)));
       }
     }
 
@@ -112,7 +112,6 @@ class SmtInterpolProofNode extends AbstractProofNode {
   private SmtInterpolProofNode left;
   private SmtInterpolProofNode right;
   private org.sosy_lab.java_smt.api.proofs.ProofNode transformed;
-
 
   protected SmtInterpolProofNode(ProofRule rule, Formula formula) {
     super(rule, formula);

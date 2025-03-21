@@ -14,7 +14,9 @@ import static org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.MODUS_PONENS;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.ResolutionProofNode;
@@ -28,72 +30,67 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Converts a Z3 proof to a RESOLUTE proof.
- */
-
-@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access","ModifiedButNotUsed"})
+/** Converts a Z3 proof to a RESOLUTE proof. */
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
 public class Z3ToResoluteProofConverter {
 
   private final Z3FormulaManager formulaManager;
 
   private final BooleanFormulaManager bfm;
 
-   Z3ToResoluteProofConverter(Z3FormulaManager creator) {
+  Z3ToResoluteProofConverter(Z3FormulaManager creator) {
     formulaManager = creator;
     bfm = formulaManager.getBooleanFormulaManager();
   }
 
   private static final Map<Z3ProofRule, ResAxiom> ruleMapping = new HashMap<>();
-/*
-  static {
-    ruleMapping.put(Z3ProofRule.UNDEF, ResAxiom.ORACLE);
-    ruleMapping.put(Z3ProofRule.TRUE, ResAxiom.TRUE_POSITIVE);
-    ruleMapping.put(Z3ProofRule.ASSERTED, ResAxiom.ASSUME);
-    ruleMapping.put(Z3ProofRule.GOAL, ResAxiom.ASSUME);
-    ruleMapping.put(Z3ProofRule.REFLEXIVITY, ResAxiom.REFLEXIVITY);
-    ruleMapping.put(Z3ProofRule.SYMMETRY, ResAxiom.SYMMETRY);
-    ruleMapping.put(Z3ProofRule.TRANSITIVITY, ResAxiom.TRANSITIVITY);
-    ruleMapping.put(Z3ProofRule.TRANSITIVITY_STAR, ResAxiom.TRANSITIVITY_STAR);
-    ruleMapping.put(Z3ProofRule.MONOTONICITY, ResAxiom.MONOTONICITY);
-    ruleMapping.put(Z3ProofRule.QUANT_INTRO, ResAxiom.QUANT_INTRO);
-    ruleMapping.put(Z3ProofRule.BIND, ResAxiom.BIND);
-    ruleMapping.put(Z3ProofRule.DISTRIBUTIVITY, ResAxiom.DISTRIBUTIVITY);
-    ruleMapping.put(Z3ProofRule.AND_ELIM, ResAxiom.AND_POSITIVE);
-    ruleMapping.put(Z3ProofRule.NOT_OR_ELIM, ResAxiom.NOT_NEGATIVE);
-    ruleMapping.put(Z3ProofRule.REWRITE, ResAxiom.REWRITE);
-    ruleMapping.put(Z3ProofRule.REWRITE_STAR, ResAxiom.REWRITE_STAR);
-    ruleMapping.put(Z3ProofRule.PULL_QUANT, ResAxiom.PULL_QUANT);
-    ruleMapping.put(Z3ProofRule.PUSH_QUANT, ResAxiom.PUSH_QUANT);
-    ruleMapping.put(Z3ProofRule.ELIM_UNUSED_VARS, ResAxiom.ELIM_UNUSED_VARS);
-    ruleMapping.put(Z3ProofRule.DER, ResAxiom.DER);
-    ruleMapping.put(Z3ProofRule.QUANT_INST, ResAxiom.QUANT_INST);
-    ruleMapping.put(Z3ProofRule.HYPOTHESIS, ResAxiom.HYPOTHESIS);
-    ruleMapping.put(Z3ProofRule.LEMMA, ResAxiom.LEMMA);
-    ruleMapping.put(Z3ProofRule.UNIT_RESOLUTION, ResAxiom.UNIT_RESOLUTION);
-    ruleMapping.put(Z3ProofRule.IFF_TRUE, ResAxiom.IFF_TRUE);
-    ruleMapping.put(Z3ProofRule.IFF_FALSE, ResAxiom.IFF_FALSE);
-    ruleMapping.put(Z3ProofRule.COMMUTATIVITY, ResAxiom.COMMUTATIVITY);
-    ruleMapping.put(Z3ProofRule.DEF_AXIOM, ResAxiom.DEF_AXIOM);
-    ruleMapping.put(Z3ProofRule.ASSUMPTION_ADD, ResAxiom.ASSUMPTION_ADD);
-    ruleMapping.put(Z3ProofRule.LEMMA_ADD, ResAxiom.LEMMA_ADD);
-    ruleMapping.put(Z3ProofRule.REDUNDANT_DEL, ResAxiom.REDUNDANT_DEL);
-    ruleMapping.put(Z3ProofRule.CLAUSE_TRAIL, ResAxiom.CLAUSE_TRAIL);
-    ruleMapping.put(Z3ProofRule.DEF_INTRO, ResAxiom.DEF_INTRO);
-    ruleMapping.put(Z3ProofRule.APPLY_DEF, ResAxiom.APPLY_DEF);
-    ruleMapping.put(Z3ProofRule.IFF_OEQ, ResAxiom.IFF_OEQ);
-    ruleMapping.put(Z3ProofRule.NNF_POS, ResAxiom.NNF_POS);
-    ruleMapping.put(Z3ProofRule.NNF_NEG, ResAxiom.NNF_NEG);
-    ruleMapping.put(Z3ProofRule.SKOLEMIZE, ResAxiom.SKOLEMIZE);
-    ruleMapping.put(Z3ProofRule.MODUS_PONENS_OEQ, ResAxiom.MODUS_PONENS_OEQ);
-    ruleMapping.put(Z3ProofRule.TH_LEMMA, ResAxiom.TH_LEMMA);
-    ruleMapping.put(Z3ProofRule.HYPER_RESOLVE, ResAxiom.HYPER_RESOLVE);
-  }
 
- */
+  /*
+   static {
+     ruleMapping.put(Z3ProofRule.UNDEF, ResAxiom.ORACLE);
+     ruleMapping.put(Z3ProofRule.TRUE, ResAxiom.TRUE_POSITIVE);
+     ruleMapping.put(Z3ProofRule.ASSERTED, ResAxiom.ASSUME);
+     ruleMapping.put(Z3ProofRule.GOAL, ResAxiom.ASSUME);
+     ruleMapping.put(Z3ProofRule.REFLEXIVITY, ResAxiom.REFLEXIVITY);
+     ruleMapping.put(Z3ProofRule.SYMMETRY, ResAxiom.SYMMETRY);
+     ruleMapping.put(Z3ProofRule.TRANSITIVITY, ResAxiom.TRANSITIVITY);
+     ruleMapping.put(Z3ProofRule.TRANSITIVITY_STAR, ResAxiom.TRANSITIVITY_STAR);
+     ruleMapping.put(Z3ProofRule.MONOTONICITY, ResAxiom.MONOTONICITY);
+     ruleMapping.put(Z3ProofRule.QUANT_INTRO, ResAxiom.QUANT_INTRO);
+     ruleMapping.put(Z3ProofRule.BIND, ResAxiom.BIND);
+     ruleMapping.put(Z3ProofRule.DISTRIBUTIVITY, ResAxiom.DISTRIBUTIVITY);
+     ruleMapping.put(Z3ProofRule.AND_ELIM, ResAxiom.AND_POSITIVE);
+     ruleMapping.put(Z3ProofRule.NOT_OR_ELIM, ResAxiom.NOT_NEGATIVE);
+     ruleMapping.put(Z3ProofRule.REWRITE, ResAxiom.REWRITE);
+     ruleMapping.put(Z3ProofRule.REWRITE_STAR, ResAxiom.REWRITE_STAR);
+     ruleMapping.put(Z3ProofRule.PULL_QUANT, ResAxiom.PULL_QUANT);
+     ruleMapping.put(Z3ProofRule.PUSH_QUANT, ResAxiom.PUSH_QUANT);
+     ruleMapping.put(Z3ProofRule.ELIM_UNUSED_VARS, ResAxiom.ELIM_UNUSED_VARS);
+     ruleMapping.put(Z3ProofRule.DER, ResAxiom.DER);
+     ruleMapping.put(Z3ProofRule.QUANT_INST, ResAxiom.QUANT_INST);
+     ruleMapping.put(Z3ProofRule.HYPOTHESIS, ResAxiom.HYPOTHESIS);
+     ruleMapping.put(Z3ProofRule.LEMMA, ResAxiom.LEMMA);
+     ruleMapping.put(Z3ProofRule.UNIT_RESOLUTION, ResAxiom.UNIT_RESOLUTION);
+     ruleMapping.put(Z3ProofRule.IFF_TRUE, ResAxiom.IFF_TRUE);
+     ruleMapping.put(Z3ProofRule.IFF_FALSE, ResAxiom.IFF_FALSE);
+     ruleMapping.put(Z3ProofRule.COMMUTATIVITY, ResAxiom.COMMUTATIVITY);
+     ruleMapping.put(Z3ProofRule.DEF_AXIOM, ResAxiom.DEF_AXIOM);
+     ruleMapping.put(Z3ProofRule.ASSUMPTION_ADD, ResAxiom.ASSUMPTION_ADD);
+     ruleMapping.put(Z3ProofRule.LEMMA_ADD, ResAxiom.LEMMA_ADD);
+     ruleMapping.put(Z3ProofRule.REDUNDANT_DEL, ResAxiom.REDUNDANT_DEL);
+     ruleMapping.put(Z3ProofRule.CLAUSE_TRAIL, ResAxiom.CLAUSE_TRAIL);
+     ruleMapping.put(Z3ProofRule.DEF_INTRO, ResAxiom.DEF_INTRO);
+     ruleMapping.put(Z3ProofRule.APPLY_DEF, ResAxiom.APPLY_DEF);
+     ruleMapping.put(Z3ProofRule.IFF_OEQ, ResAxiom.IFF_OEQ);
+     ruleMapping.put(Z3ProofRule.NNF_POS, ResAxiom.NNF_POS);
+     ruleMapping.put(Z3ProofRule.NNF_NEG, ResAxiom.NNF_NEG);
+     ruleMapping.put(Z3ProofRule.SKOLEMIZE, ResAxiom.SKOLEMIZE);
+     ruleMapping.put(Z3ProofRule.MODUS_PONENS_OEQ, ResAxiom.MODUS_PONENS_OEQ);
+     ruleMapping.put(Z3ProofRule.TH_LEMMA, ResAxiom.TH_LEMMA);
+     ruleMapping.put(Z3ProofRule.HYPER_RESOLVE, ResAxiom.HYPER_RESOLVE);
+   }
+
+  */
 
   /*
   public static ResAxiom mapRule(Z3ProofRule z3Rule) {
@@ -101,8 +98,7 @@ public class Z3ToResoluteProofConverter {
   }
    */
 
-
-   static ResolutionProofDag convertToResolutionProofDag(Z3ProofNode[] z3ProofNodes) {
+  static ResolutionProofDag convertToResolutionProofDag(Z3ProofNode[] z3ProofNodes) {
     ResolutionProofDag dag = new ResolutionProofDag();
 
     for (Z3ProofNode z3Node : z3ProofNodes) {
@@ -110,9 +106,9 @@ public class Z3ToResoluteProofConverter {
 
       } else {
         Formula formula = z3Node.getFormula();
-        //ResAxiom resAxiom = mapRule(z3Node.getRule());
-        //SourceProofNode sourceNode = new SourceProofNode(resAxiom, formula);
-        //dag.addNode(sourceNode);
+        // ResAxiom resAxiom = mapRule(z3Node.getRule());
+        // SourceProofNode sourceNode = new SourceProofNode(resAxiom, formula);
+        // dag.addNode(sourceNode);
       }
     }
 
@@ -170,9 +166,7 @@ public class Z3ToResoluteProofConverter {
 
     @Override
     public TraversalProcess visitIfThenElse(
-        BooleanFormula condition,
-        BooleanFormula thenFormula,
-        BooleanFormula elseFormula) {
+        BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula) {
       return TraversalProcess.CONTINUE;
     }
 
@@ -187,8 +181,7 @@ public class Z3ToResoluteProofConverter {
 
     @Override
     public TraversalProcess visitAtom(
-        BooleanFormula atom,
-        FunctionDeclaration<BooleanFormula> funcDecl) {
+        BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
       return TraversalProcess.CONTINUE;
     }
   }
@@ -373,7 +366,6 @@ public class Z3ToResoluteProofConverter {
     return pn;
   }
 
-
   ProofNode handleTransitivity(Z3ProofNode node) {
 
     BooleanFormula t1 = (BooleanFormula) node.getChildren().get(0).getFormula();
@@ -385,17 +377,13 @@ public class Z3ToResoluteProofConverter {
 
     assert equivalenceOperands1.get(1).equals(equivalenceOperands2.get(0));
 
-    BooleanFormula transRes =
-        formula;
-    BooleanFormula transClause = bfm.or(bfm.not(t1),
-        bfm.not(t2), formula);
+    BooleanFormula transRes = formula;
+    BooleanFormula transClause = bfm.or(bfm.not(t1), bfm.not(t2), formula);
 
     SourceProofNode pn = new SourceProofNode(ResAxiom.TRANSITIVITY, transClause);
 
-    ResolutionProofNode transResNode = new ResolutionProofNode(transRes,
-        t2);
-    ResolutionProofNode trnAnte1 =
-        new ResolutionProofNode(t2, t2);
+    ResolutionProofNode transResNode = new ResolutionProofNode(transRes, t2);
+    ResolutionProofNode trnAnte1 = new ResolutionProofNode(t2, t2);
     BooleanFormula trn2Formula = bfm.or(bfm.not(t2), transRes);
     ResolutionProofNode trnAnte2 = new ResolutionProofNode(trn2Formula, t1);
     ResolutionProofNode trnAnte2Ante = new ResolutionProofNode(t1, t1);
@@ -410,33 +398,29 @@ public class Z3ToResoluteProofConverter {
 
   ProofNode handleTransitivityStar(Z3ProofNode node) {
     BooleanFormula resPivot = null;
-     Collection<BooleanFormula> formulas = new ArrayList<>();
-     List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
-     int numChildren = node.getChildren().size();
+    Collection<BooleanFormula> formulas = new ArrayList<>();
+    List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
+    int numChildren = node.getChildren().size();
 
-        for (int i = 0; i < numChildren; i++) {
-          Collection<BooleanFormula> newCollection = new ArrayList<>();
-          formulas.add(bfm.not((BooleanFormula) node.getChildren().get(i).getFormula()));
-          if (i == numChildren - 1) {
-            resPivot = (BooleanFormula) node.getChildren().get(i).getFormula();
-          }
-        }
+    for (int i = 0; i < numChildren; i++) {
+      Collection<BooleanFormula> newCollection = new ArrayList<>();
+      formulas.add(bfm.not((BooleanFormula) node.getChildren().get(i).getFormula()));
+      if (i == numChildren - 1) {
+        resPivot = (BooleanFormula) node.getChildren().get(i).getFormula();
+      }
+    }
 
     assert resPivot != null;
     ResolutionProofNode resNode = new ResolutionProofNode(node.getFormula(), resPivot);
 
+    formulas.add((BooleanFormula) node.getFormula());
+    BooleanFormula transitivityFormula = bfm.or(formulas);
+    SourceProofNode sn = new SourceProofNode(ResAxiom.TRANSITIVITY, transitivityFormula);
 
-        formulas.add((BooleanFormula) node.getFormula());
-        BooleanFormula transitivityFormula = bfm.or(formulas);
-        SourceProofNode sn = new SourceProofNode(ResAxiom.TRANSITIVITY, transitivityFormula);
-
-        for (int i = 0; i < formulas.size()-2; i++){
-          //ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
-              //formulaList.get(i))
-        }
-
-
-
+    for (int i = 0; i < formulas.size() - 2; i++) {
+      // ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
+      // formulaList.get(i))
+    }
 
     return resNode;
   }
@@ -581,8 +565,6 @@ public class Z3ToResoluteProofConverter {
     return null;
   }
 
-
-
   void printProof(ProofNode node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
 
@@ -611,6 +593,4 @@ public class Z3ToResoluteProofConverter {
       throw new AssertionError("Unknown proof node type");
     }
   }
-
-
 }

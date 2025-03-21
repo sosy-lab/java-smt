@@ -30,7 +30,9 @@ public class Mathsat5ProofProcessor {
   private final Mathsat5TheoremProver theoremProver;
 
   Mathsat5ProofProcessor(
-      Mathsat5SolverContext ctx, long pCurEnv, Mathsat5FormulaCreator creator,
+      Mathsat5SolverContext ctx,
+      long pCurEnv,
+      Mathsat5FormulaCreator creator,
       Mathsat5TheoremProver prover) {
     context = ctx;
     curEnv = pCurEnv;

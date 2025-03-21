@@ -17,9 +17,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
 public class Mathsat5ProofNode extends AbstractProofNode {
 
-  protected Mathsat5ProofNode(
-      ProofRule rule,
-      Formula formula) {
+  protected Mathsat5ProofNode(ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 
