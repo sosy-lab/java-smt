@@ -1,16 +1,8 @@
-/*
- * This file is part of JavaSMT,
- * an API wrapper for a collection of SMT solvers:
- * https://github.com/sosy-lab/java-smt
- *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 package org.sosy_lab.java_smt.utils;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Locale;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -29,11 +21,22 @@ public class ParseGenerateAndReparseTest {
       throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
 
     if (args.length < 2) {
-      System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-string> <solver>");
+      System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-file> <solver>");
       System.exit(1);
     }
 
-    String smt2 = args[0];
+    // Lese den Inhalt der SMT2-Datei
+    String smt2FilePath = args[0];
+    String smt2;
+    try {
+      smt2 = new String(Files.readAllBytes(Paths.get(smt2FilePath)));
+    } catch (IOException e) {
+      System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
+      e.printStackTrace();
+      System.exit(1);
+      return; // Unreachable, aber notwendig für Compiler
+    }
+
     String solverName = args[1];
 
     // Try to get the solver
