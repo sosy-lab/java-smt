@@ -10,9 +10,10 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import org.sosy_lab.java_smt.ProofRuleRegistry;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
-//TODO correctly document the formula strings
+// TODO correctly document the formula strings
 public enum Z3ProofRule implements ProofRule {
 
   // Undefined proof object
@@ -25,12 +26,12 @@ public enum Z3ProofRule implements ProofRule {
 
   // Logical inference rules
   MODUS_PONENS("modus_ponens", "(mp p (implies p q) q)"),
-  REFLEXIVITY("reflexivity", "reflexivity (R t t), R is element of {=, ~, iff}"), //no antecendts
+  REFLEXIVITY("reflexivity", "reflexivity (R t t), R is element of {=, ~, iff}"), // no antecendts
   SYMMETRY("symmetry", "symmetry (R t1 t2) (R t2 t1)"),
   TRANSITIVITY("transitivity", "trans (R t1 t2) (R t2 t3) (R t1 t3)"),
   TRANSITIVITY_STAR("transitivity*", "trans *(R t1 t2) ... (R t3 t4) (R t1 t4)"),
-  MONOTONICITY("monotonicity", "monotonicity (R t1 s1) ... (R tn sn) (R (f t1 ... tn) (f s1 ...  "
-      + "sn))"),
+  MONOTONICITY(
+      "monotonicity", "monotonicity (R t1 s1) ... (R tn sn) (R (f t1 ... tn) (f s1 ...  " + "sn))"),
   QUANT_INTRO("quant-intro", "quant-intro (~ p q) (~ (forall (x) p) (forall (x) q))"),
   BIND("bind", "(proof-bind f (forall (x) f))"),
 
@@ -41,10 +42,11 @@ public enum Z3ProofRule implements ProofRule {
   NOT_OR_ELIM("not-or-elim", "not-or-elim (not (or p1 ... pn)) (not pi)"),
 
   // Rewriting and simplifications
-  REWRITE("rewrite", "rewrite (R t s), R is element of {=, iff}"), //no antededents
+  REWRITE("rewrite", "rewrite (R t s), R is element of {=, iff}"), // no antededents
   REWRITE_STAR("rewrite*", "rewrite* (= t1 t2) ... (= tn-1 tn) (= t1 tn)"),
   PULL_QUANT("pull_quant", "(= (f (forall x P(x)) R) (forall x (f P(x) R)))"),
-  PUSH_QUANT("push_quant", "(forall x (and P1(x) ... Pn(x))) (and (forall x P1(x)) ... (forall x Pn(x)))"),
+  PUSH_QUANT(
+      "push_quant", "(forall x (and P1(x) ... Pn(x))) (and (forall x P1(x)) ... (forall x Pn(x)))"),
   ELIM_UNUSED_VARS("elim_unused_vars", "(forall x y P(x)) (forall x P(x))"),
   DER("der", "(iff (forall x (or (not (= x t)) P(x))) P(t))"),
   QUANT_INST("quant_inst", "(or (not (forall x P(x))) P(a))"),
@@ -52,7 +54,8 @@ public enum Z3ProofRule implements ProofRule {
   // Natural deduction style
   HYPOTHESIS("hypothesis", "(hypothesis p)"),
   LEMMA("lemma", "(or (not p1) ... (not pn))"),
-  UNIT_RESOLUTION("unit_resolution", "(or p1 ... pn q1 ... qm) (not p1) ... (not pn) (or q1 ... qm)"),
+  UNIT_RESOLUTION(
+      "unit_resolution", "(or p1 ... pn q1 ... qm) (not p1) ... (not pn) (or q1 ... qm)"),
   IFF_TRUE("iff_true", "(iff p true)"),
   IFF_FALSE("iff_false", "(iff p false)"),
   COMMUTATIVITY("commutativity", "(= (f a b) (f b a))"),
@@ -93,6 +96,12 @@ public enum Z3ProofRule implements ProofRule {
     this.formula = formula;
   }
 
+  static {
+    for (Z3ProofRule rule : values()) {
+      ProofRuleRegistry.register(Z3ProofRule.class, rule);
+    }
+  }
+
   @Override
   public String getName() {
     return name;
@@ -103,4 +112,3 @@ public enum Z3ProofRule implements ProofRule {
     return formula;
   }
 }
-
