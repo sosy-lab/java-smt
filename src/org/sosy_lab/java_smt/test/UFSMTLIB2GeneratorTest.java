@@ -23,9 +23,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
-import org.sosy_lab.java_smt.basicimpl.GeneratorException;
 
 public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -84,40 +82,6 @@ public class UFSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSolver
         "(declare-fun a () Bool)\n" + "(declare-fun b () Bool)\n" + "(assert (= a b))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
-  }
-
-  @Test(expected = GeneratorException.class)
-  public void testDeclareUFInputException() {
-    requireBooleanUFs();
-    requireStrings();
-    FunctionDeclaration<BooleanFormula> a =
-        fmgr.declareUF("a", FormulaType.BooleanType, FormulaType.StringType);
-    FunctionDeclaration<BooleanFormula> b =
-        fmgr.declareUF("b", FormulaType.BooleanType, new ArrayList<>());
-
-    BooleanFormula c = fmgr.callUF(a, Objects.requireNonNull(smgr).makeString("test"));
-    BooleanFormula d = fmgr.callUF(b);
-
-    BooleanFormula constraint = bmgr.equivalence(c, d);
-
-    Generator.assembleConstraint(constraint);
-  }
-
-  @Test(expected = GeneratorException.class)
-  public void testdeclareUFOutputException() {
-    requireBooleanUFs();
-    requireStrings();
-    FunctionDeclaration<StringFormula> a =
-        fmgr.declareUF("a", FormulaType.StringType, FormulaType.BooleanType);
-    FunctionDeclaration<StringFormula> b =
-        fmgr.declareUF("b", FormulaType.StringType, new ArrayList<>());
-
-    StringFormula c = fmgr.callUF(a, bmgr.makeTrue());
-    StringFormula d = fmgr.callUF(b);
-
-    BooleanFormula constraint = Objects.requireNonNull(smgr).equal(c, d);
-
-    Generator.assembleConstraint(constraint);
   }
 
   @Test

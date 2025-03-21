@@ -94,17 +94,19 @@ public class ParseGenerateAndReparse {
     // Ergebnisse vergleichen
     boolean z3Sat = z3proverEnv.isUnsat();
     boolean reparsedSat = solverLessProverEnv.isUnsat();
-    if(z3hadException == exceptionWhileParsingAndReparsing) { //make sure exception didn't happen
-      //because of parserGenerator
+    if (z3hadException == exceptionWhileParsingAndReparsing) { // make sure exception didn't happen
+      // because of parserGenerator
       if (z3Sat == reparsedSat) {
         System.out.println("Test erfolgreich: " + z3Sat);
         System.exit(0);
       }
-    }else{
+    } else {
       System.out.println(
           "Test failed because an Exception occured whileParsing and Reparsing"
-              + "\n Z3 had an Exception while parsing= "+
-          z3hadException + "\n Exception happened while generating and reparsing: " + exceptionWhileParsingAndReparsing);
+              + "\n Z3 had an Exception while parsing= "
+              + z3hadException
+              + "\n Exception happened while generating and reparsing: "
+              + exceptionWhileParsingAndReparsing);
     }
 
     System.exit(1);
