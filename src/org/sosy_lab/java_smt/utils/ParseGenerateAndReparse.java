@@ -17,7 +17,8 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class ParseGenerateAndReparseTest {
+/** This file is meant for the Evaluation of the Parser/Generator. */
+public class ParseGenerateAndReparse {
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
 
@@ -30,7 +31,8 @@ public class ParseGenerateAndReparseTest {
     String smt2FilePath = args[0];
     String smt2;
     try {
-      smt2 = Files.readString(Paths.get(smt2FilePath), Charset.defaultCharset());;
+      smt2 = Files.readString(Paths.get(smt2FilePath), Charset.defaultCharset());
+      ;
     } catch (IOException e) {
       System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
       e.printStackTrace();
