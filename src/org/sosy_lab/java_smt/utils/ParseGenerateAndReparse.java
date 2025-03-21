@@ -76,18 +76,30 @@ public class ParseGenerateAndReparse {
     ProverEnvironment solverLessProverEnv =
         solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
 
+    boolean z3hadException = false;
+    boolean exceptionWhileParsingAndReparsing = false;
     // Constraint hinzufügen
-    z3proverEnv.addConstraint(z3solverContext.getFormulaManager().universalParseFromString(smt2));
-    solverLessProverEnv.addConstraint(
-        solverLessContext.getFormulaManager().universalParseFromString(smt2));
+    try {
+      z3proverEnv.addConstraint(z3solverContext.getFormulaManager().universalParseFromString(smt2));
+    } catch (Exception pE) {
+      z3hadException = true;
+    }
+    try {
+      solverLessProverEnv.addConstraint(
+          solverLessContext.getFormulaManager().universalParseFromString(smt2));
+    } catch (Exception pE) {
+      exceptionWhileParsingAndReparsing = true;
+    }
 
     // Ergebnisse vergleichen
     boolean z3Sat = z3proverEnv.isUnsat();
     boolean reparsedSat = solverLessProverEnv.isUnsat();
-
-    if (z3Sat == reparsedSat) {
-      System.out.println("Test erfolgreich: " + z3Sat);
-      System.exit(0);
+    if(z3hadException == exceptionWhileParsingAndReparsing) { //make sure exception didn't happen
+      //because of parserGenerator
+      if (z3Sat == reparsedSat) {
+        System.out.println("Test erfolgreich: " + z3Sat);
+        System.exit(0);
+      }
     }
     System.exit(1);
   }
