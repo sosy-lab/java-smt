@@ -41,6 +41,8 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofDag;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -211,6 +213,34 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     SmtInterpolSolverContext.flatten(builder, "", env.getInfo(":all-statistics"));
     return builder.buildOrThrow();
+  }
+
+  @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
+  @Override
+  public ProofNode getProof() {
+    checkState(!closed);
+    checkGenerateProofs();
+
+    final Term proof;
+    final ProofDag proofDAG;
+    try {
+      proof = env.getProof();
+      // proofDAG = ResolutionProofDAG.fromTerm(proof, mgr, annotatedTerms.peek());
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException("Cannot get proof from satisfiable environment", e);
+      } else {
+        throw e;
+      }
+    }
+
+    // ResolutionProofDAG proofDag = fromSmtInterpol(proof, creator, getAssertedFormulas());
+    return null;
+  }
+
+  // TODO: Delete this method
+  protected Term smtInterpolGetProof() {
+    return env.getProof();
   }
 
   @Override
