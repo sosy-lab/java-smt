@@ -70,6 +70,13 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
+  public void trivialDistinctTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    assertThatFormula(imgr.distinct(ImmutableList.of())).isTautological();
+    assertThatFormula(imgr.distinct(ImmutableList.of(imgr.makeVariable("a")))).isTautological();
+  }
+
+  @Test
   public void trivialSumTest() throws SolverException, InterruptedException {
     requireIntegers();
     assertThatFormula(imgr.equal(imgr.sum(ImmutableList.of()), imgr.makeNumber(0)))
