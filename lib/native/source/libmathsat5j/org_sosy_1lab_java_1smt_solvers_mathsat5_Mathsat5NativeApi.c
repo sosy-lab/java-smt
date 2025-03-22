@@ -174,7 +174,7 @@ CALL1(int, proof_id)
 INT_RETURN
 
 DEFINE_FUNC(void, 1destroy_1proof_1manager) WITH_ONE_ARG(jproofmgr)
-PROOF_MGR_ARG(1)
+PROOF_MGR_ARG_VOID(1)
 VOID_CALL1(destroy_proof_manager)
 
 /*
