@@ -188,7 +188,7 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     IntegerFormula uf = fmgr.callUF(ufDecl, a, r);
 
     mgr.visit(
-        bmgr.and(rmgr.equal(uf, imgr.makeNumber(0))),
+        bmgr.and(imgr.equal(uf, imgr.makeNumber(0))),
         new DefaultFormulaVisitor<Void>() {
 
           @Override
