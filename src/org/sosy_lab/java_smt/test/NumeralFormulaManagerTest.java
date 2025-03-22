@@ -69,6 +69,16 @@ public class NumeralFormulaManagerTest extends SolverBasedTest0.ParameterizedSol
     assertThatFormula(bmgr.and(imgr.distinct(symbols), bmgr.and(constraints))).isUnsatisfiable();
   }
 
+  @Test
+  public void trivialSumTest() throws SolverException, InterruptedException {
+    requireIntegers();
+    assertThatFormula(imgr.equal(imgr.sum(ImmutableList.of()), imgr.makeNumber(0)))
+        .isTautological();
+    assertThatFormula(
+            imgr.equal(imgr.sum(ImmutableList.of(imgr.makeVariable("a"))), imgr.makeVariable("a")))
+        .isTautological();
+  }
+
   @SuppressWarnings("CheckReturnValue")
   @Test
   public void failOnInvalidStringInteger() {
