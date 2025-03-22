@@ -33,7 +33,7 @@ abstract class SmtInterpolNumeralFormulaManager<
 
   /** Operators for arithmetic functions that return a numeric value. */
   private static final ImmutableSet<String> NUMERIC_FUNCTIONS =
-      ImmutableSet.of("+", "-", "*", "/", "div", "mod");
+      ImmutableSet.of("+", "-", "*", "/", "div", "mod", "to_real");
 
   protected final Script env;
 
