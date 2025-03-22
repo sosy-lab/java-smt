@@ -1065,14 +1065,6 @@ final class Mathsat5NativeApi {
    */
   public static native void msat_assert_objective(long e, long o);
 
-  // Returns a proof manager for the given environment.
-  // The manager must be destroyed by the user, with msat_destroy_proof_manager. In order to
-  // obtain a non-error result, the option "proof_generation" must be set to "true" in the
-  // configuration used for creating the environment.
-  //     env	The environment in which to operate.
-  // return:  A proof manager for the environment. MSAT_ERROR_PROOF_MANAGER can be used to check
-  //  whether an error occurred.
-
   /**
    * Returns a proof manager for the given environment. The manager must be destroyed by the user,
    * with msat_destroy_proof_manager. In order to obtain a non-error result, the option
