@@ -87,7 +87,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     if (pOptions.contains(ProverOptions.GENERATE_PROOFS)) {
         pSolver.setOption("produce-proofs", "true");
-      System.out.println("proofs enabled");
     }
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");
@@ -243,10 +242,15 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public ProofNode getProof() {
-    Proof proof = solver.getProof()[0];
+
+    Proof[] proofs = solver.getProof();
+    if (proofs == null || proofs.length == 0) {
+      throw new IllegalStateException("No proof available");
+    }
+
     CVC5ProofProcessor pp = new CVC5ProofProcessor(creator, this);
     try {
-      return pp.fromCVC5Proof(proof);
+      return pp.fromCVC5Proof(proofs[0]);
     } catch (CVC5ApiException pE) {
       throw new RuntimeException(pE);
     }
