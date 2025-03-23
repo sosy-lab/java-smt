@@ -21,6 +21,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.Set;
+import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -83,6 +84,12 @@ public class CVC5ProofsTest {
             NativeLibraries::loadLibrary);
     mgr = (CVC5FormulaManager) context.getFormulaManager();
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
+  }
+
+  @After
+  public void freeEnvironment() {
+    solver.deletePointer();
+    tm.deletePointer();
   }
 
   private static Solver createEnvironment() throws CVC5ApiException {
