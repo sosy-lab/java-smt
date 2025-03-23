@@ -30,7 +30,24 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-/** Converts a Z3 proof to a RESOLUTE proof. */
+/**
+ * Converts a Z3 proof into a format based on the RESOLUTE proof format.
+ * <p>
+ * The RESOLUTE format is a low-level proof format used by SMTInterpol. It exclusively relies on
+ * the resolution rule, with multiple axioms defined to support various theories. These axioms
+ * serve as the leaf nodes in the proof DAG.
+ * </p>
+ * The strategy used is to transform each result from a Z3 proof into corresponding resolution
+ * proof nodes, aiming to maintain the formulas used as arguments for the Z3 proof rule as well
+ * as the result. Depending on the rule, the number of nodes may remain the same (e.g., for modus ponens) or increase
+ * (e.g., for transitivity star). For the transitivity star rule, the sub-proof grows
+ * approximately <code>2n-1</code> times, where <code>n</code> is the number of nodes in the
+ * sub-proof.
+ * </p>
+ *
+ * @see Z3ProofRule for the list of Z3 proof rules.
+ * @see org.sosy_lab.java_smt.ResProofRule for the list of RESOLUTE axioms.
+ **/
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
 public class Z3ToResoluteProofConverter {
 
@@ -45,58 +62,6 @@ public class Z3ToResoluteProofConverter {
 
   private static final Map<Z3ProofRule, ResAxiom> ruleMapping = new HashMap<>();
 
-  /*
-   static {
-     ruleMapping.put(Z3ProofRule.UNDEF, ResAxiom.ORACLE);
-     ruleMapping.put(Z3ProofRule.TRUE, ResAxiom.TRUE_POSITIVE);
-     ruleMapping.put(Z3ProofRule.ASSERTED, ResAxiom.ASSUME);
-     ruleMapping.put(Z3ProofRule.GOAL, ResAxiom.ASSUME);
-     ruleMapping.put(Z3ProofRule.REFLEXIVITY, ResAxiom.REFLEXIVITY);
-     ruleMapping.put(Z3ProofRule.SYMMETRY, ResAxiom.SYMMETRY);
-     ruleMapping.put(Z3ProofRule.TRANSITIVITY, ResAxiom.TRANSITIVITY);
-     ruleMapping.put(Z3ProofRule.TRANSITIVITY_STAR, ResAxiom.TRANSITIVITY_STAR);
-     ruleMapping.put(Z3ProofRule.MONOTONICITY, ResAxiom.MONOTONICITY);
-     ruleMapping.put(Z3ProofRule.QUANT_INTRO, ResAxiom.QUANT_INTRO);
-     ruleMapping.put(Z3ProofRule.BIND, ResAxiom.BIND);
-     ruleMapping.put(Z3ProofRule.DISTRIBUTIVITY, ResAxiom.DISTRIBUTIVITY);
-     ruleMapping.put(Z3ProofRule.AND_ELIM, ResAxiom.AND_POSITIVE);
-     ruleMapping.put(Z3ProofRule.NOT_OR_ELIM, ResAxiom.NOT_NEGATIVE);
-     ruleMapping.put(Z3ProofRule.REWRITE, ResAxiom.REWRITE);
-     ruleMapping.put(Z3ProofRule.REWRITE_STAR, ResAxiom.REWRITE_STAR);
-     ruleMapping.put(Z3ProofRule.PULL_QUANT, ResAxiom.PULL_QUANT);
-     ruleMapping.put(Z3ProofRule.PUSH_QUANT, ResAxiom.PUSH_QUANT);
-     ruleMapping.put(Z3ProofRule.ELIM_UNUSED_VARS, ResAxiom.ELIM_UNUSED_VARS);
-     ruleMapping.put(Z3ProofRule.DER, ResAxiom.DER);
-     ruleMapping.put(Z3ProofRule.QUANT_INST, ResAxiom.QUANT_INST);
-     ruleMapping.put(Z3ProofRule.HYPOTHESIS, ResAxiom.HYPOTHESIS);
-     ruleMapping.put(Z3ProofRule.LEMMA, ResAxiom.LEMMA);
-     ruleMapping.put(Z3ProofRule.UNIT_RESOLUTION, ResAxiom.UNIT_RESOLUTION);
-     ruleMapping.put(Z3ProofRule.IFF_TRUE, ResAxiom.IFF_TRUE);
-     ruleMapping.put(Z3ProofRule.IFF_FALSE, ResAxiom.IFF_FALSE);
-     ruleMapping.put(Z3ProofRule.COMMUTATIVITY, ResAxiom.COMMUTATIVITY);
-     ruleMapping.put(Z3ProofRule.DEF_AXIOM, ResAxiom.DEF_AXIOM);
-     ruleMapping.put(Z3ProofRule.ASSUMPTION_ADD, ResAxiom.ASSUMPTION_ADD);
-     ruleMapping.put(Z3ProofRule.LEMMA_ADD, ResAxiom.LEMMA_ADD);
-     ruleMapping.put(Z3ProofRule.REDUNDANT_DEL, ResAxiom.REDUNDANT_DEL);
-     ruleMapping.put(Z3ProofRule.CLAUSE_TRAIL, ResAxiom.CLAUSE_TRAIL);
-     ruleMapping.put(Z3ProofRule.DEF_INTRO, ResAxiom.DEF_INTRO);
-     ruleMapping.put(Z3ProofRule.APPLY_DEF, ResAxiom.APPLY_DEF);
-     ruleMapping.put(Z3ProofRule.IFF_OEQ, ResAxiom.IFF_OEQ);
-     ruleMapping.put(Z3ProofRule.NNF_POS, ResAxiom.NNF_POS);
-     ruleMapping.put(Z3ProofRule.NNF_NEG, ResAxiom.NNF_NEG);
-     ruleMapping.put(Z3ProofRule.SKOLEMIZE, ResAxiom.SKOLEMIZE);
-     ruleMapping.put(Z3ProofRule.MODUS_PONENS_OEQ, ResAxiom.MODUS_PONENS_OEQ);
-     ruleMapping.put(Z3ProofRule.TH_LEMMA, ResAxiom.TH_LEMMA);
-     ruleMapping.put(Z3ProofRule.HYPER_RESOLVE, ResAxiom.HYPER_RESOLVE);
-   }
-
-  */
-
-  /*
-  public static ResAxiom mapRule(Z3ProofRule z3Rule) {
-    return ruleMapping.getOrDefault(z3Rule, ResAxiom.OPERATION);
-  }
-   */
 
   static ResolutionProofDag convertToResolutionProofDag(Z3ProofNode[] z3ProofNodes) {
     ResolutionProofDag dag = new ResolutionProofDag();
@@ -115,7 +80,7 @@ public class Z3ToResoluteProofConverter {
     return dag;
   }
 
-  private static class EquivalenceExtractor implements BooleanFormulaVisitor<TraversalProcess> {
+  private static class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
     private final List<BooleanFormula> equivalenceOperands = new ArrayList<>();
 
     public List<BooleanFormula> getEquivalenceOperands() {
@@ -187,11 +152,18 @@ public class Z3ToResoluteProofConverter {
   }
 
   public List<BooleanFormula> extractEquivalenceOperands(BooleanFormula formula) {
-    EquivalenceExtractor extractor = new EquivalenceExtractor();
+    ExtractorVisitor extractor = new ExtractorVisitor();
     bfm.visitRecursively(formula, extractor);
     return extractor.getEquivalenceOperands();
   }
 
+  /**
+   * Converts a {@link Z3ProofNode} into either a {@link ResolutionProofNode} or
+   * a {@link SourceProofNode}, depending on its rule.
+   *
+   * @param node the {@link Z3ProofNode} to convert
+   * @return the resulting {@link ProofNode}
+   */
   ProofNode handleNode(Z3ProofNode node) {
     Z3ProofRule rule = (Z3ProofRule) node.getRule();
 
