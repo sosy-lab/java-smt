@@ -37,7 +37,7 @@ RUN  apt-get update \
 # CVC5 requires some dependencies
 RUN apt-get update \
  && apt-get install -y \
-        python3.10 python3.10-venv python3-toml python3-pyparsing flex libssl-dev cmake \
+        python3 python3-venv python3-toml python3-pyparsing flex libssl-dev cmake \
  && apt-get clean
 
 # Bitwuzla requires Ninja and Meson (updated version from pip), and uses SWIG >4.0 from dependencies.

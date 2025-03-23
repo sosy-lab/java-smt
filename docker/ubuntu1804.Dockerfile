@@ -36,7 +36,7 @@ RUN apt-get update \
 # CVC5 requires some dependencies
 RUN apt-get update \
  && apt-get install -y \
-        python3.10 python3.10-venv python3-toml python3-pyparsing flex libssl-dev cmake \
+        python3 python3-venv python3-toml python3-pyparsing flex libssl-dev cmake \
  && apt-get clean \
  && wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3.tar.gz \
  && tar -zxvf cmake-3.26.3.tar.gz \
