@@ -132,6 +132,51 @@ FREE_STRING_ARG(3)
 FREE_STRING_ARG(2)
 INT_RETURN
 
+DEFINE_FUNC(long, 1get_1proof_1manager) WITH_ONE_ARG(jenv)
+ENV_ARG(1)
+CALL1(msat_proof_manager, get_proof_manager)
+STRUCT_RETURN_WITH_ENV
+
+DEFINE_FUNC(jproof, 1get_1proof) WITH_ONE_ARG(jproofmgr)
+PROOF_MGR_ARG(1)
+CALL1(msat_proof, get_proof)
+PROOF_RETURN
+
+DEFINE_FUNC(int, 1proof_1get_1arity) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(int, proof_get_arity)
+INT_RETURN
+
+DEFINE_FUNC(jproof, 1proof_1get_1child) WITH_TWO_ARGS(jproof, int)
+PROOF_ARG(1)
+SIMPLE_ARG(int, 2)
+CALL2(msat_proof, proof_get_child)
+PROOF_RETURN
+
+DEFINE_FUNC(string, 1proof_1get_1name) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(const char *, proof_get_name)
+PLAIN_CONST_STRING_RETURN
+
+DEFINE_FUNC(jboolean, 1proof_1is_1term) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(int, proof_is_term)
+BOOLEAN_RETURN
+
+DEFINE_FUNC(jterm, 1proof_1get_1term) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(msat_term, proof_get_term)
+STRUCT_RETURN
+
+DEFINE_FUNC(int, 1proof_1id) WITH_ONE_ARG(jproof)
+PROOF_ARG(1)
+CALL1(int, proof_id)
+INT_RETURN
+
+DEFINE_FUNC(void, 1destroy_1proof_1manager) WITH_ONE_ARG(jproofmgr)
+PROOF_MGR_ARG_VOID(1)
+VOID_CALL1(destroy_proof_manager)
+
 /*
  * msat_type msat_get_bool_type(msat_env env);
  */

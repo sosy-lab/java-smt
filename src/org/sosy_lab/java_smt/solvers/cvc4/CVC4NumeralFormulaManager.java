@@ -178,8 +178,12 @@ abstract class CVC4NumeralFormulaManager<
 
   @Override
   protected Expr distinctImpl(List<Expr> pParam) {
-    vectorExpr param = new vectorExpr();
-    pParam.forEach(param::add);
-    return exprManager.mkExpr(Kind.DISTINCT, param);
+    if (pParam.size() < 2) {
+      return exprManager.mkConst(true);
+    } else {
+      vectorExpr param = new vectorExpr();
+      pParam.forEach(param::add);
+      return exprManager.mkExpr(Kind.DISTINCT, param);
+    }
   }
 }

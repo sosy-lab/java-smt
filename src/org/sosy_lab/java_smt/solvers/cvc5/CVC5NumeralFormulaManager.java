@@ -188,6 +188,10 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term distinctImpl(List<Term> pParam) {
-    return termManager.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
+    if (pParam.size() < 2) {
+      return termManager.mkTrue();
+    } else {
+      return termManager.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
+    }
   }
 }

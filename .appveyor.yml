@@ -10,7 +10,7 @@ version: build {build} {branch}
 
 os: Visual Studio 2019
 
-clone_depth: 1
+clone_depth: 5
 
 install:
   - ps: |
