@@ -143,9 +143,33 @@ class CVC4StringFormulaManager extends AbstractStringFormulaManager<Expr, Type, 
     return exprManager.mkExpr(Kind.REGEXP_SIGMA, new vectorExpr());
   }
 
+  /**
+   * Check if the String only contains printable US ASCII characters.
+   *
+   * <p>We use this function to check if the String contains any characters that would have to be
+   * escaped in SMTLIB.
+   */
+  private boolean isAsciiString(String str) {
+    return str.codePoints().allMatch(c -> c >= 0x20 && c <= 0x7E);
+  }
+
   @Override
   protected Expr range(Expr start, Expr end) {
-    return exprManager.mkExpr(Kind.REGEXP_RANGE, start, end);
+    Preconditions.checkArgument(
+        start.isConst() && end.isConst(), "CVC4 does not support variables as bounds");
+
+    String lower = (String) formulaCreator.convertValue(start, start);
+    String upper = (String) formulaCreator.convertValue(end, end);
+
+    Preconditions.checkArgument(
+        isAsciiString(lower) && isAsciiString(upper),
+        "CVC4 only allows printable US ASCII characters as bounds");
+
+    // Return the empty language if the bounds are not single character Strings, or if the upper
+    // bound is smaller than the lower bound
+    return lower.length() != 1 || upper.length() != 1 || upper.compareTo(lower) < 0
+        ? noneImpl()
+        : exprManager.mkExpr(Kind.REGEXP_RANGE, start, end);
   }
 
   @Override

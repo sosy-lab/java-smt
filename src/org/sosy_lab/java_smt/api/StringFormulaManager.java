@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.base.Preconditions;
 import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -155,13 +154,6 @@ public interface StringFormulaManager {
    * @see #range(StringFormula, StringFormula)
    */
   default RegexFormula range(char start, char end) {
-    Preconditions.checkArgument(
-        start <= end,
-        "Range from start '%s' (%s) to end '%s' (%s) is empty.",
-        start,
-        (int) start,
-        end,
-        (int) end);
     return range(makeString(String.valueOf(start)), makeString(String.valueOf(end)));
   }
 
