@@ -15,12 +15,12 @@ import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.SourceProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 
-public class ProofFactory {
-  public static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
+ class ProofFactory {
+  static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
     return new SourceProofNode(rule, formula);
   }
 
-  public static ProofNode createResolutionNode(Formula formula, Formula pivot) {
+  static ProofNode createResolutionNode(Formula formula, Formula pivot) {
     return new ResolutionProofNode(formula, pivot);
   }
 }
