@@ -25,17 +25,8 @@ SPDX-License-Identifier: Apache-2.0
           Theoretically CVC5s performance should be improvable by using -best (uses the best
           known general performance/dependencies) but this can not be combined with auto-download.
     -->
-    <!-- SECTION: Publishing CVC5
-         ==================================================================
-    -->
-    <target name="package-cvc5" depends="">
-        <!-- Copy CVC5 binaries to the root folder along with the version postfix. -->
-        <fail unless="cvc5.path">
-            Please specify the path to CVC5 with the flag -Dcvc5.path=/path/to/cvc5.
-            The path has to point to the root CVC5 folder, i.e.,
-            a checkout of the official git repository from 'https://github.com/cvc5/cvc5'.
-            Note that shell substitutions do not work and a full absolute path has to be specified.
-        </fail>
+    <target name="set-properties-for-cvc5">
+        <checkPathOption pathOption="cvc5.path" defaultPath="/path/to/cvc5" targetName="CVC5 directory (Git checkout from https://github.com/cvc5/cvc5)"/>
         <fail unless="cvc5.customRev">
             Please specify a custom revision with the flag -Dcvc5.customRev=XXX.
             The custom revision has to be unique amongst the already known version
@@ -53,17 +44,17 @@ SPDX-License-Identifier: Apache-2.0
         <property name="cvc5.version" value="${cvc5.customRev}-g${cvc5.revision}"/>
         <echo message="Building CVC5 in version '${cvc5.version}'"/>
 
-        <!-- set a path to the build folder and make sure there are no previous build files -->
+        <!-- set a path to the build folder, which is cleaned before building any binary files -->
         <property name="cvc5.buildDir" location="${cvc5.path}/build"/>
-        <fail message="Found `/build` directory in ${cvc5.path}. Please make sure that -Dcvc5.path points to a clean checkout of CVC5 without any build files.">
-            <condition>
-                <available file="${cvc5.buildDir}" type="dir"/>
-            </condition>
-        </fail>
 
-        <!-- build CVC5 for x64 linux -->
-        <echo message="Building CVC5 for x64 linux"/>
         <property name="cvc5.installDir.x64-linux" location="${cvc5.path}/install/x64-linux"/>
+        <property name="cvc5.installDir.arm64-linux" location="${cvc5.path}/install/arm64-linux"/>
+        <property name="cvc5.installDir.x64-windows" location="${cvc5.path}/install/x64-windows"/>
+    </target>
+
+    <target name="compile-cvc5-linux-x64" depends="set-properties-for-cvc5">
+        <echo message="Building CVC5 for x64 linux"/>
+        <delete dir="${cvc5.buildDir}" quiet="true"/>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
             <arg value="production"/>
             <arg value="--static"/>
@@ -75,17 +66,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-j4"/>
             <arg value="install"/>
         </exec>
-        <exec executable="rm" failonerror="true">
-            <arg value="-rf"/>
-            <arg value="${cvc5.buildDir}"/>
-        </exec>
         <exec executable="strip" dir="${cvc5.installDir.x64-linux}/lib" failonerror="true">
             <arg value="libcvc5jni.so"/>
         </exec>
+    </target>
 
-        <!-- build CVC5 for arm64 linux -->
+    <target name="compile-cvc5-linux-arm64" depends="set-properties-for-cvc5">
         <echo message="Building CVC5 for arm64 linux"/>
-        <property name="cvc5.installDir.arm64-linux" location="${cvc5.path}/install/arm64-linux"/>
+        <delete dir="${cvc5.buildDir}" quiet="true"/>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
             <env key="JNI_HOME" value="${jdk-linux-arm64.path}"/>
             <arg value="production"/>
@@ -99,17 +87,14 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-j4"/>
             <arg value="install"/>
         </exec>
-        <exec executable="rm" failonerror="true">
-            <arg value="-rf"/>
-            <arg value="${cvc5.buildDir}"/>
-        </exec>
         <exec executable="aarch64-linux-gnu-strip" dir="${cvc5.installDir.arm64-linux}/lib" failonerror="true">
             <arg value="libcvc5jni.so"/>
         </exec>
+    </target>
 
-        <!-- build CVC5 for x64 windows -->
+    <target name="compile-cvc5-windows-x64" depends="set-properties-for-cvc5">
         <echo message="Building CVC5 for x64 windows"/>
-        <property name="cvc5.installDir.x64-windows" location="${cvc5.path}/install/x64-windows"/>
+        <delete dir="${cvc5.buildDir}" quiet="true"/>
         <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
             <env key="JNI_HOME" value="${jdk-windows-x64.path}"/>
             <arg value="production"/>
@@ -123,14 +108,12 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-j4"/>
             <arg value="install"/>
         </exec>
-        <exec executable="rm" failonerror="true">
-            <arg value="-rf"/>
-            <arg value="${cvc5.buildDir}"/>
-        </exec>
         <exec executable="x86_64-w64-mingw32-strip" dir="${cvc5.installDir.x64-windows}/bin" failonerror="true">
             <arg value="cvc5jni.dll"/>
         </exec>
+    </target>
 
+    <target name="package-cvc5" depends="compile-cvc5-linux-x64, compile-cvc5-linux-arm64, compile-cvc5-windows-x64">
         <!-- get the actual jar location as cvc5.jar is just a link -->
         <exec executable="readlink" dir="${cvc5.installDir.x64-linux}/share/java" outputproperty="cvc5.jar" failonerror="true">
             <arg value="-f"/>
