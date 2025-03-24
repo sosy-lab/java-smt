@@ -46,8 +46,8 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
  * @see org.sosy_lab.java_smt.ResProofRule for the list of RESOLUTE axioms.
  */
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
-public class Z3ToResoluteProofConverter {
-
+public class Z3ToResoluteProofConverter { // This class is inclompete and currently not used. The
+  // strategy for transforming proof rules should be proved first.
   private final Z3FormulaManager formulaManager;
 
   private final BooleanFormulaManager bfm;

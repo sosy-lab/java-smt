@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 
+// This class uses java recursion and as such, Z3NonRecursiveProofProcessor.java is preferred
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 class Z3ProofProcessor {
   private final long z3context;

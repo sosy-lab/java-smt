@@ -14,6 +14,8 @@ import org.sosy_lab.java_smt.ProofRuleRegistry;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // TODO correctly document the formula strings
+
+/** Proof rules for Z3. These can be found in the Z3 API source code in the file Z3_api.h */
 public enum Z3ProofRule implements ProofRule {
 
   // Undefined proof object
