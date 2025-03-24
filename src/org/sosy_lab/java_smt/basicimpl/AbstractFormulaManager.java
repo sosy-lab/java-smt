@@ -442,8 +442,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
     try {
       return formulaCreator.visit(input, visitor);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
