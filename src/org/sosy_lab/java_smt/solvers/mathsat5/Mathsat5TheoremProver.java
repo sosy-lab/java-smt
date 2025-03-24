@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.ProofFactory;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
@@ -52,6 +53,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   public ProofNode getProof() {
     ProofNode pn;
     long pm = msat_get_proof_manager(curEnv);
+    //ProofFactory proofFactory = new ProofFactory();
     Mathsat5ProofProcessor pp = new Mathsat5ProofProcessor(context, curEnv, creator, this);
     pn = pp.fromMsatProof(msat_get_proof(pm));
     msat_destroy_proof_manager(pm);

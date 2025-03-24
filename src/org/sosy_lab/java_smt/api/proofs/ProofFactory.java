@@ -19,7 +19,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
 
-class ProofFactory<T> {
+public class ProofFactory<T> {
 
   private final FormulaCreator<?, ?, ?, ?> formulaCreator;
   private final ProverEnvironment prover;

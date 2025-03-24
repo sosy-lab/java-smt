@@ -10,7 +10,7 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-public class ProofFrame<T> {
+public abstract class ProofFrame<T> {
   final T proof;
   int numArgs;
   boolean visited;
