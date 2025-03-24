@@ -12,61 +12,15 @@ package org.sosy_lab.java_smt;
 
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDag;
 
+/**
+ * This class represents a resolution proof DAG. Its nodes might be of the type
+ * {@link SourceProofNode} or {@link ResolutionProofNode}. It is used to represent proofs based on
+ * the RESOLUTE proof format from SMTInterpol.
+ *
+ * @see ResProofRule
+ */
 @SuppressWarnings("all")
 public class ResolutionProofDag extends AbstractProofDag {
-
-  /*
-  public ResolutionProofDAG() {
-    super();
-  }
-
-
-  public static ResolutionProofDAG fromTerm(
-      Term proof, FormulaManager pManager,
-      Map<String, BooleanFormula> pAnnotatedTerms) {
-
-    // Use our new ProofTermParser to convert the proof term to a ResolutionProofDAG
-    return ProofTermParser.convert(proof, pManager, pAnnotatedTerms);
-  }
-
-  private static void traverseTerm(Term term, ResolutionProofDAG dag, ProofNode parentClause) {
-    if (term instanceof AnnotatedTerm) {
-      AnnotatedTerm annotatedTerm = (AnnotatedTerm) term;
-      for (Annotation annotation : annotatedTerm.getAnnotations()) {
-        /*
-        if (annotation.getKey().equals(ProofConstants.ANNOTKEY_PROVES)) {
-          //ProofNode<ResAxiom> clause = annotation.getValue().toString();
-          if (parentClause != null) {
-            dag.addEdge(parentClause, clause);
-          } else {
-            dag.addNode(clause);
-          }
-          for (Term subTerm : annotatedTerm.getSubterms()) {
-            traverseTerm(subTerm, dag, clause);
-          }
-        }
-
-
-      }
-    }
-  }
-
-
-
-  @Override
-  public void addNode(ProofNode node) {
-    super.addNode(node);
-  }
-
-  @Override
-  public ProofNode getNode(int nodeId) {
-    return super.getNode(nodeId);
-  }
-
-  @Override
-  public void addEdge(int parentNodeId, int childNodeId) {
-    super.addEdge(parentNodeId, childNodeId);
-  }
-
-   */
+  //Work in progress. The functionality of producing just nodes should be provided first.
+  //The idea is to provide extended functionality (by providng a set of edges for example).
 }

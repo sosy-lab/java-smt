@@ -62,7 +62,12 @@ public class Z3ToResoluteProofConverter {
 
   private static final Map<Z3ProofRule, ResAxiom> ruleMapping = new HashMap<>();
 
-
+  /**
+   * This method converts a set of Z3ProofNodes into a {@link ResolutionProofDag}.
+   *
+   * @param z3ProofNodes
+   * @return {@link ResolutionProofDag}
+   */
   static ResolutionProofDag convertToResolutionProofDag(Z3ProofNode[] z3ProofNodes) {
     ResolutionProofDag dag = new ResolutionProofDag();
 
@@ -80,6 +85,7 @@ public class Z3ToResoluteProofConverter {
     return dag;
   }
 
+  //This should help extract parts of a formula to better transform proof rules.
   private static class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
     private final List<BooleanFormula> equivalenceOperands = new ArrayList<>();
 
@@ -298,6 +304,7 @@ public class Z3ToResoluteProofConverter {
         return handleDefault(node);
     }
   }
+
 
   ProofNode handleTrue(Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
@@ -537,6 +544,7 @@ public class Z3ToResoluteProofConverter {
     return null;
   }
 
+  //This is for debugging purposes.
   void printProof(ProofNode node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
 
