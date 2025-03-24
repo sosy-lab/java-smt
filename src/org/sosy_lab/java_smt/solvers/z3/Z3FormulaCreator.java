@@ -25,6 +25,7 @@ import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
+import java.io.IOException;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
@@ -485,7 +486,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f)
+      throws IOException {
     switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
       case Z3_NUMERAL_AST:
         return visitor.visitConstant(formula, convertValue(f));

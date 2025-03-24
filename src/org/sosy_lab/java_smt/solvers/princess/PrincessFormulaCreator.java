@@ -52,6 +52,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -383,7 +384,8 @@ class PrincessFormulaCreator
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
+  public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input)
+      throws IOException {
     if (input instanceof IIntLit) {
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(f, value.bigIntValue());

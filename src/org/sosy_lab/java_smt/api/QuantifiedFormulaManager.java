@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
@@ -30,7 +31,8 @@ public interface QuantifiedFormulaManager {
    * @return An existentially quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
+  default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody)
+      throws IOException {
     return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
   }
 
@@ -40,18 +42,27 @@ public interface QuantifiedFormulaManager {
    * @return A universally quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
+  default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody)
+      throws IOException {
     return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
   }
 
   /** Syntax sugar, see {@link #forall(List, BooleanFormula)}. */
   default BooleanFormula forall(Formula quantifiedArg, BooleanFormula pBody) {
-    return forall(ImmutableList.of(quantifiedArg), pBody);
+    try {
+      return forall(ImmutableList.of(quantifiedArg), pBody);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   /** Syntax sugar, see {@link #exists(List, BooleanFormula)}. */
   default BooleanFormula exists(Formula quantifiedArg, BooleanFormula pBody) {
-    return exists(ImmutableList.of(quantifiedArg), pBody);
+    try {
+      return exists(ImmutableList.of(quantifiedArg), pBody);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   /**
@@ -62,7 +73,7 @@ public interface QuantifiedFormulaManager {
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula mkQuantifier(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody);
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException;
 
   /**
    * Eliminate the quantifiers for a given formula. If this is not possible, it will return the
@@ -75,4 +86,5 @@ public interface QuantifiedFormulaManager {
       throws InterruptedException, SolverException;
 
   void setOptions(ProverOptions... opt);
+
 }

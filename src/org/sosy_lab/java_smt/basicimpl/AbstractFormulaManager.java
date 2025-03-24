@@ -440,7 +440,11 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
-    return formulaCreator.visit(input, visitor);
+    try {
+      return formulaCreator.visit(input, visitor);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   @Override

@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
@@ -292,14 +293,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @see org.sosy_lab.java_smt.api.FormulaManager#visit
    */
   @CanIgnoreReturnValue
-  public <R> R visit(Formula input, FormulaVisitor<R> visitor) {
+  public <R> R visit(Formula input, FormulaVisitor<R> visitor) throws IOException {
     return visit(visitor, input, extractInfo(input));
   }
 
   /**
    * @see org.sosy_lab.java_smt.api.FormulaManager#visit
    */
-  public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
+  public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f)
+      throws IOException;
 
   protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
     return Lists.transform(input, this::extractInfo);
@@ -324,7 +326,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     while (!recVisitor.isQueueEmpty()) {
       Formula tt = recVisitor.pop();
       if (shouldProcess.test(tt)) {
-        TraversalProcess process = visit(tt, recVisitor);
+        TraversalProcess process = null;
+        try {
+          process = visit(tt, recVisitor);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
         if (process == TraversalProcess.ABORT) {
           return;
         }
@@ -356,7 +363,11 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       }
 
       if (shouldProcess.test(tt)) {
-        visit(tt, recVisitor);
+        try {
+          visit(tt, recVisitor);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
       } else {
         pCache.put(tt, tt);
       }

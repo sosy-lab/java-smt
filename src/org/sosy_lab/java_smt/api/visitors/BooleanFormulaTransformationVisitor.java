@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -93,7 +94,7 @@ public abstract class BooleanFormulaTransformationVisitor
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
       List<Formula> boundVars,
-      BooleanFormula processedBody) {
+      BooleanFormula processedBody) throws IOException {
     return mgr.getQuantifiedFormulaManager().mkQuantifier(quantifier, boundVars, processedBody);
   }
 }

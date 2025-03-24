@@ -130,6 +130,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Ints;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -318,7 +319,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
+  public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) throws IOException {
     int constructor = yices_term_constructor(pF);
     switch (constructor) {
       case YICES_BOOL_CONST:

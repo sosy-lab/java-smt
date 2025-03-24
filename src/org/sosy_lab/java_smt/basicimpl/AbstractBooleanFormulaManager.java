@@ -16,6 +16,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -279,7 +280,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
-    return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
+    try {
+      return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   @Override
@@ -406,7 +411,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         BooleanFormula f,
         Quantifier quantifier,
         List<Formula> boundVariables,
-        BooleanFormula body) {
+        BooleanFormula body) throws IOException {
       return delegate.visitQuantifier(quantifier, f, boundVariables, body);
     }
 
@@ -421,7 +426,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (flatten) {
       return asFuncRecursive(f, conjunctionFinder);
     }
-    return formulaCreator.visit(f, conjunctionFinder);
+    try {
+      return formulaCreator.visit(f, conjunctionFinder);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   @Override
@@ -429,7 +438,11 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     if (flatten) {
       return asFuncRecursive(f, disjunctionFinder);
     }
-    return formulaCreator.visit(f, disjunctionFinder);
+    try {
+      return formulaCreator.visit(f, disjunctionFinder);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   /** Optimized non-recursive flattening implementation. */
@@ -442,7 +455,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> formulaCreator.visit(ss, visitor));
+      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> {
+        try {
+          return formulaCreator.visit(ss, visitor);
+        } catch (IOException pE) {
+          throw new RuntimeException(pE);
+        }
+      });
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

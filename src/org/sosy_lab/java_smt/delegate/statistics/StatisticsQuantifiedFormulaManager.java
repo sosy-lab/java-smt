@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -30,7 +31,7 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   @Override
   public BooleanFormula mkQuantifier(
-      Quantifier pQ, List<? extends Formula> pVariables, BooleanFormula pBody) {
+      Quantifier pQ, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
     stats.quantifierOperations.getAndIncrement();
     return delegate.mkQuantifier(pQ, pVariables, pBody);
   }
@@ -41,6 +42,7 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
     stats.quantifierOperations.getAndIncrement();
     return delegate.eliminateQuantifiers(pF);
   }
+
 
   @Override
   public void setOptions(ProverOptions... opt) {

@@ -250,14 +250,19 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     BooleanFormula pred3 = bmgr.makeVariable("pred3");
 
     BooleanFormula query =
-        bmgr.and(
-            bvmgr.equal(y, one),
-            bmgr.equivalence(pred1, bvmgr.equal(y, one)),
-            bmgr.equivalence(
-                pred3,
-                qmgr.forall(
-                    ImmutableList.of(bound),
-                    bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+        null;
+    try {
+      query = bmgr.and(
+          bvmgr.equal(y, one),
+          bmgr.equivalence(pred1, bvmgr.equal(y, one)),
+          bmgr.equivalence(
+              pred3,
+              qmgr.forall(
+                  ImmutableList.of(bound),
+                  bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+    } catch (java.io.IOException pE) {
+      throw new RuntimeException(pE);
+    }
 
     env.push(query);
 

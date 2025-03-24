@@ -33,8 +33,18 @@ import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
+  /*
+  For activating UltimateEliminator with different setting e.g. warning and falling back to
+  the native quantifier elimination or creation method in case of an error.
+  */
   private List<ProverOptions> options;
+  /*
+  For parsing and dumping formula between UltimateEliminator and the native solver.
+   */
   private Optional<AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>> fmgr;
+  /*
+  for logging warnings.
+   */
   private final LogManager logger;
 
   private final UltimateEliminatorWrapper ultimateEliminatorWrapper;
@@ -68,7 +78,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         }
 
         if (extractQuantifierEliminationOptions()
-            .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
+            .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
           return wrap(eliminateQuantifiers(extractInfo(pF)));
         } else {
           logger.logException(
@@ -98,7 +108,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         }
       }
 
-      if (extractQuantifierEliminationOptions().contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
+      if (extractQuantifierEliminationOptions().contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
         } catch (Exception e3) {
@@ -116,14 +126,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo)
-      throws UnsupportedOperationException {
-    FormulaManager formulaManager = getFormulaManager();
+  protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo) {
+    FormulaManager formulaManager = fmgr.orElseThrow();
     Term formula =
-        getUltimateEliminatorWrapper().parse(formulaManager.dumpFormula(pExtractInfo).toString());
-    formula = getUltimateEliminatorWrapper().simplify(formula);
+        ultimateEliminatorWrapper.parse(formulaManager.dumpFormula(pExtractInfo).toString());
+    formula = ultimateEliminatorWrapper.simplify(formula);
     return extractInfo(
-        formulaManager.parse(getUltimateEliminatorWrapper().dumpFormula(formula).toString()));
+        formulaManager.parse(ultimateEliminatorWrapper.dumpFormula(formula).toString()));
   }
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
@@ -131,14 +140,31 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula mkQuantifier(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
     if (extractQuantifierEliminationOptions()
             .contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
       } catch (IOException | UnsupportedOperationException e) {
-        return wrap(
-            mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+        if(options.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE)){
+          logger.logException(
+              Level.WARNING,
+              e,
+              "External quantifier creation failed. Falling back to native");
+            return wrap(
+              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+        }
+        else if(options.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK)){
+          return wrap(
+              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+        }
+        else{
+          logger.logException(
+              Level.WARNING,
+              e,
+              "External quantifier creation failed.");
+          throw e;
+        }
       }
     }
     return wrap(
@@ -148,20 +174,10 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 
+
   @Override
   public void setOptions(ProverOptions... opt) {
     options.addAll(Arrays.asList(opt));
-  }
-
-  public UltimateEliminatorWrapper getUltimateEliminatorWrapper() {
-    return ultimateEliminatorWrapper;
-  }
-
-  public FormulaManager getFormulaManager() {
-    if (fmgr.isEmpty()) {
-      throw new RuntimeException("FormulaManager is not set");
-    }
-    return fmgr.orElseThrow();
   }
 
   public void setFmgr(AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pFmgr) {
@@ -170,22 +186,22 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   private BooleanFormula mkWithoutQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
-    List<String> nameList = new ArrayList<>();
-    List<String> sortList = new ArrayList<>();
+    List<String> boundVariablesNameList = new ArrayList<>();
+    List<String> boundVariablesSortList = new ArrayList<>();
 
     String form = fmgr.orElseThrow().dumpFormulaImpl(extractInfo(pBody));
-    Term ultimateBody = getUltimateEliminatorWrapper().parse(form);
+    Term ultimateBody = ultimateEliminatorWrapper.parse(form);
     for (Formula var : pVariables) {
-      populateNameAndSortList(var, nameList, sortList);
+      enrichBoundVariablesNameAndSortList(var, boundVariablesNameList, boundVariablesSortList);
     }
-    String ultimateFormula = buildSmtlib2Formula(q, nameList, sortList, ultimateBody);
+    String ultimateFormula = buildSmtlib2Formula(q, boundVariablesNameList, boundVariablesSortList, ultimateBody);
 
-    Term parsedResult = getUltimateEliminatorWrapper().parse(ultimateFormula);
-    Term resultFormula = getUltimateEliminatorWrapper().simplify(parsedResult);
+    Term parsedResult = ultimateEliminatorWrapper.parse(ultimateFormula);
+    Term resultFormula = ultimateEliminatorWrapper.simplify(parsedResult);
 
     BooleanFormula result =
         fmgr.orElseThrow()
-            .parse(getUltimateEliminatorWrapper().dumpFormula(resultFormula).toString());
+            .parse(ultimateEliminatorWrapper.dumpFormula(resultFormula).toString());
     return result;
   }
 
@@ -199,12 +215,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   private String buildSmtlib2Formula(
-      Quantifier pQ, List<String> pNameList, List<String> pSortList, Term pUltimateBody) {
+      Quantifier pQ, List<String> pBoundVariablesNameList, List<String> pBoundVariablesSortList, Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
     sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
-    if (!pNameList.isEmpty()) {
-      for (int i = 0; i < pNameList.size(); i++) {
-        sb.append("(").append(pNameList.get(i)).append(" ").append(pSortList.get(i)).append(")");
+    if (!pBoundVariablesNameList.isEmpty()) {
+      for (int i = 0; i < pBoundVariablesNameList.size(); i++) {
+        sb.append("(").append(pBoundVariablesNameList.get(i)).append(" ").append(pBoundVariablesSortList.get(i)).append(")");
       }
     }
     sb.append(") ");
@@ -221,31 +237,35 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  private void populateNameAndSortList(Formula pF, List<String> nameList, List<String> sortList) {
-    formulaCreator.visit(
-        pF,
-        new DefaultFormulaVisitor<TraversalProcess>() {
+  private void enrichBoundVariablesNameAndSortList(Formula pF, List<String> nameList, List<String> sortList) {
+    try {
+      formulaCreator.visit(
+          pF,
+          new DefaultFormulaVisitor<TraversalProcess>() {
 
-          @Override
-          protected TraversalProcess visitDefault(Formula f) {
-            return TraversalProcess.CONTINUE;
-          }
+            @Override
+            protected TraversalProcess visitDefault(Formula f) {
+              return TraversalProcess.CONTINUE;
+            }
 
-          @Override
-          public TraversalProcess visitFreeVariable(Formula f, String name) {
-            nameList.add(name);
-            String sort = getSortAsString(f);
-            sortList.add(mapTypeToUltimateSort(sort));
-            return TraversalProcess.CONTINUE;
-          }
-        });
+            @Override
+            public TraversalProcess visitFreeVariable(Formula f, String name) {
+              nameList.add(name);
+              String sort = getSortAsString(f);
+              sortList.add(mapTypeToUltimateSort(sort));
+              return TraversalProcess.CONTINUE;
+            }
+          });
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
   }
 
   private List<ProverOptions> extractQuantifierEliminationOptions() {
       List<ProverOptions> validOptions = new ArrayList<>();
       boolean fallback = false;
-      boolean fallbackWithoutWarning = false;
-      boolean externalCreation = false;
+      boolean fallbackWarning = false;
+      boolean externalCreationFallbackWarning = false;
       boolean externalCreationFallback = false;
 
       for (ProverOptions option : options) {
@@ -257,16 +277,19 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
                   fallback = true;
                   validOptions.add(option);
                   break;
-              case QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING:
-                  fallbackWithoutWarning = true;
+            case QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE:
+                  fallbackWarning = true;
                   validOptions.add(option);
                   break;
               case EXTERNAL_QUANTIFIER_CREATION:
-                  externalCreation = true;
                   validOptions.add(option);
                   break;
               case EXTERNAL_QUANTIFIER_CREATION_FALLBACK:
                   externalCreationFallback = true;
+                  validOptions.add(option);
+                  break;
+            case EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE:
+                  externalCreationFallbackWarning = true;
                   validOptions.add(option);
                   break;
               default:
@@ -274,12 +297,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           }
       }
 
-      if (fallback && fallbackWithoutWarning) {
-          throw new IllegalArgumentException("Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.");
+      if (fallback && fallbackWarning) {
+          throw new IllegalArgumentException("Incompatible options: "
+              + "QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE cannot be used together.");
       }
 
-      if (externalCreation && externalCreationFallback) {
-          throw new IllegalArgumentException("Incompatible options: EXTERNAL_QUANTIFIER_CREATION and EXTERNAL_QUANTIFIER_CREATION_FALLBACK cannot be used together.");
+      if (externalCreationFallbackWarning && externalCreationFallback) {
+          throw new IllegalArgumentException("Incompatible options: EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together.");
       }
 
       return validOptions;

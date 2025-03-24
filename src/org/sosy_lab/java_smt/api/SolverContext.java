@@ -80,13 +80,13 @@ public interface SolverContext extends AutoCloseable {
      * Whether the solver should fall back to the alternative quantifier elimination if the current
      * elimination method fails. The solver will log a warning in this case.
      */
-    QUANTIFIER_ELIMINATION_FALLBACK,
+    QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE,
 
     /**
      * Whether the solver should fall back to the alternative quantifier elimination if the current
      * elimination method fails. The solver will not log a warning in this case.
      */
-    QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+    QUANTIFIER_ELIMINATION_FALLBACK,
   }
 
   /**

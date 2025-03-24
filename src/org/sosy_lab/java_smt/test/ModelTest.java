@@ -597,7 +597,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
-    BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    BooleanFormula f = null;
+    try {
+      f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     IntegerFormula one = imgr.makeNumber(1);
 
     ValueAssignment expectedValueAssignment =
@@ -660,7 +665,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f =
-        bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+        null;
+    try {
+      f = bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
     IntegerFormula one = imgr.makeNumber(1);
 
     ValueAssignment expectedValueAssignment =

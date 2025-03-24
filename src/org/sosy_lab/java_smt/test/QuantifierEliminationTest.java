@@ -83,7 +83,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     requireIntegers();
     requireQuantifiers();
 
-    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK);
+    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE);
 
     assume()
         .withMessage("Solver %s does not abort with given conditions", solverToUse())
@@ -109,7 +109,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     requireIntegers();
     requireQuantifiers();
 
-    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING);
+    qmgr.setOptions(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK);
 
     assume()
         .withMessage("Solver %s does not abort with given conditions", solverToUse())
@@ -363,7 +363,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5, Solvers.CVC4);
 
     qmgr.setOptions(
-        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE,
         ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula k = imgr.makeVariable("k");
@@ -409,7 +409,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNotEqualTo(Solvers.MATHSAT5);
 
     qmgr.setOptions(
-        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE,
         ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula xx = imgr.makeVariable("x");
@@ -441,7 +441,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNoneOf(Solvers.MATHSAT5, Solvers.YICES2);
 
     qmgr.setOptions(
-        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
         ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula xx = imgr.makeVariable("x");
@@ -472,7 +472,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNoneOf(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5, Solvers.CVC4);
 
     qmgr.setOptions(
-        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
         ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION);
 
     IntegerFormula xx = imgr.makeVariable("x");
@@ -508,7 +508,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     qmgr.setOptions(
         ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION,
         ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
-        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING);
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE);
 
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
@@ -516,7 +516,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
-        "Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.";
+        "Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE cannot be used together.";
 
 
     assertThat(
@@ -540,7 +540,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
-        "Incompatible options: EXTERNAL_QUANTIFIER_CREATION and EXTERNAL_QUANTIFIER_CREATION_FALLBACK cannot be used together.";
+        "Incompatible options: EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together.";
 
     assertThat(
         expectedMessage.contains(exception.getMessage()))
