@@ -60,4 +60,6 @@ SPDX-License-Identifier: Apache-2.0
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
+
+	<classpathentry kind="lib" path="lib/java/core/slf4j-nop.jar"/>
 </classpath>
