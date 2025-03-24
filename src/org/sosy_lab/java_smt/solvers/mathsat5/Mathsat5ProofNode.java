@@ -27,8 +27,6 @@ import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-
 
 public class Mathsat5ProofNode extends AbstractProofNode {
 
@@ -42,7 +40,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     }
   }
 
-  static public Mathsat5ProofNode fromMsatProof(ProverEnvironment pProver, long rootProof) {
+  public static Mathsat5ProofNode fromMsatProof(ProverEnvironment pProver, long rootProof) {
     final Mathsat5SolverContext context = ((Mathsat5TheoremProver) pProver).context;
     final long curEnv = ((Mathsat5TheoremProver) pProver).curEnv;
     final Mathsat5FormulaCreator formulaCreator = ((Mathsat5TheoremProver) pProver).creator;
@@ -73,7 +71,8 @@ public class Mathsat5ProofNode extends AbstractProofNode {
 
           // Generate the formula and proof rule.
           Formula formula = generateFormula(frame.getProof(), (Mathsat5TheoremProver) pProver);
-          Mathsat5ProofRule proofRule = new Mathsat5ProofRule(msat_proof_get_name(frame.getProof()));
+          Mathsat5ProofRule proofRule =
+              new Mathsat5ProofRule(msat_proof_get_name(frame.getProof()));
           Mathsat5ProofNode node = new Mathsat5ProofNode(proofRule, formula);
 
           // Retrieve computed child nodes and attach them.
@@ -91,16 +90,16 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     }
   }
 
-    @Nullable
-    private static Formula generateFormula(long proof, Mathsat5TheoremProver prover){
-      Mathsat5FormulaCreator formulaCreator = prover.creator;
-      Formula formula = null;
-      if (msat_proof_is_term(proof)) {
-        long proofTerm = msat_proof_get_term(proof);
-        formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proofTerm), proofTerm);
-      }
-      return formula;
+  @Nullable
+  private static Formula generateFormula(long proof, Mathsat5TheoremProver prover) {
+    Mathsat5FormulaCreator formulaCreator = prover.creator;
+    Formula formula = null;
+    if (msat_proof_is_term(proof)) {
+      long proofTerm = msat_proof_get_term(proof);
+      formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(proofTerm), proofTerm);
     }
+    return formula;
+  }
 
   public String asString() {
     return asString(0);

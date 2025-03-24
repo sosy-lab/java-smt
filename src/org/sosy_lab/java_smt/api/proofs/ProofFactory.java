@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofNode;
 import org.sosy_lab.java_smt.SourceProofNode;
@@ -39,7 +38,8 @@ public class ProofFactory<T> {
   }
 
   ProofFactory(
-      FormulaCreator<?, ?, ?, ?> pCreator, ProverEnvironment pProver,
+      FormulaCreator<?, ?, ?, ?> pCreator,
+      ProverEnvironment pProver,
       ProofFactory.Solvers pSolver) {
     formulaCreator = pCreator;
     prover = pProver;

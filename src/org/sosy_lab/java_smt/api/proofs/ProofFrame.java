@@ -15,29 +15,28 @@ public abstract class ProofFrame<T> {
   int numArgs;
   boolean visited;
 
-   protected ProofFrame(T proof) {
+  protected ProofFrame(T proof) {
     this.proof = proof;
     this.visited = false;
   }
 
-        public T getProof() {
-        return proof;
-        }
+  public T getProof() {
+    return proof;
+  }
 
-        public int getNumArgs() {
+  public int getNumArgs() {
     return numArgs;
-        }
+  }
 
-        public boolean getVisited() {
-        return visited;
-        }
+  public boolean getVisited() {
+    return visited;
+  }
 
-        public void setVisited(boolean visited) {
-        this.visited = visited;
-        }
+  public void setVisited(boolean visited) {
+    this.visited = visited;
+  }
 
-        public void setNumArgs(int numArgs) {
-        this.numArgs = numArgs;
-        }
-
+  public void setNumArgs(int numArgs) {
+    this.numArgs = numArgs;
+  }
 }

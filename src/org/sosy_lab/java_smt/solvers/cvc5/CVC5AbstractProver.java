@@ -86,7 +86,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       pSolver.setOption("produce-unsat-cores", "true");
     }
     if (pOptions.contains(ProverOptions.GENERATE_PROOFS)) {
-        pSolver.setOption("produce-proofs", "true");
+      pSolver.setOption("produce-proofs", "true");
     }
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");

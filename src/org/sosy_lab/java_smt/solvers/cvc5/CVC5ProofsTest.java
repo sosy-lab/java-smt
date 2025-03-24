@@ -20,7 +20,6 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
-import java.util.Set;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -39,7 +38,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
-
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 public class CVC5ProofsTest {
@@ -127,7 +125,6 @@ public class CVC5ProofsTest {
     } catch (SolverException | InterruptedException pE) {
       throw new RuntimeException(pE);
     }
-
   }
 
   private void processProof(Proof proof, int depth, int childNumber) throws CVC5ApiException {
@@ -160,8 +157,8 @@ public class CVC5ProofsTest {
     // (assert q1)
     // (assert (not q2))
     Sort booleanSort = tm.getBooleanSort();
-    Term q1 = solver.declareFun("q1", new Sort[]{}, booleanSort);
-    Term q2 = solver.declareFun("q2", new Sort[]{}, booleanSort);
+    Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
+    Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
 
     solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
     solver.assertFormula(q1);
@@ -187,8 +184,8 @@ public class CVC5ProofsTest {
     // (assert q1)
     // (assert (not q2))
     Sort booleanSort = tm.getBooleanSort();
-    Term q1 = solver.declareFun("q1", new Sort[]{}, booleanSort);
-    Term q2 = solver.declareFun("q2", new Sort[]{}, booleanSort);
+    Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
+    Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
 
     solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
     solver.assertFormula(q1);

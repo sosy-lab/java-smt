@@ -13,10 +13,10 @@ package org.sosy_lab.java_smt;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 /**
- * A proof rule in the proof DAG of the proof format RESOLUTE used by SMTInterpol.
- * See: <a href="https://ultimate.informatik.uni-freiburg.de/smtinterpol/proof-format.html">...</a>
+ * A proof rule in the proof DAG of the proof format RESOLUTE used by SMTInterpol. See: <a
+ * href="https://ultimate.informatik.uni-freiburg.de/smtinterpol/proof-format.html">...</a>
  *
- * The conversion from other formats to RESOLUTE appears to be simple and as such, it is a good
+ * <p>The conversion from other formats to RESOLUTE appears to be simple and as such, it is a good
  * candidate for a common proof format.
  *
  * @author Gabriel Carpio
