@@ -408,10 +408,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     @Override
     public R visitQuantifier(
-        BooleanFormula f,
-        Quantifier quantifier,
-        List<Formula> boundVariables,
-        BooleanFormula body) throws IOException {
+        BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body)
+        throws IOException {
       return delegate.visitQuantifier(quantifier, f, boundVariables, body);
     }
 
@@ -455,13 +453,16 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
 
     while (!toProcess.isEmpty()) {
       BooleanFormula s = toProcess.pop();
-      Set<BooleanFormula> out = cache.computeIfAbsent(s, ss -> {
-        try {
-          return formulaCreator.visit(ss, visitor);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
-        }
-      });
+      Set<BooleanFormula> out =
+          cache.computeIfAbsent(
+              s,
+              ss -> {
+                try {
+                  return formulaCreator.visit(ss, visitor);
+                } catch (IOException e) {
+                  throw new RuntimeException(e);
+                }
+              });
       if (out.size() == 1 && s.equals(out.iterator().next())) {
         output.add(s);
       }

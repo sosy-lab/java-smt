@@ -23,6 +23,7 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverContext sync;
+
   @SuppressWarnings("unused")
   private ProverOptions[] option;
 

@@ -978,8 +978,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula constraint = null;
     try {
       constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
 
     // The variable extraction should visit "x" and "y" only once,
@@ -1230,8 +1230,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f = null;
     try {
       f = qmgr.forall(quantifiedVars, body);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula transformed =
         bmgr.transformRecursively(
@@ -1266,8 +1266,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f = null;
     try {
       f = qmgr.exists(quantifiedVars, body);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
@@ -1286,8 +1286,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f = null;
     try {
       f = qmgr.exists(quantifiedVars, body);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
@@ -1306,8 +1306,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f = null;
     try {
       f = qmgr.exists(quantifiedVars, body);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).containsEntry("b", body);

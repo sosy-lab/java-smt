@@ -43,7 +43,6 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
     return delegate.eliminateQuantifiers(pF);
   }
 
-
   @Override
   public void setOptions(ProverOptions... opt) {
     option = opt;

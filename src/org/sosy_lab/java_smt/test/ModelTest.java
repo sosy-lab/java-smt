@@ -659,7 +659,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
-    BooleanFormula f =bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
+    BooleanFormula f =
+        bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
     ValueAssignment expectedValueAssignment =

@@ -140,9 +140,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (forall x . b[x] = 0) AND (b[123] = 1) is UNSAT
     requireIntegers();
 
-    BooleanFormula f = bmgr.and(
-          qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
+    BooleanFormula f =
+        bmgr.and(
+            qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
+            imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     assertThatFormula(f).isUnsatisfiable();
   }
 
@@ -159,11 +160,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f = bmgr.and(
-          qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0),
-          bvmgr.equal(
-              amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
-              bvmgr.makeBitvector(bvWidth, 1)));
+    BooleanFormula f =
+        bmgr.and(
+            qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0),
+            bvmgr.equal(
+                amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
+                bvmgr.makeBitvector(bvWidth, 1)));
 
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -179,9 +181,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (forall x . b[x] = 0) AND (b[123] = 0) is SAT
     requireIntegers();
 
-    BooleanFormula f = bmgr.and(
-          qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
+    BooleanFormula f =
+        bmgr.and(
+            qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
+            imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
 
     try {
       // CVC4 and Princess fail this
@@ -203,14 +206,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0),
-          bvmgr.equal(
-              amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
-              bvmgr.makeBitvector(bvWidth, 0)));
+      f =
+          bmgr.and(
+              qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0),
+              bvmgr.equal(
+                  amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
+                  bvmgr.makeBitvector(bvWidth, 0)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -231,14 +234,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     // (forall x . b[x] = 0) AND (b[123] = 1 OR b[123] = 0) is SAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
-          bmgr.or(
-              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
-              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
+      f =
+          bmgr.and(
+              qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
+              bmgr.or(
+                  imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
+                  imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -258,12 +261,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .isNotEqualTo(Solvers.CVC5);
     // (forall x . b[x] = 0) OR (b[123] = 1) is SAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
+      f =
+          bmgr.or(
+              qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -284,12 +287,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     // (not exists x . not b[x] = 0) AND (b[123] = 1) is UNSAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
+      f =
+          bmgr.and(
+              bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -309,12 +312,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     // (not exists x . not b[x] = 0) AND (b[123] = 0) is SAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
+      f =
+          bmgr.and(
+              bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -334,12 +337,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     // (not exists x . b[x] = 0) AND (b[123] = 0) is UNSAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          bmgr.not(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0)),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
+      f =
+          bmgr.and(
+              bmgr.not(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0)),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -355,14 +358,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     // (not exists x . not b[x] = 0) AND (b[123] = 1 OR b[123] = 0) is SAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-          bmgr.or(
-              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
-              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
+      f =
+          bmgr.and(
+              bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+              bmgr.or(
+                  imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
+                  imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -382,12 +385,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC5);
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
+      f =
+          bmgr.or(
+              bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -403,12 +406,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void testLIAExistsArrayConjunct1() throws SolverException, InterruptedException {
     // (exists x . b[x] = 0) AND (b[123] = 1) is SAT
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
-          imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
+      f =
+          bmgr.and(
+              qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
+              imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -422,14 +425,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.and(
-          qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
-          bvmgr.equal(
-              amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
-              bvmgr.makeBitvector(bvWidth, 1)));
+      f =
+          bmgr.and(
+              qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
+              bvmgr.equal(
+                  amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
+                  bvmgr.makeBitvector(bvWidth, 1)));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -446,8 +449,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (exists x . b[x] = 1) AND  (forall x . b[x] = 0) is UNSAT
 
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_1), forall_x_a_at_x_eq_0);
     } catch (IOException e) {
@@ -468,8 +470,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1), bv_forall_x_a_at_x_eq_0);
     } catch (IOException e) {
@@ -488,8 +489,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (exists x . b[x] = 0) AND  (forall x . b[x] = 0) is SAT
     requireIntegers();
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0), forall_x_a_at_x_eq_0);
     } catch (IOException e) {
@@ -513,8 +513,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNoneOf(Solvers.CVC5, Solvers.CVC4);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0), bv_forall_x_a_at_x_eq_0);
     } catch (IOException e) {
@@ -533,12 +532,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (exists x . b[x] = 0) OR  (forall x . b[x] = 1) is SAT
 
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
-          qmgr.forall(ImmutableList.of(x), a_at_x_eq_1));
+      f =
+          bmgr.or(
+              qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
+              qmgr.forall(ImmutableList.of(x), a_at_x_eq_1));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -557,12 +556,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0),
-          qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_1));
+      f =
+          bmgr.or(
+              qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0),
+              qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_1));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -574,12 +573,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (exists x . b[x] = 1) OR (exists x . b[x] = 1) is SAT
 
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          qmgr.exists(ImmutableList.of(x), a_at_x_eq_1),
-          qmgr.exists(ImmutableList.of(x), a_at_x_eq_1));
+      f =
+          bmgr.or(
+              qmgr.exists(ImmutableList.of(x), a_at_x_eq_1),
+              qmgr.exists(ImmutableList.of(x), a_at_x_eq_1));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -593,12 +592,12 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = bmgr.or(
-          qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1),
-          qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1));
+      f =
+          bmgr.or(
+              qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1),
+              qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -610,8 +609,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // forall x . x = x+1  is UNSAT
 
     requireIntegers();
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = qmgr.forall(ImmutableList.of(x), imgr.equal(x, imgr.add(x, imgr.makeNumber(1))));
     } catch (IOException e) {
@@ -627,11 +625,11 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     int width = 16;
     BitvectorFormula z = bvmgr.makeVariable(width, "z");
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = qmgr.forall(
-          ImmutableList.of(z), bvmgr.equal(z, bvmgr.add(z, bvmgr.makeBitvector(width, 1))));
+      f =
+          qmgr.forall(
+              ImmutableList.of(z), bvmgr.equal(z, bvmgr.add(z, bvmgr.makeBitvector(width, 1))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -643,14 +641,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // forall x . x+2 = x+1+1  is SAT
     requireIntegers();
 
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = qmgr.forall(
-          ImmutableList.of(x),
-          imgr.equal(
-              imgr.add(x, imgr.makeNumber(2)),
-              imgr.add(imgr.add(x, imgr.makeNumber(1)), imgr.makeNumber(1))));
+      f =
+          qmgr.forall(
+              ImmutableList.of(x),
+              imgr.equal(
+                  imgr.add(x, imgr.makeNumber(2)),
+                  imgr.add(imgr.add(x, imgr.makeNumber(1)), imgr.makeNumber(1))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -664,15 +662,15 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     int width = 16;
     BitvectorFormula z = bvmgr.makeVariable(width, "z");
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = qmgr.forall(
-          ImmutableList.of(z),
-          bvmgr.equal(
-              bvmgr.add(z, bvmgr.makeBitvector(width, 2)),
-              bvmgr.add(
-                  bvmgr.add(z, bvmgr.makeBitvector(width, 1)), bvmgr.makeBitvector(width, 1))));
+      f =
+          qmgr.forall(
+              ImmutableList.of(z),
+              bvmgr.equal(
+                  bvmgr.add(z, bvmgr.makeBitvector(width, 2)),
+                  bvmgr.add(
+                      bvmgr.add(z, bvmgr.makeBitvector(width, 1)), bvmgr.makeBitvector(width, 1))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -686,8 +684,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Note that due to the variable cache we simply get the existing var x here!
     IntegerFormula z = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
     } catch (IOException e) {
@@ -702,8 +699,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     BitvectorFormula z = bvmgr.makeVariable(bvWidth, "z");
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
       f = qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), bvmgr.equal(z, y)));
     } catch (IOException e) {
@@ -737,14 +733,14 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BitvectorFormula zPlusTwo =
         bvmgr.add(bvmgr.makeVariable(bvWidth, "z"), bvmgr.makeBitvector(bvWidth, 2));
     BitvectorFormula y = bvmgr.makeVariable(bvWidth, "y");
-    BooleanFormula f =
-        null;
+    BooleanFormula f = null;
     try {
-      f = qmgr.exists(
-          ImmutableList.of(z),
-          qmgr.forall(
-              ImmutableList.of(y),
-              bmgr.and(bvmgr.equal(z, y), bvmgr.greaterThan(zPlusTwo, z, false))));
+      f =
+          qmgr.exists(
+              ImmutableList.of(z),
+              qmgr.forall(
+                  ImmutableList.of(y),
+                  bmgr.and(bvmgr.equal(z, y), bvmgr.greaterThan(zPlusTwo, z, false))));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -899,8 +895,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierElimination()
-      throws InterruptedException, SolverException {
+  public void checkLIAQuantifierElimination() throws InterruptedException, SolverException {
     // build formula: (forall x . ((x < 5) | (7 < x + y)))
     // quantifier-free equivalent: (2 < y)
     requireIntegers();
@@ -917,8 +912,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkLIAQuantifierEliminationFail()
-      throws InterruptedException, SolverException {
+  public void checkLIAQuantifierEliminationFail() throws InterruptedException, SolverException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -942,8 +936,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void checkBVQuantifierEliminationFail()
-      throws InterruptedException, SolverException {
+  public void checkBVQuantifierEliminationFail() throws InterruptedException, SolverException {
     // build formula: (exists x : arr[x] = 3) && (forall y: arr[y] = 2)
     // as there is no quantifier free equivalent, it should return the input formula.
     requireBitvectors();

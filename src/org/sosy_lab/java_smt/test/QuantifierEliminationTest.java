@@ -26,8 +26,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testEliminationWithUltimateEliminator()
-      throws SolverException, InterruptedException {
+  public void testEliminationWithUltimateEliminator() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -214,9 +213,9 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     ArrayFormula<IntegerFormula, IntegerFormula> var =
         amgr.makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
 
-    Exception exception = assertThrows(UnsupportedOperationException.class,
+    assertThrows(
+        UnsupportedOperationException.class,
         () -> qmgr.forall(var, imgr.equal(amgr.select(var, k), amgr.select(var, i))));
-
   }
 
   @Test
@@ -425,8 +424,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void testQuantElimFallbackWithoutWarning()
-      throws SolverException, InterruptedException {
+  public void testQuantElimFallbackWithoutWarning() throws SolverException, InterruptedException {
     requireIntegers();
     requireQuantifiers();
 
@@ -514,17 +512,14 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
 
-    Exception exception = assertThrows(IllegalArgumentException.class,
-        () -> qmgr.forall(k, imgr.equal(k, i)));
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
         "Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and "
             + "QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.";
 
-
-    assertThat(
-        expectedMessage.contains(exception.getMessage()))
-        .isTrue();
+    assertThat(expectedMessage.contains(exception.getMessage())).isTrue();
   }
 
   @SuppressWarnings("LineLength")
@@ -541,15 +536,13 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     IntegerFormula k = imgr.makeVariable("k");
     IntegerFormula i = imgr.makeVariable("i");
 
-    Exception exception = assertThrows(IllegalArgumentException.class,
-        () -> qmgr.forall(k, imgr.equal(k, i)));
+    Exception exception =
+        assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
         "Incompatible options: EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and "
             + "EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together.";
 
-    assertThat(
-        expectedMessage.contains(exception.getMessage()))
-        .isTrue();
+    assertThat(expectedMessage.contains(exception.getMessage())).isTrue();
   }
 }

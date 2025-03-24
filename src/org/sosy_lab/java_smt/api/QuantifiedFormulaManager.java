@@ -51,8 +51,8 @@ public interface QuantifiedFormulaManager {
   default BooleanFormula forall(Formula quantifiedArg, BooleanFormula pBody) {
     try {
       return forall(ImmutableList.of(quantifiedArg), pBody);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -60,8 +60,8 @@ public interface QuantifiedFormulaManager {
   default BooleanFormula exists(Formula quantifiedArg, BooleanFormula pBody) {
     try {
       return exists(ImmutableList.of(quantifiedArg), pBody);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -86,5 +86,4 @@ public interface QuantifiedFormulaManager {
       throws InterruptedException, SolverException;
 
   void setOptions(ProverOptions... opt);
-
 }

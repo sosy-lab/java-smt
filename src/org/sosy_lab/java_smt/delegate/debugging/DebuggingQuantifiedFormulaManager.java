@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
+
   @SuppressWarnings("unused")
   private List<ProverOptions> option;
 
@@ -53,7 +54,6 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
     debugging.addFormulaTerm(result);
     return result;
   }
-
 
   @Override
   public void setOptions(ProverOptions... opt) {

@@ -632,8 +632,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void quantifierEliminationTest1()
-      throws SolverException, InterruptedException {
+  public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();
@@ -663,8 +662,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   @Ignore
-  public void quantifierEliminationTest2()
-      throws SolverException, InterruptedException {
+  public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     requireQuantifierElimination();

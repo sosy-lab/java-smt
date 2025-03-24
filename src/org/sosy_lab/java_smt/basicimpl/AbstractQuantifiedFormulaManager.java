@@ -67,13 +67,11 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
     List<ProverOptions> proverOptions = extractQuantifierEliminationOptions();
-    if (proverOptions
-            .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
+    if (proverOptions.contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
         return wrap(eliminateQuantifiersUltimateEliminator(pF));
       } catch (UnsupportedOperationException | IllegalArgumentException e) {
-        if (proverOptions
-            .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
+        if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
           logger.logException(
               Level.WARNING,
               e,
@@ -81,8 +79,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           return wrap(eliminateQuantifiers(extractInfo(pF)));
         }
 
-        if (proverOptions
-            .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+        if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
           return wrap(eliminateQuantifiers(extractInfo(pF)));
         } else {
           logger.logException(
@@ -99,8 +96,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     try {
       return wrap(eliminateQuantifiers(extractInfo(pF)));
     } catch (Exception e1) {
-      if (proverOptions
-          .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
+      if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
         logger.logException(
             Level.WARNING,
             e1,
@@ -147,28 +143,21 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
     List<ProverOptions> proverOptions = extractQuantifierEliminationOptions();
-    if (proverOptions
-            .contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
+    if (proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
       } catch (IOException | UnsupportedOperationException e) {
-        if(proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE)){
+        if (proverOptions.contains(
+            ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE)) {
           logger.logException(
-              Level.WARNING,
-              e,
-              "External quantifier creation failed. Falling back to native");
-            return wrap(
-              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        }
-        else if(proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK)){
+              Level.WARNING, e, "External quantifier creation failed. Falling back to native");
           return wrap(
               mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        }
-        else{
-          logger.logException(
-              Level.WARNING,
-              e,
-              "External quantifier creation failed.");
+        } else if (proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK)) {
+          return wrap(
+              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+        } else {
+          logger.logException(Level.WARNING, e, "External quantifier creation failed.");
           throw e;
         }
       }
@@ -179,7 +168,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
-
 
   @Override
   public void setOptions(ProverOptions... opt) {
@@ -200,14 +188,14 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     for (Formula var : pVariables) {
       enrichBoundVariablesNameAndSortList(var, boundVariablesNameList, boundVariablesSortList);
     }
-    String ultimateFormula = buildSmtlib2Formula(q, boundVariablesNameList, boundVariablesSortList, ultimateBody);
+    String ultimateFormula =
+        buildSmtlib2Formula(q, boundVariablesNameList, boundVariablesSortList, ultimateBody);
 
     Term parsedResult = ultimateEliminatorWrapper.parse(ultimateFormula);
     Term resultFormula = ultimateEliminatorWrapper.simplify(parsedResult);
 
     BooleanFormula result =
-        fmgr.orElseThrow()
-            .parse(ultimateEliminatorWrapper.dumpFormula(resultFormula).toString());
+        fmgr.orElseThrow().parse(ultimateEliminatorWrapper.dumpFormula(resultFormula).toString());
     return result;
   }
 
@@ -221,12 +209,19 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   private String buildSmtlib2Formula(
-      Quantifier pQ, List<String> pBoundVariablesNameList, List<String> pBoundVariablesSortList, Term pUltimateBody) {
+      Quantifier pQ,
+      List<String> pBoundVariablesNameList,
+      List<String> pBoundVariablesSortList,
+      Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
     sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
     if (!pBoundVariablesNameList.isEmpty()) {
       for (int i = 0; i < pBoundVariablesNameList.size(); i++) {
-        sb.append("(").append(pBoundVariablesNameList.get(i)).append(" ").append(pBoundVariablesSortList.get(i)).append(")");
+        sb.append("(")
+            .append(pBoundVariablesNameList.get(i))
+            .append(" ")
+            .append(pBoundVariablesSortList.get(i))
+            .append(")");
       }
     }
     sb.append(") ");
@@ -243,7 +238,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  private void enrichBoundVariablesNameAndSortList(Formula pF, List<String> nameList, List<String> sortList) {
+  private void enrichBoundVariablesNameAndSortList(
+      Formula pF, List<String> nameList, List<String> sortList) {
     try {
       formulaCreator.visit(
           pF,
@@ -268,49 +264,53 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   private List<ProverOptions> extractQuantifierEliminationOptions() {
-      List<ProverOptions> validOptions = new ArrayList<>();
-      boolean fallback = false;
-      boolean fallbackWarning = false;
-      boolean externalCreationFallbackWarning = false;
-      boolean externalCreationFallback = false;
+    List<ProverOptions> validOptions = new ArrayList<>();
+    boolean fallback = false;
+    boolean fallbackWarning = false;
+    boolean externalCreationFallbackWarning = false;
+    boolean externalCreationFallback = false;
 
-      for (ProverOptions option : options) {
-          switch (option) {
-              case SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION:
-                  validOptions.add(option);
-                  break;
-              case QUANTIFIER_ELIMINATION_FALLBACK:
-                  fallback = true;
-                  validOptions.add(option);
-                  break;
-            case QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE:
-                  fallbackWarning = true;
-                  validOptions.add(option);
-                  break;
-              case EXTERNAL_QUANTIFIER_CREATION:
-                  validOptions.add(option);
-                  break;
-              case EXTERNAL_QUANTIFIER_CREATION_FALLBACK:
-                  externalCreationFallback = true;
-                  validOptions.add(option);
-                  break;
-            case EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE:
-                  externalCreationFallbackWarning = true;
-                  validOptions.add(option);
-                  break;
-              default:
-                  break;
-          }
+    for (ProverOptions option : options) {
+      switch (option) {
+        case SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION:
+          validOptions.add(option);
+          break;
+        case QUANTIFIER_ELIMINATION_FALLBACK:
+          fallback = true;
+          validOptions.add(option);
+          break;
+        case QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE:
+          fallbackWarning = true;
+          validOptions.add(option);
+          break;
+        case EXTERNAL_QUANTIFIER_CREATION:
+          validOptions.add(option);
+          break;
+        case EXTERNAL_QUANTIFIER_CREATION_FALLBACK:
+          externalCreationFallback = true;
+          validOptions.add(option);
+          break;
+        case EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE:
+          externalCreationFallbackWarning = true;
+          validOptions.add(option);
+          break;
+        default:
+          break;
       }
+    }
 
-    checkArgument(!fallbackWarning || !fallback, "Incompatible options: "
-        + "QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.");
+    checkArgument(
+        !fallbackWarning || !fallback,
+        "Incompatible options: "
+            + "QUANTIFIER_ELIMINATION_FALLBACK and "
+            + "QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.");
 
-checkArgument(
-    !externalCreationFallbackWarning || !externalCreationFallback,
-    "Incompatible options: EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together."
-);
+    checkArgument(
+        !externalCreationFallbackWarning || !externalCreationFallback,
+        "Incompatible options: "
+            + "EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and "
+            + "EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together.");
 
-      return validOptions;
+    return validOptions;
   }
 }

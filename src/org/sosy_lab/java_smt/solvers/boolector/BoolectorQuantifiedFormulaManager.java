@@ -23,8 +23,8 @@ public class BoolectorQuantifiedFormulaManager
 
   private final long btor;
 
-  BoolectorQuantifiedFormulaManager(FormulaCreator<Long, Long, Long, Long> pCreator,
-                                    LogManager pLogger) {
+  BoolectorQuantifiedFormulaManager(
+      FormulaCreator<Long, Long, Long, Long> pCreator, LogManager pLogger) {
     super(pCreator, pLogger);
     btor = getFormulaCreator().getEnv();
   }

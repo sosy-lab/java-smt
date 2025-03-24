@@ -94,7 +94,8 @@ public abstract class BooleanFormulaTransformationVisitor
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
       List<Formula> boundVars,
-      BooleanFormula processedBody) throws IOException {
+      BooleanFormula processedBody)
+      throws IOException {
     return mgr.getQuantifiedFormulaManager().mkQuantifier(quantifier, boundVars, processedBody);
   }
 }

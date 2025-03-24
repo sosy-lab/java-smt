@@ -70,7 +70,8 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
       BooleanFormula f,
       Quantifier quantifier,
       List<Formula> boundVariables,
-      BooleanFormula transformedBody) throws IOException {
+      BooleanFormula transformedBody)
+      throws IOException {
     return fmgr.getQuantifiedFormulaManager()
         .mkQuantifier(quantifier, boundVariables, transformedBody);
   }
