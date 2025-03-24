@@ -15,6 +15,8 @@ import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
+import io.github.cvc5.Proof;
+import io.github.cvc5.ProofRule;
 import io.github.cvc5.Result;
 import io.github.cvc5.RoundingMode;
 import io.github.cvc5.Solver;
@@ -26,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -1373,5 +1376,65 @@ public class CVC5NativeAPITest {
         sort,
         exp.getSort(),
         exp);
+  }
+
+  @Test
+  public void testProofMethods() throws CVC5ApiException {
+    solver.setOption("produce-proofs", "true");
+    Sort boolSort = termManager.getBooleanSort();
+
+    //(declare-fun q1 () Bool)
+    //(declare-fun q2 () Bool)
+    //(assert (or (not q1) q2))
+    //(assert q1)
+    //(assert (not q2))
+    //(check-sat)
+    //(get-proof)
+    Term q1 = solver.declareFun("q1", new Sort[]{}, boolSort);
+    Term q2 = solver.declareFun("q2", new Sort[]{}, boolSort);
+
+    solver.assertFormula(termManager.mkTerm(Kind.OR, termManager.mkTerm(Kind.NOT, q1), q2));
+    solver.assertFormula(q1);
+    solver.assertFormula(termManager.mkTerm(Kind.NOT, q2));
+
+    Result satCheck = solver.checkSat();
+    assertThat(satCheck.isUnsat()).isTrue();
+
+    Proof[] proofs = solver.getProof();
+
+    assertThat(proofs).isNotNull();
+
+    Proof proof = proofs[0];
+
+    //Test getRule
+    assertThat(proof.getRule()).isNotNull();
+
+    assertThat(proof.getRule()).isEqualTo(ProofRule.SCOPE);
+
+    //Test getChildren
+    assertThat(proof.getChildren()).isNotNull();
+
+    assertThat(proof.getChildren()[0]).isNotNull();
+
+    //The way the proof DAG is structured, the root has one child, which has also one child and
+    // the child of the latter has more than one child.
+    Proof[] childOfSecondProof = proof.getChildren()[0].getChildren();
+
+    Proof[] childrenOfThirdProof = childOfSecondProof[0].getChildren();
+
+    assertThat(childrenOfThirdProof.length).isEqualTo(2);
+
+    //Test equals
+    assertThat(childrenOfThirdProof[0].equals(childrenOfThirdProof[1])).isFalse();
+
+    assertThat(childrenOfThirdProof[0].equals(childrenOfThirdProof[0])).isTrue();
+
+    //Test getResult
+    assertThat(Optional.ofNullable(proof.getResult())).isNotNull();
+
+    //Test getArguments
+    assertThat(childrenOfThirdProof[0].getArguments()).isNotNull();
+    assertThat(Optional.ofNullable(childrenOfThirdProof[0].getArguments()[0])).isNotNull();
+
   }
 }
