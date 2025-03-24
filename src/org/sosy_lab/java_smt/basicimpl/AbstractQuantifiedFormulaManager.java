@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
-  private ProverOptions[] options;
+  private List<ProverOptions> options;
   private Optional<AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>> fmgr;
   private final LogManager logger;
 
@@ -44,7 +44,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     super(pCreator);
     ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
     logger = pLogger;
-    options = new ProverOptions[0];
+    options = List.of();
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -54,13 +54,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
-    if (options != null
-        && Arrays.asList(options)
+    if (extractQuantifierEliminationOptions()
             .contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
       try {
         return wrap(eliminateQuantifiersUltimateEliminator(pF));
       } catch (UnsupportedOperationException | IllegalArgumentException e) {
-        if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+        if (extractQuantifierEliminationOptions().contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
           logger.logException(
               Level.WARNING,
               e,
@@ -68,7 +67,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           return wrap(eliminateQuantifiers(extractInfo(pF)));
         }
 
-        if (Arrays.asList(options)
+        if (extractQuantifierEliminationOptions()
             .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
           return wrap(eliminateQuantifiers(extractInfo(pF)));
         } else {
@@ -86,7 +85,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     try {
       return wrap(eliminateQuantifiers(extractInfo(pF)));
     } catch (Exception e1) {
-      if (Arrays.asList(options).contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+      if (extractQuantifierEliminationOptions().contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
         logger.logException(
             Level.WARNING,
             e1,
@@ -99,8 +98,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         }
       }
 
-      if (Arrays.asList(options)
-          .contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
+      if (extractQuantifierEliminationOptions().contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING)) {
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
         } catch (Exception e3) {
@@ -134,8 +132,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
-    if (options != null
-        && Arrays.asList(options)
+    if (extractQuantifierEliminationOptions()
             .contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
       try {
         return mkWithoutQuantifier(q, pVariables, pBody);
@@ -152,13 +149,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 
   @Override
-  public ProverOptions[] getOptions() {
-    return options;
-  }
-
-  @Override
   public void setOptions(ProverOptions... opt) {
-    options = opt;
+    options.addAll(Arrays.asList(opt));
   }
 
   public UltimateEliminatorWrapper getUltimateEliminatorWrapper() {
@@ -247,5 +239,49 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             return TraversalProcess.CONTINUE;
           }
         });
+  }
+
+  private List<ProverOptions> extractQuantifierEliminationOptions() {
+      List<ProverOptions> validOptions = new ArrayList<>();
+      boolean fallback = false;
+      boolean fallbackWithoutWarning = false;
+      boolean externalCreation = false;
+      boolean externalCreationFallback = false;
+
+      for (ProverOptions option : options) {
+          switch (option) {
+              case SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION:
+                  validOptions.add(option);
+                  break;
+              case QUANTIFIER_ELIMINATION_FALLBACK:
+                  fallback = true;
+                  validOptions.add(option);
+                  break;
+              case QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING:
+                  fallbackWithoutWarning = true;
+                  validOptions.add(option);
+                  break;
+              case EXTERNAL_QUANTIFIER_CREATION:
+                  externalCreation = true;
+                  validOptions.add(option);
+                  break;
+              case EXTERNAL_QUANTIFIER_CREATION_FALLBACK:
+                  externalCreationFallback = true;
+                  validOptions.add(option);
+                  break;
+              default:
+                  break;
+          }
+      }
+
+      if (fallback && fallbackWithoutWarning) {
+          throw new IllegalArgumentException("Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.");
+      }
+
+      if (externalCreation && externalCreationFallback) {
+          throw new IllegalArgumentException("Incompatible options: EXTERNAL_QUANTIFIER_CREATION and EXTERNAL_QUANTIFIER_CREATION_FALLBACK cannot be used together.");
+      }
+
+      return validOptions;
   }
 }

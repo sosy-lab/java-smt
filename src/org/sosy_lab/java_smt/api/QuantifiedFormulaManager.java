@@ -74,7 +74,5 @@ public interface QuantifiedFormulaManager {
   BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException;
 
-  ProverOptions[] getOptions();
-
   void setOptions(ProverOptions... opt);
 }

@@ -499,4 +499,53 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
                 || expectedMessage.contains(exception.getMessage()))
         .isTrue();
   }
+
+  @Test
+  public void testExtractQuantifierEliminationOptionsInvalidQuantifierEliminationOptions() {
+    requireIntegers();
+    requireQuantifiers();
+
+    qmgr.setOptions(
+        ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK,
+        ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
+
+    String expectedMessage =
+        "QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.";
+
+
+    assertThat(
+        (exception instanceof IllegalArgumentException)
+            || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
+  }
+
+  @Test
+  public void testExtractQuantifierEliminationOptionsInvalidExternalCreationOptions() {
+    requireIntegers();
+    requireQuantifiers();
+
+    qmgr.setOptions(
+        ProverOptions.EXTERNAL_QUANTIFIER_CREATION,
+        ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK,
+        ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE);
+
+    IntegerFormula k = imgr.makeVariable("k");
+    IntegerFormula i = imgr.makeVariable("i");
+
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
+
+    String expectedMessage =
+        "EXTERNAL_QUANTIFIER_CREATION and SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION cannot be used together.";
+
+    assertThat(
+        (exception instanceof IllegalArgumentException)
+            || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
+  }
 }

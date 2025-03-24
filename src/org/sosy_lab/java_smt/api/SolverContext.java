@@ -65,6 +65,18 @@ public interface SolverContext extends AutoCloseable {
     EXTERNAL_QUANTIFIER_CREATION,
 
     /**
+     * Whether the solver should fall back to the alternative quantifier creation if the current
+     * creation method fails. The solver will log a warning in this case.
+     */
+    EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier creation if the current
+     * creation method fails. The solver will not log a warning in this case.
+     */
+    EXTERNAL_QUANTIFIER_CREATION_FALLBACK,
+
+    /**
      * Whether the solver should fall back to the alternative quantifier elimination if the current
      * elimination method fails. The solver will log a warning in this case.
      */

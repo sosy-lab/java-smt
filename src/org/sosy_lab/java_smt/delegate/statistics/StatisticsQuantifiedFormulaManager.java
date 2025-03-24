@@ -43,11 +43,6 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
   }
 
   @Override
-  public ProverOptions[] getOptions() {
-    return option;
-  }
-
-  @Override
   public void setOptions(ProverOptions... opt) {
     option = opt;
   }
