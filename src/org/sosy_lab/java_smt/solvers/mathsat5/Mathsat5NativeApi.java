@@ -806,24 +806,6 @@ final class Mathsat5NativeApi {
 
   public static native long[] msat_get_unsat_core(long e);
 
-  public static native long msat_get_proof_manager(long env);
-
-  public static native void msat_destroy_proof_manager(long proofManager);
-
-  public static native long msat_get_proof(long proofManager);
-
-  public static native long msat_proof_id(long proof);
-
-  public static native boolean msat_proof_is_term(long proof);
-
-  public static native long msat_proof_get_term(long proof);
-
-  public static native String msat_proof_get_name(long proof);
-
-  public static native int msat_proof_get_arity(long proof);
-
-  public static native long msat_proof_get_child(long proof, long index);
-
   /*
    * Special functions
    */
