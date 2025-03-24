@@ -17,6 +17,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
+import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -220,9 +221,13 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void quantifierTest() {
+  public void quantifierTest() throws IOException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

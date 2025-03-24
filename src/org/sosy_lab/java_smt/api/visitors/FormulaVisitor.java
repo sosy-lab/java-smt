@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -78,5 +79,6 @@ public interface FormulaVisitor<R> {
    * @param body Body of the quantifier.
    */
   R visitQuantifier(
-      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body);
+      BooleanFormula f, Quantifier quantifier, List<Formula> boundVariables, BooleanFormula body)
+      throws IOException;
 }

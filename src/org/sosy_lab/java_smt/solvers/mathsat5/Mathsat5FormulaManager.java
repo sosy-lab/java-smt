@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
 
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
@@ -35,6 +36,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       Mathsat5RationalFormulaManager pRationalManager,
       Mathsat5BitvectorFormulaManager pBitpreciseManager,
       Mathsat5FloatingPointFormulaManager pFloatingPointManager,
+      Mathsat5QuantifiedFormulaManager pQuantifiedFormulaManager,
       Mathsat5ArrayFormulaManager pArrayManager,
       Mathsat5EnumerationFormulaManager pEnumerationManager) {
     super(
@@ -45,7 +47,7 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         pRationalManager,
         pBitpreciseManager,
         pFloatingPointManager,
-        null,
+        pQuantifiedFormulaManager,
         pArrayManager,
         null,
         null,
@@ -70,6 +72,13 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     return msat_to_smtlib2(getEnvironment(), f);
+  }
+
+  // TODO UltimateEliminator currently does not support Terms with definitions yet.
+  public String dumpFormulaImplExt(final Long f, String name) {
+    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+    return msat_to_smtlib2_ext(getEnvironment(), f, name, 1);
   }
 
   @Override

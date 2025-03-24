@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
@@ -84,7 +85,8 @@ final class RecursiveFormulaVisitorImpl implements FormulaVisitor<TraversalProce
 
   @Override
   public TraversalProcess visitQuantifier(
-      BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+      BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody)
+      throws IOException {
     TraversalProcess result = delegate.visitQuantifier(pF, pQuantifier, boundVars, pBody);
     addToQueueIfNecessary(result, ImmutableList.of(pBody));
     return result;

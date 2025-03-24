@@ -30,6 +30,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -377,7 +378,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   }
 
   @Override
-  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
+  public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) throws IOException {
     checkState(!f.isNull());
     Sort sort = f.getSort();
     try {
@@ -505,6 +506,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("Failure visiting the Term '" + f + "'.", e);
+    } catch (IOException e) {
+      throw new IOException(e);
     }
   }
 

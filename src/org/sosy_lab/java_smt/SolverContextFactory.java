@@ -292,17 +292,23 @@ public class SolverContextFactory {
 
       case PRINCESS:
         return PrincessSolverContext.create(
-            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic);
+            config, shutdownNotifier, logfile, (int) randomSeed, nonLinearArithmetic, logger);
 
       case YICES2:
-        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader);
+        return Yices2SolverContext.create(nonLinearArithmetic, shutdownNotifier, loader, logger);
 
       case BOOLECTOR:
         return BoolectorSolverContext.create(config, shutdownNotifier, logfile, randomSeed, loader);
 
       case BITWUZLA:
         return BitwuzlaSolverContext.create(
-            config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+            config,
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            loader,
+            logger);
 
       default:
         throw new AssertionError("no solver selected");

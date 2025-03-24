@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
@@ -25,8 +26,8 @@ public class BitwuzlaQuantifiedFormulaManager
     extends AbstractQuantifiedFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
-  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator) {
-    super(pCreator);
+  protected BitwuzlaQuantifiedFormulaManager(BitwuzlaFormulaCreator pCreator, LogManager pLogger) {
+    super(pCreator, pLogger);
     termManager = pCreator.getTermManager();
   }
 

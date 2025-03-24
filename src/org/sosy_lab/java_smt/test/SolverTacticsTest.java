@@ -9,12 +9,14 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.TruthJUnit;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -199,9 +201,14 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNestedQuantifierTest() {
+  public void ufEliminationNestedQuantifierTest() throws IOException {
     requireIntegers();
     requireQuantifiers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");

@@ -99,6 +99,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_i
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_rational_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_variable;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_arg;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
@@ -632,5 +633,20 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   protected Long getBooleanVarDeclarationImpl(Long pLong) {
     return msat_term_get_decl(pLong);
+  }
+
+  /**
+   * Makes a bound copy of a variable for use in quantifier. Note that all occurrences of the free
+   * var have to be substituted by the bound once it exists.
+   *
+   * @param pSolver Solver in use.
+   * @param pVar Variable you want a bound copy of.
+   * @return Bound Variable
+   */
+  public long makeBoundCopy(Long pSolver, Long pVar) {
+    Long sort = msat_term_get_type(pVar);
+    String name = getName(pVar);
+    long boundCopy = msat_make_variable(pSolver, name, sort);
+    return boundCopy;
   }
 }

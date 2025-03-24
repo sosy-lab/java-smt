@@ -207,6 +207,11 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
 
+    assume()
+        .withMessage("solver does not support quantifiers yet")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+
     if ("opt".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a partial model when using optimization")
@@ -244,19 +249,29 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     BooleanFormula pred1 = bmgr.makeVariable("pred1");
     BooleanFormula pred3 = bmgr.makeVariable("pred3");
 
-    BooleanFormula query =
-        bmgr.and(
-            bvmgr.equal(y, one),
-            bmgr.equivalence(pred1, bvmgr.equal(y, one)),
-            bmgr.equivalence(
-                pred3,
-                qmgr.forall(
-                    ImmutableList.of(bound),
-                    bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+    BooleanFormula query = null;
+    try {
+      query =
+          bmgr.and(
+              bvmgr.equal(y, one),
+              bmgr.equivalence(pred1, bvmgr.equal(y, one)),
+              bmgr.equivalence(
+                  pred3,
+                  qmgr.forall(
+                      ImmutableList.of(bound),
+                      bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
 
     env.push(query);
 
     assertThat(env.isUnsat()).isFalse();
+
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     TestAllSatCallback callback = new TestAllSatCallback();
 

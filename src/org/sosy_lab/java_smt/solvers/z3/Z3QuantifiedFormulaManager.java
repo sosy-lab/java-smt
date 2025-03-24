@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 
@@ -21,8 +22,8 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
   private final long z3context;
   private final Z3FormulaCreator z3FormulaCreator;
 
-  Z3QuantifiedFormulaManager(Z3FormulaCreator creator) {
-    super(creator);
+  Z3QuantifiedFormulaManager(Z3FormulaCreator creator, LogManager pLogger) {
+    super(creator, pLogger);
     this.z3context = creator.getEnv();
     z3FormulaCreator = creator;
   }

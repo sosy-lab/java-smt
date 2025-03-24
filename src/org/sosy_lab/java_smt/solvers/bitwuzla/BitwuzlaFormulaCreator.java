@@ -15,6 +15,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -395,7 +396,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Term f)
-      throws UnsupportedOperationException {
+      throws UnsupportedOperationException, IOException {
     Kind kind = f.kind();
     if (f.is_value()) {
       return visitor.visitConstant(formula, convertValue(f));

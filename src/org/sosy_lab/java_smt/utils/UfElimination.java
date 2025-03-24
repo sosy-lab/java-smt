@@ -40,7 +40,6 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
@@ -291,7 +290,7 @@ public class UfElimination {
           @Override
           public Integer visitQuantifier(
               BooleanFormula pF,
-              QuantifiedFormulaManager.Quantifier pQ,
+              Quantifier pQ,
               List<Formula> pBoundVariables,
               BooleanFormula pBody) {
             return fmgr.visit(pBody, this);

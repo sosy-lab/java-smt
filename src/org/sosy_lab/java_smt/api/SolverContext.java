@@ -53,7 +53,40 @@ public interface SolverContext extends AutoCloseable {
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
     /** Whether the solver should enable support for formulae build in SL theory. */
-    ENABLE_SEPARATION_LOGIC
+    ENABLE_SEPARATION_LOGIC,
+
+    /** Whether the solver should enable quantifier eliminiation via UltimateEliminator. */
+    SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION,
+
+    /**
+     * Whether the solver should eliminiate the quantifier via UltimateEliminator before inserting
+     * it to the native quantified formula.
+     */
+    EXTERNAL_QUANTIFIER_CREATION,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier creation if the current
+     * creation method fails. The solver will log a warning in this case.
+     */
+    EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier creation if the current
+     * creation method fails. The solver will not log a warning in this case.
+     */
+    EXTERNAL_QUANTIFIER_CREATION_FALLBACK,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier elimination if the current
+     * elimination method fails. The solver will log a warning in this case.
+     */
+    QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE,
+
+    /**
+     * Whether the solver should fall back to the alternative quantifier elimination if the current
+     * elimination method fails. The solver will not log a warning in this case.
+     */
+    QUANTIFIER_ELIMINATION_FALLBACK,
   }
 
   /**

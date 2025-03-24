@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api.visitors;
 
+import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -108,7 +109,8 @@ public interface BooleanFormulaVisitor<R> {
       Quantifier quantifier,
       BooleanFormula quantifiedAST,
       List<Formula> boundVars,
-      BooleanFormula body);
+      BooleanFormula body)
+      throws IOException;
 
   /**
    * Visit an SMT atom. An atom can be a theory expression, constant, or a variable.

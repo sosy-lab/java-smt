@@ -880,6 +880,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -896,6 +904,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula constraint = qmgr.forall(ImmutableList.of(x), x);
@@ -910,6 +926,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = bmgr.not(imgr.equal(imgr.makeNumber(1), x));
@@ -924,6 +948,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingTrivialSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEqx = imgr.equal(x, x);
@@ -938,12 +966,21 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierSymbolsExtraction() {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula xEqy = imgr.equal(x, y);
     // (x=y) && EX x: (X=y)
-    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+    BooleanFormula constraint = null;
+    try {
+      constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
 
     // The variable extraction should visit "x" and "y" only once,
     // otherwise AbstractFormulaManager#extractVariables might throw an exception,
@@ -962,6 +999,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testIntegerFormulaQuantifierHandlingTrivialUNSAT() throws Exception {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula notxEqx = bmgr.not(imgr.equal(x, x));
@@ -985,6 +1026,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
     // Z3 returns UNKNOWN as its quantifiers can not handle this.
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
@@ -1003,6 +1052,14 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireIntegers();
     // Z3 returns UNKNOWN as its quantifiers can not handle this.
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     BooleanFormula xEq1 = imgr.equal(x, imgr.makeNumber(1));
@@ -1158,6 +1215,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .withMessage("Princess does not support quantifier over boolean variables")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     BooleanFormula[] usedVars =
         Stream.of("a", "b", "c", "d", "e", "f")
@@ -1166,7 +1227,12 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
     BooleanFormula body = fuzzer.fuzz(30, usedVars);
-    BooleanFormula f = qmgr.forall(quantifiedVars, body);
+    BooleanFormula f = null;
+    try {
+      f = qmgr.forall(quantifiedVars, body);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
     BooleanFormula transformed =
         bmgr.transformRecursively(
             f,
@@ -1193,9 +1259,16 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
-    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = null;
+    try {
+      f = qmgr.exists(quantifiedVars, body);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
     assertThatFormula(transformed).isEquivalentTo(body);
@@ -1206,9 +1279,16 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
-    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = null;
+    try {
+      f = qmgr.exists(quantifiedVars, body);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
     assertThatFormula(transformed).isEquivalentTo(body);
@@ -1219,9 +1299,16 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
+
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
-    BooleanFormula f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = null;
+    try {
+      f = qmgr.exists(quantifiedVars, body);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
+    }
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).containsEntry("b", body);
     assertThatFormula(transformed).isEquivalentTo(body);

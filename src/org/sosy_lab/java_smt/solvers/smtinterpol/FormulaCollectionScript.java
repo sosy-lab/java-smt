@@ -44,7 +44,7 @@ import java.util.Map;
  * changed only by declaring and defining terms, sorts etc., so these terms can be used in that
  * environment afterwards.
  */
-class FormulaCollectionScript implements Script {
+public class FormulaCollectionScript implements Script {
 
   private final Theory theory;
   private final Script script;

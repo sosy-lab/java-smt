@@ -15,6 +15,7 @@ import edu.stanford.CVC4.SmtEngine;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import java.util.List;
+import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -25,8 +26,8 @@ public class CVC4QuantifiedFormulaManager
   private final ExprManager exprManager;
 
   protected CVC4QuantifiedFormulaManager(
-      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator) {
-    super(pFormulaCreator);
+      FormulaCreator<Expr, Type, ExprManager, Expr> pFormulaCreator, LogManager pLogger) {
+    super(pFormulaCreator, pLogger);
 
     exprManager = pFormulaCreator.getEnv();
   }

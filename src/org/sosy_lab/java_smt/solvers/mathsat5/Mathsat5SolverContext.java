@@ -196,6 +196,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
     Mathsat5EnumerationFormulaManager enumerationTheory =
         new Mathsat5EnumerationFormulaManager(creator);
+    Mathsat5QuantifiedFormulaManager quantifiedTheory =
+        new Mathsat5QuantifiedFormulaManager(creator, logger);
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
@@ -205,8 +207,10 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             rationalTheory,
             bitvectorTheory,
             floatingPointTheory,
+            quantifiedTheory,
             arrayTheory,
             enumerationTheory);
+    quantifiedTheory.setFmgr(manager);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }

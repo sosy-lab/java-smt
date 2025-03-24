@@ -573,9 +573,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
-  public void testQuantifiedUF() throws SolverException, InterruptedException {
+  public void testQuantifiedUF() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     // create query: "(var == 1) && exists bound : (bound == 0 && var == func(bound))"
     // then check that the model contains an evaluation "func(0) := 1"
@@ -628,9 +636,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = func(boundVar))
   @Test
-  public void testQuantifiedUF2() throws SolverException, InterruptedException {
+  public void testQuantifiedUF2() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
@@ -1857,6 +1873,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void quantifierTestShort() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Mathsat5 does not support quantifiers without UltimateEliminator")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
 
     IntegerFormula ctr = imgr.makeVariable("x");
     BooleanFormula body = imgr.equal(ctr, imgr.makeNumber(0));
