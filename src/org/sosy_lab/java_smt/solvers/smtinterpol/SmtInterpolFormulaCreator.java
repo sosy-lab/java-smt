@@ -101,12 +101,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
 
     if (fsym == null) {
-      try {
-        environment.declareFun(fun, paramSorts, resultSort);
-      } catch (SMTLIBException e) {
-        // can fail, if function is already declared with a different sort
-        throw new IllegalArgumentException("Cannot declare function '" + fun + "'", e);
-      }
+      environment.declareFun(fun, paramSorts, resultSort);
       return environment.getTheory().getFunction(fun, paramSorts);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {

@@ -11,8 +11,8 @@
 package org.sosy_lab.java_smt.api.proofs;
 
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
-import org.sosy_lab.java_smt.ResolutionProofNode;
-import org.sosy_lab.java_smt.SourceProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDag.SourceProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;

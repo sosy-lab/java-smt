@@ -165,7 +165,7 @@ public class ProofTermParser {
   }
 
   private ProofNode createSourceNode(ResAxiom rule, BooleanFormula formula) {
-    ProofNode node = new org.sosy_lab.java_smt.SourceProofNode(rule, formula);
+    ProofNode node = new org.sosy_lab.java_smt.ResolutionProofDag.SourceProofNode(rule, formula);
     proofDag.addNode(node);
     return node;
   }
