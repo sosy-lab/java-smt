@@ -36,7 +36,22 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:retrieve pattern="lib/java/[conf]/([arch]/)[artifact](-[classifier]).[ext]"/>
     </target>
 
-    <target name="compile" depends="resolve" description="--> compile the project">
+    <target name="install" depends="resolve">
+        <mkdir dir="lib/native/x86_64-windows"/>
+        <copy todir="lib/native/x86_64-windows">
+            <fileset dir="lib/java/default/x64">
+                <include name="*.dll"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-windows"/>
+        <copy todir="lib/native/arm64-windows">
+            <fileset dir="lib/java/default/arm64">
+                <include name="*.dll"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile" depends="install" description="--> compile the project">
         <mkdir dir="build"/>
         <path id="classpath.build">
             <pathelement location="build"/>
@@ -72,6 +87,8 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="build/**"/>
                 <include name="lib/ivy.jar"/>
                 <include name="lib/java/**"/>
+                <include name="lib/native/x86_64-windows/**"/>
+                <include name="lib/native/arm64-windows/**"/>
                 <include name="${project.jar}"/>
             </fileset>
             <fileset dir="lib/java"/>
