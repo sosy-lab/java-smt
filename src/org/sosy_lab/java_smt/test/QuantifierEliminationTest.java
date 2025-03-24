@@ -516,12 +516,11 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
-        "QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.";
+        "Incompatible options: QUANTIFIER_ELIMINATION_FALLBACK and QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.";
 
 
     assertThat(
-        (exception instanceof IllegalArgumentException)
-            || expectedMessage.contains(exception.getMessage()))
+        expectedMessage.contains(exception.getMessage()))
         .isTrue();
   }
 
@@ -541,11 +540,10 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     Exception exception = assertThrows(IllegalArgumentException.class, () -> qmgr.forall(k, imgr.equal(k, i)));
 
     String expectedMessage =
-        "EXTERNAL_QUANTIFIER_CREATION and SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION cannot be used together.";
+        "Incompatible options: EXTERNAL_QUANTIFIER_CREATION and EXTERNAL_QUANTIFIER_CREATION_FALLBACK cannot be used together.";
 
     assertThat(
-        (exception instanceof IllegalArgumentException)
-            || expectedMessage.contains(exception.getMessage()))
+        expectedMessage.contains(exception.getMessage()))
         .isTrue();
   }
 }

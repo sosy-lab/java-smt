@@ -44,7 +44,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     super(pCreator);
     ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
     logger = pLogger;
-    options = List.of();
+    options = new ArrayList<>();
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
