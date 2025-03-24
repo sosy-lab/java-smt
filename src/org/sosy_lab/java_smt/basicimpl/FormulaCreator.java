@@ -329,8 +329,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         TraversalProcess process = null;
         try {
           process = visit(tt, recVisitor);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
         if (process == TraversalProcess.ABORT) {
           return;
@@ -365,8 +365,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       if (shouldProcess.test(tt)) {
         try {
           visit(tt, recVisitor);
-        } catch (IOException pE) {
-          throw new RuntimeException(pE);
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
       } else {
         pCache.put(tt, tt);

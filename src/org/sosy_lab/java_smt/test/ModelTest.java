@@ -573,7 +573,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
-  public void testQuantifiedUF() throws SolverException, InterruptedException {
+  public void testQuantifiedUF() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
     assume()
@@ -597,12 +597,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
-    BooleanFormula f = null;
-    try {
-      f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
     ValueAssignment expectedValueAssignment =
@@ -641,7 +636,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = func(boundVar))
   @Test
-  public void testQuantifiedUF2() throws SolverException, InterruptedException {
+  public void testQuantifiedUF2() throws SolverException, InterruptedException, IOException {
     requireQuantifiers();
     requireIntegers();
     assume()
@@ -664,13 +659,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
-    BooleanFormula f =
-        null;
-    try {
-      f = bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
-    }
+    BooleanFormula f =bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
     ValueAssignment expectedValueAssignment =

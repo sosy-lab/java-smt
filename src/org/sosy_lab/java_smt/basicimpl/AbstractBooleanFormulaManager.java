@@ -282,8 +282,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
     try {
       return formulaCreator.visit(pFormula, new DelegatingFormulaVisitor<>(visitor));
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -428,8 +428,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
     try {
       return formulaCreator.visit(f, conjunctionFinder);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -440,8 +440,8 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
     try {
       return formulaCreator.visit(f, disjunctionFinder);
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

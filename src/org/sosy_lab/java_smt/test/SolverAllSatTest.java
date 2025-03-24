@@ -260,8 +260,8 @@ public class SolverAllSatTest extends SolverBasedTest0 {
               qmgr.forall(
                   ImmutableList.of(bound),
                   bmgr.not(bvmgr.equal(y, bvmgr.multiply(three, bound))))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
 
     env.push(query);

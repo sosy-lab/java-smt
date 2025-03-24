@@ -650,8 +650,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula f = null;
     try {
       f = qmgr.exists(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula result = qmgr.eliminateQuantifiers(f);
     assertThat(result.toString()).doesNotContain("exists");
@@ -689,8 +689,8 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula q = null;
     try {
       q = qmgr.exists(ImmutableList.of(j1), fm);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (java.io.IOException e) {
+      throw new RuntimeException(e);
     }
     BooleanFormula result = qmgr.eliminateQuantifiers(q);
     assertThat(result.toString()).doesNotContain("exists");

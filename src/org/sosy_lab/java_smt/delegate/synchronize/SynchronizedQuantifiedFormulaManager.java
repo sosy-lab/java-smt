@@ -23,7 +23,7 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverContext sync;
-  @SuppressWarnings("UnusedVariable")
+  @SuppressWarnings("unused")
   private ProverOptions[] option;
 
   SynchronizedQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverContext pSync) {

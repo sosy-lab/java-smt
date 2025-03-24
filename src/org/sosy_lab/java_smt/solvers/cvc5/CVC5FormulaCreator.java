@@ -506,8 +506,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       }
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("Failure visiting the Term '" + f + "'.", e);
-    } catch (IOException pE) {
-      throw new IOException(pE);
+    } catch (IOException e) {
+      throw new IOException(e);
     }
   }
 

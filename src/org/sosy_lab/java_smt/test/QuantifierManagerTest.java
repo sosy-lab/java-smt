@@ -15,6 +15,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -88,8 +89,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     try {
       forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -111,8 +112,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
 
     try {
       bv_forall_x_a_at_x_eq_0 = qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -129,7 +130,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
 
   @Test
-  public void testLIAForallArrayConjunctUnsat() throws SolverException, InterruptedException {
+  public void testLIAForallArrayConjunctUnsat()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -138,20 +140,15 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (forall x . b[x] = 0) AND (b[123] = 1) is UNSAT
     requireIntegers();
 
-    BooleanFormula f =
-        null;
-    try {
-      f = bmgr.and(
+    BooleanFormula f = bmgr.and(
           qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
-    }
     assertThatFormula(f).isUnsatisfiable();
   }
 
   @Test
-  public void testBVForallArrayConjunctUnsat() throws SolverException, InterruptedException {
+  public void testBVForallArrayConjunctUnsat()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -162,22 +159,18 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // Princess does not support bitvectors in arrays
     assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
 
-    BooleanFormula f =
-        null;
-    try {
-      f = bmgr.and(
+    BooleanFormula f = bmgr.and(
           qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_0),
           bvmgr.equal(
               amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
               bvmgr.makeBitvector(bvWidth, 1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
-    }
+
     assertThatFormula(f).isUnsatisfiable();
   }
 
   @Test
-  public void testLIAForallArrayConjunctSat() throws SolverException, InterruptedException {
+  public void testLIAForallArrayConjunctSat()
+      throws SolverException, InterruptedException, IOException {
     assume()
         .withMessage("Solver %s does not support the complete theory of quantifiers", solverToUse())
         .that(solverToUse())
@@ -186,15 +179,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // (forall x . b[x] = 0) AND (b[123] = 0) is SAT
     requireIntegers();
 
-    BooleanFormula f =
-        null;
-    try {
-      f = bmgr.and(
+    BooleanFormula f = bmgr.and(
           qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
-    }
+
     try {
       // CVC4 and Princess fail this
       assertThatFormula(f).isSatisfiable();
@@ -223,8 +211,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           bvmgr.equal(
               amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
               bvmgr.makeBitvector(bvWidth, 0)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 and Princess fail this
@@ -251,8 +239,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           bmgr.or(
               imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
               imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
 
     try {
@@ -276,8 +264,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           qmgr.forall(ImmutableList.of(x), a_at_x_eq_0),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 fails this
@@ -302,8 +290,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.and(
           bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       assertThatFormula(f).isUnsatisfiable();
@@ -327,8 +315,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.and(
           bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       assertThatFormula(f).isSatisfiable();
@@ -352,8 +340,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.and(
           bmgr.not(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0)),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -375,8 +363,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           bmgr.or(
               imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)),
               imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(0))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 and Princess fail this
@@ -400,8 +388,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           bmgr.not(qmgr.exists(ImmutableList.of(x), bmgr.not(a_at_x_eq_0))),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 fails this
@@ -421,8 +409,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.and(
           qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
           imgr.equal(amgr.select(a, imgr.makeNumber(123)), imgr.makeNumber(1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -442,8 +430,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           bvmgr.equal(
               amgr.select(bvArray, bvmgr.makeBitvector(bvWidth, 123)),
               bvmgr.makeBitvector(bvWidth, 1)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -462,8 +450,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_1), forall_x_a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -484,8 +472,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1), bv_forall_x_a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -504,8 +492,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(x), a_at_x_eq_0), forall_x_a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 and Princess fail this
@@ -529,8 +517,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = bmgr.and(qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0), bv_forall_x_a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // CVC4 and Princess fail this
@@ -551,8 +539,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           qmgr.exists(ImmutableList.of(x), a_at_x_eq_0),
           qmgr.forall(ImmutableList.of(x), a_at_x_eq_1));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     try {
       // Princess fails this
@@ -575,8 +563,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_0),
           qmgr.forall(ImmutableList.of(xbv), bvArray_at_x_eq_1));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -592,8 +580,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           qmgr.exists(ImmutableList.of(x), a_at_x_eq_1),
           qmgr.exists(ImmutableList.of(x), a_at_x_eq_1));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -611,8 +599,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
       f = bmgr.or(
           qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1),
           qmgr.exists(ImmutableList.of(xbv), bvArray_at_x_eq_1));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -626,8 +614,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = qmgr.forall(ImmutableList.of(x), imgr.equal(x, imgr.add(x, imgr.makeNumber(1))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -644,8 +632,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     try {
       f = qmgr.forall(
           ImmutableList.of(z), bvmgr.equal(z, bvmgr.add(z, bvmgr.makeBitvector(width, 1))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -663,8 +651,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           imgr.equal(
               imgr.add(x, imgr.makeNumber(2)),
               imgr.add(imgr.add(x, imgr.makeNumber(1)), imgr.makeNumber(1))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -685,8 +673,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
               bvmgr.add(z, bvmgr.makeBitvector(width, 2)),
               bvmgr.add(
                   bvmgr.add(z, bvmgr.makeBitvector(width, 1)), bvmgr.makeBitvector(width, 1))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -702,8 +690,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), imgr.equal(z, y)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -718,8 +706,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
         null;
     try {
       f = qmgr.forall(ImmutableList.of(z), qmgr.exists(ImmutableList.of(y), bvmgr.equal(z, y)));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isSatisfiable();
   }
@@ -733,8 +721,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula f = null;
     try {
       f = qmgr.forall(ImmutableList.of(z, y), bvmgr.equal(z, y));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -757,8 +745,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
           qmgr.forall(
               ImmutableList.of(y),
               bmgr.and(bvmgr.equal(z, y), bvmgr.greaterThan(zPlusTwo, z, false))));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(f).isUnsatisfiable();
   }
@@ -774,8 +762,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula f = null;
     try {
       f = qmgr.exists(ImmutableList.of(aa), imgr.equal(aa, one));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(bmgr.and(f, restrict)).isSatisfiable();
   }
@@ -793,8 +781,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula f = null;
     try {
       f = qmgr.exists(ImmutableList.of(aa), bvmgr.equal(aa, one));
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     assertThatFormula(bmgr.and(f, restrict)).isSatisfiable();
   }
@@ -820,8 +808,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula forall = null;
     try {
       forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
 
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
@@ -857,8 +845,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     BooleanFormula exists = null;
     try {
       exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
-    } catch (java.io.IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
     final AtomicBoolean isQuantifier = new AtomicBoolean(false);
     final AtomicBoolean isForall = new AtomicBoolean(false);

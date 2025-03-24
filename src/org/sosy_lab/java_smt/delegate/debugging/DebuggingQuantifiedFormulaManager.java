@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
-  @SuppressWarnings("UnusedVariable")
+  @SuppressWarnings("unused")
   private List<ProverOptions> option;
 
   public DebuggingQuantifiedFormulaManager(
