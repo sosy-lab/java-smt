@@ -154,14 +154,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. Should
    * only be called after {@link #isUnsat()} returned <code>true</code>.
    */
-  default ProofNode getProof() {
-    try {
-      throw new UnsupportedOperationException("Proof generation isn't enabled.");
-    } catch (UnsupportedOperationException e) {
-      System.out.println(e.getMessage());
-      throw e;
-    }
-  }
+  ProofNode getProof();
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after
