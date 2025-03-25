@@ -14,122 +14,49 @@ SPDX-License-Identifier: Apache-2.0
 <project name="publish-solvers-cvc5" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
     <import file="macros.xml"/>
 
+    <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
+    <property name="cvc5.downloads" value="/dependencies/cvc5"/>
     <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
 
-    <!-- Build options for CVC5, Reasoning:
-          - 'production' enable optimization, disables assertions and tracing,
-          - 'static' build libcvc5 and all dependencies statically,
-          - 'java-bindings' build the JNI bindings,
-          - 'auto-download' load all dependencies automatically,
-          - 'prefix' because I don't want it to use system installed or install system-wide,
-          Theoretically CVC5s performance should be improvable by using -best (uses the best
-          known general performance/dependencies) but this can not be combined with auto-download.
-    -->
-    <target name="set-properties-for-cvc5">
-        <checkPathOption pathOption="cvc5.path" defaultPath="/path/to/cvc5" targetName="CVC5 directory (Git checkout from https://github.com/cvc5/cvc5)"/>
-        <fail unless="cvc5.customRev">
-            Please specify a custom revision with the flag -Dcvc5.customRev=XXX.
-            The custom revision has to be unique amongst the already known version
-            numbers from the ivy repository. The script will append the git revision.
+    <target name="download-cvc5">
+        <fail unless="cvc5.version">
+            Please specify a version with the flag -Dcvc5.version=XXX.
+            The version must match one of the daily builds from https://github.com/cvc5/cvc5/releases
         </fail>
-        <checkPathOption pathOption="jdk-linux-arm64.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Linux arm64 version)"/>
-        <checkPathOption pathOption="jdk-windows-x64.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Windows x64 version)"/>
 
-        <!-- get the short commit hash of the cvc5 version used -->
-        <exec executable="git" dir="${cvc5.path}" outputproperty="cvc5.revision" failonerror="true">
-            <arg value="show"/>
-            <arg value="-s"/>
-            <arg value="--format=%h"/>
-        </exec>
-        <property name="cvc5.version" value="${cvc5.customRev}-g${cvc5.revision}"/>
-        <echo message="Building CVC5 in version '${cvc5.version}'"/>
+        <mkdir dir="${cvc5.downloads}"/>
+        <mkdir dir="${cvc5.distDir}"/>
 
-        <!-- set a path to the build folder, which is cleaned before building any binary files -->
-        <property name="cvc5.buildDir" location="${cvc5.path}/build"/>
+        <!-- Download binaries for linux on x64 -->
+        <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
+        <copy file="${cvc5.downloads}/cvc5-Linux-x86_64-static/lib/libcvc5jni.so" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.so"/>
 
-        <property name="cvc5.installDir.x64-linux" location="${cvc5.path}/install/x64-linux"/>
-        <property name="cvc5.installDir.arm64-linux" location="${cvc5.path}/install/arm64-linux"/>
-        <property name="cvc5.installDir.x64-windows" location="${cvc5.path}/install/x64-windows"/>
+        <!-- Download binaries for linux on arm64 -->
+        <get src="${cvc5.url}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
+        <copy file="${cvc5.downloads}/cvc5-Linux-arm64-static/lib/libcvc5jni.so" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.so"/>
+
+        <!-- Download binaries for macOS on x64 -->
+        <get src="${cvc5.url}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
+        <copy file="${cvc5.downloads}/cvc5-macOS-x86_64-static/lib/libcvc5jni.dylib" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dylib"/>
+
+        <!-- Download binaries for macOS on arm64 -->
+        <get src="${cvc5.url}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
+        <copy file="${cvc5.downloads}/cvc5-macOS-arm64-static/lib/libcvc5jni.dylib" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.dylib"/>
+
+        <!-- Download binaries for Windows on x64 -->
+        <get src="${cvc5.url}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
+        <copy file="${cvc5.downloads}/cvc5-Win64-x86_64-static/bin/cvc5jni.dll" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dll"/>
+
+        <!-- Download the Java bindings -->
+        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
     </target>
 
-    <target name="compile-cvc5-linux-x64" depends="set-properties-for-cvc5">
-        <echo message="Building CVC5 for x64 linux"/>
-        <delete dir="${cvc5.buildDir}" quiet="true"/>
-        <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <arg value="production"/>
-            <arg value="--static"/>
-            <arg value="--java-bindings"/>
-            <arg value="--auto-download"/>
-            <arg value="--prefix=${cvc5.installDir.x64-linux}"/>
-        </exec>
-        <exec executable="make" dir="${cvc5.buildDir}" failonerror="true">
-            <arg value="-j4"/>
-            <arg value="install"/>
-        </exec>
-        <exec executable="strip" dir="${cvc5.installDir.x64-linux}/lib" failonerror="true">
-            <arg value="libcvc5jni.so"/>
-        </exec>
-    </target>
-
-    <target name="compile-cvc5-linux-arm64" depends="set-properties-for-cvc5">
-        <echo message="Building CVC5 for arm64 linux"/>
-        <delete dir="${cvc5.buildDir}" quiet="true"/>
-        <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <env key="JNI_HOME" value="${jdk-linux-arm64.path}"/>
-            <arg value="production"/>
-            <arg value="--arm64"/>
-            <arg value="--static"/>
-            <arg value="--java-bindings"/>
-            <arg value="--auto-download"/>
-            <arg value="--prefix=${cvc5.installDir.arm64-linux}"/>
-        </exec>
-        <exec executable="make" dir="${cvc5.buildDir}" failonerror="true">
-            <arg value="-j4"/>
-            <arg value="install"/>
-        </exec>
-        <exec executable="aarch64-linux-gnu-strip" dir="${cvc5.installDir.arm64-linux}/lib" failonerror="true">
-            <arg value="libcvc5jni.so"/>
-        </exec>
-    </target>
-
-    <target name="compile-cvc5-windows-x64" depends="set-properties-for-cvc5">
-        <echo message="Building CVC5 for x64 windows"/>
-        <delete dir="${cvc5.buildDir}" quiet="true"/>
-        <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <env key="JNI_HOME" value="${jdk-windows-x64.path}"/>
-            <arg value="production"/>
-            <arg value="--win64"/>
-            <arg value="--static"/>
-            <arg value="--java-bindings"/>
-            <arg value="--auto-download"/>
-            <arg value="--prefix=${cvc5.installDir.x64-windows}"/>
-        </exec>
-        <exec executable="make" dir="${cvc5.buildDir}" failonerror="true">
-            <arg value="-j4"/>
-            <arg value="install"/>
-        </exec>
-        <exec executable="x86_64-w64-mingw32-strip" dir="${cvc5.installDir.x64-windows}/bin" failonerror="true">
-            <arg value="cvc5jni.dll"/>
-        </exec>
-    </target>
-
-    <target name="package-cvc5" depends="compile-cvc5-linux-x64, compile-cvc5-linux-arm64, compile-cvc5-windows-x64">
-        <!-- get the actual jar location as cvc5.jar is just a link -->
-        <exec executable="readlink" dir="${cvc5.installDir.x64-linux}/share/java" outputproperty="cvc5.jar" failonerror="true">
-            <arg value="-f"/>
-            <arg value="cvc5.jar"/>
-        </exec>
-
-        <!-- copy library files into directory to be published for IVY -->
-        <echo message="Copying artifact for Ivy release"/>
-        <copy file="${cvc5.jar}" tofile="${cvc5.distDir}/cvc5-${cvc5.version}.jar"/>
-        <copy file="${cvc5.installDir.x64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.so"/>
-        <copy file="${cvc5.installDir.arm64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.so"/>
-        <copy file="${cvc5.installDir.x64-windows}/bin/cvc5jni.dll" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dll"/>
-    </target>
-
-    <target name="publish-cvc5" depends="package-cvc5, load-ivy"
-            description="Publish CVC5 binaries to Ivy repository.">
+    <target name="publish-cvc5" depends="download-cvc5, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
         <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml"/>
         <publishToRepository solverName="CVC5" solverVersion="${cvc5.version}" distDir="${cvc5.distDir}"/>
 
