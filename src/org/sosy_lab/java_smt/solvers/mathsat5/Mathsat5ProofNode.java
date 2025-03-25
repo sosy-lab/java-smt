@@ -54,9 +54,9 @@ public class Mathsat5ProofNode extends AbstractProofNode {
       while (!stack.isEmpty()) {
         MsatProofFrame frame = stack.peek();
 
-        if (!frame.getVisited()) {
+        if (!frame.isVisited()) {
           frame.setNumArgs(msat_proof_get_arity(frame.getProof()));
-          frame.setVisited(true);
+          frame.setAsVisited(true);
           // Push children first so that the leaves are processed first.
           for (int i = 0; i < frame.getNumArgs(); i++) {
             long child = msat_proof_get_child(frame.getProof(), i);

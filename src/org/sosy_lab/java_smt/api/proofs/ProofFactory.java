@@ -18,6 +18,13 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
 
+/**
+ * A factory for creating proof nodes. The methods of this class are to be used in the ProofNode
+ * implementations of each solver to be able to convert the proof object given back by the solver to
+ * a proof in JavaSMT.
+ *
+ * @param <T> The type of the proof object.
+ */
 public class ProofFactory<T> {
 
   private final FormulaCreator<?, ?, ?, ?> formulaCreator;

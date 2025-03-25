@@ -122,5 +122,4 @@ public class ResolutionProofDag extends AbstractProofDag {
       return true;
     }
   }
-
 }

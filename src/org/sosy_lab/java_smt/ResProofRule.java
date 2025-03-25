@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 /**
@@ -28,6 +29,7 @@ public class ResProofRule {
     // Resolution Rule
     RESOLUTION("res", "(res t proof1 proof2)"),
 
+    // RUP("rup", null),
     ASSUME("assume", "(assume t)"),
     // Logical operators
     TRUE_POSITIVE("true+", "(+ true)"),
@@ -109,9 +111,9 @@ public class ResProofRule {
         "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))");
 
     private final String name;
-    private final String formula;
+    @Nullable private final String formula;
 
-    ResAxiom(String pName, String pFormula) {
+    ResAxiom(String pName, @Nullable String pFormula) {
       name = pName;
       formula = pFormula;
     }
