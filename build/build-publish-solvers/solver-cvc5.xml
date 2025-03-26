@@ -14,7 +14,7 @@ SPDX-License-Identifier: Apache-2.0
 <project name="publish-solvers-cvc5" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
     <import file="macros.xml"/>
 
-    <property name="cvc5.version" value="2025-03-24-760e695"/>
+    <property name="cvc5.version" value="2025-03-26-8594a8e"/>
     <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
     <property name="cvc5.downloads" value="/dependencies/cvc5"/>
     <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
