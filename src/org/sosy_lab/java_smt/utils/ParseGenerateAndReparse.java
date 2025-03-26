@@ -81,7 +81,12 @@ public class ParseGenerateAndReparse {
     // Constraint hinzufügen
     try {
       z3proverEnv.addConstraint(z3solverContext.getFormulaManager().universalParseFromString(smt2));
-    } catch (Exception pE) {
+    }
+    catch (Exception pE) {
+      if (pE instanceof UnsupportedOperationException){
+        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE);
+        System.exit(1);
+      }
       z3hadException = true;
     }
     try {
@@ -90,14 +95,18 @@ public class ParseGenerateAndReparse {
     } catch (Exception pE) {
       exceptionWhileParsingAndReparsing = true;
     }
+    if(z3hadException && exceptionWhileParsingAndReparsing) {
+      System.out.println("RESULT UNKNOWN: An exception occured independently of Parser/Generator");
+      System.exit(1);
+    }
 
     // Ergebnisse vergleichen
     boolean z3Sat = z3proverEnv.isUnsat();
     boolean reparsedSat = solverLessProverEnv.isUnsat();
     if (z3hadException == exceptionWhileParsingAndReparsing) { // make sure exception didn't happen
       // because of parserGenerator
-      if (z3Sat == reparsedSat) {
-        System.out.println("Test erfolgreich: " + z3Sat);
+      if (z3Sat == reparsedSat ) {
+        System.out.println("SUCCESS: " + z3Sat);
         System.exit(0);
       }
     } else {

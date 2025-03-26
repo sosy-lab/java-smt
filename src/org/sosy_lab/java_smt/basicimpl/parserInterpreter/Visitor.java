@@ -2249,17 +2249,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
 
   @Override
   public Object visitCmd_pop(Cmd_popContext ctx) {
-    throw new ParserException("Parser does not support \"pop\"");
+    throw new UnsupportedOperationException("Parser does not support \"pop\"");
   }
 
   @Override
   public Object visitCmd_push(Cmd_pushContext ctx) {
-    throw new ParserException("Parser does not support \"push\"");
+    throw new UnsupportedOperationException("Parser does not support \"push\"");
   }
 
   @Override
   public Object visitDecl_sort(Decl_sortContext ctx) {
-    throw new ParserException("JavaSMT does not support \"declare-sort\"");
+    throw new UnsupportedOperationException("JavaSMT does not support \"declare-sort\"");
   }
 
   @Override
