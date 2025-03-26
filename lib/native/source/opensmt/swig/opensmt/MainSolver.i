@@ -77,9 +77,15 @@ namespace opensmt {
 %ignore MainSolver::getAssertionsAtCurrentLevel() const;
 %ignore MainSolver::getAssertionsAtLevel(std::size_t) const;
 
-// TODO These were also added recently. Are they useful to us?
 %ignore MainSolver::printResolutionProofSMT2() const;
 %ignore MainSolver::printResolutionProofSMT2(std::ostream &) const;
+%extend MainSolver {
+  std::string printResolutionProofSMT2() {
+    std::ostringstream out;
+    $self->printResolutionProofSMT2(out);
+    return out.str();
+  }
+}
 
 %ignore MainSolver::getUnsatCore() const;
 %ignore MainSolver::printFramesAsQuery() const;
