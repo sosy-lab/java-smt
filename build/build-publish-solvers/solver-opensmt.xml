@@ -72,7 +72,7 @@ SPDX-License-Identifier: Apache-2.0
              Make sure to remove the old 'build/' directory from OpenSMT!
              It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
-        <exec executable="make" dir="${opensmt.path}" failonerror="true">
+        <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
             <arg value="CMAKE_FLAGS=
@@ -89,6 +89,15 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-R"/>
             <arg value="${source.path}/api.patch"/>
         </exec>
+
+        <!-- Abort if the build failed -->
+        <fail message="Failed to build OpenSMT">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${build.returnCode}"/>
+                </not>
+            </condition>
+        </fail>
 
         <!-- copy OpenSMT include files to JavaSMT -->
         <copy todir="${source.installPathLinuxX64}">
@@ -110,7 +119,7 @@ SPDX-License-Identifier: Apache-2.0
              Make sure to remove the old 'build/' directory from OpenSMT!
              It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
-        <exec executable="make" dir="${opensmt.path}" failonerror="true">
+        <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
             <arg value="CMAKE_FLAGS=
@@ -129,6 +138,15 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-R"/>
             <arg value="${source.path}/api.patch"/>
         </exec>
+
+        <!-- Abort if the build failed -->
+        <fail message="Failed to build OpenSMT">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${build.returnCode}"/>
+                </not>
+            </condition>
+        </fail>
 
         <!-- copy OpenSMT include files to JavaSMT -->
         <copy todir="${source.installPathLinuxArm64}">
