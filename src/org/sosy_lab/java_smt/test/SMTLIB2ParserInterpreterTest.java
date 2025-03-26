@@ -3073,7 +3073,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
-  @Test(expected = ParserException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testExceptionNewSort()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
@@ -3123,7 +3123,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
-  @Test(expected = ParserException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testExceptionPop()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
@@ -3133,7 +3133,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
-  @Test(expected = ParserException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testExceptionPush()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
