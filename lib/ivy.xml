@@ -165,7 +165,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.21.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
-        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
+        <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1388-ga5a4ab0c" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
         <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-11-08" conf="runtime-princess-with-javacup->default; contrib->sources"/>
