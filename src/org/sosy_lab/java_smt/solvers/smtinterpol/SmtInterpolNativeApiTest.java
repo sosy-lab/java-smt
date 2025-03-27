@@ -72,4 +72,30 @@ public class SmtInterpolNativeApiTest {
 
     assertThat(script.checkSat()).isEqualTo(LBool.UNSAT);
   }
+
+  @Test
+  public void proofTest() {
+    // (declare-fun q1 () Bool)
+    // (declare-fun q2 () Bool)
+    // (assert (or (not q1) q2))
+    // (assert q1)
+    // (assert (not q2))
+    // (check-sat)
+    // (get-proof)
+
+    Term q1 = makeVariable("q1", booleanSort);
+    Term q2 = makeVariable("q2", booleanSort);
+
+    script.assertTerm(script.term("or", script.term("not", q1), q2));
+    script.assertTerm(q1);
+    script.assertTerm(script.term("not", q2));
+
+    assertThat(script.checkSat()).isEqualTo(LBool.UNSAT);
+
+    // Proofs are simply annotated Terms
+    // We could use a visitor to traverse the proof and convert it to our representation
+    Term proof = script.getProof();
+
+    System.out.println(proof);
+  }
 }
