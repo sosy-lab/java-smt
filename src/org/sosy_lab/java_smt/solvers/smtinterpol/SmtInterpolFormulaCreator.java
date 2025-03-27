@@ -25,7 +25,9 @@ import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -98,25 +100,19 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
   @CanIgnoreReturnValue
   private FunctionSymbol declareFun(String fun, Sort[] paramSorts, Sort resultSort) {
     checkSymbol(fun);
-    FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
 
-    if (fsym == null) {
-      try {
-        environment.declareFun(fun, paramSorts, resultSort);
-      } catch (SMTLIBException e) {
-        // can fail, if function is already declared with a different sort
-        throw new IllegalArgumentException("Cannot declare function '" + fun + "'", e);
-      }
-      return environment.getTheory().getFunction(fun, paramSorts);
-    } else {
-      if (!fsym.getReturnSort().equals(resultSort)) {
-        throw new IllegalArgumentException(
-            "Function " + fun + " is already declared with different definition");
-      }
-      if (fun.equals("true") || fun.equals("false")) {
-        throw new IllegalArgumentException("Cannot declare a variable named " + fun);
-      }
+    Map<String, FunctionSymbol> declared = environment.getTheory().getDeclaredFunctions();
+    if (declared.containsKey(fun)) {
+      FunctionSymbol fsym = declared.get(fun);
+      checkArgument(
+          Arrays.equals(fsym.getParameterSorts(), paramSorts)
+              && fsym.getReturnSort().equals(resultSort),
+          "Function %s is already declared with different definition",
+          fun);
       return fsym;
+    } else {
+      environment.declareFun(fun, paramSorts, resultSort);
+      return environment.getTheory().getFunction(fun, paramSorts);
     }
   }
 
@@ -135,6 +131,10 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     checkArgument(
         !UNSUPPORTED_IDENTIFIERS.contains(symbol),
         "SMTInterpol does not support %s as identifier.",
+        symbol);
+    checkArgument(
+        !symbol.equals("true") && !symbol.equals("false"),
+        "Cannot declare a variable named %s",
         symbol);
   }
 

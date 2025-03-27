@@ -28,6 +28,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Theory;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -70,15 +71,16 @@ class FormulaCollectionScript implements Script {
 
   @Override
   public void declareFun(String fun, Sort[] paramSorts, Sort resultSort) throws SMTLIBException {
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
-
-    if (fsym == null) {
-      script.declareFun(fun, paramSorts, resultSort);
-    } else {
-      if (!fsym.getReturnSort().equals(resultSort)) {
+    Map<String, FunctionSymbol> declared = script.getTheory().getDeclaredFunctions();
+    if (declared.containsKey(fun)) {
+      FunctionSymbol fsym = declared.get(fun);
+      if (!Arrays.equals(fsym.getParameterSorts(), paramSorts)
+          || !fsym.getReturnSort().equals(resultSort)) {
         throw new SMTLIBException(
             "Function " + fun + " is already declared with different definition");
       }
+    } else {
+      script.declareFun(fun, paramSorts, resultSort);
     }
   }
 
@@ -89,15 +91,18 @@ class FormulaCollectionScript implements Script {
     for (int i = 0; i < paramSorts.length; i++) {
       paramSorts[i] = params[i].getSort();
     }
-    FunctionSymbol fsym = theory.getFunction(fun, paramSorts);
 
-    if (fsym == null) {
-      script.defineFun(fun, params, resultSort, definition);
-    } else {
-      if (!fsym.getDefinition().equals(definition) || !fsym.getReturnSort().equals(resultSort)) {
+    Map<String, FunctionSymbol> declared = script.getTheory().getDeclaredFunctions();
+    if (declared.containsKey(fun)) {
+      FunctionSymbol fsym = declared.get(fun);
+      if (!Arrays.equals(fsym.getParameterSorts(), paramSorts)
+          || !fsym.getReturnSort().equals(resultSort)
+          || !fsym.getDefinition().equals(definition)) {
         throw new SMTLIBException(
-            "Function " + fun + " is already defined with different definition");
+            "Function " + fun + " is already declared with different definition");
       }
+    } else {
+      script.defineFun(fun, params, resultSort, definition);
     }
   }
 
