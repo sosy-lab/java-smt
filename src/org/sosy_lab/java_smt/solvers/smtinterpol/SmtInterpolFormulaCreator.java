@@ -434,7 +434,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       castedArgs.add(arg);
     }
 
-    return environment.term(declaration.getName(), castedArgs.toArray(new Term[0]));
+    return environment.getTheory().term(declaration, castedArgs.toArray(new Term[0]));
   }
 
   @Override
