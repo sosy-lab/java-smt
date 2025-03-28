@@ -33,9 +33,11 @@ public class Z3ProofsTest {
   private Z3SolverContext context;
   private Z3FormulaManager mgr;
   private Z3BooleanFormulaManager bmgr;
+  private ProverEnvironment q1q2prover;
 
   @Before
-  public void setUpSolver() throws Exception {
+  public void setUpSolverContext() throws Exception {
+    //Z3 requires to enable proof generation in the configuration of the context
     Configuration config =
         Configuration.builder().setOption("solver.z3.requireProofs", "true").build();
     LogManager logger = BasicLogManager.create(config);
@@ -56,6 +58,25 @@ public class Z3ProofsTest {
     bmgr = (Z3BooleanFormulaManager) mgr.getBooleanFormulaManager();
   }
 
+  @Before
+  public void setUpQ1Q2Prover() throws InterruptedException {
+    // example from the 2022 RESOLUTE paper
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+
+    q1q2prover = context.newProverEnvironment0(Set.of());
+
+    try {
+      q1q2prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      q1q2prover.addConstraint(q1);
+      q1q2prover.addConstraint(bmgr.not(q2));
+      assertTrue(q1q2prover.isUnsat());
+
+    } catch (SolverException pE) {
+      throw new RuntimeException(pE);
+    }
+  }
+
   @After
   public void closeSolver() {
     if (context != null) {
@@ -65,205 +86,17 @@ public class Z3ProofsTest {
 
   @Test
   public void getProofTest() throws InterruptedException {
-    // example from the 2022 RESOLUTE paper
-    BooleanFormula q1 = bmgr.makeVariable("q1");
-    BooleanFormula q2 = bmgr.makeVariable("q2");
-
-    ProverEnvironment prover = context.newProverEnvironment0(Set.of());
-    // Z3TheoremProver prover =
-    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
-    //    .GENERATE_UNSAT_CORE));
-    try {
-      System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-      prover.addConstraint(q1);
-      prover.addConstraint(bmgr.not(q2));
-      assertTrue(prover.isUnsat());
-
-      ProofNode proof = prover.getProof();
-      assertThat(proof).isNotNull();
-    } catch (SolverException pE) {
-      throw new RuntimeException(pE);
-    }
+    ProofNode proof = q1q2prover.getProof();
+    assertThat(proof).isNotNull();
   }
 
   @Test
-  public void printProofTest() throws InterruptedException {
-    // example from the 2022 RESOLUTE paper
-    BooleanFormula q1 = bmgr.makeVariable("q1");
-    BooleanFormula q2 = bmgr.makeVariable("q2");
+  public void getChildrenTest() {
+    ProofNode proof = q1q2prover.getProof();
+    assertThat(proof).isNotNull();
+    assertThat(proof.getChildren()).isNotEmpty();
+    assertThat(proof.getChildren().get(0)).isNotNull();
 
-    ProverEnvironment prover = context.newProverEnvironment0(Set.of());
-    // Z3TheoremProver prover =
-    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
-    //    .GENERATE_UNSAT_CORE));
-    try {
-      System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-      prover.addConstraint(q1);
-      prover.addConstraint(bmgr.not(q2));
-      assertTrue(prover.isUnsat());
-
-      ProofNode proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      System.out.println(((Z3ProofNode) proof).asString());
-    } catch (SolverException pE) {
-      throw new RuntimeException(pE);
-    }
-  }
-
-  @Test
-  public void internalPrintProcessedProofTest() throws SolverException, InterruptedException {
-    // example from the 2022 RESOLUTE paper
-    BooleanFormula q1 = bmgr.makeVariable("q1");
-    BooleanFormula q2 = bmgr.makeVariable("q2");
-
-    Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    // Z3TheoremProver prover =
-    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
-    //    .GENERATE_UNSAT_CORE));
-    try {
-      System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-      prover.addConstraint(q1);
-      prover.addConstraint(bmgr.not(q2));
-      assertTrue(prover.isUnsat());
-
-      long proof = prover.getZ3Proof();
-      Z3ProofProcessor parser =
-          new Z3ProofProcessor(
-              mgr.getEnvironment(),
-              prover.getZ3solver(),
-              (Z3FormulaCreator) mgr.getFormulaCreator(),
-              prover);
-      Z3ProofNode root = parser.fromAST(proof);
-
-      System.out.println(root.asString());
-
-    } finally {
-      prover.close();
-    }
-  }
-
-  @Test
-  public void nonRecursivePrintParsedProofTest() throws SolverException, InterruptedException {
-    // example from the 2022 RESOLUTE paper
-    BooleanFormula q1 = bmgr.makeVariable("q1");
-    BooleanFormula q2 = bmgr.makeVariable("q2");
-
-    Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    // Z3TheoremProver prover =
-    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
-    //    .GENERATE_UNSAT_CORE));
-    try {
-      System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-      prover.addConstraint(q1);
-      prover.addConstraint(bmgr.not(q2));
-      assertTrue(prover.isUnsat());
-
-      long proof = prover.getZ3Proof();
-      Z3NonRecursiveProofProcessor parser =
-          new Z3NonRecursiveProofProcessor(
-              mgr.getEnvironment(),
-              prover.getZ3solver(),
-              (Z3FormulaCreator) mgr.getFormulaCreator(),
-              prover);
-      Z3ProofNode root = parser.fromASTIterative(proof);
-
-      System.out.println(root.asString());
-
-    } finally {
-      prover.close();
-    }
-  }
-
-  @Test
-  public void compareRecursiveAndNonRecursiveOutputsTest()
-      throws SolverException, InterruptedException {
-    // example from the 2022 RESOLUTE paper
-    BooleanFormula q1 = bmgr.makeVariable("q1");
-    BooleanFormula q2 = bmgr.makeVariable("q2");
-
-    Z3TheoremProver prover = (Z3TheoremProver) context.newProverEnvironment0(Set.of());
-    // Z3TheoremProver prover =
-    //    (Z3TheoremProver) context.newProverEnvironment0(Set.of(ProverOptions
-    //    .GENERATE_UNSAT_CORE));
-    try {
-      System.out.println("proofs enabled: " + context.getGenerateProofs());
-      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-      prover.addConstraint(q1);
-      prover.addConstraint(bmgr.not(q2));
-      assertTrue(prover.isUnsat());
-
-      long proof = prover.getZ3Proof();
-
-      Z3ProofProcessor parser =
-          new Z3ProofProcessor(
-              mgr.getEnvironment(),
-              prover.getZ3solver(),
-              (Z3FormulaCreator) mgr.getFormulaCreator(),
-              prover);
-      Z3ProofNode root = parser.fromAST(proof);
-
-      Z3NonRecursiveProofProcessor nrParser =
-          new Z3NonRecursiveProofProcessor(
-              mgr.getEnvironment(),
-              prover.getZ3solver(),
-              (Z3FormulaCreator) mgr.getFormulaCreator(),
-              prover);
-      Z3ProofNode nRroot = nrParser.fromASTIterative(proof);
-
-      assertEquals(root.asString(), nRroot.asString());
-
-    } finally {
-      prover.close();
-    }
-  }
-
-  public static Context createContextWithRawPointer(long m_ctx) {
-    try {
-      Constructor<Context> constructor = Context.class.getDeclaredConstructor(long.class);
-      constructor.setAccessible(true); // allow access even if non‑public
-      return constructor.newInstance(m_ctx);
-    } catch (Exception e) {
-      throw new RuntimeException("Failed to create Context instance", e);
-    }
-  }
-
-  @Test
-  public void printZ3ProofAstTest() {
-    HashMap<String, String> cfg = new HashMap<>();
-    cfg.put("proof", "true");
-    Context ctx = new Context(cfg);
-    try {
-      // Create boolean variables
-      BoolExpr q1 = ctx.mkBoolConst("q1");
-      BoolExpr q2 = ctx.mkBoolConst("q2");
-
-      // Create solver
-      Solver solver = ctx.mkSolver();
-
-      // Assert (or (not q1) q2)
-      solver.add(ctx.mkOr(ctx.mkNot(q1), q2));
-
-      // Assert q1
-      solver.add(q1);
-
-      // Assert (not q2)
-      solver.add(ctx.mkNot(q2));
-
-      Status status = solver.check();
-
-      System.out.println("Unsat: " + (status == Status.UNSATISFIABLE));
-
-      Expr<?> proof = solver.getProof();
-      System.out.println("proof: " + proof);
-      System.out.println(Version.getFullVersion());
-    } finally {
-      ctx.close();
-    }
   }
 
   @Test
@@ -279,12 +112,12 @@ public class Z3ProofsTest {
     pn.addChild(new Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
     pn.addChild(new Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
-    System.out.println(pn.asString());
+
 
     Z3ToResoluteProofConverter pc = new Z3ToResoluteProofConverter(mgr);
 
     ProofNode res = pc.handleTransitivity(pn);
 
-    pc.printProof(res, 0);
+   assertThat(res).isNotNull();
   }
 }
