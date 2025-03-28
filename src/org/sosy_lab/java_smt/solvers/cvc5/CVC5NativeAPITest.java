@@ -1383,15 +1383,15 @@ public class CVC5NativeAPITest {
     solver.setOption("produce-proofs", "true");
     Sort boolSort = termManager.getBooleanSort();
 
-    //(declare-fun q1 () Bool)
-    //(declare-fun q2 () Bool)
-    //(assert (or (not q1) q2))
-    //(assert q1)
-    //(assert (not q2))
-    //(check-sat)
-    //(get-proof)
-    Term q1 = solver.declareFun("q1", new Sort[]{}, boolSort);
-    Term q2 = solver.declareFun("q2", new Sort[]{}, boolSort);
+    // (declare-fun q1 () Bool)
+    // (declare-fun q2 () Bool)
+    // (assert (or (not q1) q2))
+    // (assert q1)
+    // (assert (not q2))
+    // (check-sat)
+    // (get-proof)
+    Term q1 = solver.declareFun("q1", new Sort[] {}, boolSort);
+    Term q2 = solver.declareFun("q2", new Sort[] {}, boolSort);
 
     solver.assertFormula(termManager.mkTerm(Kind.OR, termManager.mkTerm(Kind.NOT, q1), q2));
     solver.assertFormula(q1);
@@ -1406,17 +1406,17 @@ public class CVC5NativeAPITest {
 
     Proof proof = proofs[0];
 
-    //Test getRule
+    // Test getRule
     assertThat(proof.getRule()).isNotNull();
 
     assertThat(proof.getRule()).isEqualTo(ProofRule.SCOPE);
 
-    //Test getChildren
+    // Test getChildren
     assertThat(proof.getChildren()).isNotNull();
 
     assertThat(proof.getChildren()[0]).isNotNull();
 
-    //The way the proof DAG is structured, the root has one child, which has also one child and
+    // The way the proof DAG is structured, the root has one child, which has also one child and
     // the child of the latter has more than one child.
     Proof[] childOfSecondProof = proof.getChildren()[0].getChildren();
 
@@ -1424,17 +1424,16 @@ public class CVC5NativeAPITest {
 
     assertThat(childrenOfThirdProof.length).isEqualTo(2);
 
-    //Test equals
+    // Test equals
     assertThat(childrenOfThirdProof[0].equals(childrenOfThirdProof[1])).isFalse();
 
     assertThat(childrenOfThirdProof[0].equals(childrenOfThirdProof[0])).isTrue();
 
-    //Test getResult
+    // Test getResult
     assertThat(Optional.ofNullable(proof.getResult())).isNotNull();
 
-    //Test getArguments
+    // Test getArguments
     assertThat(childrenOfThirdProof[0].getArguments()).isNotNull();
     assertThat(Optional.ofNullable(childrenOfThirdProof[0].getArguments()[0])).isNotNull();
-
   }
 }
