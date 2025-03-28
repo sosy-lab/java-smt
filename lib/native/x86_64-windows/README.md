@@ -41,7 +41,7 @@ For Bitwuzla:
 
 For CVC5:
 
-- `mlink libcvc5j.dll ..\..\java\runtime-cvc5\x64\libcvcj.so`
+- `mlink libcvc5jni.dll ..\..\java\runtime-cvc5\x64\libcvcjni.so`
 
 ### With a direct copy of the library:
 
@@ -63,7 +63,7 @@ For Bitwuzla:
 
 For CVC5:
 
-- `copy ..\..\java\runtime-cvc5\x64\libcvc5j.dll libcvc5j.dll`
+- `copy ..\..\java\runtime-cvc5\x64\libcvc5jni.dll libcvc5jni.dll`
 
 Or simply use a wildcard:
 - `copy ..\..\java\runtime-*\*dll .\`
