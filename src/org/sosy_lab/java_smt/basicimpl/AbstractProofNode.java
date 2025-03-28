@@ -42,7 +42,7 @@ public abstract class AbstractProofNode implements ProofNode {
     return Collections.unmodifiableList(children);
   }
 
-  @Override
+@Override
   public void addChild(ProofNode child) {
     children.add(child);
   }
@@ -52,18 +52,8 @@ public abstract class AbstractProofNode implements ProofNode {
   }
 
   @Override
-  public boolean isSource() {
-    return false;
-  }
-
-  @Override
-  public boolean isSink() {
+  public boolean isLeaf() {
     return children.isEmpty();
-  }
-
-  @Override
-  public void accept(ProofVisitor visitor) {
-    visitor.visitNode(this);
   }
 
   @Override
@@ -71,11 +61,11 @@ public abstract class AbstractProofNode implements ProofNode {
     return id;
   }
 
-  public void setRule(ProofRule rule) {
+  void setRule(ProofRule rule) {
     this.rule = rule;
   }
 
-  public void setFormula(Formula pFormula) {
+  void setFormula(Formula pFormula) {
     formula = pFormula;
   }
 }

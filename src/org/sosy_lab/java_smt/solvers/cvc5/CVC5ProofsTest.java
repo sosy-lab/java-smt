@@ -109,7 +109,13 @@ public class CVC5ProofsTest {
 
   @Test
   public void getProofTest() {
-    // example from the 2022 RESOLUTE paper
+    //(declare-fun q1 () Bool)
+    //(declare-fun q2 () Bool)
+    //(assert (or (not q1) q2))
+    //(assert q1)
+    //(assert (not q2))
+    //(check-sat)
+    //(get-proof)
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
