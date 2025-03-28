@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -33,6 +34,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
+  private final boolean generateProofs;
   protected final boolean enableSL;
   protected boolean closed = false;
 
@@ -53,6 +55,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    generateProofs = pOptions.contains(ProverOptions.GENERATE_PROOFS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -75,6 +78,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+  }
+
+  protected final void checkGenerateProofs() {
+    Preconditions.checkState(generateProofs, TEMPLATE, ProverOptions.GENERATE_PROOFS);
   }
 
   protected final void checkEnableSeparationLogic() {
@@ -157,5 +164,13 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.clear();
     closeAllEvaluators();
     closed = true;
+  }
+
+  @Override
+  public ProofNode getProof() {
+    checkState(!closed);
+    checkGenerateProofs();
+
+    return null;
   }
 }

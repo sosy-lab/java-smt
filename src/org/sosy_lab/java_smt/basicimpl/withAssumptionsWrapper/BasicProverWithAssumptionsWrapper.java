@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
@@ -127,5 +128,10 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
+  }
+
+  @Override
+  public ProofNode getProof() {
+    return delegate.getProof();
   }
 }

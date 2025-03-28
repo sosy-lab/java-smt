@@ -30,6 +30,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -185,6 +186,26 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       pProver.addConstraint(constraint); // Z3 crashed here
       assertThat(pProver.isUnsat()).isFalse();
       pProver.pop();
+    }
+  }
+
+  @Test
+  public void testGetProof() throws InterruptedException {
+    requireProofGeneration(); // Ensures proofs are supported
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      ProofNode proof = prover.getProof();
+      assertThat(proof).isNotNull();
+    } catch (SolverException pE) {
+      throw new RuntimeException(pE);
     }
   }
 }

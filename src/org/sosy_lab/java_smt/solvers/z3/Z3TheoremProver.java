@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -144,6 +145,22 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     } catch (Z3Exception e) {
       throw creator.handleZ3ExceptionAsRuntimeException(e);
     }
+  }
+
+  @Override
+  public ProofNode getProof() {
+    long proofAst = Native.solverGetProof(z3context, z3solver);
+    return new Z3NonRecursiveProofProcessor(z3context, z3solver, creator, this).fromASTIterative(proofAst);
+  }
+
+  // This method is used to get the Z3 proof as a long for testing exclusively
+  long getZ3Proof() {
+    return Native.solverGetProof(z3context, z3solver);
+  }
+
+  // This method is used to get the Z3 solver object for testing exclusively
+  long getZ3solver() {
+    return z3solver;
   }
 
   @Override
