@@ -47,6 +47,7 @@ public abstract class AbstractProofNode implements ProofNode {
     children.add(child);
   }
 
+  @Override
   public ProofRule getRule() {
     return rule;
   }

@@ -181,21 +181,13 @@ public enum CVC5ProofRule implements ProofRule {
     formula = pFormula;
   }
 
-  private static final Map<String, CVC5ProofRule> NAME_TO_RULE_MAP = new HashMap<>();
-
-  static {
-    for (CVC5ProofRule rule : values()) {
-      ProofRuleRegistry.register(CVC5ProofRule.class, rule);
-    }
-  }
-
   @Override
   public String getName() {
-    return "";
+    return name;
   }
 
   @Override
   public String getFormula() {
-    return "";
+    return formula;
   }
 }

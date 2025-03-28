@@ -18,13 +18,14 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class CVC5ProofProcessor {
   private final CVC5FormulaCreator formulaCreator;
-  private final CVC5AbstractProver prover;
+  private final ProverEnvironment prover;
 
-  CVC5ProofProcessor(CVC5FormulaCreator creator, CVC5AbstractProver pProver) {
+  CVC5ProofProcessor(CVC5FormulaCreator creator, ProverEnvironment pProver) {
     formulaCreator = creator;
     prover = pProver;
   }
@@ -40,27 +41,34 @@ public class CVC5ProofProcessor {
     while (!stack.isEmpty()) {
       Frame frame = stack.peek();
 
-      // Skip processing the frame if its rule is "SCOPE"
-      // This rule seems to just help the processing by CVC5
-      if (!frame.visited && frame.proof.getRule().getValue() == 1) {
-        // Pop the SCOPE frame and push its children onto the stack
-        stack.pop();
-        frame.numChildren = rootProof.getChildren().length;
+
+      if (!frame.visited) {
+
+        frame.numChildren = frame.proof.getChildren().length;
         frame.visited = true;
 
-        for (int i = frame.numChildren; i >= 0; i--) {
-          Proof child = rootProof.getChildren()[i];
+        for (int i = frame.numChildren-1; i >= 0; i--) {
+          Proof child = frame.proof.getChildren()[i];
           if (!computed.containsKey(child)) {
             stack.push(new Frame(child));
           }
         }
       } else {
 
+        if (frame.proof.getRule().getValue() == 1) {
+          // Skip processing the frame if its rule is "SCOPE"
+          // This rule seems to just help the processing by CVC5
+          System.out.println("Skipping SCOPE");
+          stack.pop();
+          continue;
+        }
+
+
         stack.pop();
         int numChildren = frame.numChildren;
 
         CVC5ProofRule proofRule =
-            ProofRule.fromName(CVC5ProofRule.class, frame.proof.getRule().toString());
+            ProofRule.fromName(CVC5ProofRule.class, frame.proof.getRule().toString().toLowerCase());
         CVC5ProofNode pn = new CVC5ProofNode(proofRule, generateFormula(frame.proof));
         for (int i = 0; i < numChildren - 1; i++) {
           Proof child = frame.proof.getChildren()[i];
