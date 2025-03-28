@@ -12,6 +12,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Solver;
@@ -99,7 +100,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
-    pLoader.accept("cvc5j");
+    loadLibrariesWithFallback(pLoader, ImmutableList.of("cvc5jni"), ImmutableList.of("libcvc5jni"));
 
     // disable CVC5's own loading mechanism,
     // see io.github.cvc5.Util#loadLibraries and https://github.com/cvc5/cvc5/pull/9047
