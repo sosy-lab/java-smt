@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -148,6 +149,10 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testCVC5WithValidOptionsTimeLimit()
       throws InvalidConfigurationException, InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
+    assume()
+        .withMessage("CVC5 has an issue with creating and closing a second context on Windows.")
+        .that(IS_WINDOWS)
+        .isFalse();
 
     //  tlimit-per is time limit in ms of wall clock time per query
     var configValid =

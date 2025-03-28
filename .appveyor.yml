@@ -44,6 +44,7 @@ build_script:
       Copy-Item -Path "lib\java\runtime-z3\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
       Copy-Item -Path "lib\java\runtime-mathsat\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
       Copy-Item -Path "lib\java\runtime-bitwuzla\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
+      Copy-Item -Path "lib\java\runtime-cvc5\x64\*.dll" -Destination "lib\native\x86_64-windows\" -Force
 
 test_script:
   - ant unit-tests
