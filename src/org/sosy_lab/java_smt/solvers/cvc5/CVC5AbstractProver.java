@@ -79,9 +79,9 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       Solver pSolver) {
     try {
       CVC5SolverContext.setSolverOptions(pSolver, randomSeed, pFurtherOptionsMap);
-    } catch (CVC5ApiRecoverableException pE) {
+    } catch (CVC5ApiRecoverableException e) {
       // We've already used these options in CVC5SolverContext, so there should be no exception
-      throw new AssertionError("Unexpected exception", pE);
+      throw new AssertionError("Unexpected exception", e);
     }
 
     if (incremental) {
