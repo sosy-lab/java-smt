@@ -124,6 +124,8 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         new SmtInterpolIntegerFormulaManager(creator, pNonLinearArithmetic);
     SmtInterpolRationalFormulaManager rationalTheory =
         new SmtInterpolRationalFormulaManager(creator, pNonLinearArithmetic);
+    SmtInterpolBitvectorFormulaManager bitvectorFormulaManager =
+        new SmtInterpolBitvectorFormulaManager(creator, booleanTheory);
     SmtInterpolArrayFormulaManager arrayTheory = new SmtInterpolArrayFormulaManager(creator);
     SmtInterpolFormulaManager manager =
         new SmtInterpolFormulaManager(
@@ -132,6 +134,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             booleanTheory,
             integerTheory,
             rationalTheory,
+            bitvectorFormulaManager,
             arrayTheory,
             logger);
     return new SmtInterpolSolverContext(manager, pShutdownNotifier, settings);
@@ -160,11 +163,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
             e);
       }
     }
-    // TODO: We would like to use Logics.ALL here and let the solver decide which logics are needed.
-    // But ... SMTInterpol eagerly checks logics for model generation,
-    // so we limit the available theories here to a large set of logics,
-    // including Arrays, UFs, and non-linear arithmetics over Ints and Rationals.
-    script.setLogic(Logics.AUFNIRA);
+    script.setLogic(Logics.ALL);
     return script;
   }
 

@@ -167,7 +167,8 @@ public class SolverFormulaIODeclarationsTest
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
-    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA, Solvers.SMTINTERPOL)
+        .contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {

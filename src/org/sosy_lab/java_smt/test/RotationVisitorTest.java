@@ -58,6 +58,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
         break;
       case CVC5:
       case PRINCESS:
+      case SMTINTERPOL:
         assertThat(functions)
             .containsExactly(
                 FunctionDeclarationKind.BV_OR,
@@ -121,6 +122,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
         break;
       case CVC5:
       case PRINCESS:
+      case SMTINTERPOL:
         assertThat(functions)
             .containsExactly(
                 FunctionDeclarationKind.BV_OR,
@@ -166,6 +168,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
       case PRINCESS:
+      case SMTINTERPOL:
         assertThat(functions)
             .containsExactly(FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
         break;
@@ -198,6 +201,7 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
     var functions = mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
     switch (solverToUse()) {
       case PRINCESS:
+      case SMTINTERPOL:
         assertThat(functions)
             .containsExactly(FunctionDeclarationKind.BV_EXTRACT, FunctionDeclarationKind.BV_CONCAT);
         break;

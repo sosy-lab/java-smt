@@ -46,6 +46,7 @@ public class SmtInterpolFormulaManager
       SmtInterpolBooleanFormulaManager pBooleanManager,
       SmtInterpolIntegerFormulaManager pIntegerManager,
       SmtInterpolRationalFormulaManager pRationalManager,
+      SmtInterpolBitvectorFormulaManager pBitvectorManager,
       SmtInterpolArrayFormulaManager pArrayFormulaManager,
       LogManager pLogger) {
     super(
@@ -54,7 +55,7 @@ public class SmtInterpolFormulaManager
         pBooleanManager,
         pIntegerManager,
         pRationalManager,
-        null,
+        pBitvectorManager,
         null,
         null,
         pArrayFormulaManager,

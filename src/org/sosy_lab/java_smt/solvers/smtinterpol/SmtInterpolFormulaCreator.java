@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -68,6 +69,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       return FormulaType.getArrayType(
           getFormulaTypeOfSort(pSort.getArguments()[0]),
           getFormulaTypeOfSort(pSort.getArguments()[1]));
+    } else if (pSort.isBitVecSort()) {
+      return FormulaType.getBitvectorTypeWithSize(Integer.parseInt(pSort.getIndices()[0]));
     } else {
       throw new IllegalArgumentException("Unknown formula type for sort: " + pSort);
     }
@@ -81,9 +84,13 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
       final FormulaType<?> arrayElementType =
           getArrayFormulaElementType((ArrayFormula<?, ?>) pFormula);
       return (FormulaType<T>) FormulaType.getArrayType(arrayIndexType, arrayElementType);
+    } else if (pFormula instanceof BitvectorFormula) {
+      Sort bvSort = extractInfo(pFormula).getSort();
+      return (FormulaType<T>)
+          FormulaType.getBitvectorTypeWithSize(Integer.parseInt(bvSort.getIndices()[0]));
+    } else {
+      return super.getFormulaType(pFormula);
     }
-
-    return super.getFormulaType(pFormula);
   }
 
   @Override
@@ -140,8 +147,7 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
   @Override
   public Sort getBitvectorType(final int pBitwidth) {
-    throw new UnsupportedOperationException(
-        "Bitvector theory is not supported " + "by SmtInterpol");
+    return environment.getTheory().getSort("BitVec", new String[] {String.valueOf(pBitwidth)});
   }
 
   @Override
@@ -166,14 +172,17 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
       /*
        * From SmtInterpol documentation (see {@link ConstantTerm#getValue}),
-       * the output is SmtInterpol's Rational unless it is a bitvector,
-       * and currently we do not support bitvectors for SmtInterpol.
+       * the output is SmtInterpol's Rational unless it is a bitvector.
        */
       Rational rationalValue = (Rational) ((ConstantTerm) value).getValue();
       org.sosy_lab.common.rationals.Rational ratValue =
           org.sosy_lab.common.rationals.Rational.of(
               rationalValue.numerator(), rationalValue.denominator());
       return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
+    } else if (value instanceof ConstantTerm
+        && ((ConstantTerm) value).getValue() instanceof BigInteger) {
+      // SmtInterpol returns Bitvectors as BigInteger values
+      return ((ConstantTerm) value).getValue();
     } else {
       throw new IllegalArgumentException("Unexpected value: " + value);
     }
@@ -206,8 +215,12 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         } else {
           outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
         }
+      } else if (interpolValue instanceof String) {
+        outValue = new BigInteger(((String) interpolValue).substring(2), 2);
+      } else if (interpolValue instanceof BigInteger) {
+        outValue = interpolValue;
       } else {
-        outValue = ((ConstantTerm) input).getValue();
+        throw new IllegalArgumentException("Unknown constant type");
       }
       return visitor.visitConstant(f, outValue);
     } else if (input instanceof ApplicationTerm) {
@@ -342,6 +355,56 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         return FunctionDeclarationKind.FLOOR;
       case "to_real":
         return FunctionDeclarationKind.TO_REAL;
+      case "bvneg":
+        return FunctionDeclarationKind.BV_NEG;
+      case "bvadd":
+        return FunctionDeclarationKind.BV_ADD;
+      case "bvsub":
+        return FunctionDeclarationKind.BV_SUB;
+      case "bvsdiv":
+        return FunctionDeclarationKind.BV_SDIV;
+      case "bvudiv":
+        return FunctionDeclarationKind.BV_UDIV;
+      case "bvsrem":
+        return FunctionDeclarationKind.BV_SREM;
+      case "bvurem":
+        return FunctionDeclarationKind.BV_UREM;
+      case "bvsmod":
+        return FunctionDeclarationKind.BV_SMOD;
+      case "bvmul":
+        return FunctionDeclarationKind.BV_MUL;
+      case "bvsgt":
+        return FunctionDeclarationKind.BV_SGT;
+      case "bvugt":
+        return FunctionDeclarationKind.BV_UGT;
+      case "bvsge":
+        return FunctionDeclarationKind.BV_SGE;
+      case "bvuge":
+        return FunctionDeclarationKind.BV_UGE;
+      case "bvslt":
+        return FunctionDeclarationKind.BV_SLT;
+      case "bvult":
+        return FunctionDeclarationKind.BV_ULT;
+      case "bvsle":
+        return FunctionDeclarationKind.BV_SLE;
+      case "bvule":
+        return FunctionDeclarationKind.BV_ULE;
+      case "bvnot":
+        return FunctionDeclarationKind.BV_NOT;
+      case "bvand":
+        return FunctionDeclarationKind.BV_AND;
+      case "bvor":
+        return FunctionDeclarationKind.BV_OR;
+      case "bvxor":
+        return FunctionDeclarationKind.BV_XOR;
+      case "bvlshr":
+        return FunctionDeclarationKind.BV_LSHR;
+      case "bvshl":
+        return FunctionDeclarationKind.BV_SHL;
+      case "concat":
+        return FunctionDeclarationKind.BV_CONCAT;
+      case "extract":
+        return FunctionDeclarationKind.BV_EXTRACT;
       default:
         // TODO: other declaration kinds!
         return FunctionDeclarationKind.OTHER;

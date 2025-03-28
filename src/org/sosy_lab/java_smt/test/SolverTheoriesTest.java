@@ -373,6 +373,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   @Test
   public void intTestBV_DivMod() throws SolverException, InterruptedException {
     requireBitvectors();
+    assume().that(solver).isNotEqualTo(Solvers.SMTINTERPOL); // Can't handle non-linear cases
 
     final int bitsize = 8;
     BitvectorFormula a = bvmgr.makeVariable(bitsize, "int_a");

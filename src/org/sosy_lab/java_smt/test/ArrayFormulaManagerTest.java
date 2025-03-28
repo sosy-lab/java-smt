@@ -222,6 +222,11 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
 
+    assume()
+        .withMessage("Solver %s does not support constant array with bitvectors", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.SMTINTERPOL);
+
     final int size = 8;
 
     for (int elem : new int[] {0, 1, 5, 100, -100}) {
