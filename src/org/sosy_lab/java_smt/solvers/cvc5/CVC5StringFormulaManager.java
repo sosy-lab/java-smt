@@ -149,8 +149,8 @@ class CVC5StringFormulaManager extends AbstractStringFormulaManager<Term, Sort, 
             Kind.AND,
             termManager.mkTerm(Kind.EQUAL, length(start), one),
             termManager.mkTerm(Kind.EQUAL, length(end), one));
-    return termManager.mkTerm(Kind.ITE, cond, termManager.mkTerm(Kind.REGEXP_RANGE, start, end),
-        noneImpl());
+    return termManager.mkTerm(
+        Kind.ITE, cond, termManager.mkTerm(Kind.REGEXP_RANGE, start, end), noneImpl());
   }
 
   @Override

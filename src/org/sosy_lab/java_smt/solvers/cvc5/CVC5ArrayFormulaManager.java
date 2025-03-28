@@ -17,8 +17,8 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
 @SuppressWarnings("MethodTypeParameterName")
-public class CVC5ArrayFormulaManager extends AbstractArrayFormulaManager<Term, Sort, TermManager,
-    Term> {
+public class CVC5ArrayFormulaManager
+    extends AbstractArrayFormulaManager<Term, Sort, TermManager, Term> {
 
   private final TermManager termManager;
 
