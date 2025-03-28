@@ -39,9 +39,9 @@ SPDX-License-Identifier: Apache-2.0
     </configurations>
 
     <publications defaultconf="solver-cvc5">
-        <artifact name="libcvc5j" conf="solver-cvc5-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
-        <artifact name="libcvc5j" conf="solver-cvc5-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
-        <artifact name="libcvc5j" conf="solver-cvc5-windows-x64" e:arch="x64" type="shared-object" ext="dll"/>
+        <artifact name="libcvc5jni" conf="solver-cvc5-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libcvc5jni" conf="solver-cvc5-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        <artifact name="libcvc5jni" conf="solver-cvc5-windows-x64" e:arch="x64" type="shared-object" ext="dll"/>
         <!-- Java code -->
         <artifact name="cvc5" conf="solver-cvc5-common" ext="jar"/>
     </publications>

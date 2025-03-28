@@ -123,9 +123,9 @@ SPDX-License-Identifier: Apache-2.0
         <!-- copy library files into directory to be published for IVY -->
         <echo message="Copying artifact for Ivy release"/>
         <copy file="${cvc5.jar}" tofile="${cvc5.distDir}/cvc5-${cvc5.version}.jar"/>
-        <copy file="${cvc5.installDir.x64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/x64/libcvc5j-${cvc5.version}.so"/>
-        <copy file="${cvc5.installDir.arm64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/arm64/libcvc5j-${cvc5.version}.so"/>
-        <copy file="${cvc5.installDir.x64-windows}/bin/cvc5jni.dll" tofile="${cvc5.distDir}/x64/libcvc5j-${cvc5.version}.dll"/>
+        <copy file="${cvc5.installDir.x64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.so"/>
+        <copy file="${cvc5.installDir.arm64-linux}/lib/libcvc5jni.so" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.so"/>
+        <copy file="${cvc5.installDir.x64-windows}/bin/cvc5jni.dll" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dll"/>
     </target>
 
     <target name="publish-cvc5" depends="package-cvc5, load-ivy"
