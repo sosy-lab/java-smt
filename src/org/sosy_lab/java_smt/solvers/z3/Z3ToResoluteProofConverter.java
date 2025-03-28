@@ -20,7 +20,7 @@ import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDag;
 import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
-import org.sosy_lab.java_smt.ResolutionProofDag.SourceProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -162,7 +162,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
 
   /**
    * Converts a {@link Z3ProofNode} into either a {@link ResolutionProofNode} or a {@link
-   * SourceProofNode}, depending on its rule.
+   * AxiomProofNode}, depending on its rule.
    *
    * @param node the {@link Z3ProofNode} to convert
    * @return the resulting {@link ProofNode}
@@ -304,13 +304,13 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
 
   ProofNode handleTrue(Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    SourceProofNode pn = new SourceProofNode(ResAxiom.TRUE_POSITIVE, formula);
+    AxiomProofNode pn = new AxiomProofNode(ResAxiom.TRUE_POSITIVE, formula);
     return pn;
   }
 
   ProofNode handleAsserted(Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    SourceProofNode pn = new SourceProofNode(ResAxiom.ASSUME, formula);
+    AxiomProofNode pn = new AxiomProofNode(ResAxiom.ASSUME, formula);
     return pn;
   }
 
@@ -325,7 +325,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
 
   ProofNode handleReflexivity(Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    SourceProofNode pn = new SourceProofNode(ResAxiom.REFLEXIVITY, formula);
+    AxiomProofNode pn = new AxiomProofNode(ResAxiom.REFLEXIVITY, formula);
     return pn;
   }
 
@@ -335,7 +335,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
 
     ResolutionProofNode pn = new ResolutionProofNode(formula, pivot);
-    SourceProofNode sn = new SourceProofNode(ResAxiom.SYMMETRY, snFormula);
+    AxiomProofNode sn = new AxiomProofNode(ResAxiom.SYMMETRY, snFormula);
     pn.addChild(sn);
     pn.addChild(handleNode((Z3ProofNode) node.getChildren().get(0)));
     return pn;
@@ -355,7 +355,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     BooleanFormula transRes = formula;
     BooleanFormula transClause = bfm.or(bfm.not(t1), bfm.not(t2), formula);
 
-    SourceProofNode pn = new SourceProofNode(ResAxiom.TRANSITIVITY, transClause);
+    AxiomProofNode pn = new AxiomProofNode(ResAxiom.TRANSITIVITY, transClause);
 
     ResolutionProofNode transResNode = new ResolutionProofNode(transRes, t2);
     ResolutionProofNode trnAnte1 = new ResolutionProofNode(t2, t2);
@@ -390,7 +390,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
 
     formulas.add((BooleanFormula) node.getFormula());
     BooleanFormula transitivityFormula = bfm.or(formulas);
-    SourceProofNode sn = new SourceProofNode(ResAxiom.TRANSITIVITY, transitivityFormula);
+    AxiomProofNode sn = new AxiomProofNode(ResAxiom.TRANSITIVITY, transitivityFormula);
 
     for (int i = 0; i < formulas.size() - 2; i++) {
       // ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
@@ -544,8 +544,8 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
   void printProof(ProofNode node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
 
-    if (node instanceof SourceProofNode) {
-      SourceProofNode sourceNode = (SourceProofNode) node;
+    if (node instanceof AxiomProofNode) {
+      AxiomProofNode sourceNode = (AxiomProofNode) node;
       System.out.println(indent + "Formula: " + sourceNode.getFormula());
       System.out.println(indent + "Rule: " + sourceNode.getRule());
       System.out.println(indent + "No. Children: " + sourceNode.getChildren().size());

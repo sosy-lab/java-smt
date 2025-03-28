@@ -12,7 +12,7 @@ package org.sosy_lab.java_smt.api.proofs;
 
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
-import org.sosy_lab.java_smt.ResolutionProofDag.SourceProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -73,7 +73,7 @@ public class ProofFactory<T> {
   }
 
   static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
-    return new SourceProofNode(rule, formula);
+    return new AxiomProofNode(rule, formula);
   }
 
   static ProofNode createResolutionNode(Formula formula, Formula pivot) {

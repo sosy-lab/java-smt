@@ -20,7 +20,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
 /**
  * This class represents a resolution proof DAG. Its nodes might be of the type {@link
- * SourceProofNode} or {@link ResolutionProofNode}. It is used to represent proofs based on the
+ * AxiomProofNode} or {@link ResolutionProofNode}. It is used to represent proofs based on the
  * RESOLUTE proof format from SMTInterpol.
  *
  * @see ResProofRule
@@ -94,11 +94,6 @@ public class ResolutionProofDag extends AbstractProofDag {
       this.pivot = Objects.requireNonNull(pivot, "Pivot must not be null");
     }
 
-    @Override
-    public boolean isSource() {
-      return false;
-    }
-
     public Formula getPivot() {
       return pivot;
     }
@@ -109,17 +104,13 @@ public class ResolutionProofDag extends AbstractProofDag {
     }
   }
 
-  public static class SourceProofNode extends AbstractProofNode implements ProofNode {
+  public static class AxiomProofNode extends AbstractProofNode implements ProofNode {
 
-    public SourceProofNode(ResAxiom rule, Formula formula) {
+    public AxiomProofNode(ResAxiom rule, Formula formula) {
       super(
           Objects.requireNonNull(rule, "Rule must not be null"),
           Objects.requireNonNull(formula, "Formula must not be null"));
     }
 
-    @Override
-    public boolean isSource() {
-      return true;
-    }
   }
 }

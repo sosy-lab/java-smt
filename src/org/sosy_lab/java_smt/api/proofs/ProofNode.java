@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.api.proofs;
 
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
 /**
  * A proof node in the proof DAG of a proof.
@@ -26,11 +25,7 @@ public interface ProofNode {
 
   void addChild(ProofNode child);
 
-  boolean isSource();
-
-  boolean isSink();
-
-  void accept(ProofVisitor visitor);
+  boolean isLeaf();
 
   /**
    * Get the formula of the proof node.

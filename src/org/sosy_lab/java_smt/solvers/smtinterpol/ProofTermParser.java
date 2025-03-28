@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDag;
+import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
@@ -165,7 +166,7 @@ public class ProofTermParser {
   }
 
   private ProofNode createSourceNode(ResAxiom rule, BooleanFormula formula) {
-    ProofNode node = new org.sosy_lab.java_smt.ResolutionProofDag.SourceProofNode(rule, formula);
+    ProofNode node = new AxiomProofNode(rule, formula);
     proofDag.addNode(node);
     return node;
   }
