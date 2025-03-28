@@ -98,12 +98,6 @@ public enum Z3ProofRule implements ProofRule {
     this.formula = formula;
   }
 
-  static {
-    for (Z3ProofRule rule : values()) {
-      ProofRuleRegistry.register(Z3ProofRule.class, rule);
-    }
-  }
-
   @Override
   public String getName() {
     return name;

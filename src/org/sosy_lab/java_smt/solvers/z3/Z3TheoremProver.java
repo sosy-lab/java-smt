@@ -150,7 +150,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   @Override
   public ProofNode getProof() {
     long proofAst = Native.solverGetProof(z3context, z3solver);
-    return new Z3ProofProcessor(z3context, z3solver, creator, this).fromAST(proofAst);
+    return new Z3NonRecursiveProofProcessor(z3context, z3solver, creator, this).fromASTIterative(proofAst);
   }
 
   // This method is used to get the Z3 proof as a long for testing exclusively

@@ -166,15 +166,6 @@ class Z3ProofProcessor {
     }
   }
 
-  // @Nullable
-  // private Formula getFromStoredConstraints(long proof) {
-  //  String varName = Native.astToString(z3context, proof);
-  //  if (prover.getStoredConstraints().peek().containsKey(varName)) {
-  //    return prover.getStoredConstraints().peek().get(varName);
-  //  } else {
-  //   return null;
-  // }
-  // }
 
   private Formula generateFormula(long proof) {
     Formula formula = null;

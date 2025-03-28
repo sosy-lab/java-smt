@@ -96,7 +96,22 @@ public class Z3ProofsTest {
     assertThat(proof).isNotNull();
     assertThat(proof.getChildren()).isNotEmpty();
     assertThat(proof.getChildren().get(0)).isNotNull();
+  }
 
+  @Test
+  public void getProofRuleTest() {
+    ProofNode proof = q1q2prover.getProof();
+    assertThat(proof).isNotNull();
+    assertThat(proof.getRule()).isNotNull();
+    assertThat(proof.getRule()).isEqualTo(Z3ProofRule.UNIT_RESOLUTION);
+  }
+
+  @Test
+  public void getFormulaTest() {
+    ProofNode proof = q1q2prover.getProof();
+    assertThat(proof).isNotNull();
+    assertThat(proof.getFormula()).isNotNull();
+    assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
   }
 
   @Test

@@ -40,4 +40,6 @@ public interface ProofNode {
    * @return The id of the proof node.
    */
   int getId();
+
+  ProofRule getRule();
 }
