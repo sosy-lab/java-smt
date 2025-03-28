@@ -207,8 +207,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      // Don't use Context.deletePointers(); as it deletes statically information from all
-      // existing contexts, not only this one!
       termManager.deletePointer();
       solver.deletePointer();
       creator = null;
