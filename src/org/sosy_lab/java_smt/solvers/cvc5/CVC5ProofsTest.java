@@ -116,6 +116,8 @@ public class CVC5ProofsTest {
     //(assert (not q2))
     //(check-sat)
     //(get-proof)
+    //This problem is from the paper found in https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
+
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 

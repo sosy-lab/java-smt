@@ -19,9 +19,11 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
@@ -30,7 +32,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearAr
 @Ignore("prevent this class being executed as testcase by ant")
 public class Z3ProofsTest {
 
-  private Z3SolverContext context;
+  private SolverContext context;
   private Z3FormulaManager mgr;
   private Z3BooleanFormulaManager bmgr;
   private ProverEnvironment q1q2prover;
@@ -43,28 +45,28 @@ public class Z3ProofsTest {
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
 
-    // Create new context with SMTInterpol
-    context =
-        Z3SolverContext.create(
-            logger,
-            config,
-            shutdown.getNotifier(),
-            null, // no logfile
-            42, // random seed value
-            FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN,
-            NonLinearArithmetic.USE,
-            NativeLibraries::loadLibrary);
+    context = SolverContextFactory.createSolverContext(
+        config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.Z3);
+
+
     mgr = (Z3FormulaManager) context.getFormulaManager();
     bmgr = (Z3BooleanFormulaManager) mgr.getBooleanFormulaManager();
   }
 
   @Before
   public void setUpQ1Q2Prover() throws InterruptedException {
-    // example from the 2022 RESOLUTE paper
+    //(declare-fun q1 () Bool)
+    //(declare-fun q2 () Bool)
+    //(assert (or (not q1) q2))
+    //(assert q1)
+    //(assert (not q2))
+    //(check-sat)
+    //(get-proof)
+    //This problem is from the paper found in https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
-    q1q2prover = context.newProverEnvironment0(Set.of());
+    q1q2prover = context.newProverEnvironment();
 
     try {
       q1q2prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
@@ -113,6 +115,13 @@ public class Z3ProofsTest {
     assertThat(proof.getFormula()).isNotNull();
     assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
   }
+
+  @Test
+        public void getProofTermTest() throws SolverException, InterruptedException {
+        ProofNode proof = q1q2prover.getProof();
+
+    System.out.println(((Z3ProofNode) proof).asString());
+        }
 
   @Test
   public void Z3handleTransitivityTest() {
