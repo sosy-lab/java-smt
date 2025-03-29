@@ -13,7 +13,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // TODO: Properly include the formulas for the proof rules.
-public enum CVC5ProofRule implements ProofRule {
+enum CVC5ProofRule implements ProofRule {
   ASSUME("assume", ""),
   SCOPE("scope", ""),
   SUBS("subs", ""),
