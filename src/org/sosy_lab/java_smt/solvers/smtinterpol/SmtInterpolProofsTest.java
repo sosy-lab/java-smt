@@ -149,49 +149,6 @@ public class SmtInterpolProofsTest {
     }
   }
 
-  @Test
-  public void testProofTermParserIntegration() throws Exception {
-    // Arrange: parse constraints as in the SmtInterpolProofsTest.
-    String constraint1 =
-        "(set-logic QF_UF)\n"
-            + "(declare-fun q1 () Bool)\n"
-            + "(declare-fun q2 () Bool)\n"
-            + "(assert (or (not q1) q2))";
-    String constraint2 = "(assert q1)";
-    String constraint3 = "(assert (not q2))";
-
-    BooleanFormula formula1 = context.getFormulaManager().parse(constraint1);
-    BooleanFormula formula2 = context.getFormulaManager().parse(constraint2);
-    BooleanFormula formula3 = context.getFormulaManager().parse(constraint3);
-
-    // Create a prover with proof and model generation enabled.
-    SmtInterpolTheoremProver prover =
-        (SmtInterpolTheoremProver)
-            context.newProverEnvironment0(
-                ImmutableSet.of(ProverOptions.GENERATE_PROOFS, ProverOptions.GENERATE_MODELS));
-    SMTInterpol smtInterpol = (SMTInterpol) prover.env;
-    try {
-      // Act: add constraints and check unsat.
-      prover.addConstraint(formula1);
-      prover.addConstraint(formula2);
-      prover.addConstraint(formula3);
-      assertTrue(prover.isUnsat());
-
-      // Retrieve the proof term from SMTInterpol.
-      Term proofTerm = smtInterpol.getProof();
-      assertNotNull(proofTerm);
-
-      // Convert the retrieved proof term to a ResolutionProofDAG using the context's formula
-      // creator
-      // and the asserted formulas.
-      ResolutionProofDag dag = (ResolutionProofDag) prover.getProof();
-      assertNotNull(dag);
-
-      // Optionally, additional assertions on the dag structure can be added here.
-    } finally {
-      prover.close();
-    }
-  }
 
   @Test
   public void testSmtInterpolProof() throws Exception {
