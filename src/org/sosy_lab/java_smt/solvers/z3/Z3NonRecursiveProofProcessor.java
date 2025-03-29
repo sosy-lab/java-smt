@@ -26,9 +26,9 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  * non-(java-)recursive implementation of the proof processor.#
  *
  * <p>The resulting DAG from transforming the proof from the Z3 provided structures into a set of
- * {@link Z3ProofNode} should enable an easier way to extract the information from the proofs.
+ * {@link Z3ProofDag.Z3ProofNode} should enable an easier way to extract the information from the proofs.
  * However, some information is lost from the original proof, as the Z3 provided proof makes uses of
- * more general structures like AST, SortKind, DeclKind. E.g. the leafs in the {@link Z3ProofNode}
+ * more general structures like AST, SortKind, DeclKind. E.g. the leafs in the {@link Z3ProofDag.Z3ProofNode}
  * contain the whole formula used for the first proof rules in the tree, while these are internal
  * nodes in the Z3 proof and leafs are the operands use in innermost terms.
  */
@@ -47,12 +47,12 @@ class Z3NonRecursiveProofProcessor {
     prover = pProver;
   }
 
-  Z3ProofNode fromASTIterative(long rootProof) {
+  Z3ProofDag.Z3ProofNode fromASTIterative(long rootProof) {
     // proof ast to be processed wrapped inside a frame
     Deque<Frame> stack = new ArrayDeque<>();
 
     // proof ast has been converted into ProofNode
-    Map<Long, Z3ProofNode> computed = new HashMap<>();
+    Map<Long, Z3ProofDag.Z3ProofNode> computed = new HashMap<>();
 
     stack.push(new Frame(rootProof));
 
@@ -96,7 +96,7 @@ class Z3NonRecursiveProofProcessor {
         }
         int declKind = Native.getDeclKind(z3context, Native.getAppDecl(z3context, frame.proof));
         ProofRule proofRule = getPRfromDK(declKind);
-        Z3ProofNode node = new Z3ProofNode(formula, proofRule);
+        Z3ProofDag.Z3ProofNode node = new Z3ProofDag.Z3ProofNode(formula, proofRule);
 
         for (int i = 0; i < numArgs - 1; i++) {
           long arg = Native.getAppArg(z3context, frame.proof, i);
@@ -114,7 +114,8 @@ class Z3NonRecursiveProofProcessor {
   private ProofRule getPRfromDK(int declKind) {
     String rawName = Z3_decl_kind.fromInt(declKind).name();
     String prName = rawName.replaceFirst("Z3_OP_PR_", "");
-    return ProofRuleRegistry.fromName(Z3ProofRule.class, prName);
+    return ProofRule.fromName(Z3ProofRule.class, prName);
+    //return ProofRuleRegistry.fromName(Z3ProofRule.class, prName);
   }
 
   private Formula generateFormula(long proof) {

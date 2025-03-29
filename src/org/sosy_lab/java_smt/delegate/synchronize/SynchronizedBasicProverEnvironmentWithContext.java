@@ -123,7 +123,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public ProofNode getProof() {
+  public ProofNode getProof() throws SolverException, InterruptedException {
     return delegate.getProof();
   }
 

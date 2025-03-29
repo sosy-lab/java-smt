@@ -16,7 +16,6 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDag;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
 /**
  * This class represents a resolution proof DAG. Its nodes might be of the type {@link

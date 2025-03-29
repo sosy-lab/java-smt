@@ -4,29 +4,20 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.microsoft.z3.*;
-import com.microsoft.z3.Context;
-import com.microsoft.z3.Solver;
-import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.Set;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.sosy_lab.common.NativeLibraries;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
-import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 @Ignore("prevent this class being executed as testcase by ant")
@@ -87,13 +78,13 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void getProofTest() throws InterruptedException {
+  public void getProofTest() throws InterruptedException, SolverException {
     ProofNode proof = q1q2prover.getProof();
     assertThat(proof).isNotNull();
   }
 
   @Test
-  public void getChildrenTest() {
+  public void getChildrenTest() throws SolverException, InterruptedException {
     ProofNode proof = q1q2prover.getProof();
     assertThat(proof).isNotNull();
     assertThat(proof.getChildren()).isNotEmpty();
@@ -101,7 +92,7 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void getProofRuleTest() {
+  public void getProofRuleTest() throws SolverException, InterruptedException {
     ProofNode proof = q1q2prover.getProof();
     assertThat(proof).isNotNull();
     assertThat(proof.getRule()).isNotNull();
@@ -109,7 +100,7 @@ public class Z3ProofsTest {
   }
 
   @Test
-  public void getFormulaTest() {
+  public void getFormulaTest() throws SolverException, InterruptedException {
     ProofNode proof = q1q2prover.getProof();
     assertThat(proof).isNotNull();
     assertThat(proof.getFormula()).isNotNull();
@@ -120,7 +111,7 @@ public class Z3ProofsTest {
         public void getProofTermTest() throws SolverException, InterruptedException {
         ProofNode proof = q1q2prover.getProof();
 
-    System.out.println(((Z3ProofNode) proof).asString());
+    System.out.println(((Z3ProofDag.Z3ProofNode) proof).asString());
         }
 
   @Test
@@ -132,9 +123,9 @@ public class Z3ProofsTest {
     BooleanFormula equiv2 = bmgr.equivalence(f2, f3);
     BooleanFormula equiv3 = bmgr.equivalence(f1, f3);
 
-    Z3ProofNode pn = new Z3ProofNode(equiv3, Z3ProofRule.TRANSITIVITY);
-    pn.addChild(new Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
-    pn.addChild(new Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
+    Z3ProofDag.Z3ProofNode pn = new Z3ProofDag.Z3ProofNode(equiv3, Z3ProofRule.TRANSITIVITY);
+    pn.addChild(new Z3ProofDag.Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
+    pn.addChild(new Z3ProofDag.Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
 
 

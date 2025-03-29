@@ -161,7 +161,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                 //       (Solver.java:1455)
                 //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
                 //       (CVC5AbstractProver.java:114)
-                //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.addConstraint
+                //   at org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProver.addConstraint
                 //       (AbstractProver.java:108)
                 //   at ..
                 prover.push(formula);
@@ -283,7 +283,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   // You tried to use push() on an CVC5 assertion stack illegally.
                   //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.pushImpl
                   //       (CVC5AbstractProver.java:89)
-                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProver.push
+                  //   at org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProver.push
                   //       (AbstractProver.java:88)
                   //   at ..
                   prover.push(f2);

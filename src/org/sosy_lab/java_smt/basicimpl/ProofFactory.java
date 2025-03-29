@@ -8,15 +8,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.api.proofs;
+package org.sosy_lab.java_smt.basicimpl;
 
+import io.github.cvc5.Proof;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
 import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
+import org.sosy_lab.java_smt.solvers.z3.Z3ProofDag;
 
 /**
  * A factory for creating proof nodes. The methods of this class are to be used in the ProofNode
@@ -44,20 +47,21 @@ public class ProofFactory<T> {
     BITWUZLA
   }
 
-  ProofFactory(
+  protected ProofFactory(
       FormulaCreator<?, ?, ?, ?> pCreator,
       ProverEnvironment pProver,
-      ProofFactory.Solvers pSolver) {
+      String pSolver) {
     formulaCreator = pCreator;
     prover = pProver;
-    solver = pSolver;
+    solver = Solvers.valueOf(pSolver);
   }
 
-  ProofNode createProofNode(T proof) {
-    return createProofNode0(proof);
+  protected ProofNode createProofNode(T proof) {
+     return createProofNode0(proof);
   }
 
-  ProofNode createProofNode0(T proof) {
+  protected ProofNode createProofNode0(T proof) {
+
     switch (solver) {
       case MATHSAT5:
         return Mathsat5ProofNode.fromMsatProof(prover, (long) proof);
@@ -66,17 +70,15 @@ public class ProofFactory<T> {
       default:
         throw new UnsupportedOperationException("Unsupported solver: " + solver);
     }
+
+
   }
 
-  static ProofNode createRresoluteNode() {
-    return null;
-  }
-
-  static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
+  protected static ProofNode createSourceNode(ResAxiom rule, Formula formula) {
     return new AxiomProofNode(rule, formula);
   }
 
-  static ProofNode createResolutionNode(Formula formula, Formula pivot) {
+  protected static ProofNode createResolutionNode(Formula formula, Formula pivot) {
     return new ResolutionProofNode(formula, pivot);
   }
 }
