@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import org.sosy_lab.java_smt.ProofRuleRegistry;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // TODO correctly document the formula strings

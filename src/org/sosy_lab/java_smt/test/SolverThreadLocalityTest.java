@@ -161,7 +161,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                 //       (Solver.java:1455)
                 //   at org.sosy_lab.java_smt.solvers.cvc5.CVC5AbstractProver.addConstraintImpl
                 //       (CVC5AbstractProver.java:114)
-                //   at org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProver.addConstraint
+                //   at
+                // org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProver.addConstraint
                 //       (AbstractProver.java:108)
                 //   at ..
                 prover.push(formula);

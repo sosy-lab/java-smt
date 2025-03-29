@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkState;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofDag;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -88,7 +86,7 @@ public abstract class AbstractProofDag implements ProofDag {
       return Collections.unmodifiableList(children);
     }
 
-  @Override
+    @Override
     public void addChild(ProofNode child) {
       children.add(child);
     }
@@ -115,6 +113,5 @@ public abstract class AbstractProofDag implements ProofDag {
     void setFormula(Formula pFormula) {
       formula = pFormula;
     }
-
   }
 }

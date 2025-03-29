@@ -55,6 +55,5 @@ public class ResolutionProofDag extends AbstractProofDag {
           Objects.requireNonNull(rule, "Rule must not be null"),
           Objects.requireNonNull(formula, "Formula must not be null"));
     }
-
   }
 }

@@ -35,7 +35,6 @@ public class ProofRuleRegistry {
   }
 
   static {
-
     for (CVC5ProofRule rule : CVC5ProofRule.values()) {
       ProofRuleRegistry.register(CVC5ProofRule.class, rule);
     }

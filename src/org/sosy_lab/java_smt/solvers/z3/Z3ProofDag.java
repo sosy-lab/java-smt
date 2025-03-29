@@ -33,8 +33,8 @@ public class Z3ProofDag extends AbstractProofDag {
       proof.append(indent).append("Formula: ").append(getFormula().toString()).append("\n");
       proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
       proof.append(indent).append("No. Children: ").append(getChildren().size()).append("\n");
-          proof.append(indent).append("ID: ").append(getId()).append("\n");
-          proof.append(indent).append("leaf: ").append(isLeaf()).append("\n");
+      proof.append(indent).append("ID: ").append(getId()).append("\n");
+      proof.append(indent).append("leaf: ").append(isLeaf()).append("\n");
 
       int i = 0;
       for (ProofNode child : getChildren()) {

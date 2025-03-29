@@ -22,7 +22,7 @@ public class CVC5ProofNode extends AbstractProofNode {
     super(pProofRule, formula);
   }
 
-   String asString(int indentLevel) {
+  String asString(int indentLevel) {
     StringBuilder proof = new StringBuilder();
     String indent = "  ".repeat(indentLevel);
 

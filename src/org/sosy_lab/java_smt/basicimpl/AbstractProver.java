@@ -25,10 +25,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -167,5 +164,4 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     closeAllEvaluators();
     closed = true;
   }
-
 }

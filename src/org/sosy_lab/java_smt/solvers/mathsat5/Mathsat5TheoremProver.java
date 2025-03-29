@@ -26,7 +26,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.ProofFactory;
 
-
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
 
   Mathsat5TheoremProver(
@@ -53,9 +52,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   @Override
   public ProofNode getProof() throws SolverException, InterruptedException {
-        Preconditions.checkState(!closed);
-        Preconditions.checkState(this.isUnsat());
-
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(this.isUnsat());
 
     ProofNode pn;
     long pm = msat_get_proof_manager(curEnv);
@@ -65,22 +63,20 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
     return pn;
 
-
-
-    //return getProof0();
+    // return getProof0();
   }
 
   protected ProofNode getProof0() {
-          var proofFactory = new ProofFactory<Long>(this.creator, this, "MATHSAT5") {
-               public ProofNode createProofWrapper(long pProof) {
-                return this.createProofNode(pProof);
-              }
-          };
-          long pm = msat_get_proof_manager(curEnv);
-          long proof = msat_get_proof(pm);
-          ProofNode pn = proofFactory.createProofWrapper(proof);
-          msat_destroy_proof_manager(pm);
-          return pn;
-        }
-
+    var proofFactory =
+        new ProofFactory<Long>(this.creator, this, "MATHSAT5") {
+          public ProofNode createProofWrapper(long pProof) {
+            return this.createProofNode(pProof);
+          }
+        };
+    long pm = msat_get_proof_manager(curEnv);
+    long proof = msat_get_proof(pm);
+    ProofNode pn = proofFactory.createProofWrapper(proof);
+    msat_destroy_proof_manager(pm);
+    return pn;
+  }
 }

@@ -1,7 +1,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -30,15 +29,15 @@ public class Z3ProofsTest {
 
   @Before
   public void setUpSolverContext() throws Exception {
-    //Z3 requires to enable proof generation in the configuration of the context
+    // Z3 requires to enable proof generation in the configuration of the context
     Configuration config =
         Configuration.builder().setOption("solver.z3.requireProofs", "true").build();
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
 
-    context = SolverContextFactory.createSolverContext(
-        config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.Z3);
-
+    context =
+        SolverContextFactory.createSolverContext(
+            config, logger, shutdown.getNotifier(), SolverContextFactory.Solvers.Z3);
 
     mgr = (Z3FormulaManager) context.getFormulaManager();
     bmgr = (Z3BooleanFormulaManager) mgr.getBooleanFormulaManager();
@@ -46,14 +45,15 @@ public class Z3ProofsTest {
 
   @Before
   public void setUpQ1Q2Prover() throws InterruptedException {
-    //(declare-fun q1 () Bool)
-    //(declare-fun q2 () Bool)
-    //(assert (or (not q1) q2))
-    //(assert q1)
-    //(assert (not q2))
-    //(check-sat)
-    //(get-proof)
-    //This problem is from the paper found in https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
+    // (declare-fun q1 () Bool)
+    // (declare-fun q2 () Bool)
+    // (assert (or (not q1) q2))
+    // (assert q1)
+    // (assert (not q2))
+    // (check-sat)
+    // (get-proof)
+    // This problem is from the paper found in
+    // https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
 
@@ -108,11 +108,11 @@ public class Z3ProofsTest {
   }
 
   @Test
-        public void getProofTermTest() throws SolverException, InterruptedException {
-        ProofNode proof = q1q2prover.getProof();
+  public void getProofTermTest() throws SolverException, InterruptedException {
+    ProofNode proof = q1q2prover.getProof();
 
     System.out.println(((Z3ProofDag.Z3ProofNode) proof).asString());
-        }
+  }
 
   @Test
   public void Z3handleTransitivityTest() {
@@ -127,12 +127,10 @@ public class Z3ProofsTest {
     pn.addChild(new Z3ProofDag.Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
     pn.addChild(new Z3ProofDag.Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
-
-
     Z3ToResoluteProofConverter pc = new Z3ToResoluteProofConverter(mgr);
 
     ProofNode res = pc.handleTransitivity(pn);
 
-   assertThat(res).isNotNull();
+    assertThat(res).isNotNull();
   }
 }

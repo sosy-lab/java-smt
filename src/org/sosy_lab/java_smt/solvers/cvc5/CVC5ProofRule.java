@@ -10,9 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.sosy_lab.java_smt.ProofRuleRegistry;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // TODO: Properly include the formulas for the proof rules.

@@ -109,14 +109,15 @@ public class CVC5ProofsTest {
 
   @Test
   public void getProofTest() {
-    //(declare-fun q1 () Bool)
-    //(declare-fun q2 () Bool)
-    //(assert (or (not q1) q2))
-    //(assert q1)
-    //(assert (not q2))
-    //(check-sat)
-    //(get-proof)
-    //This problem is from the paper found in https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
+    // (declare-fun q1 () Bool)
+    // (declare-fun q2 () Bool)
+    // (assert (or (not q1) q2))
+    // (assert q1)
+    // (assert (not q2))
+    // (check-sat)
+    // (get-proof)
+    // This problem is from the paper found in
+    // https://ultimate.informatik.uni-freiburg.de/smtinterpol/proofs.html
 
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");

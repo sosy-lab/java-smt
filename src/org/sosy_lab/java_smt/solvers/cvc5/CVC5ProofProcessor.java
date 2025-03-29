@@ -25,10 +25,11 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 public class CVC5ProofProcessor {
 
   private class CVC5Frame extends ProofFrame<Proof> {
-     CVC5Frame(Proof proof) {
+    CVC5Frame(Proof proof) {
       super(proof);
     }
   }
+
   private final CVC5FormulaCreator formulaCreator;
   private final ProverEnvironment prover;
 
@@ -50,13 +51,12 @@ public class CVC5ProofProcessor {
     while (!stack.isEmpty()) {
       CVC5Frame frame = stack.peek();
 
-
       if (!frame.isVisited()) {
 
         frame.setNumArgs(frame.getProof().getChildren().length);
         frame.setAsVisited(true);
 
-        for (int i = frame.getNumArgs()-1; i >= 0; i--) {
+        for (int i = frame.getNumArgs() - 1; i >= 0; i--) {
           Proof child = frame.getProof().getChildren()[i];
           if (!computed.containsKey(child)) {
             stack.push(new CVC5Frame(child));
@@ -75,7 +75,8 @@ public class CVC5ProofProcessor {
         }
 
         CVC5ProofRule proofRule =
-            ProofRule.fromName(CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
+            ProofRule.fromName(
+                CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
         CVC5ProofNode pn = new CVC5ProofNode(proofRule, generateFormula(frame.getProof()));
         for (int i = 0; i < numChildren; i++) {
           Proof child = frame.getProof().getChildren()[i];
@@ -102,5 +103,4 @@ public class CVC5ProofProcessor {
   private Proof changeRoot(Proof root) {
     return root.getChildren()[0];
   }
-
 }

@@ -10,16 +10,13 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import io.github.cvc5.Proof;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
-import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
 import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
-import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
-import org.sosy_lab.java_smt.solvers.z3.Z3ProofDag;
 
 /**
  * A factory for creating proof nodes. The methods of this class are to be used in the ProofNode
@@ -48,16 +45,14 @@ public class ProofFactory<T> {
   }
 
   protected ProofFactory(
-      FormulaCreator<?, ?, ?, ?> pCreator,
-      ProverEnvironment pProver,
-      String pSolver) {
+      FormulaCreator<?, ?, ?, ?> pCreator, ProverEnvironment pProver, String pSolver) {
     formulaCreator = pCreator;
     prover = pProver;
     solver = Solvers.valueOf(pSolver);
   }
 
   protected ProofNode createProofNode(T proof) {
-     return createProofNode0(proof);
+    return createProofNode0(proof);
   }
 
   protected ProofNode createProofNode0(T proof) {
@@ -70,8 +65,6 @@ public class ProofFactory<T> {
       default:
         throw new UnsupportedOperationException("Unsupported solver: " + solver);
     }
-
-
   }
 
   protected static ProofNode createSourceNode(ResAxiom rule, Formula formula) {

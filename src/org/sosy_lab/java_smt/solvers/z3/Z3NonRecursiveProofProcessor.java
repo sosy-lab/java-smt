@@ -17,7 +17,6 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import org.sosy_lab.java_smt.ProofRuleRegistry;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
@@ -26,11 +25,11 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  * non-(java-)recursive implementation of the proof processor.#
  *
  * <p>The resulting DAG from transforming the proof from the Z3 provided structures into a set of
- * {@link Z3ProofDag.Z3ProofNode} should enable an easier way to extract the information from the proofs.
- * However, some information is lost from the original proof, as the Z3 provided proof makes uses of
- * more general structures like AST, SortKind, DeclKind. E.g. the leafs in the {@link Z3ProofDag.Z3ProofNode}
- * contain the whole formula used for the first proof rules in the tree, while these are internal
- * nodes in the Z3 proof and leafs are the operands use in innermost terms.
+ * {@link Z3ProofDag.Z3ProofNode} should enable an easier way to extract the information from the
+ * proofs. However, some information is lost from the original proof, as the Z3 provided proof makes
+ * uses of more general structures like AST, SortKind, DeclKind. E.g. the leafs in the {@link
+ * Z3ProofDag.Z3ProofNode} contain the whole formula used for the first proof rules in the tree,
+ * while these are internal nodes in the Z3 proof and leafs are the operands use in innermost terms.
  */
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
 class Z3NonRecursiveProofProcessor {
@@ -115,7 +114,7 @@ class Z3NonRecursiveProofProcessor {
     String rawName = Z3_decl_kind.fromInt(declKind).name();
     String prName = rawName.replaceFirst("Z3_OP_PR_", "");
     return ProofRule.fromName(Z3ProofRule.class, prName);
-    //return ProofRuleRegistry.fromName(Z3ProofRule.class, prName);
+    // return ProofRuleRegistry.fromName(Z3ProofRule.class, prName);
   }
 
   private Formula generateFormula(long proof) {
