@@ -22,7 +22,7 @@ public abstract class AbstractProofNode implements ProofNode {
   private final List<ProofNode> children;
   private ProofRule rule;
   private Formula formula;
-  private final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+  private static final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
   private final int id;
 
   protected AbstractProofNode(ProofRule rule, Formula formula) {
