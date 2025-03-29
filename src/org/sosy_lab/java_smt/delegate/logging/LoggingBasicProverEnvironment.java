@@ -122,7 +122,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ProofNode getProof() {
+  public ProofNode getProof() throws SolverException, InterruptedException {
     ProofNode p = wrapped.getProof();
     logger.log(Level.FINE, "proof", p);
     return p;

@@ -26,16 +26,17 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProofNode;
 
-public class Mathsat5ProofNode extends AbstractProofNode {
+ public class Mathsat5ProofNode extends AbstractProofNode {
 
-  public Mathsat5ProofNode(ProofRule rule, Formula formula) {
+   protected Mathsat5ProofNode(ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 
-  protected static class MsatProofFrame extends ProofFrame<Long> {
-    public MsatProofFrame(Long proof) {
+
+   protected static class MsatProofFrame extends ProofFrame<Long> {
+     MsatProofFrame(Long proof) {
       super(proof);
     }
   }
@@ -101,7 +102,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     return formula;
   }
 
-  public String asString() {
+   String asString() {
     return asString(0);
   }
 

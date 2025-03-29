@@ -131,7 +131,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public ProofNode getProof() {
+  public ProofNode getProof() throws SolverException, InterruptedException {
     return delegate.getProof();
   }
 }

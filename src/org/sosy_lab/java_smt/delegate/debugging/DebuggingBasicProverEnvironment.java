@@ -95,7 +95,7 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ProofNode getProof() {
+  public ProofNode getProof() throws SolverException, InterruptedException {
     return delegate.getProof();
   }
 
