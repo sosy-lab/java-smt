@@ -8,20 +8,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt;
+package org.sosy_lab.java_smt.api.proofs;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5ProofRule;
-import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule;
+//import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule;
 
 /**
  * Registry for proof rules. This class is used to register and retrieve proof rules by their name.
  * It checks for the solver that called to retrieve the according rule.
  */
-public class ProofRuleRegistry {
+ class ProofRuleRegistry {
+   /*
   // Key: ProofRule class, Value: (Key: Name, Value: ProofRule)
   private static final Map<Class<? extends ProofRule>, Map<String, ProofRule>> RULES =
       new ConcurrentHashMap<>();
@@ -43,4 +43,6 @@ public class ProofRuleRegistry {
       ProofRuleRegistry.register(Z3ProofRule.class, rule);
     }
   }
+
+    */
 }

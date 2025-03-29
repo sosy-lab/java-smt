@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-import org.sosy_lab.java_smt.ProofRuleRegistry;
-
 /** A proof rule from a given proof format. */
 public interface ProofRule {
 
@@ -23,11 +21,11 @@ public interface ProofRule {
     return "no formula available";
   }
 
-  /**
+  /*
    * Get a proof rule from its name.
    *
    * @return A proof rule.
-   */
+
   static <T extends ProofRule> T fromName(Class<T> clazz, String name) {
     ProofRule rule = ProofRuleRegistry.fromName(clazz, name);
     if (rule == null) {
@@ -36,4 +34,5 @@ public interface ProofRule {
     }
     return clazz.cast(rule);
   }
+   */
 }
