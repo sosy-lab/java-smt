@@ -117,8 +117,8 @@ spotbugs:
       - "SpotBugs.html"
     when: on_failure
 
-.unit-tests: &unit-tests
-  <<: *binary_check
+.unit-tests:
+  extends: .binary_check
   before_script:
     - "uname -a"
     - "ldd --version"
@@ -135,19 +135,12 @@ spotbugs:
       junit: "junit/TESTS-TestSuites.xml"
 
 .unit-tests-quick:
-  <<: *binary_check
-  before_script:
-    - "uname -a"
-    - "ldd --version"
-    - "java -version"
+  extends: [ .binary_check, .unit-tests ]
   script:
     - "ant $ANT_PROPS_CHECKS unit-tests-quick"
   artifacts:
     paths:
-      - "JUnit.html"
-    when: always
-    reports:
-      junit: "junit/TESTS-TestSuites.xml"
+      - "JUnit.html" # no coverage files available
 
 unit-tests:x86_64:jdk-11:
   extends: .unit-tests
@@ -245,6 +238,11 @@ deploy-gh-pages:
   stage: images
   variables:
     EXTRA_ARGS: ""
+    DOCKERFILE: "build/gitlab-ci.Dockerfile.$JDK_VERSION"
+    IMAGE: "test:$JDK_VERSION" # no architecture suffix for backwards compatibility
+  image:
+    name: "gcr.io/kaniko-project/executor:debug"
+    entrypoint: [""]
   script:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
@@ -253,30 +251,18 @@ deploy-gh-pages:
   #   - schedules
   #   - web
 
-.build-docker:x86_64:
-  extends: .build-docker
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  variables:
-    DOCKERFILE: "build/gitlab-ci.Dockerfile.$JDK_VERSION"
-    IMAGE: "test:$JDK_VERSION" # no architecture suffix for backwards compatibility
-
 .build-docker:arm64:
   extends: .build-docker
   image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
     docker:
       platform: linux/arm64
   variables:
-    DOCKERFILE: "build/gitlab-ci.Dockerfile.$JDK_VERSION"
-    IMAGE: "test:$JDK_VERSION-arm64"
+    IMAGE: "test:$JDK_VERSION-arm64" # override image name for arm64
 
-build-docker:x86_64:jdk-11: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-11 } }
-build-docker:x86_64:jdk-17: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-17 } }
-build-docker:x86_64:jdk-21: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-21 } }
-build-docker:x86_64:jdk-23: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-23 } }
+build-docker:x86_64:jdk-11: { extends: .build-docker, variables: { JDK_VERSION: jdk-11 } }
+build-docker:x86_64:jdk-17: { extends: .build-docker, variables: { JDK_VERSION: jdk-17 } }
+build-docker:x86_64:jdk-21: { extends: .build-docker, variables: { JDK_VERSION: jdk-21 } }
+build-docker:x86_64:jdk-23: { extends: .build-docker, variables: { JDK_VERSION: jdk-23 } }
 
 build-docker:arm64:jdk-11: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-11 } }
 build-docker:arm64:jdk-17: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-17 } }
