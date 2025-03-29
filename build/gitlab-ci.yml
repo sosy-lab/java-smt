@@ -43,7 +43,7 @@ build-dependencies:
 
 
 # Build binaries and provide them to later stages
-.build: &build
+.build:
   stage: build
   script: "ant $ANT_PROPS_BUILD jar"
   interruptible: true
@@ -54,22 +54,10 @@ build-dependencies:
       - "hs_err_pid*.log"
       - "core.*"
 
-build:jdk-11:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-11
-
-build:jdk-17:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
-
-build:jdk-21:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
-build:jdk-23:
-  <<: *build
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
-
+build:jdk-11: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-11" }
+build:jdk-17: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-17" }
+build:jdk-21: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-21" }
+build:jdk-23: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-23" }
 
 # For checks that need the binaries
 .binary_check: &binary_check
@@ -84,22 +72,13 @@ build:jdk-23:
   interruptible: true
 
 
-.build-project-ecj: &build-project-ecj
-  <<: *source_check
+.build-project-ecj:
+  extends: .source_check
   script: "ant $ANT_PROPS_BUILD build-project-ecj"
 
-build-project-ecj:jdk-17:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
-
-build-project-ecj:jdk-21:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
-build-project-ecj:jdk-23:
-  <<: *build-project-ecj
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
-
+build-project-ecj:jdk-17: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-17" }
+build-project-ecj:jdk-21: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-21" }
+build-project-ecj:jdk-23: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-23" }
 
 check-format:
   <<: *source_check
