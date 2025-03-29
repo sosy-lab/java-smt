@@ -134,7 +134,7 @@ spotbugs:
     reports:
       junit: "junit/TESTS-TestSuites.xml"
 
-.unit-tests-quick: &unit-tests-quick
+.unit-tests-quick:
   <<: *binary_check
   before_script:
     - "uname -a"
@@ -150,73 +150,38 @@ spotbugs:
       junit: "junit/TESTS-TestSuites.xml"
 
 unit-tests:x86_64:jdk-11:
-  <<: *unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-11
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-11
-
+  extends: .unit-tests
+  needs: [ build-dependencies, build:jdk-11 ]
+  image: "${CI_REGISTRY_IMAGE}/test:jdk-11"
 unit-tests:x86_64:jdk-17:
-  <<: *unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-17
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
-
+  extends: .unit-tests
+  needs: [ build-dependencies, build:jdk-17 ]
+  image: "${CI_REGISTRY_IMAGE}/test:jdk-17"
 unit-tests:x86_64:jdk-21:
-  <<: *unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-21
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-21
-
+  extends: .unit-tests
+  needs: [ build-dependencies, build:jdk-21 ]
+  image: "${CI_REGISTRY_IMAGE}/test:jdk-21"
 unit-tests:x86_64:jdk-23:
-  <<: *unit-tests
-  needs:
-    - build-dependencies
-    - build:jdk-23
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-23
+  extends: .unit-tests
+  needs: [ build-dependencies, build:jdk-23 ]
+  image: "${CI_REGISTRY_IMAGE}/test:jdk-23"
 
 unit-tests:arm64:jdk-11:
-  <<: *unit-tests-quick
-  needs:
-    - build-dependencies
-    - build:jdk-11
-  image:
-    name: "${CI_REGISTRY_IMAGE}/test:jdk-11"
-    docker:
-      platform: linux/arm64
-
+  extends: .unit-tests-quick
+  needs: [ build-dependencies, build:jdk-11 ]
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-11-arm64", docker: { platform: linux/arm64 } }
 unit-tests:arm64:jdk-17:
-  <<: *unit-tests-quick
-  needs:
-    - build-dependencies
-    - build:jdk-17
-  image:
-    name: "${CI_REGISTRY_IMAGE}/test:jdk-17"
-    docker:
-      platform: linux/arm64
-
+  extends: .unit-tests-quick
+  needs: [ build-dependencies, build:jdk-17 ]
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-17-arm64", docker: { platform: linux/arm64 } }
 unit-tests:arm64:jdk-21:
-  <<: *unit-tests-quick
-  needs:
-    - build-dependencies
-    - build:jdk-21
-  image:
-    name: "${CI_REGISTRY_IMAGE}/test:jdk-21"
-    docker:
-      platform: linux/arm64
-
+  extends: .unit-tests-quick
+  needs: [ build-dependencies, build:jdk-21 ]
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-21-arm64", docker: { platform: linux/arm64 } }
 unit-tests:arm64:jdk-23:
-  <<: *unit-tests-quick
-  needs:
-    - build-dependencies
-    - build:jdk-23
-  image:
-    name: "${CI_REGISTRY_IMAGE}/test:jdk-23"
-    docker:
-      platform: linux/arm64
-
+  extends: .unit-tests-quick
+  needs: [ build-dependencies, build:jdk-23 ]
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-23-arm64", docker: { platform: linux/arm64 } }
 
 refaster:
   <<: *source_check
@@ -294,8 +259,8 @@ deploy-gh-pages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
-    IMAGE: test:$JDK_VERSION-x86_64
+    DOCKERFILE: "build/gitlab-ci.Dockerfile.$JDK_VERSION"
+    IMAGE: "test:$JDK_VERSION" # no architecture suffix for backwards compatibility
 
 .build-docker:arm64:
   extends: .build-docker
@@ -305,28 +270,8 @@ deploy-gh-pages:
     docker:
       platform: linux/arm64
   variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
-    IMAGE: test:$JDK_VERSION-arm64
-
-# merge existing images into one multi-platform image.
-# https://arborxr.com/blog/developers-journal-building-unprivileged-multi-arch-images-with-kaniko-and-gitlab-ci/
-.docker-manifest:
-  stage: images
-  image:
-    name: mplatform/manifest-tool
-    entrypoint: [""]
-  script:
-    - |
-      manifest-tool
-        --username $CI_REGISTRY_USER --password $CI_REGISTRY_PASSWORD push from-args \
-        --platforms linux/amd64 \
-        --template $CI_REGISTRY_IMAGE/test:$JDK_VERSION-x86_64 \
-        --platforms linux/arm64 \
-        --template $CI_REGISTRY_IMAGE/test:$JDK_VERSION-arm64 \
-        --target $CI_REGISTRY_IMAGE/test:$JDK_VERSION
-  # only:
-  #   - schedules
-  #   - web
+    DOCKERFILE: "build/gitlab-ci.Dockerfile.$JDK_VERSION"
+    IMAGE: "test:$JDK_VERSION-arm64"
 
 build-docker:x86_64:jdk-11: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-11 } }
 build-docker:x86_64:jdk-17: { extends: .build-docker:x86_64, variables: { JDK_VERSION: jdk-17 } }
@@ -337,35 +282,3 @@ build-docker:arm64:jdk-11: { extends: .build-docker:arm64, variables: { JDK_VERS
 build-docker:arm64:jdk-17: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-17 } }
 build-docker:arm64:jdk-21: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-21 } }
 build-docker:arm64:jdk-23: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-23 } }
-
-docker-manifest:jdk-11: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-11, build-docker:arm64:jdk-11 ], variables: { JDK_VERSION: jdk-11 } }
-docker-manifest:jdk-17: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-17, build-docker:arm64:jdk-17 ], variables: { JDK_VERSION: jdk-17 } }
-docker-manifest:jdk-21: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-21, build-docker:arm64:jdk-21 ], variables: { JDK_VERSION: jdk-21 } }
-docker-manifest:jdk-23: { extends: .docker-manifest, needs: [ build-docker:x86_64:jdk-23, build-docker:arm64:jdk-23 ], variables: { JDK_VERSION: jdk-23 } }
-
-# Build container images for multiple architectures directly with podman.
-.build-docker-simple:
-  stage: images
-  image: quay.io/podman/stable
-  script:
-    - podman login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - podman build --userns=host --platform $DOCKER_PLATFORMS --manifest $IMAGE -f $DOCKERFILE
-    - podman tag $IMAGE $CI_REGISTRY_IMAGE/$IMAGE
-    - podman manifest inspect $IMAGE
-    - podman manifest push --all $CI_REGISTRY_IMAGE/$IMAGE
-  only:
-    - schedules
-    - web
-
-# disabled job (it has a point "." in front of its name)
-# TODO: Sadly this does not work with the current version of Gitlab Runner due to insufficient
-#       privileges for the executed podman commands. They might need a privileged container.
-.build-docker-simple:test:
-  extends: .build-docker-simple
-  parallel:
-    matrix:
-      - JDK_VERSION: [jdk-11, jdk-17, jdk-21, jdk-23]
-  variables:
-    DOCKERFILE: build/gitlab-ci.Dockerfile.$JDK_VERSION
-    IMAGE: test:$JDK_VERSION
-    DOCKER_PLATFORMS: linux/amd64,linux/arm64
