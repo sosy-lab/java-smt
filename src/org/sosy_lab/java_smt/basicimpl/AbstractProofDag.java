@@ -10,11 +10,20 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkState;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.sosy_lab.common.UniqueIdGenerator;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofDag;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
 
 /**
@@ -53,5 +62,59 @@ public abstract class AbstractProofDag implements ProofDag {
   @Override
   public void accept(ProofVisitor visitor) {
     visitor.visitDAG(this);
+  }
+
+  public abstract static class AbstractProofNode implements ProofNode {
+    private final List<ProofNode> children;
+    private ProofRule rule;
+    private Formula formula;
+    private static final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
+    private final int id;
+
+    protected AbstractProofNode(ProofRule rule, Formula formula) {
+      this.rule = rule;
+      this.formula = formula;
+      children = new ArrayList<>();
+      id = idGenerator.getFreshId();
+    }
+
+    @Override
+    public Formula getFormula() {
+      return formula;
+    }
+
+    @Override
+    public List<ProofNode> getChildren() {
+      return Collections.unmodifiableList(children);
+    }
+
+  @Override
+    public void addChild(ProofNode child) {
+      children.add(child);
+    }
+
+    @Override
+    public ProofRule getRule() {
+      return rule;
+    }
+
+    @Override
+    public boolean isLeaf() {
+      return children.isEmpty();
+    }
+
+    @Override
+    public int getId() {
+      return id;
+    }
+
+    void setRule(ProofRule rule) {
+      this.rule = rule;
+    }
+
+    void setFormula(Formula pFormula) {
+      formula = pFormula;
+    }
+
   }
 }
