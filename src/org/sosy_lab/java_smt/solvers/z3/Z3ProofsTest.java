@@ -107,12 +107,6 @@ public class Z3ProofsTest {
     assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
   }
 
-  @Test
-  public void getProofTermTest() throws SolverException, InterruptedException {
-    ProofNode proof = q1q2prover.getProof();
-
-    System.out.println(((Z3ProofDag.Z3ProofNode) proof).asString());
-  }
 
   @Test
   public void Z3handleTransitivityTest() {
