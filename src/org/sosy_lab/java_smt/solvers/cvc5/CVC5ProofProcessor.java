@@ -19,9 +19,16 @@ import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class CVC5ProofProcessor {
+
+  private class CVC5Frame extends ProofFrame<Proof> {
+     CVC5Frame(Proof proof) {
+      super(proof);
+    }
+  }
   private final CVC5FormulaCreator formulaCreator;
   private final ProverEnvironment prover;
 
@@ -30,57 +37,57 @@ public class CVC5ProofProcessor {
     prover = pProver;
   }
 
-  CVC5ProofNode fromCVC5Proof(Proof rootProof) throws CVC5ApiException {
+  CVC5ProofNode fromCVC5Proof(Proof pProof) throws CVC5ApiException {
 
-    Deque<Frame> stack = new ArrayDeque<>();
+    boolean skippedScope = false;
+
+    Deque<CVC5Frame> stack = new ArrayDeque<>();
 
     Map<Proof, CVC5ProofNode> computed = new HashMap<>();
 
-    stack.push(new Frame(rootProof));
+    stack.push(new CVC5Frame(pProof));
 
     while (!stack.isEmpty()) {
-      Frame frame = stack.peek();
+      CVC5Frame frame = stack.peek();
 
 
-      if (!frame.visited) {
+      if (!frame.isVisited()) {
 
-        frame.numChildren = frame.proof.getChildren().length;
-        frame.visited = true;
+        frame.setNumArgs(frame.getProof().getChildren().length);
+        frame.setAsVisited(true);
 
-        for (int i = frame.numChildren-1; i >= 0; i--) {
-          Proof child = frame.proof.getChildren()[i];
+        for (int i = frame.getNumArgs()-1; i >= 0; i--) {
+          Proof child = frame.getProof().getChildren()[i];
           if (!computed.containsKey(child)) {
-            stack.push(new Frame(child));
+            stack.push(new CVC5Frame(child));
           }
         }
       } else {
+        stack.pop();
+        int numChildren = frame.getNumArgs();
 
-        if (frame.proof.getRule().getValue() == 1) {
+        if (frame.getProof().getRule().getValue() == 1 && !skippedScope) {
           // Skip processing the frame if its rule is "SCOPE"
           // This rule seems to just help the processing by CVC5
-          System.out.println("Skipping SCOPE");
-          stack.pop();
+          pProof = changeRoot(frame.getProof());
+          skippedScope = true;
           continue;
         }
 
-
-        stack.pop();
-        int numChildren = frame.numChildren;
-
         CVC5ProofRule proofRule =
-            ProofRule.fromName(CVC5ProofRule.class, frame.proof.getRule().toString().toLowerCase());
-        CVC5ProofNode pn = new CVC5ProofNode(proofRule, generateFormula(frame.proof));
-        for (int i = 0; i < numChildren - 1; i++) {
-          Proof child = frame.proof.getChildren()[i];
+            ProofRule.fromName(CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
+        CVC5ProofNode pn = new CVC5ProofNode(proofRule, generateFormula(frame.getProof()));
+        for (int i = 0; i < numChildren; i++) {
+          Proof child = frame.getProof().getChildren()[i];
 
           if (computed.containsKey(child)) {
             pn.addChild(computed.get(child));
           }
         }
-        computed.put(frame.proof, pn);
+        computed.put(frame.getProof(), pn);
       }
     }
-    return computed.get(rootProof);
+    return computed.get(pProof);
   }
 
   private Formula generateFormula(Proof proof) {
@@ -92,14 +99,8 @@ public class CVC5ProofProcessor {
     return formula;
   }
 
-  private static class Frame {
-    final Proof proof;
-    int numChildren;
-    boolean visited;
-
-    Frame(Proof pProof) {
-      proof = pProof;
-      visited = false;
-    }
+  private Proof changeRoot(Proof root) {
+    return root.getChildren()[0];
   }
+
 }
