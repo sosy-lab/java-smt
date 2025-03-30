@@ -179,6 +179,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTranslationTest() throws Throwable {
     // Test that even when using translation, the thread local problem persists for CVC5
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 

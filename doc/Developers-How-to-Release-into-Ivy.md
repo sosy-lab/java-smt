@@ -114,23 +114,36 @@ ant publish-z3 -Dz3.path=$Z3_DIR/build
 ```
 Finally follow the instructions shown in the message at the end.
 
-
-### Publishing CVC5 (previously CVC4)
+### Publishing CVC5
 
 We prefer to compile our own CVC5 binaries and Java bindings.
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5).
-Then execute the following command in the JavaSMT directory,
-where `$CVC5_DIR` is the path to the CVC5 directory and `$CVC5_VERSION` is the version number:
+To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5) and download the
+JDK for windows and arm64 from Oracle. We will build bindings for several platforms and
+the JDKs are needed to cross-compile. To start building, execute the following command
+in the JavaSMT directory, where `$CVC5_DIR` is the path to the CVC5 directory and
+`$CVC5_VERSION` is the version number:
+
 ```
-ant publish-cvc5 -Dcvc5.path=$CVC5_DIR -Dcvc5.customRev=$CVC5_VERSION
+ant publish-cvc5 \
+    -Dcvc5.path=$CVC5_DIR\
+    -Dcvc5.customRev=$CVC5_VERSION \
+    -Djdk-windows.path=$JDK_DIR_WINDOWS \
+    -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
+
 Example:
+
 ```
-ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
+ant publish-cvc5 \
+    -Dcvc5.path=../CVC5 \
+    -Dcvc5.customRev=1.2.1 \
+    -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2/ \
+    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2/
 ```
+
 During the build process, our script automatically appends the git-revision after the version.
 Finally, follow the instructions shown in the message at the end.
 

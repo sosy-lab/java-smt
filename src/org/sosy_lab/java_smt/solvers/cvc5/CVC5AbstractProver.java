@@ -15,16 +15,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Proof;
+import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import io.github.cvc5.UnknownExplanation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -66,8 +67,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     mgr = pMgr;
     creator = pFormulaCreator;
     incremental = !enableSL;
-    solver = new Solver();
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
+
+    TermManager termManager = creator.getEnv();
+    solver = new Solver(termManager);
 
     setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, solver);
   }
@@ -77,6 +80,13 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       Set<ProverOptions> pOptions,
       ImmutableMap<String, String> pFurtherOptionsMap,
       Solver pSolver) {
+    try {
+      CVC5SolverContext.setSolverOptions(pSolver, randomSeed, pFurtherOptionsMap);
+    } catch (CVC5ApiRecoverableException e) {
+      // We've already used these options in CVC5SolverContext, so there should be no exception
+      throw new AssertionError("Unexpected exception", e);
+    }
+
     if (incremental) {
       pSolver.setOption("incremental", "true");
     }
@@ -91,18 +101,16 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");
-    pSolver.setOption("output-language", "smt2");
-    pSolver.setOption("seed", String.valueOf(randomSeed));
 
     // Set Strings option to enable all String features (such as lessOrEquals)
     pSolver.setOption("strings-exp", "true");
 
+    // Enable experimental array features
+    // Needed when array constants (= with default element) are used
+    pSolver.setOption("arrays-exp", "true");
+
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
     pSolver.setOption("full-saturate-quant", "true");
-
-    for (Entry<String, String> option : pFurtherOptionsMap.entrySet()) {
-      pSolver.setOption(option.getKey(), option.getValue());
-    }
   }
 
   @Override

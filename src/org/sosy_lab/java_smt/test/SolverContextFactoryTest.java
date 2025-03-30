@@ -93,9 +93,14 @@ public class SolverContextFactoryTest {
         return;
       case BOOLECTOR:
       case CVC4:
-      case CVC5:
       case YICES2:
         assume.that(IS_LINUX).isTrue();
+        return;
+      case CVC5:
+        assume.that(IS_LINUX || IS_WINDOWS).isTrue();
+        if (IS_LINUX) {
+          assume.that(isSufficientVersionOfLibcxx("cvc5jni")).isTrue();
+        }
         return;
       case OPENSMT:
         assume.that(IS_LINUX).isTrue();
@@ -149,6 +154,8 @@ public class SolverContextFactoryTest {
         return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
         return new String[] {"GLIBC_2.33"};
+      case "cvc5jni":
+        return new String[] {"GLIBC_2.32"};
       default:
         return new String[] {};
     }
