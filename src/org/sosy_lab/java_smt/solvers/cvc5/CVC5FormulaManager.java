@@ -88,6 +88,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     Table<String, Sort, Term> cache = creator.getDeclaredVariables();
 
     // Process the declarations
+    Map<String, Sort> localSymbols = new HashMap<>();
     ImmutableList.Builder<String> processed = ImmutableList.builder();
     for (String token : tokens) {
       if (Tokenizer.isDeclarationToken(token)) {
@@ -107,14 +108,21 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
         // Check if the symbol is already defined in the variable cache
         if (cache.containsRow(symbol)) {
-          if (!cache.contains(symbol, sort)) {
-            // Sort of the definition that we parsed does not match the sort from the variable
-            // cache.
-            throw new IllegalArgumentException();
-          }
-          // Skip if it's just a redefinition
-          continue;
+          Preconditions.checkArgument(
+              cache.contains(symbol, sort),
+              "Symbol %s is already used by the solver with a different typ",
+              symbol);
+          continue; // Skip if it's a redefinition
         }
+
+        // Check if it collides with a definition that was parsed earlier
+        Preconditions.checkArgument(
+            !localSymbols.containsKey(symbol) || localSymbols.get(symbol).equals(sort),
+            "Symbol %s has already been defined by this script with a different type",
+            sort);
+
+        // Add the symbol to the local definitions for this parse
+        localSymbols.put(symbol, sort);
       }
       // Otherwise, keep the command
       processed.add(token);
