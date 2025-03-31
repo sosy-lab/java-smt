@@ -194,13 +194,6 @@ public class SolverFormulaIODeclarationsTest
   @Test
   public void parseDeclareConflictInQueryTest3() {
     requireIntegers();
-    // CVC5 allows multiple definitions of the same symbol with different types. This is causing
-    // some issues with JavaSMT where UF functions must have a single type.
-    // In the test above we were able to work around the issue by checking if the list of
-    // declared symbols that is returned by the parser contains any duplicates. However, this
-    // does not seem to work here as the two definitions only differ in their return type and
-    // CVC5 reports only one if the declaration.
-    // TODO Report this to the developers
     String query = "(declare-fun x (Int) Bool)(declare-fun x (Int) Int)(assert (x 0))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
