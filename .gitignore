@@ -61,7 +61,11 @@ solvers_maven_conf/*.asc
 /gh-pages
 
 .idea/
-
+run
+Out.smt2
+retrieve-jars.sh
+rule.refaster
+/dependencies
 /*.so
 /*.dll
 /*.jar
@@ -69,5 +73,4 @@ solvers_maven_conf/*.asc
 build.properties
 /.apt-generated/
 /repository
-
 pom.xml
