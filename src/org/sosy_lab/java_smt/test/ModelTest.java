@@ -2240,7 +2240,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
 
     BooleanFormula formula =
         context
