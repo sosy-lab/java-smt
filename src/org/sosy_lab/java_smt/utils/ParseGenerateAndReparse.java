@@ -1,9 +1,13 @@
+// Copyright (C) 2007-2016  Dirk Beyer
+// SPDX-FileCopyrightText: 2025 2020 Dirk Beyer <https://www.sosy-lab.org>
+//
+// SPDX-License-Identifier: Apache-2.0
 package org.sosy_lab.java_smt.utils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Locale;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.configuration.Configuration;
@@ -18,7 +22,9 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 /** This file is meant for the Evaluation of the Parser/Generator. */
-public class ParseGenerateAndReparse {
+class ParseGenerateAndReparse {
+  private ParseGenerateAndReparse() {}
+
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
 
@@ -31,8 +37,7 @@ public class ParseGenerateAndReparse {
     String smt2FilePath = args[0];
     String smt2;
     try {
-      smt2 = Files.readString(Paths.get(smt2FilePath), Charset.defaultCharset());
-      ;
+      smt2 = Files.readString(Path.of(smt2FilePath), Charset.defaultCharset());
     } catch (IOException e) {
       System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
       e.printStackTrace();
@@ -76,48 +81,54 @@ public class ParseGenerateAndReparse {
     ProverEnvironment solverLessProverEnv =
         solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
 
-    boolean z3hadException = false;
-    boolean exceptionWhileParsingAndReparsing = false;
     // Constraint hinzufügen
     try {
       z3proverEnv.addConstraint(z3solverContext.getFormulaManager().universalParseFromString(smt2));
-    }
-    catch (Exception pE) {
-      if (pE instanceof UnsupportedOperationException){
-        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE);
+    } catch (Exception pE) {
+      if (pE instanceof UnsupportedOperationException) {
+        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+        z3solverContext.close();
+        solverLessContext.close();
         System.exit(1);
       }
-      z3hadException = true;
+      System.out.println("Exception in first parsing: " + pE);
+      z3solverContext.close();
+      solverLessContext.close();
+      System.exit(1);
     }
     try {
       solverLessProverEnv.addConstraint(
           solverLessContext.getFormulaManager().universalParseFromString(smt2));
     } catch (Exception pE) {
-      exceptionWhileParsingAndReparsing = true;
-    }
-    if(z3hadException && exceptionWhileParsingAndReparsing) {
-      System.out.println("RESULT UNKNOWN: An exception occured independently of Parser/Generator");
+      if (pE instanceof UnsupportedOperationException) {
+        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+        z3solverContext.close();
+        solverLessContext.close();
+        System.exit(1);
+      }
+      System.out.println("Exception while Generating and Reparsing" + pE.getMessage());
+      z3solverContext.close();
+      solverLessContext.close();
       System.exit(1);
     }
-
     // Ergebnisse vergleichen
     boolean z3Sat = z3proverEnv.isUnsat();
     boolean reparsedSat = solverLessProverEnv.isUnsat();
-    if (z3hadException == exceptionWhileParsingAndReparsing) { // make sure exception didn't happen
-      // because of parserGenerator
-      if (z3Sat == reparsedSat ) {
-        System.out.println("SUCCESS: " + z3Sat);
-        System.exit(0);
-      }
+    if (z3Sat == reparsedSat) {
+      System.out.println("SUCCESS: " + z3Sat);
+      z3solverContext.close();
+      solverLessContext.close();
+      System.exit(0);
     } else {
       System.out.println(
-          "Test failed because an Exception occured whileParsing and Reparsing"
-              + "\n Z3 had an Exception while parsing= "
-              + z3hadException
-              + "\n Exception happened while generating and reparsing: "
-              + exceptionWhileParsingAndReparsing);
+          "FAILURE: SolverSat:"
+              + z3Sat
+              + "is not equal to generated and "
+              + "reparsed Sat: "
+              + reparsedSat);
+      z3solverContext.close();
+      solverLessContext.close();
+      System.exit(1);
     }
-
-    System.exit(1);
   }
 }

@@ -15,6 +15,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator.Keyword;
 
+/** This class provides logging Functions for StringFormulas (for later SMTLIB2 code generating). */
 public class StringGenerator {
 
   private StringGenerator() {}

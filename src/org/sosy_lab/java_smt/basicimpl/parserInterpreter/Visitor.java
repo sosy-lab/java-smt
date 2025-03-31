@@ -302,6 +302,13 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     // TODO: Do I need extra handling if a String contains a escape sequence like double ""?
   }
 
+  /**
+   * Parses a bitvector string to an integer value.
+   *
+   * @param bitVec The bitvector string (starts with #b or #x)
+   * @return The parsed integer value
+   * @throws IllegalArgumentException if the format is invalid
+   */
   private int parseBitVectorToInt(String bitVec) {
     if (bitVec.startsWith("#b")) {
       return Integer.parseInt(bitVec.substring(2), 2);
@@ -312,6 +319,13 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     }
   }
 
+  /**
+   * Parses a bitvector string to a long value.
+   *
+   * @param bitVec The bitvector string (starts with #b or #x)
+   * @return The parsed long value
+   * @throws IllegalArgumentException if the format is invalid
+   */
   private long parseBitVectorToLong(String bitVec) {
     if (bitVec.startsWith("#b")) {
       return Long.parseLong(bitVec.substring(2), 2);
@@ -322,6 +336,13 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     }
   }
 
+  /**
+   * Gets the size in bits of a bitvector string.
+   *
+   * @param bitVec The bitvector string (starts with #b or #x)
+   * @return The size in bits
+   * @throws IllegalArgumentException if the format is invalid
+   */
   private int getBitVecSize(String bitVec) {
     if (bitVec.startsWith("#b")) {
       return bitVec.length() - 2;
@@ -332,7 +353,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     }
   }
 
-  private double convertToDouble(
+  /**
+   * Converts floating point components to a double value.
+   *
+   * @param sign The sign bit (0 or 1)
+   * @param exponent The exponent value
+   * @param mantissa The mantissa value
+   * @param exponentSize The size of exponent in bits
+   * @param mantissaSize The size of mantissa in bits
+   * @return The converted double value
+   */
+  private double convertFPToDouble(
       int sign, int exponent, long mantissa, int exponentSize, int mantissaSize) {
     int bias = (int) (Math.pow(2, exponentSize - 1) - 1);
     int unbiasedExponent = exponent - bias;
@@ -343,7 +374,14 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     return (sign == 1) ? -result : result;
   }
 
-  private BitvectorFormula parseBitVector(String bitVec) {
+  /**
+   * Parses a bitvector string to a BitvectorFormula.
+   *
+   * @param bitVec The bitvector string (starts with #b)
+   * @return The BitvectorFormula
+   * @throws IllegalArgumentException if the format is invalid
+   */
+  private BitvectorFormula parseStringToBitVectorFormula(String bitVec) {
     if (!bitVec.startsWith("#b")) {
       throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
     }
@@ -353,6 +391,13 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     return Objects.requireNonNull(bvmgr).makeBitvector(bitSize, value);
   }
 
+  /**
+   * Parses a hex vector string to a BitvectorFormula.
+   *
+   * @param hexVec The hex vector string (starts with #x)
+   * @return The BitvectorFormula
+   * @throws IllegalArgumentException if the format is invalid
+   */
   private BitvectorFormula parseHexVector(String hexVec) {
     if (!hexVec.startsWith("#x")) {
       throw new IllegalArgumentException("Invalid HexVector format: " + hexVec);
@@ -516,7 +561,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       variables.put(operand, createParserFormulaForString(operand));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
-      variables.put(operand, new ParserFormula(parseBitVector(operand)));
+      variables.put(operand, new ParserFormula(parseStringToBitVectorFormula(operand)));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#x")) {
       variables.put(operand, new ParserFormula(parseHexVector(operand)));
@@ -564,7 +609,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       variables.put(operand, createParserFormulaForString(operand));
       return variables.get(operand).javaSmt;
     } else if (operand.startsWith("#b")) {
-      return parseBitVector(operand);
+      return parseStringToBitVectorFormula(operand);
     } else if (operand.startsWith("#x")) {
       return parseHexVector(operand);
     } else {
@@ -597,7 +642,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       int exponentSize = getBitVecSize(exponentStr);
       int mantissaSize = getBitVecSize(mantissaStr);
 
-      double doubleValue = convertToDouble(signBit, exponent, mantissa, exponentSize, mantissaSize);
+      double doubleValue =
+          convertFPToDouble(signBit, exponent, mantissa, exponentSize, mantissaSize);
 
       fp =
           fpmgr.makeNumber(
@@ -1977,7 +2023,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         result =
             new ParserFormula(
                 fpmgr.fromIeeeBitvector(
-                    parseBitVector(ctx.term(0).getText()),
+                    parseStringToBitVectorFormula(ctx.term(0).getText()),
                     FormulaType.getFloatingPointType(exponent, mantissa - 1)));
         variables.put(fpExpr, result);
         return variables.get(fpExpr).javaSmt;
