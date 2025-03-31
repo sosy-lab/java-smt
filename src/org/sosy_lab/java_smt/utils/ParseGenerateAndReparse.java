@@ -87,13 +87,9 @@ class ParseGenerateAndReparse {
     } catch (Exception pE) {
       if (pE instanceof UnsupportedOperationException) {
         System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
-        z3solverContext.close();
-        solverLessContext.close();
         System.exit(1);
       }
       System.out.println("Exception in first parsing: " + pE);
-      z3solverContext.close();
-      solverLessContext.close();
       System.exit(1);
     }
     try {
@@ -102,13 +98,9 @@ class ParseGenerateAndReparse {
     } catch (Exception pE) {
       if (pE instanceof UnsupportedOperationException) {
         System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
-        z3solverContext.close();
-        solverLessContext.close();
         System.exit(1);
       }
       System.out.println("Exception while Generating and Reparsing" + pE.getMessage());
-      z3solverContext.close();
-      solverLessContext.close();
       System.exit(1);
     }
     // Ergebnisse vergleichen
@@ -116,8 +108,6 @@ class ParseGenerateAndReparse {
     boolean reparsedSat = solverLessProverEnv.isUnsat();
     if (z3Sat == reparsedSat) {
       System.out.println("SUCCESS: " + z3Sat);
-      z3solverContext.close();
-      solverLessContext.close();
       System.exit(0);
     } else {
       System.out.println(
@@ -126,8 +116,6 @@ class ParseGenerateAndReparse {
               + "is not equal to generated and "
               + "reparsed Sat: "
               + reparsedSat);
-      z3solverContext.close();
-      solverLessContext.close();
       System.exit(1);
     }
   }
