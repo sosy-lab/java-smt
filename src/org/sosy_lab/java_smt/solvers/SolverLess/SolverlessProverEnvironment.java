@@ -41,12 +41,14 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
           SolverContextFactory.createSolverContext(
               config, logger, shutdown.getNotifier(), Solvers.Z3);
     } catch (Exception e) {
-      throw new RuntimeException("Problem creating solver differentSolverContext", e);
+      throw new RuntimeException(
+          "Problem creating solver differentSolverContext:" + e.getMessage(), e);
     }
     try {
       prover = differentSolverContext.newProverEnvironment(pOptions.toArray(new ProverOptions[0]));
     } catch (Exception e) {
-      throw new RuntimeException("Problem creating solver differentSolverContext", e);
+      throw new RuntimeException(
+          "Problem creating solver differentSolverContext" + e.getMessage(), e);
     }
   }
 
@@ -58,7 +60,7 @@ public class SolverlessProverEnvironment implements ProverEnvironment {
       prover.addConstraint(
           differentSolverContext.getFormulaManager().universalParseFromString(smtlib2String));
     } catch (Exception e) {
-      throw new RuntimeException("Problem whilst parsing and reparsing", e);
+      throw new RuntimeException("Problem whilst parsing and reparsing " + e.getMessage(), e);
     }
     return null;
   }

@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
 
 /** This file is meant for the Evaluation of the Parser/Generator. */
 class ParseGenerateAndReparse {
@@ -67,15 +68,15 @@ class ParseGenerateAndReparse {
     ShutdownManager shutdown = ShutdownManager.create();
 
     try (SolverContext z3solverContext =
-             SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-                 solver);
-         SolverContext solverLessContext =
-             SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
-                 Solvers.SOLVERLESS);
-         ProverEnvironment z3proverEnv =
-             z3solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-         ProverEnvironment solverLessProverEnv =
-             solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+            SolverContextFactory.createSolverContext(
+                config, logger, shutdown.getNotifier(), solver);
+        SolverContext solverLessContext =
+            SolverContextFactory.createSolverContext(
+                config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
+        ProverEnvironment z3proverEnv =
+            z3solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+        ProverEnvironment solverLessProverEnv =
+            solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       try {
         z3proverEnv.addConstraint(
             z3solverContext.getFormulaManager().universalParseFromString(smt2));
@@ -83,6 +84,14 @@ class ParseGenerateAndReparse {
         if (pE instanceof UnsupportedOperationException) {
           System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
           System.exit(1);
+        }
+        if (pE instanceof ParserException) {
+          System.out.println(
+              "RESULT UNKNOWN: ParserException. Please make sure that your code.\n"
+                  + "Follows the official SMTLIB2 Standard. This Exception happens most of the"
+                  + " time, because arguments are used with more than arguments, which is"
+                  + " officially notallowed but still supported by some solvers. Please consider"
+                  + " the official theories: https://smt-lib.org/theories.shtml");
         }
         System.out.println("Exception in first parsing: " + pE);
         System.exit(1);

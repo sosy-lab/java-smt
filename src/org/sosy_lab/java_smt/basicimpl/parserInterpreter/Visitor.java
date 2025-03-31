@@ -1088,7 +1088,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           }
         }
       case "bvsmod":
-        throw new ParserException("bvsmod is not supported in JavaSMT");
+        throw new UnsupportedOperationException("bvsmod is not supported in JavaSMT");
       case "bvsub":
         if (operands.size() != 2) {
           throw new ParserException(operator + " takes two bitvector operand as input.");
@@ -1465,7 +1465,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
                           (FormulaType.ArrayFormulaType<?, ?>) sort)));
           return variables.get("temp").javaSmt;
         } else {
-          throw new ParserException("\"as const\" is not supported by JavaSMT");
+          throw new UnsupportedOperationException("\"as const\" is not supported by JavaSMT");
         }
       case "fp.abs":
         if (operands.size() == 1) {
@@ -1651,7 +1651,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               "fp.isNegative requires exactly one " + "FloatingPointFormula operand.");
         }
       case "fp.isPositive":
-        throw new ParserException("fp.isPositive is not supported by JavaSMT");
+        throw new UnsupportedOperationException("fp.isPositive is not supported by JavaSMT");
       case "str.++":
         if (operands.size() != 2) {
           throw new ParserException("str.++ requires exactly 2 operands.");
@@ -1747,9 +1747,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         return Objects.requireNonNull(smgr).toStringFormula((IntegerFormula) operands.get(0));
       case "str.to_code":
-        throw new ParserException("str.to_code is not supported in JavaSMT");
+        throw new UnsupportedOperationException("str.to_code is not supported in JavaSMT");
       case "str.from_code":
-        throw new ParserException("str.from_code is not supported in JavaSMT");
+        throw new UnsupportedOperationException("str.from_code is not supported in JavaSMT");
       case "str.to_re":
         if (operands.size() != 1) {
           throw new ParserException("str.to_re requires exactly 1 operand.");
@@ -1758,7 +1758,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         value = value.replace("\"", "");
         return Objects.requireNonNull(smgr).makeRegex(value);
       case "str.is_digit":
-        throw new ParserException("str.is_digit is not supported in JavaSMT");
+        throw new UnsupportedOperationException("str.is_digit is not supported in JavaSMT");
       case "str.in_re":
         if (operands.size() != 2) {
           throw new ParserException("str.in_re requires exactly 2 operands.");
@@ -1770,7 +1770,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
             .in((StringFormula) operands.get(0), (RegexFormula) operands.get(1));
       case "str.replace_re":
       case "str.replace_re_all":
-        throw new ParserException(
+        throw new UnsupportedOperationException(
             "str.replace_re_all and str.replace_re" + " are not supported in JavaSMT");
       case "re.none":
         if (!operands.isEmpty()) {
@@ -2048,7 +2048,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     String regexExpr = ctx1.getText();
 
     if (regexExpr.startsWith("((_ re.loop")) {
-      throw new ParserException("Loop is not supported in JavaSMT.");
+      throw new UnsupportedOperationException("Loop is not supported in JavaSMT.");
     }
 
     Pattern powerPattern = Pattern.compile("\\(_ re.\\^ (\\d+)\\)");
