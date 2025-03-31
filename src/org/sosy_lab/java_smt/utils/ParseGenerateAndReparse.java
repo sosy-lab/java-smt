@@ -26,7 +26,7 @@ class ParseGenerateAndReparse {
   private ParseGenerateAndReparse() {}
 
   public static void main(String[] args)
-      throws InvalidConfigurationException, InterruptedException, SolverException, IOException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
 
     if (args.length < 2) {
       System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-file> <solver>");
@@ -66,57 +66,53 @@ class ParseGenerateAndReparse {
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
 
-    // Solver-Kontext für Z3
-    SolverContext z3solverContext =
-        SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(), solver);
-
-    // Solverless Kontext (nutzt Z3, aber parsed Constraint vorher neu)
-    SolverContext solverLessContext =
-        SolverContextFactory.createSolverContext(
-            config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
-
-    // Prover Environments für beide Kontexte
-    ProverEnvironment z3proverEnv =
-        z3solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-    ProverEnvironment solverLessProverEnv =
-        solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-
-    // Constraint hinzufügen
-    try {
-      z3proverEnv.addConstraint(z3solverContext.getFormulaManager().universalParseFromString(smt2));
-    } catch (Exception pE) {
-      if (pE instanceof UnsupportedOperationException) {
-        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+    try (SolverContext z3solverContext =
+             SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
+                 solver);
+         SolverContext solverLessContext =
+             SolverContextFactory.createSolverContext(config, logger, shutdown.getNotifier(),
+                 Solvers.SOLVERLESS);
+         ProverEnvironment z3proverEnv =
+             z3solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+         ProverEnvironment solverLessProverEnv =
+             solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      try {
+        z3proverEnv.addConstraint(
+            z3solverContext.getFormulaManager().universalParseFromString(smt2));
+      } catch (Exception pE) {
+        if (pE instanceof UnsupportedOperationException) {
+          System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+          System.exit(1);
+        }
+        System.out.println("Exception in first parsing: " + pE);
         System.exit(1);
       }
-      System.out.println("Exception in first parsing: " + pE);
-      System.exit(1);
-    }
-    try {
-      solverLessProverEnv.addConstraint(
-          solverLessContext.getFormulaManager().universalParseFromString(smt2));
-    } catch (Exception pE) {
-      if (pE instanceof UnsupportedOperationException) {
-        System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+      try {
+        solverLessProverEnv.addConstraint(
+            solverLessContext.getFormulaManager().universalParseFromString(smt2));
+      } catch (Exception pE) {
+        if (pE instanceof UnsupportedOperationException) {
+          System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
+          System.exit(1);
+        }
+        System.out.println("Exception while Generating and Reparsing" + pE.getMessage());
         System.exit(1);
       }
-      System.out.println("Exception while Generating and Reparsing" + pE.getMessage());
-      System.exit(1);
-    }
-    // Ergebnisse vergleichen
-    boolean z3Sat = z3proverEnv.isUnsat();
-    boolean reparsedSat = solverLessProverEnv.isUnsat();
-    if (z3Sat == reparsedSat) {
-      System.out.println("SUCCESS: " + z3Sat);
-      System.exit(0);
-    } else {
-      System.out.println(
-          "FAILURE: SolverSat:"
-              + z3Sat
-              + "is not equal to generated and "
-              + "reparsed Sat: "
-              + reparsedSat);
-      System.exit(1);
+      // Ergebnisse vergleichen
+      boolean z3Sat = z3proverEnv.isUnsat();
+      boolean reparsedSat = solverLessProverEnv.isUnsat();
+      if (z3Sat == reparsedSat) {
+        System.out.println("SUCCESS: " + z3Sat);
+        System.exit(0);
+      } else {
+        System.out.println(
+            "FAILURE: SolverSat:"
+                + z3Sat
+                + "is not equal to generated and "
+                + "reparsed Sat: "
+                + reparsedSat);
+        System.exit(1);
+      }
     }
   }
 }
