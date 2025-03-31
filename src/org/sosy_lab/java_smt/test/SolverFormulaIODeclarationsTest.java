@@ -167,7 +167,7 @@ public class SolverFormulaIODeclarationsTest
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
-    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA, Solvers.CVC5).contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {
@@ -194,6 +194,13 @@ public class SolverFormulaIODeclarationsTest
   @Test
   public void parseDeclareConflictInQueryTest3() {
     requireIntegers();
+    // CVC5 allows multiple definitions of the same symbol with different types. This is causing
+    // some issues with JavaSMT where UF functions must have a single type.
+    // In the test above we were able to work around the issue by checking if the list of
+    // declared symbols that is returned by the parser contains any duplicates. However, this
+    // does not seem to work here as the two definitions only differ in their return type and
+    // CVC5 reports only one if the declaration.
+    // TODO Report this to the developers
     String query = "(declare-fun x (Int) Bool)(declare-fun x (Int) Int)(assert (x 0))";
     if (Solvers.Z3 != solverToUse()) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
@@ -318,7 +325,15 @@ public class SolverFormulaIODeclarationsTest
             + " (not (= |f::v@2| (_ bv1 32)))))";
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
-    assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
-    assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
+    if (solver == Solvers.CVC5) {
+      // CVC5 does not substitute "abbrev_9", but adds the definition to the assertions and then
+      // counts it as another variable
+      assert_().that(mgr.extractVariables(parsedQuery)).hasSize(10);
+      assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(10);
+
+    } else {
+      assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
+      assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
+    }
   }
 }

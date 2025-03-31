@@ -9,18 +9,34 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Table;
+import com.google.common.collect.Table.Cell;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Command;
+import io.github.cvc5.InputParser;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
+import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import io.github.cvc5.modes.InputLanguage;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager, Term> {
 
@@ -66,7 +82,131 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+    // Split the input string into a list of SMT-LIB2 commands
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
+
+    Table<String, Sort, Term> cache = creator.getDeclaredVariables();
+
+    // Process the declarations
+    ImmutableList.Builder<String> processed = ImmutableList.builder();
+    for (String token : tokens) {
+      if (Tokenizer.isDeclarationToken(token)) {
+        // Parse the variable/UF declaration to get a name
+        TermManager tm = new TermManager();
+        Solver solver = new Solver(tm);
+        InputParser parser = new InputParser(solver);
+        SymbolManager symbolManager = new SymbolManager(tm);
+        parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + token, "");
+        parser.nextCommand().invoke(solver, symbolManager);
+        parser.nextCommand().invoke(solver, symbolManager);
+
+        Term parsed = symbolManager.getDeclaredTerms()[0];
+
+        String symbol = parsed.getSymbol();
+        Sort sort = parsed.getSort();
+
+        // Check if the symbol is already defined in the variable cache
+        if (cache.containsRow(symbol)) {
+          if (!cache.contains(symbol, sort)) {
+            // Sort of the definition that we parsed does not match the sort from the variable
+            // cache.
+            throw new IllegalArgumentException();
+          }
+          // Skip if it's just a redefinition
+          continue;
+        }
+      }
+      // Otherwise, keep the command
+      processed.add(token);
+    }
+
+    // Build SMT-LIB2 declarations for all variables in the cache
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    for (Cell<String, Sort, Term> c : cache.cellSet()) {
+      String symbol = c.getValue().toString();
+      List<Sort> args = ImmutableList.of();
+      Sort sort = c.getValue().getSort();
+
+      if (sort.isFunction()) {
+        args = List.of(sort.getFunctionDomainSorts());
+        sort = sort.getFunctionCodomainSort();
+      }
+      StringBuilder decl = new StringBuilder();
+      decl.append("(declare-fun").append(" ");
+      decl.append(symbol).append(" ");
+      decl.append("(");
+      for (Sort p : args) {
+        decl.append(p).append(" ");
+      }
+      decl.append(")").append(" ");
+      decl.append(sort);
+      decl.append(")");
+
+      builder.add(decl.toString());
+    }
+
+    String decls = String.join("\n", builder.build());
+    String input = String.join("\n", processed.build());
+
+    // Add the declarations to the input and parse everything
+    TermManager termManager = new TermManager();
+    Solver solver = new Solver(termManager);
+    InputParser parser = new InputParser(solver);
+    SymbolManager symbolManager = parser.getSymbolManager();
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + decls + input, "");
+
+    Command cmd = parser.nextCommand();
+    while (!cmd.isNull()) {
+      try {
+        Preconditions.checkArgument(
+            ImmutableList.of("set-logic", "declare-fun", "declare-const", "define-fun", "assert")
+                .contains(cmd.getCommandName()),
+            "Command %s is not supported",
+            cmd.getCommandName());
+        cmd.invoke(solver, symbolManager);
+        cmd = parser.nextCommand();
+      } catch (Throwable e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+    // Get the assertions from the input
+    Term[] asserted = solver.getAssertions();
+    Term result = asserted.length == 1 ? asserted[0] : termManager.mkTerm(Kind.AND, asserted);
+
+    // Now get all declared symbols
+    Term[] declared = symbolManager.getDeclaredTerms();
+
+    // Check that all variables/UF have a single type signature
+    // The CVC5 parser allows polymorphic types, but we don't support them in JavaSMT
+    Set<String> duplicates =
+        Arrays.stream(declared)
+            .collect(Collectors.groupingBy(Term::getSymbol, Collectors.counting()))
+            .entrySet()
+            .stream()
+            .filter(m -> m.getValue() > 1)
+            .map(Entry::getKey)
+            .collect(Collectors.toSet());
+    Preconditions.checkArgument(
+        duplicates.isEmpty(),
+        "Parsing failed as there were multiple conflicting definitions for the symbol(s) '%s'",
+        duplicates);
+
+    // Process the symbols from the parser
+    Map<Term, Term> subst = new HashMap<>();
+    for (Term term : declared) {
+      if (cache.containsRow(term.getSymbol())) {
+        // Symbol is from the context: add the original term to the substitution map
+        subst.put(term, cache.get(term.getSymbol(), term.getSort()));
+      } else {
+        // Symbol is new, add it to the context
+        cache.put(term.getSymbol(), term.getSort(), term);
+      }
+    }
+
+    // Substitute all symbols from the context with their original terms
+    return result.substitute(
+        subst.keySet().toArray(new Term[0]), subst.values().toArray(new Term[0]));
   }
 
   @Override

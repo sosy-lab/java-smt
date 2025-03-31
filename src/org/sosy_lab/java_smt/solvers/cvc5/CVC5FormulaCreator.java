@@ -34,9 +34,7 @@ import io.github.cvc5.TermManager;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -72,13 +70,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
 
-  // private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^\\(fp #b(?<sign>\\d)
-  // #b(?<exp>\\d+) #b(?<mant>\\d+)$");
+  /** We use a variable cache to keep track of variables/Ufs that have already been defined. */
+  private final Table<String, Sort, Term> variablesCache = HashBasedTable.create();
 
-  // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
-  // String representation is equal (and they are equal)
-  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
-  private final Map<String, Term> functionsCache = new HashMap<>();
   private final TermManager termManager;
   private final Solver solver;
 
@@ -98,9 +92,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return solver;
   }
 
+  Table<String, Sort, Term> getDeclaredVariables() {
+    return variablesCache;
+  }
+
   @Override
   public Term makeVariable(Sort sort, String name) {
-    Term existingVar = variablesCache.get(name, sort.toString());
+    Term existingVar = variablesCache.get(name, sort);
     if (existingVar != null) {
       return existingVar;
     }
@@ -124,7 +122,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
                   .getKey());
     }
     Term newVar = termManager.mkConst(sort, name);
-    variablesCache.put(name, sort.toString(), newVar);
+    variablesCache.put(name, sort, newVar);
     return newVar;
   }
 
@@ -426,13 +424,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
                 getFormulaType(f),
                 f.getKind()));
 
-      } else if (f.getKind() == Kind.VARIABLE) {
-        // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
-        // We resubstitute them back to the original free.
-        // CVC5 doesn't give you the de-brujin index
-        Term originalVar = accessVariablesCache(formula.toString(), sort);
-        return visitor.visitBoundVariable(encapsulate(originalVar), 0);
-
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
         // QUANTIFIER: replace bound variable with free variable for visitation
         assert f.getNumChildren() == 2;
@@ -440,7 +431,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
+          Term freeVar = makeVariable(boundVar.getSort(), name);
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -520,7 +511,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    * back to a common one.
    */
   private Term normalize(Term operator) {
-    Term function = functionsCache.get(getName(operator));
+    Term function = variablesCache.get(getName(operator), operator.getSort());
     if (function != null) {
       checkState(
           function.getId() == operator.getId(),
@@ -766,20 +757,19 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   public Term declareUFImpl(String pName, Sort pReturnType, List<Sort> pArgTypes) {
     checkSymbol(pName);
 
-    Term exp = functionsCache.get(pName);
+    // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
+    Sort termSort =
+        pArgTypes.isEmpty()
+            ? pReturnType
+            : environment.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+    Term exp = variablesCache.get(pName, termSort);
 
     if (exp == null) {
-      // Ufs in CVC5 can't have 0 arity. We just use a variable as a workaround.
-      Sort sort =
-          pArgTypes.isEmpty()
-              ? pReturnType
-              : termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
-      exp = termManager.mkConst(sort, pName);
-      functionsCache.put(pName, exp);
-
+      exp = termManager.mkConst(termSort, pName);
+      variablesCache.put(pName, exp.getSort(), exp);
     } else {
       Preconditions.checkArgument(
-          exp.getSort().equals(exp.getSort()),
+          pReturnType.equals(exp.getSort().getFunctionCodomainSort()),
           "Symbol %s already in use for different return type %s",
           exp,
           exp.getSort());
@@ -799,6 +789,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       }
     }
     return exp;
+  }
+
+  @Override
+  public Object convertValue(Term pValue) {
+    return convertValue(pValue, pValue);
   }
 
   @Override
@@ -856,29 +851,5 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     Preconditions.checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
-  }
-
-  private Term accessVariablesCache(String name, Sort sort) {
-    Term existingVar = variablesCache.get(name, sort.toString());
-    if (existingVar == null) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type"
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
-    return existingVar;
   }
 }
