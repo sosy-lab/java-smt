@@ -107,7 +107,6 @@ public class Z3ProofsTest {
     assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
   }
 
-
   @Test
   public void Z3handleTransitivityTest() {
     BooleanFormula f1 = bmgr.makeVariable("f1");

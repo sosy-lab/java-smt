@@ -20,7 +20,6 @@ import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
-import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class CVC5ProofProcessor {
 
@@ -74,10 +73,10 @@ public class CVC5ProofProcessor {
           continue;
         }
 
-        CVC5ProofRule proofRule = Enum.valueOf(CVC5ProofRule.class,
-            frame.getProof().getRule().toString());
-            //ProofRule.fromName(
-                //CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
+        CVC5ProofRule proofRule =
+            Enum.valueOf(CVC5ProofRule.class, frame.getProof().getRule().toString());
+        // ProofRule.fromName(
+        // CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
         CVC5ProofNode pn = new CVC5ProofNode(proofRule, generateFormula(frame.getProof()));
         for (int i = 0; i < numChildren; i++) {
           Proof child = frame.getProof().getChildren()[i];

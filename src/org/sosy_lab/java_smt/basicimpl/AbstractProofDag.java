@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
