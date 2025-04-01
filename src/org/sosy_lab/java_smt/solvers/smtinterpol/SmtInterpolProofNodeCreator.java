@@ -179,7 +179,7 @@ class SmtInterpolProofNodeCreator {
           pivot = first;
         }
 
-        for (int i = parameters.length-1; i > 1; i--) {
+        for (int i = parameters.length-1; i > 0; i--) {
           Sort sort = term.getSort();
           if (sort.toString().equals("..Proof")) {
               //children.add(new ProvitionalProofNode(parameters[i]));
@@ -262,6 +262,7 @@ class SmtInterpolProofNodeCreator {
             stack.push(childFrame);
             frame.children.add(childFrame);
             //children.add(new ProvitionalProofNode(term.getSubterm()));
+            //computed.put(term, this);
             computed.put(term.getSubterm(), new ProvitionalProofNode(term.getSubterm()));
           }
           rup = true;
