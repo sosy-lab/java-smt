@@ -8,13 +8,14 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.truth.TruthJUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -62,13 +63,20 @@ public class TimeoutTest extends SolverBasedTest0 {
     return Logics.QF_LIA;
   }
 
+  @Before
+  public void setUp() {
+    // FIXME CVC5 has interruptions, but crashes on Windows, probably due to concurrency issues
+    // TODO Add interruption for Princess
+    assume()
+        .withMessage(solverToUse() + " does not support interruption")
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
+  }
+
   @Test
   @SuppressWarnings("CheckReturnValue")
   public void testTacticTimeout() {
-    TruthJUnit.assume()
-        .withMessage("Only Z3 has native tactics")
-        .that(solverToUse())
-        .isEqualTo(Solvers.Z3);
+    assume().withMessage("Only Z3 has native tactics").that(solverToUse()).isEqualTo(Solvers.Z3);
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     String msg = "ShutdownRequest";
     BooleanFormula test = fuzzer.fuzz(20, 3);
@@ -79,21 +87,12 @@ public class TimeoutTest extends SolverBasedTest0 {
   @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testProverTimeoutInt() throws InterruptedException {
     requireIntegers();
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support interruption")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testProverTimeoutBv() throws InterruptedException {
     requireBitvectors();
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support interruption")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
-
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
@@ -101,10 +100,6 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testInterpolationProverTimeout() throws InterruptedException {
     requireInterpolation();
     requireIntegers();
-    TruthJUnit.assume()
-        .withMessage(solverToUse() + " does not support interruption")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BOOLECTOR, Solvers.CVC5);
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
