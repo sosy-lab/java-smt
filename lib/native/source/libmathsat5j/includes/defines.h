@@ -382,16 +382,6 @@ typedef jvoid jjfailureCode;
 
 typedef jobject jjnamedtermswrapper;
 
-typedef jlong jjproofManager;
-#define MANAGER_ARG(num) STRUCT_ARG(msat_proof_manager, num)
-#define MANAGER_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof_manager, num)
-#define MANAGER_RETURN STRUCT_RETURN
-
-typedef jlong jjproof;
-#define PROOF_ARG(num) STRUCT_ARG(msat_proof, num)
-#define PROOF_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof, num)
-#define PROOF_RETURN STRUCT_RETURN
-
 // Abbreviations for common combinations of return and argument types
 //
 // Parameter explanation:
