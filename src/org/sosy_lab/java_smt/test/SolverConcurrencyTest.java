@@ -124,6 +124,11 @@ public class SolverConcurrencyTest {
           .that(solver)
           .isNotEqualTo(Solvers.MATHSAT5);
     }
+
+    assume()
+        .withMessage("Solver does not support concurrency without concurrent context.")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC5);
   }
 
   private void requireConcurrentMultipleStackSupport() {
@@ -298,7 +303,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -348,11 +353,6 @@ public class SolverConcurrencyTest {
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
 
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
-
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -372,11 +372,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
@@ -545,7 +540,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
