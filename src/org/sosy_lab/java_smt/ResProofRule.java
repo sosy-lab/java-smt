@@ -10,7 +10,8 @@
 
 package org.sosy_lab.java_smt;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 /**
@@ -24,12 +25,18 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  */
 public class ResProofRule {
 
+  private static final Map<String, ResAxiom> RULE_MAP = new HashMap<>();
+
+  static {
+    for (ResAxiom rule : ResAxiom.values()) {
+      RULE_MAP.put(rule.getName().toLowerCase(), rule);
+    }
+  }
+
   /** Any operation that proves a term. */
   public enum ResAxiom implements ProofRule {
     // Resolution Rule
     RESOLUTION("res", "(res t proof1 proof2)"),
-
-    // RUP("rup", null),
     ASSUME("assume", "(assume t)"),
     // Logical operators
     TRUE_POSITIVE("true+", "(+ true)"),
@@ -111,9 +118,9 @@ public class ResProofRule {
         "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))");
 
     private final String name;
-    @Nullable private final String formula;
+    private final String formula;
 
-    ResAxiom(String pName, @Nullable String pFormula) {
+    ResAxiom(String pName, String pFormula) {
       name = pName;
       formula = pFormula;
     }
@@ -137,17 +144,13 @@ public class ResProofRule {
    * @throws NullPointerException if the name is null.
    * @throws IllegalArgumentException if the name does not match any rule.
    */
-  public static ResAxiom getResAxiomRuleByName(String name) {
-    if (name == null) {
-      throw new NullPointerException("Rule name cannot be null");
+  public static ResAxiom getFromName(String name) {
+
+    ResAxiom rule = RULE_MAP.get(name.toLowerCase());
+    if (rule == null) {
+      throw new IllegalArgumentException("Rule not found or not specified: " + name);
     }
 
-    for (ResAxiom rule : ResAxiom.values()) {
-      if (rule.getName().equalsIgnoreCase(name)) {
-        return rule;
-      }
-    }
-
-    throw new IllegalArgumentException("Rule not found or not specified: " + name);
+    return rule;
   }
 }
