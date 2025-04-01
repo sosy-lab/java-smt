@@ -85,7 +85,7 @@ public class SolverContextFactoryTest {
    *
    * <p>We update this list, whenever a new solver or operating system is added.
    */
-  private void requireSupportedOperatingSystem() {
+  private void requirePlatformSupported() {
     assume()
         .withMessage(
             "Solver %s is not yet supported in the operating system %s with architecture %s",
@@ -94,7 +94,7 @@ public class SolverContextFactoryTest {
         .isTrue();
   }
 
-  private void requireNoSupportedOperatingSystem() {
+  private void requirePlatformNotSupported() {
     assume()
         .withMessage(
             "Solver %s is not yet supported in the operating system %s with architecture %s",
@@ -177,7 +177,7 @@ public class SolverContextFactoryTest {
 
   @Test
   public void createSolverContextFactoryWithDefaultLoader() throws InvalidConfigurationException {
-    requireSupportedOperatingSystem();
+    requirePlatformSupported();
 
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
@@ -190,7 +190,7 @@ public class SolverContextFactoryTest {
   @Test
   public void createSolverContextFactoryWithSystemLoader() throws InvalidConfigurationException {
     requireNativeLibrary();
-    requireSupportedOperatingSystem();
+    requirePlatformSupported();
 
     // we assume that no native solvers are installed on the testing machine by default.
     SolverContextFactory factory =
@@ -206,7 +206,7 @@ public class SolverContextFactoryTest {
   public void createSolverContextFactoryWithSystemLoaderForJavaSolver()
       throws InvalidConfigurationException {
     requireNoNativeLibrary();
-    requireSupportedOperatingSystem();
+    requirePlatformSupported();
 
     SolverContextFactory factory =
         new SolverContextFactory(
@@ -222,7 +222,7 @@ public class SolverContextFactoryTest {
   public void testFailToLoadNativeLibraryWithInvalidOperatingSystem()
       throws InvalidConfigurationException {
     requireNativeLibrary();
-    requireNoSupportedOperatingSystem();
+    requirePlatformNotSupported();
 
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
