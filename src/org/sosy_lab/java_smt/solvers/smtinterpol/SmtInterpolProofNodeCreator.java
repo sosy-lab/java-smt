@@ -16,13 +16,13 @@ import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Util;
-import io.github.cvc5.Proof;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.sosy_lab.java_smt.ResProofRule;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
@@ -36,6 +36,8 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 class SmtInterpolProofNodeCreator {
   private final SmtInterpolFormulaCreator creator;
   private final SmtInterpolTheoremProver prover;
+  private Map<Term, ProvitionalProofNode> computed = new ConcurrentHashMap<>();
+  private Deque<SmtTermFrame> stack = new ArrayDeque<>();
 
   SmtInterpolProofNodeCreator(
       SmtInterpolFormulaCreator pCreator, SmtInterpolTheoremProver pProver) {
@@ -53,6 +55,7 @@ class SmtInterpolProofNodeCreator {
   }
 
   private class SmtTermFrame extends ProofFrame<Term> {
+    List<SmtTermFrame> children = new ArrayList<>();
     public SmtTermFrame(Term term) {
       super(term);
     }
@@ -103,7 +106,14 @@ class SmtInterpolProofNodeCreator {
   }
 
   ProvitionalProofNode createPPNDag(Term proof) {
-    return new ProvitionalProofNode(proof);
+    try {
+     ProvitionalProofNode root = new ProvitionalProofNode(proof);
+     root.buildDag(proof);
+     return root;
+    } finally {
+        stack.clear();
+        computed.clear();
+    }
   }
 
   class ProvitionalProofNode {
@@ -117,18 +127,47 @@ class SmtInterpolProofNodeCreator {
 
     public ProvitionalProofNode(Term pParameter) {
       this.unprocessedTerm = pParameter;
-      processTerm(pParameter);
+      //processTerm(pParameter);
     }
 
-    void processTerm(Term pParameter) {
-      if (pParameter instanceof ApplicationTerm) {
-        processApplication((ApplicationTerm) pParameter);
-      } else if (pParameter instanceof AnnotatedTerm) {
-        processAnnotated((AnnotatedTerm) pParameter);
+    void buildDag(Term term) {
+
+
+      stack.push(new SmtTermFrame(term));
+
+      while (!stack.isEmpty()) {
+        SmtTermFrame frame = stack.peek();
+
+        if (!frame.isVisited()) {
+          frame.setAsVisited(true);
+          processTerm(frame);
+        } else {
+
+          stack.pop();
+
+
+                for (int i = 0; i < frame.children.size(); i++) {
+                  Term child = frame.children.get(i).getProof();
+                  ProvitionalProofNode childNode = computed.get(child);
+                  this.children.add(childNode);
+                }
+
+        }
       }
     }
 
-    void processApplication(ApplicationTerm term) {
+    void processTerm(SmtTermFrame frame) {
+      Term pParameter = frame.getProof();
+
+      if (pParameter instanceof ApplicationTerm) {
+        processApplication(frame);
+      } else if (pParameter instanceof AnnotatedTerm) {
+        processAnnotated(frame);
+      }
+    }
+
+    void processApplication(SmtTermFrame frame) {
+      ApplicationTerm term = (ApplicationTerm) frame.getProof();
       Term[] parameters = term.getParameters();
       if (parameters.length == 3) {
         this.proofRule = ResAxiom.RESOLUTION;
@@ -140,10 +179,19 @@ class SmtInterpolProofNodeCreator {
           pivot = first;
         }
 
-        for (int i = 1; i < parameters.length; i++) {
+        for (int i = parameters.length-1; i > 1; i--) {
           Sort sort = term.getSort();
           if (sort.toString().equals("..Proof")) {
-            children.add(new ProvitionalProofNode(parameters[i]));
+              //children.add(new ProvitionalProofNode(parameters[i]));
+              frame.setNumArgs(parameters.length-1);
+              if (!computed.containsKey(parameters[i])) {
+                SmtTermFrame childFrame = new SmtTermFrame(parameters[i]);
+                stack.push(childFrame);
+                frame.children.add(childFrame);
+                //children.add(new ProvitionalProofNode(parameters[i]));
+                computed.put(parameters[i], new ProvitionalProofNode(parameters[i]));
+              }
+
           }
         }
       }
@@ -162,12 +210,9 @@ class SmtInterpolProofNodeCreator {
 
     }
 
-    void processAnnotated(AnnotatedTerm term) {
-      processAnnotated0(term);
-    }
 
-    private void processAnnotated0(AnnotatedTerm term) {
-
+    private void processAnnotated(SmtTermFrame frame) {
+      AnnotatedTerm term = (AnnotatedTerm) frame.getProof();
       boolean rup = false;
 
       if (term.getSort().toString().equals("Bool")) {
@@ -201,7 +246,8 @@ class SmtInterpolProofNodeCreator {
             Object[] values = (Object[]) annotation.getValue();
             addTermsFromAnnotationValue(values, false);
           } else if (annotation.getValue() instanceof AnnotatedTerm) {
-            processAnnotated((AnnotatedTerm) annotation.getValue());
+            frame.setProof((AnnotatedTerm) annotation.getValue());
+            processAnnotated(frame);
           } else if (annotation.getValue() instanceof ApplicationTerm) {
             formulas.add((Term) annotation.getValue());
           }
@@ -209,7 +255,15 @@ class SmtInterpolProofNodeCreator {
 
         if (key.equals("rup")) {
           this.proofRule = Rup.RUP;
-          this.children.add(new ProvitionalProofNode(term.getSubterm()));
+          //this.children.add(new ProvitionalProofNode(term.getSubterm()));
+          frame.setNumArgs(1);
+          if (!computed.containsKey(term.getSubterm())) {
+            SmtTermFrame childFrame = new SmtTermFrame(term.getSubterm());
+            stack.push(childFrame);
+            frame.children.add(childFrame);
+            //children.add(new ProvitionalProofNode(term.getSubterm()));
+            computed.put(term.getSubterm(), new ProvitionalProofNode(term.getSubterm()));
+          }
           rup = true;
         }
 
@@ -220,7 +274,8 @@ class SmtInterpolProofNodeCreator {
 
       }
       if (!rup) {
-        processTerm(term.getSubterm());
+        frame.setProof(term.getSubterm());
+        processTerm(frame);
       }
     }
 
@@ -231,7 +286,7 @@ class SmtInterpolProofNodeCreator {
           // this is the value of the proves Annotation.
           if (isProves) {
             assert values[i - 1].getClass() == String.class;
-            if (((String)values[i - 1]).contains("+")) {
+            if (((String) values[i - 1]).contains("+")) {
               this.formulas.add((Term) values[i]);
             } else {
               // We try to create the negative polarity Term
