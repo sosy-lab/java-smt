@@ -74,3 +74,4 @@ build.properties
 /.apt-generated/
 /repository
 pom.xml
+/error-prone.patch

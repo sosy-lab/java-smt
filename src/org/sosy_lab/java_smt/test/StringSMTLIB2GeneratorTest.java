@@ -7,11 +7,13 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.util.List;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
@@ -104,6 +106,43 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
             + "(declare-const result Int)\n"
             + "(assert (= (str.indexof str \"find\" 0) result))\n";
 
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testStringMultipleConcat() {
+    requireStrings();
+    StringFormula a = Objects.requireNonNull(smgr).makeVariable("a");
+    StringFormula b = Objects.requireNonNull(smgr).makeVariable("b");
+    StringFormula c = Objects.requireNonNull(smgr).makeVariable("c");
+    StringFormula d = Objects.requireNonNull(smgr).makeVariable("d");
+    BooleanFormula result = smgr.equal(d, smgr.concat(a, b, c));
+
+    String expectedResult =
+        "(declare-const d String)\n"
+            + "(declare-const a String)\n"
+            + "(declare-const b String)\n"
+            + "(declare-const c String)\n"
+            + "(assert (= d (str.++ a b c)))\n";
+    Generator.assembleConstraint(result);
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testRegexMultipleConcat() {
+    requireStrings();
+    RegexFormula a = Objects.requireNonNull(smgr).makeRegex("a");
+    RegexFormula b = Objects.requireNonNull(smgr).makeRegex("b");
+    RegexFormula c = Objects.requireNonNull(smgr).makeRegex("c");
+    StringFormula d = Objects.requireNonNull(smgr).makeVariable("d");
+    BooleanFormula result = smgr.in(d, smgr.concatRegex(List.of(a, b, c)));
+    String expectedResult =
+        "(declare-const d String)\n"
+            + "(assert (str.in_re d (re.++ (str.to_re \"a\") (str.to_re \"b\") (str.to_re"
+            + " \"c\"))))\n";
+    Generator.assembleConstraint(result);
+    String actualResult = String.valueOf(Generator.getLines());
     assertThat(actualResult).isEqualTo(expectedResult);
   }
 

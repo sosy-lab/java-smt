@@ -145,10 +145,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
         break;
     }
     if (Generator.isLoggingEnabled()) {
-      if (parts.size() != 2) {
-        throw new GeneratorException("SMTLIB2 only allows concat with exactly 2 operands!");
-      }
-      StringGenerator.logConcat(result, parts.get(0), parts.get(1));
+      StringGenerator.logConcat(result, parts);
     }
     return result;
   }
@@ -337,10 +334,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
         break;
     }
     if (Generator.isLoggingEnabled()) {
-      if (parts.size() != 2) {
-        throw new GeneratorException("SMTLIB2 only allows concatRegex with exactly 2 operands!");
-      }
-      StringGenerator.logRegexConcat(result, parts.get(0), parts.get(1));
+      StringGenerator.logRegexConcat(result, parts);
     }
     return result;
   }

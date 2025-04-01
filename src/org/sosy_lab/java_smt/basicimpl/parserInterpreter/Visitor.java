@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.basicimpl.parserInterpreter;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Splitter;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
@@ -1653,11 +1655,14 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       case "fp.isPositive":
         throw new UnsupportedOperationException("fp.isPositive is not supported by JavaSMT");
       case "str.++":
-        if (operands.size() != 2) {
-          throw new ParserException("str.++ requires exactly 2 operands.");
+        List<StringFormula> stringFormulas = new ArrayList<>();
+        for (Object operand : operands) {
+          checkArgument(
+              (operand instanceof StringFormula),
+              "All operands of str.++ must be a StringFormula.");
+          stringFormulas.add((StringFormula) operand);
         }
-        return Objects.requireNonNull(smgr)
-            .concat((StringFormula) operands.get(0), (StringFormula) operands.get(1));
+        return Objects.requireNonNull(smgr).concat(stringFormulas);
       case "str.len":
         if (operands.size() != 1) {
           throw new ParserException("str.len requires exactly 1 operand.");
@@ -1783,14 +1788,17 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         return Objects.requireNonNull(smgr).all();
       case "re.++":
-        if (operands.isEmpty()) {
-          throw new ParserException("re.++ requires at least one operand.");
+        List<RegexFormula> regexFormulas = new ArrayList<>();
+        for (Object operand : operands) {
+          checkArgument(
+              (operand instanceof RegexFormula),
+              "All operands of re.++ must be a " + "RegexFormula.");
+          regexFormulas.add((RegexFormula) operand);
         }
-        return Objects.requireNonNull(smgr)
-            .concat(operands.stream().map(o -> (RegexFormula) o).toArray(RegexFormula[]::new));
+        return Objects.requireNonNull(smgr).concatRegex(regexFormulas);
       case "re.union":
         if (operands.size() != 2) {
-          throw new ParserException("re.union requires exactly two operand.");
+          throw new ParserException("re.union requires exactly two operands.");
         }
         return Objects.requireNonNull(smgr)
             .union((RegexFormula) operands.get(0), (RegexFormula) operands.get(1));

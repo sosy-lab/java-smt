@@ -42,9 +42,15 @@ public class StringGenerator {
         .add(new FunctionEnvironment(result, inputParams, functionToString, Keyword.STRING));
   }
 
-  protected static void logConcat(Object result, StringFormula part1, StringFormula part2) {
-    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, part1, part2));
-    logBinaryOp(result, "str.++", part1, part2);
+  protected static void logConcat(Object result, List<StringFormula> parts) {
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, parts));
+    List<Object> inputParams = new ArrayList<>(parts);
+    String format = "(str.++";
+    for (int i = 0; i < parts.size(); i++) {
+      format += " %s";
+    }
+    format += ")";
+    logOperation(result, inputParams, format, Keyword.SKIP);
   }
 
   protected static void logEqual(BooleanFormula result, StringFormula str1, StringFormula str2) {
@@ -162,9 +168,15 @@ public class StringGenerator {
     logOperation(result, ImmutableList.of(), "(re.allchar)", Keyword.SKIP);
   }
 
-  protected static void logRegexConcat(
-      RegexFormula result, RegexFormula part1, RegexFormula part2) {
-    logBinaryOp(result, "re.++", part1, part2);
+  protected static void logRegexConcat(RegexFormula result, List<RegexFormula> parts) {
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, parts));
+    List<Object> inputParams = new ArrayList<>(parts);
+    String format = "(re.++";
+    for (int i = 0; i < parts.size(); i++) {
+      format += " %s";
+    }
+    format += ")";
+    logOperation(result, inputParams, format, Keyword.SKIP);
   }
 
   protected static void logRegexOptional(RegexFormula result, RegexFormula regex) {

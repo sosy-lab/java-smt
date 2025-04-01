@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 @SuppressWarnings("StringSplitter")
 public class SolverLessFloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<
-    SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
+        SMTLIB2Formula, DummyType, DummyEnv, DummyFunction> {
 
   protected SolverLessFloatingPointFormulaManager(SolverLessFormulaCreator creator) {
     super(creator);
@@ -52,8 +52,9 @@ public class SolverLessFloatingPointFormulaManager
   protected SMTLIB2Formula makeNumberImpl(
       BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
     int i = signBit ? 1 : 0;
-    return new SMTLIB2Formula(new DummyType(type.getExponentSize(), type.getMantissaSize()),
-        i + exponent.toString() + mantissa.toString());
+    return new SMTLIB2Formula(
+        new DummyType(type.getExponentSize(), type.getMantissaSize()),
+        i + exponent.toString() + mantissa);
   }
 
   @Override
@@ -141,13 +142,29 @@ public class SolverLessFloatingPointFormulaManager
 
     // Handle special cases
     if (Double.isNaN(value)) {
-      return "(fp #b0 #b" + generateOnes(exponentSize) + " #b1" + generateZeros(mantissaSize - 1) + ")";
+      return "(fp #b0 #b"
+          + generateOnes(exponentSize)
+          + " #b1"
+          + generateZeros(mantissaSize - 1)
+          + ")";
     } else if (Double.isInfinite(value)) {
       String sign = (value < 0) ? "1" : "0";
-      return "(fp #b" + sign + " #b" + generateOnes(exponentSize) + " #b" + generateZeros(mantissaSize) + ")";
+      return "(fp #b"
+          + sign
+          + " #b"
+          + generateOnes(exponentSize)
+          + " #b"
+          + generateZeros(mantissaSize)
+          + ")";
     } else if (value == 0.0) {
-      String sign = (1/value < 0) ? "1" : "0"; // handle -0.0
-      return "(fp #b" + sign + " #b" + generateZeros(exponentSize) + " #b" + generateZeros(mantissaSize) + ")";
+      String sign = (1 / value < 0) ? "1" : "0"; // handle -0.0
+      return "(fp #b"
+          + sign
+          + " #b"
+          + generateZeros(exponentSize)
+          + " #b"
+          + generateZeros(mantissaSize)
+          + ")";
     }
 
     int signBit = (value < 0) ? 1 : 0;
@@ -170,14 +187,24 @@ public class SolverLessFloatingPointFormulaManager
 
     // Handle denormal numbers
     if (biasedExponent <= 0) {
-      return "(fp #b" + signBit + " #b" + generateZeros(exponentSize) +
-          " #b" + generateZeros(mantissaSize) + ")";
+      return "(fp #b"
+          + signBit
+          + " #b"
+          + generateZeros(exponentSize)
+          + " #b"
+          + generateZeros(mantissaSize)
+          + ")";
     }
 
     // Handle overflow (infinity)
     if (biasedExponent >= (1 << exponentSize) - 1) {
-      return "(fp #b" + signBit + " #b" + generateOnes(exponentSize) +
-          " #b" + generateZeros(mantissaSize) + ")";
+      return "(fp #b"
+          + signBit
+          + " #b"
+          + generateOnes(exponentSize)
+          + " #b"
+          + generateZeros(mantissaSize)
+          + ")";
     }
 
     // Calculate mantissa bits (without the implicit leading 1)
@@ -212,10 +239,11 @@ public class SolverLessFloatingPointFormulaManager
       }
     }
 
-    String exponentBits = String.format("%" + exponentSize + "s", Integer.toBinaryString(biasedExponent))
-        .replace(' ', '0');
+    String exponentBits =
+        String.format("%" + exponentSize + "s", Integer.toBinaryString(biasedExponent))
+            .replace(' ', '0');
 
-    return "(fp #b" + signBit + " #b" + exponentBits + " #b" + mantissaBits.toString() + ")";
+    return "(fp #b" + signBit + " #b" + exponentBits + " #b" + mantissaBits + ")";
   }
 
   public static String generateOnes(int count) {
