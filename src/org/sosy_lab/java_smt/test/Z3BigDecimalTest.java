@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assume.assumeTrue;
 
 import java.math.BigDecimal;
 import org.junit.Before;
@@ -28,7 +29,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
-    requireSolver(Solvers.Z3);
+    assumeTrue(solverToUse() == Solvers.Z3);
     requireIntegers();
   }
 
@@ -39,7 +40,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     
     // Make sure the number is truncated correctly to 3
     IntegerFormula three = imgr.makeNumber(3);
-    BooleanFormula equals = bmgr.equal(f, three);
+    BooleanFormula equals = bmgr.equals(f, three);
     
     // Verify the formula evaluates correctly
     assertThatFormula(equals).isSatisfiable();
@@ -60,8 +61,8 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula two = imgr.makeNumber(2);
     IntegerFormula minusOne = imgr.makeNumber(-1);
     
-    assertThatFormula(bmgr.equal(f1, two)).isSatisfiable();
-    assertThatFormula(bmgr.equal(f2, minusOne)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f1, two)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f2, minusOne)).isSatisfiable();
   }
   
   @Test
@@ -69,7 +70,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(42));
     IntegerFormula fortyTwo = imgr.makeNumber(42);
     
-    assertThatFormula(bmgr.equal(f, fortyTwo)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f, fortyTwo)).isSatisfiable();
   }
   
   @Test
@@ -77,7 +78,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(0.1));
     IntegerFormula zero = imgr.makeNumber(0);
     
-    assertThatFormula(bmgr.equal(f, zero)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f, zero)).isSatisfiable();
   }
   
   @Test
@@ -85,7 +86,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(-0.1));
     IntegerFormula zero = imgr.makeNumber(0);
     
-    assertThatFormula(bmgr.equal(f, zero)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f, zero)).isSatisfiable();
   }
   
   @Test
@@ -94,6 +95,6 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
         BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.valueOf(0.99)));
     IntegerFormula expected = imgr.makeNumber(BigDecimal.valueOf(Long.MAX_VALUE).toBigInteger());
     
-    assertThatFormula(bmgr.equal(f, expected)).isSatisfiable();
+    assertThatFormula(bmgr.equals(f, expected)).isSatisfiable();
   }
 } 

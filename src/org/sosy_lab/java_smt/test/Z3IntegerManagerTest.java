@@ -8,12 +8,13 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static org.junit.Assume.assumeTrue;
+
+import java.math.BigDecimal;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-
-import java.math.BigDecimal;
 
 /**
  * Simple test to verify Z3 doesn't segfault with BigDecimal values.
@@ -23,7 +24,7 @@ public class Z3IntegerManagerTest extends SolverBasedTest0 {
 
   @Before
   public void setupTest() {
-    requireSolver(Solvers.Z3);
+    assumeTrue(solverToUse() == Solvers.Z3);
     requireIntegers();
   }
 
