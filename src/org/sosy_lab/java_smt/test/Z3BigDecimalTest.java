@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assume.assumeTrue;
 
 import java.math.BigDecimal;
 import org.junit.Before;
@@ -17,22 +16,19 @@ import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 /**
- * Test for the fix of Issue #457 in Z3.
- * The issue was a segfault when calling IntegerFormulaManager.makeNumber with BigDecimal values
- * that have fractional parts.
+ * Test for the fix of Issue #457 in Z3. The issue was a segfault when calling
+ * IntegerFormulaManager.makeNumber with BigDecimal values that have fractional parts.
  */
 public class Z3BigDecimalTest extends SolverBasedTest0 {
 
   @Before
   public void setupEnvironment() {
-    // Skip the test if Z3 is not available
     requireSolver(Solvers.Z3);
-    // Skip if integers are not supported
     requireIntegers();
   }
 
@@ -45,7 +41,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula three = imgr.makeNumber(3);
     BooleanFormula equals = bmgr.equal(f, three);
     
-    // Verify the formula is satisfiable and values match
+    // Verify the formula evaluates correctly
     assertThatFormula(equals).isSatisfiable();
     
     // Double-check using model evaluation
@@ -64,11 +60,8 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula two = imgr.makeNumber(2);
     IntegerFormula minusOne = imgr.makeNumber(-1);
     
-    BooleanFormula equals1 = bmgr.equal(f1, two);
-    BooleanFormula equals2 = bmgr.equal(f2, minusOne);
-    
-    assertThatFormula(equals1).isSatisfiable();
-    assertThatFormula(equals2).isSatisfiable();
+    assertThatFormula(bmgr.equal(f1, two)).isSatisfiable();
+    assertThatFormula(bmgr.equal(f2, minusOne)).isSatisfiable();
   }
   
   @Test
@@ -76,8 +69,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(42));
     IntegerFormula fortyTwo = imgr.makeNumber(42);
     
-    BooleanFormula equals = bmgr.equal(f, fortyTwo);
-    assertThatFormula(equals).isSatisfiable();
+    assertThatFormula(bmgr.equal(f, fortyTwo)).isSatisfiable();
   }
   
   @Test
@@ -85,8 +77,7 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(0.1));
     IntegerFormula zero = imgr.makeNumber(0);
     
-    BooleanFormula equals = bmgr.equal(f, zero);
-    assertThatFormula(equals).isSatisfiable();
+    assertThatFormula(bmgr.equal(f, zero)).isSatisfiable();
   }
   
   @Test
@@ -94,16 +85,15 @@ public class Z3BigDecimalTest extends SolverBasedTest0 {
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(-0.1));
     IntegerFormula zero = imgr.makeNumber(0);
     
-    BooleanFormula equals = bmgr.equal(f, zero);
-    assertThatFormula(equals).isSatisfiable();
+    assertThatFormula(bmgr.equal(f, zero)).isSatisfiable();
   }
   
   @Test
   public void testLargeDecimals() throws SolverException, InterruptedException {
-    IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.valueOf(0.99)));
+    IntegerFormula f = imgr.makeNumber(
+        BigDecimal.valueOf(Long.MAX_VALUE).add(BigDecimal.valueOf(0.99)));
     IntegerFormula expected = imgr.makeNumber(BigDecimal.valueOf(Long.MAX_VALUE).toBigInteger());
     
-    BooleanFormula equals = bmgr.equal(f, expected);
-    assertThatFormula(equals).isSatisfiable();
+    assertThatFormula(bmgr.equal(f, expected)).isSatisfiable();
   }
 } 
