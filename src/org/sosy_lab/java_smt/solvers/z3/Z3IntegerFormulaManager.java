@@ -35,12 +35,21 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
   protected Long makeNumberImpl(BigDecimal pNumber) {
     // If the number has a fractional part, we need to handle it differently
     // than the default implementation to avoid segfaults in Z3
-    if (pNumber.scale() <= 0) {
-      // No fractional part, safe to use the BigInteger conversion
-      return makeNumberImpl(pNumber.toBigIntegerExact());
-    } else {
-      // For fractional parts, just use the integer part (truncating toward zero)
-      // This is safer than trying to use division with Z3's native functions
+    if (pNumber == null) {
+      return makeNumberImpl(0);
+    }
+    
+    try {
+      if (pNumber.scale() <= 0) {
+        // No fractional part, safe to use the BigInteger conversion
+        return makeNumberImpl(pNumber.toBigIntegerExact());
+      } else {
+        // For fractional parts, just use the integer part (truncating toward zero)
+        // This is safer than trying to use division with Z3's native functions
+        return makeNumberImpl(pNumber.toBigInteger());
+      }
+    } catch (ArithmeticException e) {
+      // If any arithmetic conversion fails, fall back to simple truncation
       return makeNumberImpl(pNumber.toBigInteger());
     }
   }
