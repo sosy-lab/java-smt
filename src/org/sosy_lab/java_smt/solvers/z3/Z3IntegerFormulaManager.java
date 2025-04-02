@@ -31,10 +31,22 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
     return makeNumberImpl((long) pNumber);
   }
 
+  /**
+   * Creates an integer formula from a BigDecimal value.
+   * For Z3, we need to handle this specially to avoid segfaults when dealing with
+   * decimal values that have fractional parts.
+   *
+   * <p>This method safely converts BigDecimal values by:
+   * <ol>
+   *   <li>Using exact conversion for integers (no fractional part)</li>
+   *   <li>Truncating toward zero for values with fractional parts</li>
+   * </ol>
+   *
+   * <p>This prevents the segfault described in issue #457.
+   */
   @Override
   protected Long makeNumberImpl(BigDecimal pNumber) {
-    // If the number has a fractional part, we need to handle it differently
-    // than the default implementation to avoid segfaults in Z3
+    // If the number is null, return zero
     if (pNumber == null) {
       return makeNumberImpl(0);
     }
@@ -46,9 +58,10 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
       } else {
         // For fractional parts, just use the integer part (truncating toward zero)
         // This is safer than trying to use division with Z3's native functions
+        // which can cause segfaults (issue #457)
         return makeNumberImpl(pNumber.toBigInteger());
       }
-    } catch (ArithmeticException e) {
+    } catch (ArithmeticException | NumberFormatException e) {
       // If any arithmetic conversion fails, fall back to simple truncation
       return makeNumberImpl(pNumber.toBigInteger());
     }
