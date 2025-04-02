@@ -544,6 +544,7 @@ public class Yices2NativeApiTest {
     assertThat(term2).isEqualTo(x);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test(expected = IllegalArgumentException.class)
   public void bvExtensionStructureTest() {
     int initialSize = 5;
