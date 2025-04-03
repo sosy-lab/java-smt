@@ -14,7 +14,7 @@ public class IntegerFormulaManagerTest extends SolverBasedTest0 {
     // Test that BigDecimal values are handled correctly by all solvers
     IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(3.5));
     IntegerFormula three = imgr.makeNumber(3);
-    BooleanFormula equals = bmgr.equal(f, three);
+    BooleanFormula equals = imgr.equal(f, three);
     assertThatFormula(equals).isSatisfiable();
   }
   
