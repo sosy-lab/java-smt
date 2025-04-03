@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -812,6 +813,116 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         };
     mgr.visitRecursively(f, nameExtractor);
     assertThat(usedVariables).containsExactly("x", "y", "z");
+  }
+
+  @Test
+  public void testFormulaQuantifierNegationVisitor() {
+    // Some solvers encode quantifiers as the negated other quantifier, and we don't ever want
+    // to confuse those when traversing the formulas. Also, we want to make sure that the
+    // formulas are not rewritten unexpectedly.
+    requireQuantifiers();
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+
+    // y is free, x is bound, and there exists an x that fulfills the formula even if you negate
+    // it in the body or the quantified formula or both.
+    BooleanFormula fExists = qmgr.exists(x, bmgr.or(x, y));
+    BooleanFormula fExistsNegatedBody = qmgr.exists(x, bmgr.not(bmgr.or(x, y)));
+    BooleanFormula fNotExists = bmgr.not(fExists);
+    BooleanFormula fNotExistsNegatedBody = bmgr.not(fExistsNegatedBody);
+
+    // Build the same formula for FORALL
+    // y is free, x is bound, and all x fulfil the formula as y can be true or false.
+    // This holds for all negations as well.
+    BooleanFormula fForall = qmgr.forall(x, bmgr.or(x, y));
+    BooleanFormula fForallNegatedBody = qmgr.forall(x, bmgr.not(bmgr.or(x, y)));
+    BooleanFormula fNotForall = bmgr.not(fForall);
+    BooleanFormula fNotForallNegatedBody = bmgr.not(fForallNegatedBody);
+
+    final int[] amountOfNots = {0};
+    final int[] amountOfExists = {0};
+    final int[] amountOfForalls = {0};
+
+    FormulaVisitor<TraversalProcess> notAndQuantifierCountingVisitor =
+        new DefaultFormulaVisitor<>() {
+          @Override
+          protected TraversalProcess visitDefault(Formula formula) {
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitQuantifier(
+              BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
+            if (q == Quantifier.EXISTS) {
+              amountOfExists[0]++;
+            } else {
+              amountOfForalls[0]++;
+            }
+            return TraversalProcess.CONTINUE;
+          }
+
+          @Override
+          public TraversalProcess visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            if (functionDeclaration.getKind() == FunctionDeclarationKind.NOT) {
+              amountOfNots[0]++;
+            }
+            return TraversalProcess.CONTINUE;
+          }
+        };
+
+    mgr.visitRecursively(fExists, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(1);
+    assertThat(amountOfForalls[0]).isEqualTo(0);
+    assertThat(amountOfNots[0]).isEqualTo(0);
+    amountOfExists[0] = 0;
+
+    mgr.visitRecursively(fNotExists, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(1);
+    assertThat(amountOfForalls[0]).isEqualTo(0);
+    assertThat(amountOfNots[0]).isEqualTo(1);
+    amountOfNots[0] = 0;
+    amountOfExists[0] = 0;
+
+    mgr.visitRecursively(fExistsNegatedBody, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(1);
+    assertThat(amountOfForalls[0]).isEqualTo(0);
+    assertThat(amountOfNots[0]).isEqualTo(1);
+    amountOfNots[0] = 0;
+    amountOfExists[0] = 0;
+
+    mgr.visitRecursively(fNotExistsNegatedBody, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(1);
+    assertThat(amountOfForalls[0]).isEqualTo(0);
+    assertThat(amountOfNots[0]).isEqualTo(2);
+    amountOfNots[0] = 0;
+    amountOfExists[0] = 0;
+
+    mgr.visitRecursively(fForall, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(0);
+    assertThat(amountOfForalls[0]).isEqualTo(1);
+    assertThat(amountOfNots[0]).isEqualTo(0);
+    amountOfNots[0] = 0;
+    amountOfForalls[0] = 0;
+
+    mgr.visitRecursively(fNotForall, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(0);
+    assertThat(amountOfForalls[0]).isEqualTo(1);
+    assertThat(amountOfNots[0]).isEqualTo(1);
+    amountOfNots[0] = 0;
+    amountOfForalls[0] = 0;
+
+    mgr.visitRecursively(fForallNegatedBody, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(0);
+    assertThat(amountOfForalls[0]).isEqualTo(1);
+    assertThat(amountOfNots[0]).isEqualTo(1);
+    amountOfNots[0] = 0;
+    amountOfForalls[0] = 0;
+
+    mgr.visitRecursively(fNotForallNegatedBody, notAndQuantifierCountingVisitor);
+    assertThat(amountOfExists[0]).isEqualTo(0);
+    assertThat(amountOfForalls[0]).isEqualTo(1);
+    assertThat(amountOfNots[0]).isEqualTo(2);
   }
 
   @Test
