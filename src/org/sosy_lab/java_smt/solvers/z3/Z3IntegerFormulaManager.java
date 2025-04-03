@@ -41,7 +41,8 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
    * <p>This method safely converts BigDecimal values by:
    * <ol>
    *   <li>Using exact conversion for integers (no fractional part)</li>
-   *   <li>Truncating toward zero for values with fractional parts</li>
+   *   <li>Using euclidean division for values with fractional parts to maintain consistency
+   *       with other solvers in JavaSMT</li>
    * </ol>
    *
    * <p>This prevents the segfault described in issue #457.
@@ -60,8 +61,31 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
         throw new AssertionError("Unexpected error converting BigDecimal", e);
       }
     } else {
-      // For fractional parts, use integer part (truncating toward zero)
-      return makeNumberImpl(pNumber.toBigInteger());
+      // For values with fractional parts, use euclidean division to maintain
+      // consistency with the behavior of other solvers in JavaSMT
+      BigInteger unscaledValue = pNumber.unscaledValue();
+      BigInteger scale = BigInteger.TEN.pow(pNumber.scale());
+      return makeNumberImpl(euclideanDivision(unscaledValue, scale));
+    }
+  }
+
+  /**
+   * Euclidean division.
+   *
+   * <p>In Euclidean division the remainder is always positive and the quotient needs to be rounded
+   * accordingly.
+   *
+   * <p>More formally, when dividing <code>a</code> by <code>b</code> we have <code>a = k*b + r
+   * </code> where <code> k</code> is the quotient <code>a/b</code> and <code>r</code> is the
+   * remainder of the division. In Euclidean division we now requires <code>0 <= r < b</code> to
+   * hold, which uniquely determines the equation.
+   */
+  private static BigInteger euclideanDivision(BigInteger x, BigInteger y) {
+    BigInteger div = x.divide(y);
+    if (x.signum() < 0 && !x.equals(y.multiply(div))) {
+      return div.subtract(BigInteger.valueOf(y.signum()));
+    } else {
+      return div;
     }
   }
 

@@ -16,4 +16,17 @@ public class IntegerFormulaManagerTest extends SolverBasedTest0 {
     BooleanFormula equals = bmgr.equals(f, three);
     assertThatFormula(equals).isSatisfiable();
   }
+  
+  @Test
+  public void testEuclideanDivisionForNegativeValues() throws SolverException, InterruptedException {
+    requireIntegers();
+    
+    // Test euclidean division for negative values with fractional parts
+    // For -3.5, we expect -4 (not -3 that simple truncation would give)
+    IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(-3.5));
+    IntegerFormula minusFour = imgr.makeNumber(-4);
+    
+    // This should be a tautology if euclidean division is working correctly
+    assertThatFormula(imgr.equal(f, minusFour)).isTautological();
+  }
 }
