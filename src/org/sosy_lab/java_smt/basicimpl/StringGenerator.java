@@ -59,7 +59,7 @@ public class StringGenerator {
 
   protected static void logGreaterThan(
       BooleanFormula result, StringFormula str1, StringFormula str2) {
-    logBinaryOp(result, "str.gt", str1, str2);
+    logBinaryOp(result, "str.", str1, str2);
   }
 
   protected static void logGreaterOrEquals(
@@ -68,12 +68,12 @@ public class StringGenerator {
   }
 
   protected static void logLessThan(BooleanFormula result, StringFormula str1, StringFormula str2) {
-    logBinaryOp(result, "str.lt", str1, str2);
+    logBinaryOp(result, "str.<", str1, str2);
   }
 
   protected static void logLessOrEquals(
       BooleanFormula result, StringFormula str1, StringFormula str2) {
-    logBinaryOp(result, "str.le", str1, str2);
+    logBinaryOp(result, "str.<=", str1, str2);
   }
 
   protected static void logPrefix(BooleanFormula result, StringFormula prefix, StringFormula str) {
@@ -90,7 +90,7 @@ public class StringGenerator {
 
   protected static void logRegexRange(RegexFormula result, StringFormula start, StringFormula end) {
     List<Object> inputParams = ImmutableList.of(start, end);
-    logOperation(result, inputParams, "(str.range %s %s)", Keyword.SKIP);
+    logOperation(result, inputParams, "(re.range %s %s)", Keyword.SKIP);
   }
 
   protected static void logRegexUnion(
@@ -184,11 +184,12 @@ public class StringGenerator {
   }
 
   protected static void logRegexTimes(RegexFormula result, RegexFormula regex, int repetitions) {
-    logOperation(result, ImmutableList.of(regex, repetitions), "(re.tms %s %d)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(regex, repetitions), "((_ re.^ "+repetitions+") %s)",
+        Keyword.SKIP);
   }
 
   protected static void logRegexCross(RegexFormula result, RegexFormula regex) {
-    logOperation(result, ImmutableList.of(regex), "(re.cross %s)", Keyword.SKIP);
+    logOperation(result, ImmutableList.of(regex), "(re.+ %s)", Keyword.SKIP);
   }
 
   protected static void logLength(IntegerFormula result, StringFormula str) {
@@ -208,7 +209,7 @@ public class StringGenerator {
 
   protected static void logToString(Object result, IntegerFormula number) {
     List<Object> inputParams = ImmutableList.of(number);
-    logOperation(result, inputParams, "(int.to_str %s)", Keyword.SKIP);
+    logOperation(result, inputParams, "(str.from_int %s)", Keyword.SKIP);
   }
 
   private static void logBinaryOp(Object result, String op, Object n1, Object n2) {

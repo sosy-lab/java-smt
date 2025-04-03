@@ -198,7 +198,7 @@ public class FloatingPointGenerator {
 
   protected static void logFPRound(
       FloatingPointFormula result, FloatingPointFormula n, String roundingMode) {
-    logUnaryOpWithMode(result, "fp.round", roundingMode, n);
+    logUnaryOpWithMode(result, "fp.roundToIntegral", roundingMode, n);
   }
 
   protected static void logFPAssignment(
