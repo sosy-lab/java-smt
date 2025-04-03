@@ -31,12 +31,6 @@ class ParseGenerateAndReparse {
 
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
-    String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 24))\n"
-            + "(declare-const b (_ FloatingPoint 8 24))\n"
-            + "(declare-const min (_ FloatingPoint 8 24))\n"
-            + "(assert (fp.eq (fp.min a b) min))\n";
-    System.out.println(nativeZ3ParseAndIsUnsat(expectedResult));
     if (args.length < 3) {
       System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-file> <solver> <mode>");
       System.exit(1);
@@ -84,7 +78,7 @@ class ParseGenerateAndReparse {
         Generator.assembleConstraint(formula);
         String regenerated = Generator.getSMTLIB2String();
         // NATIVE PARSE
-        checkResult(nativeZ3ParseAndIsUnsat(regenerated));
+        checkResult(checkNativeParseAndIsUnsat(solver, regenerated));
       } catch (Exception pE) {
         printError(pE);
       }
@@ -92,7 +86,7 @@ class ParseGenerateAndReparse {
     if (mode.equals("NATIVE")) {
       try {
         // NATIVE PARSE
-        checkResult(nativeZ3ParseAndIsUnsat(smt2FilePath));
+        checkResult(checkNativeParseAndIsUnsat(solver, smt2FilePath));
       } catch (Exception pE) {
         printError(pE);
       }
@@ -121,6 +115,14 @@ class ParseGenerateAndReparse {
     System.out.println("SUCCESS: isUnsat = " + isUnsat);
     System.exit(0);
   }
+  public static boolean checkNativeParseAndIsUnsat(Solvers solver, String smt2)
+      throws SolverException, InterruptedException, InvalidConfigurationException {
+    switch (solver){
+      case Z3: return nativeZ3ParseAndIsUnsat(smt2);
+      case MATHSAT5: return nativeMathSatParseAndIsUnsat(smt2);
+    }
+    throw new SolverException("Unsupported solver: " + solver);
+  }
 
   public static boolean nativeZ3ParseAndIsUnsat(String smt2) {
     try (Context ctx = new Context()) {
@@ -129,6 +131,14 @@ class ParseGenerateAndReparse {
       Status status = solver.check();
       return status == Status.UNSATISFIABLE;
     }
+  }
+
+  public static boolean nativeMathSatParseAndIsUnsat(String smt2)
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    SolverContext mathsat = SolverContextFactory.createSolverContext(Solvers.MATHSAT5);
+    ProverEnvironment prover = mathsat.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    prover.addConstraint(mathsat.getFormulaManager().parse(smt2));
+    return prover.isUnsat();
   }
 
   public static void printError(Exception pE) {
