@@ -120,6 +120,7 @@ class ParseGenerateAndReparse {
     switch (solver){
       case Z3: return nativeZ3ParseAndIsUnsat(smt2);
       case MATHSAT5: return nativeMathSatParseAndIsUnsat(smt2);
+      case BITWUZLA: return nativeBitwuzlaParseAndIsUnsat(smt2);
     }
     throw new SolverException("Unsupported solver: " + solver);
   }
@@ -131,6 +132,13 @@ class ParseGenerateAndReparse {
       Status status = solver.check();
       return status == Status.UNSATISFIABLE;
     }
+  }
+  public static boolean nativeBitwuzlaParseAndIsUnsat(String smt2)
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    SolverContext bitwuz = SolverContextFactory.createSolverContext(Solvers.BITWUZLA);
+    ProverEnvironment prover = bitwuz.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    prover.addConstraint(bitwuz.getFormulaManager().parse(smt2));
+    return prover.isUnsat();
   }
 
   public static boolean nativeMathSatParseAndIsUnsat(String smt2)
