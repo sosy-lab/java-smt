@@ -96,15 +96,9 @@ public class SolverLessBooleanFormulaManager
       return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
     }
     if (Boolean.parseBoolean(cond.getValue())) {
-      if (Objects.equals(f1.getValue(), "")) {
-        return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-      }
-      return new SMTLIB2Formula(Boolean.parseBoolean(f1.getValue()));
+      return f1;
     } else {
-      if (Objects.equals(f2.getValue(), "")) {
-        return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-      }
-      return new SMTLIB2Formula(Boolean.parseBoolean(f2.getValue()));
+      return f2;
     }
   }
 }
