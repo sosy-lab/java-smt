@@ -820,6 +820,12 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     // Some solvers encode quantifiers as the negated other quantifier, and we don't ever want
     // to confuse those when traversing the formulas. Also, we want to make sure that the
     // formulas are not rewritten unexpectedly.
+
+    assume()
+        .withMessage("Princess does not allow boolean quantification currently")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
     requireQuantifiers();
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
