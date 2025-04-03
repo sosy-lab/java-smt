@@ -16,25 +16,28 @@ import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.parserInterpreter.ParserException;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
-/** This file is meant for the Evaluation of the Parser/Generator. */
+/**
+ * This file is meant for the Evaluation of the Parser/Generator.
+ */
 class ParseGenerateAndReparse {
-  private ParseGenerateAndReparse() {}
+  private ParseGenerateAndReparse() {
+  }
 
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
 
-    if (args.length < 2) {
-      System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-file> <solver>");
+    if (args.length < 3) {
+      System.err.println("Usage: java ParseGenerateAndReparseTest <smt2-file> <solver> <mode>");
       System.exit(1);
     }
 
-    // Lese den Inhalt der SMT2-Datei
     String smt2FilePath = args[0];
     String smt2;
     try {
@@ -43,22 +46,19 @@ class ParseGenerateAndReparse {
       System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
       e.printStackTrace();
       System.exit(1);
-      return; // Unreachable, aber notwendig für Compiler
+      return;
     }
 
     String solverName = args[1];
-
-    // Try to get the solver
     Solvers solver;
     try {
       solver = Solvers.valueOf(solverName.toUpperCase(Locale.ROOT));
     } catch (IllegalArgumentException e) {
       System.err.println("Invalid solver name: " + solverName);
       System.exit(1);
-      return; // Unreachable, aber notwendig für Compiler
+      return;
     }
-
-    // JavaSMT-Konfiguration
+    String mode = args[2].toUpperCase(Locale.ROOT);
     Configuration config =
         Configuration.builder()
             .setOption("solver.generateSMTLIB2", "true")
@@ -67,61 +67,79 @@ class ParseGenerateAndReparse {
     LogManager logger = BasicLogManager.create(config);
     ShutdownManager shutdown = ShutdownManager.create();
 
-    try (SolverContext z3solverContext =
-            SolverContextFactory.createSolverContext(
-                config, logger, shutdown.getNotifier(), solver);
-        SolverContext solverLessContext =
-            SolverContextFactory.createSolverContext(
-                config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
-        ProverEnvironment z3proverEnv =
-            z3solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
-        ProverEnvironment solverLessProverEnv =
-            solverLessContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-      try {
-        z3proverEnv.addConstraint(
-            z3solverContext.getFormulaManager().universalParseFromString(smt2));
-      } catch (Exception pE) {
-        if (pE instanceof UnsupportedOperationException) {
-          System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
-          System.exit(1);
+    if (mode.equals("GENERATE_AND_REPARSE")) {
+      //PARSE REGENERATE THEN NATIVE PARSE
+      try (SolverContext realSolverContext =
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), solver);
+           SolverContext solverLessContext =
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
+           ProverEnvironment realProverEnvironment =
+               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+        try {
+          //JAVASMT'S PARSER
+          BooleanFormula formula =
+              solverLessContext.getFormulaManager().universalParseFromString(smt2);
+          //JAVASMT'S GENERATOR
+          Generator.assembleConstraint(formula);
+          String regenerated = Generator.getSMTLIB2String();
+          //NATIVE PARSE
+          BooleanFormula reparsed = realSolverContext.getFormulaManager().parse(regenerated);
+          realProverEnvironment.addConstraint(reparsed);
+          checkResult(realProverEnvironment.isUnsat());
+
+        } catch (Exception pE) {
+          printError(pE);
         }
-        if (pE instanceof ParserException) {
-          System.out.println(
-              "RESULT UNKNOWN: ParserException. Please make sure that your code.\n"
-                  + "Follows the official SMTLIB2 Standard. This Exception happens most of the"
-                  + " time, because arguments are used with more than arguments, which is"
-                  + " officially notallowed but still supported by some solvers. Please consider"
-                  + " the official theories: https://smt-lib.org/theories.shtml");
-        }
-        System.out.println("Exception in first parsing: " + pE);
-        System.exit(1);
-      }
-      try {
-        solverLessProverEnv.addConstraint(
-            solverLessContext.getFormulaManager().universalParseFromString(smt2));
-      } catch (Exception pE) {
-        if (pE instanceof UnsupportedOperationException) {
-          System.out.println("RESULT UNKNOWN: Unsupported operation: " + pE.getMessage());
-          System.exit(1);
-        }
-        System.out.println("Exception while Generating and Reparsing" + pE.getMessage());
-        System.exit(1);
-      }
-      // Ergebnisse vergleichen
-      boolean z3Sat = z3proverEnv.isUnsat();
-      boolean reparsedSat = solverLessProverEnv.isUnsat();
-      if (z3Sat == reparsedSat) {
-        System.out.println("SUCCESS: " + z3Sat);
-        System.exit(0);
-      } else {
-        System.out.println(
-            "FAILURE: SolverSat:"
-                + z3Sat
-                + "is not equal to generated and "
-                + "reparsed Sat: "
-                + reparsedSat);
-        System.exit(1);
       }
     }
+    if (mode.equals("NATIVE")) {
+      try (SolverContext realSolverContext =
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), solver);
+           ProverEnvironment realProverEnvironment =
+               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+
+        try {
+          //NATIVE PARSE
+          BooleanFormula nativeParsed = realSolverContext.getFormulaManager().parse(smt2);
+          realProverEnvironment.addConstraint(nativeParsed);
+          checkResult(realProverEnvironment.isUnsat());
+        } catch (Exception pE) {
+          printError(pE);
+        }
+      }
+    }
+    if (mode.equals("PARSE")) {
+      try (SolverContext realSolverContext =
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), solver);
+           ProverEnvironment realProverEnvironment =
+               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        try {
+          //JAVASMT'S PARSER
+          BooleanFormula javaSMTParsed =
+              realSolverContext.getFormulaManager().universalParseFromString(smt2);
+          realProverEnvironment.addConstraint(javaSMTParsed);
+          checkResult(realProverEnvironment.isUnsat());
+        } catch (Exception pE) {
+          printError(pE);
+        }
+      }
+    }
+  }
+
+  public static void checkResult(boolean isUnsat) {
+    System.out.println("SUCCESS: isUnsat = " + isUnsat);
+    System.exit(0);
+  }
+
+  public static void printError(Exception pE) {
+    System.out.println("ERROR: ");
+    pE.printStackTrace();
+    System.exit(1);
+    throw new RuntimeException(pE);
   }
 }
