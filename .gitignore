@@ -64,14 +64,11 @@ solvers_maven_conf/*.asc
 run
 Out.smt2
 retrieve-jars.sh
-rule.refaster
 /dependencies
 /*.so
 /*.dll
 /*.jar
 
-build.properties
 /.apt-generated/
 /repository
 pom.xml
-/error-prone.patch
