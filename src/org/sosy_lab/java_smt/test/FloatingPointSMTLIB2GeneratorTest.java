@@ -462,7 +462,8 @@ public class FloatingPointSMTLIB2GeneratorTest
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const a (_ FloatingPoint 8 24))\n" + "(assert (fp.eq a (fp.roundToIntegral RNE "
+        "(declare-const a (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq a (fp.roundToIntegral RNE "
             + "a)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);

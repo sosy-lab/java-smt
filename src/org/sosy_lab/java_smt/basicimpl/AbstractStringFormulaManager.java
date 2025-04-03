@@ -78,8 +78,9 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   public BooleanFormula greaterThan(StringFormula str1, StringFormula str2) {
     BooleanFormula result = wrapBool(greaterThan(extractInfo(str1), extractInfo(str2)));
     if (Generator.isLoggingEnabled()) {
-      throw new UnsupportedOperationException("SMTLIB does not allow greater "
-          + "than or equal to StringFormula! Use str.< or str.<= instead.");
+      throw new UnsupportedOperationException(
+          "SMTLIB does not allow greater "
+              + "than or equal to StringFormula! Use str.< or str.<= instead.");
     }
     return result;
   }
@@ -90,8 +91,9 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   public BooleanFormula greaterOrEquals(StringFormula str1, StringFormula str2) {
     BooleanFormula result = wrapBool(greaterOrEquals(extractInfo(str1), extractInfo(str2)));
     if (Generator.isLoggingEnabled()) {
-      throw new UnsupportedOperationException("SMTLIB does not allow greater "
-          + "than or equal to StringFormula! Use str.< or str.<= instead.");
+      throw new UnsupportedOperationException(
+          "SMTLIB does not allow greater "
+              + "than or equal to StringFormula! Use str.< or str.<= instead.");
     }
     return result;
   }

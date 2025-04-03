@@ -184,7 +184,10 @@ public class StringGenerator {
   }
 
   protected static void logRegexTimes(RegexFormula result, RegexFormula regex, int repetitions) {
-    logOperation(result, ImmutableList.of(regex, repetitions), "((_ re.^ "+repetitions+") %s)",
+    logOperation(
+        result,
+        ImmutableList.of(regex, repetitions),
+        "((_ re.^ " + repetitions + ") %s)",
         Keyword.SKIP);
   }
 
