@@ -46,16 +46,7 @@ solvers_maven_conf/*.asc
 /common-*.jar
 /TEST-*.txt
 /junit
-/JUnit.html
 /JUnit-coverage
-/Checkstyle.html
-/Checkstyle.xml
-/Checkstyle.Test.html
-/Checkstyle.Test.xml
-/SpotBugs.html
-/SpotBugs.xml
-/SpotBugs.diff.html
-/SpotBugs.diff.xml
 /Javadoc
 /Javadoc-z3
 /gh-pages
