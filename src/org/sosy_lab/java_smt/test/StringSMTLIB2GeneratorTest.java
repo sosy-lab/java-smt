@@ -250,7 +250,7 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
     String actualResult = String.valueOf(Generator.getLines());
 
     String expectedResult =
-        "(declare-const result String)\n" + "(assert (= (int.to_str 42) result))\n";
+        "(declare-const result String)\n" + "(assert (= (str.from_int 42) result))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }
