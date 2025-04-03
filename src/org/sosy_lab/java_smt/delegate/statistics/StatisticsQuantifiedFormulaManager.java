@@ -22,7 +22,6 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverStatistics stats;
-  ProverOptions[] option;
 
   StatisticsQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverStatistics pStats) {
     delegate = checkNotNull(pDelegate);
@@ -45,6 +44,6 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   @Override
   public void setOptions(ProverOptions... opt) {
-    option = opt;
+    delegate.setOptions(opt);
   }
 }

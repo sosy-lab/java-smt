@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -22,9 +21,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
-
-  @SuppressWarnings("unused")
-  private List<ProverOptions> option;
 
   public DebuggingQuantifiedFormulaManager(
       QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
@@ -57,6 +53,6 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
 
   @Override
   public void setOptions(ProverOptions... opt) {
-    option.addAll(Arrays.asList(opt));
+    delegate.setOptions(opt);
   }
 }

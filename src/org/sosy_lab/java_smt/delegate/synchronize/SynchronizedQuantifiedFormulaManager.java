@@ -24,9 +24,6 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
   private final QuantifiedFormulaManager delegate;
   private final SolverContext sync;
 
-  @SuppressWarnings("unused")
-  private ProverOptions[] option;
-
   SynchronizedQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);
     sync = checkNotNull(pSync);
@@ -50,6 +47,6 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   @Override
   public void setOptions(ProverOptions... opt) {
-    option = opt;
+    delegate.setOptions(opt);
   }
 }
