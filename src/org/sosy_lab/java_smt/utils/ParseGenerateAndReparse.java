@@ -121,8 +121,8 @@ class ParseGenerateAndReparse {
       case Z3: return nativeZ3ParseAndIsUnsat(smt2);
       case MATHSAT5: return nativeMathSatParseAndIsUnsat(smt2);
       case BITWUZLA: return nativeBitwuzlaParseAndIsUnsat(smt2);
+      default: throw new SolverException("Unsupported solver: " + solver);
     }
-    throw new SolverException("Unsupported solver: " + solver);
   }
 
   public static boolean nativeZ3ParseAndIsUnsat(String smt2) {
