@@ -52,17 +52,15 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
       return makeNumberImpl(0);
     }
     
-    try {
-      if (pNumber.scale() <= 0) {
-        // No fractional part, safe to use the BigInteger conversion
+    if (pNumber.scale() <= 0) {
+      try {
         return makeNumberImpl(pNumber.toBigIntegerExact());
-      } else {
-        // For fractional parts, use integer part (truncating toward zero)
-        // This avoids problems with Z3's division operations
-        return makeNumberImpl(pNumber.toBigInteger());
+      } catch (ArithmeticException e) {
+        // This shouldn't happen since we checked scale <= 0
+        throw new AssertionError("Unexpected error converting BigDecimal", e);
       }
-    } catch (ArithmeticException | NumberFormatException e) {
-      // If any conversion fails, fall back to simple truncation
+    } else {
+      // For fractional parts, use integer part (truncating toward zero)
       return makeNumberImpl(pNumber.toBigInteger());
     }
   }
