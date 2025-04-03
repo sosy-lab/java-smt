@@ -23,12 +23,9 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-/**
- * This file is meant for the Evaluation of the Parser/Generator.
- */
+/** This file is meant for the Evaluation of the Parser/Generator. */
 class ParseGenerateAndReparse {
-  private ParseGenerateAndReparse() {
-  }
+  private ParseGenerateAndReparse() {}
 
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
@@ -68,24 +65,24 @@ class ParseGenerateAndReparse {
     ShutdownManager shutdown = ShutdownManager.create();
 
     if (mode.equals("GENERATE_AND_REPARSE")) {
-      //PARSE REGENERATE THEN NATIVE PARSE
+      // PARSE REGENERATE THEN NATIVE PARSE
       try (SolverContext realSolverContext =
-               SolverContextFactory.createSolverContext(
-                   config, logger, shutdown.getNotifier(), solver);
-           SolverContext solverLessContext =
-               SolverContextFactory.createSolverContext(
-                   config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
-           ProverEnvironment realProverEnvironment =
-               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+              SolverContextFactory.createSolverContext(
+                  config, logger, shutdown.getNotifier(), solver);
+          SolverContext solverLessContext =
+              SolverContextFactory.createSolverContext(
+                  config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS);
+          ProverEnvironment realProverEnvironment =
+              realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
         try {
-          //JAVASMT'S PARSER
+          // JAVASMT'S PARSER
           BooleanFormula formula =
               solverLessContext.getFormulaManager().universalParseFromString(smt2);
-          //JAVASMT'S GENERATOR
+          // JAVASMT'S GENERATOR
           Generator.assembleConstraint(formula);
           String regenerated = Generator.getSMTLIB2String();
-          //NATIVE PARSE
+          // NATIVE PARSE
           BooleanFormula reparsed = realSolverContext.getFormulaManager().parse(regenerated);
           realProverEnvironment.addConstraint(reparsed);
           checkResult(realProverEnvironment.isUnsat());
@@ -97,13 +94,13 @@ class ParseGenerateAndReparse {
     }
     if (mode.equals("NATIVE")) {
       try (SolverContext realSolverContext =
-               SolverContextFactory.createSolverContext(
-                   config, logger, shutdown.getNotifier(), solver);
-           ProverEnvironment realProverEnvironment =
-               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+              SolverContextFactory.createSolverContext(
+                  config, logger, shutdown.getNotifier(), solver);
+          ProverEnvironment realProverEnvironment =
+              realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
 
         try {
-          //NATIVE PARSE
+          // NATIVE PARSE
           BooleanFormula nativeParsed = realSolverContext.getFormulaManager().parse(smt2);
           realProverEnvironment.addConstraint(nativeParsed);
           checkResult(realProverEnvironment.isUnsat());
@@ -114,12 +111,12 @@ class ParseGenerateAndReparse {
     }
     if (mode.equals("PARSE")) {
       try (SolverContext realSolverContext =
-               SolverContextFactory.createSolverContext(
-                   config, logger, shutdown.getNotifier(), solver);
-           ProverEnvironment realProverEnvironment =
-               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+              SolverContextFactory.createSolverContext(
+                  config, logger, shutdown.getNotifier(), solver);
+          ProverEnvironment realProverEnvironment =
+              realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
         try {
-          //JAVASMT'S PARSER
+          // JAVASMT'S PARSER
           BooleanFormula javaSMTParsed =
               realSolverContext.getFormulaManager().universalParseFromString(smt2);
           realProverEnvironment.addConstraint(javaSMTParsed);
