@@ -49,10 +49,6 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
    */
   @Override
   protected Long makeNumberImpl(BigDecimal pNumber) {
-    if (pNumber == null) {
-      return makeNumberImpl(0);
-    }
-    
     if (pNumber.scale() <= 0) {
       try {
         return makeNumberImpl(pNumber.toBigIntegerExact());
