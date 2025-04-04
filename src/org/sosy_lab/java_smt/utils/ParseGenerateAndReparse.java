@@ -150,7 +150,11 @@ class ParseGenerateAndReparse {
   }
 
   public static void printError(Exception pE) {
-    System.out.println("ERROR: ");
+    if(pE instanceof UnsupportedOperationException){
+      System.out.println("UNSUPPORTED: ");
+    }else{
+      System.out.println("ERROR: ");
+    }
     pE.printStackTrace();
     System.exit(1);
     throw new RuntimeException(pE);
