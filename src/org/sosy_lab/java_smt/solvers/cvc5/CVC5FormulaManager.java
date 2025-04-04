@@ -93,10 +93,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     for (String token : tokens) {
       if (Tokenizer.isDeclarationToken(token)) {
         // Parse the variable/UF declaration to get a name
-        TermManager tm = new TermManager();
-        Solver solver = new Solver(tm);
+        Solver solver = new Solver(getEnvironment());
         InputParser parser = new InputParser(solver);
-        SymbolManager symbolManager = new SymbolManager(tm);
+        SymbolManager symbolManager = new SymbolManager(getEnvironment());
         parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + token, "");
         parser.nextCommand().invoke(solver, symbolManager);
         parser.nextCommand().invoke(solver, symbolManager);
@@ -157,8 +156,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     String input = String.join("\n", processed.build());
 
     // Add the declarations to the input and parse everything
-    TermManager termManager = new TermManager();
-    Solver solver = new Solver(termManager);
+    Solver solver = new Solver(getEnvironment());
     InputParser parser = new InputParser(solver);
     SymbolManager symbolManager = parser.getSymbolManager();
     parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + decls + input, "");
@@ -180,7 +178,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Get the assertions from the input
     Term[] asserted = solver.getAssertions();
-    Term result = asserted.length == 1 ? asserted[0] : termManager.mkTerm(Kind.AND, asserted);
+    Term result = asserted.length == 1 ? asserted[0] : getEnvironment().mkTerm(Kind.AND, asserted);
 
     // Now get all declared symbols
     Term[] declared = symbolManager.getDeclaredTerms();
