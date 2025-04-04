@@ -103,6 +103,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         Term parsed = symbolManager.getDeclaredTerms()[0];
 
         String symbol = parsed.getSymbol();
+        if (symbol.startsWith("|") && symbol.endsWith("|")) {
+          // Strip quotes from the name
+          symbol = symbol.substring(1, symbol.length() - 1);
+        }
         Sort sort = parsed.getSort();
 
         // Check if the symbol is already defined in the variable cache
@@ -201,12 +205,17 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     // Process the symbols from the parser
     Map<Term, Term> subst = new HashMap<>();
     for (Term term : declared) {
-      if (cache.containsRow(term.getSymbol())) {
+      String symbol = term.getSymbol();
+      if (symbol.startsWith("|") && symbol.endsWith("|")) {
+        // Strip quotes from the name
+        symbol = symbol.substring(1, symbol.length() - 1);
+      }
+      if (cache.containsRow(symbol)) {
         // Symbol is from the context: add the original term to the substitution map
-        subst.put(term, cache.get(term.getSymbol(), term.getSort()));
+        subst.put(term, cache.get(symbol, term.getSort()));
       } else {
         // Symbol is new, add it to the context
-        cache.put(term.getSymbol(), term.getSort(), term);
+        cache.put(symbol, term.getSort(), term);
       }
     }
 
