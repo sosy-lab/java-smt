@@ -37,9 +37,9 @@ class ParseGenerateAndReparse {
     }
 
     String smt2FilePath = args[0];
-    String smt2;
+    String smt2FileContent;
     try {
-      smt2 = Files.readString(Path.of(smt2FilePath), Charset.defaultCharset());
+      smt2FileContent = Files.readString(Path.of(smt2FilePath), Charset.defaultCharset());
     } catch (IOException e) {
       System.err.println("Fehler beim Lesen der SMT2-Datei: " + smt2FilePath);
       e.printStackTrace();
@@ -73,7 +73,7 @@ class ParseGenerateAndReparse {
 
         // JAVASMT'S PARSER
         BooleanFormula formula =
-            solverLessContext.getFormulaManager().universalParseFromString(smt2);
+            solverLessContext.getFormulaManager().universalParseFromString(smt2FileContent);
         // JAVASMT'S GENERATOR
         Generator.assembleConstraint(formula);
         String regenerated = Generator.getSMTLIB2String();
@@ -86,7 +86,7 @@ class ParseGenerateAndReparse {
     if (mode.equals("NATIVE")) {
       try {
         // NATIVE PARSE
-        checkResult(checkNativeParseAndIsUnsat(solver, smt2FilePath));
+        checkResult(checkNativeParseAndIsUnsat(solver, smt2FileContent));
       } catch (Exception pE) {
         printError(pE);
       }
@@ -100,7 +100,7 @@ class ParseGenerateAndReparse {
         try {
           // JAVASMT'S PARSER
           BooleanFormula javaSMTParsed =
-              realSolverContext.getFormulaManager().universalParseFromString(smt2);
+              realSolverContext.getFormulaManager().universalParseFromString(smt2FileContent);
           realProverEnvironment.addConstraint(javaSMTParsed);
           // JAVASMT'S PARSE
           checkResult(realProverEnvironment.isUnsat());
