@@ -13,6 +13,8 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Command;
+import io.github.cvc5.InputParser;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
 import io.github.cvc5.Proof;
@@ -21,8 +23,10 @@ import io.github.cvc5.Result;
 import io.github.cvc5.RoundingMode;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
+import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import io.github.cvc5.modes.InputLanguage;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1376,6 +1380,29 @@ public class CVC5NativeAPITest {
         sort,
         exp.getSort(),
         exp);
+  }
+
+  @Test
+  public void parseTest() {
+    InputParser parser = new InputParser(solver);
+    SymbolManager symbolManager = parser.getSymbolManager();
+    parser.setStringInput(
+        InputLanguage.SMT_LIB_2_6, "(declare-const a Int)(assert (= a 3))", "parseTest");
+
+    Command cmd = parser.nextCommand();
+    while (!cmd.isNull()) {
+      try {
+        cmd.invoke(solver, symbolManager);
+        cmd = parser.nextCommand();
+      } catch (Throwable e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+    assertThat(symbolManager.getDeclaredTerms()).hasLength(1);
+    assertThat(symbolManager.getDeclaredTerms()[0].getSymbol()).isEqualTo("a");
+
+    assertThat(solver.getAssertions()).hasLength(1);
+    assertThat(solver.getAssertions()[0].toString()).isEqualTo("(= a 3)");
   }
 
   @Test
