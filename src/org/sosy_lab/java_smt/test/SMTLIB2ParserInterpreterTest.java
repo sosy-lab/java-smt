@@ -2296,7 +2296,7 @@ public class SMTLIB2ParserInterpreterTest extends SolverBasedTest0.Parameterized
     assertThat(actualResult).isEqualTo(null);
   }
 
-  @Test(expected = ParserException.class)
+  @Test(expected = UnsupportedOperationException.class)
   public void testExceptionDistinct()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireIntegers();
