@@ -968,7 +968,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               return Objects.requireNonNull(imgr).distinct(integerOperands);
             }
           } catch (Exception e) {
-            throw new ParserException("Operands for " + operator + " need to be of numeral type");
+            throw new UnsupportedOperationException("JavaSMT support distinct only for numeral types!");
           }
         } else {
           throw new ParserException(operator + " takes at least one numeral operand as input. ");
