@@ -63,3 +63,11 @@ retrieve-jars.sh
 /.apt-generated/
 /repository
 pom.xml
+/Checkstyle.html
+/Checkstyle.Test.html
+/Checkstyle.Test.xml
+/Checkstyle.xml
+/JUnit.html
+/local_test_run
+/rule.refaster
+/SpotBugs.xml

@@ -115,13 +115,18 @@ class ParseGenerateAndReparse {
     System.out.println("SUCCESS: isUnsat = " + isUnsat);
     System.exit(0);
   }
+
   public static boolean checkNativeParseAndIsUnsat(Solvers solver, String smt2)
       throws SolverException, InterruptedException, InvalidConfigurationException {
-    switch (solver){
-      case Z3: return nativeZ3ParseAndIsUnsat(smt2);
-      case MATHSAT5: return nativeMathSatParseAndIsUnsat(smt2);
-      case BITWUZLA: return nativeBitwuzlaParseAndIsUnsat(smt2);
-      default: throw new SolverException("Unsupported solver: " + solver);
+    switch (solver) {
+      case Z3:
+        return nativeZ3ParseAndIsUnsat(smt2);
+      case MATHSAT5:
+        return nativeMathSatParseAndIsUnsat(smt2);
+      case BITWUZLA:
+        return nativeBitwuzlaParseAndIsUnsat(smt2);
+      default:
+        throw new SolverException("Unsupported solver: " + solver);
     }
   }
 
@@ -133,6 +138,7 @@ class ParseGenerateAndReparse {
       return status == Status.UNSATISFIABLE;
     }
   }
+
   public static boolean nativeBitwuzlaParseAndIsUnsat(String smt2)
       throws InvalidConfigurationException, InterruptedException, SolverException {
     SolverContext bitwuz = SolverContextFactory.createSolverContext(Solvers.BITWUZLA);
@@ -150,9 +156,9 @@ class ParseGenerateAndReparse {
   }
 
   public static void printError(Exception pE) {
-    if(pE instanceof UnsupportedOperationException){
+    if (pE instanceof UnsupportedOperationException) {
       System.out.println("UNSUPPORTED: ");
-    }else{
+    } else {
       System.out.println("ERROR: ");
     }
     pE.printStackTrace();
