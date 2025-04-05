@@ -25,9 +25,12 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-/** This file is meant for the Evaluation of the Parser/Generator. */
+/**
+ * This file is meant for the Evaluation of the Parser/Generator.
+ */
 class ParseGenerateAndReparse {
-  private ParseGenerateAndReparse() {}
+  private ParseGenerateAndReparse() {
+  }
 
   public static void main(String[] args)
       throws InvalidConfigurationException, InterruptedException, SolverException {
@@ -56,6 +59,18 @@ class ParseGenerateAndReparse {
       System.exit(1);
       return;
     }
+    boolean expectedIsUnsat = false;
+    boolean foundInFile = false;
+
+    if (smt2FileContent.contains("(set-info :status sat)")) {
+      expectedIsUnsat = false;
+      foundInFile = true;
+    } else if (smt2FileContent.contains("(set-info :status unsat)")) {
+      expectedIsUnsat = true;
+      foundInFile = true;
+    }
+
+
     String mode = args[2].toUpperCase(Locale.ROOT);
     Configuration config =
         Configuration.builder()
@@ -68,8 +83,8 @@ class ParseGenerateAndReparse {
     if (mode.equals("GENERATE_AND_REPARSE")) {
       // PARSE REGENERATE THEN NATIVE PARSE
       try (SolverContext solverLessContext =
-          SolverContextFactory.createSolverContext(
-              config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS)) {
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), Solvers.SOLVERLESS)) {
 
         // JAVASMT'S PARSER
         BooleanFormula formula =
@@ -78,7 +93,7 @@ class ParseGenerateAndReparse {
         Generator.assembleConstraint(formula);
         String regenerated = Generator.getSMTLIB2String();
         // NATIVE PARSE
-        checkResult(checkNativeParseAndIsUnsat(solver, regenerated));
+        checkResult(checkNativeParseAndIsUnsat(solver, regenerated), expectedIsUnsat, foundInFile);
       } catch (Exception pE) {
         printError(pE);
       }
@@ -86,24 +101,24 @@ class ParseGenerateAndReparse {
     if (mode.equals("NATIVE")) {
       try {
         // NATIVE PARSE
-        checkResult(checkNativeParseAndIsUnsat(solver, smt2FileContent));
+        checkResult(checkNativeParseAndIsUnsat(solver, smt2FileContent), expectedIsUnsat, foundInFile);
       } catch (Exception pE) {
         printError(pE);
       }
     }
     if (mode.equals("PARSE")) {
       try (SolverContext realSolverContext =
-              SolverContextFactory.createSolverContext(
-                  config, logger, shutdown.getNotifier(), solver);
-          ProverEnvironment realProverEnvironment =
-              realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+               SolverContextFactory.createSolverContext(
+                   config, logger, shutdown.getNotifier(), solver);
+           ProverEnvironment realProverEnvironment =
+               realSolverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
         try {
           // JAVASMT'S PARSER
           BooleanFormula javaSMTParsed =
               realSolverContext.getFormulaManager().universalParseFromString(smt2FileContent);
           realProverEnvironment.addConstraint(javaSMTParsed);
           // JAVASMT'S PARSE
-          checkResult(realProverEnvironment.isUnsat());
+          checkResult(realProverEnvironment.isUnsat(), expectedIsUnsat, foundInFile);
         } catch (Exception pE) {
           printError(pE);
         }
@@ -111,9 +126,25 @@ class ParseGenerateAndReparse {
     }
   }
 
-  public static void checkResult(boolean isUnsat) {
-    System.out.println("SUCCESS: isUnsat = " + isUnsat);
-    System.exit(0);
+  public static void checkResult(
+      boolean actualIsUnsat,
+      boolean expectedIsUnsat,
+      boolean foundInFile) {
+    if (foundInFile) {
+      if (actualIsUnsat != expectedIsUnsat) {
+        System.out.println(
+            "FALSE: actualIsUnsat :" + actualIsUnsat + " does not match expectedIsUnsat :"
+                + expectedIsUnsat);
+        System.exit(1);
+      } else{
+        System.out.println("SUCCESS: PROPERTY HOLDS: expectedIsUnsat = " + expectedIsUnsat + " = "
+            + "actualIsUnsat = " + actualIsUnsat);
+        System.exit(0);
+      }
+    }else {
+      System.out.println("SUCCESS: isUnsat = " + actualIsUnsat);
+      System.exit(0);
+    }
   }
 
   public static boolean checkNativeParseAndIsUnsat(Solvers solver, String smt2)
