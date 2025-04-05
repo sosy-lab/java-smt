@@ -111,18 +111,25 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
         // Check if the symbol is already defined in the variable cache
         if (cache.containsRow(symbol)) {
+          Sort typeDefinition = cache.row(symbol).keySet().toArray(new Sort[0])[0];
           Preconditions.checkArgument(
               cache.contains(symbol, sort),
-              "Symbol %s is already used by the solver with a different typ",
-              symbol);
+              "Symbol '%s' is already used by the solver with a different type. The new type is "
+                  + "%s, but we already have a definition with type %s.",
+              symbol,
+              sort,
+              typeDefinition);
           continue; // Skip if it's a redefinition
         }
 
         // Check if it collides with a definition that was parsed earlier
         Preconditions.checkArgument(
             !localSymbols.containsKey(symbol) || localSymbols.get(symbol).equals(sort),
-            "Symbol %s has already been defined by this script with a different type",
-            sort);
+            "Symbol '%s' has already been defined by this script with a different type. The new "
+                + "type is %s, but we have already a definition with type %s.",
+            symbol,
+            sort,
+            localSymbols.get(symbol));
 
         // Add the symbol to the local definitions for this parse
         localSymbols.put(symbol, sort);
