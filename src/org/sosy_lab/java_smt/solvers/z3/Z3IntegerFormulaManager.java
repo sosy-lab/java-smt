@@ -39,10 +39,11 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
    * operations, which can cause segfaults in Z3 when used with integer sorts.
    *
    * <p>This method safely converts BigDecimal values by:
+   *
    * <ol>
-   *   <li>Using exact conversion for integers (no fractional part)</li>
-   *   <li>Using euclidean division for values with fractional parts to maintain consistency
-   *       with other solvers in JavaSMT</li>
+   *   <li>Using exact conversion for integers (no fractional part)
+   *   <li>Using euclidean division for values with fractional parts to maintain consistency with
+   *       other solvers in JavaSMT
    * </ol>
    *
    * <p>This prevents the segfault described in issue #457.
