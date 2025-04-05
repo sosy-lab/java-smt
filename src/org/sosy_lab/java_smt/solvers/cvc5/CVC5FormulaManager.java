@@ -25,14 +25,10 @@ import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import io.github.cvc5.modes.InputLanguage;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -193,21 +189,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Now get all declared symbols
     Term[] declared = symbolManager.getDeclaredTerms();
-
-    // Check that all variables/UF have a single type signature
-    // The CVC5 parser allows polymorphic types, but we don't support them in JavaSMT
-    Set<String> duplicates =
-        Arrays.stream(declared)
-            .collect(Collectors.groupingBy(Term::getSymbol, Collectors.counting()))
-            .entrySet()
-            .stream()
-            .filter(m -> m.getValue() > 1)
-            .map(Entry::getKey)
-            .collect(Collectors.toSet());
-    Preconditions.checkArgument(
-        duplicates.isEmpty(),
-        "Parsing failed as there were multiple conflicting definitions for the symbol(s) '%s'",
-        duplicates);
 
     // Process the symbols from the parser
     Map<Term, Term> subst = new HashMap<>();
