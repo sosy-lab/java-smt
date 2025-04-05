@@ -255,7 +255,9 @@ public class Generator {
     String endSMTLIB2 = "(check-sat)\n(get-model)\n(exit)";
     // FIXME Should we really add this to lines?
     lines.append(endSMTLIB2);
-    return "(set-logic AUFLIRA)\n" + lines;
+    // TODO GENERATOR URGENTLY NEEDS TO DETECT USED THEORIES AND DECLARE IT HERE
+    // TODO NOT ALL SOLVER SUPPORT SET-LOGIC ALL!
+    return "(set-logic ALL)\n" + lines;
   }
 
   public static void resetGenerator() {

@@ -56,6 +56,7 @@ import org.sosy_lab.java_smt.api.UFManager;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_assertContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_declareConstContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_declareFunContext;
+import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_defineSortContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_popContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Cmd_pushContext;
 import org.sosy_lab.java_smt.basicimpl.parserInterpreter.Smtlibv2Parser.Decl_sortContext;
@@ -456,7 +457,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       case "String":
         return FormulaType.StringType;
       default:
-        throw new ParserException(type + " is not a known Array sort. ");
+        throw new ParserException(type + " is not a known sort.");
     }
   }
 
@@ -2315,6 +2316,11 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   @Override
   public Object visitDecl_sort(Decl_sortContext ctx) {
     throw new UnsupportedOperationException("JavaSMT does not support \"declare-sort\"");
+  }
+
+  @Override
+  public Object visitCmd_defineSort(Cmd_defineSortContext ctx) {
+    throw new UnsupportedOperationException("JavaSMT does not support \"define-sort\"");
   }
 
   @Override

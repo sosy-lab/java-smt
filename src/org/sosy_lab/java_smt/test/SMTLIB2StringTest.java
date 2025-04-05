@@ -15,10 +15,13 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
+import org.sosy_lab.java_smt.basicimpl.Generator;
 
 @SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -416,5 +419,61 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula regexMatch = smgr.in(a, regex);
 
     assertThat(actualResult).isEqualTo(regexMatch);
+  }
+
+  @Test
+  public void testDeclareUFString()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    String x =
+        "(set-info :license \"https://creativecommons.org/licenses/by/4.0/\")\n"
+            + "(set-info :category \"random\")\n"
+            + "(set-info :status sat)\n"
+            + "\n"
+            + "(declare-fun I () String)\n"
+            + "(declare-fun B () String)\n"
+            + "(declare-fun G () String)\n"
+            + "(declare-fun F () String)\n"
+            + "(assert (= (str.++  \"cefcdf\" B \"bgcdfedb\" G \"fgafb\" G \"gefdgcbadf\")  (str.++"
+            + "  G \"ef\" I \"dcbbf\" G \"f\" G \"bbg\" F \"gefdg\" G \"badf\") ))\n"
+            + "(check-sat)\n"
+            + "\n"
+            + "(exit)";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    FunctionDeclaration<StringFormula> I =
+        mgr.getUFManager().declareUF("I", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> B =
+        mgr.getUFManager().declareUF("B", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> G =
+        mgr.getUFManager().declareUF("G", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> F =
+        mgr.getUFManager().declareUF("F", FormulaType.StringType);
+    BooleanFormula constraint =
+        smgr.equal(
+            smgr.concat(
+                smgr.makeString("cefcdf"),
+                fmgr.callUF(B),
+                smgr.makeString("bgcdfedb"),
+                fmgr.callUF(G),
+                smgr.makeString("fgafb"),
+                fmgr.callUF(G),
+                smgr.makeString("gefdgcbadf")),
+            smgr.concat(
+                fmgr.callUF(G),
+                smgr.makeString("ef"),
+                fmgr.callUF(I),
+                smgr.makeString("dcbbf"),
+                fmgr.callUF(G),
+                smgr.makeString("f"),
+                fmgr.callUF(G),
+                smgr.makeString("bbg"),
+                fmgr.callUF(F),
+                smgr.makeString("gefdg"),
+                fmgr.callUF(G),
+                smgr.makeString("badf")));
+
+    Generator.assembleConstraint(actualResult);
+    System.out.println(Generator.getSMTLIB2String());
+    assertThat(actualResult).isEqualTo(constraint);
   }
 }
