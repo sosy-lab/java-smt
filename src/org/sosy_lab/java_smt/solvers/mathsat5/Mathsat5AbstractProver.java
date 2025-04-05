@@ -81,6 +81,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
             || opts.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
     config.put("model_generation", opts.contains(ProverOptions.GENERATE_MODELS) ? "true" : "false");
     config.put("unsat_core_generation", generateUnsatCore ? "1" : "0");
+    config.put("proof_generation", opts.contains(ProverOptions.GENERATE_PROOFS) ? "true" : "false");
     if (generateUnsatCore) {
       config.put("theory.bv.eager", "false");
     }
