@@ -238,6 +238,8 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="so"/>
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="dylib"/>
+        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
     </target>
 
     <!--

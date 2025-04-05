@@ -33,18 +33,6 @@ RUN apt-get update \
         autoconf gperf \
  && apt-get clean
 
-# CVC5 requires some dependencies
-RUN apt-get update \
- && apt-get install -y \
-        python3 python3-venv python3-toml python3-pyparsing flex libssl-dev cmake \
- && apt-get clean \
- && wget https://github.com/Kitware/CMake/releases/download/v3.26.3/cmake-3.26.3.tar.gz \
- && tar -zxvf cmake-3.26.3.tar.gz \
- && cd cmake-3.26.3 \
- && ./bootstrap \
- && make \
- && make install
-
 # Bitwuzla requires Ninja and Meson (updated version from pip), and uses SWIG >4.0 from dependencies.
 # GMP >6.3.0 is automatically downloaded and build within Bitwuzla.
 RUN apt-get update \
@@ -60,7 +48,7 @@ RUN pip3 install --upgrade meson
 # - lzip is required to unpack the gmp tar ball
 RUN apt-get update \
  && apt-get install -y \
-        flex bison libpcre2-dev lzip \
+        cmake flex bison libpcre2-dev lzip \
  && apt-get clean
 
 WORKDIR /dependencies
