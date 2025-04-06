@@ -15,7 +15,7 @@ SPDX-License-Identifier: Apache-2.0
     <import file="macros.xml"/>
 
     <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
-    <property name="cvc5.downloads" value="/dependencies/cvc5"/>
+    <property name="cvc5.downloads" value="./downloads/cvc5"/>
     <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
 
     <target name="download-cvc5">
@@ -25,32 +25,43 @@ SPDX-License-Identifier: Apache-2.0
         </fail>
 
         <mkdir dir="${cvc5.downloads}"/>
-        <mkdir dir="${cvc5.distDir}"/>
+        <mkdir dir="${cvc5.distDir}/x64"/>
+        <mkdir dir="${cvc5.distDir}/arm64"/>
 
         <!-- Download binaries for linux on x64 -->
         <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
-        <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
-        <copy file="${cvc5.downloads}/cvc5-Linux-x86_64-static/lib/libcvc5jni.so" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.so"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-Linux-x86_64-static/lib/libcvc5jni.so"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
+        </unzip>
 
         <!-- Download binaries for linux on arm64 -->
         <get src="${cvc5.url}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
-        <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
-        <copy file="${cvc5.downloads}/cvc5-Linux-arm64-static/lib/libcvc5jni.so" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.so"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
+            <patternset><include name="cvc5-Linux-arm64-static/lib/libcvc5jni.so"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
+        </unzip>
 
         <!-- Download binaries for macOS on x64 -->
         <get src="${cvc5.url}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
-        <unzip src="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
-        <copy file="${cvc5.downloads}/cvc5-macOS-x86_64-static/lib/libcvc5jni.dylib" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dylib"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-macOS-x86_64-static/lib/libcvc5jni.dylib"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
+        </unzip>
 
         <!-- Download binaries for macOS on arm64 -->
         <get src="${cvc5.url}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
-        <unzip src="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
-        <copy file="${cvc5.downloads}/cvc5-macOS-arm64-static/lib/libcvc5jni.dylib" tofile="${cvc5.distDir}/arm64/libcvc5jni-${cvc5.version}.dylib"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
+            <patternset><include name="cvc5-macOS-arm64-static/lib/libcvc5jni.dylib"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
+        </unzip>
 
         <!-- Download binaries for Windows on x64 -->
         <get src="${cvc5.url}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
-        <unzip src="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}"/>
-        <copy file="${cvc5.downloads}/cvc5-Win64-x86_64-static/bin/cvc5jni.dll" tofile="${cvc5.distDir}/x64/libcvc5jni-${cvc5.version}.dll"/>
+        <unzip src="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-Win64-x86_64-static/bin/cvc5jni.dll"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
+        </unzip>
 
         <!-- Download the Java bindings -->
         <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
