@@ -28,14 +28,14 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${cvc5.distDir}/x64"/>
         <mkdir dir="${cvc5.distDir}/arm64"/>
 
-        <!-- Download binaries for linux on x64 -->
+        <!-- Download binaries for Linux on x64 -->
         <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
             <patternset><include name="cvc5-Linux-x86_64-static/lib/libcvc5jni.so"/></patternset>
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
         </unzip>
 
-        <!-- Download binaries for linux on arm64 -->
+        <!-- Download binaries for Linux on arm64 -->
         <get src="${cvc5.url}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
         <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
             <patternset><include name="cvc5-Linux-arm64-static/lib/libcvc5jni.so"/></patternset>

@@ -139,7 +139,7 @@ Example:
 ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 ```
 
-During the build process, our script automatically fetches binaries for windows, linux and
+During the build process, our script automatically fetches binaries for Windows, Linux, and
 maxOS on x64 and arm64 and repackages them to be used in JavaSMT.
 
 
