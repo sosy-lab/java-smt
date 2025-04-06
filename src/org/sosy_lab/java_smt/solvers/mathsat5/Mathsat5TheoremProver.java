@@ -68,7 +68,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   protected ProofNode getProof0() {
     var proofFactory =
-        new ProofFactory<Long>(this.creator, this, "MATHSAT5") {
+        new ProofFactory<Long>(this, "MATHSAT5") {
           public ProofNode createProofWrapper(long pProof) {
             return this.createProofNode(pProof);
           }

@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 // SMTInterpol gives back a Term (apparently) only of instance ApplicationTerm or AnnotatedTerm,
 // so the other instances are not needed.
 
-@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
+@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
 class SmtInterpolProofNodeCreator {
   private final SmtInterpolFormulaCreator creator;
   private final SmtInterpolTheoremProver prover;
@@ -54,7 +54,7 @@ class SmtInterpolProofNodeCreator {
     }
   }
 
-  private class SmtTermFrame extends ProofFrame<Term> {
+  private static class SmtTermFrame extends ProofFrame<Term> {
     List<SmtTermFrame> children = new ArrayList<>();
     public SmtTermFrame(Term term) {
       super(term);
@@ -102,7 +102,7 @@ class SmtInterpolProofNodeCreator {
         // computed.put(frame.proof, pn);
       }
     }
-    return computed.get(rootProof);
+    return null;
   }
 
   ProvitionalProofNode createPPNDag(Term proof) {

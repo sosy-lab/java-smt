@@ -36,7 +36,6 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
@@ -257,7 +256,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw new IllegalStateException("No proof available");
     }
 
-    CVC5ProofProcessor pp = new CVC5ProofProcessor(creator, (ProverEnvironment) this);
+    CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
       return pp.fromCVC5Proof(proofs[0]);
     } catch (CVC5ApiException pE) {

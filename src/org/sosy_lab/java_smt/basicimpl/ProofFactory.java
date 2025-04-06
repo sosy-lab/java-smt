@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
  */
 public class ProofFactory<T> {
 
-  private final FormulaCreator<?, ?, ?, ?> formulaCreator;
+  //private final FormulaCreator<?, ?, ?, ?> formulaCreator;
   private final ProverEnvironment prover;
   private final Solvers solver;
 
@@ -44,9 +44,8 @@ public class ProofFactory<T> {
     BITWUZLA
   }
 
-  protected ProofFactory(
-      FormulaCreator<?, ?, ?, ?> pCreator, ProverEnvironment pProver, String pSolver) {
-    formulaCreator = pCreator;
+  protected ProofFactory(ProverEnvironment pProver, String pSolver) {
+    //formulaCreator = pCreator;
     prover = pProver;
     solver = Solvers.valueOf(pSolver);
   }

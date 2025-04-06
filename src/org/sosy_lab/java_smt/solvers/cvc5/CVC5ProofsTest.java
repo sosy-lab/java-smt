@@ -169,7 +169,7 @@ public class CVC5ProofsTest {
     Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
     Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
 
-    solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
+    solver.assertFormula(tm.mkTerm(Kind.OR, tm.mkTerm(Kind.NOT, q1), q2));
     solver.assertFormula(q1);
     solver.assertFormula(tm.mkTerm(Kind.NOT, q2));
 
@@ -196,7 +196,7 @@ public class CVC5ProofsTest {
     Term q1 = solver.declareFun("q1", new Sort[] {}, booleanSort);
     Term q2 = solver.declareFun("q2", new Sort[] {}, booleanSort);
 
-    solver.assertFormula(tm.mkTerm(Kind.OR, (tm.mkTerm(Kind.NOT, q1)), q2));
+    solver.assertFormula(tm.mkTerm(Kind.OR, tm.mkTerm(Kind.NOT, q1), q2));
     solver.assertFormula(q1);
     solver.assertFormula(tm.mkTerm(Kind.NOT, q2));
 

@@ -18,23 +18,20 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 
 public class CVC5ProofProcessor {
 
-  private class CVC5Frame extends ProofFrame<Proof> {
+  private static class CVC5Frame extends ProofFrame<Proof> {
     CVC5Frame(Proof proof) {
       super(proof);
     }
   }
 
   private final CVC5FormulaCreator formulaCreator;
-  private final ProverEnvironment prover;
 
-  CVC5ProofProcessor(CVC5FormulaCreator creator, ProverEnvironment pProver) {
+  CVC5ProofProcessor(CVC5FormulaCreator creator) {
     formulaCreator = creator;
-    prover = pProver;
   }
 
   CVC5ProofNode fromCVC5Proof(Proof pProof) throws CVC5ApiException {

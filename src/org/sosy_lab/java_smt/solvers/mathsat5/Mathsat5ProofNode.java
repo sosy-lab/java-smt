@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_or;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_child;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_name;
@@ -17,8 +18,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proo
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_is_term;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -27,10 +30,11 @@ import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProofNode;
+import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
 
 public class Mathsat5ProofNode extends AbstractProofNode {
 
-  protected Mathsat5ProofNode(ProofRule rule, Formula formula) {
+  protected Mathsat5ProofNode(@Nullable ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 
@@ -41,11 +45,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
   }
 
   public static Mathsat5ProofNode fromMsatProof(ProverEnvironment pProver, long rootProof) {
-    final Mathsat5SolverContext context = ((Mathsat5TheoremProver) pProver).context;
-    final long curEnv = ((Mathsat5TheoremProver) pProver).curEnv;
-    final Mathsat5FormulaCreator formulaCreator = ((Mathsat5TheoremProver) pProver).creator;
 
-    {
       Deque<MsatProofFrame> stack = new ArrayDeque<>();
       Map<Long, Mathsat5ProofNode> computed = new HashMap<>();
 
@@ -70,24 +70,44 @@ public class Mathsat5ProofNode extends AbstractProofNode {
           stack.pop();
 
           // Generate the formula and proof rule.
-          Formula formula = generateFormula(frame.getProof(), (Mathsat5TheoremProver) pProver);
-          Mathsat5ProofRule proofRule =
-              new Mathsat5ProofRule(msat_proof_get_name(frame.getProof()));
-          Mathsat5ProofNode node = new Mathsat5ProofNode(proofRule, formula);
 
-          // Retrieve computed child nodes and attach them.
-          for (int i = 0; i < frame.getNumArgs(); i++) {
-            long child = msat_proof_get_child(frame.getProof(), i);
-            Mathsat5ProofNode childNode = computed.get(child);
-            if (childNode != null) {
-              node.addChild(childNode);
+          String rule = msat_proof_get_name(frame.getProof());
+          Mathsat5ProofRule.Rule proofRule = rule == null ? Rule.NULL :
+                                             Rule.valueOf(rule.toUpperCase().replace("-", "_"));
+
+          Mathsat5ProofNode node;
+          Mathsat5TheoremProver prover = (Mathsat5TheoremProver) pProver;
+          if (proofRule == Rule.CLAUSE_HYP) {
+            // Reconstruct clause from children terms
+            long or = msat_proof_get_term(msat_proof_get_child(frame.getProof(), 0));
+            for (int i = 1; i < frame.getNumArgs(); i++) {
+              long child = msat_proof_get_term(msat_proof_get_child(frame.getProof(), i));
+              or = msat_make_or(prover.curEnv, or, child);
             }
+
+            node = new Mathsat5ProofNode(proofRule,
+                ((Mathsat5TheoremProver) pProver).creator.encapsulate(prover.creator.getFormulaType(or),or));
+
+            // Do not add children, as they are now embedded in the formula
+          } else {
+            Formula formula = generateFormula(frame.getProof(), (Mathsat5TheoremProver) pProver);
+            node = new Mathsat5ProofNode(proofRule, formula);
+
+            // Retrieve computed child nodes and attach them.
+            for (int i = 0; i < frame.getNumArgs(); i++) {
+              long child = msat_proof_get_child(frame.getProof(), i);
+              Mathsat5ProofNode childNode = computed.get(child);
+              if (childNode != null) {
+                node.addChild(childNode);
+              }
+            }
+
           }
+
           computed.put(frame.getProof(), node);
         }
       }
       return computed.get(rootProof);
-    }
   }
 
   @Nullable
