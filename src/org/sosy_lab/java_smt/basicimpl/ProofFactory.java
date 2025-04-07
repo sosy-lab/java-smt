@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
  */
 public class ProofFactory<T> {
 
-  //private final FormulaCreator<?, ?, ?, ?> formulaCreator;
+  // private final FormulaCreator<?, ?, ?, ?> formulaCreator;
   private final ProverEnvironment prover;
   private final Solvers solver;
 
@@ -45,7 +45,7 @@ public class ProofFactory<T> {
   }
 
   protected ProofFactory(ProverEnvironment pProver, String pSolver) {
-    //formulaCreator = pCreator;
+    // formulaCreator = pCreator;
     prover = pProver;
     solver = Solvers.valueOf(pSolver);
   }

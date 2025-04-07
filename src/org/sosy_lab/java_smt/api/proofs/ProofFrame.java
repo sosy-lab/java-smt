@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-
-
 /**
  * Stores proof related information and gets stored in a stack when processing proofs. Each frame
  * contains a proof object and the number of arguments it has.
@@ -20,7 +18,7 @@ package org.sosy_lab.java_smt.api.proofs;
  */
 public abstract class ProofFrame<T> {
   T proof;
-  int numArgs;
+  int numArgs = 0;
   boolean visited;
 
   protected ProofFrame(T proof) {

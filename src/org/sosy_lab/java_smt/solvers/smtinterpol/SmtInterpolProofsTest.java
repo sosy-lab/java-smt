@@ -266,7 +266,7 @@ public class SmtInterpolProofsTest {
   }
 
   @Test
-  public void testPPN(){
+  public void testPPN() {
     // example from the 2022 paper
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -291,7 +291,7 @@ public class SmtInterpolProofsTest {
 
       SmtInterpolProofNodeCreator pc =
           new SmtInterpolProofNodeCreator(
-              (SmtInterpolFormulaCreator) prover.mgr.getFormulaCreator(),prover);
+              (SmtInterpolFormulaCreator) prover.mgr.getFormulaCreator(), prover);
 
       assertThat(pc.createPPNDag(proof)).isNotNull();
 

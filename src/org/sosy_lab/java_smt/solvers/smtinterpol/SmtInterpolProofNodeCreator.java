@@ -56,6 +56,7 @@ class SmtInterpolProofNodeCreator {
 
   private static class SmtTermFrame extends ProofFrame<Term> {
     List<SmtTermFrame> children = new ArrayList<>();
+
     public SmtTermFrame(Term term) {
       super(term);
     }
@@ -73,7 +74,6 @@ class SmtInterpolProofNodeCreator {
       ProvitionalProofNode frame = stack.peek();
 
       if (!frame.isVisited) {
-
 
         frame.isVisited = true;
         // numChildren - 1 iterations
@@ -107,12 +107,12 @@ class SmtInterpolProofNodeCreator {
 
   ProvitionalProofNode createPPNDag(Term proof) {
     try {
-     ProvitionalProofNode root = new ProvitionalProofNode(proof);
-     root.buildDag(proof);
-     return root;
+      ProvitionalProofNode root = new ProvitionalProofNode(proof);
+      root.buildDag(proof);
+      return root;
     } finally {
-        stack.clear();
-        computed.clear();
+      stack.clear();
+      computed.clear();
     }
   }
 
@@ -127,11 +127,10 @@ class SmtInterpolProofNodeCreator {
 
     public ProvitionalProofNode(Term pParameter) {
       this.unprocessedTerm = pParameter;
-      //processTerm(pParameter);
+      // processTerm(pParameter);
     }
 
     void buildDag(Term term) {
-
 
       stack.push(new SmtTermFrame(term));
 
@@ -145,13 +144,11 @@ class SmtInterpolProofNodeCreator {
 
           stack.pop();
 
-
-                for (int i = 0; i < frame.children.size(); i++) {
-                  Term child = frame.children.get(i).getProof();
-                  ProvitionalProofNode childNode = computed.get(child);
-                  this.children.add(childNode);
-                }
-
+          for (int i = 0; i < frame.children.size(); i++) {
+            Term child = frame.children.get(i).getProof();
+            ProvitionalProofNode childNode = computed.get(child);
+            this.children.add(childNode);
+          }
         }
       }
     }
@@ -171,7 +168,7 @@ class SmtInterpolProofNodeCreator {
       Term[] parameters = term.getParameters();
       if (parameters.length == 3) {
         this.proofRule = ResAxiom.RESOLUTION;
-        //This should be a resolution rule
+        // This should be a resolution rule
         Term first = parameters[0];
         if (first instanceof AnnotatedTerm) {
           pivot = ((AnnotatedTerm) first).getSubterm();
@@ -179,25 +176,24 @@ class SmtInterpolProofNodeCreator {
           pivot = first;
         }
 
-        for (int i = parameters.length-1; i > 0; i--) {
+        for (int i = parameters.length - 1; i > 0; i--) {
           Sort sort = term.getSort();
           if (sort.toString().equals("..Proof")) {
-              //children.add(new ProvitionalProofNode(parameters[i]));
-              frame.setNumArgs(parameters.length-1);
-              if (!computed.containsKey(parameters[i])) {
-                SmtTermFrame childFrame = new SmtTermFrame(parameters[i]);
-                stack.push(childFrame);
-                frame.children.add(childFrame);
-                //children.add(new ProvitionalProofNode(parameters[i]));
-                computed.put(parameters[i], new ProvitionalProofNode(parameters[i]));
-              }
-
+            // children.add(new ProvitionalProofNode(parameters[i]));
+            frame.setNumArgs(parameters.length - 1);
+            if (!computed.containsKey(parameters[i])) {
+              SmtTermFrame childFrame = new SmtTermFrame(parameters[i]);
+              stack.push(childFrame);
+              frame.children.add(childFrame);
+              // children.add(new ProvitionalProofNode(parameters[i]));
+              computed.put(parameters[i], new ProvitionalProofNode(parameters[i]));
+            }
           }
         }
       }
 
       if (term.getFunction().toString().contains("..assume")) {
-        //This should be the assume axiom
+        // This should be the assume axiom
         this.axiom = true;
         this.proofRule = ResAxiom.ASSUME;
         if (parameters[0] instanceof AnnotatedTerm) {
@@ -205,11 +201,8 @@ class SmtInterpolProofNodeCreator {
         } else {
           this.formulas.add(parameters[0]);
         }
-
       }
-
     }
-
 
     private void processAnnotated(SmtTermFrame frame) {
       AnnotatedTerm term = (AnnotatedTerm) frame.getProof();
@@ -255,14 +248,14 @@ class SmtInterpolProofNodeCreator {
 
         if (key.equals("rup")) {
           this.proofRule = Rup.RUP;
-          //this.children.add(new ProvitionalProofNode(term.getSubterm()));
+          // this.children.add(new ProvitionalProofNode(term.getSubterm()));
           frame.setNumArgs(1);
           if (!computed.containsKey(term.getSubterm())) {
             SmtTermFrame childFrame = new SmtTermFrame(term.getSubterm());
             stack.push(childFrame);
             frame.children.add(childFrame);
-            //children.add(new ProvitionalProofNode(term.getSubterm()));
-            //computed.put(term, this);
+            // children.add(new ProvitionalProofNode(term.getSubterm()));
+            // computed.put(term, this);
             computed.put(term.getSubterm(), new ProvitionalProofNode(term.getSubterm()));
           }
           rup = true;
@@ -272,7 +265,6 @@ class SmtInterpolProofNodeCreator {
           Object[] values = (Object[]) annotation.getValue();
           addTermsFromAnnotationValue(values, true);
         }
-
       }
       if (!rup) {
         frame.setProof(term.getSubterm());
@@ -296,7 +288,6 @@ class SmtInterpolProofNodeCreator {
           } else {
             this.formulas.add((Term) values[i]);
           }
-
         }
       }
     }
@@ -314,8 +305,10 @@ class SmtInterpolProofNodeCreator {
 
       // Node properties
       sb.append(indent).append("  pivot: ").append(pivot != null ? pivot : "null").append("\n");
-      sb.append(indent).append("  proofRule: ")
-          .append(proofRule != null ? proofRule.getName() : "null").append("\n");
+      sb.append(indent)
+          .append("  proofRule: ")
+          .append(proofRule != null ? proofRule.getName() : "null")
+          .append("\n");
       sb.append(indent).append("  axiom: ").append(axiom).append("\n");
       sb.append(indent).append("  isVisited: ").append(isVisited).append("\n");
 
@@ -331,7 +324,8 @@ class SmtInterpolProofNodeCreator {
       sb.append(indent).append("  ]\n");
 
       // Unprocessed term
-      sb.append(indent).append("  unprocessedTerm: ")
+      sb.append(indent)
+          .append("  unprocessedTerm: ")
           .append(unprocessedTerm != null ? unprocessedTerm : "null")
           .append("\n");
 
