@@ -53,7 +53,37 @@ public interface SolverContext extends AutoCloseable {
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
     /** Whether the solver should enable support for formulae build in SL theory. */
-    ENABLE_SEPARATION_LOGIC
+    ENABLE_SEPARATION_LOGIC,
+
+    /**
+     * Enables Craig interpolation, using the model-based interpolation strategy. This strategy
+     * constructs interpolants based on the model provided by a solver, i.e. model generation must
+     * be enabled. This interpolation strategy is only usable for solvers supporting quantified
+     * solving over the theories interpolated upon. The solver does not need to support
+     * interpolation itself.
+     */
+    GENERATE_PROJECTION_BASED_INTERPOLANTS,
+
+    /**
+     * Enables (uniform) Craig interpolation, using the quantifier-based interpolation strategy
+     * utilizing quantifier-elimination in the forward direction. Forward means, that the set of
+     * formulas A, used to interpolate, interpolates towards the set of formulas B (B == all
+     * formulas that are currently asserted, but not in the given set of formulas A used to
+     * interpolate). This interpolation strategy is only usable for solvers supporting
+     * quantifier-elimination over the theories interpolated upon. The solver does not need to
+     * support interpolation itself.
+     */
+    GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+
+    /**
+     * Enables (uniform) Craig interpolation, using the quantifier-based interpolation strategy
+     * utilizing quantifier-elimination in the backward direction. Backward means, that the set of
+     * formulas B (B == all formulas that are currently asserted, but not in the given set of
+     * formulas A used to interpolate) interpolates towards the set of formulas A. This
+     * interpolation strategy is only usable for solvers supporting quantifier-elimination over the
+     * theories interpolated upon. The solver does not need to support interpolation itself.
+     */
+    GENERATE_UNIFORM_BACKWARD_INTERPOLANTS
   }
 
   /**
