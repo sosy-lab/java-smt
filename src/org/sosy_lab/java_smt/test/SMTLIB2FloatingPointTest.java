@@ -120,8 +120,20 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
 
     BooleanFormula expectedResult =
         bmgr.and(
-            fpmgr.equalWithFPSemantics(a, fpmgr.makeNumber(10.0, fpType)),
-            fpmgr.equalWithFPSemantics(b, fpmgr.makeNumber(10.0, fpType)),
+            fpmgr.equalWithFPSemantics(
+                a,
+                fpmgr.makeNumber(
+                    new BigInteger("82", 16),
+                    new BigInteger("01000000000000000000000", 2),
+                    false,
+                    fpType)),
+            fpmgr.equalWithFPSemantics(
+                b,
+                fpmgr.makeNumber(
+                    new BigInteger("82", 16),
+                    new BigInteger("01000000000000000000000", 2),
+                    false,
+                    fpType)),
             fpmgr.equalWithFPSemantics(fpmgr.add(a, b), c));
     assertThat(actualResult).isNotNull();
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -287,9 +299,11 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
             + "(assert (fp.eq b (fp #b0 #b10000010 #b01000000000000000000000)))\n";
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     FloatingPointFormula c =
-        fpmgr.makeNumber(10.0, FormulaType.getSinglePrecisionFloatingPointType());
+        fpmgr.makeNumber(
+            new BigInteger("82", 16), new BigInteger("01000000000000000000000", 2), false, fpType);
     FloatingPointFormula d =
-        fpmgr.makeNumber(10.0, FormulaType.getSinglePrecisionFloatingPointType());
+        fpmgr.makeNumber(
+            new BigInteger("82", 16), new BigInteger("01000000000000000000000", 2), false, fpType);
     FloatingPointFormula a =
         fpmgr.makeVariable("a", FormulaType.getSinglePrecisionFloatingPointType());
     FloatingPointFormula b =

@@ -29,30 +29,17 @@ public class SolverLessBooleanFormulaManager
 
   @Override
   protected SMTLIB2Formula not(SMTLIB2Formula pParam1) {
-    if (Objects.equals(pParam1.getValue(), "")) {
-      return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-    }
-    return new SMTLIB2Formula(!Boolean.parseBoolean(pParam1.getValue()));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected SMTLIB2Formula and(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
-    if (Objects.equals(pParam1.getValue(), "") || Objects.equals(pParam2.getValue(), "")) {
-      return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-    }
-    return new SMTLIB2Formula(
-        Boolean.logicalAnd(
-            Boolean.parseBoolean(pParam1.getValue()), Boolean.parseBoolean(pParam2.getValue())));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
   protected SMTLIB2Formula or(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
-    if (Objects.equals(pParam1.getValue(), "") || Objects.equals(pParam2.getValue(), "")) {
-      return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-    }
-    return new SMTLIB2Formula(
-        Boolean.logicalOr(
-            Boolean.parseBoolean(pParam1.getValue()), Boolean.parseBoolean(pParam2.getValue())));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override
@@ -67,11 +54,7 @@ public class SolverLessBooleanFormulaManager
 
   @Override
   protected SMTLIB2Formula equivalence(SMTLIB2Formula bits1, SMTLIB2Formula bits2) {
-    if (Objects.equals(bits1.getValue(), "") || Objects.equals(bits2.getValue(), "")) {
-      return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
-    }
-    return new SMTLIB2Formula(
-        Boolean.parseBoolean(bits1.getValue()) == Boolean.parseBoolean(bits2.getValue()));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override

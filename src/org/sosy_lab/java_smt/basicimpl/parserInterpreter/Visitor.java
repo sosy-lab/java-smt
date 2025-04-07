@@ -306,40 +306,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
   }
 
   /**
-   * Parses a bitvector string to an integer value.
-   *
-   * @param bitVec The bitvector string (starts with #b or #x)
-   * @return The parsed integer value
-   * @throws IllegalArgumentException if the format is invalid
-   */
-  private int parseBitVectorToInt(String bitVec) {
-    if (bitVec.startsWith("#b")) {
-      return Integer.parseInt(bitVec.substring(2), 2);
-    } else if (bitVec.startsWith("#x")) {
-      return Integer.parseInt(bitVec.substring(2), 16);
-    } else {
-      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
-    }
-  }
-
-  /**
-   * Parses a bitvector string to a long value.
-   *
-   * @param bitVec The bitvector string (starts with #b or #x)
-   * @return The parsed long value
-   * @throws IllegalArgumentException if the format is invalid
-   */
-  private long parseBitVectorToLong(String bitVec) {
-    if (bitVec.startsWith("#b")) {
-      return Long.parseLong(bitVec.substring(2), 2);
-    } else if (bitVec.startsWith("#x")) {
-      return Long.parseLong(bitVec.substring(2), 16);
-    } else {
-      throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
-    }
-  }
-
-  /**
    * Gets the size in bits of a bitvector string.
    *
    * @param bitVec The bitvector string (starts with #b or #x)
@@ -354,27 +320,6 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     } else {
       throw new IllegalArgumentException("Invalid BitVector format: " + bitVec);
     }
-  }
-
-  /**
-   * Converts floating point components to a double value.
-   *
-   * @param sign The sign bit (0 or 1)
-   * @param exponent The exponent value
-   * @param mantissa The mantissa value
-   * @param exponentSize The size of exponent in bits
-   * @param mantissaSize The size of mantissa in bits
-   * @return The converted double value
-   */
-  private double convertFPToDouble(
-      int sign, int exponent, long mantissa, int exponentSize, int mantissaSize) {
-    int bias = (int) (Math.pow(2, exponentSize - 1) - 1);
-    int unbiasedExponent = exponent - bias;
-
-    double normalizedMantissa = 1.0 + (mantissa / Math.pow(2, mantissaSize));
-
-    double result = normalizedMantissa * Math.pow(2, unbiasedExponent);
-    return (sign == 1) ? -result : result;
   }
 
   /**
@@ -638,19 +583,27 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
       String exponentStr = matcher.group(2);
       String mantissaStr = matcher.group(3);
 
-      int signBit = parseBitVectorToInt(signBitStr);
-      int exponent = parseBitVectorToInt(exponentStr);
-      long mantissa = parseBitVectorToLong(mantissaStr);
-
+      boolean signBit = signBitStr.equals("#b1") || signBitStr.equals("#x1");
+      BigInteger exponent = null;
+      BigInteger mantissa = null;
+      if (exponentStr.startsWith("#b")) {
+        exponent = new BigInteger(exponentStr.substring(2), 2);
+      } else {
+        exponent = new BigInteger(exponentStr.substring(2), 16);
+      }
+      if (mantissaStr.startsWith("#b")) {
+        mantissa = new BigInteger(mantissaStr.substring(2), 2);
+      } else {
+        mantissa = new BigInteger(mantissaStr.substring(2), 16);
+      }
       int exponentSize = getBitVecSize(exponentStr);
       int mantissaSize = getBitVecSize(mantissaStr);
-
-      double doubleValue =
-          convertFPToDouble(signBit, exponent, mantissa, exponentSize, mantissaSize);
-
       fp =
           fpmgr.makeNumber(
-              doubleValue, FormulaType.getFloatingPointType(exponentSize, mantissaSize));
+              exponent,
+              mantissa,
+              signBit,
+              FormulaType.getFloatingPointType(exponentSize, mantissaSize));
 
       variables.put(operand, new ParserFormula(fp));
       return fp;

@@ -7,10 +7,12 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -467,5 +469,161 @@ public class FloatingPointSMTLIB2GeneratorTest
             + "a)))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberFromRational() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            Rational.ofString("3/2"), FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult =
+        "(declare-const x (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq (fp #b0 #b01111111 #b10000000000000000000000) x))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberFromRationalWithRoundingMode() {
+    requireFloats();
+    assume()
+        .withMessage("Bitwuzla does not allow rational FloatingPoints")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BITWUZLA);
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            Rational.ofString("1/3"),
+            FloatingPointType.getSinglePrecisionFloatingPointType(),
+            FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult)
+        .isEqualTo(
+            "(declare-const x (_ FloatingPoint 8 24))\n"
+                + "(assert (fp.eq (fp #b0 #b01111101 #b01010101010101010101011) x))\n");
+  }
+
+  @Test
+  public void testMakeNumberFromBigDecimal() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            new BigDecimal("3.1415926535"),
+            FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+    String actualResult = String.valueOf(Generator.getLines());
+
+    // Exact value depends on rounding, but we can check the structure
+    assertThat(actualResult).contains("(declare-const x (_ FloatingPoint 8 24))");
+    assertThat(actualResult).contains("(assert (fp.eq ");
+    assertThat(actualResult).contains("x))");
+    assertThat(actualResult)
+        .isEqualTo(
+            "(declare-const x (_ FloatingPoint 8 24))\n"
+                + "(assert (fp.eq (fp #b0 #b10000000 #b10010010000111111011011) x))\n");
+  }
+
+  @Test
+  public void testMakeNumberFromBigDecimalWithRoundingMode() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            new BigDecimal("2.7182818284"),
+            FloatingPointType.getSinglePrecisionFloatingPointType(),
+            FloatingPointRoundingMode.TOWARD_NEGATIVE);
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult)
+        .isEqualTo(
+            "(declare-const x (_ FloatingPoint 8 24))\n"
+                + "(assert (fp.eq (fp #b0 #b10000000 #b01011011111100001010100) x))\n");
+  }
+
+  @Test
+  public void testMakeNumberFromString() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber("1.5", FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    String expectedResult =
+        "(declare-const x (_ FloatingPoint 8 24))\n"
+            + "(assert (fp.eq (fp #b0 #b01111111 #b10000000000000000000000) x))\n";
+
+    assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testMakeNumberFromStringWithRoundingMode() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            "0.1",
+            FloatingPointType.getSinglePrecisionFloatingPointType(),
+            FloatingPointRoundingMode.TOWARD_ZERO);
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    // Exact value depends on rounding, but we can check the structure
+    assertThat(actualResult).contains("(declare-const x (_ FloatingPoint 8 24))");
+    assertThat(actualResult).contains("(assert (fp.eq ");
+    assertThat(actualResult).contains("x))");
+    assertThat(actualResult)
+        .isEqualTo(
+            "(declare-const x (_ FloatingPoint 8 24))\n"
+                + "(assert (fp.eq (fp #b0 #b01111011 #b10011001100110011001101) x))\n");
+  }
+
+  @Test
+  public void testMakeNumberFromComponents() {
+    requireFloats();
+    FloatingPointFormula num =
+        fpmgr.makeNumber(
+            BigInteger.valueOf(127), // exponent
+            BigInteger.valueOf(1), // mantissa
+            false, // sign bit (false = positive)
+            FloatingPointType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula var =
+        fpmgr.makeVariable("x", FloatingPointType.getSinglePrecisionFloatingPointType());
+    BooleanFormula constraint = fpmgr.equalWithFPSemantics(num, var);
+
+    Generator.assembleConstraint(constraint);
+
+    String actualResult = String.valueOf(Generator.getLines());
+    assertThat(actualResult)
+        .isEqualTo(
+            "(declare-const x (_ FloatingPoint 8 24))\n"
+                + "(assert (fp.eq (fp #b0 #x127 #x1) x))\n");
   }
 }

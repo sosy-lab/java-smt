@@ -343,7 +343,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultCVC5 = "(assert (= -1 (+ (- 1.0) (/ 17 5) (/ 2147483647 1000))))\n";
     String expectedResultZ3 = "(assert (= -1 (+ (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0))))\n";
     String expectedResultSolverless = "(assert (= -1 (+ -1 3.4 2147483.647)))\n";
-
+    System.out.println(actualResult);
     assertThat(
             actualResult.equals(expectedResultMathsat5)
                 || actualResult.equals(expectedResultSMTInterpol)
@@ -511,7 +511,7 @@ public class NumeralSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedS
     String expectedResultCVC5 = "(assert (distinct (- 1.0) (/ 17 5) (/ 2147483647 1000)))\n";
     String expectedResultZ3 = "(assert (distinct (- 1.0) (/ 17.0 5.0) (/ 2147483647.0 1000.0)))\n";
     String expectedResultSolverless = "(assert (distinct -1 3.4 2147483.647))\n";
-
+    System.out.println(actualResult);
     assertThat(
             actualResult.equals(expectedResultMathsat5)
                 || actualResult.equals(expectedResultSMTInterpol)
