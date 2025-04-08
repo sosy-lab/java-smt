@@ -16,16 +16,12 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
   private final SolverContext sync;
-
-  @SuppressWarnings("unused")
-  private ProverOptions[] option;
 
   SynchronizedQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);

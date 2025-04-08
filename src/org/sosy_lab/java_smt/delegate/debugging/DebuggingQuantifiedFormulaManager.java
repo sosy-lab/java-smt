@@ -22,9 +22,6 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  @SuppressWarnings("unused")
-  private List<ProverOptions> option;
-
   public DebuggingQuantifiedFormulaManager(
       QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
