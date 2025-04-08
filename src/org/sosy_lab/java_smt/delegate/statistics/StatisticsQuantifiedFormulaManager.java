@@ -37,6 +37,16 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
   }
 
   @Override
+  public BooleanFormula mkQuantifier(
+      Quantifier pQ,
+      List<? extends Formula> pVariables,
+      BooleanFormula pBody,
+      QuantifierCreationMethod pMethod)
+      throws IOException {
+    return delegate.mkQuantifier(pQ, pVariables, pBody, pMethod);
+  }
+
+  @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
     stats.quantifierOperations.getAndIncrement();
@@ -44,7 +54,8 @@ class StatisticsQuantifiedFormulaManager implements QuantifiedFormulaManager {
   }
 
   @Override
-  public void setOptions(ProverOptions... opt) {
-    option = opt;
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF, QuantifierEliminationMethod pMethod)
+      throws InterruptedException, SolverException {
+    return delegate.eliminateQuantifiers(pF, pMethod);
   }
 }

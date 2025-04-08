@@ -8,24 +8,21 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.google.common.collect.Lists;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
+import javax.annotation.Nonnull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
-import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -35,11 +32,6 @@ import org.sosy_lab.java_smt.test.ultimate.UltimateEliminatorWrapper;
 public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements QuantifiedFormulaManager {
-  /*
-  For activating UltimateEliminator with different setting e.g. warning and falling back to
-  the native quantifier elimination or creation method in case of an error.
-  */
-  private final List<ProverOptions> options;
   /*
   For parsing and dumping formula between UltimateEliminator and the native solver.
    */
@@ -56,7 +48,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     super(pCreator);
     ultimateEliminatorWrapper = new UltimateEliminatorWrapper(pLogger);
     logger = pLogger;
-    options = new ArrayList<>();
   }
 
   private BooleanFormula wrap(TFormulaInfo formulaInfo) {
@@ -66,22 +57,18 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
-    List<ProverOptions> proverOptions = extractQuantifierEliminationOptions();
-    if (proverOptions.contains(ProverOptions.SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION)) {
-      try {
-        return wrap(eliminateQuantifiersUltimateEliminator(pF));
-      } catch (UnsupportedOperationException | IllegalArgumentException e) {
-        if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
-          logger.logException(
-              Level.WARNING,
-              e,
-              "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination");
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        }
+    return wrap(eliminateQuantifiers(extractInfo(pF)));
+  }
 
-        if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        } else {
+  @Override
+  public BooleanFormula eliminateQuantifiers(
+      BooleanFormula pF, @Nonnull QuantifierEliminationMethod pMethod)
+      throws InterruptedException, SolverException {
+    switch (pMethod) {
+      case ULTIMATE_ELIMINATOR:
+        try {
+          return wrap(eliminateQuantifiersUltimateEliminator(pF));
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
           logger.logException(
               Level.SEVERE,
               e,
@@ -90,54 +77,67 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
           throw e;
         }
-      }
-    }
 
-    try {
-      return wrap(eliminateQuantifiers(extractInfo(pF)));
-    } catch (Exception e1) {
-      if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE)) {
-        logger.logException(
-            Level.WARNING,
-            e1,
-            "Default quantifier elimination failed. Switching to UltimateEliminator");
+      case ULTIMATE_ELIMINATOR_FALLBACK_ON_FAILURE:
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (Exception e2) {
-          logger.logException(Level.SEVERE, e2, "UltimateEliminator also failed.");
-          throw e2;
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
         }
-      }
 
-      if (proverOptions.contains(ProverOptions.QUANTIFIER_ELIMINATION_FALLBACK)) {
+      case ULTIMATE_ELIMINATOR_FALLBACK_WITH_WARNING_ON_FAILURE:
         try {
           return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (Exception e3) {
-          logger.logException(Level.SEVERE, e3, "Quantifier elimination failed.");
-          throw e3;
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+          logger.logException(
+              Level.WARNING,
+              e,
+              "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination");
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
         }
-      } else {
-        logger.logException(
-            Level.SEVERE,
-            e1,
-            "Native quantifier elimination failed. Please adjust the "
-                + "option if you want to use the UltimateEliminator quantifier elimination");
-        throw e1;
-      }
+
+      case NATIVE:
+        try {
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
+        } catch (Exception e1) {
+          logger.logException(
+              Level.SEVERE,
+              e1,
+              "Native quantifier elimination failed. Please adjust the "
+                  + "option if you want to use the UltimateEliminator quantifier elimination");
+          throw e1;
+        }
+
+      case NATIVE_FALLBACK_ON_FAILURE:
+        try {
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+          return wrap(eliminateQuantifiersUltimateEliminator(pF));
+        }
+
+      case NATIVE_FALLBACK_WITH_WARNING_ON_FAILURE:
+        try {
+          return wrap(eliminateQuantifiers(extractInfo(pF)));
+        } catch (UnsupportedOperationException | IllegalArgumentException e) {
+          logger.logException(
+              Level.WARNING,
+              e,
+              "Default quantifier elimination failed. Switching to UltimateEliminator");
+          return wrap(eliminateQuantifiersUltimateEliminator(pF));
+        }
+
+      default:
+        break;
     }
+    return pF;
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo) {
     FormulaManager formulaManager = fmgr.orElseThrow();
-    Term formula =
-        ultimateEliminatorWrapper.parse(dumpFormula(pExtractInfo));
+    String form = dumpFormula(pExtractInfo);
+    Term formula = ultimateEliminatorWrapper.parse(form);
     formula = ultimateEliminatorWrapper.simplify(formula);
-    return extractInfo(
-        formulaManager.parse(ultimateEliminatorWrapper.dumpFormula(formula).toString()));
-  }
-
-  protected String dumpFormula(BooleanFormula bf){
-    return fmgr.orElseThrow().dumpFormula(bf).toString();
+    return extractInfo(parseFormula(ultimateEliminatorWrapper.dumpFormula(formula).toString()));
   }
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
@@ -145,40 +145,64 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
 
   @Override
   public BooleanFormula mkQuantifier(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
-    List<ProverOptions> proverOptions = extractQuantifierEliminationOptions();
-    if (proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION)) {
-      try {
-        return mkWithoutQuantifier(q, pVariables, pBody);
-      } catch (IOException | UnsupportedOperationException e) {
-        if (proverOptions.contains(
-            ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE)) {
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
+    return wrap(
+        mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+  }
+
+  @Override
+  public BooleanFormula mkQuantifier(
+      Quantifier q,
+      List<? extends Formula> pVariables,
+      BooleanFormula pBody,
+      QuantifierCreationMethod pMethod)
+      throws IOException {
+    switch (pMethod) {
+      case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION:
+        try {
+          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
+        } catch (IOException | UnsupportedOperationException e) {
+          logger.logException(Level.WARNING, e, "External quantifier creation failed.");
+          throw e;
+        }
+
+      case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK:
+        try {
+          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
+        } catch (IOException | UnsupportedOperationException e) {
+          return wrap(
+              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
+        }
+
+      case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK_WARN_ON_FAILURE:
+        try {
+          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
+        } catch (IOException | UnsupportedOperationException e) {
           logger.logException(
               Level.WARNING, e, "External quantifier creation failed. Falling back to native");
           return wrap(
               mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        } else if (proverOptions.contains(ProverOptions.EXTERNAL_QUANTIFIER_CREATION_FALLBACK)) {
+        }
+
+      default:
+        try {
           return wrap(
               mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        } else {
-          logger.logException(Level.WARNING, e, "External quantifier creation failed.");
+        } catch (Exception e) {
+          logger.logException(
+              Level.SEVERE,
+              e,
+              "Native quantifier creation failed. Please adjust the "
+                  + "option if you want to use the UltimateEliminator quantifier creation");
           throw e;
         }
-      }
     }
-    return wrap(
-        mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }
 
   public abstract TFormulaInfo mkQuantifier(
       Quantifier q, List<TFormulaInfo> vars, TFormulaInfo body);
 
-  @Override
-  public void setOptions(ProverOptions... opt) {
-    options.addAll(Arrays.asList(opt));
-  }
-
-  protected FormulaManager getFmgr(){
+  protected FormulaManager getFmgr() {
     return fmgr.orElseThrow();
   }
 
@@ -186,12 +210,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     fmgr = Optional.of(pFmgr);
   }
 
-  private BooleanFormula mkWithoutQuantifier(
+  private BooleanFormula eliminateQuantifierBeforeMakingFormula(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
     List<String> boundVariablesNameList = new ArrayList<>();
     List<String> boundVariablesSortList = new ArrayList<>();
 
-    String form = fmgr.orElseThrow().dumpFormulaImpl(extractInfo(pBody));
+    String form = dumpFormula(pBody);
     Term ultimateBody = ultimateEliminatorWrapper.parse(form);
     for (Formula var : pVariables) {
       enrichBoundVariablesNameAndSortList(var, boundVariablesNameList, boundVariablesSortList);
@@ -203,7 +227,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     Term resultFormula = ultimateEliminatorWrapper.simplify(parsedResult);
 
     BooleanFormula result =
-        fmgr.orElseThrow().parse(ultimateEliminatorWrapper.dumpFormula(resultFormula).toString());
+        parseFormula(ultimateEliminatorWrapper.dumpFormula(resultFormula).toString());
     return result;
   }
 
@@ -271,54 +295,11 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  private List<ProverOptions> extractQuantifierEliminationOptions() {
-    List<ProverOptions> validOptions = new ArrayList<>();
-    boolean fallback = false;
-    boolean fallbackWarning = false;
-    boolean externalCreationFallbackWarning = false;
-    boolean externalCreationFallback = false;
+  protected String dumpFormula(BooleanFormula bf) {
+    return fmgr.orElseThrow().dumpFormula(bf).toString();
+  }
 
-    for (ProverOptions option : options) {
-      switch (option) {
-        case SOLVER_INDEPENDENT_QUANTIFIER_ELIMINATION:
-          validOptions.add(option);
-          break;
-        case QUANTIFIER_ELIMINATION_FALLBACK:
-          fallback = true;
-          validOptions.add(option);
-          break;
-        case QUANTIFIER_ELIMINATION_FALLBACK_WARN_ON_FAILURE:
-          fallbackWarning = true;
-          validOptions.add(option);
-          break;
-        case EXTERNAL_QUANTIFIER_CREATION:
-          validOptions.add(option);
-          break;
-        case EXTERNAL_QUANTIFIER_CREATION_FALLBACK:
-          externalCreationFallback = true;
-          validOptions.add(option);
-          break;
-        case EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE:
-          externalCreationFallbackWarning = true;
-          validOptions.add(option);
-          break;
-        default:
-          break;
-      }
-    }
-
-    checkArgument(
-        !fallbackWarning || !fallback,
-        "Incompatible options: "
-            + "QUANTIFIER_ELIMINATION_FALLBACK and "
-            + "QUANTIFIER_ELIMINATION_FALLBACK_WITHOUT_WARNING cannot be used together.");
-
-    checkArgument(
-        !externalCreationFallbackWarning || !externalCreationFallback,
-        "Incompatible options: "
-            + "EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE and "
-            + "EXTERNAL_QUANTIFIER_CREATION_FALLBACK_WARN_ON_FAILURE cannot be used together.");
-
-    return validOptions;
+  protected BooleanFormula parseFormula(String pFormula) {
+    return fmgr.orElseThrow().parse(pFormula);
   }
 }

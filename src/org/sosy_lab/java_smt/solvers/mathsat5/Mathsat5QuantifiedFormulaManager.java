@@ -72,7 +72,7 @@ public class Mathsat5QuantifiedFormulaManager
 
   @Override
   protected String dumpFormula(BooleanFormula bf) {
-    return ((Mathsat5FormulaManager) getFmgr()).dumpFormulaImplExt(extractInfo(bf),
-        "qFormulaNameMathsat5");
+    return ((Mathsat5FormulaManager) getFmgr())
+        .dumpFormulaImplExt(extractInfo(bf), "qFormulaNameMathsat5");
   }
 }

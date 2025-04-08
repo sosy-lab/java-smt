@@ -41,6 +41,18 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
   }
 
   @Override
+  public BooleanFormula mkQuantifier(
+      Quantifier pQ,
+      List<? extends Formula> pVariables,
+      BooleanFormula pBody,
+      QuantifierCreationMethod pMethod)
+      throws IOException {
+    synchronized (sync) {
+      return delegate.mkQuantifier(pQ, pVariables, pBody, pMethod);
+    }
+  }
+
+  @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
     synchronized (sync) {
@@ -49,7 +61,10 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
   }
 
   @Override
-  public void setOptions(ProverOptions... opt) {
-    option = opt;
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF, QuantifierEliminationMethod pMethod)
+      throws InterruptedException, SolverException {
+    synchronized (sync) {
+      return delegate.eliminateQuantifiers(pF, pMethod);
+    }
   }
 }
