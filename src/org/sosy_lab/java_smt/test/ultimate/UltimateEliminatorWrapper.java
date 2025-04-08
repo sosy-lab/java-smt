@@ -21,6 +21,12 @@ import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.solvers.smtinterpol.UltimateEliminatorParser;
 
+/*
+ * UltimateEliminatorWrapper is a wrapper for the UltimateEliminator, which is used to
+ * eliminate quantifiers from formulas.
+ *
+ * This class provides methods to simplify formulas, parse strings into terms, and dump formulas.
+ */
 public class UltimateEliminatorWrapper {
   private final IUltimateServiceProvider provider;
   private final ILogger iLogger;
@@ -39,14 +45,23 @@ public class UltimateEliminatorWrapper {
     log = pLog;
   }
 
+  /*
+   * Simplifies and try to remove the quantifiers from the given term using the UltimateEliminator.
+   */
   public Term simplify(Term pTerm) {
     return ultimateEliminator.simplify(pTerm);
   }
 
+  /*
+   * Parses a string into a term using the UltimateEliminator parser.
+   */
   public Term parse(String pString) {
     return UltimateEliminatorParser.parseImpl(pString, log, ultimateEliminator);
   }
 
+  /*
+   * Dumps the formula in SMT-LIB2 format using the UltimateEliminator parser.
+   */
   public Appender dumpFormula(Term pFormula) {
     return UltimateEliminatorParser.dumpFormula(pFormula);
   }
