@@ -17,16 +17,16 @@ class Mathsat5ProofRule implements ProofRule {
   //
   enum Rule implements ProofRule {
     THEORY_LEMMA(), // " representing theory lemmas. They have as children a list of terms that
-                    // consititute the lemma, plus an optional last element which is a more detailed
-                    // proof produced by a theory solver."
+    // consititute the lemma, plus an optional last element which is a more detailed
+    // proof produced by a theory solver."
     RES_CHAIN(), // "representing Boolean resolution chains. The children are an interleaving of
-                 // proofs and terms, where terms are the pivots for the resolution. For example:
-                 // "res-chain p1 v p2" represents a resolution step between p1 and p2 on the pivot
-                 // v"
+    // proofs and terms, where terms are the pivots for the resolution. For example:
+    // "res-chain p1 v p2" represents a resolution step between p1 and p2 on the pivot
+    // v"
     CLAUSE_HYP(), // " which are the clauses of the (CNF conversion of the) input problem. They have
     // a list of terms as children"
     NULL() // We introduce this rule because Term Nodes in MathSAT5 do not have a rule associated
-           // with them.
+  // with them.
   ;
 
     @Override
