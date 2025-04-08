@@ -11,6 +11,8 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
 import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
@@ -23,12 +25,14 @@ import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 public class SmtInterpolBitvectorFormulaManager
     extends AbstractBitvectorFormulaManager<Term, Sort, Script, FunctionSymbol> {
   private final Script script;
+  private final Table<BigInteger, Integer, Term> constantCache;
 
   protected SmtInterpolBitvectorFormulaManager(
       FormulaCreator<Term, Sort, Script, FunctionSymbol> pCreator,
       AbstractBooleanFormulaManager<Term, Sort, Script, FunctionSymbol> pBmgr) {
     super(pCreator, pBmgr);
     script = pCreator.getEnv();
+    constantCache = TreeBasedTable.create();
   }
 
   @Override
@@ -38,18 +42,21 @@ public class SmtInterpolBitvectorFormulaManager
 
   @Override
   protected Term makeBitvectorImpl(int pLength, BigInteger pI) {
-    boolean isNegative = pI.compareTo(java.math.BigInteger.ZERO) < 0;
-    Preconditions.checkArgument(pI.bitLength() <= (isNegative ? (pLength - 1) : pLength));
+    if (!constantCache.contains(pI, pLength)) {
+      boolean isNegative = pI.compareTo(java.math.BigInteger.ZERO) < 0;
+      Preconditions.checkArgument(pI.bitLength() <= (isNegative ? (pLength - 1) : pLength));
 
-    BigInteger signedValue = pI.abs();
-    if (isNegative) {
-      BigInteger mask = BigInteger.ZERO.setBit(pLength).subtract(java.math.BigInteger.ONE);
-      signedValue = signedValue.xor(mask).add(BigInteger.ONE);
+      BigInteger signedValue = pI.abs();
+      if (isNegative) {
+        BigInteger mask = BigInteger.ZERO.setBit(pLength).subtract(java.math.BigInteger.ONE);
+        signedValue = signedValue.xor(mask).add(BigInteger.ONE);
+      }
+      String rawBits = signedValue.toString(2);
+      String extended = (isNegative ? "1" : "0").repeat(pLength - rawBits.length()) + rawBits;
+
+      constantCache.put(pI, pLength, script.binary("#b" + extended));
     }
-    String rawBits = signedValue.toString(2);
-    String extended = (isNegative ? "1" : "0").repeat(pLength - rawBits.length()) + rawBits;
-
-    return script.binary("#b" + extended);
+    return constantCache.get(pI, pLength);
   }
 
   @Override
