@@ -133,7 +133,6 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo) {
-    FormulaManager formulaManager = fmgr.orElseThrow();
     String form = dumpFormula(pExtractInfo);
     Term formula = ultimateEliminatorWrapper.parse(form);
     formula = ultimateEliminatorWrapper.simplify(formula);
