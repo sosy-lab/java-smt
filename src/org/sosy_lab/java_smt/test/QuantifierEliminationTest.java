@@ -42,7 +42,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     assume()
         .withMessage("Solver %s does not support parsing yet", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.MATHSAT5);
 
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");

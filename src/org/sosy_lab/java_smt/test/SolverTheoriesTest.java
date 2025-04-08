@@ -647,11 +647,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula and_cEq2_bMinusCgt1000 = bmgr.and(eq_c_2, gt_bMinusC_1000);
 
     BooleanFormula f = null;
-    try {
-      f = qmgr.exists(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
-    } catch (java.io.IOException e) {
-      throw new RuntimeException(e);
-    }
+    f = qmgr.exists(ImmutableList.of(var_C), and_cEq2_bMinusCgt1000);
     BooleanFormula result = qmgr.eliminateQuantifiers(f);
     assertThat(result.toString()).doesNotContain("exists");
     assertThat(result.toString()).doesNotContain("c");
@@ -685,11 +681,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     BooleanFormula fm = bmgr.and(i1_eq_1_plus_a1, not_j1_eq_minus1, j1_eq_j2_plus_a1);
 
     BooleanFormula q = null;
-    try {
-      q = qmgr.exists(ImmutableList.of(j1), fm);
-    } catch (java.io.IOException e) {
-      throw new RuntimeException(e);
-    }
+    q = qmgr.exists(ImmutableList.of(j1), fm);
     BooleanFormula result = qmgr.eliminateQuantifiers(q);
     assertThat(result.toString()).doesNotContain("exists");
     assertThat(result.toString()).doesNotContain("j@1");

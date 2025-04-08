@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -80,8 +79,7 @@ public interface QuantifiedFormulaManager {
    * @return An existentially quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody)
-      throws IOException {
+  default BooleanFormula exists(List<? extends Formula> pVariables, BooleanFormula pBody) {
     return mkQuantifier(Quantifier.EXISTS, pVariables, pBody);
   }
 
@@ -91,27 +89,18 @@ public interface QuantifiedFormulaManager {
    * @return A universally quantified formula.
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
-  default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody)
-      throws IOException {
+  default BooleanFormula forall(List<? extends Formula> pVariables, BooleanFormula pBody) {
     return mkQuantifier(Quantifier.FORALL, pVariables, pBody);
   }
 
   /** Syntax sugar, see {@link #forall(List, BooleanFormula)}. */
   default BooleanFormula forall(Formula quantifiedArg, BooleanFormula pBody) {
-    try {
-      return forall(ImmutableList.of(quantifiedArg), pBody);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return forall(ImmutableList.of(quantifiedArg), pBody);
   }
 
   /** Syntax sugar, see {@link #exists(List, BooleanFormula)}. */
   default BooleanFormula exists(Formula quantifiedArg, BooleanFormula pBody) {
-    try {
-      return exists(ImmutableList.of(quantifiedArg), pBody);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return exists(ImmutableList.of(quantifiedArg), pBody);
   }
 
   /**
