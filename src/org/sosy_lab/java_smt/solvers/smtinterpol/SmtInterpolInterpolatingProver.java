@@ -99,7 +99,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
         throw e;
       }
     } catch (SMTLIBException e) {
-      if ("Timeout exceeded".equals(e.getMessage())) {
+      if ("Termination requested (timeout or resource limit)".equals(e.getMessage())) {
         shutdownNotifier.shutdownIfNecessary();
       }
       throw new AssertionError(e);
