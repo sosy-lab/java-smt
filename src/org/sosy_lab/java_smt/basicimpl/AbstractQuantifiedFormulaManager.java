@@ -130,10 +130,14 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo) {
     FormulaManager formulaManager = fmgr.orElseThrow();
     Term formula =
-        ultimateEliminatorWrapper.parse(formulaManager.dumpFormula(pExtractInfo).toString());
+        ultimateEliminatorWrapper.parse(dumpFormula(pExtractInfo));
     formula = ultimateEliminatorWrapper.simplify(formula);
     return extractInfo(
         formulaManager.parse(ultimateEliminatorWrapper.dumpFormula(formula).toString()));
+  }
+
+  protected String dumpFormula(BooleanFormula bf){
+    return fmgr.orElseThrow().dumpFormula(bf).toString();
   }
 
   protected abstract TFormulaInfo eliminateQuantifiers(TFormulaInfo pExtractInfo)
@@ -172,6 +176,10 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public void setOptions(ProverOptions... opt) {
     options.addAll(Arrays.asList(opt));
+  }
+
+  protected FormulaManager getFmgr(){
+    return fmgr.orElseThrow();
   }
 
   public void setFmgr(AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pFmgr) {

@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -67,5 +68,11 @@ public class Mathsat5QuantifiedFormulaManager
       }
     }
     return quantifiedFormula;
+  }
+
+  @Override
+  protected String dumpFormula(BooleanFormula bf) {
+    return ((Mathsat5FormulaManager) getFmgr()).dumpFormulaImplExt(extractInfo(bf),
+        "qFormulaNameMathsat5");
   }
 }
