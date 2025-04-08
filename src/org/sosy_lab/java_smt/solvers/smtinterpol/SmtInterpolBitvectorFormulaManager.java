@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import de.uni_freiburg.informatik.ultimate.logic.FunctionSymbol;
@@ -43,16 +42,10 @@ public class SmtInterpolBitvectorFormulaManager
   @Override
   protected Term makeBitvectorImpl(int pLength, BigInteger pI) {
     if (!constantCache.contains(pI, pLength)) {
-      boolean isNegative = pI.compareTo(java.math.BigInteger.ZERO) < 0;
-      Preconditions.checkArgument(pI.bitLength() <= (isNegative ? (pLength - 1) : pLength));
+      BigInteger signedValue = transformValueToRange(pLength, pI);
 
-      BigInteger signedValue = pI.abs();
-      if (isNegative) {
-        BigInteger mask = BigInteger.ZERO.setBit(pLength).subtract(java.math.BigInteger.ONE);
-        signedValue = signedValue.xor(mask).add(BigInteger.ONE);
-      }
       String rawBits = signedValue.toString(2);
-      String extended = (isNegative ? "1" : "0").repeat(pLength - rawBits.length()) + rawBits;
+      String extended = "0".repeat(pLength - rawBits.length()) + rawBits;
 
       constantCache.put(pI, pLength, script.binary("#b" + extended));
     }
