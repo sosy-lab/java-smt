@@ -17,7 +17,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
-import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
@@ -221,7 +220,7 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void quantifierTest() throws IOException {
+  public void quantifierTest() {
     requireQuantifiers();
     requireIntegers();
     assume()

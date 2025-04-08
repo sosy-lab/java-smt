@@ -573,7 +573,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & Exists boundVar . (boundVar = 0 & var = f(boundVar))
   @Test
-  public void testQuantifiedUF() throws SolverException, InterruptedException, IOException {
+  public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     assume()
@@ -636,7 +636,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // var = 1 & boundVar = 1 & Exists boundVar . (boundVar = 0 & var = func(boundVar))
   @Test
-  public void testQuantifiedUF2() throws SolverException, InterruptedException, IOException {
+  public void testQuantifiedUF2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
     assume()

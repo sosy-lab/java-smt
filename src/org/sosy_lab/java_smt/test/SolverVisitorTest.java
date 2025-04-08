@@ -975,8 +975,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     IntegerFormula y = imgr.makeVariable("y");
     BooleanFormula xEqy = imgr.equal(x, y);
     // (x=y) && EX x: (X=y)
-    BooleanFormula constraint = null;
-    constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
+    BooleanFormula constraint = bmgr.and(xEqy, qmgr.forall(ImmutableList.of(x), xEqy));
 
     // The variable extraction should visit "x" and "y" only once,
     // otherwise AbstractFormulaManager#extractVariables might throw an exception,
@@ -1223,8 +1222,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     List<BooleanFormula> quantifiedVars = ImmutableList.of(bmgr.makeVariable("a"));
     BooleanFormula body = fuzzer.fuzz(30, usedVars);
-    BooleanFormula f = null;
-    f = qmgr.forall(quantifiedVars, body);
+    BooleanFormula f = qmgr.forall(quantifiedVars, body);
     BooleanFormula transformed =
         bmgr.transformRecursively(
             f,
@@ -1255,8 +1253,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeTrue();
-    BooleanFormula f = null;
-    f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
     assertThatFormula(transformed).isEquivalentTo(body);
@@ -1271,8 +1268,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeFalse();
-    BooleanFormula f = null;
-    f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).isEmpty();
     assertThatFormula(transformed).isEquivalentTo(body);
@@ -1287,8 +1283,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     List<IntegerFormula> quantifiedVars = ImmutableList.of(imgr.makeVariable("x"));
     BooleanFormula body = bmgr.makeVariable("b");
-    BooleanFormula f = null;
-    f = qmgr.exists(quantifiedVars, body);
+    BooleanFormula f = qmgr.exists(quantifiedVars, body);
     BooleanFormula transformed = qmgr.eliminateQuantifiers(f);
     assertThat(mgr.extractVariablesAndUFs(transformed)).containsEntry("b", body);
     assertThatFormula(transformed).isEquivalentTo(body);

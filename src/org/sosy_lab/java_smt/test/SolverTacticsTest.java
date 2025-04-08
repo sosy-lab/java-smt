@@ -16,7 +16,6 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.TruthJUnit;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +200,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNestedQuantifierTest() throws IOException {
+  public void ufEliminationNestedQuantifierTest() {
     requireIntegers();
     requireQuantifiers();
     assume()
