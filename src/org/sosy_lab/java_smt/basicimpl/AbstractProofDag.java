@@ -64,7 +64,7 @@ public abstract class AbstractProofDag implements ProofDag {
   public abstract static class AbstractProofNode implements ProofNode {
     private final List<ProofNode> children;
     private ProofRule rule;
-    private Formula formula;
+    protected Formula formula;
     private static final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
     private final int id;
 

@@ -85,10 +85,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
                 case "theory-lemma":
                   if (msat_proof_is_term(child)) {
                     frame.setNumArgs(frame.getNumArgs() - 1);
-                    System.out.println("theory-lemma rule has " + frame.getNumArgs() + " children");
                   } else {
-                    System.out.println("pushing theoryy-lemma non term child " + child);
-                    System.out.println("thoryy-lemma rule has " + frame.getNumArgs() + " children");
                     stack.push(new MsatProofFrame(child));
                   }
                   break;
@@ -178,6 +175,10 @@ public class Mathsat5ProofNode extends AbstractProofNode {
       }
     }
     return formula;
+  }
+
+  void setFormula(Formula formula) {
+    this.formula = formula;
   }
 
   String asString() {
