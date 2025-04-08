@@ -122,8 +122,7 @@ public interface QuantifiedFormulaManager {
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   default BooleanFormula exists(
-      List<? extends Formula> pVariables, BooleanFormula pBody, QuantifierCreationMethod pMethod)
-      throws IOException {
+      List<? extends Formula> pVariables, BooleanFormula pBody, QuantifierCreationMethod pMethod) {
     return mkQuantifier(Quantifier.EXISTS, pVariables, pBody, pMethod);
   }
 
@@ -135,29 +134,20 @@ public interface QuantifiedFormulaManager {
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   default BooleanFormula forall(
-      List<? extends Formula> pVariables, BooleanFormula pBody, QuantifierCreationMethod pMethod)
-      throws IOException {
+      List<? extends Formula> pVariables, BooleanFormula pBody, QuantifierCreationMethod pMethod) {
     return mkQuantifier(Quantifier.FORALL, pVariables, pBody, pMethod);
   }
 
   /** Syntax sugar, see {@link #forall(List, BooleanFormula)}. */
   default BooleanFormula forall(
       Formula quantifiedArg, BooleanFormula pBody, QuantifierCreationMethod pMethod) {
-    try {
-      return forall(ImmutableList.of(quantifiedArg), pBody, pMethod);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return forall(ImmutableList.of(quantifiedArg), pBody, pMethod);
   }
 
   /** Syntax sugar, see {@link #exists(List, BooleanFormula)}. */
   default BooleanFormula exists(
       Formula quantifiedArg, BooleanFormula pBody, QuantifierCreationMethod pMethod) {
-    try {
-      return exists(ImmutableList.of(quantifiedArg), pBody, pMethod);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    return exists(ImmutableList.of(quantifiedArg), pBody, pMethod);
   }
 
   /**
@@ -168,7 +158,7 @@ public interface QuantifiedFormulaManager {
    * @throws IllegalArgumentException If the list {@code pVariables} is empty.
    */
   BooleanFormula mkQuantifier(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException;
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody);
 
   /**
    * Create a formula with a specific quantifier elimination method.
@@ -184,8 +174,7 @@ public interface QuantifiedFormulaManager {
       Quantifier q,
       List<? extends Formula> pVariables,
       BooleanFormula pBody,
-      QuantifierCreationMethod pMethod)
-      throws IOException;
+      QuantifierCreationMethod pMethod);
 
   /**
    * Eliminate the quantifiers for a given formula. If this is not possible, it will return the

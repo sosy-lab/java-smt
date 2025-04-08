@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -29,7 +28,7 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
 
   @Override
   public BooleanFormula mkQuantifier(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     debugging.assertThreadLocal();
     for (Formula t : pVariables) {
       debugging.assertFormulaInContext(t);
@@ -45,8 +44,7 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
       Quantifier q,
       List<? extends Formula> pVariables,
       BooleanFormula pBody,
-      QuantifierCreationMethod pMethod)
-      throws IOException {
+      QuantifierCreationMethod pMethod) {
     debugging.assertThreadLocal();
     for (Formula t : pVariables) {
       debugging.assertFormulaInContext(t);

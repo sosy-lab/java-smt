@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -30,7 +29,7 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   @Override
   public BooleanFormula mkQuantifier(
-      Quantifier pQ, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
+      Quantifier pQ, List<? extends Formula> pVariables, BooleanFormula pBody) {
     synchronized (sync) {
       return delegate.mkQuantifier(pQ, pVariables, pBody);
     }
@@ -41,8 +40,7 @@ class SynchronizedQuantifiedFormulaManager implements QuantifiedFormulaManager {
       Quantifier pQ,
       List<? extends Formula> pVariables,
       BooleanFormula pBody,
-      QuantifierCreationMethod pMethod)
-      throws IOException {
+      QuantifierCreationMethod pMethod) {
     synchronized (sync) {
       return delegate.mkQuantifier(pQ, pVariables, pBody, pMethod);
     }

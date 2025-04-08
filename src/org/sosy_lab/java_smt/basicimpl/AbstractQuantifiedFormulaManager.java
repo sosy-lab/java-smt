@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Level;
-import javax.annotation.Nonnull;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -61,9 +60,9 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   @Override
-  public BooleanFormula eliminateQuantifiers(
-      BooleanFormula pF, @Nonnull QuantifierEliminationMethod pMethod)
+  public BooleanFormula eliminateQuantifiers(BooleanFormula pF, QuantifierEliminationMethod pMethod)
       throws InterruptedException, SolverException {
+    assert pMethod != null : "Quantifier elimination method cannot be null";
     switch (pMethod) {
       case ULTIMATE_ELIMINATOR:
         try {
@@ -154,13 +153,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Quantifier q,
       List<? extends Formula> pVariables,
       BooleanFormula pBody,
-      QuantifierCreationMethod pMethod)
-      throws IOException {
+      QuantifierCreationMethod pMethod) {
     switch (pMethod) {
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION:
         try {
           return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (IOException | UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException e) {
           logger.logException(Level.WARNING, e, "External quantifier creation failed.");
           throw e;
         }
@@ -168,7 +166,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK:
         try {
           return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (IOException | UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException e) {
           return wrap(
               mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
         }
@@ -176,7 +174,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK_WARN_ON_FAILURE:
         try {
           return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (IOException | UnsupportedOperationException e) {
+        } catch (UnsupportedOperationException e) {
           logger.logException(
               Level.WARNING, e, "External quantifier creation failed. Falling back to native");
           return wrap(
@@ -210,7 +208,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   }
 
   private BooleanFormula eliminateQuantifierBeforeMakingFormula(
-      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) throws IOException {
+      Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     List<String> boundVariablesNameList = new ArrayList<>();
     List<String> boundVariablesSortList = new ArrayList<>();
 
