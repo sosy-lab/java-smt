@@ -23,6 +23,7 @@ import de.uni_freiburg.informatik.ultimate.logic.Script;
 import de.uni_freiburg.informatik.ultimate.logic.Sort;
 import de.uni_freiburg.informatik.ultimate.logic.Term;
 import de.uni_freiburg.informatik.ultimate.logic.Theory;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -215,6 +216,8 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
         } else {
           outValue = org.sosy_lab.common.rationals.Rational.of(rat.numerator(), rat.denominator());
         }
+      } else if (interpolValue instanceof BigDecimal) {
+        outValue = interpolValue;
       } else if (interpolValue instanceof String) {
         outValue = new BigInteger(((String) interpolValue).substring(2), 2);
       } else if (interpolValue instanceof BigInteger) {
