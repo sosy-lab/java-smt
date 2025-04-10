@@ -106,6 +106,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return pF;
   }
 
+  /**
+   * Eliminates quantifiers using the UltimateEliminator.
+   *
+   * @param pExtractInfo The BooleanFormula to process.
+   * @return The quantifier-free formula in the internal representation.
+   */
   protected TFormulaInfo eliminateQuantifiersUltimateEliminator(BooleanFormula pExtractInfo) {
     String form = dumpFormula(pExtractInfo);
     Term formula = ultimateEliminatorWrapper.parse(form);
@@ -173,18 +179,26 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     fmgr = Optional.of(pFmgr);
   }
 
+  /**
+   * Eliminates quantifiers before creating a formula.
+   *
+   * @param q The quantifier (e.g., FORALL or EXISTS).
+   * @param pVariables The list of variables bound by the quantifier.
+   * @param pBody The body of the formula.
+   * @return A quantifier-free Boolean formula.
+   */
   private BooleanFormula eliminateQuantifierBeforeMakingFormula(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     List<String> boundVariablesNameList = new ArrayList<>();
-    List<String> boundVariablesSortList = new ArrayList<>();
+    List<String> boundVariablesTypeList = new ArrayList<>();
 
     String form = dumpFormula(pBody);
     Term ultimateBody = ultimateEliminatorWrapper.parse(form);
     for (Formula var : pVariables) {
-      enrichBoundVariablesNameAndSortList(var, boundVariablesNameList, boundVariablesSortList);
+      enrichBoundVariablesNameAndTypeList(var, boundVariablesNameList, boundVariablesTypeList);
     }
     String ultimateFormula =
-        buildSmtlib2Formula(q, boundVariablesNameList, boundVariablesSortList, ultimateBody);
+        buildSmtlib2Formula(q, boundVariablesNameList, boundVariablesTypeList, ultimateBody);
 
     Term parsedResult = ultimateEliminatorWrapper.parse(ultimateFormula);
     Term resultFormula = ultimateEliminatorWrapper.simplify(parsedResult);
@@ -194,8 +208,14 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return result;
   }
 
-  private String mapTypeToUltimateSort(String pSort) {
-    return pSort
+  /**
+   * Maps a given type String to its corresponding Ultimate type representation.
+   *
+   * @param pType The type String to be mapped.
+   * @return The Ultimate type-String representation of the type String.
+   */
+  private String mapTypeToUltimateType(String pType) {
+    return pType
         .replace("<", " ")
         .replace(">", "")
         .replace(",", " ")
@@ -203,10 +223,19 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         .replace("Boolean", "Bool");
   }
 
+  /**
+   * Builds an SMT-LIB 2 formula string representation for a quantified formula.
+   *
+   * @param pQ The quantifier (e.g., FORALL or EXISTS).
+   * @param pBoundVariablesNameList The list of bound variable names.
+   * @param pBoundVariablesTypeList The list of bound variable types.
+   * @param pUltimateBody The body of the formula as a Term (Ultimate datatype).
+   * @return The SMT-LIB 2 string representation of the quantified formula.
+   */
   private String buildSmtlib2Formula(
       Quantifier pQ,
       List<String> pBoundVariablesNameList,
-      List<String> pBoundVariablesSortList,
+      List<String> pBoundVariablesTypeList,
       Term pUltimateBody) {
     StringBuilder sb = new StringBuilder();
     sb.append("(assert (").append(pQ.toString().toLowerCase(Locale.getDefault())).append(" (");
@@ -215,7 +244,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         sb.append("(")
             .append(pBoundVariablesNameList.get(i))
             .append(" ")
-            .append(pBoundVariablesSortList.get(i))
+            .append(pBoundVariablesTypeList.get(i))
             .append(")");
       }
     }
@@ -225,7 +254,13 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     return sb.toString();
   }
 
-  private String getSortAsString(Formula pF) {
+  /**
+   * Retrieves the type of a given formula as a string.
+   *
+   * @param pF The formula whose type is to be retrieved.
+   * @return The type of the formula as a string.
+   */
+  private String getTypeAsString(Formula pF) {
     if (fmgr.orElseThrow().getFormulaType(pF) instanceof FormulaType.ArrayFormulaType) {
       return "(" + fmgr.orElseThrow().getFormulaType(pF) + ")";
     } else {
@@ -233,8 +268,16 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  private void enrichBoundVariablesNameAndSortList(
-      Formula pF, List<String> nameList, List<String> sortList) {
+  /**
+   * Visit the given formula (of a bound variable) and fill the lists of bound variable names and
+   * types with data gained.
+   *
+   * @param pF The formula to process.
+   * @param nameList The list to store variable names.
+   * @param typeList The list to store variable types.
+   */
+  private void enrichBoundVariablesNameAndTypeList(
+      Formula pF, List<String> nameList, List<String> typeList) {
     try {
       formulaCreator.visit(
           pF,
@@ -248,8 +291,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             @Override
             public TraversalProcess visitFreeVariable(Formula f, String name) {
               nameList.add(name);
-              String sort = getSortAsString(f);
-              sortList.add(mapTypeToUltimateSort(sort));
+              String type = getTypeAsString(f);
+              typeList.add(mapTypeToUltimateType(type));
               return TraversalProcess.CONTINUE;
             }
           });
@@ -258,6 +301,17 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
+  /**
+   * Handles quantifier elimination using the native solver.
+   *
+   * @param pF The BooleanFormula to process.
+   * @param logLevel The logging level for errors.
+   * @param logMessage The message to log in case of failure.
+   * @param fallback Whether to fall back to UltimateEliminator on failure.
+   * @return The quantifier-free formula.
+   * @throws SolverException If the solver encounters an error.
+   * @throws InterruptedException If the operation is interrupted.
+   */
   private BooleanFormula handleNativeElimination(
       BooleanFormula pF, Level logLevel, String logMessage, boolean fallback)
       throws SolverException, InterruptedException {
@@ -274,6 +328,17 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
+  /**
+   * Handles quantifier elimination using UltimateEliminator.
+   *
+   * @param pF The BooleanFormula to process.
+   * @param logLevel The logging level for errors.
+   * @param logMessage The message to log in case of failure.
+   * @param fallback Whether to fall back to the native solver on failure.
+   * @return The quantifier-free formula.
+   * @throws SolverException If the solver encounters an error.
+   * @throws InterruptedException If the operation is interrupted.
+   */
   private BooleanFormula handleUltimateEliminator(
       BooleanFormula pF, Level logLevel, String logMessage, boolean fallback)
       throws SolverException, InterruptedException {
@@ -290,7 +355,18 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     }
   }
 
-  private BooleanFormula handleQuantifierCreation(
+  /**
+   * Handles the creation of a formula with quantifier, with optional fallback behavior.
+   *
+   * @param q The quantifier (e.g., FORALL or EXISTS).
+   * @param pVariables The list of variables bound by the quantifier.
+   * @param pBody The body of the formula.
+   * @param logLevel The logging level for errors.
+   * @param logMessage The message to log in case of failure.
+   * @param fallback Whether to fall back to native quantifier creation on failure.
+   * @return The created formula.
+   */
+  private BooleanFormula handleQuantifierFormulaCreation(
       Quantifier q,
       List<? extends Formula> pVariables,
       BooleanFormula pBody,
