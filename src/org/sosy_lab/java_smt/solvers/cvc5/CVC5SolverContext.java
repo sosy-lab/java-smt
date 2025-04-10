@@ -159,8 +159,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             slTheory,
             strTheory,
             enumTheory);
-    qfTheory.setFmgr(manager);
-
     return new CVC5SolverContext(
         pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
   }

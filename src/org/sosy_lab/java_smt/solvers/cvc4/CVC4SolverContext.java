@@ -105,9 +105,6 @@ public final class CVC4SolverContext extends AbstractSolverContext {
             arrayTheory,
             slTheory,
             strTheory);
-
-    qfTheory.setFmgr(manager);
-
     return new CVC4SolverContext(creator, manager, pShutdownNotifier, randomSeed);
   }
 

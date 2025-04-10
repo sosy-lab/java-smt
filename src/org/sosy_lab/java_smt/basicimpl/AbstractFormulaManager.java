@@ -173,6 +173,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
             && !(quantifiedManager != null
                 && quantifiedManager.getFormulaCreator() != formulaCreator),
         "The creator instances must match across the managers!");
+    if (this.quantifiedManager != null) {
+      this.quantifiedManager.setFmgr(this);
+    }
   }
 
   public final FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> getFormulaCreator() {

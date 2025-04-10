@@ -186,9 +186,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
             floatingPointTheory,
             arrayTheory,
             solverOptions);
-
-    quantifierTheory.setFmgr(manager);
-
     return new BitwuzlaSolverContext(manager, creator, pShutdownNotifier, solverOptions);
   }
 

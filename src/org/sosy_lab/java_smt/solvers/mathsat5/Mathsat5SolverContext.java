@@ -210,7 +210,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             quantifiedTheory,
             arrayTheory,
             enumerationTheory);
-    quantifiedTheory.setFmgr(manager);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }
