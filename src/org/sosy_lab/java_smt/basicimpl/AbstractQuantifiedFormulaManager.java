@@ -65,65 +65,40 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     assert pMethod != null : "Quantifier elimination method cannot be null";
     switch (pMethod) {
       case ULTIMATE_ELIMINATOR:
-        try {
-          return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (UnsupportedOperationException | IllegalArgumentException e) {
-          logger.logException(
-              Level.SEVERE,
-              e,
-              "UltimateEliminator failed. Please adjust the "
-                  + "option if you want to use the native quantifier elimination");
-
-          throw e;
-        }
+        return handleUltimateEliminator(
+            pF,
+            Level.SEVERE,
+            "UltimateEliminator failed. Please adjust the option if you want to use the native "
+                + "quantifier elimination",
+            false);
 
       case ULTIMATE_ELIMINATOR_FALLBACK_ON_FAILURE:
-        try {
-          return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (UnsupportedOperationException | IllegalArgumentException e) {
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        }
+        return handleUltimateEliminator(pF, null, null, true);
 
       case ULTIMATE_ELIMINATOR_FALLBACK_WITH_WARNING_ON_FAILURE:
-        try {
-          return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        } catch (UnsupportedOperationException | IllegalArgumentException e) {
-          logger.logException(
-              Level.WARNING,
-              e,
-              "UltimateEliminator failed. " + "Reverting to native " + "quantifier elimination");
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        }
+        return handleUltimateEliminator(
+            pF,
+            Level.WARNING,
+            "UltimateEliminator failed. Reverting to native quantifier elimination",
+            true);
 
       case NATIVE:
-        try {
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        } catch (Exception e1) {
-          logger.logException(
-              Level.SEVERE,
-              e1,
-              "Native quantifier elimination failed. Please adjust the "
-                  + "option if you want to use the UltimateEliminator quantifier elimination");
-          throw e1;
-        }
+        return handleNativeElimination(
+            pF,
+            Level.SEVERE,
+            "Native quantifier elimination failed. Please adjust the option if you want to use the"
+                + " UltimateEliminator quantifier elimination",
+            false);
 
       case NATIVE_FALLBACK_ON_FAILURE:
-        try {
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        } catch (UnsupportedOperationException | IllegalArgumentException e) {
-          return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        }
+        return handleNativeElimination(pF, null, null, true);
 
       case NATIVE_FALLBACK_WITH_WARNING_ON_FAILURE:
-        try {
-          return wrap(eliminateQuantifiers(extractInfo(pF)));
-        } catch (UnsupportedOperationException | IllegalArgumentException e) {
-          logger.logException(
-              Level.WARNING,
-              e,
-              "Default quantifier elimination failed. Switching to UltimateEliminator");
-          return wrap(eliminateQuantifiersUltimateEliminator(pF));
-        }
+        return handleNativeElimination(
+            pF,
+            Level.WARNING,
+            "Default quantifier elimination failed. Switching to UltimateEliminator",
+            true);
 
       default:
         break;
@@ -182,17 +157,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
         }
 
       default:
-        try {
-          return wrap(
-              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        } catch (Exception e) {
-          logger.logException(
-              Level.SEVERE,
-              e,
-              "Native quantifier creation failed. Please adjust the "
-                  + "option if you want to use the UltimateEliminator quantifier creation");
-          throw e;
-        }
+        return wrap(
+            mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
     }
   }
 
@@ -289,6 +255,59 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
           });
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  private BooleanFormula handleNativeElimination(
+      BooleanFormula pF, Level logLevel, String logMessage, boolean fallback)
+      throws SolverException, InterruptedException {
+    try {
+      return wrap(eliminateQuantifiers(extractInfo(pF)));
+    } catch (SolverException | InterruptedException e) {
+      if (logLevel != null) {
+        logger.logException(logLevel, e, logMessage);
+      }
+      if (!fallback) {
+        throw e;
+      }
+      return wrap(eliminateQuantifiersUltimateEliminator(pF));
+    }
+  }
+
+  private BooleanFormula handleUltimateEliminator(
+      BooleanFormula pF, Level logLevel, String logMessage, boolean fallback)
+      throws SolverException, InterruptedException {
+    try {
+      return wrap(eliminateQuantifiersUltimateEliminator(pF));
+    } catch (UnsupportedOperationException | IllegalArgumentException e) {
+      if (logLevel != null && logMessage != null) {
+        logger.logException(logLevel, e, logMessage);
+      }
+      if (!fallback) {
+        throw e;
+      }
+      return wrap(eliminateQuantifiers(extractInfo(pF)));
+    }
+  }
+
+  private BooleanFormula handleQuantifierCreation(
+      Quantifier q,
+      List<? extends Formula> pVariables,
+      BooleanFormula pBody,
+      Level logLevel,
+      String logMessage,
+      boolean fallback) {
+    try {
+      return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
+    } catch (UnsupportedOperationException e) {
+      if (logLevel != null && logMessage != null) {
+        logger.logException(logLevel, e, logMessage);
+      }
+      if (!fallback) {
+        throw e;
+      }
+      return wrap(
+          mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
     }
   }
 
