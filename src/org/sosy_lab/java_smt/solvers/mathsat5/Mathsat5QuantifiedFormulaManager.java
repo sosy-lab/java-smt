@@ -14,10 +14,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exists;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_forall;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
 
 import java.util.List;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -72,7 +74,9 @@ public class Mathsat5QuantifiedFormulaManager
 
   @Override
   protected String dumpFormula(BooleanFormula bf) {
-    return ((Mathsat5FormulaManager) getFmgr())
-        .dumpFormulaImplExt(extractInfo(bf), "qFormulaNameMathsat5");
+    assert getFormulaCreator().getFormulaType(extractInfo(bf)) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+    // UltimateEliminator currently does not support quantified Terms with definitions yet.
+    return msat_to_smtlib2_ext(formulaCreator.getEnv(), extractInfo(bf), "qFormulaNameMathsat5", 1);
   }
 }
