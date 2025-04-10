@@ -16,9 +16,11 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -69,57 +71,81 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     long proof = msat_get_proof(pm);
     pn = Mathsat5ProofNode.fromMsatProof(this, proof);
     context.getFormulaManager().getBooleanFormulaManager();
-    ProofNode result = pn;
-    result = clausifyResChain(pn, context.getFormulaManager().getBooleanFormulaManager());
+    clausifyResChain(pn, context.getFormulaManager().getBooleanFormulaManager());
     msat_destroy_proof_manager(pm);
 
-    return result;
+    return pn;
 
     // return getProof0();
   }
 
-  // recursively update all RES_CHAIN nodes in the proof DAG by computing resolution
+  // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
-  private ProofNode clausifyResChain(ProofNode root, BooleanFormulaManager bfmgr) {
-    return processResChain(root, bfmgr); // Start traversal and resolution from root node
+  private void clausifyResChain(ProofNode root, BooleanFormulaManager bfmgr) {
+    Map<ProofNode, Boolean> visited = new HashMap<>(); // Track visited nodes
+    Stack<ProofNode> stack = new Stack<>();
+    Stack<ProofNode> processStack =
+        new Stack<>(); // Stack to hold nodes for post-processing after children
+
+    stack.push(root); // Start with the root node
+    visited.put(root, Boolean.FALSE); // Mark root as unvisited
+
+    while (!stack.isEmpty()) {
+      ProofNode node = stack.peek(); // Look at the top node, but don't pop yet
+
+      if (visited.get(node) == Boolean.FALSE) {
+        // First time visiting this node
+        visited.put(node, Boolean.TRUE); // Mark node as visited
+
+        // Push all children onto stack
+        List<ProofNode> children = node.getChildren();
+        for (int i = children.size() - 1; i >= 0; i--) {
+          ProofNode child = children.get(i);
+          if (!visited.containsKey(child)) {
+            stack.push(child); // Only push unvisited children
+            visited.put(child, Boolean.FALSE); // Mark child as unvisited
+          }
+        }
+      } else {
+        // All children have been visited, now process the node
+        stack.pop(); // Pop the current node as we are done processing its children
+
+        // Check if this node is a RES_CHAIN, process if true
+        if (node.getRule().equals(Rule.RES_CHAIN)) {
+          processResChain(node, bfmgr); // Process RES_CHAIN node
+        }
+      }
+    }
   }
 
-  // Recursively process proof nodes and compute formulas for res-chain nodes
-  private ProofNode processResChain(ProofNode node, BooleanFormulaManager bfmgr) {
+  // process proof nodes and compute formulas for res-chain nodes
+  private void processResChain(ProofNode node, BooleanFormulaManager bfmgr) {
     List<ProofNode> children = node.getChildren();
-    List<ProofNode> newChildren = new ArrayList<>();
-
-    // First process all children recursively so their formulas are computed
-    for (ProofNode child : children) {
-      newChildren.add(processResChain(child, bfmgr));
-    }
 
     // If the current node is a RES_CHAIN, compute the resolved formula
     if (node.getRule().equals(Rule.RES_CHAIN)) {
       // Sanity check: res-chain nodes must have an odd number of children (clause, pivot, clause,
       // ..., clause)
-      if (newChildren.size() < 3 || newChildren.size() % 2 == 0) {
+      if (children.size() < 3 || children.size() % 2 == 0) {
         throw new IllegalArgumentException("Invalid res-chain structure: must be odd and >= 3");
       }
 
       // Begin resolution chain: start with the first clause
-      BooleanFormula current = (BooleanFormula) newChildren.get(0).getFormula();
+      BooleanFormula current = (BooleanFormula) children.get(0).getFormula();
 
       // Apply resolution iteratively using pivot, clause pairs
-      for (int i = 1; i < newChildren.size() - 1; i += 2) {
-        BooleanFormula pivot = (BooleanFormula) newChildren.get(i).getFormula();
-        BooleanFormula nextClause = (BooleanFormula) newChildren.get(i + 1).getFormula();
+      for (int i = 1; i < children.size() - 1; i += 2) {
+        BooleanFormula pivot = (BooleanFormula) children.get(i).getFormula();
+        BooleanFormula nextClause = (BooleanFormula) children.get(i + 1).getFormula();
         current = resolve(current, nextClause, pivot, bfmgr); // Perform resolution step
       }
 
       // Store the resolved formula in the current node
       ((Mathsat5ProofNode) node).setFormula(current);
     }
-
-    return node;
   }
 
-  // Perform resolution between two disjunctive clauses using a given pivot
+  // Perform resolution between two  clauses using a given pivot
   private BooleanFormula resolve(
       BooleanFormula clause1,
       BooleanFormula clause2,
@@ -132,9 +158,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     boolean removed = false;
 
     for (BooleanFormula lit : literals1) {
-      if (isComplement(lit, pivot, bfmgr)) {
-        removed = true;
-      } else {
+      if (!isComplement(lit, pivot, bfmgr)) {
         combined.add(lit);
       }
     }
@@ -142,9 +166,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     List<BooleanFormula> temp = new ArrayList<>();
     boolean removed2 = false;
     for (BooleanFormula lit : literals2) {
-      if (isComplement(lit, pivot, bfmgr)) {
-        removed2 = true;
-      } else {
+      if (!isComplement(lit, pivot, bfmgr)) {
         temp.add(lit);
       }
     }
@@ -160,7 +182,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     }
   }
 
-  // Helper method to flatten an OR-formula into a list of disjunctive literals
+  // Helper method to flatten an OR/AND-formula into a list of disjunctive literals
   private List<BooleanFormula> flattenLiterals(
       BooleanFormula formula, BooleanFormulaManager bfmgr) {
     List<BooleanFormula> result = new ArrayList<>();
@@ -186,14 +208,14 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
           @Override
           public TraversalProcess visitNot(BooleanFormula operand) {
-            result.add(formula); // ✅ add original NOT node
+            result.add(formula); // add original NOT node
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitAtom(
               BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
-            result.add(formula); // ✅ add original atom
+            result.add(formula); // add original atom
             return TraversalProcess.SKIP;
           }
 
