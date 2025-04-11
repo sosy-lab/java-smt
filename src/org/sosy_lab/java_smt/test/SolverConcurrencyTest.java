@@ -87,6 +87,8 @@ public class SolverConcurrencyTest {
 
   private static final ImmutableMap<Solvers, Integer> BITVECTOR_FORMULA_GEN =
       ImmutableMap.of(
+          Solvers.SMTINTERPOL,
+          5,
           Solvers.BOOLECTOR,
           50,
           Solvers.CVC4,
@@ -153,7 +155,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
