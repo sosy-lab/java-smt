@@ -148,7 +148,9 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public ProofNode getProof() {
+  public ProofNode getProof() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(this.isUnsat());
     long proofAst = Native.solverGetProof(z3context, z3solver);
     return new Z3NonRecursiveProofProcessor(z3context, z3solver, creator, this)
         .fromASTIterative(proofAst);
