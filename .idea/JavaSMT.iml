@@ -177,17 +177,14 @@ SPDX-License-Identifier: Apache-2.0
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/smtinterpol.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/ultimate.smtinterpol.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/ultimate.lib.util.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/ultimate.lib.smtlib.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/ultimate.lib.ultimatemodel.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/java/runtime-smtinterpol/ultimate.javacup.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES>
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/DeltaDebugger/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/Library-SMTLIB/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/ProoftreeCheck/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpol/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolSamples/src" />
-          <root url="jar://$MODULE_DIR$/lib/java-contrib/smtinterpol-sources.zip!/SMTInterpol/SMTInterpolTest/src" />
-        </SOURCES>
+        <SOURCES />
       </library>
     </orderEntry>
     <orderEntry type="module-library">
