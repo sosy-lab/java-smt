@@ -112,7 +112,7 @@ public class StringGenerator {
 
   protected static void logRegexComplement(RegexFormula result, RegexFormula regex) {
     List<Object> inputParams = ImmutableList.of(regex);
-    logOperation(result, inputParams, "(re.complement %s)", Keyword.SKIP);
+    logOperation(result, inputParams, "(re.comp %s)", Keyword.SKIP);
   }
 
   protected static void logRegexDifference(
@@ -150,7 +150,7 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logMakeRegex(RegexFormula result, String value) {
+  protected static void logMakeRegex(Object result, String value) {
     String unquotedValue = value.replace("\"", "");
     List<Object> inputParams = ImmutableList.of(unquotedValue);
     logOperation(result, inputParams, "(str.to_re \"%s\")", Keyword.SKIP);

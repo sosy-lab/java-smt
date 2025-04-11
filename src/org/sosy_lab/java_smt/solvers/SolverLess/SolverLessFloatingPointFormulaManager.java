@@ -177,7 +177,7 @@ public class SolverLessFloatingPointFormulaManager
 
   @Override
   protected SMTLIB2Formula assignment(SMTLIB2Formula pParam1, SMTLIB2Formula pParam2) {
-    return new SMTLIB2Formula(pParam1.getExponent(), pParam1.getMantissa());
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.BOOLEAN));
   }
 
   @Override

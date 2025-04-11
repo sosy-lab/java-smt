@@ -52,15 +52,24 @@ public class FloatingPointGenerator {
     List<Object> inputParams = new ArrayList<>();
     // SIGN BIT
     String output = "(fp ";
-    if (sign) output += "#b1 ";
-    else output += "#b0 ";
+    if (sign) {
+      output += "#b1 ";
+    } else {
+      output += "#b0 ";
+    }
     // EXPONENT
-    if (exponent.toString().length() == type.getExponentSize()) output += "#b";
-    else output += "#x";
+    if (exponent.toString().length() == type.getExponentSize()) {
+      output += "#b";
+    } else {
+      output += "#x";
+    }
     output += exponent + " ";
     // MANTISSA
-    if (mantissa.toString().length() == type.getMantissaSize()) output += "#b";
-    else output += "#x";
+    if (mantissa.toString().length() == type.getMantissaSize()) {
+      output += "#b";
+    } else {
+      output += "#x";
+    }
     output += mantissa + ")";
     inputParams.add(output);
     Function<List<Object>, String> functionToString = createString -> (String) createString.get(0);
@@ -159,8 +168,13 @@ public class FloatingPointGenerator {
     }
 
     // Return the SMT-LIB formatted string
-    return "(fp #b" + signBit + " #b" + String.format("%" + exponentSize + "s", Integer.toBinaryString(biasedExponent))
-        .replace(' ', '0') + " #b" + mantissaBits
+    return "(fp #b"
+        + signBit
+        + " #b"
+        + String.format("%" + exponentSize + "s", Integer.toBinaryString(biasedExponent))
+            .replace(' ', '0')
+        + " #b"
+        + mantissaBits
         + ")";
   }
 
@@ -376,9 +390,9 @@ public class FloatingPointGenerator {
     final int exponentSize = type.getExponentSize();
     final int mantissaSize = type.getMantissaSize();
     final int bias = (1 << (exponentSize - 1)) - 1;
-    final Rational TWO = Rational.ofLong(2);
-    final Rational ONE = Rational.ofLong(1);
-    final Rational HALF = Rational.ofLongs(1, 2);
+    final Rational two = Rational.ofLong(2);
+    final Rational one = Rational.ofLong(1);
+    final Rational half = Rational.ofLongs(1, 2);
 
     // Handle zero
     if (value.equals(Rational.ZERO)) {
@@ -392,14 +406,14 @@ public class FloatingPointGenerator {
 
     // Calculate exponent
     int exponent = 0;
-    if (absValue.compareTo(ONE) >= 0) {
-      while (absValue.compareTo(TWO) >= 0) {
-        absValue = absValue.divides(TWO);
+    if (absValue.compareTo(one) >= 0) {
+      while (absValue.compareTo(two) >= 0) {
+        absValue = absValue.divides(two);
         exponent++;
       }
     } else {
-      while (absValue.compareTo(ONE) < 0) {
-        absValue = absValue.times(TWO);
+      while (absValue.compareTo(one) < 0) {
+        absValue = absValue.times(two);
         exponent--;
       }
     }
@@ -421,21 +435,21 @@ public class FloatingPointGenerator {
 
     // Calculate mantissa bits
     StringBuilder mantissaBits = new StringBuilder(mantissaSize);
-    Rational remainder = absValue.minus(ONE);
+    Rational remainder = absValue.minus(one);
 
     for (int i = 0; i < mantissaSize; i++) {
-      remainder = remainder.times(TWO);
-      if (remainder.compareTo(ONE) >= 0) {
+      remainder = remainder.times(two);
+      if (remainder.compareTo(one) >= 0) {
         mantissaBits.append('1');
-        remainder = remainder.minus(ONE);
+        remainder = remainder.minus(one);
       } else {
         mantissaBits.append('0');
       }
     }
 
     // Rounding - round to nearest, ties to even
-    if (remainder.compareTo(HALF) > 0
-        || (remainder.equals(HALF) && mantissaBits.charAt(mantissaSize - 1) == '1')) {
+    if (remainder.compareTo(half) > 0
+        || (remainder.equals(half) && mantissaBits.charAt(mantissaSize - 1) == '1')) {
       // Need to round up
       boolean carry = true;
       for (int i = mantissaSize - 1; i >= 0 && carry; i--) {
@@ -640,7 +654,7 @@ public class FloatingPointGenerator {
 
   protected static void logFPAssignment(
       BooleanFormula result, FloatingPointFormula num1, FloatingPointFormula num2) {
-    logBinaryOp(result, "fp.assign", num1, num2);
+    logBinaryOp(result, "=", num1, num2);
   }
 
   protected static void logFPCastTo(

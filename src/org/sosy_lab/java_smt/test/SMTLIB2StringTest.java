@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -422,6 +423,34 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void testComplexRegex()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const X String)\n"
+            + "(assert (not (str.in_re X (str.to_re"
+            + " \"HXLogOnlyDaemonactivityIterenetFrom:Class\\u{a}\"))))\n"
+            + "(assert (not (str.in_re X (re.union (re.++ (str.to_re \"\\u{22}\") (re.* (re.comp"
+            + " (str.to_re \"\\u{22}\"))) (str.to_re \"\\u{22}\")) (re.++ (re.opt (str.to_re"
+            + " \"\\u{d}\\u{a}\")) (str.to_re \"\\u{a}'\") (re.* (re.comp (str.to_re"
+            + " \"\\u{d}\"))))))))\n"
+            + "(assert (not (str.in_re X (re.++ (str.to_re \"Download\") (re.+ (re.range \"0\""
+            + " \"9\")) (str.to_re \"ocllceclbhs/gth\\u{a}\")))))\n"
+            + "(assert (str.in_re X (str.to_re"
+            + " \"User-Agent:Host:TeomaBarHost:HoursHost:\\u{a}\")))\n"
+            + "(assert (not (str.in_re X (re.++ (str.to_re \"$\") (re.opt (re.* (re.range \"0\""
+            + " \"9\"))) (re.opt (str.to_re \",\")) (re.opt (re.* (re.range \"0\" \"9\"))) (re.opt"
+            + " (str.to_re \",\")) (re.* (re.range \"0\" \"9\")) (str.to_re \".\") (re.* (re.range"
+            + " \"0\" \"9\")) (str.to_re \"\\u{a}\")))))\n"
+            + "(check-sat)";
+
+    BooleanFormula parsed = mgr.universalParseFromString(x);
+    ProverEnvironment proverEnvironment = context.newProverEnvironment();
+    proverEnvironment.addConstraint(parsed);
+    assertThat(proverEnvironment.isUnsat()).isFalse();
+  }
+
+  @Test
   public void testDeclareUFString()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     String x =
@@ -429,47 +458,47 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
             + "(set-info :category \"random\")\n"
             + "(set-info :status sat)\n"
             + "\n"
-            + "(declare-fun I () String)\n"
-            + "(declare-fun B () String)\n"
-            + "(declare-fun G () String)\n"
-            + "(declare-fun F () String)\n"
-            + "(assert (= (str.++  \"cefcdf\" B \"bgcdfedb\" G \"fgafb\" G \"gefdgcbadf\")  (str.++"
-            + "  G \"ef\" I \"dcbbf\" G \"f\" G \"bbg\" F \"gefdg\" G \"badf\") ))\n"
+            + "(declare-fun i () String)\n"
+            + "(declare-fun b () String)\n"
+            + "(declare-fun g () String)\n"
+            + "(declare-fun f () String)\n"
+            + "(assert (= (str.++  \"cefcdf\" b \"bgcdfedb\" g \"fgafb\" g \"gefdgcbadf\")  (str.++"
+            + "  g \"ef\" i \"dcbbf\" g \"f\" g \"bbg\" f \"gefdg\" g \"badf\") ))\n"
             + "(check-sat)\n"
             + "\n"
             + "(exit)";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-    FunctionDeclaration<StringFormula> I =
-        mgr.getUFManager().declareUF("I", FormulaType.StringType);
-    FunctionDeclaration<StringFormula> B =
-        mgr.getUFManager().declareUF("B", FormulaType.StringType);
-    FunctionDeclaration<StringFormula> G =
-        mgr.getUFManager().declareUF("G", FormulaType.StringType);
-    FunctionDeclaration<StringFormula> F =
-        mgr.getUFManager().declareUF("F", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> i =
+        mgr.getUFManager().declareUF("i", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> b =
+        mgr.getUFManager().declareUF("b", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> g =
+        mgr.getUFManager().declareUF("g", FormulaType.StringType);
+    FunctionDeclaration<StringFormula> f =
+        mgr.getUFManager().declareUF("f", FormulaType.StringType);
     BooleanFormula constraint =
         smgr.equal(
             smgr.concat(
                 smgr.makeString("cefcdf"),
-                fmgr.callUF(B),
+                fmgr.callUF(b),
                 smgr.makeString("bgcdfedb"),
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("fgafb"),
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("gefdgcbadf")),
             smgr.concat(
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("ef"),
-                fmgr.callUF(I),
+                fmgr.callUF(i),
                 smgr.makeString("dcbbf"),
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("f"),
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("bbg"),
-                fmgr.callUF(F),
+                fmgr.callUF(f),
                 smgr.makeString("gefdg"),
-                fmgr.callUF(G),
+                fmgr.callUF(g),
                 smgr.makeString("badf")));
 
     Generator.assembleConstraint(actualResult);

@@ -47,7 +47,11 @@ public class UFGenerator {
         return "String";
       } else if (arg.isFloatingPointType()) {
         FloatingPointType type = (FloatingPointType) arg;
-        return "(_ FloatingPoint " + type.getExponentSize() + " " + type.getExponentSize() + ")";
+        return "(_ FloatingPoint "
+            + type.getExponentSize()
+            + " "
+            + (type.getMantissaSize() + 1)
+            + ")";
       } else {
         throw new GeneratorException(arg + " is not a known sort. ");
       }
@@ -76,7 +80,11 @@ public class UFGenerator {
       return "String";
     } else if (out.isFloatingPointType()) {
       FloatingPointType type = (FloatingPointType) out;
-      return "(_ FloatingPoint " + type.getExponentSize() + " " + type.getExponentSize() + ")";
+      return "(_ FloatingPoint "
+          + type.getExponentSize()
+          + " "
+          + (type.getMantissaSize() + 1)
+          + ")";
     } else {
       throw new GeneratorException(out + " is not a known sort. ");
     }

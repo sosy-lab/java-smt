@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
@@ -313,6 +314,41 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     Generator.assembleConstraint(actualResult);
     Generator.assembleConstraint(expectedResult);
     assertThat(actualResult).isEqualTo(expectedResult);
+  }
+
+  @Test
+  public void testComplexFP()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireFloats();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.BITWUZLA);
+    assume()
+        .withMessage("For some reason very slow here")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.MATHSAT5);
+    String x =
+        "(declare-fun |c::main::$tmp::return_value_nondet_double$1@1!0&0#1|\n"
+            + "             ()\n"
+            + "             (_ FloatingPoint 11 53))\n"
+            + "(declare-fun |nondet$symex::nondet0| () (_ FloatingPoint 11 53))\n"
+            + "(declare-fun |c::main::main::1::x@1!0&0#1| () (_ FloatingPoint 11 53))\n"
+            + "(declare-fun |execution_statet::guard_exec@0!0| () Bool)\n"
+            + "(assert (= |nondet$symex::nondet0|\n"
+            + "   |c::main::$tmp::return_value_nondet_double$1@1!0&0#1|))\n"
+            + "(assert (= |c::main::$tmp::return_value_nondet_double$1@1!0&0#1|\n"
+            + "   |c::main::main::1::x@1!0&0#1|))\n"
+            + "(assert (let ((a!1 (not (=> true\n"
+            + "                    (=> |execution_statet::guard_exec@0!0|\n"
+            + "                        (fp.eq |c::main::main::1::x@1!0&0#1|\n"
+            + "                               |c::main::main::1::x@1!0&0#1|))))))\n"
+            + "  a!1))";
+
+    BooleanFormula parsed = mgr.universalParseFromString(x);
+    Generator.assembleConstraint(parsed);
+    System.out.println(parsed + "\n-----------\n");
+    System.out.println(Generator.getSMTLIB2String());
+    ProverEnvironment proverEnvironment = context.newProverEnvironment();
+    proverEnvironment.addConstraint(parsed);
+    assertThat(proverEnvironment.isUnsat()).isFalse();
   }
 
   @Test

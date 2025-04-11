@@ -391,6 +391,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     if (isABitVecInSMT2(type)) {
       return parseToBitVecFormulaTypeIfMatching(type);
     }
+    if (isAFloatingPointInSMT2(type)) {
+      return parseToFPOnlyNumeral(type);
+    }
 
     switch (type) {
       case "Int":
@@ -1716,7 +1719,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         }
         String value = operands.get(0).toString();
         value = value.replace("\"", "");
-        return Objects.requireNonNull(smgr).makeRegex(value);
+        return Objects.requireNonNull(smgr).makeRegex(Pattern.quote(value));
       case "str.is_digit":
         throw new UnsupportedOperationException("str.is_digit is not supported in JavaSMT");
       case "str.in_re":
@@ -1836,7 +1839,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
               return result;
             } else if (operands.stream().anyMatch(c -> c instanceof FloatingPointFormula)) {
               return Objects.requireNonNull(fpmgr)
-                  .equalWithFPSemantics(
+                  .assignment(
                       (FloatingPointFormula) operands.get(0),
                       (FloatingPointFormula) operands.get(1));
             } else if (operands.stream().anyMatch(c -> c instanceof StringFormula)) {

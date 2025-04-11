@@ -4,8 +4,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.sosy_lab.java_smt.utils;
 
-import com.microsoft.z3.*;
 import com.microsoft.z3.Context;
+import com.microsoft.z3.Solver;
+import com.microsoft.z3.Status;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
