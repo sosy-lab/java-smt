@@ -6,6 +6,7 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 public class SolverLessStringFormulaManager
@@ -17,7 +18,7 @@ public class SolverLessStringFormulaManager
 
   @Override
   protected SMTLIB2Formula makeStringImpl(String value) {
-    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.STRING), value);
   }
 
   @Override
@@ -113,7 +114,7 @@ public class SolverLessStringFormulaManager
 
   @Override
   protected SMTLIB2Formula makeRegexImpl(String value) {
-    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX));
+    return new SMTLIB2Formula(new DummyType(DummyType.Type.REGEX), value);
   }
 
   @Override

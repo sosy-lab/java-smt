@@ -261,13 +261,9 @@ public class SMTLIB2Formula
         break;
       case INTEGER:
       case RATIONAL:
-        this.representation = value;
-        break;
-      case STRING:
-        this.representation = "String";
-        break;
       case REGEX:
-        this.representation = "Regex";
+      case STRING:
+        this.representation = value;
         break;
       default:
         this.representation = formulaType.toString();
