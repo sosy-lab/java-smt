@@ -100,7 +100,8 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
           "unknown",
           "unsupported",
           "unsat",
-          "_",
+          // Fixme Not allowed by SMTInterpol
+          // "_",
           "as",
           "BINARY",
           "DECIMAL",

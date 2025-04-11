@@ -174,6 +174,11 @@ class FormulaCollectionScript implements Script {
   }
 
   @Override
+  public Term lambda(TermVariable[] pTermVariables, Term pTerm) throws SMTLIBException {
+    return script.lambda(pTermVariables, pTerm);
+  }
+
+  @Override
   public Term let(TermVariable[] vars, Term[] values, Term body) throws SMTLIBException {
     return script.let(vars, values, body);
   }
