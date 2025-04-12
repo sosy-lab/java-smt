@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
@@ -40,7 +39,6 @@ public class StringGenerator {
     Generator.getExecutedAggregator().add(newEntry);
   }
 
-
   protected static void logMakeRegex(Object result, String value) {
     Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, value));
     List<Object> params = ImmutableList.of(value);
@@ -58,7 +56,6 @@ public class StringGenerator {
 
     Generator.getExecutedAggregator().add(newEntry);
   }
-
 
   protected static void logMakeVariable(Object result, String pVar) {
     Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pVar));
@@ -177,8 +174,6 @@ public class StringGenerator {
     List<Object> inputParams = ImmutableList.of(fullStr, target, replacement);
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
   }
-
-
 
   protected static void logRegexAll(RegexFormula result) {
     logOperation(result, ImmutableList.of(), "(re.all)", Keyword.SKIP);

@@ -386,7 +386,6 @@ public class SMTLIB2FloatingPointTest extends SolverBasedTest0.ParameterizedSolv
     assertThat(proverEnvironment.isUnsat()).isFalse();
   }
 
-
   @Test
   public void testDeclareFloatingPointsWithBitVectors()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {

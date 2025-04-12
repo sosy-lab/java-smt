@@ -107,9 +107,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testStringConcatenationWithValues()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     requireStrings();
-    String x =
-        "(declare-const d String)\n"
-            + "(assert (= d (str.++ \"a\" \"b\" \"c\")))\n";
+    String x = "(declare-const d String)\n" + "(assert (= d (str.++ \"a\" \"b\" \"c\")))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
     StringFormula a = smgr.makeString("a");
@@ -117,8 +115,7 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     StringFormula c = smgr.makeString("c");
     StringFormula d = smgr.makeVariable("d");
 
-
-    BooleanFormula constraint = smgr.equal(d, smgr.concat(a,b,c));
+    BooleanFormula constraint = smgr.equal(d, smgr.concat(a, b, c));
 
     assertThat(actualResult).isEqualTo(constraint);
   }
@@ -253,8 +250,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
     BooleanFormula regexMatch = smgr.in(a, regex);
 
-    assertThat(actualResult.equals("(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re "
-        + "\"\\Qb\\E\")))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re " + "\"\\Qb\\E\")))"));
   }
 
   @Test
@@ -299,8 +297,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
     BooleanFormula regexMatch = smgr.in(a, regex);
 
-    assertThat(actualResult.equals("(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re "
-        + "\"\\Qb\\E\")))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re " + "\"\\Qb\\E\")))"));
   }
 
   @Test
@@ -313,7 +312,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    assertThat(actualResult.equals("(str.in_re a (re.union (str.to_re \"\\Qa\\E\") (str.to_re \"\\Qb\\E\")))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.union (str.to_re \"\\Qa\\E\") (str.to_re \"\\Qb\\E\")))"));
   }
 
   @Test
@@ -359,8 +360,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
     BooleanFormula regexMatch = smgr.in(a, regex);
 
-    assertThat(actualResult.equals("(str.in_re a (re.inter (str.to_re \"\\Qa\\E\") (str.to_re "
-        + "\"\\Qb\\E\")))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.inter (str.to_re \"\\Qa\\E\") (str.to_re " + "\"\\Qb\\E\")))"));
   }
 
   @Test
@@ -387,8 +389,10 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
             + "(assert (str.in_re a (re.diff (str.to_re \"a\") (str.to_re \"b\"))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-    assertThat(actualResult.equals("(str.in_re a (re.inter (str.to_re \"\\Qa\\E\") (re.comp (str"
-        + ".to_re \"\\Qb\\E\"))))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.inter (str.to_re \"\\Qa\\E\") (re.comp (str"
+                + ".to_re \"\\Qb\\E\"))))"));
   }
 
   @Test
@@ -398,7 +402,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.+ (str.to_re \"a\"))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-    assertThat(actualResult.equals("(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (re.* (str.to_re \"\\Qa\\E\"))))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (re.* (str.to_re \"\\Qa\\E\"))))"));
   }
 
   @Test
@@ -408,8 +414,9 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
     String x = "(declare-const a String)\n" + "(assert (str.in_re a (re.opt (str.to_re \"a\"))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-    assertThat(actualResult.equals("(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (re.* (str.to_re "
-        + "\"\\Qa\\E\")))))"));
+    assertThat(
+        actualResult.equals(
+            "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (re.* (str.to_re " + "\"\\Qa\\E\")))))"));
   }
 
   @Test
@@ -485,28 +492,30 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testComplexStringRegex()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    String x = "(declare-const X String)\n"
-        + "(assert (not (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp (str.to_re \"\\u{a}\"))) (str.to_re \".otf/i\\u{a}\")))))\n"
-        + "(assert (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp (str.to_re \"\\u{a}\"))) (str.to_re \".xlw/i\\u{a}\"))))\n"
-        + "(check-sat)";
+    String x =
+        "(declare-const X String)\n"
+            + "(assert (not (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp"
+            + " (str.to_re \"\\u{a}\"))) (str.to_re \".otf/i\\u{a}\")))))\n"
+            + "(assert (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp (str.to_re"
+            + " \"\\u{a}\"))) (str.to_re \".xlw/i\\u{a}\"))))\n"
+            + "(check-sat)";
     parseGenerateReparseAndCheckSat(x, false);
   }
 
   private void parseGenerateReparseAndCheckSat(String pX, boolean isUnsat)
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     BooleanFormula parse = mgr.universalParseFromString(pX);
-    System.out.println(parse+"\n--------\n");
+    System.out.println(parse + "\n--------\n");
     Generator.assembleConstraint(parse);
     String reparsed = Generator.getSMTLIB2String();
     System.out.println(reparsed);
     BooleanFormula result = mgr.universalParseFromString(reparsed);
     ProverEnvironment proverEnvironment = context.newProverEnvironment();
     proverEnvironment.addConstraint(result);
-    if(isUnsat) {
+    if (isUnsat) {
       assertThat(proverEnvironment.isUnsat()).isTrue();
-    }else{
+    } else {
       assertThat(proverEnvironment.isUnsat()).isFalse();
     }
-
   }
 }

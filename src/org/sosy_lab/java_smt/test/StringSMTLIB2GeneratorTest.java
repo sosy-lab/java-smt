@@ -137,8 +137,10 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
     RegexFormula c = Objects.requireNonNull(smgr).makeRegex("c");
     StringFormula d = Objects.requireNonNull(smgr).makeVariable("d");
     BooleanFormula result = smgr.in(d, smgr.concatRegex(List.of(a, b, c)));
-    String expectedResult = "(declare-const d String)\n"
-        + "(assert (str.in_re d (re.++ (str.to_re \"a\") (str.to_re \"b\") (str.to_re \"c\"))))\n";
+    String expectedResult =
+        "(declare-const d String)\n"
+            + "(assert (str.in_re d (re.++ (str.to_re \"a\") (str.to_re \"b\") (str.to_re"
+            + " \"c\"))))\n";
     Generator.assembleConstraint(result);
     String actualResult = String.valueOf(Generator.getLines());
     assertThat(actualResult).isEqualTo(expectedResult);
@@ -213,8 +215,8 @@ public class StringSMTLIB2GeneratorTest extends SolverBasedTest0.ParameterizedSo
 
     String actualResult = String.valueOf(Generator.getLines());
 
-    String expectedResult = "(declare-const str String)\n"
-        + "(assert (str.in_re str (str.to_re \".*test.*\")))\n";
+    String expectedResult =
+        "(declare-const str String)\n" + "(assert (str.in_re str (str.to_re \".*test.*\")))\n";
 
     assertThat(actualResult).isEqualTo(expectedResult);
   }

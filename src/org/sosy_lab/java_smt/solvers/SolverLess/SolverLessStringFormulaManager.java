@@ -6,7 +6,6 @@
 package org.sosy_lab.java_smt.solvers.SolverLess;
 
 import java.util.List;
-import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 public class SolverLessStringFormulaManager

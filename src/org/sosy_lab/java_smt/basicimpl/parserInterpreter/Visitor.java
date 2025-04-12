@@ -1733,7 +1733,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException("str.to_re requires exactly 1 operand.");
         }
         String reInString = getOperandsAsString(ctx, operands).get(0);
-        String regexContent = reInString.substring(1, reInString.length() - 1).replace("\"\"", "\"");
+        String regexContent =
+            reInString.substring(1, reInString.length() - 1).replace("\"\"", "\"");
         return Objects.requireNonNull(smgr).makeRegex(regexContent);
       case "str.is_digit":
         throw new UnsupportedOperationException("str.is_digit is not supported in JavaSMT");
