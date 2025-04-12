@@ -1604,7 +1604,7 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
           throw new ParserException(
               "fp.isZero requires exactly one " + "FloatingPointFormula operand.");
         }
-      case "fp.isInfinity":
+      case "fp.isInfinite":
         if (operands.size() == 1) {
           return Objects.requireNonNull(fpmgr).isInfinity((FloatingPointFormula) operands.get(0));
         } else {
