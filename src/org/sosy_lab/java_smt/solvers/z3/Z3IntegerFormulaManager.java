@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.microsoft.z3.Native;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -32,58 +33,12 @@ class Z3IntegerFormulaManager extends Z3NumeralFormulaManager<IntegerFormula, In
   }
 
   /**
-   * Creates an integer formula from a BigDecimal value. For Z3, we need to handle this specially to
-   * avoid segfaults when dealing with decimal values that have fractional parts.
-   *
-   * <p>The issue is that the default implementation tries to represent decimal values as division
-   * operations, which can cause segfaults in Z3 when used with integer sorts.
-   *
-   * <p>This method safely converts BigDecimal values by:
-   *
-   * <ol>
-   *   <li>Using exact conversion for integers (no fractional part)
-   *   <li>Using euclidean division for values with fractional parts to maintain consistency with
-   *       other solvers in JavaSMT
-   * </ol>
-   *
-   * <p>This prevents the segfault described in issue #457.
+   * Creates an integer formula from a BigDecimal value. This method converts BigDecimal values to
+   * BigInteger by using {@link RoundingMode#FLOOR}.
    */
   @Override
   protected Long makeNumberImpl(BigDecimal pNumber) {
-    if (pNumber.scale() <= 0) {
-      try {
-        return makeNumberImpl(pNumber.toBigIntegerExact());
-      } catch (ArithmeticException e) {
-        // This shouldn't happen since we checked scale <= 0
-        throw new AssertionError("Unexpected error converting BigDecimal", e);
-      }
-    } else {
-      // For values with fractional parts, use euclidean division to maintain
-      // consistency with the behavior of other solvers in JavaSMT
-      BigInteger unscaledValue = pNumber.unscaledValue();
-      BigInteger scale = BigInteger.TEN.pow(pNumber.scale());
-      return makeNumberImpl(euclideanDivision(unscaledValue, scale));
-    }
-  }
-
-  /**
-   * Euclidean division.
-   *
-   * <p>In Euclidean division the remainder is always positive and the quotient needs to be rounded
-   * accordingly.
-   *
-   * <p>More formally, when dividing <code>a</code> by <code>b</code> we have <code>a = k*b + r
-   * </code> where <code> k</code> is the quotient <code>a/b</code> and <code>r</code> is the
-   * remainder of the division. In Euclidean division we now requires <code>0 <= r < b</code> to
-   * hold, which uniquely determines the equation.
-   */
-  private static BigInteger euclideanDivision(BigInteger x, BigInteger y) {
-    BigInteger div = x.divide(y);
-    if (x.signum() < 0 && !x.equals(y.multiply(div))) {
-      return div.subtract(BigInteger.valueOf(y.signum()));
-    } else {
-      return div;
-    }
+    return makeNumberImpl(pNumber.setScale(0, RoundingMode.FLOOR).toBigInteger());
   }
 
   @Override
