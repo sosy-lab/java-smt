@@ -104,6 +104,26 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void testStringConcatenationWithValues()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    requireStrings();
+    String x =
+        "(declare-const d String)\n"
+            + "(assert (= d (str.++ \"a\" \"b\" \"c\")))\n";
+
+    BooleanFormula actualResult = mgr.universalParseFromString(x);
+    StringFormula a = smgr.makeString("a");
+    StringFormula b = smgr.makeString("b");
+    StringFormula c = smgr.makeString("c");
+    StringFormula d = smgr.makeVariable("d");
+
+
+    BooleanFormula constraint = smgr.equal(d, smgr.concat(a,b,c));
+
+    assertThat(actualResult).isEqualTo(constraint);
+  }
+
+  @Test
   public void testStringLength()
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
     String x =
@@ -112,7 +132,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
             + "(assert (= len (str.len a)))\n";
 
     BooleanFormula expectedResult = mgr.universalParseFromString(x);
-
     StringFormula a = smgr.makeVariable("a");
     IntegerFormula len = imgr.makeVariable("len");
 
@@ -460,7 +479,46 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
                 smgr.makeString("badf")));
 
     Generator.assembleConstraint(actualResult);
-    System.out.println(Generator.getSMTLIB2String());
     assertThat(actualResult).isEqualTo(constraint);
+  }
+
+  @Test
+  public void testComplexStringRegex()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    String x = "(declare-const X String)\n"
+        + "(assert (not (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp (str.to_re \"\\u{a}\"))) (str.to_re \".otf/i\\u{a}\")))))\n"
+        + "(assert (str.in_re X (re.++ (str.to_re \"/filename=\") (re.* (re.comp (str.to_re \"\\u{a}\"))) (str.to_re \".xlw/i\\u{a}\"))))\n"
+        + "(check-sat)";
+    parseGenerateReparseAndCheckSat(x, false);
+  }
+  @Test
+  public void testComplex2()
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    String x = "(set-info :license \"https://creativecommons.org/licenses/by/4.0/\")\n"
+        + "(set-info :category \"random\")\n"
+        + "(set-info :status unknown)\n"
+        + "(declare-fun x () String)\n"
+        + "(assert (let ((_let_0 (re.* re.allchar ))) (and (not (= (str.in_re x (re.++ _let_0 re.allchar  _let_0 re.allchar  _let_0 (str.to_re (str.++ \"B\" (str.++ \"B\" (str.++ \"A\" \"C\")))) _let_0)) (str.in_re x (re.++ _let_0 re.allchar  _let_0 re.allchar  _let_0 (str.to_re (str.++ \"A\" (str.++ \"B\" (str.++ \"A\" \"B\")))) _let_0)))) (not (= (str.in_re x (re.++ _let_0 re.allchar  _let_0 (str.to_re (str.++ \"A\" (str.++ \"C\" \"C\"))) _let_0 (str.to_re \"B\") _let_0)) (str.in_re x (re.++ _let_0 re.allchar  _let_0 (str.to_re \"A\") _let_0 (str.to_re (str.++ \"C\" (str.++ \"C\" \"B\"))) _let_0)))))))\n"
+        + "(check-sat)\n"
+        + "(exit)";
+    parseGenerateReparseAndCheckSat(x, true);
+  }
+
+  private void parseGenerateReparseAndCheckSat(String pX, boolean isUnsat)
+      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
+    BooleanFormula parse = mgr.universalParseFromString(pX);
+    System.out.println(parse+"\n--------\n");
+    Generator.assembleConstraint(parse);
+    String reparsed = Generator.getSMTLIB2String();
+    System.out.println(reparsed);
+    BooleanFormula result = mgr.universalParseFromString(reparsed);
+    ProverEnvironment proverEnvironment = context.newProverEnvironment();
+    proverEnvironment.addConstraint(result);
+    if(isUnsat) {
+      assertThat(proverEnvironment.isUnsat()).isTrue();
+    }else{
+      assertThat(proverEnvironment.isUnsat()).isFalse();
+    }
+
   }
 }

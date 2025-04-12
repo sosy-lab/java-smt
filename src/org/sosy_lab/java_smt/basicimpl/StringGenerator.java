@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
@@ -24,13 +25,40 @@ public class StringGenerator {
     Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, value));
     List<Object> params = new ArrayList<>();
     params.add(value);
-    String format = "\"%s\"";
+
+    // Prüfen, ob value schon als SMT-String formatiert ist (fängt und endet mit Anführungszeichen)
+    boolean isQuoted = value.startsWith("\"") && value.endsWith("\"");
+
+    String format = isQuoted ? "%s" : "\"%s\"";
+
     Function<List<Object>, String> functionToString =
         inputs -> String.format(format, inputs.toArray());
+
     FunctionEnvironment newEntry =
         new FunctionEnvironment(result, params, functionToString, Keyword.SKIP);
+
     Generator.getExecutedAggregator().add(newEntry);
   }
+
+
+  protected static void logMakeRegex(Object result, String value) {
+    Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, value));
+    List<Object> params = ImmutableList.of(value);
+
+    // Prüfen, ob der value ein echter SMT-Ausdruck ist
+    boolean isExpression = value.trim().startsWith("(");
+
+    String format = isExpression ? "(str.to_re %s)" : "(str.to_re \"%s\")";
+
+    Function<List<Object>, String> functionToString =
+        inputs -> String.format(format, inputs.toArray());
+
+    FunctionEnvironment newEntry =
+        new FunctionEnvironment(result, params, functionToString, Keyword.SKIP);
+
+    Generator.getExecutedAggregator().add(newEntry);
+  }
+
 
   protected static void logMakeVariable(Object result, String pVar) {
     Generator.throwExceptionWhenParameterIsNull(ImmutableList.of(result, pVar));
@@ -150,11 +178,7 @@ public class StringGenerator {
     logOperation(result, inputParams, "(str.replaceall %s %s %s)", Keyword.SKIP);
   }
 
-  protected static void logMakeRegex(Object result, String value) {
-    String unquotedValue = value.replace("\"", "");
-    List<Object> inputParams = ImmutableList.of(unquotedValue);
-    logOperation(result, inputParams, "(str.to_re \"%s\")", Keyword.SKIP);
-  }
+
 
   protected static void logRegexAll(RegexFormula result) {
     logOperation(result, ImmutableList.of(), "(re.all)", Keyword.SKIP);
@@ -231,18 +255,9 @@ public class StringGenerator {
               placeholders, params.size(), format));
     }
 
-    List<Object> sanitizedParams = new ArrayList<>();
-    for (Object param : params) {
-      if (param instanceof String) {
-        sanitizedParams.add(((String) param).replace("\"", ""));
-      } else {
-        sanitizedParams.add(param);
-      }
-    }
-
     Function<List<Object>, String> functionToString =
         inputs -> String.format(format, inputs.toArray());
     Generator.getExecutedAggregator()
-        .add(new FunctionEnvironment(result, sanitizedParams, functionToString, keyword));
+        .add(new FunctionEnvironment(result, params, functionToString, keyword));
   }
 }

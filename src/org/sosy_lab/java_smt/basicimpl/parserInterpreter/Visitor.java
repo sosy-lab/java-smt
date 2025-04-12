@@ -300,9 +300,8 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
     if (!(operand.startsWith("\"") && operand.endsWith("\""))) {
       throw new ParserException("Invalid string format: " + operand);
     }
-    return new ParserFormula(
-        Objects.requireNonNull(smgr).makeString(operand.substring(1, operand.length() - 1)));
-    // TODO: Do I need extra handling if a String contains a escape sequence like double ""?
+    String content = operand.substring(1, operand.length() - 1).replace("\"\"", "\"");
+    return new ParserFormula(Objects.requireNonNull(smgr).makeString(content));
   }
 
   /**
@@ -694,6 +693,22 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         operands.add((Formula) operand);
       }
     }
+  }
+
+  /**
+   * gets the operands used in a nested term.
+   *
+   * @param ctx current MultitermContext
+   * @param operands List of the operands transformed to Formula objects
+   */
+  public List<String> getOperandsAsString(MultitermContext ctx, List<Formula> operands) {
+    List<String> output = new ArrayList<>();
+    for (int i = 0; i < ctx.term().size(); ++i) {
+      if (ctx.term().get(i) != null) {
+        output.add(ctx.term().get(i).getText());
+      }
+    }
+    return output;
   }
 
   // TODO Can we get a better return type?
@@ -1717,9 +1732,9 @@ public class Visitor extends Smtlibv2BaseVisitor<Object> {
         if (operands.size() != 1) {
           throw new ParserException("str.to_re requires exactly 1 operand.");
         }
-        String value = operands.get(0).toString();
-        value = value.replace("\"", "");
-        return Objects.requireNonNull(smgr).makeRegex(Pattern.quote(value));
+        String reInString = getOperandsAsString(ctx, operands).get(0);
+        String regexContent = reInString.substring(1, reInString.length() - 1).replace("\"\"", "\"");
+        return Objects.requireNonNull(smgr).makeRegex(regexContent);
       case "str.is_digit":
         throw new UnsupportedOperationException("str.is_digit is not supported in JavaSMT");
       case "str.in_re":
