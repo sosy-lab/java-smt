@@ -9,33 +9,38 @@
 package org.sosy_lab.java_smt.test;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
-public class IntegerFormulaManagerTest extends SolverBasedTest0 {
+public class IntegerFormulaManagerTest extends ParameterizedSolverBasedTest0 {
 
-  @Test
-  public void testBigDecimalInIntegerFormula() throws SolverException, InterruptedException {
-    // Test that BigDecimal values are handled correctly by all solvers
-    IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(3.5));
-    IntegerFormula three = imgr.makeNumber(3);
-    BooleanFormula equals = imgr.equal(f, three);
-    assertThatFormula(equals).isSatisfiable();
+  @Before
+  public void init() {
+    requireIntegers();
+  }
+
+  private void checkEqualInt(BigDecimal bd, BigInteger bi)
+      throws SolverException, InterruptedException {
+    assertThatFormula(imgr.equal(imgr.makeNumber(bd), imgr.makeNumber(bi))).isTautological();
   }
 
   @Test
-  public void testEuclideanDivisionForNegativeValues()
-      throws SolverException, InterruptedException {
-    requireIntegers();
-
-    // Test euclidean division for negative values with fractional parts
-    // For -3.5, we expect -4 (not -3 that simple truncation would give)
-    IntegerFormula f = imgr.makeNumber(BigDecimal.valueOf(-3.5));
-    IntegerFormula minusFour = imgr.makeNumber(-4);
-
-    // This should be a tautology if euclidean division is working correctly
-    assertThatFormula(imgr.equal(f, minusFour)).isTautological();
+  public void testIntegers() throws SolverException, InterruptedException {
+    checkEqualInt(BigDecimal.valueOf(0), BigInteger.valueOf(0));
+    checkEqualInt(BigDecimal.valueOf(4), BigInteger.valueOf(4));
+    checkEqualInt(BigDecimal.valueOf(4.01), BigInteger.valueOf(4));
+    checkEqualInt(BigDecimal.valueOf(4.5), BigInteger.valueOf(4));
+    checkEqualInt(BigDecimal.valueOf(4.99), BigInteger.valueOf(4));
+    checkEqualInt(BigDecimal.valueOf(-4), BigInteger.valueOf(-4));
+    checkEqualInt(BigDecimal.valueOf(-3.01), BigInteger.valueOf(-4));
+    checkEqualInt(BigDecimal.valueOf(-3.5), BigInteger.valueOf(-4));
+    checkEqualInt(BigDecimal.valueOf(-3.99), BigInteger.valueOf(-4));
+    checkEqualInt(
+        new BigDecimal("12345678901234567890.123"), new BigInteger("12345678901234567890"));
+    checkEqualInt(
+        new BigDecimal("-12345678901234567890.123"), new BigInteger("-12345678901234567891"));
   }
 }
