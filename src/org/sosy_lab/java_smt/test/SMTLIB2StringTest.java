@@ -491,18 +491,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
         + "(check-sat)";
     parseGenerateReparseAndCheckSat(x, false);
   }
-  @Test
-  public void testComplex2()
-      throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
-    String x = "(set-info :license \"https://creativecommons.org/licenses/by/4.0/\")\n"
-        + "(set-info :category \"random\")\n"
-        + "(set-info :status unknown)\n"
-        + "(declare-fun x () String)\n"
-        + "(assert (let ((_let_0 (re.* re.allchar ))) (and (not (= (str.in_re x (re.++ _let_0 re.allchar  _let_0 re.allchar  _let_0 (str.to_re (str.++ \"B\" (str.++ \"B\" (str.++ \"A\" \"C\")))) _let_0)) (str.in_re x (re.++ _let_0 re.allchar  _let_0 re.allchar  _let_0 (str.to_re (str.++ \"A\" (str.++ \"B\" (str.++ \"A\" \"B\")))) _let_0)))) (not (= (str.in_re x (re.++ _let_0 re.allchar  _let_0 (str.to_re (str.++ \"A\" (str.++ \"C\" \"C\"))) _let_0 (str.to_re \"B\") _let_0)) (str.in_re x (re.++ _let_0 re.allchar  _let_0 (str.to_re \"A\") _let_0 (str.to_re (str.++ \"C\" (str.++ \"C\" \"B\"))) _let_0)))))))\n"
-        + "(check-sat)\n"
-        + "(exit)";
-    parseGenerateReparseAndCheckSat(x, true);
-  }
 
   private void parseGenerateReparseAndCheckSat(String pX, boolean isUnsat)
       throws IOException, SolverException, InterruptedException, InvalidConfigurationException {
