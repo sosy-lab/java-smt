@@ -102,7 +102,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
+  public boolean isUnsat() throws InterruptedException, SolverException {
     checkState(!closed);
 
     // We actually terminate SmtInterpol during the analysis
@@ -118,23 +118,23 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       case UNSAT:
         return true;
       case UNKNOWN:
-        Object reason = env.getInfo(":reason-unknown");
-        if (!(reason instanceof ReasonUnknown)) {
-          throw new SMTLIBException("checkSat returned UNKNOWN with unknown reason " + reason);
-        }
-        switch ((ReasonUnknown) reason) {
+        ReasonUnknown reason = (ReasonUnknown) env.getInfo(":reason-unknown");
+        switch (reason) {
           case MEMOUT:
             // SMTInterpol catches OOM, but we want to have it thrown.
             throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
           case CANCELLED:
-            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
-            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+            // expected if we requested termination
+            shutdownNotifier.shutdownIfNecessary();
+            throw new AssertionError(
+                "checkSat was aborted, but shutdown notifier has " + "not been triggered");
           default:
-            throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
+            throw new SolverException(
+                String.format("checkSat returned UNKNOWN with reason '%s'", reason));
         }
 
       default:
-        throw new SMTLIBException("checkSat returned " + result);
+        throw new AssertionError("Result must be SAT, UNSAT or UNKNOWN");
     }
   }
 
