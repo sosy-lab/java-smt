@@ -24,9 +24,8 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-@SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored"})
+@SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored","EqualsIncompatibleType"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
-
   @Before
   public void setUp() {
     assume().that(smgr).isNotNull();
@@ -246,10 +245,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    StringFormula a = smgr.makeVariable("a");
-    RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
-    BooleanFormula regexMatch = smgr.in(a, regex);
-
     assertThat(
         actualResult.equals(
             "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re " + "\"\\Qb\\E\")))"));
@@ -293,10 +288,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    StringFormula a = smgr.makeVariable("a");
-    RegexFormula regex = smgr.concat(smgr.makeRegex("a"), smgr.makeRegex("b"));
-    BooleanFormula regexMatch = smgr.in(a, regex);
-
     assertThat(
         actualResult.equals(
             "(str.in_re a (re.++ (str.to_re \"\\Qa\\E\") (str.to_re " + "\"\\Qb\\E\")))"));
@@ -325,10 +316,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    StringFormula a = smgr.makeVariable("a");
-    RegexFormula regex = smgr.closure(smgr.makeRegex("a"));
-    BooleanFormula regexMatch = smgr.in(a, regex);
-
     assertThat(actualResult.equals("(str.in_re a (re.* (str.to_re \"\\Qa\\E\")))"));
   }
 
@@ -356,9 +343,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
 
-    StringFormula a = smgr.makeVariable("a");
-    RegexFormula regex = smgr.intersection(smgr.makeRegex("a"), smgr.makeRegex("b"));
-    BooleanFormula regexMatch = smgr.in(a, regex);
 
     assertThat(
         actualResult.equals(
