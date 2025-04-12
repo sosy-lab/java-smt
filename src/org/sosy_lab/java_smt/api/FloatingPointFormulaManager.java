@@ -8,9 +8,12 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -58,12 +61,18 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Creates a floating point formula representing the given string value with the specified type.
+   *
+   * <p>The string can be any valid floating-point number, e.g., "1.0", "1.0e-3", but also special
+   * values like "NaN", "Infinity", or "-0.0", etc. A leading "+" sign or "-" sign is allowed.
    */
   FloatingPointFormula makeNumber(String n, FloatingPointType type);
 
   /**
    * Creates a floating point formula representing the given string value with the specified type
    * and rounding mode.
+   *
+   * <p>The string can be any valid floating-point number, e.g., "1.0", "1.0e-3", but also special
+   * values like "NaN", "Infinity", or "-0.0", etc. A leading "+" sign or "-" sign is allowed.
    */
   FloatingPointFormula makeNumber(
       String n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
@@ -81,15 +90,44 @@ public interface FloatingPointFormulaManager {
       Rational n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode);
 
   /**
-   * Creates a floating point formula from the given exponent, mantissa, and sign bit with the
+   * Creates a floating point formula from the given {@link FloatingPointNumber}.
+   *
+   * @param number the floating point number
+   */
+  default FloatingPointFormula makeNumber(FloatingPointNumber number) {
+    return makeNumber(
+        number.getExponent(),
+        number.getMantissa(),
+        number.getMathSign(),
+        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+  }
+
+  /**
+   * Creates a floating point formula from the given exponent, mantissa, and sign-bit with the
    * specified type.
    *
    * @param exponent the exponent part of the floating point number
    * @param mantissa the mantissa part of the floating point number
    * @param signBit the sign bit of the floating point number, e.g., true for negative numbers
    */
+  @Deprecated(
+      since = "2025.01, because using a boolean flag as signBit is misleading",
+      forRemoval = true)
+  default FloatingPointFormula makeNumber(
+      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+    return makeNumber(exponent, mantissa, Sign.of(signBit), type);
+  }
+
+  /**
+   * Creates a floating point formula from the given exponent, mantissa, and sign with the specified
+   * type.
+   *
+   * @param exponent the exponent part of the floating point number
+   * @param mantissa the mantissa part of the floating point number
+   * @param sign the sign of the floating point number
+   */
   FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   /**
    * Creates a variable with exactly the given name.
@@ -107,6 +145,51 @@ public interface FloatingPointFormulaManager {
   FloatingPointFormula makeMinusInfinity(FloatingPointType type);
 
   FloatingPointFormula makeNaN(FloatingPointType type);
+
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}. This method uses the
+   * default rounding mode.
+   *
+   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
+   * cast a floating-point number into another floating-point type. We do not support casting from
+   * boolean or array types. We try to keep an exact representation, however fall back to rounding
+   * if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param targetType the type of the resulting formula
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
+  @Deprecated(
+      forRemoval = true,
+      since = "2022.06, because of missing sign-bit for bitvector conversion")
+  default <T extends Formula> T castTo(FloatingPointFormula source, FormulaType<T> targetType) {
+    return castTo(source, true, targetType);
+  }
+
+  /**
+   * Build a formula of compatible type from a {@link FloatingPointFormula}.
+   *
+   * <p>Compatible formula types are all numeral types and bitvector types. It is also possible to
+   * cast a floating-point number into another floating-point type. We do not support casting from
+   * boolean or array types. We try to keep an exact representation, however fall back to rounding
+   * if needed.
+   *
+   * @param source the source formula of floating-point type
+   * @param targetType the type of the resulting formula
+   * @param pFloatingPointRoundingMode if rounding is needed, we apply the rounding mode.
+   * @throws IllegalArgumentException if an incompatible type is used, e.g. a {@link
+   *     FloatingPointFormula} cannot be cast to {@link BooleanFormula}.
+   */
+  @Deprecated(
+      forRemoval = true,
+      since = "2022.06, because of missing sign-bit for bitvector conversion")
+  default <T extends Formula> T castTo(
+      FloatingPointFormula source,
+      FormulaType<T> targetType,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    return castTo(source, true, targetType, pFloatingPointRoundingMode);
+  }
 
   /**
    * Build a formula of compatible type from a {@link FloatingPointFormula}. This method uses the
@@ -215,8 +298,16 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula abs(FloatingPointFormula number);
 
+  /**
+   * Returns the maximum value of the two given floating-point numbers. If one of the numbers is
+   * NaN, the other number is returned.
+   */
   FloatingPointFormula max(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns the minimum value of the two given floating-point numbers. If one of the numbers is
+   * NaN, the other number is returned.
+   */
   FloatingPointFormula min(FloatingPointFormula number1, FloatingPointFormula number2);
 
   FloatingPointFormula sqrt(FloatingPointFormula number);
@@ -262,36 +353,118 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a term for assigning one floating-point term to another. This means both terms are
-   * considered equal afterwards. This method is the same as the method <code>equal</code> for other
-   * theories.
+   * considered equal afterward, based on their bit pattern (i.e., <code>0.0 != -0
+   * .0</code> and <code>NaN ==/!= NaN</code>, depending on the bit pattern of each NaN). This
+   * method is the same as the method <code>equal</code> for other theories.
    */
   BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2);
 
   /**
    * Create a term for comparing the equality of two floating-point terms, according to standard
-   * floating-point semantics (i.e., NaN != NaN). Be careful to not use this method when you really
-   * need {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
+   * floating-point semantics (i.e., <code>NaN != NaN</code> and <code>0.0 == -0.0</code>). Be
+   * careful to not use this method when you really need {@link #assignment(FloatingPointFormula,
+   * FloatingPointFormula)}.
    */
   BooleanFormula equalWithFPSemantics(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is greater than another FP number. If one of the numbers is NaN,
+   * the result is always false.
+   */
   BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is greater or equal than another FP number. If one of the numbers
+   * is NaN, the result is always false.
+   */
   BooleanFormula greaterOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is less than another FP number. If one of the numbers is NaN, the
+   * result is always false.
+   */
   BooleanFormula lessThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is less or equal than another FP number. If one of the numbers is
+   * NaN, the result is always false.
+   */
   BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Check whether a floating-point number is NaN.
+   *
+   * <p>The bit patterns for NaN in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (irrelevant for NaN)
+   *   <li>exponent=11...11 (all bits are 1)
+   *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
+   */
   BooleanFormula isNaN(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is positive or negative infinity.
+   *
+   * <p>The bit patterns for infinity in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for +Inf, 1 for -Inf)
+   *   <li>exponent=11...11 (all bits are 1)
+   *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
+   */
   BooleanFormula isInfinity(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is positive or negative zero.
+   *
+   * <p>The bit patterns for zero in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for +0, 1 for -0)
+   *   <li>exponent=00...00 (all bits are 0)
+   *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
+   */
   BooleanFormula isZero(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is normal FP number.
+   *
+   * <p>The bit patterns for normal FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
+   *   <li>exponent!=00...00 and exponent!=11...11 (exponent is not all 0 or all 1)
+   *   <li>mantissa=? (mantissa is irrelevant)
+   * </ul>
+   */
   BooleanFormula isNormal(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is subnormal FP number.
+   *
+   * <p>The bit patterns for subnormal FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
+   *   <li>exponent=00...00 (exponent is all 0)
+   *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
+   */
   BooleanFormula isSubnormal(FloatingPointFormula number);
 
-  /** checks whether a formula is negative, including -0.0. */
+  /**
+   * Checks whether a formula is negative, including -0.0.
+   *
+   * <p>The bit patterns for negative FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=1 (1 for negative numbers)
+   *   <li>number is not NaN, i.e., exponent=11...11 implies mantissa=00...00
+   * </ul>
+   */
   BooleanFormula isNegative(FloatingPointFormula number);
 }

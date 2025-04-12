@@ -23,7 +23,9 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +34,7 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -45,6 +48,15 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final SimpleAPI api;
   protected final PrincessFormulaManager mgr;
   protected final Deque<Level> trackingStack = new ArrayDeque<>(); // symbols on all levels
+
+  /**
+   * Values returned by {@link Model#evaluate(Formula)}.
+   *
+   * <p>We need to record these to make sure that the values returned by the evaluator are
+   * consistant. Calling {@link #isUnsat()} will reset this list as the underlying model has been
+   * updated.
+   */
+  protected final Set<IFormula> evaluatedTerms = new LinkedHashSet<>();
 
   // assign a unique partition number for eah added constraint, for unsat-core and interpolation.
   protected final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
@@ -76,9 +88,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public boolean isUnsat() throws SolverException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
+    evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       wasLastSatCheckSat = true;
+      evaluatedTerms.add(api.partialModelAsFormula());
       return false;
     } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
@@ -121,12 +135,25 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
     Level level = trackingStack.pop();
     api.addBooleanVariables(asScala(level.booleanSymbols));
-    api.addConstants(asScala(level.intSymbols));
+    api.addConstants(asScala(level.theorySymbols));
     level.functionSymbols.forEach(api::addFunction);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().mergeWithHigher(level);
     }
     partitions.pop();
+  }
+
+  /**
+   * Get all terms that have been evaluated in the current model. The formulas are assignments that
+   * extend the original model.
+   */
+  Collection<IFormula> getEvaluatedTerms() {
+    return Collections.unmodifiableCollection(evaluatedTerms);
+  }
+
+  /** Track an assignment `term == value` for an evaluated term and its value. */
+  void addEvaluatedTerm(IFormula pFormula) {
+    evaluatedTerms.add(pFormula);
   }
 
   @SuppressWarnings("resource")
@@ -138,6 +165,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
+  @SuppressWarnings("resource")
   @Override
   protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
     final PartialModel partialModel;
@@ -146,7 +174,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     } catch (SimpleAPIException ex) {
       throw new SolverException(ex.getMessage(), ex);
     }
-    return new PrincessModel(this, partialModel, creator, api);
+    return registerEvaluator(new PrincessModel(this, partialModel, creator, api));
   }
 
   /**
@@ -213,12 +241,12 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     }
   }
 
-  /** add external definition: integer variable. */
+  /** add external definition: theory variable (integer, rational, string, etc). */
   void addSymbol(ITerm f) {
     Preconditions.checkState(!closed);
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
-      trackingStack.peek().intSymbols.add(f);
+      trackingStack.peek().theorySymbols.add(f);
     }
   }
 
@@ -233,7 +261,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   static class Level {
     final List<IFormula> booleanSymbols = new ArrayList<>();
-    final List<ITerm> intSymbols = new ArrayList<>();
+    final List<ITerm> theorySymbols = new ArrayList<>();
     final List<IFunction> functionSymbols = new ArrayList<>();
 
     Level() {}
@@ -241,13 +269,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     /** add higher level to current level, we keep the order of creating symbols. */
     void mergeWithHigher(Level other) {
       this.booleanSymbols.addAll(other.booleanSymbols);
-      this.intSymbols.addAll(other.intSymbols);
+      this.theorySymbols.addAll(other.theorySymbols);
       this.functionSymbols.addAll(other.functionSymbols);
     }
 
     @Override
     public String toString() {
-      return String.format("{%s, %s, %s}", booleanSymbols, intSymbols, functionSymbols);
+      return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
     }
   }
 }

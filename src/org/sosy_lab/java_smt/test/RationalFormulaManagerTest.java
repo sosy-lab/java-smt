@@ -9,8 +9,8 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.Iterables;
 import java.util.HashSet;
@@ -37,10 +37,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void rationalToIntTest() throws SolverException, InterruptedException {
     requireRationals();
-    assume()
-        .withMessage("Solver %s does not support floor operation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.OPENSMT);
+    requireRationalFloor();
 
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
@@ -65,6 +62,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void intToIntWithRmgrTest() throws SolverException, InterruptedException {
     requireRationals();
+    requireRationalFloor();
     for (double v : SOME_DOUBLES) {
       IntegerFormula i = imgr.makeNumber((int) Math.floor(v));
       assertThat(mgr.getFormulaType(i)).isEqualTo(FormulaType.IntegerType);
@@ -77,6 +75,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void floorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(rmgr.lessOrEquals(rmgr.floor(v), v)).isTautological();
   }
@@ -85,6 +84,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void floorIsGreaterThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     RationalFormula v = rmgr.makeVariable("v");
     assertThatFormula(rmgr.lessOrEquals(rmgr.floor(v), v)).isTautological();
   }
@@ -93,6 +93,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void forallFloorIsLessOrEqualsValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -106,6 +107,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void forallFloorIsLessThanValueTest() throws SolverException, InterruptedException {
     requireRationals();
     requireQuantifiers();
+    requireRationalFloor();
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -119,10 +121,7 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   @Test
   public void visitFloorTest() {
     requireRationals();
-    assume()
-        .withMessage("Solver %s does not support floor operation", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.OPENSMT);
+    requireRationalFloor();
 
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
@@ -149,10 +148,8 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
     }
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test(expected = Exception.class)
+  @Test
   public void failOnInvalidString() {
-    rmgr.makeNumber("a");
-    assert_().fail();
+    assertThrows(Exception.class, () -> rmgr.makeNumber("a"));
   }
 }

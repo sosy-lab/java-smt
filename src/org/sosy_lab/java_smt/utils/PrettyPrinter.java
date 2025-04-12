@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
-public class PrettyPrinter {
+public final class PrettyPrinter {
 
   public enum PrinterOption {
     /** introduce newlines only for boolean operations, instead of for all operations. */
@@ -115,7 +115,7 @@ public class PrettyPrinter {
     }
   }
 
-  private static class PrettyPrintVisitor extends DefaultFormulaVisitor<Void> {
+  private static final class PrettyPrintVisitor extends DefaultFormulaVisitor<Void> {
 
     private final FormulaManager fmgr;
     private final StringBuilder out;
@@ -188,7 +188,7 @@ public class PrettyPrinter {
     }
   }
 
-  private static class DotVisitor extends DefaultFormulaVisitor<TraversalProcess> {
+  private static final class DotVisitor extends DefaultFormulaVisitor<TraversalProcess> {
 
     private final Map<Formula, Integer> nodeMapping = new LinkedHashMap<>();
     private final UniqueIdGenerator id = new UniqueIdGenerator();

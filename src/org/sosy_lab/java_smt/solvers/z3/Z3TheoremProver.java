@@ -23,6 +23,7 @@ import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
@@ -56,12 +57,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected void pushImpl() throws InterruptedException {
+  protected void pushImpl() {
     push0();
     try {
       Native.solverPush(z3context, z3solver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3Exception(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception);
     }
   }
 
@@ -82,7 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     logSolverStack();
     int result;
@@ -97,7 +98,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws Z3SolverException, InterruptedException {
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
 
     int result;
@@ -116,7 +117,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   private void undefinedStatusToException(int solverStatus)
-      throws Z3SolverException, InterruptedException {
+      throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
       creator.shutdownNotifier.shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
@@ -126,7 +127,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
         case "interrupted from keyboard": // see Z3: src/solver/check_sat_result.cpp
           throw new InterruptedException(reason);
         default:
-          throw new Z3SolverException("Solver returned 'unknown' status, reason: " + reason);
+          throw new SolverException("Z3 returned 'unknown' status, reason: " + reason);
       }
     }
   }
@@ -138,7 +139,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   protected long getZ3Model() {
-    return Native.solverGetModel(z3context, z3solver);
+    try {
+      return Native.solverGetModel(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3ExceptionAsRuntimeException(e);
+    }
   }
 
   @Override

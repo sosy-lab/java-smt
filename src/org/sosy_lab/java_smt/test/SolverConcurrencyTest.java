@@ -12,7 +12,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +30,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +60,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
 @SuppressWarnings("resource")
 @RunWith(Parameterized.class)
@@ -95,7 +100,7 @@ public class SolverConcurrencyTest {
 
   @Parameters(name = "{0}")
   public static Object[] getAllSolvers() {
-    return Solvers.values();
+    return ParameterizedSolverBasedTest0.getAllSolvers();
   }
 
   @Parameter(0)
@@ -119,6 +124,11 @@ public class SolverConcurrencyTest {
           .that(solver)
           .isNotEqualTo(Solvers.MATHSAT5);
     }
+
+    assume()
+        .withMessage("Solver does not support concurrency without concurrent context.")
+        .that(solver)
+        .isNotEqualTo(Solvers.CVC5);
   }
 
   private void requireConcurrentMultipleStackSupport() {
@@ -293,7 +303,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS, Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -343,11 +353,6 @@ public class SolverConcurrencyTest {
   public void testIntConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireIntegers();
 
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
-
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
     for (int i = 0; i < NUMBER_OF_THREADS; i++) {
@@ -367,11 +372,6 @@ public class SolverConcurrencyTest {
   @Test
   public void testBvConcurrencyWithoutConcurrentContext() throws InvalidConfigurationException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
 
     ConcurrentLinkedQueue<SolverContext> contextList = new ConcurrentLinkedQueue<>();
     // Initialize contexts before using them in the threads
@@ -540,7 +540,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
@@ -728,9 +728,22 @@ public class SolverConcurrencyTest {
     } finally {
       threadPool.shutdownNow();
     }
-    assertWithMessage("Test %s failed with exception(s): %s", testName, exceptionsList)
-        .that(exceptionsList.isEmpty())
-        .isTrue();
+    List<String> exceptionDetails =
+        exceptionsList.stream()
+            .map(
+                ex -> {
+                  StringWriter sw = new StringWriter();
+                  @SuppressWarnings("checkstyle:IllegalInstantiation")
+                  PrintWriter pw = new PrintWriter(sw);
+                  ex.printStackTrace(pw);
+                  return sw.toString();
+                })
+            .collect(Collectors.toList());
+    assertWithMessage(
+            "Test %s failed with exception(s): %s",
+            testName, Joiner.on("\n").join(exceptionDetails))
+        .that(exceptionsList)
+        .isEmpty();
   }
 
   /** just a small lambda-compatible interface. */

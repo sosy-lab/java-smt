@@ -30,6 +30,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
-public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term> {
+public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
@@ -78,17 +79,23 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // String representation is equal (and they are equal)
   private final Table<String, String, Term> variablesCache = HashBasedTable.create();
   private final Map<String, Term> functionsCache = new HashMap<>();
+  private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5FormulaCreator(Solver pSolver) {
+  protected CVC5FormulaCreator(TermManager pTermManager, Solver pSolver) {
     super(
-        pSolver,
-        pSolver.getBooleanSort(),
-        pSolver.getIntegerSort(),
-        pSolver.getRealSort(),
-        pSolver.getStringSort(),
-        pSolver.getRegExpSort());
+        pTermManager,
+        pTermManager.getBooleanSort(),
+        pTermManager.getIntegerSort(),
+        pTermManager.getRealSort(),
+        pTermManager.getStringSort(),
+        pTermManager.getRegExpSort());
+    termManager = pTermManager;
     solver = pSolver;
+  }
+
+  public Solver getSolver() {
+    return solver;
   }
 
   @Override
@@ -116,7 +123,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
                   0]
                   .getKey());
     }
-    Term newVar = solver.mkConst(sort, name);
+    Term newVar = termManager.mkConst(sort, name);
     variablesCache.put(name, sort.toString(), newVar);
     return newVar;
   }
@@ -131,14 +138,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   public Term makeBoundCopy(Term var) {
     Sort sort = var.getSort();
     String name = getName(var);
-    Term boundCopy = solver.mkVar(sort, name);
+    Term boundCopy = termManager.mkVar(sort, name);
     return boundCopy;
   }
 
   @Override
   public Sort getBitvectorType(int pBitwidth) {
     try {
-      return solver.mkBitVectorSort(pBitwidth);
+      return termManager.mkBitVectorSort(pBitwidth);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create bitvector sort with size " + pBitwidth + ".", e);
@@ -149,7 +156,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   public Sort getFloatingPointType(FloatingPointType pType) {
     try {
       // plus sign bit
-      return solver.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return termManager.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create floatingpoint sort with exponent size "
@@ -163,7 +170,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
-    return solver.mkArraySort(pIndexType, pElementType);
+    return termManager.mkArraySort(pIndexType, pElementType);
   }
 
   @Override
@@ -257,8 +264,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       try {
         throw new AssertionError(
             String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
-      } catch (CVC5ApiException pE) {
-        throw new AssertionError("Unexpected error when accessing sort.", pE);
+      } catch (CVC5ApiException exception) {
+        throw new AssertionError("Unexpected error when accessing sort.", exception);
       }
     }
   }
@@ -578,6 +585,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
@@ -600,6 +609,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.FLOATINGPOINT_ADD, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
+          .put(Kind.FLOATINGPOINT_REM, FunctionDeclarationKind.FP_REM)
           .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
           .put(Kind.FLOATINGPOINT_NEG, FunctionDeclarationKind.FP_NEG)
           .put(Kind.FLOATINGPOINT_LT, FunctionDeclarationKind.FP_LT)
@@ -623,6 +633,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
           .put(Kind.STRING_FROM_INT, FunctionDeclarationKind.INT_TO_STR)
           .put(Kind.STRING_TO_INT, FunctionDeclarationKind.STR_TO_INT)
+          .put(Kind.STRING_TO_CODE, FunctionDeclarationKind.STR_TO_CODE)
+          .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
@@ -687,7 +699,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       if (pDeclaration.hasOp()) {
         Op op = pDeclaration.getOp();
-        return solver.mkTerm(op, pArgs.toArray(new Term[] {}));
+        return termManager.mkTerm(op, pArgs.toArray(new Term[] {}));
       } else {
         try {
           Sort[] paramSorts = pDeclaration.getSort().getFunctionDomainSorts();
@@ -698,7 +710,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
             kind = Kind.APPLY_UF;
             args.add(0, pDeclaration);
           }
-          return solver.mkTerm(kind, args.toArray(new Term[] {}));
+          return termManager.mkTerm(kind, args.toArray(new Term[] {}));
         } catch (CVC5ApiException e) {
           throw new IllegalArgumentException(
               "Failure when building the UF '"
@@ -732,7 +744,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   private Term castToParamTypeIfRequired(Term input, @Nullable Sort targetSort) {
     if (input.getSort().isInteger() && targetSort.isReal()) {
-      return solver.mkTerm(Kind.TO_REAL, input);
+      return termManager.mkTerm(Kind.TO_REAL, input);
     }
     return input;
   }
@@ -761,8 +773,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       Sort sort =
           pArgTypes.isEmpty()
               ? pReturnType
-              : solver.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
-      exp = solver.mkConst(sort, pName);
+              : termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+      exp = termManager.mkConst(sort, pName);
       functionsCache.put(pName, exp);
 
     } else {

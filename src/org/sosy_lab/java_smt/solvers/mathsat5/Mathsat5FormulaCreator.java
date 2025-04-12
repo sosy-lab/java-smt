@@ -23,6 +23,8 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NEG;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_NOT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_OR;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ROL;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ROR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SDIV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SEXT;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_SLE;
@@ -124,6 +126,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -458,6 +461,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_SIGN_EXTENSION;
       case MSAT_TAG_BV_ZEXT:
         return FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      case MSAT_TAG_BV_ROL:
+        return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
+      case MSAT_TAG_BV_ROR:
+        return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;
@@ -570,7 +577,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int expWidth = Integer.parseInt(matcher.group(2));
     int mantWidth = Integer.parseInt(matcher.group(3));
 
-    boolean sign = bits.testBit(expWidth + mantWidth);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidth));
     BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
     BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
 

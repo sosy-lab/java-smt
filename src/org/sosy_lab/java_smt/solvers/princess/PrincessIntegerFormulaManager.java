@@ -100,4 +100,9 @@ class PrincessIntegerFormulaManager
   protected boolean isNumeral(IExpression val) {
     return val instanceof IIntLit;
   }
+
+  @Override
+  protected IExpression floor(IExpression pNumber) {
+    return pNumber; // identity for integers
+  }
 }

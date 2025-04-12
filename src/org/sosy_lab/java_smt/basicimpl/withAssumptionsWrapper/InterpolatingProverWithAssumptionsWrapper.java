@@ -86,7 +86,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     solverAssumptionsFromPush.clear();
   }
 
-  class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
+  final class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
 
     private RemoveAssumptionsFromFormulaVisitor() {
       super(fmgr);

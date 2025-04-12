@@ -354,4 +354,22 @@ public class DebuggingStringFormulaManager implements StringFormulaManager {
     debugging.addFormulaTerm(result);
     return result;
   }
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula str) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    IntegerFormula result = delegate.toCodePoint(str);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula codepoint) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(codepoint);
+    StringFormula result = delegate.fromCodePoint(codepoint);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
 }

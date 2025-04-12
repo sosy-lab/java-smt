@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /** This program parses user-given formulas and prints them in a pretty format. */
 @SuppressWarnings("unused")
-public class PrettyPrinter {
+public final class PrettyPrinter {
 
   /** Utility class without a public constructor. */
   private PrettyPrinter() {}

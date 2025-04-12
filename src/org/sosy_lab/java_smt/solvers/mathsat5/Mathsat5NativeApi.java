@@ -18,7 +18,7 @@ import com.google.errorprone.annotations.CheckReturnValue;
 import org.sosy_lab.java_smt.api.SolverException;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
-class Mathsat5NativeApi {
+final class Mathsat5NativeApi {
   private Mathsat5NativeApi() {}
 
   // msat_result
@@ -710,6 +710,24 @@ class Mathsat5NativeApi {
 
   public static native String msat_to_smtlib2(long e, long t);
 
+  /**
+   * @param env The environment in which term is defined.
+   * @param term The term to convert.
+   * @param logic_name Name of the SMT-LIBv2 logic for the output. Can be empty string (not NULL as
+   *     in the MathSAT5 documentation!).
+   * @param use_defines If nonzero, the output will contain define-funs instead of let bindings.
+   * @return a string in SMT-LIB v2 format for the formula represented by term, or NULL in case of
+   *     errors. If not NULL, the returned string must be deallocated by the user with msat_free().
+   */
+  public static native String msat_to_smtlib2_ext(
+      long env, long term, String logic_name, long use_defines);
+
+  /**
+   * @param e The environment in which term is defined.
+   * @param t The term to print.
+   * @return a string in SMT-LIB v2 format for the given term, or NULL in case of errors. If not
+   *     NULL, the returned string must be deallocated by the user with msat_free().
+   */
   public static native String msat_to_smtlib2_term(long e, long t);
 
   public static native String msat_named_list_to_smtlib2(long e, NamedTermsWrapper w);
@@ -1046,4 +1064,37 @@ class Mathsat5NativeApi {
    * @param o msat_objective to push on the stack
    */
   public static native void msat_assert_objective(long e, long o);
+
+  /**
+   * Returns a proof manager for the given environment. The manager must be destroyed by the user,
+   * with msat_destroy_proof_manager. In order to obtain a non-error result, the option
+   * "proof_generation" must be set to "true" in the configuration used for creating the
+   * environment.
+   *
+   * @param env The environment in which to operate.
+   * @return A proof manager for the environment. MSAT_ERROR_PROOF_MANAGER can be used to check
+   *     whether an error occurred.
+   */
+  public static native long msat_get_proof_manager(long env);
+
+  /** Get current proof from a manager. */
+  public static native long msat_get_proof(long proofMgr);
+
+  public static native int msat_proof_get_arity(long proof);
+
+  // Child is also a proof
+  public static native long msat_proof_get_child(long proof, int i);
+
+  public static native String msat_proof_get_name(long proof);
+
+  public static native boolean msat_proof_is_term(long proof);
+
+  // Term representation of the current proof
+  public static native long msat_proof_get_term(long proof);
+
+  // Can be used to check for the equality of proofs
+  public static native int msat_proof_id(long proof);
+
+  // Cleans up the proof manager and the associated proof
+  public static native void msat_destroy_proof_manager(long proofMgr);
 }

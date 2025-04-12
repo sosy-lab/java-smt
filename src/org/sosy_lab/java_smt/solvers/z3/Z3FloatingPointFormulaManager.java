@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.z3;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import java.math.BigInteger;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -73,13 +74,13 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected Long makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
 
     final long signSort = getFormulaCreator().getBitvectorType(1);
     final long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
     final long mantSort = getFormulaCreator().getBitvectorType(type.getMantissaSize());
 
-    final long signBv = Native.mkNumeral(z3context, signBit ? "1" : "0", signSort);
+    final long signBv = Native.mkNumeral(z3context, sign.isNegative() ? "1" : "0", signSort);
     Native.incRef(z3context, signBv);
     final long expoBv = Native.mkNumeral(z3context, exponent.toString(), expoSort);
     Native.incRef(z3context, expoBv);

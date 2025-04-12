@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -177,7 +178,7 @@ public class DebuggingFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(input);
     BooleanFormula result = delegate.applyTactic(input, tactic);

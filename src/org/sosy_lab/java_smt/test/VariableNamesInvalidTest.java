@@ -8,9 +8,10 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static org.junit.Assert.assertThrows;
+
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.junit.Test;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
@@ -18,55 +19,56 @@ public class VariableNamesInvalidTest extends SolverBasedTest0.ParameterizedSolv
 
   // currently the only invalid String is the empty String
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidBoolVariable() {
-    @SuppressWarnings("unused")
-    Formula var = bmgr.makeVariable("");
+    assertThrows(IllegalArgumentException.class, () -> bmgr.makeVariable(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidIntVariable() {
     requireIntegers();
-    @SuppressWarnings("unused")
-    Formula var = imgr.makeVariable("");
+    assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidRatVariable() {
     requireRationals();
-    @SuppressWarnings("unused")
-    Formula var = rmgr.makeVariable("");
+    assertThrows(IllegalArgumentException.class, () -> rmgr.makeVariable(""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidBVVariable() {
     requireBitvectors();
-    @SuppressWarnings("unused")
-    Formula var = bvmgr.makeVariable(4, "");
+    assertThrows(IllegalArgumentException.class, () -> bvmgr.makeVariable(4, ""));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidFloatVariable() {
     requireFloats();
-    @SuppressWarnings("unused")
-    Formula var = fpmgr.makeVariable("", FormulaType.getSinglePrecisionFloatingPointType());
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> fpmgr.makeVariable("", FormulaType.getSinglePrecisionFloatingPointType()));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidIntArrayVariable() {
     requireIntegers();
     requireArrays();
-    @SuppressWarnings("unused")
-    Formula var = amgr.makeArray("", FormulaType.IntegerType, FormulaType.IntegerType);
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> amgr.makeArray("", FormulaType.IntegerType, FormulaType.IntegerType));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void testInvalidBvArrayVariable() {
     requireBitvectors();
     requireArrays();
-    @SuppressWarnings("unused")
-    Formula var =
-        amgr.makeArray(
-            "", FormulaType.getBitvectorTypeWithSize(2), FormulaType.getBitvectorTypeWithSize(2));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            amgr.makeArray(
+                "",
+                FormulaType.getBitvectorTypeWithSize(2),
+                FormulaType.getBitvectorTypeWithSize(2)));
   }
 }

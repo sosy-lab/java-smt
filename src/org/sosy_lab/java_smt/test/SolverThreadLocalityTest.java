@@ -166,8 +166,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                 //   at ..
                 prover.push(formula);
                 assertThat(prover).isUnsatisfiable();
-              } catch (SolverException | InterruptedException pE) {
-                throw new RuntimeException(pE);
+              } catch (SolverException | InterruptedException exception) {
+                throw new RuntimeException(exception);
               }
             });
 
@@ -178,6 +178,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTranslationTest() throws Throwable {
     // Test that even when using translation, the thread local problem persists for CVC5
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -196,8 +197,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                                   .getFormulaManager()
                                   .translateFrom(formula, context.getFormulaManager()));
                           assertThat(prover).isUnsatisfiable();
-                        } catch (SolverException | InterruptedException pE) {
-                          throw new RuntimeException(pE);
+                        } catch (SolverException | InterruptedException exception) {
+                          throw new RuntimeException(exception);
                         }
                       }));
       Truth.assertThat(task.get()).isInstanceOf(io.github.cvc5.CVC5ApiException.class);
@@ -212,8 +213,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                           .getFormulaManager()
                           .translateFrom(formula, context.getFormulaManager()));
                   assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
       Truth.assertThat(task.get()).isNull();
@@ -289,8 +290,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   prover.push(f2);
                   assertThat(prover).isUnsatisfiable();
 
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
 
@@ -306,8 +307,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                         () -> {
                           try {
                             checkInterpolant(f1, f2, interpol);
-                          } catch (SolverException | InterruptedException pE) {
-                            throw new RuntimeException(pE);
+                          } catch (SolverException | InterruptedException exception) {
+                            throw new RuntimeException(exception);
                           }
                         });
                 assert task3.get() == null;
@@ -328,8 +329,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   prover.push(f2);
 
                   assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
 

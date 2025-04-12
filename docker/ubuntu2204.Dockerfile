@@ -13,9 +13,9 @@ RUN apt-get update \
  && DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
         tzdata locales locales-all \
  && apt-get clean
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
 
 # Install basic packages for building several solvers
 RUN apt-get update \
@@ -23,6 +23,8 @@ RUN apt-get update \
         wget curl git build-essential cmake patchelf unzip \
         openjdk-11-jdk ant maven \
         gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix \
+        gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
+        binutils-aarch64-linux-gnu libc6-dev-arm64-cross \
         zlib1g-dev m4 \
  && apt-get clean
 
@@ -30,12 +32,6 @@ RUN apt-get update \
 RUN  apt-get update \
  && apt-get install -y \
         autoconf gperf \
- && apt-get clean
-
-# CVC5 requires some dependencies
-RUN apt-get update \
- && apt-get install -y \
-        python3 python3-toml python3-pyparsing flex libssl-dev cmake \
  && apt-get clean
 
 # Bitwuzla requires Ninja and Meson (updated version from pip), and uses SWIG >4.0 from dependencies.
@@ -53,7 +49,7 @@ RUN pip3 install --upgrade meson
 # - lzip is required to unpack the gmp tar ball
 RUN apt-get update \
  && apt-get install -y \
-        flex bison libpcre2-dev lzip \
+        cmake flex bison libpcre2-dev lzip \
  && apt-get clean
 
 WORKDIR /dependencies
@@ -78,15 +74,6 @@ RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
 RUN wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip \
  && unzip openjdk-11+28_windows-x64_bin.zip \
  && rm openjdk-11+28_windows-x64_bin.zip
-
-# Add the user "developer" with UID:1000, GID:1000, home at /developer.
-# This allows to map the docker-internal user to the local user 1000:1000 outside of the container.
-# This avoids to have new files created with root-rights.
-RUN groupadd -r developer -g 1000 \
- && useradd -u 1000 -r -g developer -m -d /developer -s /sbin/nologin -c "JavaSMT Development User" developer \
- && chmod 755 /developer
-
-USER developer
 
 # JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/

@@ -89,7 +89,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   /** dump the current solver stack into a new SMTLIB file. */
-  protected void logSolverStack() throws Z3SolverException {
+  protected void logSolverStack() throws SolverException {
     if (logfile != null) { // if logging is not disabled
       try {
         // write stack content to logfile
@@ -97,25 +97,25 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         MoreFiles.createParentDirectories(filename);
         Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
-        throw new Z3SolverException("Cannot write Z3 log file: " + e.getMessage());
+        throw new SolverException("Cannot write Z3 log file", e);
       }
     }
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() {
+  public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
-  protected Z3Model getEvaluatorWithoutChecks() {
+  protected Z3Model getEvaluatorWithoutChecks() throws SolverException {
     return new Z3Model(this, z3context, getZ3Model(), creator);
   }
 
-  protected abstract long getZ3Model();
+  protected abstract long getZ3Model() throws SolverException;
 
   protected abstract void assertContraint(long constraint);
 
@@ -135,7 +135,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
-      throw creator.handleZ3Exception(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception);
     }
     return null;
   }

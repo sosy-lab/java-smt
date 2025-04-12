@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
-import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -345,25 +344,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // sequential interpolation should always work as expected
     checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
-
-    if (solverToUse() == Solvers.CVC5) {
-      assertThatFormula(A).implies(itp1);
-      assertThatFormula(bmgr.and(A, B)).implies(itp2);
-      assertThatFormula(bmgr.and(itp1, B, C)).isUnsatisfiable();
-      assertThatFormula(bmgr.and(itp2, C)).isUnsatisfiable();
-
-      // this is a counterexample for sequential interpolation via individual interpolants:
-      assertThatFormula(bmgr.not(bmgr.implication(bmgr.and(itp1, B), itp2))).isSatisfiable();
-
-    } else {
-      // other solvers satisfy this condition,
-      // because they internally use the same proof for all interpolation queries
-      checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
-    }
+    checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     requireIntegers();
@@ -373,8 +357,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
-    stack.getSeqInterpolants(ImmutableList.of());
-    assert_().fail();
+    assertThrows(
+        IllegalArgumentException.class, () -> stack.getSeqInterpolants(ImmutableList.of()));
   }
 
   @Test
@@ -889,8 +873,8 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThat(itp).hasSize(5);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -900,11 +884,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {0, 0}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -914,11 +900,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA), new int[] {4}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings({"unchecked", "varargs", "CheckReturnValue"})
+  @Test
+  @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -928,11 +916,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     Set<T> TA = ImmutableSet.of(stack.push(A));
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(TA, TA), new int[] {1, 0}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -942,11 +931,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 1}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -956,11 +946,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 1, 2}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
 
     requireTreeItp();
@@ -970,11 +961,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     T TA = stack.push(A);
     assertThat(stack).isUnsatisfiable();
 
-    stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0});
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants0(ImmutableList.of(TA, TA, TA), new int[] {0, 2, 0}));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
     requireTreeItp();
 
@@ -984,8 +976,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assertThat(stack).isUnsatisfiable();
 
     // empty list of partition
-    stack.getTreeInterpolants(ImmutableList.of(), new int[] {});
-    assert_().fail();
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> stack.getTreeInterpolants(ImmutableList.of(), new int[] {}));
   }
 
   @Test

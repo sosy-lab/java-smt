@@ -18,12 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
@@ -60,7 +59,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public BooleanFormula parse(String str) throws IllegalArgumentException {
+  public Long parseImpl(String str) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,
     // but requires all symbols as part of the query.
@@ -123,7 +122,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
     // last step: all parsed symbols need to be declared again to have them tracked in the creator.
     declareAllSymbols(term);
 
-    return getFormulaCreator().encapsulateBoolean(term);
+    return term;
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -148,54 +147,56 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  protected BooleanFormula applyQELightImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyQELightImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "qe-light");
   }
 
   @Override
-  protected BooleanFormula applyCNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyCNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "tseitin-cnf");
   }
 
   @Override
-  protected BooleanFormula applyNNFImpl(BooleanFormula pF) throws InterruptedException {
+  protected BooleanFormula applyNNFImpl(BooleanFormula pF)
+      throws InterruptedException, SolverException {
     return applyTacticImpl(pF, "nnf");
   }
 
   private BooleanFormula applyTacticImpl(BooleanFormula pF, String tacticName)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     long out =
         formulaCreator.applyTactic(getFormulaCreator().getEnv(), extractInfo(pF), tacticName);
     return formulaCreator.encapsulateBoolean(out);
   }
 
   @Override
-  public Appender dumpFormula(final Long expr) {
+  public String dumpFormulaImpl(final Long expr) {
     assert getFormulaCreator().getFormulaType(expr) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    return Appenders.fromToStringMethod(
-        new Object() {
-          @Override
-          public String toString() {
-            // Serializing a solver is the simplest way to dump a formula in Z3,
-            // cf https://github.com/Z3Prover/z3/issues/397
-            long z3solver = Native.mkSolver(getEnvironment());
-            Native.solverIncRef(getEnvironment(), z3solver);
-            Native.solverAssert(getEnvironment(), z3solver, expr);
-            String serialized = Native.solverToString(getEnvironment(), z3solver);
-            Native.solverDecRef(getEnvironment(), z3solver);
-            return serialized;
-          }
-        });
+    // Serializing a solver is the simplest way to dump a formula in Z3,
+    // cf https://github.com/Z3Prover/z3/issues/397
+    long z3solver = Native.mkSolver(getEnvironment());
+    Native.solverIncRef(getEnvironment(), z3solver);
+    Native.solverAssert(getEnvironment(), z3solver, expr);
+    String serialized = Native.solverToString(getEnvironment(), z3solver);
+    Native.solverDecRef(getEnvironment(), z3solver);
+    return serialized;
   }
 
   @Override
   protected Long simplify(Long pF) throws InterruptedException {
     try {
-      return Native.simplify(getFormulaCreator().getEnv(), pF);
-    } catch (Z3Exception exp) {
-      throw formulaCreator.handleZ3Exception(exp);
+      try {
+        return Native.simplify(getFormulaCreator().getEnv(), pF);
+      } catch (Z3Exception exp) {
+        throw formulaCreator.handleZ3Exception(exp);
+      }
+    } catch (SolverException e) {
+      // ignore exception and return original formula AS-IS.
+      return pF;
     }
   }
 

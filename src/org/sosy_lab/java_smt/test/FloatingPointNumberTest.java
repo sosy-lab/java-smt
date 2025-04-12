@@ -19,6 +19,7 @@ import com.google.common.base.Strings;
 import java.math.BigInteger;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 
 public class FloatingPointNumberTest {
 
@@ -89,7 +90,7 @@ public class FloatingPointNumberTest {
 
   @Test
   public void floatingPointNumberWithArbitraryPrecision() {
-    var fpNum = FloatingPointNumber.of(false, BigInteger.valueOf(10), BigInteger.ONE, 5, 7);
+    var fpNum = FloatingPointNumber.of(Sign.POSITIVE, BigInteger.valueOf(10), BigInteger.ONE, 5, 7);
     assertThat(fpNum.toString()).isEqualTo("0" + "01010" + "0000001");
     assertThrows(IllegalArgumentException.class, () -> fpNum.floatValue());
     assertThrows(IllegalArgumentException.class, () -> fpNum.doubleValue());

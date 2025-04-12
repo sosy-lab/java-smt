@@ -13,7 +13,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
-public class Yices2NativeApi {
+public final class Yices2NativeApi {
   private Yices2NativeApi() {}
 
   // Yices2 status codes

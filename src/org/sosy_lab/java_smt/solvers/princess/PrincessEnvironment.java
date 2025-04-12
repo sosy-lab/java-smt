@@ -22,7 +22,10 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IPlus;
 import ap.parser.ITerm;
+import ap.parser.ITermITE;
+import ap.parser.ITimes;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -33,7 +36,8 @@ import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
-import ap.theories.rationals.Fractions.FractionSort$;
+import ap.theories.rationals.Rationals$;
+import ap.theories.strings.StringTheory;
 import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.Sort.MultipleValueBool$;
@@ -54,6 +58,7 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,6 +69,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.Appenders;
@@ -76,6 +82,8 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import ostrich.OFlags;
+import ostrich.OstrichStringTheory;
 import scala.Tuple2;
 import scala.Tuple4;
 import scala.collection.immutable.Seq;
@@ -104,6 +112,52 @@ class PrincessEnvironment {
 
   public static final Sort BOOL_SORT = Sort$.MODULE$.Bool();
   public static final Sort INTEGER_SORT = Sort.Integer$.MODULE$;
+  public static final Sort NAT_SORT = Sort.Nat$.MODULE$;
+
+  static final StringTheory stringTheory =
+      new OstrichStringTheory(
+          toSeq(new ArrayList<>()),
+          new OFlags(
+              /* OFlag default values:
+               * -- Pre-image specific options
+               * eagerAutomataOperations : false,
+               * measureTimes            : false,
+               * useLength               : OFlags.LengthOptions.Auto,
+               * useParikhConstraints    : true,
+               * minimizeAutomata        : false,
+               * forwardPropagation      : false,
+               * backwardPropagation     : true,
+               * nielsenSplitter         : true,
+               * regexTranslator         : OFlags.RegexTranslator.Hybrid,
+               */
+              OFlags.$lessinit$greater$default$1(),
+              OFlags.$lessinit$greater$default$2(),
+              OFlags.$lessinit$greater$default$3(),
+              OFlags.$lessinit$greater$default$4(),
+              OFlags.$lessinit$greater$default$5(),
+              OFlags.$lessinit$greater$default$6(),
+              OFlags.$lessinit$greater$default$7(),
+              OFlags.$lessinit$greater$default$8(),
+              OFlags.$lessinit$greater$default$9(),
+              /* -- Options for the cost-enriched-automata solver
+               * ceaBackend              : OFlags.CEABackend.Unary,
+               * useCostEnriched         : false,
+               * debug                   : false,
+               * underApprox             : true,
+               * underApproxBound        : 15,
+               * simplifyAut             : true
+               */
+              OFlags.$lessinit$greater$default$10(),
+              OFlags.$lessinit$greater$default$11(),
+              OFlags.$lessinit$greater$default$12(),
+              OFlags.$lessinit$greater$default$13(),
+              OFlags.$lessinit$greater$default$14(),
+              OFlags.$lessinit$greater$default$15()));
+  public static final Sort STRING_SORT = stringTheory.StringSort();
+  public static final Sort REGEX_SORT = stringTheory.RegexSort();
+
+  static Rationals$ rationalTheory = Rationals$.MODULE$;
+  public static final Sort FRACTION_SORT = rationalTheory.dom();
 
   @Option(secure = true, description = "log all queries as Princess-specific Scala code")
   private boolean logAllQueriesAsScala = false;
@@ -330,7 +384,8 @@ class PrincessEnvironment {
    * <p>We return an {@link Appender} to avoid storing larger Strings in memory. We sort the symbols
    * and abbreviations for the export only "on demand".
    */
-  public Appender dumpFormula(IFormula formula, final PrincessFormulaCreator creator) {
+  public String dumpFormula(IFormula formula, final PrincessFormulaCreator creator)
+      throws IOException {
     // remove redundant expressions
     // TODO do we want to remove redundancy completely (as checked in the unit
     // tests (SolverFormulaIOTest class)) or do we want to remove redundancy up
@@ -340,8 +395,8 @@ class PrincessEnvironment {
     final IExpression lettedFormula = tuple._1();
     final Map<IExpression, IExpression> abbrevMap = asJava(tuple._2());
 
-    return new Appenders.AbstractAppender() {
-
+    StringBuilder builder = new StringBuilder();
+    new Appenders.AbstractAppender() {
       @Override
       public void appendTo(Appendable out) throws IOException {
         try {
@@ -489,7 +544,9 @@ class PrincessEnvironment {
         return ImmutableSet.copyOf(
             creator.extractVariablesAndUFs(abbrevMap.get(var), true).values());
       }
-    };
+    }.appendTo(builder);
+
+    return builder.toString();
   }
 
   private static String getName(IExpression var) {
@@ -508,9 +565,25 @@ class PrincessEnvironment {
   }
 
   static FormulaType<?> getFormulaType(IExpression pFormula) {
+    // TODO: We could use Sort.sortof() here, but it sometimes returns `integer` even though the
+    //  term is rational. We should figure out why and then open a new issue for this.
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITerm) {
+    } else if (pFormula instanceof ITimes) {
+      // coeff is always INT, lets check the subterm.
+      ITimes times = (ITimes) pFormula;
+      return getFormulaType(times.subterm());
+    } else if (pFormula instanceof IPlus) {
+      IPlus plus = (IPlus) pFormula;
+      FormulaType<?> t1 = getFormulaType(plus.t1());
+      FormulaType<?> t2 = getFormulaType(plus.t2());
+      return mergeFormulaTypes(t1, t2);
+    } else if (pFormula instanceof ITermITE) {
+      ITermITE plus = (ITermITE) pFormula;
+      FormulaType<?> t1 = getFormulaType(plus.left());
+      FormulaType<?> t2 = getFormulaType(plus.right());
+      return mergeFormulaTypes(t1, t2);
+    } else {
       final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       try {
         return getFormulaTypeFromSort(sort);
@@ -518,22 +591,46 @@ class PrincessEnvironment {
         // add more info about the formula, then rethrow
         throw new IllegalArgumentException(
             String.format(
-                "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula),
+                "Unknown formula type '%s' of sort '%s' for formula '%s'.",
+                pFormula.getClass(), sort.toString(), pFormula),
             e);
       }
     }
+  }
+
+  /**
+   * Merge INTEGER and RATIONAL type or INTEGER and BITVECTOR and return the more general type. The
+   * ordering is: RATIONAL > INTEGER > BITVECTOR.
+   *
+   * @throws IllegalArgumentException for any other type.
+   */
+  private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
+    if (type1.equals(type2)) {
+      return type1;
+    }
+    if ((type1.isIntegerType() || type1.isRationalType())
+        && (type2.isIntegerType() || type2.isRationalType())) {
+      return type1.isRationalType() ? type1 : type2;
+    }
+    if ((type1.isIntegerType() || type1.isBitvectorType())
+        && (type2.isIntegerType() || type2.isBitvectorType())) {
+      return type1.isIntegerType() ? type1 : type2;
+    }
     throw new IllegalArgumentException(
-        String.format(
-            "Unknown formula type '%s' for formula '%s'.", pFormula.getClass(), pFormula));
+        String.format("Types %s and %s can not be merged.", type1, type2));
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
     if (sort == PrincessEnvironment.BOOL_SORT) {
       return FormulaType.BooleanType;
-    } else if (sort == PrincessEnvironment.INTEGER_SORT) {
+    } else if (sort == PrincessEnvironment.INTEGER_SORT || sort == PrincessEnvironment.NAT_SORT) {
       return FormulaType.IntegerType;
-    } else if (sort instanceof FractionSort$) {
+    } else if (sort == PrincessEnvironment.FRACTION_SORT) {
       return FormulaType.RationalType;
+    } else if (sort == PrincessEnvironment.STRING_SORT) {
+      return FormulaType.StringType;
+    } else if (sort == PrincessEnvironment.REGEX_SORT) {
+      return FormulaType.RegexType;
     } else if (sort instanceof ArraySort) {
       Seq<Sort> indexSorts = ((ArraySort) sort).theory().indexSorts();
       Sort elementSort = ((ArraySort) sort).theory().objSort();
@@ -619,8 +716,8 @@ class PrincessEnvironment {
     try {
       Method constMethod = ExtArray.class.getMethod("const");
       constArrayOp = (IFunction) constMethod.invoke(arraySort.theory());
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException pE) {
-      throw new RuntimeException(pE);
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException exception) {
+      throw new RuntimeException(exception);
     }
 
     return new IFunApp(constArrayOp, toSeq(ImmutableList.of(elseTerm)));
@@ -659,6 +756,15 @@ class PrincessEnvironment {
 
   static <T> Seq<T> toSeq(List<T> list) {
     return collectionAsScalaIterableConverter(list).asScala().toSeq();
+  }
+
+  static Seq<ITerm> toITermSeq(List<IExpression> exprs) {
+    return PrincessEnvironment.toSeq(
+        exprs.stream().map(e -> (ITerm) e).collect(Collectors.toList()));
+  }
+
+  static Seq<ITerm> toITermSeq(IExpression... exprs) {
+    return toITermSeq(Arrays.asList(exprs));
   }
 
   IExpression simplify(IExpression f) {

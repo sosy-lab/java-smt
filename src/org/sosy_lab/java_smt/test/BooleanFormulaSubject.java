@@ -173,7 +173,7 @@ public final class BooleanFormulaSubject extends Subject {
         prover.push(part);
       }
       if (!prover.isUnsat()) {
-        throw new AssertionError("repated satisfiability check returned different result");
+        throw new AssertionError("repeated satisfiability check returned different result");
       }
       final List<BooleanFormula> unsatCore = prover.getUnsatCore();
       if (unsatCore.isEmpty()

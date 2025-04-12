@@ -72,7 +72,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, Z3SolverException {
+  public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     int status;
     try {
@@ -101,12 +101,12 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected void pushImpl() throws InterruptedException {
+  protected void pushImpl() {
     push0();
     try {
       Native.optimizePush(z3context, z3optSolver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3Exception(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception);
     }
   }
 
@@ -132,7 +132,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsat() throws Z3SolverException, InterruptedException {
+  public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     logSolverStack();
     return check() == OptStatus.UNSAT;
@@ -198,7 +198,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   protected long getZ3Model() {
-    return Native.optimizeGetModel(z3context, z3optSolver);
+    try {
+      return Native.optimizeGetModel(z3context, z3optSolver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3ExceptionAsRuntimeException(e);
+    }
   }
 
   @Override

@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
 /** Example of a simple user propagator that prohibits variables/expressions to be set to true. */
-public class SimpleUserPropagator {
+public final class SimpleUserPropagator {
 
   private SimpleUserPropagator() {}
 
