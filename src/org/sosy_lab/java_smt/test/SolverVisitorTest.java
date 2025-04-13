@@ -906,7 +906,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       return TraversalProcess.CONTINUE;
     }
   }
-  ;
 
   @Test
   public void testFormulaQuantifierExistsVisitor() {
