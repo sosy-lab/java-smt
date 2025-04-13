@@ -127,6 +127,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Ints;
@@ -134,6 +135,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -335,22 +337,25 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_VARIABLE:
         return pVisitor.visitBoundVariable(pFormula, 0);
       case YICES_FORALL_TERM:
-        int children = yices_term_num_children(pF);
-        ImmutableList.Builder<Formula> boundVars = ImmutableList.builder();
-        for (int i = 0; i < children - 1; i++) {
-          int boundVar = yices_term_child(pF, i);
-          boundVars.add(encapsulateWithTypeOf(boundVar));
-        }
-        BooleanFormula body = encapsulateBoolean(yices_term_child(pF, children - 1));
-        Quantifier quant = Quantifier.EXISTS;
-        if (yices_term_to_string(pF).startsWith("(forall")) {
-          // TODO: this is stupid, but i could not find a way of discerning between the quantifiers
-          quant = Quantifier.FORALL;
-        }
-        return pVisitor.visitQuantifier((BooleanFormula) pFormula, quant, boundVars.build(), body);
+        return visitQuantifier(pVisitor, pFormula, pF, Quantifier.FORALL);
       default:
         return visitFunctionApplication(pVisitor, pFormula, pF, constructor);
     }
+  }
+
+  private <R> R visitQuantifier(
+      FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF, Quantifier pQuantifier) {
+    List<Integer> args = getArgs(pF);
+    List<Formula> boundVariables =
+        args.subList(0, args.size() - 1).stream()
+            .map(this::encapsulateWithTypeOf)
+            .collect(Collectors.toList());
+    int body = Iterables.getLast(args);
+    if (pQuantifier == Quantifier.EXISTS) {
+      body = yices_not(body); // EXISTS is an alias for NOT(FORALL(x, NOT(body)))
+    }
+    return pVisitor.visitQuantifier(
+        (BooleanFormula) pFormula, pQuantifier, boundVariables, encapsulateBoolean(body));
   }
 
   private <R> R visitFunctionApplication(
@@ -386,7 +391,10 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
         functionKind = FunctionDeclarationKind.EQ; // Covers all equivalences
         break;
       case YICES_NOT_TERM:
-        if (isNestedConjunction(pF)) {
+        if (isNestedExists(pF)) {
+          int existsTerm = Iterables.getOnlyElement(getArgs(pF));
+          return visitQuantifier(pVisitor, pFormula, existsTerm, Quantifier.EXISTS);
+        } else if (isNestedConjunction(pF)) {
           functionKind = FunctionDeclarationKind.AND;
           functionArgs = getNestedConjunctionArgs(pF);
           functionDeclaration = -YICES_AND;
@@ -520,25 +528,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return Lists.transform(args, this::getFormulaType);
   }
 
+  /**
+   * Yices transforms <code>EXISTS(x, body)</code> into <code>NOT(FORALL(x, NOT(body)))</code>. See
+   * <a
+   * href="https://github.com/SRI-CSL/yices2/blob/fda0a325ea7923f152ea9f9a5d20eddfd1d96224/src/io/term_printer.c#L1947">sources
+   * of Yices</a>.
+   */
+  private static boolean isNestedExists(int outerTerm) {
+    return yices_term_constructor(outerTerm) == YICES_NOT_TERM
+        && yices_term_constructor(yices_term_child(outerTerm, 0)) == YICES_FORALL_TERM;
+  }
+
   /** Yices transforms <code>AND(x,...)</code> into <code>NOT(OR(NOT(X),NOT(...))</code>. */
   private static boolean isNestedConjunction(int outerTerm) {
-    if (yices_term_constructor(outerTerm) != YICES_NOT_TERM) {
-      return false;
-    }
-
-    int middleTerm = yices_term_child(outerTerm, 0);
-    if (yices_term_constructor(middleTerm) != YICES_OR_TERM) {
-      return false;
-    }
-
-    // code commented out --> ignore nested NOTs and just negate all resulting child-terms.
-    // for (int child : getArgs(middleTerm)) {
-    //   if (yices_term_constructor(child) != YICES_NOT_TERM) {
-    //     return false;
-    //   }
-    // }
-
-    return true;
+    return yices_term_constructor(outerTerm) == YICES_NOT_TERM
+        && yices_term_constructor(yices_term_child(outerTerm, 0)) == YICES_OR_TERM;
   }
 
   /**

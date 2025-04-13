@@ -874,21 +874,54 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(usedVariables).containsExactly("x", "y", "z");
   }
 
-  @Test
-  public void testFormulaQuantifierNegationVisitor() {
-    // Some solvers encode quantifiers as the negated other quantifier, and we don't ever want
-    // to confuse those when traversing the formulas. Also, we want to make sure that the
-    // formulas are not rewritten unexpectedly.
+  private final class CountingFormulaVisitor extends DefaultFormulaVisitor<TraversalProcess> {
 
+    int amountOfNots = 0;
+    int amountOfExists = 0;
+    int amountOfForalls = 0;
+
+    @Override
+    protected TraversalProcess visitDefault(Formula formula) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitQuantifier(
+        BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
+      if (q == Quantifier.EXISTS) {
+        amountOfExists++;
+      } else {
+        amountOfForalls++;
+      }
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      if (functionDeclaration.getKind() == FunctionDeclarationKind.NOT) {
+        amountOfNots++;
+      }
+      return TraversalProcess.CONTINUE;
+    }
+  }
+  ;
+
+  @Test
+  public void testFormulaQuantifierExistsVisitor() {
+    // Some solvers encode quantifiers as the negated other quantifier, and we don't ever want
+    // to confuse those when traversing the formulas.
+
+    requireQuantifiers();
     assume()
         .withMessage("Princess does not allow boolean quantification currently")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
 
-    requireQuantifiers();
     BooleanFormula x = bmgr.makeVariable("x");
     BooleanFormula y = bmgr.makeVariable("y");
 
+    // Bssis is "EXISTS x: OR(x, y)".
     // y is free, x is bound, and there exists an x that fulfills the formula even if you negate
     // it in the body or the quantified formula or both.
     BooleanFormula fExists = qmgr.exists(x, bmgr.or(x, y));
@@ -896,98 +929,112 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula fNotExists = bmgr.not(fExists);
     BooleanFormula fNotExistsNegatedBody = bmgr.not(fExistsNegatedBody);
 
-    // Build the same formula for FORALL
-    // y is free, x is bound, and all x fulfil the formula as y can be true or false.
+    CountingFormulaVisitor v1 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fExists, v1);
+    assertThat(v1.amountOfExists).isEqualTo(1);
+    assertThat(v1.amountOfForalls).isEqualTo(0);
+    assertThat(v1.amountOfNots).isEqualTo(0);
+
+    CountingFormulaVisitor v2 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fNotExists, v2);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v2.amountOfExists).isEqualTo(0);
+      assertThat(v2.amountOfForalls).isEqualTo(1);
+      assertThat(v2.amountOfNots).isEqualTo(2);
+    } else {
+      assertThat(v2.amountOfExists).isEqualTo(1);
+      assertThat(v2.amountOfForalls).isEqualTo(0);
+      assertThat(v2.amountOfNots).isEqualTo(1);
+    }
+
+    CountingFormulaVisitor v3 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fExistsNegatedBody, v3);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v3.amountOfExists).isEqualTo(1);
+      assertThat(v3.amountOfForalls).isEqualTo(0);
+      assertThat(v3.amountOfNots).isEqualTo(2);
+    } else {
+      assertThat(v3.amountOfExists).isEqualTo(1);
+      assertThat(v3.amountOfForalls).isEqualTo(0);
+      assertThat(v3.amountOfNots).isEqualTo(1);
+    }
+
+    CountingFormulaVisitor v4 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fNotExistsNegatedBody, v4);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v4.amountOfExists).isEqualTo(0);
+      assertThat(v4.amountOfForalls).isEqualTo(1);
+      assertThat(v4.amountOfNots).isEqualTo(0);
+    } else {
+      assertThat(v4.amountOfExists).isEqualTo(1);
+      assertThat(v4.amountOfForalls).isEqualTo(0);
+      assertThat(v4.amountOfNots).isEqualTo(2);
+    }
+  }
+
+  @Test
+  public void testFormulaQuantifierForallNegationVisitor() {
+    // Some solvers encode quantifiers as the negated other quantifier, and we don't ever want
+    // to confuse those when traversing the formulas.
+
+    requireQuantifiers();
+    assume()
+        .withMessage("Princess does not allow boolean quantification currently")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+
+    // Basis is "FORALL x: OR(x, y)".
+    // y is free, x is bound, and all x fulfill the formula as y can be true or false.
     // This holds for all negations as well.
     BooleanFormula fForall = qmgr.forall(x, bmgr.or(x, y));
     BooleanFormula fForallNegatedBody = qmgr.forall(x, bmgr.not(bmgr.or(x, y)));
     BooleanFormula fNotForall = bmgr.not(fForall);
     BooleanFormula fNotForallNegatedBody = bmgr.not(fForallNegatedBody);
 
-    final int[] amountOfNots = {0};
-    final int[] amountOfExists = {0};
-    final int[] amountOfForalls = {0};
+    CountingFormulaVisitor v5 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fForall, v5);
+    assertThat(v5.amountOfExists).isEqualTo(0);
+    assertThat(v5.amountOfForalls).isEqualTo(1);
+    assertThat(v5.amountOfNots).isEqualTo(0);
 
-    FormulaVisitor<TraversalProcess> notAndQuantifierCountingVisitor =
-        new DefaultFormulaVisitor<>() {
-          @Override
-          protected TraversalProcess visitDefault(Formula formula) {
-            return TraversalProcess.CONTINUE;
-          }
+    CountingFormulaVisitor v6 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fNotForall, v6);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v6.amountOfExists).isEqualTo(1);
+      assertThat(v6.amountOfForalls).isEqualTo(0);
+      assertThat(v6.amountOfNots).isEqualTo(2);
+    } else {
+      assertThat(v6.amountOfExists).isEqualTo(0);
+      assertThat(v6.amountOfForalls).isEqualTo(1);
+      assertThat(v6.amountOfNots).isEqualTo(1);
+    }
 
-          @Override
-          public TraversalProcess visitQuantifier(
-              BooleanFormula f, Quantifier q, List<Formula> boundVariables, BooleanFormula body) {
-            if (q == Quantifier.EXISTS) {
-              amountOfExists[0]++;
-            } else {
-              amountOfForalls[0]++;
-            }
-            return TraversalProcess.CONTINUE;
-          }
+    CountingFormulaVisitor v7 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fForallNegatedBody, v7);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v7.amountOfExists).isEqualTo(0);
+      assertThat(v7.amountOfForalls).isEqualTo(1);
+      assertThat(v7.amountOfNots).isEqualTo(2);
+    } else {
+      assertThat(v7.amountOfExists).isEqualTo(0);
+      assertThat(v7.amountOfForalls).isEqualTo(1);
+      assertThat(v7.amountOfNots).isEqualTo(1);
+    }
 
-          @Override
-          public TraversalProcess visitFunction(
-              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-            if (functionDeclaration.getKind() == FunctionDeclarationKind.NOT) {
-              amountOfNots[0]++;
-            }
-            return TraversalProcess.CONTINUE;
-          }
-        };
-
-    mgr.visitRecursively(fExists, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(1);
-    assertThat(amountOfForalls[0]).isEqualTo(0);
-    assertThat(amountOfNots[0]).isEqualTo(0);
-    amountOfExists[0] = 0;
-
-    mgr.visitRecursively(fNotExists, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(1);
-    assertThat(amountOfForalls[0]).isEqualTo(0);
-    assertThat(amountOfNots[0]).isEqualTo(1);
-    amountOfNots[0] = 0;
-    amountOfExists[0] = 0;
-
-    mgr.visitRecursively(fExistsNegatedBody, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(1);
-    assertThat(amountOfForalls[0]).isEqualTo(0);
-    assertThat(amountOfNots[0]).isEqualTo(1);
-    amountOfNots[0] = 0;
-    amountOfExists[0] = 0;
-
-    mgr.visitRecursively(fNotExistsNegatedBody, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(1);
-    assertThat(amountOfForalls[0]).isEqualTo(0);
-    assertThat(amountOfNots[0]).isEqualTo(2);
-    amountOfNots[0] = 0;
-    amountOfExists[0] = 0;
-
-    mgr.visitRecursively(fForall, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(0);
-    assertThat(amountOfForalls[0]).isEqualTo(1);
-    assertThat(amountOfNots[0]).isEqualTo(0);
-    amountOfNots[0] = 0;
-    amountOfForalls[0] = 0;
-
-    mgr.visitRecursively(fNotForall, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(0);
-    assertThat(amountOfForalls[0]).isEqualTo(1);
-    assertThat(amountOfNots[0]).isEqualTo(1);
-    amountOfNots[0] = 0;
-    amountOfForalls[0] = 0;
-
-    mgr.visitRecursively(fForallNegatedBody, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(0);
-    assertThat(amountOfForalls[0]).isEqualTo(1);
-    assertThat(amountOfNots[0]).isEqualTo(1);
-    amountOfNots[0] = 0;
-    amountOfForalls[0] = 0;
-
-    mgr.visitRecursively(fNotForallNegatedBody, notAndQuantifierCountingVisitor);
-    assertThat(amountOfExists[0]).isEqualTo(0);
-    assertThat(amountOfForalls[0]).isEqualTo(1);
-    assertThat(amountOfNots[0]).isEqualTo(2);
+    CountingFormulaVisitor v8 = new CountingFormulaVisitor();
+    mgr.visitRecursively(fNotForallNegatedBody, v8);
+    if (solverToUse() == Solvers.YICES2) {
+      assertThat(v8.amountOfExists).isEqualTo(1);
+      assertThat(v8.amountOfForalls).isEqualTo(0);
+      assertThat(v8.amountOfNots).isEqualTo(0);
+    } else {
+      assertThat(v8.amountOfExists).isEqualTo(0);
+      assertThat(v8.amountOfForalls).isEqualTo(1);
+      assertThat(v8.amountOfNots).isEqualTo(2);
+    }
   }
 
   @Test
