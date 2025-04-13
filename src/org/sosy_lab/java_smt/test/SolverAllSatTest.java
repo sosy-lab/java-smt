@@ -205,7 +205,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assume()
         .withMessage("solver does only partially support quantifiers")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
 
     if ("opt".equals(proverEnv)) {
       assume()
@@ -257,11 +257,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     env.push(query);
 
     assertThat(env.isUnsat()).isFalse();
-
-    assume()
-        .withMessage("Yices2 quantifier support is very limited at the moment")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.YICES2);
 
     TestAllSatCallback callback = new TestAllSatCallback();
 
