@@ -874,7 +874,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(usedVariables).containsExactly("x", "y", "z");
   }
 
-  private final class CountingFormulaVisitor extends DefaultFormulaVisitor<TraversalProcess> {
+  private static final class CountingFormulaVisitor
+      extends DefaultFormulaVisitor<TraversalProcess> {
 
     int amountOfNots = 0;
     int amountOfExists = 0;
