@@ -137,31 +137,20 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       QuantifierCreationMethod pMethod) {
     switch (pMethod) {
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION:
-        try {
-          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (UnsupportedOperationException e) {
-          logger.logException(Level.WARNING, e, "External quantifier creation failed.");
-          throw e;
-        }
+        return handleQuantifierFormulaCreation(
+            q, pVariables, pBody, Level.SEVERE, "External " + "quantifier creation failed.", false);
 
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK:
-        try {
-          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (UnsupportedOperationException e) {
-          return wrap(
-              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        }
+        return handleQuantifierFormulaCreation(q, pVariables, pBody, null, null, true);
 
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK_WARN_ON_FAILURE:
-        try {
-          return eliminateQuantifierBeforeMakingFormula(q, pVariables, pBody);
-        } catch (UnsupportedOperationException e) {
-          logger.logException(
-              Level.WARNING, e, "External quantifier creation failed. Falling back to native");
-          return wrap(
-              mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
-        }
-
+        return handleQuantifierFormulaCreation(
+            q,
+            pVariables,
+            pBody,
+            Level.WARNING,
+            "External " + "quantifier creation failed. Falling back to native",
+            true);
       default:
         return wrap(
             mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
