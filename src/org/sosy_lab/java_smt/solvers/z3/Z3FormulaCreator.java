@@ -588,7 +588,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     for (int i = 0; i < numBound; i++) {
       long varName = Native.getQuantifierBoundName(environment, pF, i);
       long varSort = Native.getQuantifierBoundSort(environment, pF, i);
-      freeVars[i] = Native.mkConst(environment, varName, varSort);
+      long freeVar = Native.mkConst(environment, varName, varSort);
+      Native.incRef(environment, freeVar);
+      freeVars[i] = freeVar;
     }
 
     // For every bound variable (de-Bruijn index from 0 to numBound), we replace the bound variable
