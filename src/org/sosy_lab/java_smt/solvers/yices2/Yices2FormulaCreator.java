@@ -105,6 +105,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_proj_in
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rational_const_value;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_real_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_set_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sum_component;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_bitsize;
@@ -346,17 +347,31 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   private <R> R visitQuantifier(
       FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF, Quantifier pQuantifier) {
+
+    // in Yices2QuantifierManager, we replace fre variables with bound variables.
+    // Here, we revert this replacement and provide free variables towards the user.
     List<Integer> args = getArgs(pF);
-    List<Formula> boundVariables =
-        args.subList(0, args.size() - 1).stream()
-            .map(this::encapsulateWithTypeOf)
-            .collect(Collectors.toList());
+    int[] boundVars = Ints.toArray(args.subList(0, args.size() - 1));
+    int[] freeVars = new int[] {boundVars.length};
+    for (int i = 0; i < boundVars.length; i++) {
+      // use from cached variable mapping
+      freeVars[i] =
+          createNamedVariable(yices_type_of_term(boundVars[i]), yices_get_term_name(boundVars[i]));
+    }
+
     int body = Iterables.getLast(args);
     if (pQuantifier == Quantifier.EXISTS) {
       body = yices_not(body); // EXISTS is an alias for NOT(FORALL(x, NOT(body)))
     }
+    int substBody = yices_subst_term(freeVars.length, boundVars, freeVars, body);
+
     return pVisitor.visitQuantifier(
-        (BooleanFormula) pFormula, pQuantifier, boundVariables, encapsulateBoolean(body));
+        (BooleanFormula) pFormula,
+        pQuantifier,
+        Ints.asList(freeVars).stream()
+            .map(this::encapsulateWithTypeOf)
+            .collect(Collectors.toList()),
+        encapsulateBoolean(substBody));
   }
 
   private <R> R visitFunctionApplication(
