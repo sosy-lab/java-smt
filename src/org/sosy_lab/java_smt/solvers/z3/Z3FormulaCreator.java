@@ -584,7 +584,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private <R> R visitQuantifier(FormulaVisitor<R> pVisitor, BooleanFormula pFormula, Long pF) {
     int numBound = Native.getQuantifierNumBound(environment, pF);
-    long[] freeVars = new long[] {numBound};
+    long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
       long varName = Native.getQuantifierBoundName(environment, pF, i);
       long varSort = Native.getQuantifierBoundSort(environment, pF, i);

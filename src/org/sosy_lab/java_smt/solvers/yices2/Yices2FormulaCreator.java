@@ -352,7 +352,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     // Here, we revert this replacement and provide free variables towards the user.
     List<Integer> args = getArgs(pF);
     int[] boundVars = Ints.toArray(args.subList(0, args.size() - 1));
-    int[] freeVars = new int[] {boundVars.length};
+    int[] freeVars = new int[boundVars.length];
     for (int i = 0; i < boundVars.length; i++) {
       // use from cached variable mapping
       freeVars[i] =
