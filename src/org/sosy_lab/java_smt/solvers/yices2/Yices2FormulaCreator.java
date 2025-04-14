@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ABS;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_AND;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
@@ -267,10 +268,12 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     if (maybeFormula != null) {
       return maybeFormula;
     }
-    if (formulaCache.containsRow(name)) {
-      throw new IllegalArgumentException(
-          "Symbol " + name + " already used for a variable of type " + formulaCache.row(name));
-    }
+    checkArgument(
+        !formulaCache.containsRow(name),
+        "Symbol '%s' already used for a variable of type '%s'",
+        name,
+        formulaCache.row(name));
+
     int var = yices_new_uninterpreted_term(type);
     // Names in Yices2 behave like a stack. The last variable named is retrieved when asking for
     // a term with a specific name. Since we substitute free vars with bound for quantifiers,
@@ -293,21 +296,19 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     int termFromName = yices_get_term_by_name(name);
     if (termFromName != -1) {
       int termFromNameType = yices_type_of_term(termFromName);
-      if (type == termFromNameType) {
-        int constructor = yices_term_constructor(termFromName);
-        if (constructor == YICES_VARIABLE) {
-          // Already a bound var
-          return termFromName;
-        }
-        // Fall-through to creation of new bound variable
-      } else {
-        throw new IllegalArgumentException(
-            String.format(
-                "Can't create variable with name '%s' and type '%s' "
-                    + "as it would omit a variable with type '%s'",
-                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
+      checkArgument(
+          type == termFromNameType,
+          "Cannot override symbol '%s' with new symbol '%s' of type '%s'",
+          yices_type_to_string(termFromNameType),
+          name,
+          yices_type_to_string(type));
+      int constructor = yices_term_constructor(termFromName);
+      if (constructor == YICES_VARIABLE) {
+        // Already a bound var
+        return termFromName;
       }
     }
+
     // reset term name binding
     // TODO: add yices_remove_term_name();
     int bound = yices_new_variable(type);
@@ -551,9 +552,9 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
    * <p>Only call this method for terms that are nested conjunctions!
    */
   private static List<Integer> getNestedConjunctionArgs(int outerTerm) {
-    Preconditions.checkArgument(yices_term_constructor(outerTerm) == YICES_NOT_TERM);
+    checkArgument(yices_term_constructor(outerTerm) == YICES_NOT_TERM);
     int middleTerm = yices_term_child(outerTerm, 0);
-    Preconditions.checkArgument(yices_term_constructor(middleTerm) == YICES_OR_TERM);
+    checkArgument(yices_term_constructor(middleTerm) == YICES_OR_TERM);
     List<Integer> result = new ArrayList<>();
     for (int child : getArgs(middleTerm)) {
       result.add(yices_not(child));
@@ -614,21 +615,21 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
 
   /** extract -1 and X from the sum of one element [-1*x]. */
   private static List<Integer> getMultiplyBvSumArgsFromSum(int parent) {
-    Preconditions.checkArgument(yices_term_num_children(parent) == 1);
+    checkArgument(yices_term_num_children(parent) == 1);
     int bitsize = yices_term_bitsize(parent);
     int[] component = yices_bvsum_component(parent, 0, bitsize);
     int coeff = yices_bvconst_from_array(bitsize, Arrays.copyOfRange(component, 0, bitsize));
     int term = component[component.length - 1];
-    Preconditions.checkArgument(term != -1, "unexpected constant coeff without variable");
+    checkArgument(term != -1, "unexpected constant coeff without variable");
     return ImmutableList.of(coeff, term);
   }
 
   /** extract -1 and X from the sum of one element [-1*x]. */
   private static List<Integer> getMultiplySumArgsFromSum(int parent) {
-    Preconditions.checkArgument(yices_term_num_children(parent) == 1);
+    checkArgument(yices_term_num_children(parent) == 1);
     String[] child = yices_sum_component(parent, 0);
     int term = Integer.parseInt(child[1]);
-    Preconditions.checkArgument(term != -1, "unexpected constant coeff without variable");
+    checkArgument(term != -1, "unexpected constant coeff without variable");
     int coeffTerm = yices_parse_rational(child[0]);
     return ImmutableList.of(coeffTerm, term);
   }
@@ -771,7 +772,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private void checkArgsLength(String kind, List<Integer> pArgs, final int expectedLength) {
-    Preconditions.checkArgument(
+    checkArgument(
         pArgs.size() == expectedLength,
         "%s with %s expected arguments was called with unexpected arguments: %s",
         kind,
@@ -800,34 +801,33 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
   }
 
   private Object parseNumeralValue(Integer pF, FormulaType<?> type) {
-    if (yices_term_constructor(pF) == YICES_ARITH_CONST) {
-      String value = yices_rational_const_value(pF);
-      if (type.isRationalType()) {
-        Rational ratValue = Rational.of(value);
-        return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
-      } else if (type.isIntegerType()) {
-        return new BigInteger(value);
-      } else {
-        throw new IllegalArgumentException("Unexpected type: " + type);
-      }
+    checkArgument(
+        yices_term_constructor(pF) == YICES_ARITH_CONST,
+        "Term: '%s' with type '%s' is not an arithmetic constant",
+        yices_term_to_string(pF),
+        yices_type_to_string(yices_type_of_term(pF)));
+
+    String value = yices_rational_const_value(pF);
+    if (type.isRationalType()) {
+      Rational ratValue = Rational.of(value);
+      return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
+    } else if (type.isIntegerType()) {
+      return new BigInteger(value);
     } else {
-      throw new IllegalArgumentException(
-          String.format(
-              "Term: '%s' with type '%s' is not an arithmetic constant",
-              yices_term_to_string(pF), yices_type_to_string(yices_type_of_term(pF))));
+      throw new IllegalArgumentException("Unexpected type: " + type);
     }
   }
 
   private BigInteger parseBitvector(int pF) {
-    if (yices_term_constructor(pF) == YICES_BV_CONST) {
-      int[] littleEndianBV = yices_bv_const_value(pF, yices_term_bitsize(pF));
-      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
-      String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
-      return new BigInteger(bigEndianBV, 2);
-    } else {
-      throw new IllegalArgumentException(
-          String.format("Term: '%s' is not a bitvector constant", yices_term_to_string(pF)));
-    }
+    checkArgument(
+        yices_term_constructor(pF) == YICES_BV_CONST,
+        "Term: '%s' is not a bitvector constant",
+        yices_term_to_string(pF));
+
+    int[] littleEndianBV = yices_bv_const_value(pF, yices_term_bitsize(pF));
+    checkArgument(littleEndianBV.length != 0, "BV was empty");
+    String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
+    return new BigInteger(bigEndianBV, 2);
   }
 
   @Override
