@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
@@ -93,7 +94,6 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
@@ -307,7 +307,7 @@ public class Yices2NativeApiTest {
     int bv = yices_bvconst_int64(4, value);
     if (yices_term_constructor(bv) == YICES_BV_CONST) {
       int[] littleEndianBV = yices_bv_const_value(bv, yices_term_bitsize(bv));
-      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
+      checkArgument(littleEndianBV.length != 0, "BV was empty");
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
       BigInteger big = new BigInteger(bigEndianBV, 2);
       assertThat(big).isEqualTo(BigInteger.valueOf(value));
@@ -629,21 +629,20 @@ public class Yices2NativeApiTest {
 
   /**
    * Only to be used for tests in this class. Old implementation used for creating/retrieving named
-   * variables. Superseded by Yices2FormulaCreator.createNamedVariable() for reasons outlined there.
+   * variables. Superseded by {@link Yices2FormulaCreator#createNamedVariable} for reasons outlined
+   * there.
    */
   private static int yices_named_variable(int type, String name) {
     int termFromName = yices_get_term_by_name(name);
     if (termFromName != -1) {
       int termFromNameType = yices_type_of_term(termFromName);
-      if (type == termFromNameType) {
-        return termFromName;
-      } else {
-        throw new IllegalArgumentException(
-            String.format(
-                "Can't create variable with name '%s' and type '%s' "
-                    + "as it would omit a variable with type '%s'",
-                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
-      }
+      checkArgument(
+          type == termFromNameType,
+          "Cannot override symbol '%s' with new symbol '%s' of type '%s'",
+          yices_type_to_string(termFromNameType),
+          name,
+          yices_type_to_string(type));
+      return termFromName;
     }
     int var = yices_new_uninterpreted_term(type);
     yices_set_term_name(var, name);

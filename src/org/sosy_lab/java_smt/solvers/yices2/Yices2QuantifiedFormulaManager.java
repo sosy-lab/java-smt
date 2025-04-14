@@ -8,12 +8,13 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import com.google.common.primitives.Ints;
-import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -35,26 +36,19 @@ public class Yices2QuantifiedFormulaManager
 
   @Override
   public Integer mkQuantifier(Quantifier pQ, List<Integer> pVars, Integer pBody) {
-    // Quantifier support is very limited in Yices2
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable list for Quantifier.");
-    } else {
-      List<Integer> yicesVars = new ArrayList<>();
-      for (int var : pVars) {
-        yicesVars.add(
-            ((Yices2FormulaCreator) formulaCreator).createBoundVariableFromFreeVariable(var));
-      }
-      int substBody = pBody;
-      substBody =
-          yices_subst_term(
-              yicesVars.size(), Ints.toArray(pVars), Ints.toArray(yicesVars), substBody);
+    checkArgument(
+        !pVars.isEmpty(),
+        "Missing variables for quantifier '%s' and body '%s'.",
+        pQ,
+        yices_term_to_string(pBody));
 
-      int[] terms = Ints.toArray(yicesVars);
-      if (pQ == Quantifier.FORALL) {
-        return yices_forall(terms.length, terms, substBody);
-      } else {
-        return yices_exists(terms.length, terms, substBody);
-      }
+    Yices2FormulaCreator creator = (Yices2FormulaCreator) formulaCreator;
+    int[] vars = pVars.stream().mapToInt(creator::createBoundVariableFromFreeVariable).toArray();
+    int substBody = yices_subst_term(vars.length, Ints.toArray(pVars), vars, pBody);
+    if (pQ == Quantifier.FORALL) {
+      return yices_forall(vars.length, vars, substBody);
+    } else {
+      return yices_exists(vars.length, vars, substBody);
     }
   }
 }
