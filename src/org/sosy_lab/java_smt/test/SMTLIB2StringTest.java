@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.basicimpl.Generator;
 
-@SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored","EqualsIncompatibleType"})
+@SuppressWarnings({"CheckReturnValue", "ReturnValueIgnored", "EqualsIncompatibleType"})
 public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Before
   public void setUp() {
@@ -342,7 +342,6 @@ public class SMTLIB2StringTest extends SolverBasedTest0.ParameterizedSolverBased
             + "(assert (str.in_re a (re.inter (str.to_re \"a\") (str.to_re \"b\"))))\n";
 
     BooleanFormula actualResult = mgr.universalParseFromString(x);
-
 
     assertThat(
         actualResult.equals(
