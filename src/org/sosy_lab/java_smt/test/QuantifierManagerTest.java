@@ -15,10 +15,9 @@ import static org.sosy_lab.java_smt.api.FormulaType.StringType;
 
 import com.google.common.collect.ImmutableList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.sosy_lab.common.UniqueIdGenerator;
@@ -679,81 +678,147 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     assertThat(out).isEqualTo(imgr.equal(x, imgr.makeNumber(7)));
   }
 
-  @Test
-  public void testIntrospectionForall() {
-    setUpLIA();
-    BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
+  private static final class QuantifierVisitor extends DefaultFormulaVisitor<Void> {
+    Quantifier foundQuantifier = null;
+    Collection<Formula> foundBoundVariables = null;
+    BooleanFormula foundBody = null;
 
-    final AtomicBoolean isQuantifier = new AtomicBoolean(false);
-    final AtomicBoolean isForall = new AtomicBoolean(false);
-    final AtomicInteger numBound = new AtomicInteger(0);
+    @Override
+    protected Void visitDefault(Formula f) {
+      return null;
+    }
 
-    // Test introspection with visitors.
-    mgr.visit(
-        forall,
-        new DefaultFormulaVisitor<Void>() {
-          @Override
-          protected Void visitDefault(Formula f) {
-            return null;
-          }
-
-          @Override
-          public Void visitQuantifier(
-              BooleanFormula f,
-              Quantifier quantifier,
-              List<Formula> boundVariables,
-              BooleanFormula body) {
-            isForall.set(quantifier == Quantifier.FORALL);
-            isQuantifier.set(true);
-            numBound.set(boundVariables.size());
-            return null;
-          }
-        });
+    @Override
+    public Void visitQuantifier(
+        BooleanFormula f,
+        Quantifier quantifier,
+        List<Formula> boundVariables,
+        BooleanFormula body) {
+      foundQuantifier = quantifier;
+      foundBoundVariables = boundVariables;
+      foundBody = body;
+      return null;
+    }
   }
 
   @Test
-  public void testIntrospectionExists() {
-    setUpLIA();
-    BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
-    final AtomicBoolean isQuantifier = new AtomicBoolean(false);
-    final AtomicBoolean isForall = new AtomicBoolean(false);
-    final List<Formula> boundVars = new ArrayList<>();
-
-    // Test introspection with visitors.
-    mgr.visit(
-        exists,
-        new DefaultFormulaVisitor<Void>() {
-          @Override
-          protected Void visitDefault(Formula f) {
-            return null;
-          }
-
-          @Override
-          public Void visitQuantifier(
-              BooleanFormula f,
-              Quantifier quantifier,
-              List<Formula> boundVariables,
-              BooleanFormula body) {
-            assertThat(isQuantifier.get()).isFalse();
-            isForall.set(quantifier == Quantifier.FORALL);
-            isQuantifier.set(true);
-            boundVars.addAll(boundVariables);
-            return null;
-          }
-        });
-    assertThat(isQuantifier.get()).isTrue();
-    assertThat(isForall.get()).isFalse();
-
+  public void testIntrospectionForallArray() {
     assume()
         .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
         .that(solverToUse())
         .isNotEqualTo(Solvers.PRINCESS);
-    assertThat(boundVars).hasSize(1);
+
+    setUpLIA();
+    BooleanFormula forall = qmgr.forall(ImmutableList.of(x), a_at_x_eq_0);
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(forall, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.FORALL);
+    assertThat(v.foundBoundVariables).containsExactly(x);
+    assertThat(mgr.extractVariables(v.foundBody)).containsExactlyEntriesIn(Map.of("x", x, "a", a));
+  }
+
+  @Test
+  public void testIntrospectionForallBoolean() {
+    assume()
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    setUp();
+    BooleanFormula x1 = bmgr.makeVariable("x1");
+    BooleanFormula y1 = bmgr.makeVariable("y1");
+    BooleanFormula forall = qmgr.forall(ImmutableList.of(x1), bmgr.and(x1, y1));
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(forall, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.FORALL);
+    assertThat(v.foundBoundVariables).containsExactly(x1);
+    assertThat(mgr.extractVariables(v.foundBody))
+        .containsExactlyEntriesIn(Map.of("x1", x1, "y1", y1));
+  }
+
+  @Test
+  public void testIntrospectionForallInteger() {
+    requireIntegers();
+    assume()
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    setUp();
+    IntegerFormula x1 = imgr.makeVariable("x1");
+    IntegerFormula y1 = imgr.makeVariable("y1");
+    BooleanFormula forall = qmgr.forall(ImmutableList.of(x1), imgr.equal(x1, y1));
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(forall, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.FORALL);
+    assertThat(v.foundBoundVariables).containsExactly(x1);
+    assertThat(mgr.extractVariables(v.foundBody))
+        .containsExactlyEntriesIn(Map.of("x1", x1, "y1", y1));
+  }
+
+  @Test
+  public void testIntrospectionExistsArray() {
+    assume()
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    setUpLIA();
+    BooleanFormula exists = qmgr.exists(ImmutableList.of(x), a_at_x_eq_0);
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(exists, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.EXISTS);
+    assertThat(v.foundBoundVariables).containsExactly(x);
+    assertThat(mgr.extractVariables(v.foundBody)).containsExactlyEntriesIn(Map.of("x", x, "a", a));
+  }
+
+  @Test
+  public void testIntrospectionExistsBoolean() {
+    assume()
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    setUp();
+    BooleanFormula x1 = bmgr.makeVariable("x1");
+    BooleanFormula y1 = bmgr.makeVariable("y1");
+    BooleanFormula exists = qmgr.exists(ImmutableList.of(x1), bmgr.or(x1, y1));
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(exists, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.EXISTS);
+    assertThat(v.foundBoundVariables).containsExactly(x1);
+    assertThat(mgr.extractVariables(v.foundBody))
+        .containsExactlyEntriesIn(Map.of("x1", x1, "y1", y1));
+  }
+
+  @Test
+  public void testIntrospectionExistsInteger() {
+    requireIntegers();
+    assume()
+        .withMessage("Quantifier introspection in JavaSMT for Princess is currently not complete.")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
+
+    setUp();
+    IntegerFormula x1 = imgr.makeVariable("x1");
+    IntegerFormula y1 = imgr.makeVariable("y1");
+    BooleanFormula exists = qmgr.exists(ImmutableList.of(x1), imgr.equal(x1, y1));
+
+    QuantifierVisitor v = new QuantifierVisitor();
+    mgr.visit(exists, v);
+    assertThat(v.foundQuantifier).isEqualTo(Quantifier.EXISTS);
+    assertThat(v.foundBoundVariables).containsExactly(x1);
+    assertThat(mgr.extractVariables(v.foundBody))
+        .containsExactlyEntriesIn(Map.of("x1", x1, "y1", y1));
   }
 
   @Test
   public void testEmpty() {
-
     assume()
         .withMessage("TODO: The JavaSMT code for Princess explicitly allows this.")
         .that(solverToUse())
