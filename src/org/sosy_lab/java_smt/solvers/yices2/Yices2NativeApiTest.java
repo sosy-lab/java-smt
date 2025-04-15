@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
@@ -16,8 +17,10 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_S
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_EQ_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_FORALL_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_NOT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_OR_TERM;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_POWER_PRODUCT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_add;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_and2;
@@ -42,11 +45,14 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_check_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_context_disable_option;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_eq;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exit;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_false;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_by_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
@@ -54,11 +60,12 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int32;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int64;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_int_type;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_is_thread_safe;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_mul;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_named_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_config;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_context;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_uninterpreted_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_new_variable;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_not;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_or2;
@@ -82,16 +89,15 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_is
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_num_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to_string;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -196,6 +202,7 @@ public class Yices2NativeApiTest {
     assertThat(yices_check_context(env, 0)).isEqualTo(UNSAT);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test
   public void rationalError() {
     assertThrows(IllegalArgumentException.class, () -> yices_rational32(1, 0));
@@ -204,10 +211,10 @@ public class Yices2NativeApiTest {
   @Test
   public void negativeRationalError() {
     // TODO negative unsigned integer causes no error. Need to ensure positive value before
-    int rat = yices_rational32(1, -5);
-    System.out.println(rat); // "use" variable
+    assertThat(yices_rational32(1, -5)).isGreaterThan(0);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test
   public void wrongType() {
     int one = yices_int32(1);
@@ -300,7 +307,7 @@ public class Yices2NativeApiTest {
     int bv = yices_bvconst_int64(4, value);
     if (yices_term_constructor(bv) == YICES_BV_CONST) {
       int[] littleEndianBV = yices_bv_const_value(bv, yices_term_bitsize(bv));
-      Preconditions.checkArgument(littleEndianBV.length != 0, "BV was empty");
+      checkArgument(littleEndianBV.length != 0, "BV was empty");
       String bigEndianBV = Joiner.on("").join(Lists.reverse(Ints.asList(littleEndianBV)));
       BigInteger big = new BigInteger(bigEndianBV, 2);
       assertThat(big).isEqualTo(BigInteger.valueOf(value));
@@ -473,80 +480,100 @@ public class Yices2NativeApiTest {
     int[] oneX = {three, x};
     int sumOneX = yices_sum(2, oneX);
     for (int i = 0; i < yices_term_num_children(sumOneX); i++) {
-      System.out.println(yices_term_to_string(sumOneX));
-      System.out.println(Arrays.toString(yices_sum_component(sumOneX, i)));
+      assertThat(yices_term_to_string(sumOneX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumOneX, i))).isNotNull();
     }
     int[] twoX = {three, x, x};
     int sumTwoX = yices_sum(3, twoX);
     for (int i = 0; i < yices_term_num_children(sumTwoX); i++) {
-      System.out.println(yices_term_to_string(sumTwoX));
-      System.out.println(Arrays.toString(yices_sum_component(sumTwoX, i)));
+      assertThat(yices_term_to_string(sumTwoX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumTwoX, i))).isNotNull();
     }
     int[] twoThrees = {three, x, three};
     int sumTwoThrees = yices_sum(3, twoThrees);
     for (int i = 0; i < yices_term_num_children(sumTwoThrees); i++) {
-      System.out.println(yices_term_to_string(sumTwoThrees));
-      System.out.println(Arrays.toString(yices_sum_component(sumTwoThrees, i)));
+      assertThat(yices_term_to_string(sumTwoThrees)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumTwoThrees, i))).isNotNull();
     }
     int xTimesRational = yices_mul(rat, x);
     int[] ratSum = {three, xTimesRational};
     int sumRatX = yices_sum(2, ratSum);
     for (int i = 0; i < yices_term_num_children(sumRatX); i++) {
-      System.out.println(yices_term_to_string(sumRatX));
-      System.out.println(Arrays.toString(yices_sum_component(sumRatX, i)));
+      assertThat(yices_term_to_string(sumRatX)).isNotNull();
+      assertThat(Arrays.toString(yices_sum_component(sumRatX, i))).isNotNull();
     }
   }
 
   @Test
   public void bvSumComponents() {
-    int bv1 = yices_parse_bvbin("00101");
+    String bv1StringValue = "00101";
+    int bv1 = yices_parse_bvbin(bv1StringValue);
     int bv5type = yices_bv_type(5);
     int x = yices_named_variable(bv5type, "x");
     int negativeX = yices_bvmul(yices_bvconst_minus_one(5), x);
     int add = yices_bvadd(bv1, negativeX);
-    for (int i = 0; i < yices_term_num_children(add); i++) {
-      System.out.println(yices_term_to_string(add));
-      int[] component = yices_bvsum_component(add, i, yices_term_bitsize(add));
-      String value =
-          Joiner.on("")
-              .join(
-                  Lists.reverse(
-                      Ints.asList(Arrays.copyOfRange(component, 0, component.length - 1))));
-      int term = component[component.length - 1];
-      System.out.println("Value of coefficient: " + value);
-      System.out.println("Coefficient as BigInt: " + new BigInteger(value, 2));
-      System.out.println("Term id: " + term);
-    }
+    assertThat(yices_term_num_children(add)).isEqualTo(2);
+    assertThat(yices_term_to_string(add)).isNotNull();
+
+    int[] component1 = yices_bvsum_component(add, 0, yices_term_bitsize(add));
+    String value1 =
+        Joiner.on("")
+            .join(
+                Lists.reverse(
+                    Ints.asList(Arrays.copyOfRange(component1, 0, component1.length - 1))));
+    int term1 = component1[component1.length - 1];
+    // Value of coefficient
+    assertThat(value1).isEqualTo(bv1StringValue);
+    // Coefficient as BigInt
+    assertThat(new BigInteger(value1, 2)).isEqualTo(BigInteger.valueOf(5));
+    // Term id is NULL (-1) for i = 0
+    assertThat(term1).isEqualTo(-1);
+
+    int[] component2 = yices_bvsum_component(add, 1, yices_term_bitsize(add));
+    String value2 =
+        Joiner.on("")
+            .join(
+                Lists.reverse(
+                    Ints.asList(Arrays.copyOfRange(component2, 0, component2.length - 1))));
+    int term2 = component2[component2.length - 1];
+    // Value of coefficient (-1 == 11111)
+    assertThat(value2).isEqualTo("11111");
+    // Coefficient as BigInt (31 because it has no sign bit, and -1 is max for bv)
+    assertThat(new BigInteger(value2, 2)).isEqualTo(BigInteger.valueOf(31));
+    // Term id is NULL (-1) for i = 0
+    assertThat(term2).isEqualTo(x);
   }
 
-  @Test
+  @SuppressWarnings("CheckReturnValue")
+  @Test(expected = IllegalArgumentException.class)
   public void bvExtensionStructureTest() {
+    int initialSize = 5;
     int extendBy = 5;
-    int x = yices_named_variable(yices_bv_type(5), "x");
-    List<Integer> terms = new ArrayList<>();
-    terms.add(yices_sign_extend(x, extendBy));
-    terms.add(yices_sign_extend(x, extendBy));
-    terms.add(yices_zero_extend(x, extendBy));
-    terms.add(yices_zero_extend(x, extendBy));
-    for (int t : terms) {
-      System.out.println("--------BEGIN-------");
-      System.out.println(yices_term_to_string(t));
-      for (int i = 0; i < yices_term_num_children(t); i++) {
-        System.out.println(yices_term_to_string(yices_term_child(t, i)));
-      }
-      int bv = yices_proj_arg(yices_term_child(t, 0));
-      int bvSize = yices_term_bitsize(bv);
-      int extendedBy = yices_term_num_children(t) - bvSize;
-      System.out.println("Extended by: " + extendedBy);
-      if (extendedBy != 0) {
-        if (yices_term_child(t, bvSize) == yices_false()) {
-          System.out.println("Zero-Extend");
-        } else {
-          System.out.println("Sign-extend");
-        }
-      }
-      System.out.println("--------END-------");
-    }
+    int x = yices_named_variable(yices_bv_type(initialSize), "x");
+    int signExtendedX = yices_sign_extend(x, extendBy);
+    int zeroExtendedX = yices_zero_extend(x, extendBy);
+
+    assertThat(yices_term_to_string(x)).isNotNull();
+    assertThat(yices_term_num_children(x)).isEqualTo(0);
+    assertThat(yices_term_num_children(signExtendedX)).isEqualTo(initialSize + extendBy);
+    assertThat(yices_term_to_string(signExtendedX)).isNotNull();
+    assertThat(yices_term_num_children(zeroExtendedX)).isEqualTo(initialSize + extendBy);
+    assertThat(yices_term_to_string(zeroExtendedX)).isNotNull();
+
+    int bvSignExt = yices_proj_arg(yices_term_child(signExtendedX, 0));
+    int bvSizeSignExt = yices_term_bitsize(bvSignExt);
+    int extendedBySignExt = yices_term_num_children(signExtendedX) - bvSizeSignExt;
+    assertThat(extendedBySignExt).isEqualTo(extendBy);
+
+    int bvZeroExt = yices_proj_arg(yices_term_child(zeroExtendedX, 0));
+    int bvSizeZeroExt = yices_term_bitsize(bvZeroExt);
+    int extendedByZeroExt = yices_term_num_children(zeroExtendedX) - bvSizeZeroExt;
+    assertThat(extendedByZeroExt).isEqualTo(extendBy);
+
+    assertThat(yices_term_child(zeroExtendedX, bvSizeZeroExt)).isEqualTo(yices_false());
+    assertThat(yices_term_child(signExtendedX, bvSizeSignExt)).isNotEqualTo(yices_false());
+
+    yices_proj_arg(yices_term_child(x, 0)); // throws
   }
 
   @Test
@@ -572,10 +599,53 @@ public class Yices2NativeApiTest {
     int type = yices_bv_type(5);
     int bv2 = yices_named_variable(type, "x");
     int mul = yices_bvmul(bv2, bv2);
-    System.out.println(yices_term_constructor(mul));
+    assertThat(yices_term_constructor(mul)).isEqualTo(YICES_POWER_PRODUCT);
+    // bv2 + bv2 == bv2²
     int[] component = yices_product_component(mul, 0);
-    System.out.println(component[0]);
-    System.out.println(component[1]);
-    System.out.println(yices_term_constructor(yices_bvpower(component[0], component[1])));
+    assertThat(component[0]).isEqualTo(bv2);
+    assertThat(component[1]).isEqualTo(2);
+    assertThat(yices_term_constructor(yices_bvpower(component[0], component[1]))).isGreaterThan(0);
+  }
+
+  @Test
+  public void isThreadSafe() {
+    // TODO: this explains why our concurrency tests fail ;D FIX!
+    assertThat(yices_is_thread_safe()).isEqualTo(0);
+  }
+
+  @Test
+  public void quantifierTest() {
+    int boundVar = yices_new_variable(yices_int_type());
+    int eleven = yices_int32(11);
+    int body = yices_eq(eleven, boundVar);
+
+    int forall = yices_forall(1, new int[] {boundVar}, body);
+    int exists = yices_exists(1, new int[] {boundVar}, body);
+
+    assertThat(yices_term_constructor(forall)).isEqualTo(YICES_FORALL_TERM);
+    assertThat(yices_term_constructor(exists)).isEqualTo(YICES_NOT_TERM);
+    assertThat(yices_term_constructor(yices_term_child(exists, 0))).isEqualTo(YICES_FORALL_TERM);
+  }
+
+  /**
+   * Only to be used for tests in this class. Old implementation used for creating/retrieving named
+   * variables. Superseded by {@link Yices2FormulaCreator#createNamedVariable} for reasons outlined
+   * there.
+   */
+  private static int yices_named_variable(int type, String name) {
+    int termFromName = yices_get_term_by_name(name);
+    if (termFromName != -1) {
+      int termFromNameType = yices_type_of_term(termFromName);
+      checkArgument(
+          type == termFromNameType,
+          "Cannot override symbol '%s' with new symbol '%s' of type '%s'",
+          yices_type_to_string(termFromNameType),
+          name,
+          yices_type_to_string(type));
+      return termFromName;
+    }
+    int var = yices_new_uninterpreted_term(type);
+    yices_set_term_name(var, name);
+    return var;
   }
 }
