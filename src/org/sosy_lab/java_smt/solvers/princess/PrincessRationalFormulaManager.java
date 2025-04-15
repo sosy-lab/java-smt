@@ -13,12 +13,11 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.ITerm;
 import ap.theories.rationals.Rationals;
-import ap.types.Sort;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -108,8 +107,9 @@ public class PrincessRationalFormulaManager
     return getFormulaCreator().makeVariable(PrincessEnvironment.FRACTION_SORT, varName);
   }
 
-  /** Make sure the value is real and add a cast if necessary */
-  private ITerm toReal(ITerm number) {
+  @Override
+  protected ITerm toType(IExpression param) {
+    ITerm number = (ITerm) param;
     return formulaCreator.getFormulaType(number).isIntegerType()
         ? Rationals.int2ring(number)
         : number;
@@ -122,68 +122,57 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected ITerm negate(IExpression number) {
-    return Rationals.minus(toReal((ITerm) number));
+    return Rationals.minus(toType(number));
   }
 
   @Override
   protected ITerm add(IExpression number1, IExpression number2) {
-    return Rationals.plus(toReal((ITerm) number1), toReal((ITerm) number2));
-  }
-
-  @Override
-  protected IExpression sumImpl(List<IExpression> operands) {
-    List<IExpression> castOperands =
-        FluentIterable.from(operands).transform(t -> (IExpression) toReal((ITerm) t)).toList();
-    return super.sumImpl(castOperands);
+    return Rationals.plus(toType(number1), toType(number2));
   }
 
   @Override
   protected ITerm subtract(IExpression number1, IExpression number2) {
-    return Rationals.minus(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.minus(toType(number1), toType(number2));
   }
 
   @Override
   protected IExpression multiply(IExpression number1, IExpression number2) {
-    return Rationals.mul(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.mul(toType(number1), toType(number2));
   }
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
-    return Rationals.div(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.div(toType(number1), toType(number2));
   }
 
   @Override
   protected IFormula equal(IExpression number1, IExpression number2) {
-    return super.equal(toReal((ITerm) number1), toReal((ITerm) number2));
+    return super.equal(toType(number1), toType(number2));
   }
 
   @Override
   protected IExpression distinctImpl(List<IExpression> operands) {
-    List<IExpression> castOperands =
-        FluentIterable.from(operands)
-                .anyMatch(t -> Sort.sortOf((ITerm) t).equals(PrincessEnvironment.FRACTION_SORT))
-            ? FluentIterable.from(operands).transform(t -> (IExpression) toReal((ITerm) t)).toList()
-            : operands;
-    return super.distinctImpl(castOperands);
+    List<IExpression> castedOps = operands.stream().map(this::toType).collect(Collectors.toList());
+    return super.distinctImpl(castedOps);
   }
 
   @Override
   protected IFormula greaterThan(IExpression number1, IExpression number2) {
-    return Rationals.gt(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.gt(toType(number1), toType(number2));
   }
 
   @Override
   protected IFormula greaterOrEquals(IExpression number1, IExpression number2) {
-    return Rationals.geq(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.geq(toType(number1), toType(number2));
   }
 
   @Override
   protected IFormula lessThan(IExpression number1, IExpression number2) {
-    return Rationals.lt(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.lt(toType(number1), toType(number2));
   }
 
   @Override
   protected IFormula lessOrEquals(IExpression number1, IExpression number2) {
-    return Rationals.leq(toReal((ITerm) number1), toReal((ITerm) number2));
+    return Rationals.leq(toType(number1), toType(number2));
   }
 }
