@@ -14,13 +14,18 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.collect.ImmutableList;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Before;
 import org.junit.Test;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -34,44 +39,96 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   }
 
   /** Check if this unary operation returns the expected value. */
-  private void testOperation(
+  private void testRationalOperation(
       Function<NumeralFormula, NumeralFormula> f, NumeralFormula arg, NumeralFormula expected)
       throws SolverException, InterruptedException {
-    assertThatFormula(rmgr.equal(f.apply(arg), expected)).isSatisfiable();
+    assertThatFormula(rmgr.equal(f.apply(arg), expected)).isTautological();
     assertThat(mgr.getFormulaType(f.apply(arg)).isRationalType()).isTrue();
   }
 
   /** Check if this binary operation returns the expected value. */
-  private void testOperation(
+  private void testRationalOperation(
       BiFunction<NumeralFormula, NumeralFormula, NumeralFormula> f,
       NumeralFormula arg1,
       NumeralFormula arg2,
       NumeralFormula expected)
       throws SolverException, InterruptedException {
-    assertThatFormula(rmgr.equal(f.apply(arg1, arg2), expected)).isSatisfiable();
+    assertThatFormula(rmgr.equal(f.apply(arg1, arg2), expected)).isTautological();
     assertThat(mgr.getFormulaType(f.apply(arg1, arg2)).isRationalType()).isTrue();
   }
 
-  /** Same as unary testOperation(), but we expect the result to be an integer term. */
+  /** Same as unary testRationalOperation(), but we expect the result to be an integer term. */
   private void testIntegerOperation(
       Function<NumeralFormula, IntegerFormula> f, NumeralFormula arg, IntegerFormula expected)
       throws SolverException, InterruptedException {
-    assertThatFormula(imgr.equal(f.apply(arg), expected)).isSatisfiable();
+    assertThatFormula(imgr.equal(f.apply(arg), expected)).isTautological();
     assertThat(mgr.getFormulaType(f.apply(arg)).isIntegerType()).isTrue();
   }
 
   @Test
+  public void createIntegerNumberTest() throws SolverException, InterruptedException {
+    IntegerFormula num1 = imgr.makeNumber(1.0);
+    for (IntegerFormula num2 :
+        List.of(
+            imgr.makeNumber(1.0),
+            imgr.makeNumber("1"),
+            imgr.makeNumber(1),
+            imgr.makeNumber(BigInteger.ONE),
+            imgr.makeNumber(BigDecimal.ONE),
+            imgr.makeNumber(Rational.ONE))) {
+      assertThatFormula(imgr.equal(num1, num2)).isTautological();
+      assertThat(mgr.getFormulaType(num2).isIntegerType()).isTrue();
+      assertThat(num2).isEqualTo(num1);
+    }
+  }
+
+  @Test
+  public void createRationalNumberTest() throws SolverException, InterruptedException {
+    RationalFormula num1 = rmgr.makeNumber(1.0);
+    for (RationalFormula num2 :
+        List.of(
+            rmgr.makeNumber(1.0),
+            rmgr.makeNumber("1"),
+            rmgr.makeNumber(1),
+            rmgr.makeNumber(BigInteger.ONE),
+            rmgr.makeNumber(BigDecimal.ONE),
+            rmgr.makeNumber(Rational.ONE))) {
+      assertThatFormula(rmgr.equal(num1, num2)).isTautological();
+      assertThat(mgr.getFormulaType(num2).isRationalType()).isTrue();
+      assertThat(num2).isEqualTo(num1);
+    }
+  }
+
+  @Test
+  public void createRational2NumberTest() throws SolverException, InterruptedException {
+    RationalFormula num1 = rmgr.makeNumber(1.5);
+    for (RationalFormula num2 :
+        List.of(
+            rmgr.makeNumber(1.5),
+            rmgr.makeNumber("1.5"),
+            rmgr.makeNumber(BigDecimal.valueOf(1.5)),
+            rmgr.makeNumber(Rational.ofLongs(3, 2)))) {
+      assertThatFormula(rmgr.equal(num1, num2)).isTautological();
+      assertThat(mgr.getFormulaType(num2).isRationalType()).isTrue();
+      // assertThat(num2).isEqualTo(num1); // some solvers do not normalize rational numbers
+    }
+  }
+
+  @Test
   public void negateTest() throws SolverException, InterruptedException {
-    testOperation(rmgr::negate, imgr.makeNumber(1.5), rmgr.makeNumber(-1.0));
-    testOperation(rmgr::negate, rmgr.makeNumber(1.5), rmgr.makeNumber(-1.5));
+    testRationalOperation(rmgr::negate, imgr.makeNumber(1.5), rmgr.makeNumber(-1.0));
+    testRationalOperation(rmgr::negate, rmgr.makeNumber(1.5), rmgr.makeNumber(-1.5));
   }
 
   @Test
   public void addTest() throws SolverException, InterruptedException {
-    testOperation(rmgr::add, imgr.makeNumber(2), imgr.makeNumber(1), rmgr.makeNumber(3.0));
-    testOperation(rmgr::add, imgr.makeNumber(2), rmgr.makeNumber(1.5), rmgr.makeNumber(3.5));
-    testOperation(rmgr::add, rmgr.makeNumber(1.5), imgr.makeNumber(2), rmgr.makeNumber(3.5));
-    testOperation(rmgr::add, rmgr.makeNumber(1.5), rmgr.makeNumber(2.5), rmgr.makeNumber(4.0));
+    testRationalOperation(rmgr::add, imgr.makeNumber(2), imgr.makeNumber(1), rmgr.makeNumber(3.0));
+    testRationalOperation(
+        rmgr::add, imgr.makeNumber(2), rmgr.makeNumber(1.5), rmgr.makeNumber(3.5));
+    testRationalOperation(
+        rmgr::add, rmgr.makeNumber(1.5), imgr.makeNumber(2), rmgr.makeNumber(3.5));
+    testRationalOperation(
+        rmgr::add, rmgr.makeNumber(1.5), rmgr.makeNumber(2.5), rmgr.makeNumber(4.0));
   }
 
   @Test
@@ -100,33 +157,44 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void subtractTest() throws SolverException, InterruptedException {
-    testOperation(rmgr::subtract, imgr.makeNumber(2), imgr.makeNumber(1), rmgr.makeNumber(1.0));
-    testOperation(rmgr::subtract, imgr.makeNumber(2), rmgr.makeNumber(1.5), rmgr.makeNumber(0.5));
-    testOperation(rmgr::subtract, rmgr.makeNumber(1.5), imgr.makeNumber(2), rmgr.makeNumber(-0.5));
-    testOperation(rmgr::subtract, rmgr.makeNumber(1.5), rmgr.makeNumber(0.5), rmgr.makeNumber(1.0));
+    testRationalOperation(
+        rmgr::subtract, imgr.makeNumber(2), imgr.makeNumber(1), rmgr.makeNumber(1.0));
+    testRationalOperation(
+        rmgr::subtract, imgr.makeNumber(2), rmgr.makeNumber(1.5), rmgr.makeNumber(0.5));
+    testRationalOperation(
+        rmgr::subtract, rmgr.makeNumber(1.5), imgr.makeNumber(2), rmgr.makeNumber(-0.5));
+    testRationalOperation(
+        rmgr::subtract, rmgr.makeNumber(1.5), rmgr.makeNumber(0.5), rmgr.makeNumber(1.0));
   }
 
   @Test
   public void divideTest() throws SolverException, InterruptedException {
-    testOperation(rmgr::divide, imgr.makeNumber(1), imgr.makeNumber(2), rmgr.makeNumber(0.5));
-    testOperation(rmgr::divide, imgr.makeNumber(1), rmgr.makeNumber(2.0), rmgr.makeNumber(0.5));
-    testOperation(rmgr::divide, rmgr.makeNumber(1.0), imgr.makeNumber(2), rmgr.makeNumber(0.5));
-    testOperation(rmgr::divide, rmgr.makeNumber(1.0), rmgr.makeNumber(0.5), rmgr.makeNumber(2.0));
+    testRationalOperation(
+        rmgr::divide, imgr.makeNumber(1), imgr.makeNumber(2), rmgr.makeNumber(0.5));
+    testRationalOperation(
+        rmgr::divide, imgr.makeNumber(1), rmgr.makeNumber(2.0), rmgr.makeNumber(0.5));
+    testRationalOperation(
+        rmgr::divide, rmgr.makeNumber(1.0), imgr.makeNumber(2), rmgr.makeNumber(0.5));
+    testRationalOperation(
+        rmgr::divide, rmgr.makeNumber(1.0), rmgr.makeNumber(0.5), rmgr.makeNumber(2.0));
   }
 
   @Test
   public void multiplyTest() throws SolverException, InterruptedException {
-    testOperation(rmgr::multiply, imgr.makeNumber(2), imgr.makeNumber(3), rmgr.makeNumber(6.0));
-    testOperation(rmgr::multiply, imgr.makeNumber(2), rmgr.makeNumber(1.25), rmgr.makeNumber(2.5));
-    testOperation(rmgr::multiply, rmgr.makeNumber(1.25), imgr.makeNumber(2), rmgr.makeNumber(2.5));
-    testOperation(
+    testRationalOperation(
+        rmgr::multiply, imgr.makeNumber(2), imgr.makeNumber(3), rmgr.makeNumber(6.0));
+    testRationalOperation(
+        rmgr::multiply, imgr.makeNumber(2), rmgr.makeNumber(1.25), rmgr.makeNumber(2.5));
+    testRationalOperation(
+        rmgr::multiply, rmgr.makeNumber(1.25), imgr.makeNumber(2), rmgr.makeNumber(2.5));
+    testRationalOperation(
         rmgr::multiply, rmgr.makeNumber(1.5), rmgr.makeNumber(2.5), rmgr.makeNumber(3.75));
   }
 
   @Test
   public void equalTest() throws SolverException, InterruptedException {
-    assertThatFormula(rmgr.equal(imgr.makeNumber(1.5), rmgr.makeNumber(1.0))).isSatisfiable();
-    assertThatFormula(rmgr.equal(rmgr.makeNumber(1.0), imgr.makeNumber(1.5))).isSatisfiable();
+    assertThatFormula(rmgr.equal(imgr.makeNumber(1.5), rmgr.makeNumber(1.0))).isTautological();
+    assertThatFormula(rmgr.equal(rmgr.makeNumber(1.0), imgr.makeNumber(1.5))).isTautological();
   }
 
   @Test
@@ -143,30 +211,48 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void greaterThanTest() throws SolverException, InterruptedException {
-    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(1.5), rmgr.makeNumber(0.5))).isSatisfiable();
-    assertThatFormula(rmgr.greaterThan(rmgr.makeNumber(1.5), imgr.makeNumber(1.5))).isSatisfiable();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(1.5), rmgr.makeNumber(0.5)))
+        .isTautological();
+    assertThatFormula(rmgr.greaterThan(rmgr.makeNumber(1.5), imgr.makeNumber(1.5)))
+        .isTautological();
+
+    assertThatFormula(rmgr.greaterThan(rmgr.makeNumber(1.5), imgr.makeNumber(1.5)))
+        .isTautological();
+    assertThatFormula(rmgr.greaterThan(rmgr.makeNumber(1.5), rmgr.makeNumber(1.5)))
+        .isUnsatisfiable();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(0.5), rmgr.makeNumber(0))).isUnsatisfiable();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(0), rmgr.makeNumber(0))).isUnsatisfiable();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(0), rmgr.makeNumber(0.5))).isUnsatisfiable();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(1), rmgr.makeNumber(0.5))).isTautological();
+    assertThatFormula(rmgr.greaterThan(imgr.makeNumber(1.5), rmgr.makeNumber(0.5)))
+        .isTautological();
   }
 
   @Test
   public void greaterOrEqualTest() throws SolverException, InterruptedException {
     assertThatFormula(rmgr.greaterOrEquals(imgr.makeNumber(1.5), rmgr.makeNumber(1.0)))
-        .isSatisfiable();
+        .isTautological();
     assertThatFormula(rmgr.greaterOrEquals(rmgr.makeNumber(1.5), imgr.makeNumber(1.5)))
-        .isSatisfiable();
+        .isTautological();
   }
 
   @Test
   public void lessThanTest() throws SolverException, InterruptedException {
-    assertThatFormula(rmgr.lessThan(imgr.makeNumber(1.5), rmgr.makeNumber(1.5))).isSatisfiable();
-    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0.5), imgr.makeNumber(1.5))).isSatisfiable();
+    assertThatFormula(rmgr.lessThan(imgr.makeNumber(1.5), rmgr.makeNumber(1.5))).isTautological();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(1.5), rmgr.makeNumber(1.5))).isUnsatisfiable();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0), imgr.makeNumber(0.5))).isUnsatisfiable();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0), imgr.makeNumber(0))).isUnsatisfiable();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0.5), imgr.makeNumber(0))).isUnsatisfiable();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0.5), imgr.makeNumber(1))).isTautological();
+    assertThatFormula(rmgr.lessThan(rmgr.makeNumber(0.5), imgr.makeNumber(1.5))).isTautological();
   }
 
   @Test
   public void lessOrEqualTest() throws SolverException, InterruptedException {
     assertThatFormula(rmgr.lessOrEquals(imgr.makeNumber(1.5), rmgr.makeNumber(1.0)))
-        .isSatisfiable();
+        .isTautological();
     assertThatFormula(rmgr.lessOrEquals(rmgr.makeNumber(1.5), imgr.makeNumber(2.0)))
-        .isSatisfiable();
+        .isTautological();
   }
 
   @Test
@@ -174,5 +260,18 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
     requireRationalFloor();
     testIntegerOperation(rmgr::floor, imgr.makeNumber(1.0), imgr.makeNumber(1.0));
     testIntegerOperation(rmgr::floor, rmgr.makeNumber(1.5), imgr.makeNumber(1.0));
+  }
+
+  @Test
+  public void simplificationTest() throws InterruptedException {
+    IntegerFormula sumInt = imgr.add(imgr.makeNumber(2), imgr.makeNumber(1));
+    assertThat(mgr.getFormulaType(sumInt).isIntegerType()).isTrue();
+    IntegerFormula simplifiedSumInt = mgr.simplify(sumInt);
+    assertThat(mgr.getFormulaType(simplifiedSumInt).isIntegerType()).isTrue();
+
+    RationalFormula sumRat = rmgr.add(rmgr.makeNumber(2.0), imgr.makeNumber(1.0));
+    assertThat(mgr.getFormulaType(sumRat).isRationalType()).isTrue();
+    RationalFormula simplifiedSumRat = mgr.simplify(sumRat);
+    assertThat(mgr.getFormulaType(simplifiedSumRat).isRationalType()).isTrue();
   }
 }
