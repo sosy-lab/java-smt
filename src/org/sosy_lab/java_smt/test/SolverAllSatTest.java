@@ -205,7 +205,7 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assume()
         .withMessage("solver does only partially support quantifiers")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.BOOLECTOR);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2);
 
     if ("opt".equals(proverEnv)) {
       assume()

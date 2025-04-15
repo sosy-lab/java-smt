@@ -46,21 +46,21 @@ SPDX-License-Identifier: Apache-2.0
             <path refid="classpath"/>
         </path>
 
+        <delete dir="${junit.dir}"/>
         <mkdir dir="${junit.dir}"/>
     </target>
 
-    <target name="unit-tests" depends="build, load-junit, init-unit-tests" description="Run all JUnit tests">
-        <delete dir="{junit.dir}"/>
+    <macrodef name="run-junit-tests">
+      <sequential>
         <junit fork="true" printSummary="true" showOutput="false" failureproperty="junit.failed" timeout="600000">
             <assertions><enable/></assertions>
             <formatter type="xml"/>
             <classpath refid="classpath.junit"/>
             <sysproperty key="java.awt.headless" value="true" />
             <batchtest fork="true" todir="${junit.dir}">
-                <fileset dir="${class.dir}">
-                    <include name="**/*Test.*"/>
-                    <exclude name="**/*$*Test.*"/>
-                </fileset>
+              <fileset dir="${class.dir}">
+                <patternset refid="test.sources"/>
+              </fileset>
             </batchtest>
         </junit>
         <junitreport todir="${junit.dir}">
@@ -69,6 +69,41 @@ SPDX-License-Identifier: Apache-2.0
         </junitreport>
         <move file="junit-noframes.html" tofile="JUnit.html"/>
         <fail if="junit.failed" message="JUnit tests failed, look at JUnit.html"/>
+      </sequential>
+    </macrodef>
+
+    <target name="unit-tests-quick" depends="build, load-junit, init-unit-tests"
+            description="Run a minimal set of JUnit tests that are considered quick">
+        <!-- A simpler way for specifying quick tests would be an annotation on class or method level.
+             JUnit 5 might bring such features. However, we still depend on JUnit 4. -->
+        <patternset id="test.sources">
+            <include name="**/solvers/bitwuzla/BitwuzlaNativeApiTest.*"/>
+            <include name="**/solvers/boolector/BoolectorNativeApiTest.*"/>
+            <include name="**/solvers/cvc4/CVC4NativeAPITest.*"/>
+            <include name="**/solvers/cvc5/CVC5NativeAPITest.*"/>
+            <include name="**/solvers/mathsat5/Mathsat5AbstractNativeApiTest.*"/>
+            <include name="**/solvers/mathsat5/Mathsat5NativeApiTest.*"/>
+            <include name="**/solvers/mathsat5/Mathsat5OptimizationNativeApiTest.*"/>
+            <include name="**/solvers/opensmt/OpenSmtNativeAPITest.*"/>
+            <include name="**/solvers/yices2/Yices2NativeApiTest.*"/>
+            <include name="**/test/FloatingPointNumberTest.*"/>
+            <include name="**/test/FormulaManagerTest.*"/>
+            <include name="**/test/NumeralFormulaManagerTest.*"/>
+            <include name="**/test/ProverEnvironmentTest.*"/>
+            <include name="**/test/RationalFormulaManagerTest.*"/>
+            <include name="**/test/SolverContextFactoryTest.*"/>
+            <include name="**/test/SolverContextTest.*"/>
+        </patternset>
+        <run-junit-tests/>
+    </target>
+
+    <target name="unit-tests" depends="build, load-junit, init-unit-tests"
+            description="Run all JUnit tests">
+        <patternset id="test.sources">
+            <include name="**/*Test.*"/>
+            <exclude name="**/*$*Test.*"/>
+        </patternset>
+        <run-junit-tests/>
     </target>
 
     <target name="load-jacoco" depends="resolve-dependencies">
@@ -78,7 +113,6 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="unit-tests-coverage" depends="build, load-junit, load-jacoco, init-unit-tests" description="Run all JUnit tests with coverage report">
-        <delete dir="{junit.dir}"/>
         <jacoco:coverage destfile="${junit.dir}/jacoco.exec" excludes="**/*Test*:**/Dummy*">
             <junit fork="true" printSummary="true" showOutput="false" failureproperty="junit.failed" timeout="600000">
                 <assertions><enable/></assertions>

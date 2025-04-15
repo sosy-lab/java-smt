@@ -114,25 +114,33 @@ ant publish-z3 -Dz3.path=$Z3_DIR/build
 ```
 Finally follow the instructions shown in the message at the end.
 
+### Publishing CVC5
 
-### Publishing CVC5 (previously CVC4)
+We prefer to use the official CVC5 binaries, please build from source only if necessary (e.g., in
+case of an important bugfix). The binaries can be fetched and repackaged fully automatically.
+CVC5 provides releases on GitHub (https://github.com/cvc5/cvc5/releases) for multiple platform,
+including Linux, Windows, and macOS (x64 and arm64). 
+The releases on GitHub include versioned releases and also daily builds for the last two days.
+Our build-script downloads daily build artifacts, extracts the native libraries and Java bindings, 
+and publishes them for JavaSMT.
 
-We prefer to compile our own CVC5 binaries and Java bindings.
-For simple usage, we provide a Docker definition/environment under `/docker`,
-in which the following command can be run.
+To publish a daily version of CVC5, execute the following command in the JavaSMT directory:
 
-To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5).
-Then execute the following command in the JavaSMT directory,
-where `$CVC5_DIR` is the path to the CVC5 directory and `$CVC5_VERSION` is the version number:
 ```
-ant publish-cvc5 -Dcvc5.path=$CVC5_DIR -Dcvc5.customRev=$CVC5_VERSION
+ant publish-cvc5 -Dcvc5.version=$CVC5_VERSION
 ```
+
+Where `CVC5_VERSION` must match one of the daily releases from
+their [GitHub](https://github.com/cvc5/cvc5/releases/tag/latest) website
+
 Example:
+
 ```
-ant publish-cvc5 -Dcvc5.path=../CVC5 -Dcvc5.customRev=1.0.1
+ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 ```
-During the build process, our script automatically appends the git-revision after the version.
-Finally, follow the instructions shown in the message at the end.
+
+During the build process, our script automatically fetches binaries for Windows, Linux, and
+maxOS on x64 and arm64 and repackages them to be used in JavaSMT.
 
 
 ### Publishing OpenSMT

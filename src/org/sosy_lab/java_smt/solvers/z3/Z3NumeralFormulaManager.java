@@ -72,7 +72,11 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   protected Long sumImpl(List<Long> operands) {
-    return Native.mkAdd(z3context, operands.size(), Longs.toArray(operands));
+    if (operands.isEmpty()) {
+      return makeNumberImpl(0);
+    } else {
+      return Native.mkAdd(z3context, operands.size(), Longs.toArray(operands));
+    }
   }
 
   @Override

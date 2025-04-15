@@ -12,135 +12,75 @@ SPDX-License-Identifier: Apache-2.0
 
 <!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
 <project name="publish-solvers-cvc5" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
-
     <import file="macros.xml"/>
 
-    <!-- Build options for CVC5, Reasoning:
-          - 'auto-download' loads all dependencies automatically,
-          - 'statistics' for the new statistics stuff,
-          - 'prefix' because i don't want it to use system installed or install systemwide,
-          - 'fPIC' for position-independent code, required for shared libraries.
-          The full cmdline for building CVC5 is (note the double-dashes!):
-            ./configure.sh production - -java-bindings - -auto-download - -statistics - -prefix=$WORKSPACE/cvc5-main/build/install -DVAR=fPIC
-          Theoretically CVC5s performance should be improveable by using -best (uses the best
-          known general performance/dependencies) but this can not be combined with auto-download.
-    -->
-    <!-- SECTION: Publishing CVC5
-         ==================================================================
-    -->
-    <target name="package-cvc5" depends="">
-        <!-- Copy CVC5 binaries to the root folder along with the version postfix. -->
-        <fail unless="cvc5.path">
-            Please specify the path to CVC5 with the flag -Dcvc5.path=/path/to/cvc5.
-            The path has to point to the root CVC5 folder, i.e.,
-            a checkout of the official git repository from 'https://github.com/cvc5/cvc5'.
-            Note that shell substitutions do not work and a full absolute path has to be specified.
-        </fail>
-        <fail unless="cvc5.customRev">
-            Please specify a custom revision with the flag -Dcvc5.customRev=XXX.
-            The custom revision has to be unique amongst the already known version
-            numbers from the ivy repository. The script will append the git revision.
+    <property name="cvc5.url" value="https://github.com/cvc5/cvc5/releases/download/latest"/>
+    <property name="cvc5.downloads" value="./downloads/cvc5"/>
+    <property name="cvc5.distDir" value="${ivy.solver.dist.dir}/cvc5"/>
+
+    <target name="download-cvc5">
+        <fail unless="cvc5.version">
+            Please specify a version with the flag -Dcvc5.version=XXX.
+            The version must match one of the daily builds from https://github.com/cvc5/cvc5/releases
         </fail>
 
-        <!-- get the short commit hash of the cvc5 version used -->
-        <exec executable="git" dir="${cvc5.path}" outputproperty="cvc5.revision" failonerror="true">
-            <arg value="show"/>
-            <arg value="-s"/>
-            <arg value="--format=%h"/>
-        </exec>
-        <property name="cvc5.version" value="${cvc5.customRev}-g${cvc5.revision}"/>
-        <echo message="Building CVC5 in version '${cvc5.version}'"/>
+        <mkdir dir="${cvc5.downloads}"/>
+        <mkdir dir="${cvc5.distDir}/x64"/>
+        <mkdir dir="${cvc5.distDir}/arm64"/>
 
-        <!-- build CVC5 -->
-        <echo message="Cleaning old build files"/>
-        <exec executable="rm" dir="${cvc5.path}" failonerror="true">
-            <arg value="-rf"/>
-            <arg value="build"/>
-        </exec>
+        <!-- Download binaries for Linux on x64 -->
+        <get src="${cvc5.url}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-Linux-x86_64-static/lib/libcvc5jni.so"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
+        </unzip>
 
-        <echo message="Configuring and building CVC5 in version '${cvc5.version}'"/>
-        <exec executable="./configure.sh" dir="${cvc5.path}" failonerror="true">
-            <!--<arg value="production"/>-->
-            <arg value="--java-bindings"/>
-            <arg value="--auto-download"/>
-            <arg value="--statistics"/>
-            <arg value="--prefix=${cvc5.path}/build/install"/>
-            <arg value="-DVAR=fPIC"/>
-        </exec>
-        <exec executable="make" dir="${cvc5.path}/build/" failonerror="true">
-            <arg value="-j4" />
-        </exec>
+        <!-- Download binaries for Linux on arm64 -->
+        <get src="${cvc5.url}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Linux-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
+            <patternset><include name="cvc5-Linux-arm64-static/lib/libcvc5jni.so"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.so"/>
+        </unzip>
 
-        <!-- get the actual jar location as cvc5.jar is just a link -->
-        <exec executable="readlink" dir="${cvc5.path}/build/src/api/java" outputproperty="cvc5.jar" failonerror="true">
-            <arg value="-f"/>
-            <arg value="cvc5.jar"/>
-        </exec>
+        <!-- Download binaries for macOS on x64 -->
+        <get src="${cvc5.url}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-macOS-x86_64-static/lib/libcvc5jni.dylib"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
+        </unzip>
 
-        <!-- copy library files into directory to be published for IVY -->
-        <echo message="Copying artifact files into current directory"/>
-        <copy file="${cvc5.path}/build/src/libcvc5.so" tofile="libcvc5-${cvc5.version}.so"/>
-        <copy file="${cvc5.path}/build/src/parser/libcvc5parser.so" tofile="libcvc5parser-${cvc5.version}.so"/>
-        <copy file="${cvc5.path}/build/src/api/java/libcvc5jni.so" tofile="libcvc5jni-${cvc5.version}.so"/>
-        <copy file="${cvc5.jar}" tofile="cvc5-${cvc5.version}.jar"/>
-        <copy file="${cvc5.path}/build/deps/lib/libpolyxx.so" tofile="libpolyxx-${cvc5.version}.so"/>
-        <copy file="${cvc5.path}/build/deps/lib/libpoly.so" tofile="libpoly-${cvc5.version}.so"/>
+        <!-- Download binaries for macOS on arm64 -->
+        <get src="${cvc5.url}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-macOS-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
+            <patternset><include name="cvc5-macOS-arm64-static/lib/libcvc5jni.dylib"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dylib"/>
+        </unzip>
 
-        <!-- remove unneeded symbols -->
-        <echo message="Strip unneeded symbols"/>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libcvc5-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libcvc5jni-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libcvc5parser-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libpoly-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="strip" dir="./" failonerror="true">
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
+        <!-- Download binaries for Windows on x64 -->
+        <get src="${cvc5.url}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Win64-x86_64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/x64">
+            <patternset><include name="cvc5-Win64-x86_64-static/bin/cvc5jni.dll"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
+        </unzip>
 
-        <!-- fix RPATH and library dependencies -->
-        <echo message="Fixing library path for all artifact libraries"/>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpolyxx.so.0"/><arg value="libpolyxx.so"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libcvc5-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
-            <arg value="libcvc5jni-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libcvc5.so.1"/><arg value="libcvc5.so"/>
-            <arg value="libcvc5parser-${cvc5.version}.so"/>
-        </exec>
-        <!-- patchelf finds two dependencies and needs to be called twice for libpolyxx.so -->
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--replace-needed"/><arg value="libpoly.so.0"/><arg value="libpoly.so"/>
-            <arg value="libpolyxx-${cvc5.version}.so"/>
-        </exec>
-        <exec executable="patchelf" dir="./" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libpoly-${cvc5.version}.so"/>
-        </exec>
+        <!-- Download the Java bindings -->
+        <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
     </target>
 
-    <target name="publish-cvc5" depends="package-cvc5, load-ivy"
-        description="Publish CVC5 binaries to Ivy repository.">
-        <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml" />
-        <publishToRepository solverName="CVC5" solverVersion="${cvc5.version}"/>
+    <target name="publish-cvc5" depends="download-cvc5, load-ivy" description="Publish CVC5 binaries to Ivy repository.">
+        <ivy:resolve conf="solver-cvc5" file="solvers_ivy_conf/ivy_cvc5.xml"/>
+        <publishToRepository solverName="CVC5" solverVersion="${cvc5.version}" distDir="${cvc5.distDir}"/>
+
+        <!--
+          We additionally provide x64-files without arch-attribute for backwards compatibility,
+          such that applications can load dependencies without changing their Ivy configuration.
+          Those files are not part of any direct configuration, but will be resolved if the
+          arch-attribute is not used.
+        -->
+        <copy todir="repository/${ivy.organisation}/${ivy.module}/">
+            <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                <include name="*-${cvc5.version}.*"/>
+            </fileset>
+        </copy>
     </target>
 </project>

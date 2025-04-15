@@ -2,7 +2,7 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -14,6 +14,22 @@
 # docker build --pull -t registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-11 - < build/gitlab-ci.Dockerfile.jdk-11
 # docker push registry.gitlab.com/sosy-lab/software/java-smt/test:jdk-11
 
-FROM registry.gitlab.com/sosy-lab/software/java-project-template/test:jdk-11
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ant \
+  curl \
+  git \
+  jq \
+  openjdk-11-jre-headless \
+  openjdk-11-jdk-headless \
+  wget \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV LANG C.UTF-8
+
 RUN apt-get update && apt-get install -y \
   libgomp1
