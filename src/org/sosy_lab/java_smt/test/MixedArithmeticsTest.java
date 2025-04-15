@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
-  /** Require that the solver supports mixed integer-real arithmetics */
+  /** Require that the solver supports mixed integer-real arithmetics. */
   @Before
   public void requireMixedArithmetics() {
     requireIntegers();
