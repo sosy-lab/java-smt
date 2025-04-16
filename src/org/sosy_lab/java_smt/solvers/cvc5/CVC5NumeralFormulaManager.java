@@ -163,7 +163,7 @@ abstract class CVC5NumeralFormulaManager<
 
   @Override
   protected Term equal(Term pParam1, Term pParam2) {
-    return termManager.mkTerm(Kind.EQUAL, pParam1, pParam2);
+    return termManager.mkTerm(Kind.EQUAL, toType(pParam1), toType(pParam2));
   }
 
   @Override
@@ -191,7 +191,8 @@ abstract class CVC5NumeralFormulaManager<
     if (pParam.size() < 2) {
       return termManager.mkTrue();
     } else {
-      return termManager.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
+      return termManager.mkTerm(
+          Kind.DISTINCT, pParam.stream().map(this::toType).toArray(Term[]::new));
     }
   }
 }

@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -180,7 +181,7 @@ public abstract class AbstractNumeralFormulaManager<
   @Override
   public ResultFormulaType negate(ParamFormulaType pNumber) {
     TFormulaInfo param1 = extractInfo(pNumber);
-    return wrap(negate(param1));
+    return wrap(negate(toType(param1)));
   }
 
   protected abstract TFormulaInfo negate(TFormulaInfo pParam1);
@@ -190,14 +191,19 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(add(param1, param2));
+    return wrap(add(toType(param1), toType(param2)));
   }
 
   protected abstract TFormulaInfo add(TFormulaInfo pParam1, TFormulaInfo pParam2);
 
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
-    return wrap(sumImpl(Lists.transform(operands, this::extractInfo)));
+    return wrap(
+        sumImpl(
+            operands.stream()
+                .map(this::extractInfo)
+                .map(this::toType)
+                .collect(Collectors.toList())));
   }
 
   protected TFormulaInfo sumImpl(List<TFormulaInfo> operands) {
@@ -213,7 +219,7 @@ public abstract class AbstractNumeralFormulaManager<
     TFormulaInfo param1 = extractInfo(pNumber1);
     TFormulaInfo param2 = extractInfo(pNumber2);
 
-    return wrap(subtract(param1, param2));
+    return wrap(subtract(toType(param1), toType(param2)));
   }
 
   protected abstract TFormulaInfo subtract(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -231,7 +237,7 @@ public abstract class AbstractNumeralFormulaManager<
       result = makeUf(divUfDecl, param1, param2);
     } else {
       try {
-        result = divide(param1, param2);
+        result = divide(toType(param1), toType(param2));
       } catch (UnsupportedOperationException e) {
         if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
           result = makeUf(divUfDecl, param1, param2);
@@ -263,7 +269,7 @@ public abstract class AbstractNumeralFormulaManager<
       result = makeUf(modUfDecl, param1, param2);
     } else {
       try {
-        result = modulo(param1, param2);
+        result = modulo(toType(param1), toType(param2));
       } catch (UnsupportedOperationException e) {
         if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
           result = makeUf(modUfDecl, param1, param2);
@@ -337,7 +343,7 @@ public abstract class AbstractNumeralFormulaManager<
       result = makeUf(multUfDecl, param1, param2);
     } else {
       try {
-        result = multiply(param1, param2);
+        result = multiply(toType(param1), toType(param2));
       } catch (UnsupportedOperationException e) {
         if (nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
           result = makeUf(multUfDecl, param1, param2);
@@ -433,5 +439,10 @@ public abstract class AbstractNumeralFormulaManager<
     throw new AssertionError(
         "method should only be called for RationalFormulae, but type is "
             + getFormulaCreator().getFormulaType(number));
+  }
+
+  /** Make sure the value is of correct type (Int vs. Real) and add a cast if necessary. */
+  protected TFormulaInfo toType(TFormulaInfo param) {
+    return param;
   }
 }

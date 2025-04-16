@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -38,6 +38,11 @@ public class CVC5RationalFormulaManager
   @Override
   protected Term makeNumberImpl(BigDecimal pNumber) {
     return makeNumberImpl(pNumber.toPlainString());
+  }
+
+  @Override
+  protected Term toType(Term pNumber) {
+    return pNumber.getSort().isInteger() ? termManager.mkTerm(Kind.TO_REAL, pNumber) : pNumber;
   }
 
   @Override
