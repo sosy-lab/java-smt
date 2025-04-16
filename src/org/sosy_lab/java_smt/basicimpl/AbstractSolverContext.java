@@ -8,17 +8,22 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.InterpolatingProverWithAssumptionsWrapper;
 import org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper.ProverWithAssumptionsWrapper;
 
@@ -53,11 +58,62 @@ public abstract class AbstractSolverContext implements SolverContext {
   public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
 
-    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
+    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation1(toSet(options));
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
       out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
+    }
+    return out;
+  }
+
+  // TODO: would it be better to add the option for interpolation procedure based on the call to
+  //  getInterpolant() and always use the wrapper as long as there is a option?
+  //  If this remains, clean it up!
+  @SuppressWarnings({"CheckReturnValue", "resource"})
+  private InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation1(
+      Set<ProverOptions> options) {
+    InterpolatingProverEnvironment<?> out;
+    // Try to get a new prover environment w native interpolation with the current options
+    try {
+      out = newProverEnvironmentWithInterpolation0(options);
+    } catch (UnsupportedOperationException e) {
+      // If native interpolation fails, we check the options for independent interpolation and
+      // return a wrapped normal prover with independent interpolation, as long as the prover
+      // supports the option chosen.
+      String additionalMsg = ". You can try to use a independent interpolation strategy.";
+      try {
+        if (!useNativeInterpolation(options)) {
+          if (getIndependentInterpolationStrategy(options)
+                  == ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS
+              || getIndependentInterpolationStrategy(options)
+                  == ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS) {
+            fmgr.getQuantifiedFormulaManager()
+                .eliminateQuantifiers(fmgr.getBooleanFormulaManager().makeTrue());
+          }
+          return new IndependentInterpolatingSolverDelegate(
+              this, newProverEnvironment0(options), options);
+        }
+      } catch (UnsupportedOperationException e2) {
+        // Solver does not support independent interpolation
+        additionalMsg =
+            ". Interpolation strategy "
+                + getIndependentInterpolationStrategy(options)
+                + " is not "
+                + "available "
+                + "due to: "
+                + e2.getMessage();
+      } catch (SolverException | InterruptedException pE) {
+        // Should never happen as we only run the solver briefly to determine feature availability
+        throw new RuntimeException(pE);
+      }
+      // Build a nice message with additional info
+      throw new UnsupportedOperationException(e.getMessage() + additionalMsg);
+    }
+
+    if (!useNativeInterpolation(options)) {
+      // The user may choose to use independent interpolation on top of native
+      out = new IndependentInterpolatingSolverDelegate(this, out, options);
     }
     return out;
   }
@@ -91,6 +147,42 @@ public abstract class AbstractSolverContext implements SolverContext {
    * class is undefined.
    */
   protected abstract boolean supportsAssumptionSolving();
+
+  private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
+      ImmutableSet.of(
+          ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+
+  protected boolean useNativeInterpolation(Set<ProverOptions> options) {
+    return getIndependentInterpolationStrategy(options) == null;
+  }
+
+  @SuppressWarnings("CheckReturnValue")
+  protected @Nullable ProverOptions getIndependentInterpolationStrategy(
+      Set<ProverOptions> options) {
+    List<ProverOptions> itpStrat = new ArrayList<>(options);
+    itpStrat.retainAll(ALL_INDEPENDENT_INTERPOLATION_STRATEGIES);
+
+    if (itpStrat.isEmpty()) {
+      return null;
+    } else if (itpStrat.size() != 1) {
+      throw new IllegalArgumentException(
+          "Only a single independent interpolation strategy can be"
+              + " chosen for a prover, but chosen were: "
+              + Joiner.on(", ").join(options));
+    }
+
+    ProverOptions interpolationOption = itpStrat.get(0);
+    try {
+      fmgr.getQuantifiedFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      throw new UnsupportedOperationException(
+          "Solver does not support independent interpolation based on the current strategy, as"
+              + " it is lacking quantifier support.");
+    }
+    return interpolationOption;
+  }
 
   private static Set<ProverOptions> toSet(ProverOptions... options) {
     Set<ProverOptions> opts = EnumSet.noneOf(ProverOptions.class);
