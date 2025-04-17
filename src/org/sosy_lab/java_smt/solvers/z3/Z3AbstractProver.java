@@ -242,6 +242,11 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     return key;
   }
 
+  @Nullable
+  protected Deque<PersistentMap<String, BooleanFormula>> getStoredConstraints() {
+    return storedConstraints;
+  }
+
   @Override
   public void close() {
     if (!closed) {

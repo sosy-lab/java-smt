@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_asse
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
@@ -107,20 +108,41 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     env = msat_create_env(cfg);
     msat_destroy_config(cfg);
 
-    const0 = msat_make_number(env, "0");
-    const1 = msat_make_number(env, "1");
-    long rationalType = msat_get_rational_type(env);
-    var = msat_make_variable(env, "rat", rationalType);
+    testProofManager(env);
+  }
 
-    msat_push_backtrack_point(env);
+  // Tests if it is possible to enable proof generation in a shared environment after it was not
+  // enabled in the original
+  @Test
+  public void proofSharedEnvironmentTest()
+      throws IllegalStateException, InterruptedException, SolverException {
+    long cfg = msat_create_config();
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
 
-    msat_assert_formula(env, msat_make_equal(env, var, const0));
-    msat_assert_formula(env, msat_make_equal(env, var, const1));
+    cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    long sharedEnv = msat_create_shared_env(cfg, env);
+    msat_destroy_config(cfg);
+
+    testProofManager(sharedEnv);
+  }
+
+  private void testProofManager(long testEnv) throws InterruptedException, SolverException {
+    const0 = msat_make_number(testEnv, "0");
+    const1 = msat_make_number(testEnv, "1");
+    long rationalType = msat_get_rational_type(testEnv);
+    var = msat_make_variable(testEnv, "rat", rationalType);
+
+    msat_push_backtrack_point(testEnv);
+
+    msat_assert_formula(testEnv, msat_make_equal(testEnv, var, const0));
+    msat_assert_formula(testEnv, msat_make_equal(testEnv, var, const1));
 
     // UNSAT
-    assertThat(msat_check_sat(env)).isFalse();
+    assertThat(msat_check_sat(testEnv)).isFalse();
 
-    long proofMgr = msat_get_proof_manager(env);
+    long proofMgr = msat_get_proof_manager(testEnv);
     long proof = msat_get_proof(proofMgr);
 
     assertThat(msat_proof_is_term(proof)).isFalse();
