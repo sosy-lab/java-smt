@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5ProofDAG.CVC5ProofNode;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -256,9 +257,9 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw new IllegalStateException("No proof available");
     }
 
-    CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
+    //CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
-      return pp.fromCVC5Proof(proofs[0]);
+      return CVC5ProofNode.fromCVC5Proof(proofs[0], creator);
     } catch (CVC5ApiException pE) {
       throw new RuntimeException(pE);
     }

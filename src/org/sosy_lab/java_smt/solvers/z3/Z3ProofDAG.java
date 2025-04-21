@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class Z3ProofDAG extends AbstractProofDAG {
-  protected static class Frame extends ProofFrame<Long> {
+  private static class Frame extends ProofFrame<Long> {
     protected Frame(Long proof) {
       super(proof);
     }
