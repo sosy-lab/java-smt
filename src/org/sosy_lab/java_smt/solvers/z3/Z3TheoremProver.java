@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.solvers.z3.Z3ProofDAG.Z3ProofNode;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -152,8 +153,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     Preconditions.checkState(!closed);
     Preconditions.checkState(this.isUnsat());
     long proofAst = Native.solverGetProof(z3context, z3solver);
-    return new Z3NonRecursiveProofProcessor(z3context, z3solver, creator, this)
-        .fromASTIterative(proofAst);
+    return Z3ProofNode.fromZ3Proof(proofAst, creator);
   }
 
   // This method is used to get the Z3 proof as a long for testing exclusively

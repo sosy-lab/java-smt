@@ -116,11 +116,11 @@ public class Z3ProofsTest {
     BooleanFormula equiv2 = bmgr.equivalence(f2, f3);
     BooleanFormula equiv3 = bmgr.equivalence(f1, f3);
 
-    Z3ProofDag.Z3ProofNode pn = new Z3ProofDag.Z3ProofNode(equiv3, Z3ProofRule.TRANSITIVITY);
-    pn.addChild(new Z3ProofDag.Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
-    pn.addChild(new Z3ProofDag.Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
+    Z3ProofDAG.Z3ProofNode pn = new Z3ProofDAG.Z3ProofNode(equiv3, Z3ProofRule.TRANSITIVITY);
+    pn.addChild(new Z3ProofDAG.Z3ProofNode(equiv1, Z3ProofRule.ASSERTED));
+    pn.addChild(new Z3ProofDAG.Z3ProofNode(equiv2, Z3ProofRule.ASSERTED));
 
-    Z3ToResoluteProofConverter pc = new Z3ToResoluteProofConverter(mgr);
+    Z3ToResolutionProofConverter pc = new Z3ToResolutionProofConverter(mgr);
 
     ProofNode res = pc.handleTransitivity(pn);
 
