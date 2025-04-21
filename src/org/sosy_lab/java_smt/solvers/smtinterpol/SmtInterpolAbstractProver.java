@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofDag;
+import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
@@ -222,7 +222,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     checkGenerateProofs();
 
     final Term proof;
-    final ProofDag proofDAG;
+    final ProofDAG proofDAG;
     try {
       proof = env.getProof();
       // proofDAG = ResolutionProofDAG.fromTerm(proof, mgr, annotatedTerms.peek());

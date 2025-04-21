@@ -12,7 +12,7 @@ package org.sosy_lab.java_smt.api.proofs.visitors;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.sosy_lab.java_smt.api.proofs.ProofDag;
+import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 public class ProofTraversalVisitor implements ProofVisitor {
@@ -28,7 +28,7 @@ public class ProofTraversalVisitor implements ProofVisitor {
   }
 
   @Override
-  public void visitDAG(ProofDag dag) {
+  public void visitDAG(ProofDAG dag) {
     for (ProofNode node : dag.getNodes()) {
       if (!visited.contains(node)) {
         visitNode(node);

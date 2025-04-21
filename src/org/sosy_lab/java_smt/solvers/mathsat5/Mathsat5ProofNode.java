@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG.AbstractProofNode;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
 
 public class Mathsat5ProofNode extends AbstractProofNode {

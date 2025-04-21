@@ -45,4 +45,9 @@ class Mathsat5ProofRule implements ProofRule {
   public String getName() {
     return name;
   }
+
+  @Override
+  public String toString() {
+    return getName();
+  }
 }

@@ -13,7 +13,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDag.AbstractProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG.AbstractProofNode;
 
 public class CVC5ProofNode extends AbstractProofNode {
 
