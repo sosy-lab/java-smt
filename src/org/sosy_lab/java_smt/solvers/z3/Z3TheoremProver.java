@@ -152,7 +152,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   public ProofNode getProof() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(this.isUnsat());
-    long proofAst = Native.solverGetProof(z3context, z3solver);
+    long proofAst;
+    try {
+      proofAst = Native.solverGetProof(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
     return Z3ProofNode.fromZ3Proof(proofAst, creator);
   }
 
