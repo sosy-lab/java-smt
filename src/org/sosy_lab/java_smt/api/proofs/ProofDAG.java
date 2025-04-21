@@ -17,7 +17,7 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  * A DAG representing a proof. Each node in the DAG is a {@link ProofNode} and each edge is a
  * directed edge from a parent node to a child node.
  */
-public interface ProofDag {
+public interface ProofDAG {
 
   /**
    * Add a node to the DAG.

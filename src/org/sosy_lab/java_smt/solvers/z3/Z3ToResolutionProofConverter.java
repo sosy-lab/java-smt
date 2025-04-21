@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
-import org.sosy_lab.java_smt.ResolutionProofDag;
-import org.sosy_lab.java_smt.ResolutionProofDag.AxiomProofNode;
-import org.sosy_lab.java_smt.ResolutionProofDag.ResolutionProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDAG;
+import org.sosy_lab.java_smt.ResolutionProofDAG.AxiomProofNode;
+import org.sosy_lab.java_smt.ResolutionProofDAG.ResolutionProofNode;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -46,13 +46,13 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
  * @see org.sosy_lab.java_smt.ResProofRule for the list of RESOLUTE axioms.
  */
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
-public class Z3ToResoluteProofConverter { // This class is inclompete and currently not used. The
+public class Z3ToResolutionProofConverter { // This class is inclompete and currently not used. The
   // strategy for transforming proof rules should be proved first.
   private final Z3FormulaManager formulaManager;
 
   private final BooleanFormulaManager bfm;
 
-  Z3ToResoluteProofConverter(Z3FormulaManager creator) {
+  Z3ToResolutionProofConverter(Z3FormulaManager creator) {
     formulaManager = creator;
     bfm = formulaManager.getBooleanFormulaManager();
   }
@@ -60,15 +60,15 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
   private static final Map<Z3ProofRule, ResAxiom> ruleMapping = new HashMap<>();
 
   /**
-   * This method converts a set of Z3ProofNodes into a {@link ResolutionProofDag}.
+   * This method converts a set of Z3ProofNodes into a {@link ResolutionProofDAG}.
    *
    * @param z3ProofNodes
-   * @return {@link ResolutionProofDag}
+   * @return {@link ResolutionProofDAG}
    */
-  static ResolutionProofDag convertToResolutionProofDag(Z3ProofDag.Z3ProofNode[] z3ProofNodes) {
-    ResolutionProofDag dag = new ResolutionProofDag();
+  static ResolutionProofDAG convertToResolutionProofDag(Z3ProofDAG.Z3ProofNode[] z3ProofNodes) {
+    ResolutionProofDAG dag = new ResolutionProofDAG();
 
-    for (Z3ProofDag.Z3ProofNode z3Node : z3ProofNodes) {
+    for (Z3ProofDAG.Z3ProofNode z3Node : z3ProofNodes) {
       if (z3Node.getRule() == MODUS_PONENS) {
 
       } else {
@@ -161,13 +161,13 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
   }
 
   /**
-   * Converts a {@link Z3ProofDag.Z3ProofNode} into either a {@link ResolutionProofNode} or a {@link
+   * Converts a {@link Z3ProofDAG.Z3ProofNode} into either a {@link ResolutionProofNode} or a {@link
    * AxiomProofNode}, depending on its rule.
    *
-   * @param node the {@link Z3ProofDag.Z3ProofNode} to convert
+   * @param node the {@link Z3ProofDAG.Z3ProofNode} to convert
    * @return the resulting {@link ProofNode}
    */
-  ProofNode handleNode(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleNode(Z3ProofDAG.Z3ProofNode node) {
     Z3ProofRule rule = (Z3ProofRule) node.getRule();
 
     switch (rule) {
@@ -302,34 +302,34 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     }
   }
 
-  ProofNode handleTrue(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleTrue(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     AxiomProofNode pn = new AxiomProofNode(ResAxiom.TRUE_POSITIVE, formula);
     return pn;
   }
 
-  ProofNode handleAsserted(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleAsserted(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     AxiomProofNode pn = new AxiomProofNode(ResAxiom.ASSUME, formula);
     return pn;
   }
 
-  ProofNode handleModusPonens(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleModusPonens(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     BooleanFormula pivot = (BooleanFormula) node.getChildren().get(0).getFormula();
     ResolutionProofNode pn = new ResolutionProofNode(formula, pivot);
-    ProofNode c1 = handleNode((Z3ProofDag.Z3ProofNode) node.getChildren().get(0));
-    ProofNode c2 = handleNode((Z3ProofDag.Z3ProofNode) node.getChildren().get(1));
+    ProofNode c1 = handleNode((Z3ProofDAG.Z3ProofNode) node.getChildren().get(0));
+    ProofNode c2 = handleNode((Z3ProofDAG.Z3ProofNode) node.getChildren().get(1));
     return pn;
   }
 
-  ProofNode handleReflexivity(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleReflexivity(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     AxiomProofNode pn = new AxiomProofNode(ResAxiom.REFLEXIVITY, formula);
     return pn;
   }
 
-  ProofNode handleSymmetry(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleSymmetry(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     BooleanFormula pivot = (BooleanFormula) node.getChildren().get(0).getFormula();
     BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
@@ -337,11 +337,11 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     ResolutionProofNode pn = new ResolutionProofNode(formula, pivot);
     AxiomProofNode sn = new AxiomProofNode(ResAxiom.SYMMETRY, snFormula);
     pn.addChild(sn);
-    pn.addChild(handleNode((Z3ProofDag.Z3ProofNode) node.getChildren().get(0)));
+    pn.addChild(handleNode((Z3ProofDAG.Z3ProofNode) node.getChildren().get(0)));
     return pn;
   }
 
-  ProofNode handleTransitivity(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleTransitivity(Z3ProofDAG.Z3ProofNode node) {
 
     BooleanFormula t1 = (BooleanFormula) node.getChildren().get(0).getFormula();
     BooleanFormula t2 = (BooleanFormula) node.getChildren().get(1).getFormula();
@@ -371,7 +371,7 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     return transResNode;
   }
 
-  ProofNode handleTransitivityStar(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleTransitivityStar(Z3ProofDAG.Z3ProofNode node) {
     BooleanFormula resPivot = null;
     Collection<BooleanFormula> formulas = new ArrayList<>();
     List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
@@ -400,143 +400,143 @@ public class Z3ToResoluteProofConverter { // This class is inclompete and curren
     return resNode;
   }
 
-  ProofNode handleMonotonicity(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleMonotonicity(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleQuantIntro(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleQuantIntro(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleBind(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleBind(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleDistributivity(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleDistributivity(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleAndElim(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleAndElim(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleNotOrElim(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleNotOrElim(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleRewrite(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleRewrite(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleRewriteStar(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleRewriteStar(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handlePullQuant(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handlePullQuant(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleElimUnusedVars(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleElimUnusedVars(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handlePushQuant(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handlePushQuant(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleDer(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleDer(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleQuantInst(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleQuantInst(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleHypothesis(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleHypothesis(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleLemma(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleLemma(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleUnitResolution(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleUnitResolution(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleIffTrue(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleIffTrue(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleIffFalse(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleIffFalse(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleCommutativity(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleCommutativity(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleDefAxiom(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleDefAxiom(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleAssumptionAdd(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleAssumptionAdd(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleLemmaAdd(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleLemmaAdd(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleRedundantDel(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleRedundantDel(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleClauseTrail(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleClauseTrail(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleDefIntro(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleDefIntro(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleApplyDef(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleApplyDef(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleIffOeq(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleIffOeq(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleNnfPos(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleNnfPos(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleNnfNeg(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleNnfNeg(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleSkolemize(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleSkolemize(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleModusPonensOeq(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleModusPonensOeq(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleThLemma(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleThLemma(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleHyperResolve(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleHyperResolve(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleOperation(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleOperation(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 
-  ProofNode handleDefault(Z3ProofDag.Z3ProofNode node) {
+  ProofNode handleDefault(Z3ProofDAG.Z3ProofNode node) {
     return null;
   }
 

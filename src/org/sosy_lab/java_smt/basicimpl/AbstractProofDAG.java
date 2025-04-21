@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.proofs.ProofDag;
+import org.sosy_lab.java_smt.api.proofs.ProofDAG;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
@@ -28,7 +28,7 @@ import org.sosy_lab.java_smt.api.proofs.visitors.ProofVisitor;
  *
  * @author Gabriel Carpio
  */
-public abstract class AbstractProofDag implements ProofDag {
+public abstract class AbstractProofDAG implements ProofDAG {
   private final Map<Integer, ProofNode> nodes = new HashMap<>();
   private int nodeIdCounter = 0;
 
