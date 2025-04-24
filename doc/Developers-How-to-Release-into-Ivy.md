@@ -156,6 +156,9 @@ Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also 
   make -j4
   ```
 
+When using the docker container GMP is already included and can be found
+under `/dependencies/gmp-6.2.1/install` for `x64-linux` and `arm64-linux`.
+
 For linux-arm64, provide JNI headers in a reasonable LTS version.
 Download the zip archive from https://jdk.java.net/ and unpack it into $JDK_DIR_LINUX_ARM64
 (e.g., https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz).
@@ -182,7 +185,7 @@ ant publish-opensmt \
 The build scripts for OpenSMT ... :
 - run for about 20 minutes (we build everything from scratch, two times).
 - download Google-based test components (requires internet access).
-- append the git revision of Bitwuzla.
+- append the git revision of OpenSMT.
 - produce two Linux (x64 and arm64) libraries, and publish them.
 
 Finally, follow the instructions shown in the message at the end of the command.
