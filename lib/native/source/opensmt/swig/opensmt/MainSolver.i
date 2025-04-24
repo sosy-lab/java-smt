@@ -67,7 +67,7 @@ namespace opensmt {
 %ignore MainSolver::getTheory();
 %ignore MainSolver::getTheory() const;
 %ignore MainSolver::getPartitionManager();
-%ignore MainSolver::insertFormula(PTRef, char**);
+%ignore MainSolver::addAssertion(PTRef);
 %ignore MainSolver::initialize();
 %ignore MainSolver::simplifyFormulas();
 
@@ -76,6 +76,9 @@ namespace opensmt {
 %ignore MainSolver::getCurrentAssertionsView() const;
 %ignore MainSolver::getAssertionsAtCurrentLevel() const;
 %ignore MainSolver::getAssertionsAtLevel(std::size_t) const;
+%ignore MainSolver::getAssertionsCount() const;
+%ignore MainSolver::tryAddNamedAssertion(PTRef, std::string const&);
+%ignore MainSolver::tryAddTermNameFor(PTRef, std::string const & name);
 
 %ignore MainSolver::printResolutionProofSMT2() const;
 %ignore MainSolver::printResolutionProofSMT2(std::ostream &) const;
