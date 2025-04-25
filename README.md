@@ -184,7 +184,7 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Project maintainers: [Karlheinz Friedberger][] and [Daniel Baier][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions:  [Bajczi Levente][], Daniel Raffler, [Martin Spiessl][], [Thomas Stieglmaier][],  
+ - Contributions: [Bajczi Levente][], Daniel Raffler, [Martin Spiessl][], [Thomas Stieglmaier][],  
  and several others.
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
