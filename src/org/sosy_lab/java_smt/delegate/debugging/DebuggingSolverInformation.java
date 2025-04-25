@@ -48,8 +48,6 @@ public class DebuggingSolverInformation {
       Map.of(
           Solvers.PRINCESS,
           ConcurrentHashMap.newKeySet(),
-          Solvers.CVC5,
-          ConcurrentHashMap.newKeySet(),
           Solvers.YICES2,
           ConcurrentHashMap.newKeySet());
 
@@ -59,8 +57,6 @@ public class DebuggingSolverInformation {
   private static final Map<Solvers, Set<Formula>> globalTerms =
       Map.of(
           Solvers.CVC4,
-          ConcurrentHashMap.newKeySet(),
-          Solvers.CVC5,
           ConcurrentHashMap.newKeySet(),
           Solvers.YICES2,
           ConcurrentHashMap.newKeySet());
