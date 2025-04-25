@@ -3,7 +3,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -13,7 +13,10 @@ For existing code examples, please see our [examples][example code].
 
 ## Step 1: Install JavaSMT
 
-### Automatic Installation using Ivy (preferred)
+JavaSMT is available as a Java library and can be installed using different methods.
+We provide releases in our [Ivy repository] and on [Maven Central].
+
+### Automatic Installation using Ivy
 
 If your build tool supports fetching packages from [Apache Ivy](https://ant.apache.org/ivy/),
 you can point it to [Sosy-Lab](https://www.sosy-lab.org/) [Ivy repository][],
@@ -25,8 +28,10 @@ After the repository URL is configured, you only need to add the following depen
 <dependency org="org.sosy-lab" name="java-smt" rev="5.0.0" conf="runtime->runtime"/>
 ```
 
-#### Architecture specification
+#### Architecture specification and Operating System
 
+The support for operating systems depends on the solver,
+some solvers only support Linux, others also support Windows and macOS.
 JavaSMT includes native binaries for several SMT solvers and only installs for x64 architecture, by default.
 Starting with version 5.0.?, JavaSMT also supports additional architectures, such as x64 and arm64.
 For a full list of supported solvers and architectures, refer to the [Readme](../README.md).
@@ -34,7 +39,7 @@ You can configure and download dependencies for specific architectures, or even 
 To specify an architecture, the Ivy configuration must recognize the `arch` attribute.
 An example Ivy configuration for this setup can be found in the [Ivy settings](../build/ivysettings.xml) of JavaSMT.
 
-Afterwards, you can use JavaSMT for other architectures with:
+Afterward, you can use JavaSMT for other architectures with:
 
 ```xml
 <dependency org="org.sosy_lab" name="java-smt" rev="5.0.?" conf="runtime->runtime-x64"/>
@@ -52,7 +57,7 @@ Or specify a specific architecture for a solver directly:
 <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.13.3" conf="runtime->solver-z3-arm64"/>
 ```
 
-### Automatic Installation from Maven Central (possibly outdated)
+### Automatic Installation from Maven Central
 
 If you use Maven/Gradle/SBT/etc to build your project, a dependency to JavaSMT
 can be added using a single configuration item.
@@ -69,48 +74,51 @@ For Maven:
 
 Currently, only `SMTInterpol` and `Princess` are automatically fetched from Maven Central,
 because they are written in Java and Scala, and thus are available on every machine.
-Shared object for the solvers `MathSAT5` and `Z3` can be added by using additional dependencies (example for Linux):
+Shared object for other solvers, such as `MathSAT5` and `Z3`, can be added by using additional 
+dependencies (example for Linux x64):
 
 ```xml
-    <!-- MathSAT5 has one dependency -->
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-mathsat5</artifactId>
-      <version>5.6.5</version>
-      <type>so</type>
-    </dependency>
+<!-- MathSAT5 has one dependency -->
+<dependency>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>javasmt-solver-mathsat5</artifactId>
+  <version>5.6.5</version>
+  <type>so</type>
+</dependency>
 
-    <!-- Z3 has three dependencies -->
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.10</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.10</version>
-      <type>so</type>
-      <classifier>libz3</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.sosy-lab</groupId>
-      <artifactId>javasmt-solver-z3</artifactId>
-      <version>4.8.10</version>
-      <type>so</type>
-      <classifier>libz3java</classifier>
-    </dependency>
+<!-- Z3 has three dependencies -->
+<dependency>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>javasmt-solver-z3</artifactId>
+  <version>4.8.10</version>
+</dependency>
+<dependency>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>javasmt-solver-z3</artifactId>
+  <version>4.8.10</version>
+  <type>so</type>
+  <classifier>libz3</classifier>
+</dependency>
+<dependency>
+  <groupId>org.sosy-lab</groupId>
+  <artifactId>javasmt-solver-z3</artifactId>
+  <version>4.8.10</version>
+  <type>so</type>
+  <classifier>libz3java</classifier>
+</dependency>
 ```
 
-The XML snippets for other solvers available via Maven, such as `Boolector` and `CVC4`,
+The XML snippets for other solvers available via Maven,
+such as `Boolector`, `CVC4`, `CVC5`, `OpenSMT`, `Princess`, and `Yices2`,
 can be found in the [`POM file`](Example-Maven-Project/pom.xml) of our [`Example-Maven-Project`](Example-Maven-Project).
 
 If you are not using Linux and we provide a solver binary for your system,
 you might need to set the dependencies accordingly, e.g.,
-change the type from `so` to `dll` (for Windows) or `dylib` (for MacOS).
-You can lookup the required dependency files and filename extension in the [Ivy repository][].
+change the type from `so` to `dll` (for Windows) or `dylib` (for macOS),
+and specify an architecture (e.g., `x64` or `arm64`).
+You can look up the required dependency files and filename extension in the [Ivy repository][].
 
-Additionally you can add and configure some Maven plugins to load the libraries automatically
+Additionally, you can add and configure some Maven plugins to load the libraries automatically
 and place them in the correct directories when assembling your application.
 The plugins copy all dependencies (including the solver binaries) to the target/dependency directory
 and rename the libraries as required for automated loading.
@@ -137,9 +145,6 @@ And finally configure the classpath for your jar-plugin:
 See [`Example-Maven-Project`](Example-Maven-Project) for more information and a working example.
 See [`Example-Maven-Web-Project`](Example-Maven-Web-Project) for more information about a Dynamic-Web-Project runnable by Tomcat 9.
 
-Shared object for _other solvers still need to be installed manually_:
-see the section "Manual Installation" below.
-
 
 ### Manual Installation
 
@@ -149,7 +154,8 @@ In order to perform the manual installation, the following steps should be follo
  - The desired version has to be chosen.
    Latest version can be found by looking at the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
    **JavaSMT might not yet support the latest version on the solver's webpage,
-   but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).**
+   but only the latest version in the [Ivy index](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/).
+   Please file an issue, if the update of a solver library is required.**
  - Suppose the version `5.0.0` was chosen.
    Ivy description file [`ivy-5.0.0.xml`](https://www.sosy-lab.org/ivy/org.sosy_lab/java-smt/ivy-5.0.0.xml) can
    be consulted in order to determine all the files which should be fetched.
@@ -181,10 +187,11 @@ You can find the necessary steps for compiling and using solver binaries in [`li
 Solvers which run directly on JDK (currently Princess and SMTInterpol)
 do not require any configuration and work out of the box.
 
-Currently, the support for newly integrated solvers like Boolector, CVC4, and Yices2 is limited.
-We are working on supporting more solvers on more operating systems. A helping hand or feedback is also welcome.
+We are actively expanding support for additional solvers, features, and operating systems.
+We welcome your support, insightful questions, or feedback to help us improve!
 
 ## Step 2: Initialization
+
 Below is a small example showing how to initialize the library using the entry point [SolverContextFactory][]:
 
 ```java
@@ -202,6 +209,34 @@ public class TestApp {
   }
 }
 ```
+
+### Loading Mechanism
+
+#### Default Loading Mechanism
+
+By default, JavaSMT uses its own Java class loader to load the native libraries.
+This class loader is able to load native libraries from predefined locations,
+such as `lib/native/<arch>-<os>/` or `lib/native/`.
+If this behaviour is sufficient, a user does not need to do anything special and
+can just use the JavaSMT API as follows:
+
+```java
+    SolverContext context = SolverContextFactory.createSolverContext(
+        config, logger, shutdown.getNotifier(), Solvers.SMTINTERPOL);
+```
+
+#### Custom Loading Mechanism
+
+If you want to use a custom loading mechanism, you can do so by implementing
+a simple consumer interface and passing it to the `SolverContextFactory`.
+The following example uses the default Java class loader to load the native libraries:
+
+```java
+    SolverContext context = SolverContextFactory.createSolverContext(
+        config, logger, shutdown.getNotifier(), Solvers.SMTINTERPOL, System::loadLibrary);
+```
+
+### Dependencies for the plain JavaSMT Context
 
 JavaSMT relies on three dependencies from the SoSy-Lab [Common][common] library.
 These dependencies are:
@@ -298,3 +333,4 @@ For further information, look at our full example [HoudiniApp][], [other example
 [JavaDoc]: https://sosy-lab.github.io/java-smt/
 [example code]: /src/org/sosy_lab/java_smt/example
 [Ivy repository]: https://www.sosy-lab.org/ivy
+[Maven Central]: https://repo1.maven.org/maven2/org/sosy-lab/java-smt/

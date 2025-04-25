@@ -49,15 +49,6 @@ SPDX-License-Identifier: Apache-2.0
             </roles>
         </developer>
         <developer>
-            <name>Philipp Wendler</name>
-            <email>uni@philippwendler.de</email>
-            <organization>Software Systems Lab</organization>
-            <url>https://www.sosy-lab.org/people/wendler/</url>
-            <roles>
-                <role>project maintainer</role>
-            </roles>
-        </developer>
-        <developer>
             <name>Dirk Beyer</name>
             <email>dirk.beyer@sosy-lab.org</email>
             <url>https://www.sosy-lab.org/people/beyer/</url>
