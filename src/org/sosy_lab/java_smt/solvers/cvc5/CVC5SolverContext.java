@@ -207,8 +207,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      termManager.deletePointer();
       solver.deletePointer();
+      termManager.deletePointer();
       creator = null;
     }
   }
