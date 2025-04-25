@@ -185,7 +185,7 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
  - Contributions: [Bajczi Levente][], Daniel Raffler, [Martin Spiessl][], [Thomas Stieglmaier][],  
- and several others.
+   and many others. For a full list, see the [contributors overview][].
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
@@ -200,3 +200,4 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 [Bajczi Levente]: leventebajczi.github.io
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt
+[contributors overview]: https://github.com/sosy-lab/java-smt/graphs/contributors
