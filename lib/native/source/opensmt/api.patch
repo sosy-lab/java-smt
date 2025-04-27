@@ -1,5 +1,5 @@
 diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
-index cd5e32e3..3bca780a 100644
+index 3d3bad4c..daaf1ded 100644
 --- a/src/api/Interpret.cc
 +++ b/src/api/Interpret.cc
 @@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
@@ -24,10 +24,10 @@ index cd5e32e3..3bca780a 100644
  
  PTRef
  Interpret::getParsedFormula()
-@@ -1043,11 +1049,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+@@ -1044,11 +1050,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
  
  
- void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) const {
 +    std::stringstream out;
 +
      va_list ap;
@@ -39,7 +39,7 @@ index cd5e32e3..3bca780a 100644
  
      va_start(ap, fmt_str);
      while (true) {
-@@ -1056,25 +1064,29 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+@@ -1057,25 +1065,29 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) const {
              switch (*fmt_str++) {
              case 's':
                  t = va_arg(ap, char *);
@@ -74,9 +74,9 @@ index cd5e32e3..3bca780a 100644
 +    std::cout << out.str();
  }
  
- void Interpret::notify_success() {
+ void Interpret::notify_success() const {
 diff --git a/src/api/Interpret.h b/src/api/Interpret.h
-index dcc930a9..77e0b402 100644
+index c0b42e2d..e86986cc 100644
 --- a/src/api/Interpret.h
 +++ b/src/api/Interpret.h
 @@ -138,6 +138,7 @@ class Interpret {
@@ -108,10 +108,10 @@ index dcc930a9..77e0b402 100644
  
      int interpFile(FILE* in);
 diff --git a/src/api/MainSolver.h b/src/api/MainSolver.h
-index 01fc6ad3..05d5ee2f 100644
+index 6ce4d184..30f879f5 100644
 --- a/src/api/MainSolver.h
 +++ b/src/api/MainSolver.h
-@@ -103,7 +103,7 @@ public:
+@@ -112,7 +112,7 @@ public:
      // I.e., *excluding* popped assertions
      vec<PTRef> getCurrentAssertions() const;
      // Returns just a view to the assertions
@@ -120,10 +120,10 @@ index 01fc6ad3..05d5ee2f 100644
  
      vec<PTRef> const & getAssertionsAtCurrentLevel() const { return getAssertionsAtLevel(getAssertionLevel()); }
      vec<PTRef> const & getAssertionsAtLevel(std::size_t) const;
-diff --git a/src/common/FastRational.cc b/src/common/FastRational.cc
+diff --git a/src/common/numbers/FastRational.cc b/src/common/numbers/FastRational.cc
 index 68566c05..563fe045 100644
---- a/src/common/FastRational.cc
-+++ b/src/common/FastRational.cc
+--- a/src/common/numbers/FastRational.cc
++++ b/src/common/numbers/FastRational.cc
 @@ -15,18 +15,22 @@ namespace opensmt {
  mpq_ptr FastRational::mpqPool::alloc()
  {
@@ -147,10 +147,10 @@ index 68566c05..563fe045 100644
  }
  
  FastRational::FastRational( const char * s, const int base )
-diff --git a/src/common/FastRational.h b/src/common/FastRational.h
+diff --git a/src/common/numbers/FastRational.h b/src/common/numbers/FastRational.h
 index 7948137b..b99e17ef 100644
---- a/src/common/FastRational.h
-+++ b/src/common/FastRational.h
+--- a/src/common/numbers/FastRational.h
++++ b/src/common/numbers/FastRational.h
 @@ -11,6 +11,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
  #include <cassert>
  #include <climits>
@@ -168,7 +168,7 @@ index 7948137b..b99e17ef 100644
          std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
      public:
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index 85f06522..ed42501b 100644
+index 7188ce65..16cee996 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
 @@ -9,6 +9,7 @@
@@ -222,7 +222,7 @@ index 85f06522..ed42501b 100644
  SRef Logic::getSortRef(PTRef const tr) const {
      return getSortRef(getPterm(tr).symb());
 diff --git a/src/logics/Logic.h b/src/logics/Logic.h
-index 9a144ee6..dc8ce747 100644
+index 1eff071f..1bb2dbcc 100644
 --- a/src/logics/Logic.h
 +++ b/src/logics/Logic.h
 @@ -59,6 +59,9 @@ public:
