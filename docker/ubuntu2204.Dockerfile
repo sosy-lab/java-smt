@@ -111,3 +111,14 @@ RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d713
 
 # JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
+
+# set labels for the image
+ARG BUILD_DATE
+LABEL org.opencontainers.image.created="${BUILD_DATE}"
+LABEL org.opencontainers.image.title="JavaSMT solver development"
+LABEL org.opencontainers.image.description="Ubuntu 18.04-based image for JavaSMT solver development"
+LABEL org.opencontainers.image.source="https://github.com/sosy-lab/java-smt"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
+
+# Podman-Specific Label for Auto-Update
+LABEL io.containers.autoupdate=registry
