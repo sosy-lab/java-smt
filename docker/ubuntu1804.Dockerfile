@@ -103,11 +103,16 @@ RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
  && make clean
 
 # Install the Jdk for Windows x64
-# Builds for arm64 are only available with an Oracle account and have to be downloaded manually
 RUN wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip \
  && unzip openjdk-11+28_windows-x64_bin.zip \
  && mv jdk-11 jdk11-windows-x64 \
  && rm openjdk-11+28_windows-x64_bin.zip
+
+# Install the Jdk for Linux arm64
+RUN wget https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz \
+ && tar -xzf openjdk-17.0.2_linux-aarch64_bin.tar.gz \
+ && mv jdk-17.0.2 jdk17-linux-aarch64 \
+ && rm openjdk-17.0.2_linux-aarch64_bin.tar.gz
 
 # JNI is not found when compiling Boolector in the image, so we need to set JAVA_HOME
 ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
