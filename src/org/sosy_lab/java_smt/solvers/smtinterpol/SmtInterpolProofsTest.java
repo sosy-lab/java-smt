@@ -31,9 +31,11 @@ import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.log.BasicLogManager;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.ProofPrettyPrinter;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
 @SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access"})
@@ -92,13 +94,13 @@ public class SmtInterpolProofsTest {
       prover.addConstraint(q2False);
       assertThat(prover.isUnsat()).isTrue();
 
-      Term proof = prover.smtInterpolGetProof();
+      ProofNode proof = prover.getProof();
       assertThat(proof).isNotNull();
 
-      // String proofStr = proof.toString();
-      // System.out.println(proofStr);
+      ProofPrettyPrinter pp = new ProofPrettyPrinter();
 
-      processTerm(proof);
+      pp.prettyPrint(proof);
+
     } finally {
       prover.close();
     }
@@ -289,11 +291,13 @@ public class SmtInterpolProofsTest {
       // String proofStr = proof.toString();
       // System.out.println(proofStr);
 
-      SmtInterpolProofNodeCreator pc =
-          new SmtInterpolProofNodeCreator(
+      NonRecursiveSmtInterpolCreator pc =
+          new NonRecursiveSmtInterpolCreator(
               (SmtInterpolFormulaCreator) prover.mgr.getFormulaCreator(), prover);
-
-      assertThat(pc.createPPNDag(proof)).isNotNull();
+      // SmtInterpolProofNodeCreator pc =
+      //    new SmtInterpolProofNodeCreator((SmtInterpolFormulaCreator) prover.mgr
+      //    .getFormulaCreator(), prover);
+      // assertThat(pc.createPPNDag(proof)).isNotNull();
 
       System.out.println(pc.createPPNDag(proof).asString());
 
