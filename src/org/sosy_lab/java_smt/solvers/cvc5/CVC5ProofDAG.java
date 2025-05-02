@@ -23,14 +23,13 @@ import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
 
-
-
 public class CVC5ProofDAG extends AbstractProofDAG {
   private static class CVC5Frame extends ProofFrame<Proof> {
     CVC5Frame(Proof proof) {
       super(proof);
     }
   }
+
   public static class CVC5ProofNode extends AbstractProofNode {
 
     public CVC5ProofNode(ProofRule pProofRule, Formula formula) {
@@ -38,7 +37,8 @@ public class CVC5ProofDAG extends AbstractProofDAG {
       super(pProofRule, formula);
     }
 
-    static CVC5ProofNode fromCVC5Proof(Proof pProof, CVC5FormulaCreator formulaCreator) throws CVC5ApiException {
+    static CVC5ProofNode fromCVC5Proof(Proof pProof, CVC5FormulaCreator formulaCreator)
+        throws CVC5ApiException {
 
       boolean skippedScope = false;
 
@@ -79,7 +79,7 @@ public class CVC5ProofDAG extends AbstractProofDAG {
           // ProofRule.fromName(
           // CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
 
-          //Generate formula
+          // Generate formula
           Term term = frame.getProof().getResult();
           Formula pFormula = formulaCreator.encapsulate(formulaCreator.getFormulaType(term), term);
           CVC5ProofNode pn = new CVC5ProofNode(proofRule, pFormula);

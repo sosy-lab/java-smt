@@ -382,8 +382,8 @@ public abstract class SolverBasedTest0 {
 
   protected void requireProofGeneration() {
     assume()
-        .withMessage("Current version of solver %s does not support proof generation",
-            solverToUse())
+        .withMessage(
+            "Current version of solver %s does not support proof generation", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA, Solvers.YICES2, Solvers.CVC4);
   }

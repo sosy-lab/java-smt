@@ -11,14 +11,11 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assume.assumeTrue;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -94,7 +91,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
-             context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -104,7 +101,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireOptimization();
     try (BasicProverEnvironment<?> pe =
-             context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -134,7 +131,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
 
     try (ProverEnvironment pe =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }
@@ -149,7 +146,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
     try (ProverEnvironment pe =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");
@@ -171,13 +168,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
 
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE,
-                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
   }
@@ -202,62 +198,62 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testProof() throws InterruptedException, SolverException {
-      requireProofGeneration(); // Ensures proofs are supported
-      BooleanFormula q1 = bmgr.makeVariable("q1");
-      BooleanFormula q2 = bmgr.makeVariable("q2");
+    requireProofGeneration(); // Ensures proofs are supported
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
 
-      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
-        prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
-        prover.addConstraint(q1);
-        prover.addConstraint(bmgr.not(q2));
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(bmgr.or(bmgr.not(q1), q2));
+      prover.addConstraint(q1);
+      prover.addConstraint(bmgr.not(q2));
 
-        assertThat(prover.isUnsat()).isTrue();
+      assertThat(prover.isUnsat()).isTrue();
 
-        //Test getProof()
-        ProofNode proof = prover.getProof();
-        assertThat(proof).isNotNull();
+      // Test getProof()
+      ProofNode proof = prover.getProof();
+      assertThat(proof).isNotNull();
 
-        //Test getRule()
-        assertThat(proof.getRule()).isNotNull();
-        assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
+      // Test getRule()
+      assertThat(proof.getRule()).isNotNull();
+      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
-        //Test getFormula(), the root should always be false
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      // Test getFormula(), the root should always be false
+      assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
 
-        //Test getChildren()
-        assertThat(proof.getChildren()).isNotNull();
-        assertThat(proof.getChildren()).isNotEmpty();
+      // Test getChildren()
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
-        //Test getId()
-        assertThat(proof.getId()).isNotNull();
-        assertThat(proof.getId()).isNotEqualTo(proof.getChildren().get(0).getId());
+      // Test getId()
+      assertThat(proof.getId()).isNotNull();
+      assertThat(proof.getId()).isNotEqualTo(proof.getChildren().get(0).getId());
 
-        //Test isLeaf()
-        assertThat(proof.isLeaf()).isFalse();
-        ProofNode leaf = findanyProofLeaf(proof);
-        assertThat(leaf).isNotNull();
-        assertThat(leaf.isLeaf()).isTrue();
+      // Test isLeaf()
+      assertThat(proof.isLeaf()).isFalse();
+      ProofNode leaf = findanyProofLeaf(proof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
 
-
-      } catch (UnsupportedOperationException uE) {
-        assertThat(uE).hasMessageThat()
-            .isEqualTo("Proof generation is not available for the current solver.");
-        Class<?> contextClass = context.getClass();
-        boolean isExpected = contextClass.equals(CVC4SolverContext.class)
-            || contextClass.equals(PrincessSolverContext.class)
-            || contextClass.equals(OpenSmtSolverContext.class)
-            || contextClass.equals(BoolectorSolverContext.class)
-            || contextClass.equals(BitwuzlaSolverContext.class)
-            || contextClass.equals(Yices2SolverContext.class);
-        assertThat(isExpected).isTrue();
-      }
+    } catch (UnsupportedOperationException uE) {
+      assertThat(uE)
+          .hasMessageThat()
+          .isEqualTo("Proof generation is not available for the current solver.");
+      Class<?> contextClass = context.getClass();
+      boolean isExpected =
+          contextClass.equals(CVC4SolverContext.class)
+              || contextClass.equals(PrincessSolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
+              || contextClass.equals(BoolectorSolverContext.class)
+              || contextClass.equals(BitwuzlaSolverContext.class)
+              || contextClass.equals(Yices2SolverContext.class);
+      assertThat(isExpected).isTrue();
+    }
   }
 
   private ProofNode findanyProofLeaf(ProofNode pn) {
     if (pn.isLeaf()) {
       return pn;
     }
-     return findanyProofLeaf(pn.getChildren().get(0));
-
+    return findanyProofLeaf(pn.getChildren().get(0));
   }
 }
