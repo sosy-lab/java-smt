@@ -15,12 +15,13 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_proof_manager;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Stack;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -70,7 +71,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     long pm = msat_get_proof_manager(curEnv);
     long proof = msat_get_proof(pm);
     pn = Mathsat5ProofNode.fromMsatProof(this, proof);
-    context.getFormulaManager().getBooleanFormulaManager();
     clausifyResChain(pn, context.getFormulaManager().getBooleanFormulaManager());
     msat_destroy_proof_manager(pm);
 
@@ -83,9 +83,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   // formulas and return the updated root node with formulas attached.
   private void clausifyResChain(ProofNode root, BooleanFormulaManager bfmgr) {
     Map<ProofNode, Boolean> visited = new HashMap<>(); // Track visited nodes
-    Stack<ProofNode> stack = new Stack<>();
-    Stack<ProofNode> processStack =
-        new Stack<>(); // Stack to hold nodes for post-processing after children
+    Deque<ProofNode> stack = new ArrayDeque<>();
 
     stack.push(root); // Start with the root node
     visited.put(root, Boolean.FALSE); // Mark root as unvisited
@@ -93,7 +91,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     while (!stack.isEmpty()) {
       ProofNode node = stack.peek(); // Look at the top node, but don't pop yet
 
-      if (visited.get(node) == Boolean.FALSE) {
+      if (visited.get(node).equals(Boolean.FALSE)) {
         // First time visiting this node
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
@@ -155,8 +153,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     List<BooleanFormula> literals2 = flattenLiterals(clause2, bfmgr);
     List<BooleanFormula> combined = new ArrayList<>();
 
-    boolean removed = false;
-
     for (BooleanFormula lit : literals1) {
       if (!isComplement(lit, pivot, bfmgr)) {
         combined.add(lit);
@@ -164,7 +160,6 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     }
 
     List<BooleanFormula> temp = new ArrayList<>();
-    boolean removed2 = false;
     for (BooleanFormula lit : literals2) {
       if (!isComplement(lit, pivot, bfmgr)) {
         temp.add(lit);
@@ -221,17 +216,17 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
           // others unchanged...
           @Override
-          public TraversalProcess visitXor(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitXor(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitEquivalence(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitEquivalence(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitImplication(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitImplication(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 
@@ -299,17 +294,17 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
           }
 
           @Override
-          public TraversalProcess visitXor(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitXor(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitEquivalence(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitEquivalence(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitImplication(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitImplication(BooleanFormula first, BooleanFormula second) {
             return TraversalProcess.SKIP;
           }
 

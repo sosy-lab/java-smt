@@ -225,7 +225,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getChildren()).isNotEmpty();
 
       // Test getId()
-      assertThat(proof.getId()).isNotNull();
       assertThat(proof.getId()).isNotEqualTo(proof.getChildren().get(0).getId());
 
       // Test isLeaf()

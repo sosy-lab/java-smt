@@ -62,7 +62,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   /**
    * This method converts a set of Z3ProofNodes into a {@link ResolutionProofDAG}.
    *
-   * @param z3ProofNodes
+   * @param z3ProofNodes the nodes to be converted.
    * @return {@link ResolutionProofDAG}
    */
   static ResolutionProofDAG convertToResolutionProofDag(Z3ProofDAG.Z3ProofNode[] z3ProofNodes) {
@@ -401,143 +401,143 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   ProofNode handleMonotonicity(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleQuantIntro(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleBind(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleDistributivity(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleAndElim(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleNotOrElim(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleRewrite(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleRewriteStar(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handlePullQuant(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleElimUnusedVars(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handlePushQuant(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleDer(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleQuantInst(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleHypothesis(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleLemma(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleUnitResolution(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleIffTrue(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleIffFalse(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleCommutativity(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleDefAxiom(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleAssumptionAdd(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleLemmaAdd(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleRedundantDel(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleClauseTrail(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleDefIntro(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleApplyDef(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleIffOeq(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleNnfPos(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleNnfNeg(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleSkolemize(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleModusPonensOeq(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleThLemma(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleHyperResolve(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleOperation(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   ProofNode handleDefault(Z3ProofDAG.Z3ProofNode node) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 
   // This is for debugging purposes.

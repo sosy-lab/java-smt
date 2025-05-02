@@ -22,23 +22,23 @@ public interface ProofDAG {
   /**
    * Add a node to the DAG.
    *
-   * @param node
+   * @param node The node to be added to the DAG.
    */
   void addNode(ProofNode node);
 
   /**
    * Get a node from the DAG.
    *
-   * @param nodeId
-   * @return
+   * @param nodeId The ID of the node.
+   * @return A {@link ProofNode} based on its ID.
    */
   ProofNode getNode(int nodeId);
 
   /**
    * Add an edge to the DAG.
    *
-   * @param parentNodeId
-   * @param childNodeId
+   * @param parentNodeId Predecessor
+   * @param childNodeId Successor
    */
   void addEdge(int parentNodeId, int childNodeId);
 

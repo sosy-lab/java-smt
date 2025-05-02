@@ -44,12 +44,12 @@ public class Z3ProofDAG extends AbstractProofDAG {
      * that is a whole subtree from Z3 composed of the asseertion, the OR operation and the
      * operands.
      *
-     * @param rootProof
-     * @param formulaCreator
-     * @return
+     * @param rootProof The root of proof DAG to be converted
+     * @param formulaCreator The {@link FormulaCreator} to be able to produce the {@link Formula}s
+     * @return The root of converted proof DAG as {@link Z3ProofNode}
      */
-    static Z3ProofNode fromZ3Proof(long rootProof, FormulaCreator formulaCreator) {
-      long z3context = (long) formulaCreator.getEnv();
+    static Z3ProofNode fromZ3Proof(long rootProof, Z3FormulaCreator formulaCreator) {
+      long z3context = formulaCreator.getEnv();
       // proof ast to be processed wrapped inside a frame
       Deque<Frame> stack = new ArrayDeque<>();
 

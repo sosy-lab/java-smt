@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.java_smt.ResProofRule;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
@@ -44,7 +45,7 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
 
     @Override
     public String getName() {
-      return name().toLowerCase();
+      return name().toLowerCase(Locale.ROOT);
     }
   }
 
@@ -56,12 +57,9 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
 
   static class SmtInterpolProofNodeCreator {
     private final SmtInterpolFormulaCreator creator;
-    private final SmtInterpolAbstractProver<?> prover;
 
-    SmtInterpolProofNodeCreator(
-        SmtInterpolFormulaCreator pCreator, SmtInterpolAbstractProver<?> pProver) {
+    SmtInterpolProofNodeCreator(SmtInterpolFormulaCreator pCreator) {
       creator = pCreator;
-      prover = pProver;
     }
 
     SmtInterpolProofNode createProof(ProvitionalProofNode pProofNode) {

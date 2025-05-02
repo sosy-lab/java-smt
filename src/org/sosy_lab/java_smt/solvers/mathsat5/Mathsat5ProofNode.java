@@ -21,6 +21,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proo
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -106,7 +107,10 @@ public class Mathsat5ProofNode extends AbstractProofNode {
         // If the theory-lemma rule includes a last argument that is not a term, it means it has
         // a proof attached to it. Not all rules are known beforehand so they are not in the enum.
         try {
-          proofRule = rule == null ? Rule.NULL : Rule.valueOf(rule.toUpperCase().replace("-", "_"));
+          proofRule =
+              rule == null
+                  ? Rule.NULL
+                  : Rule.valueOf(rule.toUpperCase(Locale.ROOT).replace("-", "_"));
         } catch (IllegalArgumentException e) {
           proofRule = new Mathsat5ProofRule(rule);
         }

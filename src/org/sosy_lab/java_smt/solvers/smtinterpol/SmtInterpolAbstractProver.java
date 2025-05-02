@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
@@ -244,7 +243,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     }
 
     SmtInterpolProofNodeCreator pc =
-        new SmtInterpolProofNodeCreator((SmtInterpolFormulaCreator) this.creator, this);
+        new SmtInterpolProofNodeCreator((SmtInterpolFormulaCreator) this.creator);
     ProvitionalProofNode ppn = pc.createPPNDag(tProof);
     ProofNode proof = pc.createProof(ppn);
     // Before being able to perfom resolution, we need to calculate the formulas resulting from
@@ -299,11 +298,10 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
+  @SuppressWarnings("unused")
   private void clausifyResChain(ProofNode root, BooleanFormulaManager bfmgr) {
     Map<ProofNode, Boolean> visited = new HashMap<>(); // Track visited nodes
-    Stack<ProofNode> stack = new Stack<>();
-    Stack<ProofNode> processStack =
-        new Stack<>(); // Stack to hold nodes for post-processing after children
+    ArrayDeque<ProofNode> stack = new ArrayDeque<>();
 
     stack.push(root); // Start with the root node
     visited.put(root, Boolean.FALSE); // Mark root as unvisited
@@ -311,7 +309,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     while (!stack.isEmpty()) {
       ProofNode node = stack.peek(); // Look at the top node, but don't pop yet
 
-      if (visited.get(node) == Boolean.FALSE) {
+      if (visited.get(node).equals(Boolean.FALSE)) {
         // First time visiting this node
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
@@ -373,8 +371,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     List<BooleanFormula> literals2 = flattenLiterals(clause2, bfmgr);
     List<BooleanFormula> combined = new ArrayList<>();
 
-    boolean removed = false;
-
     for (BooleanFormula lit : literals1) {
       if (!isComplement(lit, pivot, bfmgr)) {
         combined.add(lit);
@@ -382,7 +378,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     }
 
     List<BooleanFormula> temp = new ArrayList<>();
-    boolean removed2 = false;
+
     for (BooleanFormula lit : literals2) {
       if (!isComplement(lit, pivot, bfmgr)) {
         temp.add(lit);
@@ -439,17 +435,17 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
           // others unchanged...
           @Override
-          public TraversalProcess visitXor(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitXor(BooleanFormula one, BooleanFormula two) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitEquivalence(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitEquivalence(BooleanFormula one, BooleanFormula two) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitImplication(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitImplication(BooleanFormula one, BooleanFormula two) {
             return TraversalProcess.SKIP;
           }
 
@@ -517,17 +513,17 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
           }
 
           @Override
-          public TraversalProcess visitXor(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitXor(BooleanFormula var1, BooleanFormula var2) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitEquivalence(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitEquivalence(BooleanFormula var1, BooleanFormula var2) {
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitImplication(BooleanFormula a, BooleanFormula b) {
+          public TraversalProcess visitImplication(BooleanFormula var1, BooleanFormula var2) {
             return TraversalProcess.SKIP;
           }
 

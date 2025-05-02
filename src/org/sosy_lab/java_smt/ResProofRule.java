@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
@@ -29,7 +30,7 @@ public class ResProofRule {
 
   static {
     for (ResAxiom rule : ResAxiom.values()) {
-      RULE_MAP.put(rule.getName().toLowerCase(), rule);
+      RULE_MAP.put(rule.getName().toLowerCase(Locale.ROOT), rule);
     }
   }
 
@@ -146,7 +147,7 @@ public class ResProofRule {
    */
   public static ResAxiom getFromName(String name) {
 
-    ResAxiom rule = RULE_MAP.get(name.toLowerCase());
+    ResAxiom rule = RULE_MAP.get(name.toLowerCase(Locale.ROOT));
     if (rule == null) {
       throw new IllegalArgumentException("Rule not found or not specified: " + name);
     }
