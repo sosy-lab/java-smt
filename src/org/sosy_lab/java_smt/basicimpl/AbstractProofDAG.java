@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofDAG;
@@ -64,7 +65,7 @@ public abstract class AbstractProofDAG implements ProofDAG {
   public abstract static class AbstractProofNode implements ProofNode {
     private final List<ProofNode> children;
     private ProofRule rule;
-    protected Formula formula;
+    @Nullable protected Formula formula;
     private static final UniqueIdGenerator idGenerator = new UniqueIdGenerator();
     private final int id;
 
@@ -109,7 +110,7 @@ public abstract class AbstractProofDAG implements ProofDAG {
       this.rule = rule;
     }
 
-    void setFormula(Formula pFormula) {
+    public void setFormula(Formula pFormula) {
       formula = pFormula;
     }
   }
