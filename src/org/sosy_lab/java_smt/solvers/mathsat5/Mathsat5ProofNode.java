@@ -177,10 +177,6 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     return formula;
   }
 
-  void setFormula(Formula formula) {
-    this.formula = formula;
-  }
-
   String asString() {
     return asString(0);
   }
