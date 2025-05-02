@@ -70,7 +70,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
     for (Z3ProofDAG.Z3ProofNode z3Node : z3ProofNodes) {
       if (z3Node.getRule() == MODUS_PONENS) {
-        continue; //process mp continue here to avoid empty if block
+        continue; // process mp continue here to avoid empty if block
       } else {
         Formula formula = z3Node.getFormula();
         // ResAxiom resAxiom = mapRule(z3Node.getRule());
@@ -83,7 +83,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   // This should help extract parts of a formula to better transform proof rules.
-  private final static class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
+  private final class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
     private final List<BooleanFormula> equivalenceOperands = new ArrayList<>();
 
     public List<BooleanFormula> getEquivalenceOperands() {

@@ -32,10 +32,10 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.ProofFactory;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.basicimpl.ProofFactory;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {

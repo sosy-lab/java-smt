@@ -24,12 +24,12 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  *
  * @author Gabriel Carpio
  */
-public class ResProofRule {
+public final class ResProofRule {
 
   private static final Map<String, ResAxiom> RULE_MAP = new HashMap<>();
 
   private ResProofRule() {
-    //prevent instantiation
+    // prevent instantiation
   }
 
   static {

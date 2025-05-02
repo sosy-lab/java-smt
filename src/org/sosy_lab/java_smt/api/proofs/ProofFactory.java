@@ -8,14 +8,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.basicimpl;
+package org.sosy_lab.java_smt.api.proofs;
 
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProofDAG.AxiomProofNode;
 import org.sosy_lab.java_smt.ResolutionProofDAG.ResolutionProofNode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofNode;
 
 /**

@@ -219,9 +219,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
       // Test getFormula(), the root should always be false
-      if(solverToUse().equals(SMTINTERPOL)){
+      if (solverToUse().equals(SMTINTERPOL)) {
         assertThat(proof.getFormula()).isNull();
-      }else {
+      } else {
         assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
       }
 
@@ -238,8 +238,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
-    } catch (UnsupportedOperationException uE) {
-      assertThat(uE)
+    } catch (UnsupportedOperationException e) {
+      assertThat(e)
           .hasMessageThat()
           .isEqualTo("Proof generation is not available for the current solver.");
       Class<?> contextClass = context.getClass();

@@ -50,7 +50,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
   private static final String OPT_ENGINE_CONFIG_KEY = "optsmt_engine";
   private static final String OPT_PRIORITY_CONFIG_KEY = "priority";
-  private static boolean generateProofs = false; //for debugging
+  private static boolean generateProofs = false; // for debugging
 
   @Options(prefix = "solver.z3")
   private static class ExtraOptions {
