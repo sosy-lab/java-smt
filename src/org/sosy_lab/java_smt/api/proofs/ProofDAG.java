@@ -8,6 +8,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+/**
+ * This package is meant to provide abstract classes and interfaces that are inherited and used
+ * all over to process proofs from the solvers.
+ */
 package org.sosy_lab.java_smt.api.proofs;
 
 import java.util.Collection;

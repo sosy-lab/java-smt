@@ -45,7 +45,12 @@ public class ProofFactory<T> {
   }
 
   protected ProofFactory(ProverEnvironment pProver, String pSolver) {
-    // formulaCreator = pCreator;
+    if (pProver == null) {
+      throw new NullPointerException("ProverEnvironment must not be null");
+    }
+    if (pSolver == null) {
+      throw new NullPointerException("Solver name must not be null");
+    }
     prover = pProver;
     solver = Solvers.valueOf(pSolver);
   }

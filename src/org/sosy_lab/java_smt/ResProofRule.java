@@ -28,6 +28,10 @@ public class ResProofRule {
 
   private static final Map<String, ResAxiom> RULE_MAP = new HashMap<>();
 
+  private ResProofRule() {
+    //prevent instantiation
+  }
+
   static {
     for (ResAxiom rule : ResAxiom.values()) {
       RULE_MAP.put(rule.getName().toLowerCase(Locale.ROOT), rule);

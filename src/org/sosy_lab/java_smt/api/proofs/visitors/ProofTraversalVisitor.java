@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-
+/**
+ * These package is meant to provide the visitor classes used for proof handling.
+ */
 package org.sosy_lab.java_smt.api.proofs.visitors;
 
 import java.util.HashSet;

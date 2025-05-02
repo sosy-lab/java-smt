@@ -260,8 +260,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
       return CVC5ProofNode.fromCVC5Proof(proofs[0], creator);
-    } catch (CVC5ApiException pE) {
-      throw new RuntimeException(pE);
+    } catch (CVC5ApiException e) {
+      throw new RuntimeException(e);
     }
   }
 

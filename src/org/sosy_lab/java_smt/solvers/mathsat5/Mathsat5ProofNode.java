@@ -23,7 +23,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
@@ -128,7 +128,6 @@ public class Mathsat5ProofNode extends AbstractProofNode {
             i < msat_proof_get_arity(frame.getProof());
             i++) {
 
-          // AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
           long child = msat_proof_get_child(frame.getProof(), i);
 
           Mathsat5ProofNode childNode = computed.get(child);

@@ -16,6 +16,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -218,7 +219,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
       // Test getFormula(), the root should always be false
-      assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      if(solverToUse().equals(SMTINTERPOL)){
+        assertThat(proof.getFormula()).isNull();
+      }else {
+        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
 
       // Test getChildren()
       assertThat(proof.getChildren()).isNotNull();

@@ -42,8 +42,8 @@ public abstract class ProofFrame<T> {
   }
 
   /** Set the frame as visited. */
-  public void setAsVisited(boolean visited) {
-    this.visited = visited;
+  public void setAsVisited(boolean isVisited) {
+    this.visited = isVisited;
   }
 
   /** Set the number of arguments the proof object has. */
