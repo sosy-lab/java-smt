@@ -83,7 +83,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   // This should help extract parts of a formula to better transform proof rules.
-  private final class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
+  private static final class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
     private final List<BooleanFormula> equivalenceOperands = new ArrayList<>();
 
     public List<BooleanFormula> getEquivalenceOperands() {
