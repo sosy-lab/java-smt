@@ -180,7 +180,12 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     List<String> boundVariablesNameList = new ArrayList<>();
     List<String> boundVariablesTypeList = new ArrayList<>();
-
+    if (pVariables.isEmpty()) {
+      throw new IllegalArgumentException("Empty variable list for quantifier.");
+    }
+    if(pBody == null){
+      throw new IllegalArgumentException("Body is empty. Please check the input formula");
+    }
     String form = dumpFormula(pBody);
     Term ultimateBody = ultimateEliminatorWrapper.parse(form);
     for (Formula var : pVariables) {

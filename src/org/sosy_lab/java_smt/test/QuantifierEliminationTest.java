@@ -19,6 +19,8 @@ import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierElimi
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierEliminationMethod.ULTIMATE_ELIMINATOR_FALLBACK_ON_FAILURE;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierEliminationMethod.ULTIMATE_ELIMINATOR_FALLBACK_WITH_WARNING_ON_FAILURE;
 
+import com.google.common.collect.ImmutableList;
+import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -488,6 +490,77 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
     assertThat(
             (exception instanceof UnsupportedOperationException)
                 || expectedMessage.contains(exception.getMessage()))
+        .isTrue();
+  }
+
+  @Test
+  public void testQuantElimBeforeFormulaHasNoBody() {
+  requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula zero = imgr.makeNumber(0);
+
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                qmgr.forall(
+                    x,
+                    null, ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION));
+
+    String expectedMessage = "Body is empty. Please check the input formula";
+
+    assertThat(
+        (expectedMessage.contains(exception.getMessage())))
+        .isTrue();
+  }
+
+  @Test
+  public void testQuantElimBeforeFormulaHasNoBoundVariable() {
+    requireIntegers();
+    requireQuantifiers();
+
+    assume()
+        .withMessage("Solver %s does not support quantifiers via JavaSMT", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.BOOLECTOR);
+
+    assume()
+        .withMessage("Solver %s does not support parsing yet", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula zero = imgr.makeNumber(0);
+    Exception exception =
+        assertThrows(
+            IllegalArgumentException.class,
+            () ->
+                qmgr.forall(
+                    List.of(),
+                    bmgr.or(
+                        imgr.greaterOrEquals(x, zero),
+                        qmgr.forall(
+                            y, imgr.greaterOrEquals(y, zero), ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION)),
+                    ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION));
+
+    String expectedMessage = "Empty variable list for quantifier.";
+
+    assertThat(
+        (expectedMessage.contains(exception.getMessage())))
         .isTrue();
   }
 }
