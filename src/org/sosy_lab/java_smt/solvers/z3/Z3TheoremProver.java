@@ -161,16 +161,6 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     return Z3ProofNode.fromZ3Proof(proofAst, creator);
   }
 
-  // This method is used to get the Z3 proof as a long for testing exclusively
-  long getZ3Proof() {
-    return Native.solverGetProof(z3context, z3solver);
-  }
-
-  // This method is used to get the Z3 solver object for testing exclusively
-  long getZ3solver() {
-    return z3solver;
-  }
-
   @Override
   public int size() {
     Preconditions.checkState(!closed);
