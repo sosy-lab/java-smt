@@ -42,8 +42,6 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     MsatProofFrame(Long proof) {
       super(proof);
     }
-
-    boolean skip = false;
   }
 
   /**
