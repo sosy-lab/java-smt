@@ -19,7 +19,6 @@ import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierElimi
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierEliminationMethod.ULTIMATE_ELIMINATOR_FALLBACK_ON_FAILURE;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.QuantifierEliminationMethod.ULTIMATE_ELIMINATOR_FALLBACK_WITH_WARNING_ON_FAILURE;
 
-import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -495,7 +494,7 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
 
   @Test
   public void testQuantElimBeforeFormulaHasNoBody() {
-  requireIntegers();
+    requireIntegers();
     requireQuantifiers();
 
     assume()
@@ -509,22 +508,15 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
         .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2);
 
     IntegerFormula x = imgr.makeVariable("x");
-    IntegerFormula y = imgr.makeVariable("y");
-    IntegerFormula zero = imgr.makeNumber(0);
 
     Exception exception =
         assertThrows(
             IllegalArgumentException.class,
-            () ->
-                qmgr.forall(
-                    x,
-                    null, ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION));
+            () -> qmgr.forall(x, null, ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION));
 
     String expectedMessage = "Body is empty. Please check the input formula";
 
-    assertThat(
-        (expectedMessage.contains(exception.getMessage())))
-        .isTrue();
+    assertThat(expectedMessage.contains(exception.getMessage())).isTrue();
   }
 
   @Test
@@ -554,13 +546,13 @@ public class QuantifierEliminationTest extends SolverBasedTest0.ParameterizedSol
                     bmgr.or(
                         imgr.greaterOrEquals(x, zero),
                         qmgr.forall(
-                            y, imgr.greaterOrEquals(y, zero), ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION)),
+                            y,
+                            imgr.greaterOrEquals(y, zero),
+                            ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION)),
                     ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION));
 
     String expectedMessage = "Empty variable list for quantifier.";
 
-    assertThat(
-        (expectedMessage.contains(exception.getMessage())))
-        .isTrue();
+    assertThat(expectedMessage.contains(exception.getMessage())).isTrue();
   }
 }

@@ -77,6 +77,6 @@ public class Mathsat5QuantifiedFormulaManager
     assert getFormulaCreator().getFormulaType(extractInfo(bf)) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
     // UltimateEliminator currently does not support quantified Terms with definitions yet.
-    return msat_to_smtlib2_ext(formulaCreator.getEnv(), extractInfo(bf), "qFormulaNameMathsat5", 1);
+    return msat_to_smtlib2_ext(formulaCreator.getEnv(), extractInfo(bf), "", 1);
   }
 }

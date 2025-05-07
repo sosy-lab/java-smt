@@ -73,7 +73,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             false);
 
       case ULTIMATE_ELIMINATOR_FALLBACK_ON_FAILURE:
-        return handleUltimateEliminator(pF, null, null, true);
+        return handleUltimateEliminator(pF, Level.WARNING, "", true);
 
       case ULTIMATE_ELIMINATOR_FALLBACK_WITH_WARNING_ON_FAILURE:
         return handleUltimateEliminator(
@@ -91,7 +91,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             false);
 
       case NATIVE_FALLBACK_ON_FAILURE:
-        return handleNativeElimination(pF, null, null, true);
+        return handleNativeElimination(pF, Level.WARNING, "", true);
 
       case NATIVE_FALLBACK_WITH_WARNING_ON_FAILURE:
         return handleNativeElimination(
@@ -138,10 +138,10 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     switch (pMethod) {
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION:
         return handleQuantifierFormulaCreation(
-            q, pVariables, pBody, Level.SEVERE, "External " + "quantifier creation failed.", false);
+            q, pVariables, pBody, Level.SEVERE, "External quantifier creation failed.", false);
 
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK:
-        return handleQuantifierFormulaCreation(q, pVariables, pBody, null, null, true);
+        return handleQuantifierFormulaCreation(q, pVariables, pBody, Level.WARNING, "", true);
 
       case ULTIMATE_ELIMINATOR_BEFORE_FORMULA_CREATION_FALLBACK_WARN_ON_FAILURE:
         return handleQuantifierFormulaCreation(
@@ -149,7 +149,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
             pVariables,
             pBody,
             Level.WARNING,
-            "External " + "quantifier creation failed. Falling back to native",
+            "External quantifier creation failed. Falling back to native",
             true);
       default:
         return wrap(
@@ -183,7 +183,7 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
     if (pVariables.isEmpty()) {
       throw new IllegalArgumentException("Empty variable list for quantifier.");
     }
-    if(pBody == null){
+    if (pBody == null) {
       throw new IllegalArgumentException("Body is empty. Please check the input formula");
     }
     String form = dumpFormula(pBody);
