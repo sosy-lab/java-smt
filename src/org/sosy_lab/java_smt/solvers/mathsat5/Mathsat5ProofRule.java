@@ -25,9 +25,10 @@ class Mathsat5ProofRule implements ProofRule {
     // v"
     CLAUSE_HYP(), // " which are the clauses of the (CNF conversion of the) input problem. They have
     // a list of terms as children"
-    NULL(); // We introduce this rule because Term Nodes in MathSAT5 do not have a rule associated
 
-    // with them.
+    EMPTY(); //We introduce this rule for term nodes that do not have a proof rule attached, even
+    // if they are pivots. In the future it might be good to a PIVOT rule so that those can have
+    // that instead.
 
     @Override
     public String getName() {

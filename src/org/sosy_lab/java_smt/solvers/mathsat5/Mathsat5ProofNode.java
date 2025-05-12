@@ -107,7 +107,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
         try {
           proofRule =
               rule == null
-                  ? Rule.NULL
+                  ? Rule.EMPTY
                   : Rule.valueOf(rule.toUpperCase(Locale.ROOT).replace("-", "_"));
         } catch (IllegalArgumentException e) {
           proofRule = new Mathsat5ProofRule(rule);
@@ -146,8 +146,8 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     Formula formula = null;
     long proof = frame.getProof();
     int children = msat_proof_get_arity(proof);
-    // If rule is NULL the proof should be a term and we encapsulate directly
-    if (rule.equals(Rule.NULL)) {
+    // If rule is EMPTY the proof should be a term and we encapsulate directly
+    if (rule.equals(Rule.EMPTY)) {
       formula =
           formulaCreator.encapsulate(
               formulaCreator.getFormulaType(msat_proof_get_term(proof)),
