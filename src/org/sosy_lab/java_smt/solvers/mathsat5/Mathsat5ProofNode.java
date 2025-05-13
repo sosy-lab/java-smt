@@ -108,7 +108,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
           proofRule =
               rule == null
                   ? Rule.EMPTY
-                  : Rule.valueOf(rule.toUpperCase(Locale.ROOT).replace("-", "_"));
+                  : Rule.valueOf(rule.toUpperCase(Locale.ENGLISH).replace("-", "_"));
         } catch (IllegalArgumentException e) {
           proofRule = new Mathsat5ProofRule(rule);
         }

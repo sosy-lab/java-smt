@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt;
 
+import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -34,7 +35,7 @@ public final class ResProofRule {
 
   static {
     for (ResAxiom rule : ResAxiom.values()) {
-      RULE_MAP.put(rule.getName().toLowerCase(Locale.ROOT), rule);
+      RULE_MAP.put(rule.getName().toLowerCase(Locale.ENGLISH), rule);
     }
   }
 
@@ -150,12 +151,8 @@ public final class ResProofRule {
    * @throws IllegalArgumentException if the name does not match any rule.
    */
   public static ResAxiom getFromName(String name) {
-
-    ResAxiom rule = RULE_MAP.get(name.toLowerCase(Locale.ROOT));
-    if (rule == null) {
-      throw new IllegalArgumentException("Rule not found or not specified: " + name);
-    }
-
+    ResAxiom rule = RULE_MAP.get(name.toLowerCase(Locale.ENGLISH));
+    Preconditions.checkNotNull(rule);
     return rule;
   }
 }

@@ -45,7 +45,7 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
 
     @Override
     public String getName() {
-      return name().toLowerCase(Locale.ROOT);
+      return name().toLowerCase(Locale.ENGLISH);
     }
   }
 
