@@ -1411,7 +1411,7 @@ public class CVC5NativeAPITest {
 
     assertThat(proof.getRule()).isEqualTo(ProofRule.SCOPE);
 
-    // Test getChildren
+    // Test getArguments
     assertThat(proof.getChildren()).isNotNull();
 
     assertThat(proof.getChildren()[0]).isNotNull();

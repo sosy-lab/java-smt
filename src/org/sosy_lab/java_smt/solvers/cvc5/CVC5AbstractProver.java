@@ -38,9 +38,8 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.solvers.cvc5.CVC5ProofDAG.CVC5ProofNode;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
@@ -250,7 +249,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public ProofNode getProof() {
+  public Subproof getProof() {
 
     Proof[] proofs = solver.getProof();
     if (proofs == null || proofs.length == 0) {
@@ -259,7 +258,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
-      return CVC5ProofNode.fromCVC5Proof(proofs[0], creator);
+      CVC5Proof proof = new CVC5Proof();
+      return proof.generateProofImpl(proofs[0], creator);
     } catch (CVC5ApiException e) {
       throw new RuntimeException(e);
     }

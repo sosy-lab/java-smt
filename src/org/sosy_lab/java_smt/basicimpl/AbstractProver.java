@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -168,7 +168,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ProofNode getProof() throws InterruptedException, SolverException {
+  public Subproof getProof() throws InterruptedException, SolverException {
     throw new UnsupportedOperationException(
         "Proof generation is not available for the current solver.");
   }
