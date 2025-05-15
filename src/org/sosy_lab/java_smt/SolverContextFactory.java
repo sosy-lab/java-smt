@@ -36,6 +36,7 @@ import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
+import org.sosy_lab.java_smt.solvers.portfolio.PortfolioSolverContext;
 import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
@@ -60,6 +61,7 @@ public class SolverContextFactory {
     CVC4,
     CVC5,
     YICES2,
+    PORTFOLIO,
     BITWUZLA
   }
 
@@ -303,6 +305,9 @@ public class SolverContextFactory {
       case BITWUZLA:
         return BitwuzlaSolverContext.create(
             config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
+
+      case PORTFOLIO:
+        return PortfolioSolverContext.create(config, logger, shutdownNotifier, logfile, randomSeed, loader);
 
       default:
         throw new AssertionError("no solver selected");
