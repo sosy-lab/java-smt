@@ -307,7 +307,8 @@ public class SolverContextFactory {
             config, shutdownNotifier, logfile, randomSeed, floatingPointRoundingMode, loader);
 
       case PORTFOLIO:
-        return PortfolioSolverContext.create(config, logger, shutdownNotifier, logfile, randomSeed, loader);
+        return PortfolioSolverContext.create(
+            config, logger, shutdownNotifier, logfile, randomSeed, loader);
 
       default:
         throw new AssertionError("no solver selected");

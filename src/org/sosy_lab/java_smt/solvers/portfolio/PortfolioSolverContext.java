@@ -14,8 +14,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,8 +40,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormulaCreator;
-import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 
 public class PortfolioSolverContext extends AbstractSolverContext {
 
@@ -64,13 +60,12 @@ public class PortfolioSolverContext extends AbstractSolverContext {
       config.inject(this);
       ImmutableList.Builder<Solvers> builder = ImmutableList.builder();
       // Replace all whitespaces and invisible chars with nothing
-      for (String solverName : solvers.replaceAll("\\s+","").split(",")) {
+      for (String solverName : solvers.replaceAll("\\s+", "").split(",")) {
         if (solverName.isEmpty()) {
-          throw new InvalidConfigurationException("You need to specify at least one solvers for "
-              + "portfolio mode");
+          throw new InvalidConfigurationException(
+              "You need to specify at least one solvers for " + "portfolio mode");
         }
-        Solvers solver =
-            Solvers.valueOf(sanitizeSolverNames(solverName.toUpperCase()));
+        Solvers solver = Solvers.valueOf(sanitizeSolverNames(solverName.toUpperCase()));
         builder.add(solver);
       }
       solversList = builder.build();
@@ -90,13 +85,24 @@ public class PortfolioSolverContext extends AbstractSolverContext {
       }
       String sanitizedName;
       switch (upperCaseSolverName) {
-        case "MATHSAT": sanitizedName = upperCaseSolverName + "5"; break;
-        case "OPENSMT2": sanitizedName = "OPENSMT"; break;
-        case "YICES": sanitizedName = "YICES2"; break;
-        default: throw new InvalidConfigurationException("Solver name "+upperCaseSolverName+ " "
-            + "unknown, try one of the following: "+Arrays.stream(Solvers.values()).map(
-            Enum::toString).collect(
-            Collectors.joining (", ")));
+        case "MATHSAT":
+          sanitizedName = upperCaseSolverName + "5";
+          break;
+        case "OPENSMT2":
+          sanitizedName = "OPENSMT";
+          break;
+        case "YICES":
+          sanitizedName = "YICES2";
+          break;
+        default:
+          throw new InvalidConfigurationException(
+              "Solver name "
+                  + upperCaseSolverName
+                  + " "
+                  + "unknown, try one of the following: "
+                  + Arrays.stream(Solvers.values())
+                      .map(Enum::toString)
+                      .collect(Collectors.joining(", ")));
       }
       return sanitizedName;
     }
@@ -108,9 +114,11 @@ public class PortfolioSolverContext extends AbstractSolverContext {
   private final ShutdownNotifier shutdownNotifier;
   private boolean closed = false;
 
-  PortfolioSolverContext(Map<Solvers, SolverContext> pSolversWithContexts,
-                         PortfolioFormulaManager pManager,PortfolioFormulaCreator pCreator,
-                         ShutdownNotifier pShutdownNotifier) {
+  PortfolioSolverContext(
+      Map<Solvers, SolverContext> pSolversWithContexts,
+      PortfolioFormulaManager pManager,
+      PortfolioFormulaCreator pCreator,
+      ShutdownNotifier pShutdownNotifier) {
     super(pManager);
     solversWithContexts = pSolversWithContexts;
     creator = pCreator;
@@ -134,53 +142,65 @@ public class PortfolioSolverContext extends AbstractSolverContext {
     if (solvers.size() != ImmutableSet.copyOf(solvers).size()) {
       throw new InvalidConfigurationException("You can't choose a solver twice in portfolio mode");
     }
-    ImmutableMap.Builder<Solvers, SolverContext> solversWithContextsBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<Solvers, SolverContext> solversWithContextsBuilder =
+        ImmutableMap.builder();
     for (Solvers solver : solvers) {
-      solversWithContextsBuilder.put(solver, SolverContextFactory.createSolverContext(config,
-          logger,
-          pShutdownNotifier, solver, pLoader));
+      solversWithContextsBuilder.put(
+          solver,
+          SolverContextFactory.createSolverContext(
+              config, logger, pShutdownNotifier, solver, pLoader));
     }
     Map<Solvers, SolverContext> solversWithContexts = solversWithContextsBuilder.buildOrThrow();
 
-    ImmutableMap.Builder<Solvers, FormulaManager> solversToManagersBuilder =
-        ImmutableMap.builder();
-    ImmutableMap.Builder<Solvers, FormulaCreator<?,?,?,?>> solversToCreatorsBuilder =
+    ImmutableMap.Builder<Solvers, FormulaManager> solversToManagersBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<Solvers, FormulaCreator<?, ?, ?, ?>> solversToCreatorsBuilder =
         ImmutableMap.builder();
     for (Entry<Solvers, SolverContext> solverAndContext : solversWithContexts.entrySet()) {
       FormulaManager manager = solverAndContext.getValue().getFormulaManager();
-      FormulaCreator<?,?,?,?> creator = ((AbstractFormulaManager<?,?,?,?>)manager).getFormulaCreator();
-      solversToManagersBuilder.put(solverAndContext.getKey(),
-          manager);
-      solversToCreatorsBuilder.put(solverAndContext.getKey(),
-          creator);
+      FormulaCreator<?, ?, ?, ?> creator =
+          ((AbstractFormulaManager<?, ?, ?, ?>) manager).getFormulaCreator();
+      solversToManagersBuilder.put(solverAndContext.getKey(), manager);
+      solversToCreatorsBuilder.put(solverAndContext.getKey(), creator);
     }
 
-    Map<Solvers, FormulaManager> solversToManagers =
-        solversToManagersBuilder.buildOrThrow();
+    Map<Solvers, FormulaManager> solversToManagers = solversToManagersBuilder.buildOrThrow();
 
     PortfolioFormulaCreator creator =
         new PortfolioFormulaCreator(solversToCreatorsBuilder.buildOrThrow(), solversToManagers);
     PortfolioUFManager ufMgr = new PortfolioUFManager(creator);
     PortfolioBooleanFormulaManager booleanManager = new PortfolioBooleanFormulaManager(creator);
-    PortfolioIntegerFormulaManager integerManager = new PortfolioIntegerFormulaManager(creator, pNonLinearArithmetic);
-        PortfolioRationalFormulaManager rationalManager =
-            new PortfolioRationalFormulaManager(creator, pNonLinearArithmetic);
-        PortfolioBitvectorFormulaManager bitvectorManager =
-            new PortfolioBitvectorFormulaManager(creator, booleanManager);
+    PortfolioIntegerFormulaManager integerManager =
+        new PortfolioIntegerFormulaManager(creator, pNonLinearArithmetic);
+    PortfolioRationalFormulaManager rationalManager =
+        new PortfolioRationalFormulaManager(creator, pNonLinearArithmetic);
+    PortfolioBitvectorFormulaManager bitvectorManager =
         new PortfolioBitvectorFormulaManager(creator, booleanManager);
+    new PortfolioBitvectorFormulaManager(creator, booleanManager);
     PortfolioFloatingPointFormulaManager floatingPointManager =
         new PortfolioFloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
-        PortfolioQuantifiedFormulaManager quantifiedManager =
-            new PortfolioQuantifiedFormulaManager(creator);
-        PortfolioArrayFormulaManager arrayManager = new PortfolioArrayFormulaManager(creator);
+    PortfolioQuantifiedFormulaManager quantifiedManager =
+        new PortfolioQuantifiedFormulaManager(creator);
+    PortfolioArrayFormulaManager arrayManager = new PortfolioArrayFormulaManager(creator);
     PortfolioSLFormulaManager slManager = new PortfolioSLFormulaManager(creator);
-        PortfolioStringFormulaManager strManager = new PortfolioStringFormulaManager(creator);
-        PortfolioEnumerationFormulaManager enumerationManager  =
-            new PortfolioEnumerationFormulaManager(creator);
+    PortfolioStringFormulaManager strManager = new PortfolioStringFormulaManager(creator);
+    PortfolioEnumerationFormulaManager enumerationManager =
+        new PortfolioEnumerationFormulaManager(creator);
 
-    PortfolioFormulaManager manager = new PortfolioFormulaManager(solversToManagers, creator, ufMgr,
-        booleanManager, integerManager, rationalManager, bitvectorManager, floatingPointManager,
-        quantifiedManager, arrayManager, slManager, strManager, enumerationManager);
+    PortfolioFormulaManager manager =
+        new PortfolioFormulaManager(
+            solversToManagers,
+            creator,
+            ufMgr,
+            booleanManager,
+            integerManager,
+            rationalManager,
+            bitvectorManager,
+            floatingPointManager,
+            quantifiedManager,
+            arrayManager,
+            slManager,
+            strManager,
+            enumerationManager);
 
     return new PortfolioSolverContext(solversWithContexts, manager, creator, pShutdownNotifier);
   }
@@ -191,12 +211,14 @@ public class PortfolioSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(Set<ProverOptions> pSet) {
+  protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(Set<ProverOptions> pSet) {
+  protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException();
   }
 
@@ -207,7 +229,9 @@ public class PortfolioSolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return solversWithContexts.entrySet().stream().map(e -> e.getKey().toString() + ": " + e.getValue().getVersion()).collect(Collectors.joining("\n"));
+    return solversWithContexts.entrySet().stream()
+        .map(e -> e.getKey().toString() + ": " + e.getValue().getVersion())
+        .collect(Collectors.joining("\n"));
   }
 
   @Override
@@ -219,10 +243,10 @@ public class PortfolioSolverContext extends AbstractSolverContext {
   public void close() {
     if (!closed) {
       closed = true;
-    for (SolverContext solver : solversWithContexts.values()) {
-      solver.close();
-    }
-    solversWithContexts.clear();
+      for (SolverContext solver : solversWithContexts.values()) {
+        solver.close();
+      }
+      solversWithContexts.clear();
     }
   }
 }
