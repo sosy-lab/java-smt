@@ -59,7 +59,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
         secure = true,
         description = "Require proofs from SMT solver",
         values = {"true", "false"})
-    boolean requireProofs = false;
+    String requireProofs = "true";
 
     @Option(
         secure = true,
@@ -145,7 +145,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     }
 
     long cfg = Native.mkConfig();
-    if (extraOptions.requireProofs) {
+    if (extraOptions.requireProofs.equals("true")) {
       Native.setParamValue(cfg, "PROOF", "true");
       generateProofs = true;
     }
