@@ -17,7 +17,7 @@ package org.sosy_lab.java_smt.api.proofs;
  * @param <T> The type of the proof object.
  */
 public abstract class ProofFrame<T> {
-  T proof;
+  final T proof;
   int numArgs = 0;
   boolean visited;
 
@@ -49,9 +49,5 @@ public abstract class ProofFrame<T> {
   /** Set the number of arguments the proof object has. */
   public void setNumArgs(int numArgs) {
     this.numArgs = numArgs;
-  }
-
-  public void setProof(T proof) {
-    this.proof = proof;
   }
 }
