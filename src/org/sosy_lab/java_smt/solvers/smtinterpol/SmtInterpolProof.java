@@ -27,7 +27,7 @@ import org.sosy_lab.java_smt.ResProofRule;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
+import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 
 /**
  * This class represents a SMTInterpol proof DAG in the JavaSMT proof interface. Many formulas that
@@ -38,7 +38,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG;
  * offering a proof rule at every step of the proof as well as allowing to display the pivots for
  * resolution steps.
  */
-class SmtInteprolProofDAG extends AbstractProofDAG {
+class SmtInterpolProof extends AbstractProof {
   protected enum Rules implements ProofRule {
     RUP,
     PIVOT;
@@ -49,22 +49,34 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
     }
   }
 
-  protected static class SmtInterpolProofNode extends AbstractProofNode {
-    SmtInterpolProofNode(ProofRule pRule, Formula pFormula) {
-      super(pRule, pFormula);
+  protected static class SmtInterpolSubproof extends AbstractSubproof {
+    SmtInterpolSubproof(ProofRule pRule, Formula pFormula, SmtInterpolProof pProof) {
+      super(pRule, pFormula, pProof);
+    }
+
+    @Override
+    protected void addChild(Subproof pSubproof) {
+      super.addChild(pSubproof);
+    }
+
+    @Override
+    protected String proofAsString() {
+      return super.proofAsString();
     }
   }
 
   static class SmtInterpolProofNodeCreator {
+    private final SmtInterpolProof proof;
     private final SmtInterpolFormulaCreator creator;
 
-    SmtInterpolProofNodeCreator(SmtInterpolFormulaCreator pCreator) {
+    SmtInterpolProofNodeCreator(SmtInterpolFormulaCreator pCreator, SmtInterpolProof pProof) {
       creator = pCreator;
+      proof = pProof;
     }
 
-    SmtInterpolProofNode createProof(ProvitionalProofNode pProofNode) {
+    SmtInterpolSubproof createProof(ProvitionalProofNode pProofNode) {
       Deque<ProvitionalProofNode> stack = new ArrayDeque<>();
-      Map<ProvitionalProofNode, SmtInterpolProofNode> computed = new HashMap<>();
+      Map<ProvitionalProofNode, SmtInterpolSubproof> computed = new HashMap<>();
 
       stack.push(pProofNode);
 
@@ -97,7 +109,8 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
             Term t = proofNode.formulas.get(0);
             formula = creator.encapsulate(creator.getFormulaType(t), t);
           }
-          SmtInterpolProofNode pn = new SmtInterpolProofNode(proofNode.proofRule, formula);
+          SmtInterpolSubproof pn =
+              new SmtInterpolSubproof(proofNode.proofRule, formula, this.proof);
           for (int i = 0; i < proofNode.children.size(); i++) {
             ProvitionalProofNode child = proofNode.children.get(i);
             if (computed.containsKey(child)) {
@@ -248,11 +261,11 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
       }
 
       // Just for testing purposes
-      protected String asString() {
-        return asString(0);
+      protected String proofAsString() {
+        return proofAsString(0);
       }
 
-      String asString(int indentLevel) {
+      String proofAsString(int indentLevel) {
         StringBuilder sb = new StringBuilder();
         String indent = "  ".repeat(indentLevel);
 
@@ -288,7 +301,7 @@ class SmtInteprolProofDAG extends AbstractProofDAG {
         } else {
           for (ProvitionalProofNode child : children) {
             if (child != null) {
-              sb.append(child.asString(indentLevel + 2));
+              sb.append(child.proofAsString(indentLevel + 2));
             } else {
               sb.append(indent).append("    null\n");
             }

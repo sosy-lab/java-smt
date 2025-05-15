@@ -31,7 +31,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
@@ -211,7 +211,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proof = prover.getProof();
+      Subproof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -225,16 +225,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
       }
 
-      // Test getChildren()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test getId()
-      assertThat(proof.getId()).isNotEqualTo(proof.getChildren().get(0).getId());
+      // Test getArguments()
+      assertThat(proof.getArguments()).isNotNull();
+      assertThat(proof.getArguments()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      ProofNode leaf = findanyProofLeaf(proof);
+      Subproof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -254,10 +251,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  private ProofNode findanyProofLeaf(ProofNode pn) {
+  private Subproof findanyProofLeaf(Subproof pn) {
     if (pn.isLeaf()) {
       return pn;
     }
-    return findanyProofLeaf(pn.getChildren().get(0));
+    return findanyProofLeaf(pn.getArguments().get(0));
   }
 }

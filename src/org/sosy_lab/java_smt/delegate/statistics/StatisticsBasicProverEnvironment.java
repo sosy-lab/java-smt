@@ -18,7 +18,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.delegate.statistics.TimerPool.TimerWrapper;
 
 class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
@@ -101,7 +101,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ProofNode getProof() throws SolverException, InterruptedException {
+  public Subproof getProof() throws SolverException, InterruptedException {
     return delegate.getProof();
   }
 

@@ -27,22 +27,11 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProofDAG.AbstractProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
 
-public class Mathsat5ProofNode extends AbstractProofNode {
-
-  protected Mathsat5ProofNode(@Nullable ProofRule rule, Formula formula) {
-    super(rule, formula);
-  }
-
-  protected static class MsatProofFrame extends ProofFrame<Long> {
-    MsatProofFrame(Long proof) {
-      super(proof);
-    }
-  }
+class Mathsat5Proof extends AbstractProof {
 
   /**
    * Creates a proof node from a MathSAT5 proof object.
@@ -55,10 +44,10 @@ public class Mathsat5ProofNode extends AbstractProofNode {
    * @param rootProof The root proof object.
    * @return The proof node.
    */
-  public static Mathsat5ProofNode fromMsatProof(ProverEnvironment pProver, long rootProof) {
+  public Mathsat5Subproof fromMsatProof(ProverEnvironment pProver, long rootProof) {
 
     Deque<MsatProofFrame> stack = new ArrayDeque<>();
-    Map<Long, Mathsat5ProofNode> computed = new HashMap<>();
+    Map<Long, Mathsat5Subproof> computed = new HashMap<>();
 
     stack.push(new MsatProofFrame(rootProof));
 
@@ -113,11 +102,11 @@ public class Mathsat5ProofNode extends AbstractProofNode {
           proofRule = new Mathsat5ProofRule(rule);
         }
 
-        Mathsat5ProofNode node;
+        Mathsat5Subproof node;
         Mathsat5TheoremProver prover = (Mathsat5TheoremProver) pProver;
         Formula formula = generateFormula(frame, prover, proofRule);
 
-        node = new Mathsat5ProofNode(proofRule, formula);
+        node = new Mathsat5Subproof(proofRule, formula, this);
 
         // Retrieve computed child nodes and attach them. In this case the subtraction is due to
         // the processing of the theory-lemma rule.
@@ -128,7 +117,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
 
           long child = msat_proof_get_child(frame.getProof(), i);
 
-          Mathsat5ProofNode childNode = computed.get(child);
+          Mathsat5Subproof childNode = computed.get(child);
           if (childNode != null) {
             node.addChild(childNode);
           }
@@ -140,7 +129,7 @@ public class Mathsat5ProofNode extends AbstractProofNode {
   }
 
   @Nullable
-  private static Formula generateFormula(
+  private Formula generateFormula(
       MsatProofFrame frame, Mathsat5TheoremProver prover, ProofRule rule) {
     Mathsat5FormulaCreator formulaCreator = prover.creator;
     Formula formula = null;
@@ -178,24 +167,26 @@ public class Mathsat5ProofNode extends AbstractProofNode {
     return formula;
   }
 
-  String asString() {
-    return asString(0);
+  protected static class MsatProofFrame extends ProofFrame<Long> {
+    MsatProofFrame(Long proof) {
+      super(proof);
+    }
   }
 
-  private String asString(int indentLevel) {
-    StringBuilder proof = new StringBuilder();
-    String indent = "  ".repeat(indentLevel);
-    if (getFormula() != null) {
-      proof.append(indent).append("Formula: ").append(getFormula().toString()).append("\n");
-    }
-    proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
-    proof.append(indent).append("No. Children: ").append(getChildren().size()).append("\n");
+  class Mathsat5Subproof extends AbstractSubproof {
 
-    int i = 0;
-    for (ProofNode child : getChildren()) {
-      proof.append(indent).append("Child ").append(++i).append(":\n");
-      proof.append(((Mathsat5ProofNode) child).asString(indentLevel + 1));
+    protected Mathsat5Subproof(@Nullable ProofRule rule, Formula formula, Mathsat5Proof proof) {
+      super(rule, formula, proof);
     }
-    return proof.toString();
+
+    @Override
+    protected void addChild(Subproof subproof) {
+      super.addChild(subproof);
+    }
+
+    @Override
+    protected String proofAsString() {
+      return super.proofAsString();
+    }
   }
 }

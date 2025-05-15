@@ -32,10 +32,10 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofFactory;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
+import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Proof.Mathsat5Subproof;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
 
 class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements ProverEnvironment {
@@ -63,45 +63,48 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   @Override
-  public ProofNode getProof() throws SolverException, InterruptedException {
+  public Subproof getProof() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(this.isUnsat());
 
-    ProofNode pn;
+    Mathsat5Proof proof = new Mathsat5Proof();
+
     long pm = msat_get_proof_manager(curEnv);
-    long proof = msat_get_proof(pm);
-    pn = Mathsat5ProofNode.fromMsatProof(this, proof);
-    clausifyResChain(pn, context.getFormulaManager().getBooleanFormulaManager());
+    long msatProof = msat_get_proof(pm);
+    Mathsat5Subproof root = proof.fromMsatProof(this, msatProof);
+    clausifyResChain(root, context.getFormulaManager().getBooleanFormulaManager());
     msat_destroy_proof_manager(pm);
 
-    return pn;
+    return root;
 
     // return getProof0();
   }
 
   // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
-  private void clausifyResChain(ProofNode root, BooleanFormulaManager bfmgr) {
-    Map<ProofNode, Boolean> visited = new HashMap<>(); // Track visited nodes
-    Deque<ProofNode> stack = new ArrayDeque<>();
+  private void clausifyResChain(Subproof root, BooleanFormulaManager bfmgr) {
+    Map<Subproof, Boolean> visited = new HashMap<>(); // Track visited nodes
+    Deque<Subproof> stack = new ArrayDeque<>();
 
     stack.push(root); // Start with the root node
     visited.put(root, Boolean.FALSE); // Mark root as unvisited
 
     while (!stack.isEmpty()) {
-      ProofNode node = stack.peek(); // Look at the top node, but don't pop yet
+      Subproof node = stack.peek(); // Look at the top node, but don't pop yet
 
       if (visited.get(node).equals(Boolean.FALSE)) {
         // First time visiting this node
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
         // Push all children onto stack
-        List<ProofNode> children = node.getChildren();
-        for (int i = children.size() - 1; i >= 0; i--) {
-          ProofNode child = children.get(i);
-          if (!visited.containsKey(child)) {
-            stack.push(child); // Only push unvisited children
-            visited.put(child, Boolean.FALSE); // Mark child as unvisited
+        if (!node.isLeaf()) {
+          List<Subproof> children = node.getArguments();
+          for (int i = children.size() - 1; i >= 0; i--) {
+            Subproof child = children.get(i);
+            if (!visited.containsKey(child)) {
+              stack.push(child); // Only push unvisited children
+              visited.put(child, Boolean.FALSE); // Mark child as unvisited
+            }
           }
         }
       } else {
@@ -117,8 +120,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   // process proof nodes and compute formulas for res-chain nodes
-  private void processResChain(ProofNode node, BooleanFormulaManager bfmgr) {
-    List<ProofNode> children = node.getChildren();
+  private void processResChain(Subproof node, BooleanFormulaManager bfmgr) {
+    List<Subproof> children = node.getArguments();
 
     // If the current node is a RES_CHAIN, compute the resolved formula
     if (node.getRule().equals(Rule.RES_CHAIN)) {
@@ -139,7 +142,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       }
 
       // Store the resolved formula in the current node
-      ((Mathsat5ProofNode) node).setFormula(current);
+      ((Mathsat5Subproof) node).setFormula(current);
     }
   }
 
@@ -332,19 +335,5 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
         });
 
     return isComplement[0];
-  }
-
-  protected ProofNode getProof0() {
-    var proofFactory =
-        new ProofFactory<Long>(this, "MATHSAT5") {
-          public ProofNode createProofWrapper(long pProof) {
-            return this.createProofNode(pProof);
-          }
-        };
-    long pm = msat_get_proof_manager(curEnv);
-    long proof = msat_get_proof(pm);
-    ProofNode pn = proofFactory.createProofWrapper(proof);
-    msat_destroy_proof_manager(pm);
-    return pn;
   }
 }
