@@ -11,11 +11,11 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import com.google.common.base.Preconditions;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
@@ -36,12 +36,12 @@ public abstract class AbstractProof implements Proof {
 //    protected abstract Proof generateProof();
   //}
 
-  protected final Map<Subproof, List<Subproof>> edges = new HashMap<>();
+  protected final Map<Subproof, LinkedHashSet<Subproof>> edges = new HashMap<>();
 
   protected void addEdge(Subproof source, Subproof target) {
     Preconditions.checkNotNull(source);
     Preconditions.checkNotNull(target);
-    edges.putIfAbsent(source, new ArrayList<>());
+    edges.putIfAbsent(source, new LinkedHashSet<>());
     edges.get(source).add(target);
   }
 
@@ -67,7 +67,7 @@ public abstract class AbstractProof implements Proof {
     }
 
     @Override
-    public List<Subproof> getArguments() {
+    public LinkedHashSet<Subproof> getArguments() {
       return this.proof.edges.get(this);
     }
 

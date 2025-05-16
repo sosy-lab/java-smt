@@ -321,10 +321,11 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
   Subproof handleModusPonens(Z3Subproof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    BooleanFormula pivot = (BooleanFormula) node.getArguments().get(0).getFormula();
+    BooleanFormula pivot =
+        (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
     ResolutionSubproof pn = new ResolutionSubproof(formula, pivot, proof);
-    Subproof c1 = handleNode((Z3Subproof) node.getArguments().get(0));
-    Subproof c2 = handleNode((Z3Subproof) node.getArguments().get(1));
+    Subproof c1 = handleNode((Z3Subproof) node.getArguments().stream().findFirst().get());
+    Subproof c2 = handleNode((Z3Subproof) new ArrayList<>(node.getArguments()).get(1));
     return pn;
   }
 
@@ -336,20 +337,20 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
   Subproof handleSymmetry(Z3Subproof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    BooleanFormula pivot = (BooleanFormula) node.getArguments().get(0).getFormula();
+    BooleanFormula pivot = (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
     BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
 
     ResolutionSubproof pn = new ResolutionSubproof(formula, pivot, proof);
     AxiomSubproof sn = new AxiomSubproof(ResAxiom.SYMMETRY, snFormula, proof);
     pn.addChild(sn);
-    pn.addChild(handleNode((Z3Subproof) node.getArguments().get(0)));
+    pn.addChild(handleNode((Z3Subproof) node.getArguments().stream().findFirst().get()));
     return pn;
   }
 
   Subproof handleTransitivity(Z3Subproof node) {
 
-    BooleanFormula t1 = (BooleanFormula) node.getArguments().get(0).getFormula();
-    BooleanFormula t2 = (BooleanFormula) node.getArguments().get(1).getFormula();
+    BooleanFormula t1 = (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
+    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getArguments()).get(1).getFormula();
     BooleanFormula formula = (BooleanFormula) node.getFormula();
 
     List<BooleanFormula> equivalenceOperands1 = extractEquivalenceOperands(t1);
@@ -384,9 +385,9 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
     for (int i = 0; i < numChildren; i++) {
       Collection<BooleanFormula> newCollection = new ArrayList<>();
-      formulas.add(bfm.not((BooleanFormula) node.getArguments().get(i).getFormula()));
+      formulas.add(bfm.not((BooleanFormula) new ArrayList<>(node.getArguments()).get(i).getFormula()));
       if (i == numChildren - 1) {
-        resPivot = (BooleanFormula) node.getArguments().get(i).getFormula();
+        resPivot = (BooleanFormula) new ArrayList<>(node.getArguments()).get(i).getFormula();
       }
     }
 

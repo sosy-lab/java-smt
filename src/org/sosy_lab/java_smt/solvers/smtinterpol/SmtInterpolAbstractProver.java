@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -227,9 +228,10 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Subproof getProof() {
+  public Subproof getProof() throws InterruptedException {
     checkState(!closed);
     checkGenerateProofs();
+    checkState(isUnsat());
 
     final Term tProof;
     try {
@@ -252,6 +254,20 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // clausifyResChain(proof, mgr.getBooleanFormulaManager());
 
     return proof;
+  }
+
+  public Term smtInterpolGetProof(){
+    Term tProof;
+    try {
+      tProof = env.getProof();
+    } catch (SMTLIBException e) {
+      if (e.getMessage().contains("Context is inconsistent")) {
+        throw new IllegalStateException("Cannot get proof from satisfiable environment", e);
+      } else {
+        throw e;
+      }
+    }
+    return tProof;
   }
 
   @Override
@@ -310,9 +326,10 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
         // Push all children onto stack
-        List<Subproof> children = node.getArguments();
-        for (int i = children.size() - 1; i >= 0; i--) {
-          Subproof child = children.get(i);
+        LinkedHashSet<Subproof> children = node.getArguments();
+        List<Subproof> childrenList = new ArrayList<>(children);
+        for (int i = childrenList.size() - 1; i >= 0; i--) {
+          Subproof child = childrenList.get(i);
           if (!visited.containsKey(child)) {
             stack.push(child); // Only push unvisited children
             visited.put(child, Boolean.FALSE); // Mark child as unvisited
@@ -332,7 +349,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   // process proof nodes and compute formulas for res-chain nodes
   private void processResChain(Subproof node, BooleanFormulaManager bfmgr) {
-    List<Subproof> children = node.getArguments();
+    LinkedHashSet<Subproof> childrenSet = node.getArguments();
+    List<Subproof> children = new ArrayList<>(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula
     if (node.getRule().equals(ResAxiom.RESOLUTION)) {

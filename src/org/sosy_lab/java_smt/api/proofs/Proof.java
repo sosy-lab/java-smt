@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.api.proofs;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 
@@ -30,8 +31,10 @@ public interface Proof {
    */
   interface Subproof {
 
-    /** Get the children of the proof node. */
-    List<Subproof> getArguments();
+    /**
+     * Get the children of the proof node.
+     */
+    LinkedHashSet<Subproof> getArguments();
 
     boolean isLeaf();
 
