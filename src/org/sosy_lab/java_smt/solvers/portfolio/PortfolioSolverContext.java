@@ -109,7 +109,7 @@ public class PortfolioSolverContext extends AbstractSolverContext {
   }
 
   private final Map<Solvers, SolverContext> solversWithContexts;
-
+  private final LogManager logger;
   private final PortfolioFormulaCreator creator;
   private final ShutdownNotifier shutdownNotifier;
   private boolean closed = false;
@@ -118,11 +118,13 @@ public class PortfolioSolverContext extends AbstractSolverContext {
       Map<Solvers, SolverContext> pSolversWithContexts,
       PortfolioFormulaManager pManager,
       PortfolioFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
+      ShutdownNotifier pShutdownNotifier,
+      LogManager pLogger) {
     super(pManager);
     solversWithContexts = pSolversWithContexts;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
+    logger = pLogger;
   }
 
   // TODO: provide constructor with all arguments as maps as well.
@@ -202,29 +204,36 @@ public class PortfolioSolverContext extends AbstractSolverContext {
             strManager,
             enumerationManager);
 
-    return new PortfolioSolverContext(solversWithContexts, manager, creator, pShutdownNotifier);
+    return new PortfolioSolverContext(
+        solversWithContexts, manager, creator, pShutdownNotifier, logger);
   }
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    throw new UnsupportedOperationException();
+    return new PortfolioTheoremProver(
+        options, solversWithContexts, creator, shutdownNotifier, logger);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
       Set<ProverOptions> pSet) {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   protected boolean supportsAssumptionSolving() {
     return true;
+  }
+
+  @Override
+  public SolverContext copyWithNewShutdownNotifier(ShutdownNotifier pShutdownNotifier) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
