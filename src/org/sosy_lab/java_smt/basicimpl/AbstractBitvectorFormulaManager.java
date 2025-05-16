@@ -386,14 +386,14 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   }
 
   @Override
-  public final BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
+  public BitvectorFormula concat(BitvectorFormula pNumber, BitvectorFormula pAppend) {
     return wrap(concat(extractInfo(pNumber), extractInfo(pAppend)));
   }
 
   protected abstract TFormulaInfo concat(TFormulaInfo number, TFormulaInfo pAppend);
 
   @Override
-  public final BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
+  public BitvectorFormula extract(BitvectorFormula pNumber, int pMsb, int pLsb) {
     final int bitsize = getLength(pNumber);
     checkArgument(0 <= pLsb, "index out of bounds (negative index %s)", pLsb);
     checkArgument(pLsb <= pMsb, "invalid range (lsb %s larger than msb %s)", pLsb, pMsb);
@@ -404,8 +404,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   protected abstract TFormulaInfo extract(TFormulaInfo pNumber, int pMsb, int pLsb);
 
   @Override
-  public final BitvectorFormula extend(
-      BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
+  public BitvectorFormula extend(BitvectorFormula pNumber, int pExtensionBits, boolean pSigned) {
     checkArgument(0 <= pExtensionBits, "can not extend a negative number of bits");
     return wrap(extend(extractInfo(pNumber), pExtensionBits, pSigned));
   }
@@ -419,7 +418,7 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
   }
 
   @Override
-  public final BooleanFormula distinct(List<BitvectorFormula> pBits) {
+  public BooleanFormula distinct(List<BitvectorFormula> pBits) {
     // optimization
     if (pBits.size() <= 1) {
       return bmgr.makeTrue();
