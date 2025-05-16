@@ -23,14 +23,18 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormula.PortfolioArrayFormula;
 
-public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
+public class PortfolioArrayFormulaManager
+    extends AbstractArrayFormulaManager<Map<Solvers, ? extends Formula>, Void, Void, Void>
+    implements ArrayFormulaManager {
 
   private final Map<Solvers, ArrayFormulaManager> managers;
   private final PortfolioFormulaCreator creator;
 
   PortfolioArrayFormulaManager(PortfolioFormulaCreator pCreator) {
+    super(pCreator);
     creator = pCreator;
     managers = pCreator.getSpecializedManager(FormulaManager::getArrayFormulaManager);
   }
@@ -77,6 +81,12 @@ public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
+  protected Map<Solvers, ? extends Formula> select(
+      Map<Solvers, ? extends Formula> pArray, Map<Solvers, ? extends Formula> pIndex) {
+    throw new UnsupportedOperationException("Not implemented because calling method overridden");
+  }
+
+  @Override
   public <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> store(
       ArrayFormula<TI, TE> pArray, TI pIndex, TE pValue) {
 
@@ -113,6 +123,14 @@ public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
     final FormulaType<TE> elementType = creator.getArrayFormulaElementType(pArray);
 
     return creator.encapsulateArray(finalTerm, indexType, elementType);
+  }
+
+  @Override
+  protected Map<Solvers, ? extends Formula> store(
+      Map<Solvers, ? extends Formula> pArray,
+      Map<Solvers, ? extends Formula> pIndex,
+      Map<Solvers, ? extends Formula> pValue) {
+    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override
@@ -180,6 +198,22 @@ public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
   }
 
   @Override
+  protected <TI extends Formula, TE extends Formula>
+      Map<Solvers, ? extends Formula> internalMakeArray(
+          String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+    throw new UnsupportedOperationException("Not implemented because calling method overridden");
+  }
+
+  @Override
+  protected <TI extends Formula, TE extends Formula>
+      Map<Solvers, ? extends Formula> internalMakeArray(
+          FormulaType<TI> pIndexType,
+          FormulaType<TE> pElementType,
+          Map<Solvers, ? extends Formula> defaultElement) {
+    throw new UnsupportedOperationException("Not implemented because calling method overridden");
+  }
+
+  @Override
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
 
@@ -212,6 +246,12 @@ public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
     }
 
     return creator.encapsulateBoolean(finalTerm);
+  }
+
+  @Override
+  protected Map<Solvers, ? extends Formula> equivalence(
+      Map<Solvers, ? extends Formula> pArray1, Map<Solvers, ? extends Formula> pArray2) {
+    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override
