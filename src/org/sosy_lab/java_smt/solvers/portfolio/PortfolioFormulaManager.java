@@ -44,6 +44,7 @@ public class PortfolioFormulaManager
       PortfolioSLFormulaManager pSlManager,
       PortfolioStringFormulaManager pStrManager,
       PortfolioEnumerationFormulaManager pEnumerationManager) {
+    /*
     super(
         creator,
         pFunctionManager,
@@ -57,6 +58,20 @@ public class PortfolioFormulaManager
         pSlManager,
         pStrManager,
         pEnumerationManager);
+     */
+    super(
+        creator,
+        pFunctionManager,
+        pBooleanManager,
+        pIntegerManager,
+        pRationalManager,
+        pBitpreciseManager,
+        null,
+        null,
+        pArrayManager,
+        null,
+        null,
+        null);
     solversToFormulaManagers = pSolversFormulaManagerMap;
   }
 
@@ -87,30 +102,37 @@ public class PortfolioFormulaManager
   @Override
   public <T extends Formula> T substitute(
       final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
-    ImmutableMap.Builder<Solvers, ? extends Formula> finalFormulaBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<Solvers, T> finalFormulaBuilder = ImmutableMap.builder();
 
+    FormulaType<T> type = getFormulaType(f);
     for (Entry<Solvers, ? extends Formula> otherSolverAndFormula :
         ((PortfolioFormula) f).getFormulasPerSolver().entrySet()) {
       Solvers solver = otherSolverAndFormula.getKey();
-      finalFormulaBuilder.put(
-          solver,
-          solversToFormulaManagers
-              .get(solver)
-              .substitute(otherSolverAndFormula.getValue(), fromToMapping));
+      FormulaManager specificFormulaManager = solversToFormulaManagers.get(solver);
+      if (specificFormulaManager != null) {
+        Formula substitutedSpecificFormula =
+            specificFormulaManager.substitute(otherSolverAndFormula.getValue(), fromToMapping);
+        FormulaType<?> specificType = getFormulaType(f);
+        assert specificType == type;
+        finalFormulaBuilder.put(solver, (T) substitutedSpecificFormula);
+      }
     }
-
-    FormulaType<T> type = getFormulaType(f);
     return getFormulaCreator().encapsulate(type, finalFormulaBuilder.buildOrThrow());
   }
 
   @Override
   protected Map<Solvers, ? extends Formula> simplify(Map<Solvers, ? extends Formula> f)
       throws InterruptedException {
-    ImmutableMap.Builder<Solvers, ? extends Formula> finalFormulaBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<Solvers, Formula> finalFormulaBuilder = ImmutableMap.builder();
     for (Entry<Solvers, ? extends Formula> otherSolverAndFormula : f.entrySet()) {
       Solvers solver = otherSolverAndFormula.getKey();
-      finalFormulaBuilder.put(
-          solver, solversToFormulaManagers.get(solver).simplify(otherSolverAndFormula.getValue()));
+      FormulaManager specificFormulaManager = solversToFormulaManagers.get(solver);
+      if (specificFormulaManager != null) {
+        Formula simplifiedSpecificFormula =
+            specificFormulaManager.simplify(otherSolverAndFormula.getValue());
+        finalFormulaBuilder.put(
+            solver, specificFormulaManager.simplify(otherSolverAndFormula.getValue()));
+      }
     }
     return finalFormulaBuilder.buildOrThrow();
   }
@@ -121,7 +143,7 @@ public class PortfolioFormulaManager
       return formula;
     }
     // TODO: this might fail due to translating unsupported theories.
-    ImmutableMap.Builder<Solvers, ? extends Formula> finalFormulaBuilder = ImmutableMap.builder();
+    ImmutableMap.Builder<Solvers, BooleanFormula> finalFormulaBuilder = ImmutableMap.builder();
     if (otherManager instanceof PortfolioFormulaManager) {
       PortfolioFormulaManager otherPortfolioManager = (PortfolioFormulaManager) otherManager;
       checkState(formula instanceof PortfolioFormula);
