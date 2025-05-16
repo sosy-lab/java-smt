@@ -8,13 +8,24 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_PROJECTION_BASED_INTERPOLANTS;
+import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
+import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
+import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.NATIVE;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -40,6 +51,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
@@ -288,15 +300,30 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected final void requireInterpolation() {
+  protected final void requireInterpolation(ProverOptions... options) {
     try {
-      context.newProverEnvironmentWithInterpolation().close();
+      context.newProverEnvironmentWithInterpolation(options).close();
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage("Solver %s does not support interpolation", solverToUse())
           .that(e)
           .isNull();
     }
+  }
+
+  protected final void requireSeqItp(InterpolationOption... options) {
+    assume()
+        .withMessage(
+            "Solver independent interpolation strategy %s does not support sequential "
+                + "or tree interpolation",
+            solverToUse())
+        .that(options)
+        .asList()
+        .containsNoneIn(
+            ImmutableList.of(
+                GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+                GENERATE_PROJECTION_BASED_INTERPOLANTS,
+                GENERATE_UNIFORM_FORWARD_INTERPOLANTS));
   }
 
   protected void requireParser() {
@@ -362,6 +389,54 @@ public abstract class SolverBasedTest0 {
    */
   protected final BooleanFormulaSubject assertThatFormula(BooleanFormula formula) {
     return assertUsing(context).that(formula);
+  }
+
+  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  public void isValidInterpolant(BooleanFormula interpolant, BooleanFormula a, BooleanFormula b)
+      throws SolverException, InterruptedException {
+    // TODO: move into assertion framework
+    isValidInterpolant(interpolant, ImmutableList.of(a), ImmutableList.of(b));
+  }
+
+  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  public void isValidInterpolant(
+      BooleanFormula interpolant,
+      List<BooleanFormula> formulasOfA,
+      List<BooleanFormula> formulasOfB)
+      throws SolverException, InterruptedException {
+    // TODO: move into assertion framework
+
+    BooleanFormula conjugatedFormulasOfA = bmgr.and(formulasOfA);
+    BooleanFormula conjugatedFormulasOfB = bmgr.and(formulasOfB);
+
+    // checks that every Symbol of the interpolant appears either in A or B
+    Set<String> interpolantSymbols = mgr.extractVariablesAndUFs(interpolant).keySet();
+    Set<String> interpolASymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfA).keySet();
+    Set<String> interpolBSymbols = mgr.extractVariablesAndUFs(conjugatedFormulasOfB).keySet();
+    Set<String> intersection = Sets.intersection(interpolASymbols, interpolBSymbols);
+    // TODO: assertThat is not available with message
+    checkState(
+        intersection.containsAll(interpolantSymbols),
+        "Interpolant contains symbols %s that are not part of both input formula groups A and B.",
+        Sets.difference(interpolantSymbols, intersection));
+
+    try (ProverEnvironment validationProver = context.newProverEnvironment()) {
+      validationProver.push();
+      validationProver.addConstraint(bmgr.implication(conjugatedFormulasOfA, interpolant));
+      // TODO: assertThat is not available with message
+      checkState(
+          !validationProver.isUnsat(),
+          "Invalid Craig interpolation: formula group A does not imply the interpolant.");
+      validationProver.pop();
+
+      validationProver.push();
+      validationProver.addConstraint(bmgr.and(interpolant, conjugatedFormulasOfB));
+      // TODO: assertThat is not available with message
+      checkState(
+          validationProver.isUnsat(),
+          "Invalid Craig interpolation: interpolant does not contradict formula group B.");
+      validationProver.pop();
+    }
   }
 
   /**
@@ -436,6 +511,38 @@ public abstract class SolverBasedTest0 {
     @Override
     protected Solvers solverToUse() {
       return solver;
+    }
+  }
+
+  @RunWith(Parameterized.class)
+  public abstract static class ParameterizedInterpolatingSolverBasedTest0
+      extends ParameterizedSolverBasedTest0 {
+
+    // GENERATE_MODELS as stand-in for native
+    private static final Set<InterpolationOption> ALL_INTERPOLATION_STRATEGIES =
+        ImmutableSet.of(
+            NATIVE,
+            GENERATE_PROJECTION_BASED_INTERPOLANTS,
+            GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+            GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+
+    @Parameters(name = "solver {0} with interpolation strategy {1}")
+    public static List<Object[]> getAllSolversAndItpStrategies() {
+      List<Object[]> lst = new ArrayList<>();
+      for (Solvers solver : Solvers.values()) {
+        // No arg for no option (== solver native interpolation)
+        for (InterpolationOption itpStrat : ALL_INTERPOLATION_STRATEGIES) {
+          lst.add(new Object[] {solver, itpStrat});
+        }
+      }
+      return lst;
+    }
+
+    @Parameter(1)
+    public ProverOptions interpolationStrategy;
+
+    protected ProverOptions itpStrategyToUse() {
+      return interpolationStrategy;
     }
   }
 }
