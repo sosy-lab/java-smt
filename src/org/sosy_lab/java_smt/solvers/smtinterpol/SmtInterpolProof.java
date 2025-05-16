@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import com.google.common.base.Preconditions;
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.Annotation;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -40,12 +41,37 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProof;
  */
 class SmtInterpolProof extends AbstractProof {
   protected enum Rules implements ProofRule {
+    COEFFS,
+    VALUES,
+    DIVISOR,
+    POS,
+    UNIT,
+    DEFINE_FUN("define-fun"),
+    DECLARE_FUN("declare-fun"),
     RUP,
     PIVOT;
+    String name;
+    private Rules() {}
+    Rules(String pDefineFun) {
+      name = pDefineFun;
+    }
+
+    static Rules getFromName(String pName){
+      if (pName.equals("DEFINE-FUN")){
+        return DEFINE_FUN;
+      } else if (pName.equals("DECLARE-FUN")){
+        return DECLARE_FUN;
+      }
+      return Rules.valueOf(pName);
+    }
 
     @Override
     public String getName() {
-      return name().toLowerCase(Locale.ENGLISH);
+      if (this.equals(DEFINE_FUN) || this.equals(DECLARE_FUN)) {
+        return name;
+      } else{
+        return name().toLowerCase(Locale.ENGLISH);
+      }
     }
   }
 
@@ -103,8 +129,12 @@ class SmtInterpolProof extends AbstractProof {
           stack.pop();
           Formula formula = null;
           if (proofNode.formulas.size() > 1) {
-            Term or = Util.or(creator.getEnv(), proofNode.formulas.toArray(new Term[0]));
-            formula = creator.encapsulate(creator.getFormulaType(or), or);
+            //This can not stay like this, the algorithm calculating the formulas to be stored is
+            // needed, as what we retrieve here is simply arguments for generating a clause,
+            // meaning the arguments do not have to be boolean and therefore joining them with OR
+            // causes and exception.
+            //Term or = Util.or(creator.getEnv(), proofNode.formulas.toArray(new Term[0]));
+            //formula = creator.encapsulate(creator.getFormulaType(or), or);
           } else if (!proofNode.formulas.isEmpty()) {
             Term t = proofNode.formulas.get(0);
             formula = creator.encapsulate(creator.getFormulaType(t), t);
@@ -196,7 +226,7 @@ class SmtInterpolProof extends AbstractProof {
         }
 
         for (Annotation annotation : term.getAnnotations()) {
-          ResAxiom rule;
+          ProofRule rule;
           String key = annotation.getKey().substring(1);
 
           if (term.getSubterm().toString().equals("..axiom")) {
@@ -207,6 +237,8 @@ class SmtInterpolProof extends AbstractProof {
             key = key.startsWith(":") ? key.substring(1) : key;
 
             rule = ResProofRule.getFromName(key);
+            if (rule == null) rule = Rules.getFromName(key.toUpperCase(Locale.ENGLISH));
+            Preconditions.checkNotNull(key);
 
             this.proofRule = rule;
             // This Annotation's value should have an array with the polarities and Terms that are
