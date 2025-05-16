@@ -152,7 +152,6 @@ public final class ResProofRule {
    */
   public static ResAxiom getFromName(String name) {
     ResAxiom rule = RULE_MAP.get(name.toLowerCase(Locale.ENGLISH));
-    Preconditions.checkNotNull(rule);
     return rule;
   }
 }
