@@ -25,6 +25,45 @@ import java.util.List;
  */
 public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
 
+  enum InterpolationOption {
+
+    /**
+     * The chosen solvers native interpolation. Additional options have to be selected when creating
+     * the solver or prover.
+     */
+    NATIVE,
+
+    /**
+     * Enables Craig interpolation, using the model-based interpolation strategy. This strategy
+     * constructs interpolants based on the model provided by a solver, i.e. model generation must
+     * be enabled. This interpolation strategy is only usable for solvers supporting quantified
+     * solving over the theories interpolated upon. The solver does not need to support
+     * interpolation itself.
+     */
+    GENERATE_PROJECTION_BASED_INTERPOLANTS,
+
+    /**
+     * Enables (uniform) Craig interpolation, using the quantifier-based interpolation strategy
+     * utilizing quantifier-elimination in the forward direction. Forward means, that the set of
+     * formulas A, used to interpolate, interpolates towards the set of formulas B (B == all
+     * formulas that are currently asserted, but not in the given set of formulas A used to
+     * interpolate). This interpolation strategy is only usable for solvers supporting
+     * quantifier-elimination over the theories interpolated upon. The solver does not need to
+     * support interpolation itself.
+     */
+    GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+
+    /**
+     * Enables (uniform) Craig interpolation, using the quantifier-based interpolation strategy
+     * utilizing quantifier-elimination in the backward direction. Backward means, that the set of
+     * formulas B (B == all formulas that are currently asserted, but not in the given set of
+     * formulas A used to interpolate) interpolates towards the set of formulas A. This
+     * interpolation strategy is only usable for solvers supporting quantifier-elimination over the
+     * theories interpolated upon. The solver does not need to support interpolation itself.
+     */
+    GENERATE_UNIFORM_BACKWARD_INTERPOLANTS
+  }
+
   /**
    * Get an interpolant for two groups of formulas. This should be called only immediately after an
    * {@link #isUnsat()} call that returned <code>true</code>.
@@ -44,6 +83,14 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
    */
   BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException;
+
+  default BooleanFormula getInterpolant(Collection<T> formulasOfA, InterpolationOption option)
+      throws SolverException, InterruptedException {
+    if (option == InterpolationOption.NATIVE) {
+      return getInterpolant(formulasOfA);
+    }
+    throw new UnsupportedOperationException("Interpolation option " + option + " not supported");
+  }
 
   /**
    * This method returns interpolants of an 'inductive sequence'. This property must be supported by
