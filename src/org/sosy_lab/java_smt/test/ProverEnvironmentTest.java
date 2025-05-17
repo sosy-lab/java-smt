@@ -10,13 +10,16 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -39,6 +42,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
+import org.sosy_lab.java_smt.basicimpl.AbstractProof.AbstractSubproof;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
@@ -98,7 +102,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
-        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+             context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -108,7 +112,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireOptimization();
     try (BasicProverEnvironment<?> pe =
-        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+             context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -138,7 +142,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
 
     try (ProverEnvironment pe =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }
@@ -153,7 +157,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
     try (ProverEnvironment pe =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");
@@ -175,12 +179,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
 
     try (ProverEnvironment prover =
-        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+             context.newProverEnvironment(GENERATE_UNSAT_CORE,
+                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
   }
@@ -204,7 +209,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testSimpleProof() throws InterruptedException, SolverException {
+  public void testGetSimpleBooleanProof() throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -258,47 +263,62 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testComplexProof() throws InterruptedException, SolverException {
+  public void testGetComplexRationalNumeralaAndUFProof() throws InterruptedException,
+                                                                SolverException {
     requireProofGeneration(); // Ensures proofs are supported
-
+    // "(declare-fun x1 () Real)" +
+    // "(declare-fun x2 () Real)" +
+    // "(declare-fun x3 () Real)" +
+    // "(declare-fun y1 () Real)" +
+    // "(declare-fun y2 () Real)" +
+    //  "(declare-fun y3 () Real)" +
+    //  "(declare-fun b () Real)" +
+    //  "(declare-fun f (Real) Real)" +
+    // "(declare-fun g (Real) Real)" +
+    //  "(declare-fun a () Bool)" +
+    //  "(declare-fun c () Bool)" +
+    //  "(assert (and a (= (+ (f y1) y2) y3) (<= y1 x1)))" +
+    // "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))" +
+    // "(assert (= a (= (+ (f x1) x2) x3)))" +
+    //  "(assert (and (or a c) (not c)))";
     RationalFormula x1 = mgr.makeVariable(FormulaType.RationalType, "x1");
-    NumeralFormula x2 = mgr.makeVariable(FormulaType.RationalType, "x2");
+    RationalFormula x2 = mgr.makeVariable(FormulaType.RationalType, "x2");
     RationalFormula x3 = mgr.makeVariable(FormulaType.RationalType, "x3");
     RationalFormula y1 = mgr.makeVariable(FormulaType.RationalType, "y1");
-    NumeralFormula y2 = mgr.makeVariable(FormulaType.RationalType, "y2");
+    RationalFormula y2 = mgr.makeVariable(FormulaType.RationalType, "y2");
     RationalFormula y3 = mgr.makeVariable(FormulaType.RationalType, "y3");
     RationalFormula b = mgr.makeVariable(FormulaType.RationalType, "b");
-
-    FunctionDeclaration<RationalFormula> f =
+    FunctionDeclaration f =
         mgr.getUFManager().declareUF("f", FormulaType.RationalType, FormulaType.RationalType);
-    FunctionDeclaration<RationalFormula> g =
+    FunctionDeclaration g =
         mgr.getUFManager().declareUF("g", FormulaType.RationalType, FormulaType.RationalType);
-
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula c = bmgr.makeVariable("c");
 
-    rmgr = mgr.getRationalFormulaManager();
+    RationalFormulaManager rfmgr = mgr.getRationalFormulaManager();
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
-      // Add constraints
+    try (ProverEnvironment prover =
+             context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      // "(assert (and a (= (+ (f y1) y2) y3) (<= y1 x1)))"
       prover.addConstraint(
           bmgr.and(
               a,
-              rmgr.equal(rmgr.add((NumeralFormula) mgr.makeApplication(f, y1), y2), y3),
-              rmgr.lessOrEquals(y1, x1)));
+              rfmgr.equal(rfmgr.add((NumeralFormula) mgr.makeApplication(f, y1), y2), y3),
+              rfmgr.lessOrEquals(y1, x1)));
+      // "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))"
       prover.addConstraint(
           bmgr.and(
-              rmgr.equal(x2, (NumeralFormula) mgr.makeApplication(g, b)),
-              rmgr.equal(y2, (NumeralFormula) mgr.makeApplication(g, b)),
-              rmgr.lessOrEquals(x1, y1),
-              rmgr.lessThan(x3, y3)));
+              rfmgr.equal(x2, (NumeralFormula) mgr.makeApplication(g, b)),
+              rfmgr.equal(y2, (NumeralFormula) mgr.makeApplication(g, b)),
+              rfmgr.lessOrEquals(x1, y1),
+              rfmgr.lessThan(x3, y3)));
+      // "(assert (= a (= (+ (f x1) x2) x3)))"
       prover.addConstraint(
           bmgr.equivalence(
-              a, rmgr.equal(rmgr.add((NumeralFormula) mgr.makeApplication(f, x1), x2), x3)));
+              a, rfmgr.equal(rfmgr.add((NumeralFormula) mgr.makeApplication(f, x1), x2), x3)));
+      // "(assert (and (or a c) (not c)))"
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
-
-      // Check unsatisfiability
-      assertThat(prover.isUnsat()).isTrue();
+      assertTrue(prover.isUnsat());
 
       // Retrieve and verify proof
       Subproof proof = prover.getProof();
@@ -367,7 +387,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
       assertThat(isExpected).isTrue();
-    } catch(IllegalStateException ie){
+    } catch (IllegalStateException ie) {
       //this should be thrown as getProof was called when last evaluation was SAT
     }
   }
@@ -399,13 +419,68 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
       assertThat(isExpected).isTrue();
-    } catch(IllegalStateException ie){
+    } catch (IllegalStateException ie) {
       //this should be thrown as getProof was called when last evaluation was SAT
     }
   }
 
+
   @Test
-  public void proofAfterProofTest() throws InterruptedException, SolverException {
+  public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
+    requireProofGeneration(); // Ensures proofs are supported
+    IntegerFormula x1 = imgr.makeVariable("x1");
+    IntegerFormula two = imgr.makeNumber("2");
+    IntegerFormula cero = imgr.makeNumber("0");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(imgr.equal(x1, two));
+      prover.addConstraint(imgr.lessThan(x1, cero));
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      Subproof proof = prover.getProof();
+      assertThat(proof).isNotNull();
+
+      // Test getRule()
+      assertThat(proof.getRule()).isNotNull();
+      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
+
+      // Test getFormula(), the root should always be false
+      if (solverToUse().equals(SMTINTERPOL)) {
+        assertThat(proof.getFormula()).isNull();
+      } else {
+        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
+
+      // Test getArguments()
+      assertThat(proof.getArguments()).isNotNull();
+      assertThat(proof.getArguments()).isNotEmpty();
+
+      // Test isLeaf()
+      assertThat(proof.isLeaf()).isFalse();
+      Subproof leaf = findanyProofLeaf(proof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
+
+    } catch (UnsupportedOperationException e) {
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Proof generation is not available for the current solver.");
+      Class<?> contextClass = context.getClass();
+      boolean isExpected =
+          contextClass.equals(CVC4SolverContext.class)
+              || contextClass.equals(PrincessSolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
+              || contextClass.equals(BoolectorSolverContext.class)
+              || contextClass.equals(BitwuzlaSolverContext.class)
+              || contextClass.equals(Yices2SolverContext.class);
+      assertThat(isExpected).isTrue();
+    }
+  }
+
+  @Test
+  public void getProofAfterGetProofAndAddingAssertionsTest() throws InterruptedException,
+                                                                    SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -452,7 +527,68 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      proof = prover.getProof();
+      Subproof secondProof = prover.getProof();
+      assertThat(secondProof).isNotNull();
+
+      // Test getRule()
+      assertThat(secondProof.getRule()).isNotNull();
+      assertThat(secondProof.getRule()).isInstanceOf(ProofRule.class);
+
+      // Test getFormula(), the root should always be false
+      if (solverToUse().equals(SMTINTERPOL)) {
+        assertThat(secondProof.getFormula()).isNull();
+      } else {
+        assertThat(secondProof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
+
+      // Test getArguments()
+      assertThat(secondProof.getArguments()).isNotNull();
+      assertThat(secondProof.getArguments()).isNotEmpty();
+
+      // Test isLeaf()
+      assertThat(secondProof.isLeaf()).isFalse();
+      leaf = findanyProofLeaf(secondProof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
+
+      assertNotEquals(proof, secondProof);
+
+    } catch (UnsupportedOperationException e) {
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Proof generation is not available for the current solver.");
+      Class<?> contextClass = context.getClass();
+      boolean isExpected =
+          contextClass.equals(CVC4SolverContext.class)
+              || contextClass.equals(PrincessSolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
+              || contextClass.equals(BoolectorSolverContext.class)
+              || contextClass.equals(BitwuzlaSolverContext.class)
+              || contextClass.equals(Yices2SolverContext.class);
+      assertThat(isExpected).isTrue();
+    }
+  }
+
+  @Test
+  public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
+      throws InterruptedException, SolverException {
+    requireProofGeneration(); // Ensures proofs are supported
+    BooleanFormula q1 = bmgr.makeVariable("q1");
+    BooleanFormula q2 = bmgr.makeVariable("q2");
+    IntegerFormula x1 = imgr.makeVariable("x1");
+    IntegerFormula two = imgr.makeNumber("2");
+    IntegerFormula cero = imgr.makeNumber("0");
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+
+      prover.push(bmgr.or(bmgr.not(q1), q2));
+      prover.push(q1);
+      prover.push(bmgr.not(q2));
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      Subproof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -472,11 +608,51 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
+      Subproof leaf = findanyProofLeaf(proof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
+
+      //System.out.println(((AbstractSubproof) proof).proofAsString());
+
+      prover.pop();
+      prover.pop();
+      prover.pop();
+
+      //assert integer formulas and test again
+      prover.push(imgr.equal(x1, two));
+      prover.push(imgr.lessThan(x1, cero));
+
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      Subproof secondProof = prover.getProof();
+      assertThat(secondProof).isNotNull();
+
+      // Test getRule()
+      assertThat(secondProof.getRule()).isNotNull();
+      assertThat(secondProof.getRule()).isInstanceOf(ProofRule.class);
+
+      // Test getFormula(), the root should always be false
+      if (solverToUse().equals(SMTINTERPOL)) {
+        assertThat(secondProof.getFormula()).isNull();
+      } else {
+        assertThat(secondProof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
+
+      // Test getArguments()
+      assertThat(secondProof.getArguments()).isNotNull();
+      assertThat(secondProof.getArguments()).isNotEmpty();
+
+      // Test isLeaf()
+      assertThat(secondProof.isLeaf()).isFalse();
       leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
+      //System.out.println(((AbstractSubproof) proof).proofAsString());
 
+      assertNotEquals(proof, secondProof);
+      assertNotEquals(proof.getDAG(), secondProof.getDAG());
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)
@@ -494,6 +670,34 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  @Test
+  public void getProofWithoutProofProductionEnabledTest()
+      throws InterruptedException, SolverException {
+    requireProofGeneration();
+
+    BooleanFormula bottom = bmgr.makeFalse();
+
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.addConstraint(bottom);
+      assertThat(prover.isUnsat()).isTrue();
+
+      Subproof proof = prover.getProof();
+
+      //Z3 always has proof generation on
+      if (solverToUse().equals(Z3)) {
+        assertThat(proof.getFormula()).isNotNull();
+      }
+
+    } catch (UnsupportedOperationException e) {
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Proof generation is not available for the current solver.");
+    } catch (IllegalStateException e) {
+      assertThat(e)
+          .hasMessageThat()
+          .isEqualTo("Please set the prover option GENERATE_PROOFS.");
+    }
+  }
 
   private Subproof findanyProofLeaf(Subproof pn) {
     if (pn.isLeaf()) {
