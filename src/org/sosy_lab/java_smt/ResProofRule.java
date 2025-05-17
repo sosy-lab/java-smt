@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt;
 
-import com.google.common.base.Preconditions;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

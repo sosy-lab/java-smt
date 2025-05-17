@@ -51,15 +51,17 @@ class SmtInterpolProof extends AbstractProof {
     RUP,
     PIVOT;
     String name;
+
     private Rules() {}
+
     Rules(String pDefineFun) {
       name = pDefineFun;
     }
 
-    static Rules getFromName(String pName){
-      if (pName.equals("DEFINE-FUN")){
+    static Rules getFromName(String pName) {
+      if (pName.equals("DEFINE-FUN")) {
         return DEFINE_FUN;
-      } else if (pName.equals("DECLARE-FUN")){
+      } else if (pName.equals("DECLARE-FUN")) {
         return DECLARE_FUN;
       }
       return Rules.valueOf(pName);
@@ -69,7 +71,7 @@ class SmtInterpolProof extends AbstractProof {
     public String getName() {
       if (this.equals(DEFINE_FUN) || this.equals(DECLARE_FUN)) {
         return name;
-      } else{
+      } else {
         return name().toLowerCase(Locale.ENGLISH);
       }
     }
@@ -129,12 +131,12 @@ class SmtInterpolProof extends AbstractProof {
           stack.pop();
           Formula formula = null;
           if (proofNode.formulas.size() > 1) {
-            //This can not stay like this, the algorithm calculating the formulas to be stored is
+            // This can not stay like this, the algorithm calculating the formulas to be stored is
             // needed, as what we retrieve here is simply arguments for generating a clause,
             // meaning the arguments do not have to be boolean and therefore joining them with OR
             // causes and exception.
-            //Term or = Util.or(creator.getEnv(), proofNode.formulas.toArray(new Term[0]));
-            //formula = creator.encapsulate(creator.getFormulaType(or), or);
+            // Term or = Util.or(creator.getEnv(), proofNode.formulas.toArray(new Term[0]));
+            // formula = creator.encapsulate(creator.getFormulaType(or), or);
           } else if (!proofNode.formulas.isEmpty()) {
             Term t = proofNode.formulas.get(0);
             formula = creator.encapsulate(creator.getFormulaType(t), t);

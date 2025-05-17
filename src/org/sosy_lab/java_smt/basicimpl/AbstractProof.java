@@ -19,7 +19,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.solvers.z3.Z3Proof.Z3Subproof;
 
 /**
  * A proof DAG of a proof.
@@ -28,12 +27,12 @@ import org.sosy_lab.java_smt.solvers.z3.Z3Proof.Z3Subproof;
  */
 public abstract class AbstractProof implements Proof {
 
-  //protected abstract class Transformation {
+  // protected abstract class Transformation {
   //  protected <TFormulaInfo, TType, TEnv, TFuncDecl, T> Transformation(
   //      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator, T proof) {}
 
-//    protected abstract Proof generateProof();
-  //}
+  //    protected abstract Proof generateProof();
+  // }
 
   protected final Map<Subproof, LinkedHashSet<Subproof>> edges = new HashMap<>();
 
@@ -48,7 +47,6 @@ public abstract class AbstractProof implements Proof {
   public Collection<Subproof> getSubproofs() {
     return edges.keySet();
   }
-
 
   public abstract static class AbstractSubproof implements Subproof {
     private final AbstractProof proof;
@@ -109,13 +107,12 @@ public abstract class AbstractProof implements Proof {
       Formula formula = getFormula();
       String sFormula;
       if (formula != null) {
-         sFormula = formula.toString();
+        sFormula = formula.toString();
       } else {
         sFormula = "null";
       }
 
-      proof.append(indent).append("Formula: ").append(sFormula).append(
-          "\n");
+      proof.append(indent).append("Formula: ").append(sFormula).append("\n");
       proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
       proof
           .append(indent)

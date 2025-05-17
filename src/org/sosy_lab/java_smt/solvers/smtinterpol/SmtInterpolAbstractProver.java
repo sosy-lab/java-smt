@@ -256,7 +256,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     return proof;
   }
 
-  public Term smtInterpolGetProof(){
+  public Term smtInterpolGetProof() {
     Term tProof;
     try {
       tProof = env.getProof();

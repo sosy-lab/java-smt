@@ -42,7 +42,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProof.AbstractSubproof;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
@@ -102,7 +101,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireInterpolation();
     try (BasicProverEnvironment<?> pe =
-             context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
+        context.newProverEnvironmentWithInterpolation(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -112,7 +111,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     requireUnsatCore();
     requireOptimization();
     try (BasicProverEnvironment<?> pe =
-             context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
+        context.newOptimizationProverEnvironment(GENERATE_UNSAT_CORE)) {
       unsatCoreTest0(pe);
     }
   }
@@ -142,7 +141,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
 
     try (ProverEnvironment pe =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }
@@ -157,7 +156,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .that(solverToUse())
         .isNoneOf(PRINCESS, CVC4, CVC5, OPENSMT);
     try (ProverEnvironment pe =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       pe.push();
       pe.addConstraint(imgr.equal(imgr.makeVariable("y"), imgr.makeNumber(2)));
       BooleanFormula selector = bmgr.makeVariable("b");
@@ -179,13 +178,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     requireUnsatCoreOverAssumptions();
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
 
     try (ProverEnvironment prover =
-             context.newProverEnvironment(GENERATE_UNSAT_CORE,
-                 GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+        context.newProverEnvironment(GENERATE_UNSAT_CORE, GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       checkSimpleQuery(prover);
     }
   }
@@ -263,8 +261,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testGetComplexRationalNumeralaAndUFProof() throws InterruptedException,
-                                                                SolverException {
+  public void testGetComplexRationalNumeralaAndUFProof()
+      throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     // "(declare-fun x1 () Real)" +
     // "(declare-fun x2 () Real)" +
@@ -297,8 +295,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     RationalFormulaManager rfmgr = mgr.getRationalFormulaManager();
 
-    try (ProverEnvironment prover =
-             context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
       // "(assert (and a (= (+ (f y1) y2) y3) (<= y1 x1)))"
       prover.addConstraint(
           bmgr.and(
@@ -373,7 +370,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       Subproof proof = prover.getProof();
 
-
     } catch (UnsupportedOperationException e) {
       assertThat(e)
           .hasMessageThat()
@@ -388,7 +384,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
               || contextClass.equals(Yices2SolverContext.class);
       assertThat(isExpected).isTrue();
     } catch (IllegalStateException ie) {
-      //this should be thrown as getProof was called when last evaluation was SAT
+      // this should be thrown as getProof was called when last evaluation was SAT
     }
   }
 
@@ -405,7 +401,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Subproof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
-
     } catch (UnsupportedOperationException e) {
       assertThat(e)
           .hasMessageThat()
@@ -420,10 +415,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
               || contextClass.equals(Yices2SolverContext.class);
       assertThat(isExpected).isTrue();
     } catch (IllegalStateException ie) {
-      //this should be thrown as getProof was called when last evaluation was SAT
+      // this should be thrown as getProof was called when last evaluation was SAT
     }
   }
-
 
   @Test
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
@@ -479,8 +473,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void getProofAfterGetProofAndAddingAssertionsTest() throws InterruptedException,
-                                                                    SolverException {
+  public void getProofAfterGetProofAndAddingAssertionsTest()
+      throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -520,7 +514,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
-      //assert integer formulas and test again
+      // assert integer formulas and test again
       prover.addConstraint(imgr.equal(x1, two));
       prover.addConstraint(imgr.lessThan(x1, cero));
 
@@ -612,13 +606,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
-      //System.out.println(((AbstractSubproof) proof).proofAsString());
+      // System.out.println(((AbstractSubproof) proof).proofAsString());
 
       prover.pop();
       prover.pop();
       prover.pop();
 
-      //assert integer formulas and test again
+      // assert integer formulas and test again
       prover.push(imgr.equal(x1, two));
       prover.push(imgr.lessThan(x1, cero));
 
@@ -649,7 +643,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
-      //System.out.println(((AbstractSubproof) proof).proofAsString());
+      // System.out.println(((AbstractSubproof) proof).proofAsString());
 
       assertNotEquals(proof, secondProof);
       assertNotEquals(proof.getDAG(), secondProof.getDAG());
@@ -683,7 +677,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       Subproof proof = prover.getProof();
 
-      //Z3 always has proof generation on
+      // Z3 always has proof generation on
       if (solverToUse().equals(Z3)) {
         assertThat(proof.getFormula()).isNotNull();
       }
@@ -693,9 +687,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           .hasMessageThat()
           .isEqualTo("Proof generation is not available for the current solver.");
     } catch (IllegalStateException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Please set the prover option GENERATE_PROOFS.");
+      assertThat(e).hasMessageThat().isEqualTo("Please set the prover option GENERATE_PROOFS.");
     }
   }
 
