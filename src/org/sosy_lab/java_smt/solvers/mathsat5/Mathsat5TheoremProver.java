@@ -67,6 +67,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   public Subproof getProof() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(this.isUnsat());
+    checkGenerateProofs();
 
     Mathsat5Proof proof = new Mathsat5Proof();
 
