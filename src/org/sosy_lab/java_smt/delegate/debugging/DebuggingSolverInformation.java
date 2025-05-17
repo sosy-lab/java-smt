@@ -61,7 +61,7 @@ public class DebuggingSolverInformation {
           Solvers.YICES2,
           ConcurrentHashMap.newKeySet());
 
-  private Set<Formula> definedFormulas;
+  private final Set<Formula> definedFormulas;
 
   private final Thread solverThread = Thread.currentThread();
 
