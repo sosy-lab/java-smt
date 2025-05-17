@@ -103,7 +103,7 @@ public final class ResProofRule {
     NEG_DEF("neg_def", "(+ (= (- a) (* (- 1) a)))"),
     NEG_DEF2("neg_def2", "(+ (= (- a b1 ... bn) (+ a (* (- 1) b1)) ... (* (- 1) bn)))"),
     ABS_DEF("abs_def", "(+ (= (abs x) (ite (< x 0) (- x) x)))"),
-    TOTAL_INT("total_int", "(+ (<= a c) (<= (c+1) a))"),
+    TOTAL_INT("total-int", "(+ (<= a c) (<= (c+1) a))"),
     TO_INT_LOW("to_int_low", "(+ (<= (to_real (to_int x)) x))"),
     TO_INT_HIGH("to_int_high", "(+ (< x (+ (to_real (to_int x)) 1.0)))"),
     DIV_LOW("div_low", "(+ (<= (* d (div x d)) x) (= d 0))"),
