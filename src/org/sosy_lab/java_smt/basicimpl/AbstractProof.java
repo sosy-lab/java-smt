@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
@@ -50,7 +49,8 @@ public abstract class AbstractProof implements Proof {
     return edges.keySet();
   }
 
-  protected abstract static class AbstractSubproof implements Subproof {
+
+  public abstract static class AbstractSubproof implements Subproof {
     private final AbstractProof proof;
     private ProofRule rule;
     @Nullable protected Formula formula;
@@ -98,7 +98,7 @@ public abstract class AbstractProof implements Proof {
     }
 
     // use this for debugging
-    protected String proofAsString() {
+    public String proofAsString() {
       return proofAsString(0);
     }
 
@@ -119,7 +119,7 @@ public abstract class AbstractProof implements Proof {
       if (!isLeaf()) {
         for (Subproof child : getArguments()) {
           proof.append(indent).append("Child ").append(++i).append(":\n");
-          proof.append(((Z3Subproof) child).proofAsString(indentLevel + 1));
+          proof.append(((AbstractSubproof) child).proofAsString(indentLevel + 1));
         }
       }
 
