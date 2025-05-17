@@ -42,7 +42,7 @@ public class Z3Proof extends AbstractProof {
     }
 
     @Override
-    protected String proofAsString() {
+    public String proofAsString() {
       return super.proofAsString();
     }
   }

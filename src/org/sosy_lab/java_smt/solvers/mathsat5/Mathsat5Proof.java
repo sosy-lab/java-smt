@@ -185,7 +185,7 @@ class Mathsat5Proof extends AbstractProof {
     }
 
     @Override
-    protected String proofAsString() {
+    public String proofAsString() {
       return super.proofAsString();
     }
   }

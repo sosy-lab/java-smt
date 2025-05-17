@@ -106,7 +106,16 @@ public abstract class AbstractProof implements Proof {
       StringBuilder proof = new StringBuilder();
       String indent = "  ".repeat(indentLevel);
 
-      proof.append(indent).append("Formula: ").append(getFormula().toString()).append("\n");
+      Formula formula = getFormula();
+      String sFormula;
+      if (formula != null) {
+         sFormula = formula.toString();
+      } else {
+        sFormula = "null";
+      }
+
+      proof.append(indent).append("Formula: ").append(sFormula).append(
+          "\n");
       proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
       proof
           .append(indent)
