@@ -149,10 +149,6 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testCVC5WithValidOptionsTimeLimit()
       throws InvalidConfigurationException, InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
-    assume()
-        .withMessage("CVC5 has an issue with creating and closing a second context on Windows.")
-        .that(IS_WINDOWS)
-        .isFalse();
 
     //  tlimit-per is time limit in ms of wall clock time per query
     var configValid =
