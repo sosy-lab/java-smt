@@ -167,7 +167,7 @@ public class SolverFormulaIODeclarationsTest
     BitvectorFormula var = bvmgr.makeVariable(8, "x");
     String query =
         "(declare-fun x () (_ BitVec 8))(declare-fun x () (_ BitVec 8))(assert (= x #b00000000))";
-    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.MATHSAT5, Solvers.BITWUZLA, Solvers.CVC5).contains(solverToUse())) {
       BooleanFormula formula = mgr.parse(query);
       Truth.assertThat(mgr.extractVariables(formula).values()).containsExactly(var);
     } else {
@@ -318,7 +318,15 @@ public class SolverFormulaIODeclarationsTest
             + " (not (= |f::v@2| (_ bv1 32)))))";
     BooleanFormula parsedQuery = mgr.parse(query);
     assertThatFormula(parsedQuery).isUnsatisfiable();
-    assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
-    assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
+    if (solver == Solvers.CVC5) {
+      // CVC5 does not substitute "abbrev_9", but adds the definition to the assertions and then
+      // counts it as another variable
+      assert_().that(mgr.extractVariables(parsedQuery)).hasSize(10);
+      assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(10);
+
+    } else {
+      assert_().that(mgr.extractVariables(parsedQuery)).hasSize(9);
+      assert_().that(mgr.extractVariablesAndUFs(parsedQuery)).hasSize(9);
+    }
   }
 }
