@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
