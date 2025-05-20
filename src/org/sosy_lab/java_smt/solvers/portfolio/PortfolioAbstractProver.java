@@ -61,15 +61,21 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
+@SuppressWarnings("unused")
 abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends AbstractProver<I> {
 
-  // We keep the original contexts and provers and build new ones for solving from them
-  private final Map<Solvers, SolverContext> originalSolverContexts;
+  private final PortfolioSolverContext portfolioContext;
+  // Before using a prover, we need to make sure not to use provers that have been kicked out
+  // Currently we only build provers to be used from the options of this one when actually
+  // requesting to solve something, so it's fine for now
+  // TODO: for incremental this is not sufficient
   private final Map<Solvers, P> centralSolversAndProvers;
   private static final Map<Solvers, AtomicInteger> terminatedFirstCounter =
       new ConcurrentHashMap<>();
 
   private final Set<ProverOptions> options;
+
+  // We keep the original contexts etc. in the creator
   private final PortfolioFormulaCreator creator;
   private final ShutdownNotifier externalShutdownNotifier;
   private final LogManager logger;
@@ -85,13 +91,14 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   private @Nullable ParallelProverResult lastResult;
 
   protected PortfolioAbstractProver(
+      PortfolioSolverContext pPortfolioContext,
       Set<ProverOptions> pOptions,
       Map<Solvers, SolverContext> pSolverContexts,
       PortfolioFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger) {
     super(pOptions);
-    originalSolverContexts = pSolverContexts;
+    portfolioContext = pPortfolioContext;
     centralSolversAndProvers =
         generateNewProvers(pSolverContexts, pOptions, pLogger, terminatedFirstCounter);
     options = pOptions;
@@ -114,7 +121,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
     for (Entry<Solvers, SolverContext> e : pSolverContexts.entrySet()) {
       Solvers solver = e.getKey();
       try {
-        builder.put(solver, getProver(e.getValue(), pOptions));
+        builder.put(solver, getNewSolverSpecificProver(e.getValue(), pOptions));
         if (!terminatedFirstCounter.containsKey(e.getKey())) {
           terminatedFirstCounter.put(solver, new AtomicInteger(0));
         }
@@ -137,7 +144,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
     for (Entry<Solvers, P> solverAndMainProver : centralSolversAndProvers.entrySet()) {
       Solvers solver = solverAndMainProver.getKey();
       P mainProver = solverAndMainProver.getValue();
-      SolverContext solverContext = originalSolverContexts.get(solver);
+      SolverContext solverContext = creator.getSolverSpecificContexts().get(solver);
       callables.add(createParallelIsUnsat(solver, solverContext, mainProver));
     }
     ParallelProverResult result = buildThreadsAndRunCalls(callables.build());
@@ -308,12 +315,12 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
       final AtomicInteger terminatedCounter,
       final AtomicBoolean
           terminatedCurrentCall) { // handleFutureResults needs to handle all the exceptions
-                                   // declared here
+    // declared here
     try {
       boolean isUnsat;
 
       SolverContextAndProverAndShutdownManager<P> newComponents =
-          buildNewEmptyContextAndProverFrom(usedSolver, contextToBuildFrom, proverToBuildFrom);
+          buildNewEmptyContextAndProverFrom(usedSolver, proverToBuildFrom);
       translateSolverStackTo(contextToBuildFrom, proverToBuildFrom, newComponents);
 
       P prover = newComponents.getProver();
@@ -470,7 +477,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   private void handleFutureResults(List<ListenableFuture<ParallelProverResult>> futures)
       throws InterruptedException, SolverException {
 
-    List<Exception> exceptions = new ArrayList<>();
+    // List<Exception> exceptions = new ArrayList<>();
     for (ListenableFuture<ParallelProverResult> f : Futures.inCompletionOrder(futures)) {
       try {
         ParallelProverResult result = f.get();
@@ -545,16 +552,16 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
    * etc.!
    */
   protected SolverContextAndProverAndShutdownManager<P> buildNewEmptyContextAndProverFrom(
-      Solvers solver, SolverContext contextToBuildFrom, ProverEnvironment proverToBuildFrom) {
+      Solvers solver, ProverEnvironment proverToBuildFrom) {
     // If users request shutdown, we want all to shut down
     ShutdownManager shutdownManagerForNew =
         ShutdownManager.createWithParent(centralShutdownManager.getNotifier());
     ShutdownNotifier newNotifier = shutdownManagerForNew.getNotifier();
 
     SolverContext newEmptyContextWSameOptions =
-        contextToBuildFrom.copyWithNewShutdownNotifier(newNotifier);
+        portfolioContext.copySolverContextWithNewShutdownNotifier(solver, newNotifier);
 
-    P newProver = getProver(newEmptyContextWSameOptions, options);
+    P newProver = getNewSolverSpecificProver(newEmptyContextWSameOptions, options);
 
     SolverContextAndProverAndShutdownManager<P> triple =
         new SolverContextAndProverAndShutdownManager<>(
@@ -568,7 +575,8 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
    * specialized Provers! The context/prover returned is empty! You still need to add the stack
    * etc.!
    */
-  abstract P getProver(SolverContext newEmptyContextWSameOptions, Set<ProverOptions> pOptions);
+  abstract P getNewSolverSpecificProver(
+      SolverContext newEmptyContextWSameOptionsForSolver, Set<ProverOptions> pOptions);
 
   public static class SolverContextAndProverAndShutdownManager<P extends ProverEnvironment> {
 
