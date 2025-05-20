@@ -118,6 +118,10 @@ public class MainSolver {
     OsmtNativeJNI.MainSolver_stop(swigCPtr, this);
   }
 
+  public String printResolutionProofSMT2() {
+    return OsmtNativeJNI.MainSolver_printResolutionProofSMT2(swigCPtr, this);
+  }
+
   public VectorPTRef getUnsatCore() {
     return new VectorPTRef(OsmtNativeJNI.MainSolver_getUnsatCore(swigCPtr, this), true);
   }

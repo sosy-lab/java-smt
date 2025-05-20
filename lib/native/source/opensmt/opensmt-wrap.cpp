@@ -629,6 +629,11 @@ SWIGINTERN opensmt::sstat opensmt_sstat_True(){ return s_True; }
 SWIGINTERN opensmt::sstat opensmt_sstat_False(){ return s_False; }
 SWIGINTERN opensmt::sstat opensmt_sstat_Undef(){ return s_Undef; }
 SWIGINTERN opensmt::sstat opensmt_sstat_Error(){ return s_Error; }
+SWIGINTERN std::string opensmt_MainSolver_printResolutionProofSMT2(opensmt::MainSolver *self){
+    std::ostringstream out;
+    self->printResolutionProofSMT2(out);
+    return out.str();
+  }
 SWIGINTERN std::vector< opensmt::PTRef > opensmt_MainSolver_getUnsatCore(opensmt::MainSolver *self){
     std::vector<PTRef> result;
     auto core = self->getUnsatCore();
@@ -5084,6 +5089,40 @@ SWIGEXPORT void JNICALL Java_org_sosy_1lab_java_1smt_solvers_opensmt_api_OsmtNat
       return ;
     }
   }
+}
+
+
+SWIGEXPORT jstring JNICALL Java_org_sosy_1lab_java_1smt_solvers_opensmt_api_OsmtNativeJNI_MainSolver_1printResolutionProofSMT2(JNIEnv *jenv, jclass jcls, jlong jarg1, jobject jarg1_) {
+  jstring jresult = 0 ;
+  opensmt::MainSolver *arg1 = (opensmt::MainSolver *) 0 ;
+  std::string result;
+  
+  (void)jenv;
+  (void)jcls;
+  (void)jarg1_;
+  arg1 = *(opensmt::MainSolver **)&jarg1; 
+  {
+    try {
+      result = opensmt_MainSolver_printResolutionProofSMT2(arg1); 
+    }
+    catch(std::exception& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/UnsupportedOperationException");
+      jenv->ThrowNew(exceptionType, e.what());
+      return 0;
+    }
+    catch(OutOfMemoryException& e) {
+      jclass exceptionType = jenv->FindClass("java/lang/OutOfMemoryError");
+      jenv->ThrowNew(exceptionType, "");
+      return 0;
+    }
+    catch(...) {
+      jclass exceptionType = jenv->FindClass("java/lang/RuntimeException");
+      jenv->ThrowNew(exceptionType, "");
+      return 0;
+    }
+  }
+  jresult = jenv->NewStringUTF((&result)->c_str()); 
+  return jresult;
 }
 
 

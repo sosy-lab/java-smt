@@ -36,21 +36,6 @@ abstract class PrincessNumeralFormulaManager<
   }
 
   @Override
-  protected ITerm negate(IExpression pNumber) {
-    return ((ITerm) pNumber).unary_$minus();
-  }
-
-  @Override
-  protected ITerm add(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$plus((ITerm) pNumber2);
-  }
-
-  @Override
-  protected ITerm subtract(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$minus((ITerm) pNumber2);
-  }
-
-  @Override
   protected IFormula equal(IExpression pNumber1, IExpression pNumber2) {
     return ((ITerm) pNumber1).$eq$eq$eq((ITerm) pNumber2);
   }
@@ -58,25 +43,5 @@ abstract class PrincessNumeralFormulaManager<
   @Override
   protected IExpression distinctImpl(List<IExpression> pNumbers) {
     return IExpression.distinct(asScala(Iterables.filter(pNumbers, ITerm.class)));
-  }
-
-  @Override
-  protected IFormula greaterThan(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$greater((ITerm) pNumber2);
-  }
-
-  @Override
-  protected IFormula greaterOrEquals(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$greater$eq((ITerm) pNumber2);
-  }
-
-  @Override
-  protected IFormula lessThan(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$less((ITerm) pNumber2);
-  }
-
-  @Override
-  protected IFormula lessOrEquals(IExpression pNumber1, IExpression pNumber2) {
-    return ((ITerm) pNumber1).$less$eq((ITerm) pNumber2);
   }
 }

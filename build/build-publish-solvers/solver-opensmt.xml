@@ -20,19 +20,12 @@ SPDX-License-Identifier: Apache-2.0
     <target name="set-properties-for-opensmt">
         <checkPathOption pathOption="opensmt.path" defaultPath="/path/to/opensmt" targetName="OpenSMT source folder (git checkout from 'https://github.com/usi-verification-and-security/opensmt.git)"/>
 
-        <!--
-            Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
-            For linux-x64:
-                ./configure -?-enable-cxx -?-with-pic -?-disable-shared -?-enable-static -?-enable-fat
-                make -j4
-            For linux-arm64:
-                ./configure -?-enable-cxx -?-with-pic -?-disable-shared -?-enable-static -?-enable-fat \
-                     -?-host=aarch64-linux-gnu \
-                     CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
-                make -j4
-        -->
-        <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
-        <checkPathOption pathOption="gmp-linux-arm64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux arm64)"/>
+        <!-- Define paths to the GMP installation for x86 and arm64
+             When using the docker image the files are already included and can be found under
+             /dependencies/gmp-6.2.1/install -->
+        <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP installation directory (Linux x64)"/>
+        <checkPathOption pathOption="gmp-linux-arm64.path" defaultPath="/path/to/gmp" targetName="GMP installation directory (Linux arm64)"/>
+
         <checkPathOption pathOption="jdk-linux-arm64.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Linux arm64 version)"/>
 
         <fail unless="opensmt.customRev">
@@ -76,12 +69,17 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Build OpenSMT,
-                     Make sure to remove the old 'build/' directory from OpenSMT!
-                     It keeps old build commands and previous cmake-flags. -->
+             Make sure to remove the old 'build/' directory from OpenSMT!
+             It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
-        <exec executable="make" dir="${opensmt.path}" failonerror="true">
+        <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
-            <arg value="CMAKE_FLAGS=-DFORCE_STATIC_GMP=ON"/>
+            <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
+            <arg value="CMAKE_FLAGS=
+              -DFORCE_STATIC_GMP=ON
+              -DGMP_LIBRARY=${gmp-linux-x64.path}/lib/libgmp.a
+              -DGMPXX_LIBRARY=${gmp-linux-x64.path}/lib/libgmpxx.a
+              -DGMP_INCLUDE_DIR=${gmp-linux-x64.path}/include"/>
             <arg value="install"/>
         </exec>
 
@@ -91,6 +89,15 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-R"/>
             <arg value="${source.path}/api.patch"/>
         </exec>
+
+        <!-- Abort if the build failed -->
+        <fail message="Failed to build OpenSMT">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${build.returnCode}"/>
+                </not>
+            </condition>
+        </fail>
 
         <!-- copy OpenSMT include files to JavaSMT -->
         <copy todir="${source.installPathLinuxX64}">
@@ -112,10 +119,16 @@ SPDX-License-Identifier: Apache-2.0
              Make sure to remove the old 'build/' directory from OpenSMT!
              It keeps old build commands and previous cmake-flags. -->
         <delete dir="${opensmt.path}/build" quiet="true"/>
-        <exec executable="make" dir="${opensmt.path}" failonerror="true">
+        <exec executable="make" dir="${opensmt.path}" failonerror="false" resultproperty="build.returnCode">
             <arg value="INSTALL_DIR=${opensmt.installPath}"/>
             <!-- The next arg is ONE large parameter. If executed manually outside of ant, please wrap it in quotes. -->
-            <arg value="CMAKE_FLAGS=-DFORCE_STATIC_GMP=ON -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++ -DGMP_LIBRARY=${gmp-linux-arm64.path}/.libs/libgmp.a -DGMPXX_LIBRARY=${gmp-linux-arm64.path}/.libs/libgmpxx.a -DGMP_INCLUDE_DIR=${gmp-linux-arm64.path}"/>
+            <arg value="CMAKE_FLAGS=
+              -DFORCE_STATIC_GMP=ON
+              -DCMAKE_C_COMPILER=aarch64-linux-gnu-gcc
+              -DCMAKE_CXX_COMPILER=aarch64-linux-gnu-g++
+              -DGMP_LIBRARY=${gmp-linux-arm64.path}/lib/libgmp.a
+              -DGMPXX_LIBRARY=${gmp-linux-arm64.path}/lib/libgmpxx.a
+              -DGMP_INCLUDE_DIR=${gmp-linux-arm64.path}/include"/>
             <arg value="install"/>
         </exec>
 
@@ -125,6 +138,15 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-R"/>
             <arg value="${source.path}/api.patch"/>
         </exec>
+
+        <!-- Abort if the build failed -->
+        <fail message="Failed to build OpenSMT">
+            <condition>
+                <not>
+                    <equals arg1="0" arg2="${build.returnCode}"/>
+                </not>
+            </condition>
+        </fail>
 
         <!-- copy OpenSMT include files to JavaSMT -->
         <copy todir="${source.installPathLinuxArm64}">
@@ -198,7 +220,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${source.installPathLinuxX64}/include/opensmt"/>
             <arg value="-I${java.home}/include"/>
             <arg value="-I${java.home}/include/linux"/>
-            <arg value="-I${gmp-linux-x64.path}"/>
+            <arg value="-I${gmp-linux-x64.path}/include"/>
         </exec>
 
         <!-- link the wrapper to create libopensmtj-x64.so -->
@@ -216,7 +238,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libopensmtj-x64.so"/>
             <arg value="opensmt-wrap.o"/>
             <arg value="-L${source.installPathLinuxX64}/lib"/>
-            <arg value="-L${gmp-linux-x64.path}/.libs"/>
+            <arg value="-L${gmp-linux-x64.path}/lib"/>
             <arg value="-Wl,-Bstatic"/>
             <arg value="-lopensmt"/>
             <arg value="-lgmpxx"/>
@@ -246,7 +268,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="-I${source.installPathLinuxArm64}/include/opensmt"/>
             <arg value="-I${jdk-linux-arm64.path}/include"/>
             <arg value="-I${jdk-linux-arm64.path}/include/linux"/>
-            <arg value="-I${gmp-linux-arm64.path}"/>
+            <arg value="-I${gmp-linux-arm64.path}/include"/>
         </exec>
 
         <!-- link the wrapper to create libopensmtj-arm64.so -->
@@ -264,7 +286,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="libopensmtj-arm64.so"/>
             <arg value="opensmt-wrap.o"/>
             <arg value="-L${source.installPathLinuxArm64}/lib"/>
-            <arg value="-L${gmp-linux-arm64.path}/.libs"/>
+            <arg value="-L${gmp-linux-arm64.path}/lib"/>
             <arg value="-Wl,-Bstatic"/>
             <arg value="-lopensmt"/>
             <arg value="-lgmpxx"/>

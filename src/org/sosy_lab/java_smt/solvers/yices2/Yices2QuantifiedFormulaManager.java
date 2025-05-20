@@ -8,8 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_exists;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_forall;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_subst_term;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import com.google.common.primitives.Ints;
 import java.util.List;
@@ -28,27 +31,24 @@ public class Yices2QuantifiedFormulaManager
   @Override
   protected Integer eliminateQuantifiers(Integer pExtractInfo)
       throws SolverException, InterruptedException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Yices does not support eliminating Quantifiers.");
+    throw new UnsupportedOperationException("Yices2 does not support quantifier elimination.");
   }
 
   @Override
   public Integer mkQuantifier(Quantifier pQ, List<Integer> pVars, Integer pBody) {
-    /*
-     * TODO Yices needs variables constructed using yices_new_variable(), but variables passed in
-     * pVars are constructed with yices_new uninterpreted_term(). Need to construct the correct
-     * variable type from the variables in pVars and map between them.
-     */
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable list for Quantifier.");
+    checkArgument(
+        !pVars.isEmpty(),
+        "Missing variables for quantifier '%s' and body '%s'.",
+        pQ,
+        yices_term_to_string(pBody));
+
+    Yices2FormulaCreator creator = (Yices2FormulaCreator) formulaCreator;
+    int[] vars = pVars.stream().mapToInt(creator::createBoundVariableFromFreeVariable).toArray();
+    int substBody = yices_subst_term(vars.length, Ints.toArray(pVars), vars, pBody);
+    if (pQ == Quantifier.FORALL) {
+      return yices_forall(vars.length, vars, substBody);
     } else {
-      int[] terms = Ints.toArray(pVars);
-      if (pQ == Quantifier.FORALL) {
-        return yices_forall(terms.length, terms, pBody);
-      } else if (pQ == Quantifier.EXISTS) {
-        return yices_exists(terms.length, terms, pBody);
-      }
+      return yices_exists(vars.length, vars, substBody);
     }
-    return null;
   }
 }

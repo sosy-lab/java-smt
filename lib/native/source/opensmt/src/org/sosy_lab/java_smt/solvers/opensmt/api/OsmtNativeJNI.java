@@ -185,6 +185,7 @@ public class OsmtNativeJNI {
   public final static native long MainSolver_getModel(long jarg1, MainSolver jarg1_);
   public final static native long MainSolver_getInterpolationContext(long jarg1, MainSolver jarg1_);
   public final static native void MainSolver_stop(long jarg1, MainSolver jarg1_);
+  public final static native String MainSolver_printResolutionProofSMT2(long jarg1, MainSolver jarg1_);
   public final static native long MainSolver_getUnsatCore(long jarg1, MainSolver jarg1_);
   public final static native long new_Logic__SWIG_0(int jarg1);
   public final static native void delete_Logic(long jarg1);

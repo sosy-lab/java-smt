@@ -66,12 +66,14 @@ class SmtInterpolRationalFormulaManager
   }
 
   @Override
+  protected Term toType(Term pNumber) {
+    Sort intSort = pNumber.getTheory().getNumericSort();
+    return pNumber.getSort().equals(intSort) ? env.term("to_real", pNumber) : pNumber;
+  }
+
+  @Override
   public Term divide(Term pNumber1, Term pNumber2) {
     if (consistsOfNumerals(pNumber2)) {
-      Sort intSort = pNumber1.getTheory().getNumericSort();
-      Sort realSort = pNumber1.getTheory().getRealSort();
-      assert intSort.equals(pNumber1.getSort()) || realSort.equals(pNumber1.getSort());
-      assert intSort.equals(pNumber2.getSort()) || realSort.equals(pNumber2.getSort());
       return env.term("/", pNumber1, pNumber2);
     } else {
       return super.divide(pNumber1, pNumber2);

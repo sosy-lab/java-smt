@@ -65,7 +65,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [Bitwuzla](https://bitwuzla.github.io/) |  :heavy_check_mark:²  | :heavy_check_mark:² | :heavy_check_mark: |  |                                                        |  | a fast solver for bitvector logic |
 | [Boolector](https://boolector.github.io/) |  :heavy_check_mark:   |                     |  |  |                                                        |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/) |  :heavy_check_mark:   |                     |  |  |                                                        |  |  |
-| [CVC5](https://cvc5.github.io/) |  :heavy_check_mark:  |  :heavy_check_mark:  |  :heavy_check_mark:  |  |  |  |  |
+| [CVC5](https://cvc5.github.io/) |  :heavy_check_mark:  |  :heavy_check_mark:  |  :heavy_check_mark:  |  |  :heavy_check_mark:  |  :heavy_check_mark:  |  |
 | [MathSAT5](http://mathsat.fbk.eu/) |  :heavy_check_mark:   | :heavy_check_mark:  | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/430)³ |  |  |
 | [OpenSMT](https://verify.inf.usi.ch/opensmt) |  :heavy_check_mark:²  | :heavy_check_mark:² |  |  |                                                        |  |  |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) |  :heavy_check_mark:   |                     |  |  |                                                        |  | based on MathSAT5, with support for optimization queries |
@@ -181,10 +181,11 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 
 ## Authors
 
- - Project maintainers: [Karlheinz Friedberger][] and [Philipp Wendler][]
+ - Project maintainers: [Karlheinz Friedberger][] and [Daniel Baier][]
  - Former project maintainer: [George Karpenkov][]
  - Initial codebase, many design decisions: [Philipp Wendler][]
- - Contributions: [Daniel Baier][], [Thomas Stieglmaier][] and several others.
+ - Contributions: [Bajczi Levente][], Daniel Raffler, [Martin Spiessl][], [Thomas Stieglmaier][],
+   and many others. For a full list, see the [contributors overview][].
 
 [ConfigurationOptions]: https://sosy-lab.github.io/java-smt/ConfigurationOptions.txt
 [Manual Installation]: doc/Getting-started.md#manual-installation
@@ -195,5 +196,8 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
 [Thomas Stieglmaier]: https://stieglmaier.me/
 [Karlheinz Friedberger]: https://www.sosy-lab.org/people/friedberger
 [Daniel Baier]: https://www.sosy-lab.org/people/baier
+[Martin Spiessl]: https://www.sosy-lab.org/people/spiessl/
+[Bajczi Levente]: leventebajczi.github.io
 [Ivy repository]: https://www.sosy-lab.org/ivy
 [Maven repository]: https://mvnrepository.com/artifact/org.sosy-lab/java-smt
+[contributors overview]: https://github.com/sosy-lab/java-smt/graphs/contributors

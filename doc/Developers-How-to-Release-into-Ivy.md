@@ -116,36 +116,31 @@ Finally follow the instructions shown in the message at the end.
 
 ### Publishing CVC5
 
-We prefer to compile our own CVC5 binaries and Java bindings.
-For simple usage, we provide a Docker definition/environment under `/docker`,
-in which the following command can be run.
+We prefer to use the official CVC5 binaries, please build from source only if necessary (e.g., in
+case of an important bugfix). The binaries can be fetched and repackaged fully automatically.
+CVC5 provides releases on GitHub (https://github.com/cvc5/cvc5/releases) for multiple platform,
+including Linux, Windows, and macOS (x64 and arm64). 
+The releases on GitHub include versioned releases and also daily builds for the last two days.
+Our build-script downloads daily build artifacts, extracts the native libraries and Java bindings, 
+and publishes them for JavaSMT.
 
-To publish CVC5, checkout the [CVC5 repository](https://github.com/cvc5/cvc5) and download the
-JDK for windows and arm64 from Oracle. We will build bindings for several platforms and
-the JDKs are needed to cross-compile. To start building, execute the following command
-in the JavaSMT directory, where `$CVC5_DIR` is the path to the CVC5 directory and
-`$CVC5_VERSION` is the version number:
+To publish a daily version of CVC5, execute the following command in the JavaSMT directory:
 
 ```
-ant publish-cvc5 \
-    -Dcvc5.path=$CVC5_DIR\
-    -Dcvc5.customRev=$CVC5_VERSION \
-    -Djdk-windows.path=$JDK_DIR_WINDOWS \
-    -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
+ant publish-cvc5 -Dcvc5.version=$CVC5_VERSION
 ```
+
+Where `CVC5_VERSION` must match one of the daily releases from
+their [GitHub](https://github.com/cvc5/cvc5/releases/tag/latest) website
 
 Example:
 
 ```
-ant publish-cvc5 \
-    -Dcvc5.path=../CVC5 \
-    -Dcvc5.customRev=1.2.1 \
-    -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2/ \
-    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2/
+ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 ```
 
-During the build process, our script automatically appends the git-revision after the version.
-Finally, follow the instructions shown in the message at the end.
+During the build process, our script automatically fetches binaries for Windows, Linux, and
+maxOS on x64 and arm64 and repackages them to be used in JavaSMT.
 
 
 ### Publishing OpenSMT
@@ -155,7 +150,13 @@ We prefer to build directly on Ubuntu 22.04, where CMake, SWIG, and GCC are suff
 For simple usage, we provide a Docker definition/environment under `/docker`,
 in which the following command can be run.
 
-Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
+When using the Docker container, dependencies for GMP and JDK are already included for several platforms
+and include the following directories:
+- `/dependencies/gmp-6.2.1/install` for `x64-linux` and `arm64-linux`, and
+- `/dependencies/jdk17-linux-aarch64`.
+
+If you want to build your own dependencies, please apply the following steps:
+Provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
 - For linux-x64 in directory $GMP_DIR_LINUX_X64:
   ```
   ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat
@@ -168,7 +169,6 @@ Please provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also 
   CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
   make -j4
   ```
-
 For linux-arm64, provide JNI headers in a reasonable LTS version.
 Download the zip archive from https://jdk.java.net/ and unpack it into $JDK_DIR_LINUX_ARM64
 (e.g., https://download.java.net/java/GA/jdk17.0.2/dfd4a8d0985749f896bed50d7138ee7f/8/GPL/openjdk-17.0.2_linux-aarch64_bin.tar.gz).
@@ -187,15 +187,15 @@ Example:
 ```
 ant publish-opensmt \
     -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
-    -Dopensmt.customRev=2.8.0-sosy0 \
-    -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
-    -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
-    -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2
+    -Dopensmt.customRev=2.9.0 \
+    -Dgmp-linux-x64.path=/dependencies/gmp-6.2.1/install/x64-linux \
+    -Dgmp-linux-arm64.path=/dependencies/gmp-6.2.1/install/arm64-linux \
+    -Djdk-linux-arm64.path=/dependencies/jdk17-linux-aarch64
 ```
 The build scripts for OpenSMT ... :
 - run for about 20 minutes (we build everything from scratch, two times).
 - download Google-based test components (requires internet access).
-- append the git revision of Bitwuzla.
+- append the git revision of OpenSMT.
 - produce two Linux (x64 and arm64) libraries, and publish them.
 
 Finally, follow the instructions shown in the message at the end of the command.

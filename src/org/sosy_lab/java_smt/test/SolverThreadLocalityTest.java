@@ -351,7 +351,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             Solvers.Z3,
             Solvers.PRINCESS,
             Solvers.BOOLECTOR,
-            Solvers.BITWUZLA);
+            Solvers.BITWUZLA,
+            Solvers.CVC5);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.

@@ -202,7 +202,7 @@ public class CVC5NativeAPITest {
             () -> termManager.mkFloatingPoint(8, 24, bvOneFourth));
     assertThat(e.toString())
         .contains(
-            "invalid argument '((_ int2bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector"
+            "invalid argument '((_ int_to_bv 32) (to_int (/ 1 4)))' for 'val', expected bit-vector"
                 + " value");
   }
 
@@ -950,7 +950,7 @@ public class CVC5NativeAPITest {
 
     Term quantElim = solver.getQuantifierElimination(assertion);
 
-    assertThat(quantElim.toString()).isEqualTo("(or (= #b01 (bvneg x_bv)) (= #b01 x_bv))");
+    assertThat(quantElim.toString()).isEqualTo("(or (= #b01 (bvneg x_bv)) (= x_bv #b01))");
   }
 
   @Test
