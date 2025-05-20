@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,10 +37,8 @@ import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
-import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 
 public class PortfolioSolverContext extends AbstractSolverContext {
 
@@ -48,33 +47,37 @@ public class PortfolioSolverContext extends AbstractSolverContext {
 
     @Option(
         secure = true,
+        name = "solvers",
         description =
-            "Further options for solvers additional to the default ones. Usage: "
-                + "list wanted solvers seperated by a single comma ','. "
+            "comma-separated list of solvers to be used in portfolio mode"
                 + "Example: \"BOOLECTOR,Z3,YICES2\"")
-    private String solvers = "";
+    private List<Solvers> solvers = ImmutableList.of();
+
+    @Option(
+        secure = true,
+        description =
+            "The portfolio solver throws an exception if features are used that are not supported"
+                + " by all solvers in the portfolio if this is FALSE. If this option is TRUE, the"
+                + " solver will be removed from the portfolio with a warning, but the portfolio "
+                + "can be used normally after. (Note: if the portfolio is empty, it always fails!)")
+    private boolean removeSolverFromPortfolioWhenUnsupported = false;
 
     private final List<Solvers> solversList;
 
     PortfolioSettings(Configuration config) throws InvalidConfigurationException {
       config.inject(this);
-      ImmutableList.Builder<Solvers> builder = ImmutableList.builder();
-      // Replace all whitespaces and invisible chars with nothing
-      for (String solverName : solvers.replaceAll("\\s+", "").split(",")) {
-        if (solverName.isEmpty()) {
-          throw new InvalidConfigurationException(
-              "You need to specify at least one solvers for " + "portfolio mode");
-        }
-        Solvers solver = Solvers.valueOf(sanitizeSolverNames(solverName.toUpperCase()));
-        builder.add(solver);
+      if (solvers.isEmpty()) {
+        throw new InvalidConfigurationException(
+            "You need to specify at least one solvers for portfolio mode");
       }
-      solversList = builder.build();
+      solversList = solvers;
     }
 
     public List<Solvers> getSolversList() {
       return solversList;
     }
 
+    @SuppressWarnings("unused")
     private String sanitizeSolverNames(final String upperCaseSolverName)
         throws InvalidConfigurationException {
       if (upperCaseSolverName.equals("PORTFOLIO")) {
@@ -109,9 +112,13 @@ public class PortfolioSolverContext extends AbstractSolverContext {
   }
 
   private final Map<Solvers, SolverContext> solversWithContexts;
-  private final LogManager logger;
   private final PortfolioFormulaCreator creator;
+  private final LogManager logger;
   private final ShutdownNotifier shutdownNotifier;
+
+  // Info to create more solvers/provers etc.
+  private final PortfolioCreationInformation originalCreationInfo;
+
   private boolean closed = false;
 
   PortfolioSolverContext(
@@ -119,12 +126,14 @@ public class PortfolioSolverContext extends AbstractSolverContext {
       PortfolioFormulaManager pManager,
       PortfolioFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
-      LogManager pLogger) {
+      LogManager pLogger,
+      PortfolioCreationInformation pOriginalCreationInfo) {
     super(pManager);
     solversWithContexts = pSolversWithContexts;
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     logger = pLogger;
+    originalCreationInfo = pOriginalCreationInfo;
   }
 
   // TODO: provide constructor with all arguments as maps as well.
@@ -139,36 +148,49 @@ public class PortfolioSolverContext extends AbstractSolverContext {
       NonLinearArithmetic pNonLinearArithmetic,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
+
+    PortfolioCreationInformation originalCreationInfo =
+        new PortfolioCreationInformation(
+            config,
+            logger,
+            pShutdownNotifier,
+            solverLogfile,
+            randomSeed,
+            pFloatingPointRoundingMode,
+            pNonLinearArithmetic,
+            pLoader);
+
     PortfolioSettings settings = new PortfolioSettings(config);
     List<Solvers> solvers = settings.getSolversList();
     if (solvers.size() != ImmutableSet.copyOf(solvers).size()) {
       throw new InvalidConfigurationException("You can't choose a solver twice in portfolio mode");
+    } else if (solvers.isEmpty()) {
+      throw new InvalidConfigurationException(
+          "You need to choose at least one solver in " + "portfolio mode");
     }
-    ImmutableMap.Builder<Solvers, SolverContext> solversWithContextsBuilder =
-        ImmutableMap.builder();
+
+    Map<Solvers, SolverContext> solversWithContexts = new HashMap<>();
     for (Solvers solver : solvers) {
-      solversWithContextsBuilder.put(
+      solversWithContexts.put(
           solver,
           SolverContextFactory.createSolverContext(
               config, logger, pShutdownNotifier, solver, pLoader));
     }
-    Map<Solvers, SolverContext> solversWithContexts = solversWithContextsBuilder.buildOrThrow();
 
     ImmutableMap.Builder<Solvers, FormulaManager> solversToManagersBuilder = ImmutableMap.builder();
-    ImmutableMap.Builder<Solvers, FormulaCreator<?, ?, ?, ?>> solversToCreatorsBuilder =
-        ImmutableMap.builder();
     for (Entry<Solvers, SolverContext> solverAndContext : solversWithContexts.entrySet()) {
       FormulaManager manager = solverAndContext.getValue().getFormulaManager();
-      FormulaCreator<?, ?, ?, ?> creator =
-          ((AbstractFormulaManager<?, ?, ?, ?>) manager).getFormulaCreator();
       solversToManagersBuilder.put(solverAndContext.getKey(), manager);
-      solversToCreatorsBuilder.put(solverAndContext.getKey(), creator);
     }
-
-    Map<Solvers, FormulaManager> solversToManagers = solversToManagersBuilder.buildOrThrow();
+    Map<Solvers, FormulaManager> solversToFormulaManagers = solversToManagersBuilder.buildOrThrow();
 
     PortfolioFormulaCreator creator =
-        new PortfolioFormulaCreator(solversToCreatorsBuilder.buildOrThrow(), solversToManagers);
+        new PortfolioFormulaCreator(
+            solversWithContexts,
+            solversToFormulaManagers,
+            logger,
+            settings.removeSolverFromPortfolioWhenUnsupported);
+
     PortfolioUFManager ufMgr = new PortfolioUFManager(creator);
     PortfolioBooleanFormulaManager booleanManager = new PortfolioBooleanFormulaManager(creator);
     PortfolioIntegerFormulaManager integerManager =
@@ -177,7 +199,6 @@ public class PortfolioSolverContext extends AbstractSolverContext {
         new PortfolioRationalFormulaManager(creator, pNonLinearArithmetic);
     PortfolioBitvectorFormulaManager bitvectorManager =
         new PortfolioBitvectorFormulaManager(creator, booleanManager);
-    new PortfolioBitvectorFormulaManager(creator, booleanManager);
     PortfolioFloatingPointFormulaManager floatingPointManager =
         new PortfolioFloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     PortfolioQuantifiedFormulaManager quantifiedManager =
@@ -190,7 +211,6 @@ public class PortfolioSolverContext extends AbstractSolverContext {
 
     PortfolioFormulaManager manager =
         new PortfolioFormulaManager(
-            solversToManagers,
             creator,
             ufMgr,
             booleanManager,
@@ -205,13 +225,13 @@ public class PortfolioSolverContext extends AbstractSolverContext {
             enumerationManager);
 
     return new PortfolioSolverContext(
-        solversWithContexts, manager, creator, pShutdownNotifier, logger);
+        solversWithContexts, manager, creator, pShutdownNotifier, logger, originalCreationInfo);
   }
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
     return new PortfolioTheoremProver(
-        options, solversWithContexts, creator, shutdownNotifier, logger);
+        this, options, solversWithContexts, creator, shutdownNotifier, logger);
   }
 
   @Override
@@ -231,9 +251,21 @@ public class PortfolioSolverContext extends AbstractSolverContext {
     return true;
   }
 
-  @Override
-  public SolverContext copyWithNewShutdownNotifier(ShutdownNotifier pShutdownNotifier) {
-    throw new UnsupportedOperationException();
+  protected SolverContext copySolverContextWithNewShutdownNotifier(
+      Solvers solver, ShutdownNotifier pShutdownNotifier) {
+    // TODO: we can improve the logger (set it so that we know which portfolio solver etc.)
+    // TODO: we can use solver specific logfiles
+    try {
+      return SolverContextFactory.createSolverContext(
+          originalCreationInfo.getConfig(),
+          originalCreationInfo.getLogger(),
+          pShutdownNotifier,
+          solver,
+          originalCreationInfo.getLoader());
+    } catch (InvalidConfigurationException pE) {
+      // Can never happen as we already loaded this successfully
+      throw new RuntimeException(pE);
+    }
   }
 
   @Override
