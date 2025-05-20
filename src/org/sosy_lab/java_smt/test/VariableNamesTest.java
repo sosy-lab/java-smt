@@ -35,6 +35,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.AbstractUnspecializedFormulaManager;
 
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
 public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -140,7 +141,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   /**
    * Some special chars are not allowed to appear in symbol names. See {@link
-   * AbstractFormulaManager#DISALLOWED_CHARACTERS}.
+   * AbstractUnspecializedFormulaManager#DISALLOWED_CHARACTERS}.
    */
   @SuppressWarnings("javadoc")
   private static final ImmutableSet<String> UNSUPPORTED_NAMES =
@@ -162,9 +163,9 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   protected List<String> getAllNames() {
     return ImmutableList.<String>builder()
         .addAll(NAMES)
-        .addAll(AbstractFormulaManager.BASIC_OPERATORS)
-        .addAll(AbstractFormulaManager.SMTLIB2_KEYWORDS)
-        .addAll(AbstractFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
+        .addAll(AbstractUnspecializedFormulaManager.BASIC_OPERATORS)
+        .addAll(AbstractUnspecializedFormulaManager.SMTLIB2_KEYWORDS)
+        .addAll(AbstractUnspecializedFormulaManager.DISALLOWED_CHARACTER_REPLACEMENT.values())
         .addAll(FURTHER_SMTLIB2_KEYWORDS)
         .addAll(UNSUPPORTED_NAMES)
         .build();
