@@ -25,18 +25,20 @@ public class PortfolioTheoremProver extends PortfolioAbstractProver<Void, Prover
     implements ProverEnvironment {
 
   protected PortfolioTheoremProver(
+      PortfolioSolverContext pPortfolioContext,
       Set<ProverOptions> pOptions,
       Map<Solvers, SolverContext> pSolverContexts,
       PortfolioFormulaCreator pCreator,
       ShutdownNotifier pShutdownNotifier,
       LogManager pLogger) {
-    super(pOptions, pSolverContexts, pCreator, pShutdownNotifier, pLogger);
+    super(pPortfolioContext, pOptions, pSolverContexts, pCreator, pShutdownNotifier, pLogger);
   }
 
   @Override
-  ProverEnvironment getProver(
-      SolverContext newEmptyContextWSameOptions, Set<ProverOptions> pOptions) {
-    return newEmptyContextWSameOptions.newProverEnvironment(pOptions.toArray(new ProverOptions[0]));
+  ProverEnvironment getNewSolverSpecificProver(
+      SolverContext newEmptyContextWSameOptionsForSolver, Set<ProverOptions> pOptions) {
+    return newEmptyContextWSameOptionsForSolver.newProverEnvironment(
+        pOptions.toArray(new ProverOptions[0]));
   }
 
   @Override
