@@ -13,9 +13,9 @@ package org.sosy_lab.java_smt.solvers.portfolio;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Joiner;
 import com.google.errorprone.annotations.Immutable;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -30,6 +30,8 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 
+@SuppressWarnings({"unchecked", "Immutable"})
+@Immutable
 public class PortfolioFormula implements Formula {
 
   private final Map<Solvers, ? extends Formula> formulasPerSolver;
@@ -42,20 +44,8 @@ public class PortfolioFormula implements Formula {
 
   @Override
   public final String toString() {
-    // Some String for now
-    return formulasPerSolver.values().iterator().next().toString();
-  }
-
-  @SuppressWarnings("unused")
-  final String allFormulasToString() {
-    StringBuilder res = new StringBuilder();
-    for (Entry<Solvers, ? extends Formula> solverAndFormula : formulasPerSolver.entrySet()) {
-      res.append(solverAndFormula.getKey().toString())
-          .append(": ")
-          .append(solverAndFormula.getValue().toString())
-          .append("\n");
-    }
-    return res.toString();
+    return Joiner.on(System.lineSeparator()).withKeyValueSeparator(": ")
+        .join(formulasPerSolver);
   }
 
   @Override
