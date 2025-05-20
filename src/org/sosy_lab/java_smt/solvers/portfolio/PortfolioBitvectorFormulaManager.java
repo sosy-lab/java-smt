@@ -22,26 +22,18 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormula.PortfolioBitvectorFormula;
 
-public class PortfolioBitvectorFormulaManager
-    extends AbstractBitvectorFormulaManager<Map<Solvers, ? extends Formula>, Void, Void, Void>
-    implements BitvectorFormulaManager {
+public class PortfolioBitvectorFormulaManager implements BitvectorFormulaManager {
 
-  private final Map<Solvers, BitvectorFormulaManager> managers;
   private final PortfolioFormulaCreator creator;
   private final PortfolioBooleanFormulaManager bmgr;
 
   protected PortfolioBitvectorFormulaManager(
       PortfolioFormulaCreator pCreator, PortfolioBooleanFormulaManager pBmgr) {
-    super(pCreator, pBmgr);
-    managers = pCreator.getSpecializedManager(FormulaManager::getBitvectorFormulaManager);
     creator = pCreator;
     bmgr = pBmgr;
   }
@@ -49,7 +41,8 @@ public class PortfolioBitvectorFormulaManager
   @Override
   public BitvectorFormula makeBitvector(int length, long pI) {
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.makeBitvector(length, pI));
@@ -67,7 +60,8 @@ public class PortfolioBitvectorFormulaManager
   @Override
   public BitvectorFormula makeBitvector(int length, BigInteger pI) {
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.makeBitvector(length, pI));
@@ -80,17 +74,13 @@ public class PortfolioBitvectorFormulaManager
               + "combination of theories or logics");
     }
     return creator.encapsulateBitvector(finalTerm);
-  }
-
-  @Override
-  protected Map<Solvers, ? extends Formula> makeBitvectorImpl(int pLength, BigInteger pI) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override
   public BitvectorFormula makeBitvector(int length, IntegerFormula pI) {
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.makeBitvector(length, pI));
@@ -106,15 +96,10 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> makeBitvectorImpl(
-      int length, Map<Solvers, ? extends Formula> pParam1) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public IntegerFormula toIntegerFormula(BitvectorFormula pI, boolean signed) {
     ImmutableMap.Builder<Solvers, IntegerFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.toIntegerFormula(pI, signed));
@@ -130,15 +115,10 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> toIntegerFormulaImpl(
-      Map<Solvers, ? extends Formula> pI, boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula makeVariable(int length, String pVar) {
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.makeVariable(length, pVar));
@@ -154,14 +134,10 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> makeVariableImpl(int pLength, String pVar) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       finalTermBuilder.put(solver, specificBvMgr.makeVariable(type, pVar));
@@ -180,7 +156,8 @@ public class PortfolioBitvectorFormulaManager
   public int getLength(BitvectorFormula number) {
     assert number instanceof PortfolioBitvectorFormula;
     Integer length = null;
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula =
@@ -198,7 +175,7 @@ public class PortfolioBitvectorFormulaManager
     }
 
     Integer finalLength = length;
-    assert managers.entrySet().stream()
+    assert creator.getSolverSpecificBitvectorFormulaManagers().entrySet().stream()
         .allMatch(
             e ->
                 ((PortfolioBitvectorFormula) number).getFormulasPerSolver().get(e.getKey()) == null
@@ -215,7 +192,8 @@ public class PortfolioBitvectorFormulaManager
   public BitvectorFormula negate(BitvectorFormula number) {
     assert number instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula =
@@ -236,16 +214,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> negate(Map<Solvers, ? extends Formula> pParam1) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula add(BitvectorFormula number1, BitvectorFormula number2) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -267,17 +241,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> add(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula subtract(BitvectorFormula number1, BitvectorFormula number2) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -299,18 +268,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> subtract(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula divide(
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     assert dividend instanceof PortfolioBitvectorFormula;
     assert divisor instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificDividend =
@@ -333,19 +297,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> divide(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula smodulo(BitvectorFormula dividend, BitvectorFormula divisor) {
     assert dividend instanceof PortfolioBitvectorFormula;
     assert divisor instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificDividend =
@@ -367,18 +324,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> smodulo(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula remainder(
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     assert dividend instanceof PortfolioBitvectorFormula;
     assert divisor instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificDividend =
@@ -401,19 +353,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> remainder(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula multiply(BitvectorFormula number1, BitvectorFormula number2) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -435,17 +380,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> multiply(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula equal(BitvectorFormula number1, BitvectorFormula number2) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -467,18 +407,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> equal(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula greaterThan(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -501,20 +436,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> greaterThan(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula greaterOrEquals(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -537,20 +465,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> greaterOrEquals(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula lessThan(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -573,20 +494,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> lessThan(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula lessOrEquals(
       BitvectorFormula number1, BitvectorFormula number2, boolean signed) {
     assert number1 instanceof PortfolioBitvectorFormula;
     assert number2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -609,18 +523,11 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> lessOrEquals(
-      Map<Solvers, ? extends Formula> pParam1,
-      Map<Solvers, ? extends Formula> pParam2,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula not(BitvectorFormula bits) {
     assert bits instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula =
@@ -641,16 +548,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> not(Map<Solvers, ? extends Formula> pParam1) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula and(BitvectorFormula bits1, BitvectorFormula bits2) {
     assert bits1 instanceof PortfolioBitvectorFormula;
     assert bits2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -672,17 +575,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> and(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula or(BitvectorFormula bits1, BitvectorFormula bits2) {
     assert bits1 instanceof PortfolioBitvectorFormula;
     assert bits2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -704,17 +602,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> or(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula xor(BitvectorFormula bits1, BitvectorFormula bits2) {
     assert bits1 instanceof PortfolioBitvectorFormula;
     assert bits2 instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificFormula1 =
@@ -736,18 +629,13 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> xor(
-      Map<Solvers, ? extends Formula> pParam1, Map<Solvers, ? extends Formula> pParam2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula shiftRight(
       BitvectorFormula number, BitvectorFormula toShift, boolean signed) {
     assert number instanceof PortfolioBitvectorFormula;
     assert toShift instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -770,19 +658,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> shiftRight(
-      Map<Solvers, ? extends Formula> pNumber,
-      Map<Solvers, ? extends Formula> toShift,
-      boolean signed) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula shiftLeft(BitvectorFormula number, BitvectorFormula toShift) {
     assert number instanceof PortfolioBitvectorFormula;
     assert toShift instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -804,16 +685,11 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> shiftLeft(
-      Map<Solvers, ? extends Formula> pNumber, Map<Solvers, ? extends Formula> pToShift) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula rotateLeft(BitvectorFormula number, int toRotate) {
     assert number instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -837,7 +713,8 @@ public class PortfolioBitvectorFormulaManager
     assert number instanceof PortfolioBitvectorFormula;
     assert toRotate instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -862,7 +739,8 @@ public class PortfolioBitvectorFormulaManager
   public BitvectorFormula rotateRight(BitvectorFormula number, int toRotate) {
     assert number instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -886,7 +764,8 @@ public class PortfolioBitvectorFormulaManager
     assert number instanceof PortfolioBitvectorFormula;
     assert toRotate instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -912,7 +791,8 @@ public class PortfolioBitvectorFormulaManager
     assert prefix instanceof PortfolioBitvectorFormula;
     assert suffix instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificPrefix =
@@ -934,12 +814,6 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> concat(
-      Map<Solvers, ? extends Formula> number, Map<Solvers, ? extends Formula> pAppend) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula extract(BitvectorFormula number, int msb, int lsb) {
     final int bitSize = getLength(number);
     checkArgument(0 <= lsb, "index out of bounds (negative index %s)", lsb);
@@ -947,7 +821,8 @@ public class PortfolioBitvectorFormulaManager
     checkArgument(msb < bitSize, "index out of bounds (index %s beyond length %s)", msb, bitSize);
     assert number instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -967,17 +842,12 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> extract(
-      Map<Solvers, ? extends Formula> pNumber, int pMsb, int pLsb) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed) {
     checkArgument(0 <= extensionBits, "can not extend a negative number of bits");
     assert number instanceof PortfolioBitvectorFormula;
     ImmutableMap.Builder<Solvers, BitvectorFormula> finalTermBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       BitvectorFormula specificNumber =
@@ -997,12 +867,6 @@ public class PortfolioBitvectorFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> extend(
-      Map<Solvers, ? extends Formula> pNumber, int pExtensionBits, boolean pSigned) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public BooleanFormula distinct(List<BitvectorFormula> pBits) {
     // optimization
     if (pBits.size() <= 1) {
@@ -1013,7 +877,8 @@ public class PortfolioBitvectorFormulaManager
 
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
     outer:
-    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr : managers.entrySet()) {
+    for (Entry<Solvers, BitvectorFormulaManager> solverAndBvMgr :
+        creator.getSolverSpecificBitvectorFormulaManagers().entrySet()) {
       Solvers solver = solverAndBvMgr.getKey();
       BitvectorFormulaManager specificBvMgr = solverAndBvMgr.getValue();
       ImmutableList.Builder<BitvectorFormula> specificBitsBuilder = ImmutableList.builder();

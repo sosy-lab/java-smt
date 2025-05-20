@@ -21,22 +21,16 @@ import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
-import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormula.PortfolioArrayFormula;
 
-public class PortfolioArrayFormulaManager
-    extends AbstractArrayFormulaManager<Map<Solvers, ? extends Formula>, Void, Void, Void>
-    implements ArrayFormulaManager {
+@SuppressWarnings("unchecked")
+public class PortfolioArrayFormulaManager implements ArrayFormulaManager {
 
-  private final Map<Solvers, ArrayFormulaManager> managers;
   private final PortfolioFormulaCreator creator;
 
-  PortfolioArrayFormulaManager(PortfolioFormulaCreator pCreator) {
-    super(pCreator);
+  protected PortfolioArrayFormulaManager(PortfolioFormulaCreator pCreator) {
     creator = pCreator;
-    managers = pCreator.getSpecializedManager(FormulaManager::getArrayFormulaManager);
   }
 
   @Override
@@ -60,13 +54,16 @@ public class PortfolioArrayFormulaManager
       }
       Solvers solver = entry1.getKey();
       TI indexFormula = (TI) ((PortfolioFormula) pIndex).getFormulasPerSolver().get(solver);
-      if (indexFormula != null) {
-        ArrayFormulaManager mgr = managers.get(solver);
-        // mgr == null: ignore, theory is not supported.
-        if (mgr != null) {
-          // Delegate to specific solver
-          finalTermBuilder.put(solver, mgr.select(arrayFormula1, indexFormula));
-        }
+      ArrayFormulaManager mgr = creator.getSolverSpecificArrayFormulaManagers().get(solver);
+      // mgr == null: ignore, theory is not supported.
+      if (indexFormula != null && mgr != null) {
+        // Delegate to specific solver
+        finalTermBuilder.put(solver, mgr.select(arrayFormula1, indexFormula));
+      } else {
+        creator.handleUnsupportedOperationWithReason(
+            solver,
+            "Could not build array theory formula due to array theory not being "
+                + "supported or missing formula");
       }
     }
 
@@ -78,12 +75,6 @@ public class PortfolioArrayFormulaManager
     }
 
     return creator.encapsulate(elementType, finalTerm);
-  }
-
-  @Override
-  protected Map<Solvers, ? extends Formula> select(
-      Map<Solvers, ? extends Formula> pArray, Map<Solvers, ? extends Formula> pIndex) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override
@@ -103,12 +94,22 @@ public class PortfolioArrayFormulaManager
       TI indexFormula = (TI) ((PortfolioFormula) pIndex).getFormulasPerSolver().get(solver);
       TE valueFormula = (TE) ((PortfolioFormula) pValue).getFormulasPerSolver().get(solver);
       if (indexFormula != null && valueFormula != null) {
-        ArrayFormulaManager mgr = managers.get(solver);
+        ArrayFormulaManager mgr = creator.getSolverSpecificArrayFormulaManagers().get(solver);
         // mgr == null: ignore, theory is not supported.
         if (mgr != null) {
           // Delegate to specific solver
           finalTermBuilder.put(solver, mgr.store(arrayFormula, indexFormula, valueFormula));
+        } else {
+          creator.handleUnsupportedOperationWithReason(
+              solver,
+              "Could not build array theory formula due to array theory not being "
+                  + "supported or missing formula");
         }
+      } else {
+        creator.handleUnsupportedOperationWithReason(
+            solver,
+            "Could not build array theory formula due to array theory not being "
+                + "supported or missing formula");
       }
     }
 
@@ -126,14 +127,6 @@ public class PortfolioArrayFormulaManager
   }
 
   @Override
-  protected Map<Solvers, ? extends Formula> store(
-      Map<Solvers, ? extends Formula> pArray,
-      Map<Solvers, ? extends Formula> pIndex,
-      Map<Solvers, ? extends Formula> pValue) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
   public <
           TI extends Formula,
           TE extends Formula,
@@ -145,7 +138,8 @@ public class PortfolioArrayFormulaManager
     ImmutableMap.Builder<Solvers, Formula> finalTermBuilder = ImmutableMap.builder();
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
-    for (Entry<Solvers, ArrayFormulaManager> solverAndManager : managers.entrySet()) {
+    for (Entry<Solvers, ArrayFormulaManager> solverAndManager :
+        creator.getSolverSpecificArrayFormulaManagers().entrySet()) {
       Solvers solver = solverAndManager.getKey();
       ArrayFormulaManager mgr = solverAndManager.getValue();
       // Delegate to specific solver
@@ -178,12 +172,17 @@ public class PortfolioArrayFormulaManager
         ((PortfolioFormula) defaultElement).getFormulasPerSolver().entrySet()) {
       TE solverSpecificDefaultElement = (TE) entry1.getValue();
       Solvers solver = entry1.getKey();
-      ArrayFormulaManager mgr = managers.get(solver);
+      ArrayFormulaManager mgr = creator.getSolverSpecificArrayFormulaManagers().get(solver);
       // mgr == null: ignore, theory is not supported.
       if (mgr != null) {
         // Delegate to specific solver
         finalTermBuilder.put(
             solver, mgr.makeArray(pIndexType, pElementType, solverSpecificDefaultElement));
+      } else {
+        creator.handleUnsupportedOperationWithReason(
+            solver,
+            "Could not build array theory formula due to array theory not being "
+                + "supported or missing formula");
       }
     }
 
@@ -195,22 +194,6 @@ public class PortfolioArrayFormulaManager
     }
 
     return creator.encapsulateArray(finalTermBuilder.buildOrThrow(), pIndexType, pElementType);
-  }
-
-  @Override
-  protected <TI extends Formula, TE extends Formula>
-      Map<Solvers, ? extends Formula> internalMakeArray(
-          String pName, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
-  }
-
-  @Override
-  protected <TI extends Formula, TE extends Formula>
-      Map<Solvers, ? extends Formula> internalMakeArray(
-          FormulaType<TI> pIndexType,
-          FormulaType<TE> pElementType,
-          Map<Solvers, ? extends Formula> defaultElement) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override
@@ -229,12 +212,22 @@ public class PortfolioArrayFormulaManager
       ArrayFormula<TI, TE> arrayFormula2 =
           ((PortfolioArrayFormula<TI, TE>) pArray2).getFormulasPerSolver().get(solver);
       if (arrayFormula2 != null) {
-        ArrayFormulaManager mgr = managers.get(solver);
+        ArrayFormulaManager mgr = creator.getSolverSpecificArrayFormulaManagers().get(solver);
         // mgr == null: ignore, theory is not supported.
         if (mgr != null) {
           // Delegate to specific solver
           finalTermBuilder.put(solver, mgr.equivalence(arrayFormula1, arrayFormula2));
+        } else {
+          creator.handleUnsupportedOperationWithReason(
+              solver,
+              "Could not build array theory formula due to array theory not being "
+                  + "supported or missing formula");
         }
+      } else {
+        creator.handleUnsupportedOperationWithReason(
+            solver,
+            "Could not build array theory formula due to array theory not being "
+                + "supported or missing formula");
       }
     }
 
@@ -246,12 +239,6 @@ public class PortfolioArrayFormulaManager
     }
 
     return creator.encapsulateBoolean(finalTerm);
-  }
-
-  @Override
-  protected Map<Solvers, ? extends Formula> equivalence(
-      Map<Solvers, ? extends Formula> pArray1, Map<Solvers, ? extends Formula> pArray2) {
-    throw new UnsupportedOperationException("Not implemented because calling method overridden");
   }
 
   @Override

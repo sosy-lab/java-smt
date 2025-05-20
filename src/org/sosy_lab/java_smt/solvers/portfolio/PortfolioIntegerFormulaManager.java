@@ -22,7 +22,6 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
@@ -33,21 +32,18 @@ import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormulaCreator.ThreePara
 import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormulaCreator.TwoArgReturnEncapsulated;
 import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormulaCreator.TwoParameterFunction;
 
+@SuppressWarnings({"unchecked", "UnusedVariable"})
 public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
 
-  private final Map<Solvers, IntegerFormulaManager> managers;
-  private final PortfolioFormulaCreator creator;
   private final NonLinearArithmetic nonLinearArithmetic;
+  private final PortfolioFormulaCreator creator;
+  Function<Map<Solvers, ? extends Formula>, IntegerFormula> encapsulateInteger;
+  Function<Map<Solvers, ? extends Formula>, BooleanFormula> encapsulateBoolean;
 
-  private final Function<Map<Solvers, ? extends Formula>, IntegerFormula> encapsulateInteger;
-
-  private final Function<Map<Solvers, ? extends Formula>, BooleanFormula> encapsulateBoolean;
-
-  PortfolioIntegerFormulaManager(
+  protected PortfolioIntegerFormulaManager(
       PortfolioFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
-    creator = pCreator;
     nonLinearArithmetic = pNonLinearArithmetic;
-    managers = pCreator.getSpecializedManager(FormulaManager::getIntegerFormulaManager);
+    creator = pCreator;
     encapsulateInteger = creator::encapsulateInteger;
     encapsulateBoolean = creator::encapsulateBoolean;
   }
@@ -63,7 +59,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
       Solvers solver = entry1.getKey();
       IntegerFormula f2 = ((PortfolioIntegerFormula) number2).getFormulasPerSolver().get(solver);
       if (f2 != null) {
-        IntegerFormulaManager mgr = managers.get(solver);
+        IntegerFormulaManager mgr = creator.getSolverSpecificIntegerFormulaManagers().get(solver);
         if (mgr != null) {
           // Delegate to specific solver
           finalFormulaBuilder.put(solver, mgr.modularCongruence(entry1.getValue(), f2, n));
@@ -90,7 +86,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
       Solvers solver = entry1.getKey();
       IntegerFormula f2 = ((PortfolioIntegerFormula) number2).getFormulasPerSolver().get(solver);
       if (f2 != null) {
-        IntegerFormulaManager mgr = managers.get(solver);
+        IntegerFormulaManager mgr = creator.getSolverSpecificIntegerFormulaManagers().get(solver);
         if (mgr != null) {
           // Delegate to specific solver
           finalFormulaBuilder.put(solver, mgr.modularCongruence(entry1.getValue(), f2, n));
@@ -116,7 +112,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) numerator,
         (PortfolioIntegerFormula) denominator,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateInteger);
   }
 
@@ -125,7 +121,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -148,7 +145,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -171,7 +169,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -194,7 +193,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -217,7 +217,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -240,7 +241,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -263,7 +265,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, IntegerFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager mgr = solverAndMgr.getValue();
       if (mgr != null) {
@@ -287,7 +290,10 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         NumeralFormulaManager::negate;
 
     return oneIntArgRetInt.apply(
-        apply, (PortfolioIntegerFormula) number, managers, encapsulateInteger);
+        apply,
+        (PortfolioIntegerFormula) number,
+        creator.getSolverSpecificIntegerFormulaManagers(),
+        encapsulateInteger);
   }
 
   @Override
@@ -299,7 +305,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateInteger);
   }
 
@@ -307,7 +313,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
   public IntegerFormula sum(List<IntegerFormula> operands) {
     ImmutableMap.Builder<Solvers, IntegerFormula> finalTermBuilder = ImmutableMap.builder();
     outer:
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager specificMgr = solverAndMgr.getValue();
       ImmutableList.Builder<IntegerFormula> specificOperandsBuilder = ImmutableList.builder();
@@ -342,7 +349,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateInteger);
   }
 
@@ -355,7 +362,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) numerator,
         (PortfolioIntegerFormula) denominator,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateInteger);
   }
 
@@ -368,7 +375,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateInteger);
   }
 
@@ -381,7 +388,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         apply,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateBoolean);
   }
 
@@ -389,7 +396,8 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
   public BooleanFormula distinct(List<IntegerFormula> pNumbers) {
     ImmutableMap.Builder<Solvers, BooleanFormula> finalTermBuilder = ImmutableMap.builder();
     outer:
-    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, IntegerFormulaManager> solverAndMgr :
+        creator.getSolverSpecificIntegerFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       IntegerFormulaManager specificMgr = solverAndMgr.getValue();
       ImmutableList.Builder<IntegerFormula> specificNumbersBuilder = ImmutableList.builder();
@@ -424,7 +432,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         applyGreaterThan,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateBoolean);
   }
 
@@ -437,7 +445,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         applyGreaterOrEquals,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateBoolean);
   }
 
@@ -450,7 +458,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         applyLessThan,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateBoolean);
   }
 
@@ -466,7 +474,7 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         applyLessOrEquals,
         (PortfolioIntegerFormula) number1,
         (PortfolioIntegerFormula) number2,
-        managers,
+        creator.getSolverSpecificIntegerFormulaManagers(),
         encapsulateBoolean);
   }
 
@@ -478,7 +486,10 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
         NumeralFormulaManager::floor;
 
     return oneIntArgRetInt.apply(
-        applyFloor, (PortfolioIntegerFormula) formula, managers, encapsulateInteger);
+        applyFloor,
+        (PortfolioIntegerFormula) formula,
+        creator.getSolverSpecificIntegerFormulaManagers(),
+        encapsulateInteger);
   }
 
   private final OneArgReturnEncapsulated<
@@ -499,7 +510,10 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
                 Map<Solvers, IntegerFormulaManager> managersMap,
                 Function<Map<Solvers, ? extends Formula>, IntegerFormula> encapsulateInteger) {
               return oneArgReturnEncapsulated.apply(
-                  innerFunction, arg1, managers, encapsulateInteger);
+                  innerFunction,
+                  arg1,
+                  creator.getSolverSpecificIntegerFormulaManagers(),
+                  encapsulateInteger);
             }
           };
 
@@ -526,7 +540,11 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
                 Map<Solvers, IntegerFormulaManager> managersMap,
                 Function<Map<Solvers, ? extends Formula>, BooleanFormula> encapsulate) {
               return twoArgReturnEncapsulated.apply(
-                  innerFunction, arg1, arg2, managers, encapsulateBoolean);
+                  innerFunction,
+                  arg1,
+                  arg2,
+                  creator.getSolverSpecificIntegerFormulaManagers(),
+                  encapsulateBoolean);
             }
           };
 
@@ -553,7 +571,11 @@ public class PortfolioIntegerFormulaManager implements IntegerFormulaManager {
                 Map<Solvers, IntegerFormulaManager> managersMap,
                 Function<Map<Solvers, ? extends Formula>, IntegerFormula> encapsulateInteger) {
               return twoArgReturnEncapsulated.apply(
-                  innerFunction, arg1, arg2, managers, encapsulateInteger);
+                  innerFunction,
+                  arg1,
+                  arg2,
+                  creator.getSolverSpecificIntegerFormulaManagers(),
+                  encapsulateInteger);
             }
           };
 }

@@ -20,7 +20,6 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -28,17 +27,16 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 
+@SuppressWarnings({"UnusedVariable"})
 public class PortfolioRationalFormulaManager implements RationalFormulaManager {
 
-  private final Map<Solvers, RationalFormulaManager> managers;
   private final PortfolioFormulaCreator creator;
   private final NonLinearArithmetic nonLinearArithmetic;
 
-  PortfolioRationalFormulaManager(
+  protected PortfolioRationalFormulaManager(
       PortfolioFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     creator = pCreator;
     nonLinearArithmetic = pNonLinearArithmetic;
-    managers = pCreator.getSpecializedManager(FormulaManager::getRationalFormulaManager);
   }
 
   private RationalFormula encapsulateRational(Map<Solvers, ? extends Formula> pTerm) {
@@ -50,13 +48,12 @@ public class PortfolioRationalFormulaManager implements RationalFormulaManager {
     // Go by existing formula solver combinations as we might only have a subset of the solvers
     // actually supporting the theory combination.
     ImmutableMap.Builder<Solvers, RationalFormula> finalFormulaBuilder = ImmutableMap.builder();
-    for (Entry<Solvers, RationalFormulaManager> solverAndMgr : managers.entrySet()) {
+    for (Entry<Solvers, RationalFormulaManager> solverAndMgr :
+        creator.getSolverSpecificRationalFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       RationalFormulaManager mgr = solverAndMgr.getValue();
-      if (mgr != null) {
-        // Delegate to specific solver
-        finalFormulaBuilder.put(solver, mgr.makeNumber(number));
-      }
+      // Delegate to specific solver
+      finalFormulaBuilder.put(solver, mgr.makeNumber(number));
     }
 
     Map<Solvers, RationalFormula> finalFormula = finalFormulaBuilder.buildOrThrow();
@@ -70,96 +67,96 @@ public class PortfolioRationalFormulaManager implements RationalFormulaManager {
 
   @Override
   public RationalFormula makeNumber(BigInteger number) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula makeNumber(double number) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula makeNumber(BigDecimal number) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula makeNumber(String pI) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula makeNumber(Rational pRational) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula makeVariable(String pVar) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula negate(NumeralFormula number) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula add(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula sum(List<NumeralFormula> operands) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula subtract(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula divide(NumeralFormula numerator, NumeralFormula denominator) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public RationalFormula multiply(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula equal(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula distinct(List<NumeralFormula> pNumbers) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula greaterThan(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula greaterOrEquals(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula lessThan(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public BooleanFormula lessOrEquals(NumeralFormula number1, NumeralFormula number2) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override
   public IntegerFormula floor(NumeralFormula formula) {
-    return null;
+    throw new UnsupportedOperationException("implement me");
   }
 }
