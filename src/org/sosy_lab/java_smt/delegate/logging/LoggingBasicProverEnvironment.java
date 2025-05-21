@@ -124,7 +124,6 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   @Override
   public Subproof getProof() throws SolverException, InterruptedException {
     Subproof p = wrapped.getProof();
-    logger.log(Level.FINE, "proof", p);
     return p;
   }
 
