@@ -2331,7 +2331,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, prover::getModel);
     }
   }
 
@@ -2339,7 +2339,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalStateException.class, () -> prover.getModelAssignments());
+      assertThrows(IllegalStateException.class, prover::getModelAssignments);
     }
   }
 

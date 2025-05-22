@@ -180,7 +180,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       }
     }
 
-    String nameStr = "";
+    String nameStr;
     if (pKeyTerm.hasSymbol()) {
       nameStr = pKeyTerm.getSymbol();
     } else {

@@ -104,25 +104,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     if (existingVar != null) {
       return existingVar;
     }
-    if (variablesCache.containsRow(name)) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type "
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
+    Preconditions.checkArgument(
+        !variablesCache.containsRow(name),
+        "Symbol %s requested with type %s, but already used with type %s",
+        name,
+        sort,
+        Iterables.getOnlyElement(variablesCache.row(name).entrySet()));
     Term newVar = termManager.mkConst(sort, name);
     variablesCache.put(name, sort.toString(), newVar);
     return newVar;
@@ -860,25 +847,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   private Term accessVariablesCache(String name, Sort sort) {
     Term existingVar = variablesCache.get(name, sort.toString());
-    if (existingVar == null) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type"
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
+    Preconditions.checkNotNull(
+        existingVar,
+        "Symbol %s requested with type %s, but already used with type %s",
+        name,
+        sort,
+        Iterables.getOnlyElement(variablesCache.row(name).entrySet()));
     return existingVar;
   }
 }

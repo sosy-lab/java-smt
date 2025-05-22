@@ -384,7 +384,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   @Nullable
   protected Long evalImpl(Long formula) {
     LongPtr resultPtr = new LongPtr();
-    boolean satisfiableModel = false;
+    boolean satisfiableModel;
     try {
       satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
     } catch (Z3Exception e) {

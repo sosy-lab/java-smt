@@ -325,8 +325,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    */
   private BigInteger parseBigInt(String assignment) {
     try {
-      BigInteger bigInt = new BigInteger(assignment, 2);
-      return bigInt;
+      return new BigInteger(assignment, 2);
     } catch (NumberFormatException e) {
       char[] charArray = assignment.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
