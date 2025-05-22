@@ -1432,7 +1432,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     // If a string has a char at a specified position, a substring beginning with the same index
     // must have the same char, independent of the length of the substring.
-    // But its not really relevant to check out of bounds cases, hence the exclusion.
+    // But it's not really relevant to check out-of-bounds cases, hence the exclusion.
     // So we test substring length 1 (== charAt) and larger
     assertThatFormula(
             bmgr.and(
@@ -1614,7 +1614,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
     // string that is equal to the concat of the 2 remaining start strings and the replaced one
     // replaced
-    // This is tested with 2 different implications, 1 that only checks whether or not the
+    // This is tested with 2 different implications, 1 that only checks whether the
     // replacement is contained in the string and not in the original and vice verse for the
     // replaced String
     BooleanFormula formula =
@@ -1798,7 +1798,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula concat = smgr.concat(backslash, u, curlyOpen, sevenB, curlyClose);
     StringFormula complete = smgr.makeString("\\u{7B}");
 
-    // Concatting parts of unicode does not result in the unicode char!
+    // Concatenating parts of Unicode does not result in the Unicode char!
     assertDistinct(concat, complete);
   }
 

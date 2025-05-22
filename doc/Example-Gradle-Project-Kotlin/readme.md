@@ -9,7 +9,7 @@ SPDX-License-Identifier: Apache-2.0
 -->
 
 This example project uses Kotlin together with Gradle which uses Kotlin.
-For a example using Java and Groovy please see doc/Example-Gradle-Project.
+For an example using Java and Groovy please see doc/Example-Gradle-Project.
 
 Build the Gradle example project with:
   gradle build

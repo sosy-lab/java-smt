@@ -27,7 +27,7 @@ public class DebuggingNumeralFormulaManager<
   private final NumeralFormulaManager<ParamFormulaType, ResultFormulaType> delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingNumeralFormulaManager(
+  DebuggingNumeralFormulaManager(
       NumeralFormulaManager<ParamFormulaType, ResultFormulaType> pDelegate,
       DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);

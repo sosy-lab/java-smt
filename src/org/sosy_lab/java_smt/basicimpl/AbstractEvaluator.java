@@ -118,8 +118,8 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
 
   /**
    * Simplify the given formula and replace all symbols with their model values. If a symbol is not
-   * set in the model and evaluation aborts, return <code>null</code>. Afterwards convert the
-   * formula into a Java object as far as possible, i.e., try to match a primitive or simple type.
+   * set in the model and evaluation aborts, return <code>null</code>. Afterward convert the formula
+   * into a Java object as far as possible, i.e., try to match a primitive or simple type.
    */
   @Nullable
   protected final Object evaluateImpl(TFormulaInfo f) {

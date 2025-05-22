@@ -64,7 +64,7 @@ z3/                                 // <-- parent directory
 ```
 
 You can prepare the Z3 Java sources on an arbitrary system, as we only prepare 
-Java sources and JavaDoc for the bindings, but do no compile any native library.
+Java sources and JavaDoc for the bindings, but do not compile any native library.
 This only depends on a Python3 environment and Java 17 or later.
 For simple usage, we provide a Docker definition/environment under `/docker`, in which the following command can be run.
 
@@ -84,14 +84,14 @@ Finally, follow the instructions shown in the message at the end.
 #### Optional (from source for Linux target with older GLIBC)
 This step is for the following use case:
 Newer releases of Z3 depend on newer versions of GLIBC (>=v2.35),
-so we want to compile the Linux release on our own and then combine it with the provided libraries for Windows and MacOS.
+so we want to compile the Linux release on our own and then combine it with the provided libraries for Windows and macOS.
 We follow the steps from above, download and unpack the given zip archives for all platforms, except the Linux release (where the GLIBC is too new).
 For simple usage, we provide a Docker definition/environment under `/docker` (based on Ubuntu 18.04 with GLIBC 2.27),
 in which the following build command can be run in the unpacked source directory:
 ```
 python3 scripts/mk_make.py --java && cd build && make -j 2
 ```
-Afterwards copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory 
+Afterward, copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory 
 `./build` into `./bin` (if needed, adjust the directory to match the x64 or arm64 path for Linux).
 Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
 and publish the directory `./bin` with an ant command like the one from above:
@@ -349,7 +349,7 @@ Publish the solver binary from within JavaSMT (adjust all paths to your system!)
 ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
 ```
 
-Afterwards you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
+Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
 
 #### Publish the Java components for Yices2
 

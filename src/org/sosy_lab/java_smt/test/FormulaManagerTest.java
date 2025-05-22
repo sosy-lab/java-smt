@@ -221,7 +221,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void bitvectorFormulaEqualsAndHashCode() {
-    // Boolector does not support integers and it is easier to make a new test with bvs
+    // Boolector does not support integers, and it is easier to make a new test with bvs
     requireBitvectors();
     FunctionDeclaration<BitvectorFormula> fb =
         fmgr.declareUF(

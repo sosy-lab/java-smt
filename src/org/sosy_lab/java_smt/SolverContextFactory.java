@@ -142,7 +142,7 @@ public class SolverContextFactory {
    *     via this LogManager.
    * @param pShutdownNotifier This central instance allows to request the termination of all
    *     operations in the created solver. Please note that the solver can decide on its own to
-   *     accept the shutdown request and terminate its operation afterwards. We do not forcefully
+   *     accept the shutdown request and terminate its operation afterward. We do not forcefully
    *     terminate any solver query eagerly. In general, a solver is of good nature, and maturely
    *     developed, and terminates accordingly.
    * @param pLoader The loading mechanism (loading method) in this class can be injected by the user

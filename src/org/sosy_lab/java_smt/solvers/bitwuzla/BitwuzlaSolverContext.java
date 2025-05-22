@@ -93,7 +93,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   @org.sosy_lab.common.configuration.Options(prefix = "solver.bitwuzla")
-  public static class BitwuzlaSettings {
+  static class BitwuzlaSettings {
 
     enum SatSolver {
       LINGELING,
@@ -117,11 +117,11 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
                 + "Example: \"PRODUCE_MODELS=2,SAT_SOLVER=kissat\".")
     private String furtherOptions = "";
 
-    protected SatSolver getSatSolver() {
+    SatSolver getSatSolver() {
       return satSolver;
     }
 
-    protected String getFurtherOptions() {
+    String getFurtherOptions() {
       return furtherOptions;
     }
 

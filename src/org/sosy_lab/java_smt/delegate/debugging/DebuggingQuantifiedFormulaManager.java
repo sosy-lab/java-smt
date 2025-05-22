@@ -20,7 +20,7 @@ public class DebuggingQuantifiedFormulaManager implements QuantifiedFormulaManag
   private final QuantifiedFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingQuantifiedFormulaManager(
+  DebuggingQuantifiedFormulaManager(
       QuantifiedFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

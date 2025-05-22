@@ -19,7 +19,7 @@ Make sure that all necessary dependency libraries are already released on Maven 
 before (or at least while) publishing a new version of JavaSMT.
 Maven does not check for existing or non-existing dependencies automatically.
 Dependencies like `SMTIntinterpol`, `Princess`, and `SoSy-Lab Common` need to be available via Maven in the correct version.
-A release of `SoSy-Lab Common` can be uploaded to Maven by us, even afterwards :-).
+A release of `SoSy-Lab Common` can be uploaded to Maven by us, even afterward :-).
 
 
 ## Automation vs. Manual Steps
@@ -77,7 +77,7 @@ to avoid a failure when creating the task `antlib:org.apache.maven.artifact.ant:
 
 For publishing JavaSMT itself:
 - Execute `ant stage` to upload the local build of JavaSMT into the [Nexus Repository Manager][].
-  This is ideally done directly after an release to our [Ivy Repository][].
+  This is ideally done directly after a release to our [Ivy Repository][].
 - Login to the [Nexus Repository Manager][] and freeze (`close`) the entry in the [staging repositories][],
   and inspect the files for correctness and completeness!
 - Later `release` your staged bundle.
@@ -86,7 +86,7 @@ For publishing JavaSMT itself:
 For publishing binary solvers like Boolector, CVC4, MathSAT5, Yices2, or Z3, the process is similar:
 - Execute `ant stage-SOLVER` to upload the currently installed binary solvers into the [Nexus Repository Manager]
   whenever there was an update for the corresponding solver.
-  This is ideally done directly after an release of the solver to our [Ivy Repository][].
+  This is ideally done directly after a release of the solver to our [Ivy Repository][].
   For Yices2, we might require the execution of `ant stage-javasmt-yices2` to release the package `javasmt-yices2`.
 - Login to the [Nexus Repository Manager][] and freeze (`close`) the entry in the [staging repositories][],
   and inspect the files for correctness and completeness!

@@ -76,7 +76,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 
 We support a reasonable list of operating systems and versions.
 - Our main target is Linux (mainly Ubuntu or comparable Linux distributions).
-  Windows 10/11 and MacOS are supported for several SMT solvers.
+  Windows 10/11 and macOS are supported for several SMT solvers.
 - Our main development architecture is x64 (x86-64).
   We also provide some solvers for ARM64 (AArch64 for ARMv8-A), e.g., Java-based SMT solvers, Z3, and MathSAT.
   If a specific operating system or architecture is missing and required,
@@ -88,7 +88,7 @@ available with Ubuntu 18.04 or later.
 
 ² Solver requires at least `GLIBC_2.29`/`GLIBCXX_3.4.26` or `GLIBC_2.34`/`GLIBCXX_3.4.29`,
 available with Ubuntu 22.04 or later.  
-³ We do not provide a signed solver library for MacOS. The user needs to compile and sign it.
+³ We do not provide a signed solver library for macOS. The user needs to compile and sign it.
 
 #### Solver Features
 

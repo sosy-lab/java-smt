@@ -21,8 +21,7 @@ public class DebuggingIntegerFormulaManager
   private final IntegerFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingIntegerFormulaManager(
-      IntegerFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingIntegerFormulaManager(IntegerFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

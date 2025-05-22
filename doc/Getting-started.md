@@ -313,7 +313,7 @@ Once the constraint is generated, we can solve it and get the model:
 Try-with-resources syntax will dispose of the prover once solving is finished.
 
 Once the model is obtained we can get values from it either by iterating
-through all of the returned data, or by querying for the variables we need:
+through all the returned data, or by querying for the variables we need:
 
 ```java
     BigInteger value = model.evaluate(a);

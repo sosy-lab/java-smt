@@ -48,7 +48,7 @@ and there is seperate documentation for uploading packages into those repositori
 
 The release version number is derived from the `git describe` command,
 which output is either a git tag (if the release version corresponds exactly
-to the tagged commit), or a latest git tag together with a distance measured
+to the tagged commit), or the latest git tag together with a distance measured
 in number of commits and a git hash corresponding to the current revision.
 
 
@@ -75,6 +75,6 @@ for writing new backends.
 If the new backend is written inside JavaSMT,
 `SolverContextFactory` and the `Solvers` enum should be updated
 to include the new solver.
-The new solver can be added from outside of JavaSMT as well: in that case,
+The new solver can be added from outside JavaSMT as well: in that case,
 the user might wish to have their own factory which can create
 a suitable `SolverContext`.

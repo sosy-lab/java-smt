@@ -191,7 +191,8 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
     for (String name : variables) {
       // We get the formula here as we need the name.
       // Reason: Boolector returns names of variables with its own escape sequence sometimes. If you
-      // however name your variable like the escape sequence, we can't discern anymore if its a real
+      // however name your variable like the escape sequence, we can't discern anymore if it's a
+      // real
       // name or an escape seq.
       long entry = bfCreator.getFormulaFromCache(name).orElseThrow();
       if (BtorJNI.boolector_is_array(btor, entry)) {
@@ -213,7 +214,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private ValueAssignment getConstAssignment(long key, String name) {
     List<Object> argumentInterpretation = new ArrayList<>();
     Object value = creator.convertValue(key, evalImpl(key));
-    Long valueNode = BtorJNI.boolector_get_value(btor, key);
+    long valueNode = BtorJNI.boolector_get_value(btor, key);
     // Boolector might return the internal name of the variable with a leading BTOR_number@ which we
     // need to strip!
     return new ValueAssignment(
@@ -231,7 +232,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
     // of values may differ when calling boolector_uf_assignment_helper again to get the arguments!
     // The "value" from boolector_get_value() is just
     // a plain copy of the entered node with static results!
-    Long fun = BtorJNI.boolector_get_value(btor, key);
+    long fun = BtorJNI.boolector_get_value(btor, key);
     String[][] ufAssignments = BtorJNI.boolector_uf_assignment_helper(btor, key);
     for (int i = 0; i < ufAssignments[0].length; i++) {
       ImmutableList.Builder<Object> argBuilder = ImmutableList.builder();
@@ -264,7 +265,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
       argumentInterpretation.add(bfCreator.transformStringToBigInt(stringArrayEntry));
     }
     Object value = creator.convertValue(key, evalImpl(key));
-    Long valueNode = BtorJNI.boolector_get_value(btor, key);
+    long valueNode = BtorJNI.boolector_get_value(btor, key);
     // Boolector might return the internal name of the variable with a leading BTOR_number@ which we
     // need to strip!
     return new ValueAssignment(

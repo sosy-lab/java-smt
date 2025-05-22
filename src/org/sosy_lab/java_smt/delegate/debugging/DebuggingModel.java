@@ -29,7 +29,7 @@ public class DebuggingModel implements Model {
   private final Model delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingModel(Model pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingModel(Model pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

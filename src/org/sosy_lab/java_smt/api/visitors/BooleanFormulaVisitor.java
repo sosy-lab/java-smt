@@ -64,7 +64,7 @@ public interface BooleanFormulaVisitor<R> {
   R visitOr(List<BooleanFormula> operands);
 
   /**
-   * Visit a XOR-expression.
+   * Visit an XOR-expression.
    *
    * @see BooleanFormulaManager#xor
    */

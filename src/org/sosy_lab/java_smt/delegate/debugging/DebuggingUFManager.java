@@ -20,7 +20,7 @@ public class DebuggingUFManager implements UFManager {
   private final UFManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingUFManager(UFManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingUFManager(UFManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

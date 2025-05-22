@@ -8,7 +8,7 @@ SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# How to install a SMT solver library for Windows (arm64) for developers of JavaSMT
+# How to install an SMT solver library for Windows (arm64) for developers of JavaSMT
 
 Currently, the only native solver that is supported on Windows for arm64 is Z3. The Java based
 solvers SMTInterpol and Princess are also available and will simply work out of the box. To use

@@ -19,7 +19,7 @@ public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProver
   private final OptimizationProverEnvironment delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingOptimizationProverEnvironment(
+  DebuggingOptimizationProverEnvironment(
       OptimizationProverEnvironment pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
     delegate = pDelegate;

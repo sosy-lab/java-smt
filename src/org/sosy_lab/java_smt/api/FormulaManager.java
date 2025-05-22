@@ -140,7 +140,7 @@ public interface FormulaManager {
    * <code>set-info</code>. Most solvers just ignore those commands.
    *
    * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
-   * solver and they might not be available for later usage.
+   * solver, and they might not be available for later usage.
    *
    * @return A single formula from the assertion in the internal representation.
    * @throws IllegalArgumentException If the string cannot be parsed.
@@ -185,7 +185,7 @@ public interface FormulaManager {
   /**
    * Visit the formula with a given visitor.
    *
-   * <p>This method does <b>not recursively visit</b> sub-components of a formula its own, so the
+   * <p>This method does <b>not recursively visit</b> subcomponents of a formula its own, so the
    * given {@link FormulaVisitor} needs to call such visitation on its own.
    *
    * <p>Please be aware that calling this method might cause extensive stack usage depending on the
@@ -201,7 +201,7 @@ public interface FormulaManager {
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}. This method traverses
-   * sub-components of a formula automatically, depending on the return value of the {@link
+   * subcomponents of a formula automatically, depending on the return value of the {@link
    * TraversalProcess} in the given {@link FormulaVisitor}.
    *
    * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,

@@ -18,7 +18,7 @@ public class DebuggingEnumerationFormulaManager implements EnumerationFormulaMan
   private final EnumerationFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingEnumerationFormulaManager(
+  DebuggingEnumerationFormulaManager(
       EnumerationFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;

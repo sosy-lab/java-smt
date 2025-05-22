@@ -351,7 +351,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
-        // argumentType can be sub-type of parameterType, e.g., int < rational
+        // argumentType can be subtype of parameterType, e.g., int < rational
         long arg = msat_term_get_arg(f, i);
         FormulaType<?> argumentType = getFormulaType(arg);
         args.add(encapsulate(argumentType, arg));

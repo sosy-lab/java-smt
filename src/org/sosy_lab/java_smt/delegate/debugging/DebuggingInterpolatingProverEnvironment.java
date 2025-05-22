@@ -21,7 +21,7 @@ public class DebuggingInterpolatingProverEnvironment<T> extends DebuggingBasicPr
   private final InterpolatingProverEnvironment<T> delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingInterpolatingProverEnvironment(
+  DebuggingInterpolatingProverEnvironment(
       InterpolatingProverEnvironment<T> pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
     delegate = checkNotNull(pDelegate);

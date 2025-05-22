@@ -27,7 +27,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
-   * value may be used to identify this formula later on in a query (this depends on the sub-type of
+   * value may be used to identify this formula later on in a query (this depends on the subtype of
    * the environment).
    */
   @Nullable

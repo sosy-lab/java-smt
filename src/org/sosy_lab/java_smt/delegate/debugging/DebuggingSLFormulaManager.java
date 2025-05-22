@@ -20,7 +20,7 @@ public class DebuggingSLFormulaManager implements SLFormulaManager {
   private final SLFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingSLFormulaManager(SLFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingSLFormulaManager(SLFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

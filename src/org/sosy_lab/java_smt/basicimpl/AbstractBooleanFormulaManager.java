@@ -345,8 +345,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
-          R out = delegate.visitAnd(getBoolArgs(args));
-          return out;
+          return delegate.visitAnd(getBoolArgs(args));
         case NOT:
           checkState(args.size() == 1);
           Formula arg = args.get(0);
@@ -354,15 +353,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           checkArgument(arg instanceof BooleanFormula);
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
-          R out2 = delegate.visitOr(getBoolArgs(args));
-          return out2;
+          return delegate.visitOr(getBoolArgs(args));
         case IFF:
           checkState(args.size() == 2);
           Formula a = args.get(0);
           Formula b = args.get(1);
           checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
-          R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
-          return out3;
+          return delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
         case EQ:
           if (args.size() == 2
               && args.get(0) instanceof BooleanFormula

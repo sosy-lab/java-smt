@@ -46,7 +46,7 @@ SPDX-License-Identifier: Apache-2.0
     </condition>
     <property name="ivy.cache.dir" location="${tmp.ivy.cache.dir}" />
 
-    <!-- If necessary, download Ivy from web site so that it does not need to be installed. -->
+    <!-- If necessary, download Ivy from website so that it does not need to be installed. -->
     <target name="bootstrap-ivy" unless="ivy.jar.present">
         <mkdir dir="${ivy.jar.dir}"/>
         <echo message="Downloading ivy..."/>

@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -39,7 +37,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Tests bitvectors for all solvers that support it. Notice: Boolector does not support integer
  * theory or bitvectors length 1.
  */
-@RunWith(Parameterized.class)
 public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
@@ -409,7 +406,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
     BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
 
-    // 'cast' a to unsigned int
+    // 'cast' to unsigned int
     a = bvmgr.extend(a, 32 - 8, false);
     b = bvmgr.extend(b, 32 - 8, false);
     a = bvmgr.or(a, one);

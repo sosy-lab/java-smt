@@ -134,7 +134,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
       Vector_Term children = array.children();
       List<Object> innerIndices = new ArrayList<>(upperIndices);
       String name = getArrayName(array);
-      assert name != null;
+      Preconditions.checkNotNull(name, "unexpected array %s without name", array);
       if (children.isEmpty()) {
         // Empty array
         return assignments;

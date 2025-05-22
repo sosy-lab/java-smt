@@ -85,8 +85,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the application of the UF with arguments.
      *
-     * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
-     * {@link #value} during a model evaluation, but we provide assignments like <code>
+     * <p>For arrays, we use the selection-statement with an index. We do not support Array theory
+     * as {@link #value} during a model evaluation, but we provide assignments like <code>
      * select(arr, 12) := 34</code> where <code>arr</code> itself is a plain symbol (without an
      * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
@@ -107,8 +107,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the arguments.
      *
-     * <p>For arrays we use the index of a selection or an empty list for wildcard-selection, if the
-     * whole array is filled with a constant value. In the latter case any additionally given
+     * <p>For arrays, we use the index of a selection or an empty list for wildcard-selection, if
+     * the whole array is filled with a constant value. In the latter case any additionally given
      * array-assignment overrides the wildcard-selection for the given index. Example: "arr=0,
      * arr[2]=3" corresponds to an array {0,0,3,0,...}.
      */
@@ -120,7 +120,7 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      * <p>For UFs we use their name without parameters. Parameters are given as {@link
      * #argumentsInterpretation}.
      *
-     * <p>For arrays we use the name without any index. The index is given as {@link
+     * <p>For arrays, we use the name without any index. The index is given as {@link
      * #argumentsInterpretation}, if required.
      */
     private final String name;

@@ -43,7 +43,7 @@ public class DebuggingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingFormulaManager(FormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingFormulaManager(FormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

@@ -969,7 +969,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
-      //  - an sign for posiive/negative infinity,
+      //  - a sign for positive/negative infinity,
       //  - "11..11" as exponent,
       //  - "00..00" as mantissa.
       String sign = getSign(pValue).isNegative() ? "1" : "0";

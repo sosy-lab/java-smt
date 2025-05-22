@@ -24,7 +24,7 @@ SPDX-License-Identifier: Apache-2.0
             INFO
             Please specify the path to Z3 sources directory with the flag '-Dz3.path=/path/to/z3/z3-unpacked-sources'.
             The path should contain directories like './src/' and './scripts/', and can be relative or absolute.
-            Please provide all unpacked releases (Linux, MacOS, and Windows for x64 and arm64
+            Please provide all unpacked releases (Linux, macOS, and Windows for x64 and arm64
             architecture) in the same parent directory './../' above the 'z3.path'.
             This script does not expect other z3-related files or directories in the parent directory.
             For example, the directory structure can look like this:
@@ -39,7 +39,7 @@ SPDX-License-Identifier: Apache-2.0
              |-- z3-z3-4.13.2/                  // &lt;-- sources directory as 'z3.path'
 
             This can be achieved by:
-            - download all artifacts (Linux, MacOS, and Windows for x64 and arm64 architecture)
+            - download all artifacts (Linux, macOS, and Windows for x64 and arm64 architecture)
               from the Z3 release webpage (https://github.com/Z3Prover/z3/releases)
             - create an empty directory 'z3/' and unpack all artifact into it.
             - in the sources directory execute `python scripts/mk_make.py --java` to generate all
@@ -121,7 +121,7 @@ SPDX-License-Identifier: Apache-2.0
         -->
         <echo>
             Lets copy the files for architecture x64 into main directory, for backwards compatibility.
-            Afterwards, please execute the SVN command from above.
+            Afterward, please execute the SVN command from above.
         </echo>
         <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
             <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
@@ -155,7 +155,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- cleanup -->
         <delete dir="${z3.javadoc.dir}" quiet="true"/>
         <!-- then write new files.
-             Lets ignore minor issues, e.g. using html tag <tt> instead of <code> -->
+             Let's ignore minor issues, e.g. using html tag <tt> instead of <code> -->
         <javadoc
             destdir="${z3.javadoc.dir}"
             classpathref="classpath"
