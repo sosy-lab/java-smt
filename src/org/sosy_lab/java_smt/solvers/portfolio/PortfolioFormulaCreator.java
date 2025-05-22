@@ -241,71 +241,71 @@ public class PortfolioFormulaCreator {
   protected synchronized void handleUnsupportedOperationWithReason(Solvers solver, String reason) {
     // solversWithContexts is mutable for removal in FormulaManager!
     // TODO: also handle open provers
-    if (removeSolverFromPortfolioWhenUnsupported) {
-      SolverContext context = contexts.get(solver);
-      if (context != null) {
-        formulaManagers =
-            formulaManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        booleanManagers =
-            booleanManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        integerManagers =
-            integerManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        rationalManagers =
-            rationalManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        arrayManagers =
-            arrayManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        ufManagers =
-            ufManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        floatingPointManagers =
-            floatingPointManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        stringManagers =
-            stringManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        slManagers =
-            slManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        enumerationManagers =
-            enumerationManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        bitvectorManagers =
-            bitvectorManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        quantifiedManagers =
-            quantifiedManagers.entrySet().stream()
-                .filter(e -> e.getKey() != solver)
-                .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
-        // TODO: close all provers
-        context.close();
-        contexts.remove(solver);
-      }
+    SolverContext context = contexts.get(solver);
+    if (context != null) {
+      formulaManagers =
+          formulaManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      booleanManagers =
+          booleanManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      integerManagers =
+          integerManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      rationalManagers =
+          rationalManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      arrayManagers =
+          arrayManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      ufManagers =
+          ufManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      floatingPointManagers =
+          floatingPointManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      stringManagers =
+          stringManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      slManagers =
+          slManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      enumerationManagers =
+          enumerationManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      bitvectorManagers =
+          bitvectorManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      quantifiedManagers =
+          quantifiedManagers.entrySet().stream()
+              .filter(e -> e.getKey() != solver)
+              .collect(ImmutableMap.toImmutableMap(Map.Entry::getKey, Map.Entry::getValue));
+      // TODO: close all provers
+      context.close();
+      contexts.remove(solver);
+    }
 
-      if (contexts.isEmpty()) {
-        throw new UnsupportedOperationException(
-            "Last solver " + solver + " in portfolio removed due to: " + reason);
-      }
+    if (contexts.isEmpty()) {
+      throw new UnsupportedOperationException(
+          "Last solver " + solver + " in portfolio removed due to: " + reason);
+    }
 
-      // TODO: show remaining solvers?
-      logger.log(Level.WARNING, "Portfolio removed solver " + solver + " due to: " + reason);
+    // TODO: show remaining solvers?
+    logger.log(Level.WARNING, "Portfolio removed solver " + solver + " due to: " + reason);
 
-    } else {
+    // TODO: currently we only throw this when currently solving if all threads fail. Fix
+    if (!removeSolverFromPortfolioWhenUnsupported) {
       throw new UnsupportedOperationException("Portfolio solver " + solver + " error: " + reason);
     }
   }
