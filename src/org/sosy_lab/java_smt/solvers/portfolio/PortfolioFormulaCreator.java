@@ -238,7 +238,7 @@ public class PortfolioFormulaCreator {
    * Always use this if there is an error or unsupported operation for a solver to handle how the
    * portfolio responds to this.
    */
-  protected void handleUnsupportedOperationWithReason(Solvers solver, String reason) {
+  protected synchronized void handleUnsupportedOperationWithReason(Solvers solver, String reason) {
     // solversWithContexts is mutable for removal in FormulaManager!
     // TODO: also handle open provers
     if (removeSolverFromPortfolioWhenUnsupported) {
