@@ -44,8 +44,7 @@ public class PortfolioFormula implements Formula {
 
   @Override
   public final String toString() {
-    return Joiner.on(System.lineSeparator()).withKeyValueSeparator(": ")
-        .join(formulasPerSolver);
+    return Joiner.on(System.lineSeparator()).withKeyValueSeparator(": ").join(formulasPerSolver);
   }
 
   @Override
