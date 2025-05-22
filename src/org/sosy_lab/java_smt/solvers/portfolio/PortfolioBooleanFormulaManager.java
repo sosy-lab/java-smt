@@ -214,7 +214,7 @@ public class PortfolioBooleanFormulaManager implements BooleanFormulaManager {
       Solvers solver = f1Formulas.getKey();
       BooleanFormulaManager mgr = creator.getSolverSpecificBooleanFormulaManagers().get(solver);
       BooleanFormula specF1 = f1Formulas.getValue();
-      BooleanFormula specF2 = ((PortfolioBooleanFormula) bits1).getFormulasPerSolver().get(solver);
+      BooleanFormula specF2 = ((PortfolioBooleanFormula) bits2).getFormulasPerSolver().get(solver);
       finalFormulaBuilder.put(solver, checkNotNull(mgr).and(specF1, checkNotNull(specF2)));
     }
 
