@@ -180,15 +180,6 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
     // return new CachingModel(new PortfolioModel(this));
   }
 
-  /**
-   * @throws SolverException if an expected MathSAT failure occurs
-   */
-  protected long getMsatModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
-    throw new UnsupportedOperationException("Implement me");
-  }
-
   @SuppressWarnings("resource")
   @Override
   public Evaluator getEvaluator() {
