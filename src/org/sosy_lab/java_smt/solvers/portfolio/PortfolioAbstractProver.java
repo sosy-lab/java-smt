@@ -14,10 +14,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -27,6 +29,7 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,10 +46,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.Classes.UnexpectedCheckedException;
 import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.annotations.SuppressForbidden;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -85,12 +89,11 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
 
   private final boolean immediatelyGetModel = true;
 
-  private List<ValueAssignment> lastModelAssignments;
   // For each renewed run
   private ShutdownManager centralShutdownManager;
   private final AtomicBoolean terminatedCurrentCall = new AtomicBoolean(false);
 
-  private @Nullable ParallelProverResult lastResult;
+  private @Nullable ParallelProverResult lastResult = null;
 
   protected PortfolioAbstractProver(
       PortfolioSolverContext pPortfolioContext,
@@ -154,8 +157,11 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
   public boolean isUnsat() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
-    // Start all threads
+    // Reset
+    lastResult = null;
+    // Set up new shutdown managers
     centralShutdownManager = ShutdownManager.createWithParent(externalShutdownNotifier);
+    // Start all threads
     ImmutableList.Builder<Callable<ParallelProverResult>> callables = ImmutableList.builder();
     for (Entry<Solvers, P> solverAndMainProver : centralSolversAndProvers.entrySet()) {
       Solvers solver = solverAndMainProver.getKey();
@@ -167,11 +173,7 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
 
     if (result.hasValidIsUnsat()) {
       // Cache model if we are SAT
-      boolean isUnsat = result.getIsUnsat().orElseThrow();
-      if (!isUnsat) {
-        lastModelAssignments = result.getModelToList().orElseThrow();
-      }
-      return isUnsat;
+      return result.getIsUnsat().orElseThrow();
     }
 
     throw new SolverException("Error: no result for current portfolio of solvers returned");
@@ -192,17 +194,29 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    throw new UnsupportedOperationException("Implement me");
-    // return new CachingModel(new PortfolioModel(this));
+    if (lastResult == null) {
+      throw new SolverException(
+          "Requesting a model in portfolio mode is only permitted after a SAT "
+              + "result and with option immediatelyGetModel=TRUE");
+    }
+    Optional<ImmutableList<ValueAssignment>> maybeModel = lastResult.getModelToList();
+    if (maybeModel.isEmpty()) {
+      if (lastResult.getIsUnsat().isPresent() && lastResult.getIsUnsat().orElseThrow()) {
+        throw new SolverException(
+            "Requesting a model in portfolio mode is only permitted after a SAT "
+                + "result and with option immediatelyGetModel=TRUE");
+      }
+      throw new SolverException("Critical error when requesting a model in portfolio mode");
+    }
+    return new PortfolioModel(maybeModel.orElseThrow(), lastResult.getSolver());
   }
 
   @SuppressWarnings("resource")
   @Override
-  public Evaluator getEvaluator() {
+  public Evaluator getEvaluator() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    throw new UnsupportedOperationException("Implement me");
-    // return registerEvaluator(new PortfolioEvaluator(this));
+    return registerEvaluator(getModel());
   }
 
   @Override
@@ -336,7 +350,7 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       boolean isUnsat = prover.isUnsat();
       System.out.println(isUnsat);
 
-      List<ValueAssignment> modelAssignments = null;
+      ImmutableList<ValueAssignment> modelAssignments = null;
       if (!isUnsat && immediatelyGetModel) {
         modelAssignments = prover.getModel().asList();
       }
@@ -351,7 +365,7 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
 
     } catch (SolverException pE) {
       singleLogger.logUserException(
-          Level.INFO, pE, "Solver " + usedSolver + " terminated with " + "solver error");
+          Level.INFO, pE, "Solver " + usedSolver + " terminated with checked error: " + pE);
       return ParallelProverResult.absent(usedSolver);
 
     } finally {
@@ -416,18 +430,22 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
     private final Solvers solver;
     // Empty for errors
     private final Optional<Boolean> isUnsat;
-    // Empty for errors or not requested
-    private final Optional<List<ValueAssignment>> maybeModel;
+    // Empty for errors or not requested. Already translated to original context
+    private final Optional<ImmutableList<ValueAssignment>> maybeModel;
 
     private ParallelProverResult(
-        Optional<Boolean> pIsUnsat, Optional<List<ValueAssignment>> pMaybeModel, Solvers pSolver) {
+        Optional<Boolean> pIsUnsat,
+        Optional<ImmutableList<ValueAssignment>> pMaybeModel,
+        Solvers pSolver) {
       solver = pSolver;
       isUnsat = pIsUnsat;
       maybeModel = pMaybeModel;
     }
 
     public static ParallelProverResult of(
-        @Nullable Boolean pIsUnsat, @Nullable List<ValueAssignment> pMaybeModel, Solvers pSolver) {
+        @Nullable Boolean pIsUnsat,
+        @Nullable ImmutableList<ValueAssignment> pMaybeModel,
+        Solvers pSolver) {
       return new ParallelProverResult(
           Optional.ofNullable(pIsUnsat), Optional.ofNullable(pMaybeModel), pSolver);
     }
@@ -444,7 +462,7 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       return isUnsat.isPresent();
     }
 
-    public Optional<List<ValueAssignment>> getModelToList() {
+    public Optional<ImmutableList<ValueAssignment>> getModelToList() {
       return maybeModel;
     }
 
@@ -482,10 +500,15 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
     }
   }
 
+  /**
+   * It might happen that an execution has not yet thrown a critical error due to stopping its
+   * thread, but would if executed further, we finish without an error in that solver and it remains
+   * in the portfolio.
+   */
   private void handleFutureResults(List<ListenableFuture<ParallelProverResult>> futures)
       throws InterruptedException, SolverException {
 
-    // List<Exception> exceptions = new ArrayList<>();
+    List<SolverException> exceptions = new ArrayList<>();
     for (ListenableFuture<ParallelProverResult> f : Futures.inCompletionOrder(futures)) {
       try {
         ParallelProverResult result = f.get();
@@ -501,19 +524,20 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
           // None returned a valid result?
           throw new SolverException(
               "Portfolio solver has encountered a critical problem when "
-                  + "recieving results and can not continue");
+                  + "recieving results and can not continue: "
+                  + result);
         }
       } catch (ExecutionException e) {
         Throwable cause = e.getCause();
 
-        // runParallelAnalysis only declares CPAException, so this is unchecked or unexpected.
+        // runParallelAnalysis declares no exception, so this is unchecked or unexpected.
         // Cancel other computations and propagate.
         futures.forEach(future -> future.cancel(true));
 
         shutdownRunningProvers(
-            "cancelling all remaining analyses due to critical error when " + "retrieving result");
+            "cancelling all remaining analyses due to critical error when retrieving result");
         Throwables.throwIfUnchecked(cause);
-        throw new UnexpectedCheckedException("solver threw: ", cause);
+        exceptions.add((SolverException) cause);
 
       } catch (CancellationException e) {
         // do nothing, this is normal if we cancel other analyses
@@ -521,7 +545,13 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
     }
 
     // No result, propagate the found exceptions upwards
-    // TODO: ?
+    if (lastResult == null && !exceptions.isEmpty()) {
+      if (exceptions.size() == 1) {
+        throw Iterables.getOnlyElement(exceptions);
+      } else {
+        throw new CompoundSolverException(exceptions);
+      }
+    }
   }
 
   private void shutdownRunningProvers(String reason) {
@@ -579,6 +609,45 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       }
     }
   }
+
+  /*
+  protected List<ValueAssignment> translateModelBack(
+      PortfolioAbstractProver<I, P> centralPortfolioProver,
+      SolverContext contextToBuildFrom,
+      P proverToBuildFrom,
+      SolverContextAndProverAndShutdownManager target, List<ValueAssignment> modelOnTarget)
+      throws InterruptedException {
+    FormulaManager originalMgr = contextToBuildFrom.getFormulaManager();
+
+    FormulaManager targetMgr = target.getSolverContext().getFormulaManager();
+    P targetProver = target.getProver();
+
+    // Iterates from the lowest level to the highest
+    // We assume that interpolation points are consistent
+    for (ValueAssignment assignment : modelOnTarget) {
+      assignment.getAssignmentAsFormula();
+      assignment.getKey();
+      assignment.getValue();
+        try {
+          targetMgr.translateFrom(formula, originalMgr);
+        } catch (UnsupportedOperationException pUnsupportedOperationException) {
+          // Solver can't parse or dump, kick out of portfolio
+          String reason;
+          String failingMethod = pUnsupportedOperationException.getStackTrace()[0].getMethodName();
+          if (failingMethod.contains("parseImpl")) {
+            reason = "parsing SMTLib2 not supported by the solver or JavaSMT";
+          } else if (failingMethod.contains("dumpFormulaImpl")) {
+            reason = "dumping SMTLib2 not supported by the solver or JavaSMT";
+          } else {
+            reason = "Unknown reason";
+          }
+          centralPortfolioProver.handleUnsupportedOperationWithReason(
+              contextToBuildFrom.getSolverName(), reason, targetProver);
+        }
+      }
+    }
+  }
+   */
 
   /**
    * Only to be called in the thread this is supposed to execute the solving! Override for
@@ -706,6 +775,35 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       pOut.println("\n");
       pOut.println("Other statistics");
       pOut.println("================");
+    }
+  }
+
+  public static class CompoundSolverException extends SolverException {
+
+    private static final long serialVersionUID = -6682929813883808800L;
+    private final List<SolverException> exceptions;
+
+    public CompoundSolverException(List<SolverException> pExceptions) {
+      super(getMessage(pExceptions));
+      exceptions = Collections.unmodifiableList(pExceptions);
+    }
+
+    public List<SolverException> getExceptions() {
+      return exceptions;
+    }
+
+    @SuppressForbidden(value = "result of Collectors.toList() is only read, needs to support null")
+    private static String getMessage(List<SolverException> pExceptions) {
+      Preconditions.checkArgument(
+          pExceptions.size() > 1,
+          "Use a CompoundSolverException only if there actually are multiple exceptions.");
+      List<String> messages =
+          pExceptions.stream().map(Throwable::getMessage).distinct().collect(Collectors.toList());
+      if (messages.size() == 1) {
+        return messages.get(0);
+      }
+      return "Several exceptions occured during solver execution:\n -> "
+          + Joiner.on("\n -> ").join(messages);
     }
   }
 }
