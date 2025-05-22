@@ -10,7 +10,11 @@
 
 package org.sosy_lab.java_smt.solvers.portfolio;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.base.Preconditions;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -20,6 +24,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.portfolio.PortfolioFormula.PortfolioBooleanFormula;
 
 public class PortfolioTheoremProver extends PortfolioAbstractProver<Void, ProverEnvironment>
     implements ProverEnvironment {
@@ -44,8 +49,15 @@ public class PortfolioTheoremProver extends PortfolioAbstractProver<Void, Prover
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException {
-    for (ProverEnvironment prover : super.getCentralSolversAndProvers().values()) {
-      prover.addConstraint(constraint);
+    Preconditions.checkArgument(constraint instanceof PortfolioBooleanFormula);
+    Map<Solvers, BooleanFormula> solverSpecificConstraints =
+        ((PortfolioBooleanFormula) constraint).getFormulasPerSolver();
+    for (Entry<Solvers, ProverEnvironment> solverAndProver :
+        super.getCentralSolversAndProvers().entrySet()) {
+      Solvers solver = solverAndProver.getKey();
+      BooleanFormula solverSpecificConstraint = solverSpecificConstraints.get(solver);
+      checkNotNull(solverSpecificConstraint);
+      solverAndProver.getValue().addConstraint(solverSpecificConstraint);
     }
     return null;
   }
