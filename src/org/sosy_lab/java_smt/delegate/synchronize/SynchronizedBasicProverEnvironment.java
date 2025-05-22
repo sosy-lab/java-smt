@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -123,6 +124,13 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
       throws InterruptedException, SolverException {
     synchronized (sync) {
       return delegate.allSat(pCallback, pImportant);
+    }
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    synchronized (sync) {
+      return delegate.getInternalAssertedFormulas();
     }
   }
 }

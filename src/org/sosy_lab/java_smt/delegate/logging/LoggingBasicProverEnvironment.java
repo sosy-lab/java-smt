@@ -13,6 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -137,5 +138,10 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     R result = wrapped.allSat(callback, important);
     logger.log(Level.FINE, "allsat-result:", result);
     return result;
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    return wrapped.getInternalAssertedFormulas();
   }
 }

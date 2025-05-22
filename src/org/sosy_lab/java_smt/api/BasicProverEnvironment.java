@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
 import java.util.List;
@@ -202,4 +203,6 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   default boolean registerUserPropagator(UserPropagator propagator) {
     return false;
   }
+
+  List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas();
 }

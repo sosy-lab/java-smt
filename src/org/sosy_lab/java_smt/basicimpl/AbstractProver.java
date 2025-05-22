@@ -159,6 +159,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     closed = true;
   }
 
+  @Override
   public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
     return assertedFormulas;
   }

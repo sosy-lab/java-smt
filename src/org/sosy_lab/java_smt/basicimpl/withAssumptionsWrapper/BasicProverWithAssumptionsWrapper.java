@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl.withAssumptionsWrapper;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -127,5 +128,10 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    return delegate.getInternalAssertedFormulas();
   }
 }

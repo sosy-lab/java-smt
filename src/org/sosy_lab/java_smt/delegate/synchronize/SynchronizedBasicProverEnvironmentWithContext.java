@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -160,6 +161,13 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
     @Override
     public R getResult() throws InterruptedException {
       return delegateCallback.getResult();
+    }
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    synchronized (sync) {
+      return delegate.getInternalAssertedFormulas();
     }
   }
 }

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -107,5 +108,11 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
       debugging.assertFormulaInContext(f);
     }
     return delegate.allSat(callback, important);
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    debugging.assertThreadLocal();
+    return delegate.getInternalAssertedFormulas();
   }
 }

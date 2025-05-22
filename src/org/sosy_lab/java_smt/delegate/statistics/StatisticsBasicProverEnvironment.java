@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Multimap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -118,5 +119,10 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     } finally {
       allSatTimer.stop();
     }
+  }
+
+  @Override
+  public List<Multimap<BooleanFormula, T>> getInternalAssertedFormulas() {
+    return delegate.getInternalAssertedFormulas();
   }
 }
