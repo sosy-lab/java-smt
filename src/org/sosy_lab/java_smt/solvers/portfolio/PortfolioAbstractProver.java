@@ -50,26 +50,28 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.common.time.TimeSpan;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
+// TODO: is the statistics wrapper sufficient to get all info about nested solvers?
 @SuppressWarnings("unused")
-abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends AbstractProver<I> {
+abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
+    extends AbstractProver<I> {
 
   private final PortfolioSolverContext portfolioContext;
   // Before using a prover, we need to make sure not to use provers that have been kicked out
   // Currently we only build provers to be used from the options of this one when actually
   // requesting to solve something, so it's fine for now
   // TODO: for incremental this is not sufficient
-  private final Map<Solvers, P> centralSolversAndProvers;
+  private Map<Solvers, P> centralSolversAndProvers;
   private static final Map<Solvers, AtomicInteger> terminatedFirstCounter =
       new ConcurrentHashMap<>();
 
@@ -106,6 +108,20 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
     creator = pCreator;
     logger = pLogger;
     stats = null;
+  }
+
+  protected synchronized void handleUnsupportedOperationWithReason(
+      Solvers solver, String reason, P threadedProver) {
+    threadedProver.close();
+    centralSolversAndProvers.get(solver).close();
+    ImmutableMap.Builder<Solvers, P> newCentralSolversAndProvers = ImmutableMap.builder();
+    for (Entry<Solvers, P> solverAndCentralProver : centralSolversAndProvers.entrySet()) {
+      if (solverAndCentralProver.getKey() != solver) {
+        newCentralSolversAndProvers.put(solverAndCentralProver);
+      }
+    }
+    centralSolversAndProvers = newCentralSolversAndProvers.buildOrThrow();
+    creator.handleUnsupportedOperationWithReason(solver, reason);
   }
 
   protected Map<Solvers, P> getCentralSolversAndProvers() {
@@ -263,9 +279,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   }
 
   private Callable<ParallelProverResult> createParallelIsUnsat(
-      final Solvers solver,
-      final SolverContext contextToBuildFrom,
-      final ProverEnvironment proverToBuildFrom) {
+      final Solvers solver, final SolverContext contextToBuildFrom, final P proverToBuildFrom) {
 
     final LogManager singleLogger = logger.withComponentName("Parallel isUnsat() with " + solver);
 
@@ -282,6 +296,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
 
     return () ->
         runParallelIsUnsat(
+            this,
             solver,
             contextToBuildFrom,
             proverToBuildFrom,
@@ -295,9 +310,10 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   // TODO: add update listener that gets new info like getModel/interpolation and allow reuse of
   //  the thread.
   private ParallelProverResult runParallelIsUnsat(
+      final PortfolioAbstractProver<I, P> centralPortfolioProver,
       final Solvers usedSolver,
       final SolverContext contextToBuildFrom,
-      final ProverEnvironment proverToBuildFrom,
+      final P proverToBuildFrom,
       final boolean immediatelyGetModel,
       final LogManager singleLogger,
       //  final ResourceLimitChecker
@@ -308,16 +324,17 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
           terminatedCurrentCall) { // handleFutureResults needs to handle all the exceptions
     // declared here
     try {
-      boolean isUnsat;
 
-      SolverContextAndProverAndShutdownManager<P> newComponents =
+      SolverContextAndProverAndShutdownManager newComponents =
           buildNewEmptyContextAndProverFrom(usedSolver, proverToBuildFrom);
-      translateSolverStackTo(contextToBuildFrom, proverToBuildFrom, newComponents);
+      translateSolverStackTo(
+          centralPortfolioProver, contextToBuildFrom, proverToBuildFrom, newComponents);
 
       P prover = newComponents.getProver();
       ShutdownManager shutdownNotifierInThread = newComponents.getShutdownNotifier();
 
-      isUnsat = prover.isUnsat();
+      boolean isUnsat = prover.isUnsat();
+      System.out.println(isUnsat);
 
       List<ValueAssignment> modelAssignments = null;
       if (!isUnsat && immediatelyGetModel) {
@@ -513,26 +530,52 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   }
 
   // TODO: does this work? We are currently not on the thread of the main context/prover
+
+  /**
+   * @param centralPortfolioProver calling/building portfolio prover, so that we can throw out
+   *     failing solvers.
+   * @param contextToBuildFrom solver specific context
+   * @param proverToBuildFrom solver specific prover
+   * @param target new solver specific context, prover etc. that is the target of the stack
+   *     translation of proverToBuildFrom, so that its stack is 1:1.
+   */
   @SuppressWarnings("unchecked")
   protected void translateSolverStackTo(
+      PortfolioAbstractProver<I, P> centralPortfolioProver,
       SolverContext contextToBuildFrom,
-      ProverEnvironment proverToBuildFrom,
-      SolverContextAndProverAndShutdownManager<P> target)
+      P proverToBuildFrom,
+      SolverContextAndProverAndShutdownManager target)
       throws InterruptedException {
     FormulaManager originalMgr = contextToBuildFrom.getFormulaManager();
-    List<Multimap<BooleanFormula, I>> currentStack =
-        ((AbstractProver<I>) proverToBuildFrom).getInternalAssertedFormulas();
+    List<? extends Multimap<BooleanFormula, ?>> currentStack =
+        proverToBuildFrom.getInternalAssertedFormulas();
 
     FormulaManager targetMgr = target.getSolverContext().getFormulaManager();
     P targetProver = target.getProver();
 
     // Iterates from the lowest level to the highest
-    for (Multimap<BooleanFormula, I> level : currentStack) {
+    // We assume that interpolation points are consistent
+    for (Multimap<BooleanFormula, ?> level : currentStack) {
       // Push
       targetProver.push();
       for (BooleanFormula formula : level.keySet()) {
         // Translate and assert
-        targetProver.addConstraint(targetMgr.translateFrom(formula, originalMgr));
+        try {
+          targetProver.addConstraint(targetMgr.translateFrom(formula, originalMgr));
+        } catch (UnsupportedOperationException pUnsupportedOperationException) {
+          // Solver can't parse or dump, kick out of portfolio
+          String reason;
+          String failingMethod = pUnsupportedOperationException.getStackTrace()[0].getMethodName();
+          if (failingMethod.contains("parseImpl")) {
+            reason = "parsing SMTLib2 not supported by the solver or JavaSMT";
+          } else if (failingMethod.contains("dumpFormulaImpl")) {
+            reason = "dumping SMTLib2 not supported by the solver or JavaSMT";
+          } else {
+            reason = "Unknown reason";
+          }
+          centralPortfolioProver.handleUnsupportedOperationWithReason(
+              contextToBuildFrom.getSolverName(), reason, targetProver);
+        }
       }
     }
   }
@@ -542,8 +585,8 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
    * specialized Provers! The context/prover returned is empty! You still need to add the stack
    * etc.!
    */
-  protected SolverContextAndProverAndShutdownManager<P> buildNewEmptyContextAndProverFrom(
-      Solvers solver, ProverEnvironment proverToBuildFrom) {
+  protected SolverContextAndProverAndShutdownManager buildNewEmptyContextAndProverFrom(
+      Solvers solver, P proverToBuildFrom) {
     // If users request shutdown, we want all to shut down
     ShutdownManager shutdownManagerForNew =
         ShutdownManager.createWithParent(centralShutdownManager.getNotifier());
@@ -554,8 +597,8 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
 
     P newProver = getNewSolverSpecificProver(newEmptyContextWSameOptions, options);
 
-    SolverContextAndProverAndShutdownManager<P> triple =
-        new SolverContextAndProverAndShutdownManager<>(
+    SolverContextAndProverAndShutdownManager triple =
+        new SolverContextAndProverAndShutdownManager(
             newEmptyContextWSameOptions, newProver, shutdownManagerForNew);
 
     return triple;
@@ -569,7 +612,7 @@ abstract class PortfolioAbstractProver<I, P extends ProverEnvironment> extends A
   abstract P getNewSolverSpecificProver(
       SolverContext newEmptyContextWSameOptionsForSolver, Set<ProverOptions> pOptions);
 
-  public static class SolverContextAndProverAndShutdownManager<P extends ProverEnvironment> {
+  public class SolverContextAndProverAndShutdownManager {
 
     private final SolverContext solverContext;
     private final P prover;
