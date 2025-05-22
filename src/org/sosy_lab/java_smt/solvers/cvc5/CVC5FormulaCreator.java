@@ -108,7 +108,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         "Symbol %s requested with type %s, but already used with type %s",
         name,
         sort,
-        Iterables.getOnlyElement(variablesCache.row(name).entrySet()).getKey());
+        variablesCache.row(name).keySet());
     Term newVar = termManager.mkConst(sort, name);
     variablesCache.put(name, sort.toString(), newVar);
     return newVar;
@@ -851,7 +851,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         "Symbol %s requested with type %s, but already used with type %s",
         name,
         sort,
-        Iterables.getOnlyElement(variablesCache.row(name).entrySet()).getKey());
+        variablesCache.row(name).keySet());
     return existingVar;
   }
 }
