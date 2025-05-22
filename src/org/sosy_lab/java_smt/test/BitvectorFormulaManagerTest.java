@@ -409,7 +409,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
     BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
 
-    // 'cast' a to unsigned int
+    // 'cast' to unsigned int
     a = bvmgr.extend(a, 32 - 8, false);
     b = bvmgr.extend(b, 32 - 8, false);
     a = bvmgr.or(a, one);

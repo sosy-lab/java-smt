@@ -8,7 +8,7 @@ SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# How to install a SMT solver library for Windows (64-bit) for developers of JavaSMT
+# How to install an SMT solver library for Windows (64-bit) for developers of JavaSMT
 
 ## Note:
 

@@ -471,7 +471,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
               alreadyVisited),
           body);
 
-      // Afterwards, we skip the already finished body-formula.
+      // Afterward, we skip the already finished body-formula.
       return TraversalProcess.SKIP;
     }
   }

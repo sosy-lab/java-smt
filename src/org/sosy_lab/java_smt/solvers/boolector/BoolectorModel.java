@@ -191,7 +191,8 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
     for (String name : variables) {
       // We get the formula here as we need the name.
       // Reason: Boolector returns names of variables with its own escape sequence sometimes. If you
-      // however name your variable like the escape sequence, we can't discern anymore if its a real
+      // however name your variable like the escape sequence, we can't discern anymore if it's a
+      // real
       // name or an escape seq.
       long entry = bfCreator.getFormulaFromCache(name).orElseThrow();
       if (BtorJNI.boolector_is_array(btor, entry)) {

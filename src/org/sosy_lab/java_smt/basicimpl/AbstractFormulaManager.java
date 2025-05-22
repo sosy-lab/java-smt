@@ -267,7 +267,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
 
   /**
-   * Takes a SMT-LIB2 script and cleans it up.
+   * Takes an SMT-LIB2 script and cleans it up.
    *
    * <p>We remove all comments and put each command on its own line. Declarations and asserts are
    * kept and everything else is removed. For <code>(set-logic ..)</code> we make sure that it's at

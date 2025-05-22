@@ -241,7 +241,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     }
   }
 
-  /** add external definition: theory variable (integer, rational, string, etc). */
+  /** add external definition: theory variable (integer, rational, string, etc.). */
   void addSymbol(ITerm f) {
     Preconditions.checkState(!closed);
     api.addConstant(f);

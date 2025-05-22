@@ -806,7 +806,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     final Sort type = expForType.getSort();
     final Sort valueType = value.getSort();
 
-    // Variables are Kind.CONSTANT and can't be check with isIntegerValue() or getIntegerValue()
+    // Variables are Kind.CONSTANT and can't be checked with isIntegerValue() or getIntegerValue()
     // etc. but only with solver.getValue() and its String serialization
     try {
       if (value.getKind() == Kind.VARIABLE) {

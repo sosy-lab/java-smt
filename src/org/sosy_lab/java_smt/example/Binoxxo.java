@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  *
  * <ul>
  *   <li>In each column or row there are as many 'X's as 'O's.
- *   <li>Three aligned cells must not contains an identical value.
+ *   <li>Three aligned cells must not contain an identical value.
  * </ul>
  *
  * <p>The Binoxxo is read from StdIn and should be formatted as the following example:
@@ -59,7 +59,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * X..X..O..O
  * </pre>
  *
- * <p>A empty newline will terminate the input and start the solving process.
+ * <p>An empty newline will terminate the input and start the solving process.
  *
  * <p>The solution will then be printed on StdOut, just like the following solution:
  *
