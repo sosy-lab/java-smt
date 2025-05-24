@@ -20,6 +20,7 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
+import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -28,9 +29,12 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -688,6 +692,113 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           .isEqualTo("Proof generation is not available for the current solver.");
     } catch (IllegalStateException e) {
       assertThat(e).hasMessageThat().isEqualTo("Please set the prover option GENERATE_PROOFS.");
+    }
+  }
+
+  // This test is based on the bvIsZeroAfterShiftLeft() test in BitvectorFormulaManagerTest
+  @Test
+  public void getBitVectorProofTest() throws InterruptedException, SolverException {
+    requireProofGeneration();
+    BitvectorFormula one = bvmgr.makeBitvector(32, 1);
+
+    // unsigned char
+    BitvectorFormula a = bvmgr.makeVariable(8, "char_a");
+    BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
+    BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
+
+    // 'cast' a to unsigned int
+    a = bvmgr.extend(a, 32 - 8, false);
+    b = bvmgr.extend(b, 32 - 8, false);
+    a = bvmgr.or(a, one);
+    b = bvmgr.or(b, one);
+    a = bvmgr.extract(a, 7, 0);
+    b = bvmgr.extract(b, 7, 0);
+    a = bvmgr.extend(a, 32 - 8, false);
+    b = bvmgr.extend(b, 32 - 8, false);
+
+    a = bvmgr.shiftLeft(a, rightOp);
+    b = bvmgr.shiftLeft(b, rightOp);
+    a = bvmgr.extract(a, 7, 0);
+    b = bvmgr.extract(b, 7, 0);
+    BooleanFormula f = bmgr.not(bvmgr.equal(a, b));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(f);
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      Subproof proof = prover.getProof();
+      assertThat(proof).isNotNull();
+
+      // Test getRule()
+      assertThat(proof.getRule()).isNotNull();
+      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
+
+      // Test getFormula(), the root should always be false
+      if (solverToUse().equals(SMTINTERPOL)) {
+        assertThat(proof.getFormula()).isNull();
+      } else {
+        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
+
+      // Test getArguments()
+      assertThat(proof.getArguments()).isNotNull();
+      assertThat(proof.getArguments()).isNotEmpty();
+
+      // Test isLeaf()
+      assertThat(proof.isLeaf()).isFalse();
+      Subproof leaf = findanyProofLeaf(proof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
+    }
+  }
+
+  // This test is based on the testIntIndexIntValue() test in ArrayFormulaManagerTest
+  @Test
+  public void getArrayProofTest() throws InterruptedException, SolverException {
+    requireProofGeneration();
+    requireIntegers();
+
+    // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
+    ArrayFormulaType<IntegerFormula, IntegerFormula> type =
+        FormulaType.getArrayType(IntegerType, IntegerType);
+    IntegerFormula num2 = imgr.makeNumber(2);
+    IntegerFormula num4 = imgr.makeNumber(4);
+    ArrayFormula<IntegerFormula, IntegerFormula> arr1 = amgr.makeArray("arr1", type);
+    ArrayFormula<IntegerFormula, IntegerFormula> arr2 = amgr.makeArray("arr2", type);
+    BooleanFormula query =
+        bmgr.and(
+            amgr.equivalence(arr2, amgr.store(arr1, num4, num2)),
+            bmgr.not(imgr.equal(num2, amgr.select(arr2, num4))));
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_PROOFS)) {
+      prover.addConstraint(query);
+      assertThat(prover.isUnsat()).isTrue();
+
+      // Test getProof()
+      Subproof proof = prover.getProof();
+      assertThat(proof).isNotNull();
+
+      // Test getRule()
+      assertThat(proof.getRule()).isNotNull();
+      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
+
+      // Test getFormula(), the root should always be false
+      if (solverToUse().equals(SMTINTERPOL)) {
+        assertThat(proof.getFormula()).isNull();
+      } else {
+        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+      }
+
+      // Test getArguments()
+      assertThat(proof.getArguments()).isNotNull();
+      assertThat(proof.getArguments()).isNotEmpty();
+
+      // Test isLeaf()
+      assertThat(proof.isLeaf()).isFalse();
+      Subproof leaf = findanyProofLeaf(proof);
+      assertThat(leaf).isNotNull();
+      assertThat(leaf.isLeaf()).isTrue();
     }
   }
 
