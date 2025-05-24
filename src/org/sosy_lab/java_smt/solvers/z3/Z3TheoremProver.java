@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -144,6 +145,20 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     } catch (Z3Exception e) {
       throw creator.handleZ3ExceptionAsRuntimeException(e);
     }
+  }
+
+  @Override
+  public Subproof getProof() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(this.isUnsat());
+    long proofAst;
+    try {
+      proofAst = Native.solverGetProof(z3context, z3solver);
+    } catch (Z3Exception e) {
+      throw creator.handleZ3Exception(e);
+    }
+    Z3Proof proof = new Z3Proof();
+    return proof.generateProofImpl(proofAst, creator);
   }
 
   @Override

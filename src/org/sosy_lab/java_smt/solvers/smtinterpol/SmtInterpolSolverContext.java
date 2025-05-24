@@ -202,6 +202,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)
             || pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
     newOptions.put(":produce-models", pOptions.contains(ProverOptions.GENERATE_MODELS));
+    newOptions.put(":produce-proofs", pOptions.contains(ProverOptions.GENERATE_PROOFS));
 
     SMTInterpol smtInterpol =
         new SMTInterpol(getSmtInterpol(), newOptions, CopyMode.RESET_TO_DEFAULT);

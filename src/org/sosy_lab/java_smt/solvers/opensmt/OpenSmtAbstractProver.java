@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
@@ -78,6 +79,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     config.setOption(":produce-unsat-cores", optUnsatCore);
     config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
+    config.setOption(
+        ":produce-proofs", new SMTOption(pOptions.contains(ProverOptions.GENERATE_PROOFS)));
     if (interpolation) {
       config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
       config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
@@ -280,6 +283,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+  }
+
+  @Override
+  public Subproof getProof() {
+    throw new UnsupportedOperationException(
+        "Proof generation is not available for the current solver.");
+    // OpenSMTProof proof = new OpenSMTProof();
+    // return proof.generateProof(osmtSolver.printResolutionProofSMT2(), creator);
   }
 
   @Override
