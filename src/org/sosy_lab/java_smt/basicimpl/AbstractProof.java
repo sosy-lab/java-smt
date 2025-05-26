@@ -116,8 +116,7 @@ public abstract class AbstractProof implements Proof {
 
       sb.append(indent).append("Formula: ").append(sFormula).append("\n");
       sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
-      sb
-          .append(indent)
+      sb.append(indent)
           .append("No. Children: ")
           .append(this.isLeaf() ? 0 : getArguments().size())
           .append("\n");

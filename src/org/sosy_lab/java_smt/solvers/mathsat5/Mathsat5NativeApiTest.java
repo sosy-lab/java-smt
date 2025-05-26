@@ -131,33 +131,35 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     testProofManager(sharedEnv);
   }
 
-  //MathSAT5 can not produce a msat_manager because there is no proof in this case. See
+  // MathSAT5 can not produce a msat_manager because there is no proof in this case. See
   // ProverEnvironmentTest class
   @SuppressWarnings("CheckReturnValue")
   @Test
   public void testProofOfFalse() throws SolverException, InterruptedException {
-    assertThrows(IllegalArgumentException.class, () -> {
-      long cfg = msat_create_config();
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> {
+          long cfg = msat_create_config();
 
-      msat_set_option_checked(cfg, "proof_generation", "true");
+          msat_set_option_checked(cfg, "proof_generation", "true");
 
-      env = msat_create_env(cfg);
-      msat_destroy_config(cfg);
-      long bottom = msat_make_false(env);
+          env = msat_create_env(cfg);
+          msat_destroy_config(cfg);
+          long bottom = msat_make_false(env);
 
-      msat_assert_formula(env, bottom);
+          msat_assert_formula(env, bottom);
 
-      boolean isSat = msat_check_sat(env);
+          boolean isSat = msat_check_sat(env);
 
-      assertThat(isSat).isFalse();
+          assertThat(isSat).isFalse();
 
-      long pm = msat_get_proof_manager(env);
+          long pm = msat_get_proof_manager(env);
 
-      msat_get_proof(pm);
+          msat_get_proof(pm);
 
-      msat_destroy_proof_manager(pm);
-      msat_destroy_env(env);
-    });
+          msat_destroy_proof_manager(pm);
+          msat_destroy_env(env);
+        });
   }
 
   @SuppressWarnings("CheckReturnValue")

@@ -69,10 +69,15 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     checkGenerateProofs();
 
     Mathsat5Proof proof = new Mathsat5Proof();
-
-    long pm = msat_get_proof_manager(curEnv);
+    Mathsat5Subproof root;
+    long pm;
+    try {
+      pm = msat_get_proof_manager(curEnv);
+    } catch (IllegalArgumentException e) {
+      throw new UnsupportedOperationException("No proof available.", e);
+    }
     long msatProof = msat_get_proof(pm);
-    Mathsat5Subproof root = proof.fromMsatProof(this, msatProof);
+    root = proof.fromMsatProof(this, msatProof);
     clausifyResChain(root, context.getFormulaManager().getBooleanFormulaManager());
     msat_destroy_proof_manager(pm);
 
