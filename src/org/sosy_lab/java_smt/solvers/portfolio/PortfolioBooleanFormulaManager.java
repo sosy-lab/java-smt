@@ -157,7 +157,14 @@ public class PortfolioBooleanFormulaManager implements BooleanFormulaManager {
 
       boolean res = solverMgr.isFalse(checkNotNull(specificFormula));
       assert creator.getSolverSpecificBooleanFormulaManagers().entrySet().stream()
-          .allMatch(e -> e.getValue().isFalse(specificFormula) == res);
+          .allMatch(
+              e ->
+                  e.getValue()
+                          .isFalse(
+                              ((PortfolioBooleanFormula) formula)
+                                  .getFormulasPerSolver()
+                                  .get(e.getKey()))
+                      == res);
       return res;
     }
     throw new IllegalStateException("Portfolio solving without solver not allowed.");
