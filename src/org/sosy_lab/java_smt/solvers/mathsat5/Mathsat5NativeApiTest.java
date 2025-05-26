@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_crea
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
@@ -126,6 +127,56 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_destroy_config(cfg);
 
     testProofManager(sharedEnv);
+  }
+
+  @Test
+  public void api_exampleProofTest() throws SolverException, InterruptedException {
+
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    msat_set_option_checked(cfg, "preprocessor.toplevel_propagation", "false");
+    msat_set_option_checked(cfg, "preprocessor.simplification", "0");
+    msat_set_option_checked(cfg, "theory.bv.eager", "false"); // for BV, only the lazy solver is
+
+    msat_set_option_checked(cfg, "theory.fp.mode", "2");
+
+    long env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
+
+    long f;
+
+    String smtlib2 =
+        "(declare-fun x1 () Real)"
+            + "(declare-fun x2 () Real)"
+            + "(declare-fun x3 () Real)"
+            + "(declare-fun y1 () Real)"
+            + "(declare-fun y2 () Real)"
+            + "(declare-fun y3 () Real)"
+            + "(declare-fun b () Real)"
+            + "(declare-fun f (Real) Real)"
+            + "(declare-fun g (Real) Real)"
+            + "(declare-fun a () Bool)"
+            + "(declare-fun c () Bool)"
+            + "(assert (and a (= (+ (f y1) y2) y3) (<= y1 x1)))"
+            + "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))"
+            + "(assert (= a (= (+ (f x1) x2) x3)))"
+            + "(assert (and (or a c) (not c)))";
+    f = msat_from_smtlib2(env, smtlib2);
+
+    msat_assert_formula(env, f);
+
+    boolean isSat = msat_check_sat(env);
+
+    assertThat(isSat).isFalse();
+
+    long pm = msat_get_proof_manager(env);
+
+    long proof = msat_get_proof(pm);
+
+    assertThat(proof).isNotNull();
+
+    msat_destroy_proof_manager(pm);
+    msat_destroy_env(env);
   }
 
   private void testProofManager(long testEnv) throws InterruptedException, SolverException {
