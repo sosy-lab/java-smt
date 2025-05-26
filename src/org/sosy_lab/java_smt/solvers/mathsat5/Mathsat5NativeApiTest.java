@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
@@ -35,6 +36,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exp;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_false;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_log;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
@@ -127,6 +129,35 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     msat_destroy_config(cfg);
 
     testProofManager(sharedEnv);
+  }
+
+  //MathSAT5 can not produce a msat_manager because there is no proof in this case. See
+  // ProverEnvironmentTest class
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testProofOfFalse() throws SolverException, InterruptedException {
+    assertThrows(IllegalArgumentException.class, () -> {
+      long cfg = msat_create_config();
+
+      msat_set_option_checked(cfg, "proof_generation", "true");
+
+      env = msat_create_env(cfg);
+      msat_destroy_config(cfg);
+      long bottom = msat_make_false(env);
+
+      msat_assert_formula(env, bottom);
+
+      boolean isSat = msat_check_sat(env);
+
+      assertThat(isSat).isFalse();
+
+      long pm = msat_get_proof_manager(env);
+
+      msat_get_proof(pm);
+
+      msat_destroy_proof_manager(pm);
+      msat_destroy_env(env);
+    });
   }
 
   @SuppressWarnings("CheckReturnValue")
