@@ -194,6 +194,11 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
+    // TODO: remove once we can ask properly for a model
+    Preconditions.checkState(
+        immediatelyGetModel,
+        "Model retrieval is currently only allowed with"
+            + " option immediatelyGetModel in portfolio mode");
     if (lastResult == null) {
       throw new SolverException(
           "Requesting a model in portfolio mode is only permitted after a SAT "
