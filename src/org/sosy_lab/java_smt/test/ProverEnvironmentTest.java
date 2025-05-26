@@ -267,6 +267,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
+    requireRationals();
+
     // "(declare-fun x1 () Real)" +
     // "(declare-fun x2 () Real)" +
     // "(declare-fun x3 () Real)" +
