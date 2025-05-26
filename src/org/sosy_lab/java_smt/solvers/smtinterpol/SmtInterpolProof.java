@@ -52,12 +52,9 @@ class SmtInterpolProof extends AbstractProof {
     PIVOT("pivot");
     final String name;
 
-
     Rules(String pDefineFun) {
       name = pDefineFun;
     }
-
-
 
     static Rules getFromName(String pName) {
       if (pName.equals("DEFINE-FUN")) {

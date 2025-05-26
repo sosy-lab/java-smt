@@ -45,7 +45,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProof.AbstractSubproof;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
@@ -394,7 +393,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  //TODO: Mathsat5 does not produce a msat_manager. It adds null to de asserted formulas when
+  // TODO: Mathsat5 does not produce a msat_manager. It adds null to de asserted formulas when
   // adding the constraint for false.
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
