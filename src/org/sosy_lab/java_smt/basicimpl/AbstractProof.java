@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
@@ -65,7 +66,7 @@ public abstract class AbstractProof implements Proof {
     }
 
     @Override
-    public LinkedHashSet<Subproof> getArguments() {
+    public Set<Subproof> getArguments() {
       return this.proof.edges.get(this);
     }
 
@@ -91,6 +92,7 @@ public abstract class AbstractProof implements Proof {
       formula = pFormula;
     }
 
+    @Override
     public Proof getDAG() {
       return proof;
     }
@@ -101,35 +103,35 @@ public abstract class AbstractProof implements Proof {
     }
 
     protected String proofAsString(int indentLevel) {
-      StringBuilder proof = new StringBuilder();
+      StringBuilder sb = new StringBuilder();
       String indent = "  ".repeat(indentLevel);
 
-      Formula formula = getFormula();
+      Formula f = getFormula();
       String sFormula;
-      if (formula != null) {
-        sFormula = formula.toString();
+      if (f != null) {
+        sFormula = f.toString();
       } else {
         sFormula = "null";
       }
 
-      proof.append(indent).append("Formula: ").append(sFormula).append("\n");
-      proof.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
-      proof
+      sb.append(indent).append("Formula: ").append(sFormula).append("\n");
+      sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
+      sb
           .append(indent)
           .append("No. Children: ")
           .append(this.isLeaf() ? 0 : getArguments().size())
           .append("\n");
-      proof.append(indent).append("leaf: ").append(isLeaf()).append("\n");
+      sb.append(indent).append("leaf: ").append(isLeaf()).append("\n");
 
       int i = 0;
       if (!isLeaf()) {
         for (Subproof child : getArguments()) {
-          proof.append(indent).append("Child ").append(++i).append(":\n");
-          proof.append(((AbstractSubproof) child).proofAsString(indentLevel + 1));
+          sb.append(indent).append("Child ").append(++i).append(":\n");
+          sb.append(((AbstractSubproof) child).proofAsString(indentLevel + 1));
         }
       }
 
-      return proof.toString();
+      return sb.toString();
     }
   }
 }

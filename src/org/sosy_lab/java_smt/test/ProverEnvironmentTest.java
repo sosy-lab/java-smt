@@ -37,7 +37,6 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -265,7 +264,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void testGetComplexRationalNumeralaAndUFProof()
+  public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     // "(declare-fun x1 () Real)" +
@@ -290,9 +289,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     RationalFormula y2 = mgr.makeVariable(FormulaType.RationalType, "y2");
     RationalFormula y3 = mgr.makeVariable(FormulaType.RationalType, "y3");
     RationalFormula b = mgr.makeVariable(FormulaType.RationalType, "b");
-    FunctionDeclaration f =
+    FunctionDeclaration<RationalFormula> f =
         mgr.getUFManager().declareUF("f", FormulaType.RationalType, FormulaType.RationalType);
-    FunctionDeclaration g =
+    FunctionDeclaration<RationalFormula> g =
         mgr.getUFManager().declareUF("g", FormulaType.RationalType, FormulaType.RationalType);
     BooleanFormula a = bmgr.makeVariable("a");
     BooleanFormula c = bmgr.makeVariable("c");
@@ -304,19 +303,19 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(
           bmgr.and(
               a,
-              rfmgr.equal(rfmgr.add((NumeralFormula) mgr.makeApplication(f, y1), y2), y3),
+              rfmgr.equal(rfmgr.add(mgr.makeApplication(f, y1), y2), y3),
               rfmgr.lessOrEquals(y1, x1)));
       // "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))"
       prover.addConstraint(
           bmgr.and(
-              rfmgr.equal(x2, (NumeralFormula) mgr.makeApplication(g, b)),
-              rfmgr.equal(y2, (NumeralFormula) mgr.makeApplication(g, b)),
+              rfmgr.equal(x2, mgr.makeApplication(g, b)),
+              rfmgr.equal(y2,  mgr.makeApplication(g, b)),
               rfmgr.lessOrEquals(x1, y1),
               rfmgr.lessThan(x3, y3)));
       // "(assert (= a (= (+ (f x1) x2) x3)))"
       prover.addConstraint(
           bmgr.equivalence(
-              a, rfmgr.equal(rfmgr.add((NumeralFormula) mgr.makeApplication(f, x1), x2), x3)));
+              a, rfmgr.equal(rfmgr.add(mgr.makeApplication(f, x1), x2), x3)));
       // "(assert (and (or a c) (not c)))"
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
       assertTrue(prover.isUnsat());
@@ -373,6 +372,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       Subproof proof = prover.getProof();
+      assertThat(proof).isNotNull();
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)

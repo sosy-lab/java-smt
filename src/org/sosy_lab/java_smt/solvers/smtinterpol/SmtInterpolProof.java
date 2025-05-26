@@ -41,22 +41,23 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProof;
  */
 class SmtInterpolProof extends AbstractProof {
   protected enum Rules implements ProofRule {
-    COEFFS,
-    VALUES,
-    DIVISOR,
-    POS,
-    UNIT,
+    COEFFS("coeffs"),
+    VALUES("values"),
+    DIVISOR("divisor"),
+    POS("pos"),
+    UNIT("unit"),
     DEFINE_FUN("define-fun"),
     DECLARE_FUN("declare-fun"),
-    RUP,
-    PIVOT;
-    String name;
+    RUP("rup"),
+    PIVOT("pivot");
+    final String name;
 
-    private Rules() {}
 
     Rules(String pDefineFun) {
       name = pDefineFun;
     }
+
+
 
     static Rules getFromName(String pName) {
       if (pName.equals("DEFINE-FUN")) {
@@ -155,8 +156,8 @@ class SmtInterpolProof extends AbstractProof {
       return computed.get(pProofNode);
     }
 
-    ProvitionalProofNode createPPNDag(Term proof) {
-      return new ProvitionalProofNode(proof);
+    ProvitionalProofNode createPPNDag(Term pTerm) {
+      return new ProvitionalProofNode(pTerm);
     }
 
     class ProvitionalProofNode {

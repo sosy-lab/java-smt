@@ -21,9 +21,10 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 
+@SuppressWarnings("unchecked")
 class OpenSMTProof extends AbstractProof {
-  class OpenSMTProofRule implements ProofRule {
-    private String name;
+  static class OpenSMTProofRule implements ProofRule {
+    private final String name;
 
     OpenSMTProofRule(String pName) {
       name = pName;
@@ -35,7 +36,7 @@ class OpenSMTProof extends AbstractProof {
     }
   }
 
-  class OpenSMTSubproof extends AbstractSubproof {
+  static class OpenSMTSubproof extends AbstractSubproof {
     protected OpenSMTSubproof(ProofRule rule, Formula formula, AbstractProof proof) {
       super(rule, formula, proof);
     }
@@ -95,18 +96,21 @@ class OpenSMTProof extends AbstractProof {
             formula = creator.encapsulate(creator.getEnv().parseFormula(cls3));
             OpenSMTSubproof pivot =
                 new OpenSMTSubproof(new OpenSMTProofRule("pivot"), formula, this);
+            nodes.put(cls3, pivot);
             this.addEdge(pre, nodes.get(cls3));
 
             if (formulaStr.equals("-")) result = pre;
 
+            break;
           default:
             break;
         }
-      } else if (exp instanceof Deque) {
+      } else if (exp instanceof Deque<?>) {
         iterStack.push(((Deque<Object>) exp).iterator());
       }
     }
 
+    assert result != null;
     return result;
   }
 
@@ -126,14 +130,6 @@ class OpenSMTProof extends AbstractProof {
             OpenSMTSubproof res = new OpenSMTSubproof(new OpenSMTProofRule("res"), null, this);
             resNodes.push(res);
             nodes.putIfAbsent((String) exp, res);
-          } else {
-            String formulaStr = serializeDeque((Deque<?>) v2);
-            nodes.putIfAbsent(
-                (String) exp,
-                new OpenSMTSubproof(
-                    new OpenSMTProofRule("leaf"),
-                    creator.encapsulate(creator.getEnv().parseFormula(formulaStr)),
-                    this));
           }
         } else {
           String formulaStr = serializeDeque((Deque<?>) v1);

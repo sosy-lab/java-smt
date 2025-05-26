@@ -19,7 +19,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,7 +99,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
         // Push all children onto stack
         if (!node.isLeaf()) {
-          LinkedHashSet<Subproof> childrenSet = node.getArguments();
+          Set<Subproof> childrenSet = node.getArguments();
           List<Subproof> children = new ArrayList<>(childrenSet);
           for (int i = children.size() - 1; i >= 0; i--) {
             Subproof child = children.get(i);
@@ -124,7 +123,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   // process proof nodes and compute formulas for res-chain nodes
   private void processResChain(Subproof node, BooleanFormulaManager bfmgr) {
-    LinkedHashSet<Subproof> childrenSet = node.getArguments();
+    Set<Subproof> childrenSet = node.getArguments();
     List<Subproof> children = new ArrayList<>(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula

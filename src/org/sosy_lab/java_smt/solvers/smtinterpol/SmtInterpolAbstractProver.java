@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -326,7 +325,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
         // Push all children onto stack
-        LinkedHashSet<Subproof> children = node.getArguments();
+        Set<Subproof> children = node.getArguments();
         List<Subproof> childrenList = new ArrayList<>(children);
         for (int i = childrenList.size() - 1; i >= 0; i--) {
           Subproof child = childrenList.get(i);
@@ -349,7 +348,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   // process proof nodes and compute formulas for res-chain nodes
   private void processResChain(Subproof node, BooleanFormulaManager bfmgr) {
-    LinkedHashSet<Subproof> childrenSet = node.getArguments();
+    Set<Subproof> childrenSet = node.getArguments();
     List<Subproof> children = new ArrayList<>(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula

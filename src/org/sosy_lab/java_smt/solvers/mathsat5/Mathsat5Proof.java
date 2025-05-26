@@ -173,7 +173,7 @@ class Mathsat5Proof extends AbstractProof {
     }
   }
 
-  class Mathsat5Subproof extends AbstractSubproof {
+  static class Mathsat5Subproof extends AbstractSubproof {
 
     protected Mathsat5Subproof(@Nullable ProofRule rule, Formula formula, Mathsat5Proof proof) {
       super(rule, formula, proof);
