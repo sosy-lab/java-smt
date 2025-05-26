@@ -143,6 +143,7 @@ class Mathsat5Proof extends AbstractProof {
               msat_proof_get_term(proof));
       // For clause-hype, we create the clause using the children
     } else if (rule.equals(Rule.CLAUSE_HYP)) {
+      assert msat_proof_get_arity(proof) > 0;
       long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
       for (int i = 1; i < children; i++) {
         long child = msat_proof_get_term(msat_proof_get_child(proof, i));
