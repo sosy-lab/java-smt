@@ -309,13 +309,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(
           bmgr.and(
               rfmgr.equal(x2, mgr.makeApplication(g, b)),
-              rfmgr.equal(y2,  mgr.makeApplication(g, b)),
+              rfmgr.equal(y2, mgr.makeApplication(g, b)),
               rfmgr.lessOrEquals(x1, y1),
               rfmgr.lessThan(x3, y3)));
       // "(assert (= a (= (+ (f x1) x2) x3)))"
       prover.addConstraint(
-          bmgr.equivalence(
-              a, rfmgr.equal(rfmgr.add(mgr.makeApplication(f, x1), x2), x3)));
+          bmgr.equivalence(a, rfmgr.equal(rfmgr.add(mgr.makeApplication(f, x1), x2), x3)));
       // "(assert (and (or a c) (not c)))"
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
       assertTrue(prover.isUnsat());
@@ -426,6 +425,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
+    requireIntegers();
+
     IntegerFormula x1 = imgr.makeVariable("x1");
     IntegerFormula two = imgr.makeNumber("2");
     IntegerFormula cero = imgr.makeNumber("0");
@@ -571,6 +572,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
+    requireIntegers();
+
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
     IntegerFormula x1 = imgr.makeVariable("x1");
@@ -699,6 +702,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void getBitVectorProofTest() throws InterruptedException, SolverException {
     requireProofGeneration();
+    requireBitvectors();
+
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
 
     // unsigned char
@@ -758,6 +763,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   public void getArrayProofTest() throws InterruptedException, SolverException {
     requireProofGeneration();
     requireIntegers();
+    requireArrays();
 
     // (arr2 = store(arr1, 4, 2)) & !(select(arr2, 4) = 2)
     ArrayFormulaType<IntegerFormula, IntegerFormula> type =
