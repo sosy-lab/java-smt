@@ -129,6 +129,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     testProofManager(sharedEnv);
   }
 
+  @SuppressWarnings("CheckReturnValue")
   @Test
   public void api_exampleProofTest() throws SolverException, InterruptedException {
 
@@ -171,9 +172,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
     long pm = msat_get_proof_manager(env);
 
-    long proof = msat_get_proof(pm);
-
-    assertThat(proof).isNotNull();
+    msat_get_proof(pm);
 
     msat_destroy_proof_manager(pm);
     msat_destroy_env(env);
