@@ -27,6 +27,9 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -41,6 +44,168 @@ public class PortfolioSolverTest {
   @After
   public void after() {
     close();
+  }
+
+  /** Test hard incremental int solving with all solvers supporting it. */
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testPortfolioHardIncrementalIntegerSolving()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    // TODO: more, also with less/more managers etc
+    // CVC5, Boolector, CVC4 can not translate formulas currently
+    List<Solvers> solvers =
+        ImmutableList.of(Solvers.MATHSAT5, Solvers.Z3, Solvers.CVC5, Solvers.SMTINTERPOL);
+    loadPortfolioSolverWithProver(solvers);
+
+    BooleanFormulaManager bmgr = pfmgr.getBooleanFormulaManager();
+    IntegerFormulaManager imgr = pfmgr.getIntegerFormulaManager();
+
+    BooleanFormula hardFormula = new HardIntegerFormulaGenerator(imgr, bmgr).generate(10);
+
+    for (Solvers solver : solvers) {
+      assertThat(hardFormula.toString()).contains(solver.name());
+    }
+
+    prover.push();
+    prover.addConstraint(hardFormula);
+    assertThat(prover.isUnsat()).isTrue();
+  }
+
+  /**
+   * Test incremental int solving with all solvers supporting it and check that a model is
+   * retrievable.
+   */
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testPortfolioBasicIncrementalIntegerSolving()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    // TODO: more, also with less/more managers etc
+    // CVC5, Boolector, CVC4 can not translate formulas currently
+    List<Solvers> solvers =
+        ImmutableList.of(Solvers.MATHSAT5, Solvers.Z3, Solvers.CVC5, Solvers.SMTINTERPOL);
+    loadPortfolioSolverWithProver(solvers);
+
+    BooleanFormulaManager bmgr = pfmgr.getBooleanFormulaManager();
+    IntegerFormulaManager imgr = pfmgr.getIntegerFormulaManager();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    BooleanFormula aGT1 = imgr.greaterThan(a, one);
+    BooleanFormula aLT3 = imgr.lessThan(a, three);
+    BooleanFormula aEq2 = imgr.equal(a, two);
+    BooleanFormula aEq1 = imgr.equal(a, one);
+    BooleanFormula NotAEq2 = bmgr.not(aEq2);
+
+    BooleanFormula conj = bmgr.and(aGT1, aLT3);
+    BooleanFormula impl = bmgr.implication(conj, aEq2);
+
+    for (Solvers solver : solvers) {
+      assertThat(impl.toString()).contains(solver.name());
+    }
+
+    prover.push();
+    // SAT with a = 2
+    prover.addConstraint(impl);
+    prover.addConstraint(impl);
+    assertThat(prover.isUnsat()).isFalse();
+    for (Solvers solver : solvers) {
+      assertThat(impl.toString()).contains(solver.name());
+    }
+    // Get model (may be simply true here)
+    prover.getModel();
+    prover.getModelAssignments();
+    prover.getEvaluator();
+
+    prover.push();
+    // Still SAT, no change
+    prover.addConstraint(aEq2);
+    assertThat(prover.isUnsat()).isFalse();
+    Model model = prover.getModel();
+    assertThat(aEq2.toString()).contains(model.asList().get(0).getAssignmentAsFormula().toString());
+
+    prover.push();
+    // UNSAT
+    prover.addConstraint(NotAEq2);
+    assertThat(prover.isUnsat()).isTrue();
+
+    // UNSAT
+    prover.push(aEq1);
+    assertThat(prover.isUnsat()).isTrue();
+
+    prover.pop();
+    assertThat(prover.isUnsat()).isTrue();
+    prover.pop();
+    assertThat(prover.isUnsat()).isFalse();
+    prover.getModel();
+    prover.getModelAssignments();
+    prover.getEvaluator();
+    prover.pop();
+    assertThat(prover.isUnsat()).isFalse();
+    prover.getModel();
+    prover.getModelAssignments();
+    prover.getEvaluator();
+    prover.pop();
+    assertThat(prover.isUnsat()).isFalse();
+    prover.getModel();
+    prover.getModelAssignments();
+    prover.getEvaluator();
+  }
+
+  /** Test int solving with all solvers supporting it and check that a model is retrievable. */
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testPortfolioBasicIntegerSolving()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    // TODO: more, also with less/more managers etc
+    // CVC5, Boolector, CVC4 can not translate formulas currently
+    List<Solvers> solvers =
+        ImmutableList.of(Solvers.MATHSAT5, Solvers.Z3, Solvers.CVC5, Solvers.SMTINTERPOL);
+    loadPortfolioSolverWithProver(solvers);
+
+    BooleanFormulaManager bmgr = pfmgr.getBooleanFormulaManager();
+    IntegerFormulaManager imgr = pfmgr.getIntegerFormulaManager();
+
+    IntegerFormula a = imgr.makeVariable("a");
+    IntegerFormula three = imgr.makeNumber(3);
+    IntegerFormula two = imgr.makeNumber(2);
+    IntegerFormula one = imgr.makeNumber(1);
+
+    BooleanFormula aGT1 = imgr.greaterThan(a, one);
+    BooleanFormula aLT3 = imgr.lessThan(a, three);
+    BooleanFormula aEq2 = imgr.equal(a, two);
+    BooleanFormula NotAEq2 = bmgr.not(aEq2);
+
+    BooleanFormula conj = bmgr.and(aGT1, aLT3);
+    BooleanFormula impl = bmgr.implication(conj, aEq2);
+
+    for (Solvers solver : solvers) {
+      assertThat(impl.toString()).contains(solver.name());
+    }
+
+    // SAT with a = 2
+    prover.addConstraint(impl);
+    prover.addConstraint(impl);
+    assertThat(prover.isUnsat()).isFalse();
+    for (Solvers solver : solvers) {
+      assertThat(impl.toString()).contains(solver.name());
+    }
+    // Get model (may be simply true here)
+    prover.getModel();
+    // prover.getModelAssignments();
+    // prover.getEvaluator();
+
+    // Still SAT, no change
+    prover.addConstraint(aEq2);
+    assertThat(prover.isUnsat()).isFalse();
+    Model model = prover.getModel();
+    assertThat(aEq2.toString()).contains(model.asList().get(0).getAssignmentAsFormula().toString());
+
+    // UNSAT
+    prover.addConstraint(NotAEq2);
+    assertThat(prover.isUnsat()).isTrue();
   }
 
   /** Test bool solving with all solvers supporting it and check that a model is retrievable. */
