@@ -134,6 +134,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   protected long getUnsatCore0() {
+    // Note: interruption might return the best found result here instead of stopping with an
+    // exception!
     return Native.solverGetUnsatCore(z3context, z3solver);
   }
 
