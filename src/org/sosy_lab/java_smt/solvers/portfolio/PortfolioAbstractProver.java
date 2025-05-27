@@ -113,7 +113,8 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
     stats = null;
   }
 
-  protected synchronized void handleUnsupportedOperationWithReason(
+  /** Returns true if execution of entered solver is to be stopped. */
+  protected synchronized boolean handleUnsupportedOperationWithReason(
       Solvers solver, String reason, P threadedProver) {
     threadedProver.close();
     centralSolversAndProvers.get(solver).close();
@@ -124,7 +125,7 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       }
     }
     centralSolversAndProvers = newCentralSolversAndProvers.buildOrThrow();
-    creator.handleUnsupportedOperationWithReason(solver, reason);
+    return creator.handleUnsupportedOperationWithReason(solver, reason);
   }
 
   protected Map<Solvers, P> getCentralSolversAndProvers() {
@@ -165,9 +166,10 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
     ImmutableList.Builder<Callable<ParallelProverResult>> callables = ImmutableList.builder();
     for (Entry<Solvers, P> solverAndMainProver : centralSolversAndProvers.entrySet()) {
       Solvers solver = solverAndMainProver.getKey();
-      P mainProver = solverAndMainProver.getValue();
-      SolverContext solverContext = creator.getSolverSpecificContexts().get(solver);
-      callables.add(createParallelIsUnsat(solver, solverContext, mainProver));
+      P centralSolverSpecificProver = solverAndMainProver.getValue();
+      SolverContext centralSolverSpecificContext = creator.getSolverSpecificContexts().get(solver);
+      callables.add(
+          createParallelIsUnsat(solver, centralSolverSpecificContext, centralSolverSpecificProver));
     }
     ParallelProverResult result = buildThreadsAndRunCalls(callables.build());
 
@@ -353,14 +355,14 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
       ShutdownManager shutdownNotifierInThread = newComponents.getShutdownNotifier();
 
       boolean isUnsat = prover.isUnsat();
-      System.out.println(isUnsat);
+      System.out.println(usedSolver + " returned isUnsat: " + isUnsat);
 
       ImmutableList<ValueAssignment> modelAssignments = null;
       if (!isUnsat && immediatelyGetModel) {
         modelAssignments = prover.getModel().asList();
       }
       if (terminatedCurrentCall.get()) {
-        System.out.println("Result returned but we already had a result");
+        System.out.println("Result returned by " + usedSolver + "but we already had a result");
       }
       return ParallelProverResult.of(isUnsat, modelAssignments, usedSolver);
 
@@ -608,8 +610,16 @@ abstract class PortfolioAbstractProver<I, P extends BasicProverEnvironment<?>>
           } else {
             reason = "Unknown reason";
           }
-          centralPortfolioProver.handleUnsupportedOperationWithReason(
-              contextToBuildFrom.getSolverName(), reason, targetProver);
+          if (centralPortfolioProver.handleUnsupportedOperationWithReason(
+              contextToBuildFrom.getSolverName(), reason, targetProver)) {
+            // Stop using this solver
+            throw new CancellationException(
+                target.solverContext.getSolverName()
+                    + " canceled "
+                    + "portfolio solving as the option for continuing after unsupported operations "
+                    + "is set. Unsupported operation: "
+                    + reason);
+          }
         }
       }
     }
