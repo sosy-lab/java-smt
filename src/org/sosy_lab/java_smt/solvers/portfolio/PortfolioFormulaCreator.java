@@ -236,12 +236,14 @@ public class PortfolioFormulaCreator {
 
   /**
    * Always use this if there is an error or unsupported operation for a solver to handle how the
-   * portfolio responds to this.
+   * portfolio responds to this. Returns true if execution of entered solver is to be stopped.
    */
-  protected synchronized void handleUnsupportedOperationWithReason(Solvers solver, String reason) {
+  protected synchronized boolean handleUnsupportedOperationWithReason(
+      Solvers solver, String reason) {
     // solversWithContexts is mutable for removal in FormulaManager!
     // TODO: also handle open provers
     SolverContext context = contexts.get(solver);
+    boolean removed = false;
     if (context != null) {
       formulaManagers =
           formulaManagers.entrySet().stream()
@@ -294,6 +296,7 @@ public class PortfolioFormulaCreator {
       // TODO: close all provers
       context.close();
       contexts.remove(solver);
+      removed = true;
     }
 
     if (contexts.isEmpty()) {
@@ -308,6 +311,7 @@ public class PortfolioFormulaCreator {
     if (!removeSolverFromPortfolioWhenUnsupported) {
       throw new UnsupportedOperationException("Portfolio solver " + solver + " error: " + reason);
     }
+    return removed;
   }
 
   public BooleanFormula encapsulateBoolean(Map<Solvers, ? extends Formula> pTerm) {
