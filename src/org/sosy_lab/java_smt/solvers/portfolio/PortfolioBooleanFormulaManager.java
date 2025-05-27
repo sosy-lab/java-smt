@@ -130,16 +130,19 @@ public class PortfolioBooleanFormulaManager implements BooleanFormulaManager {
   @Override
   public boolean isTrue(BooleanFormula formula) {
     assert formula instanceof PortfolioBooleanFormula;
+    PortfolioBooleanFormula portfolioFormula = ((PortfolioBooleanFormula) formula);
     for (Entry<Solvers, BooleanFormulaManager> solverAndMgr :
         creator.getSolverSpecificBooleanFormulaManagers().entrySet()) {
       Solvers solver = solverAndMgr.getKey();
       BooleanFormulaManager solverMgr = solverAndMgr.getValue();
-      BooleanFormula specificFormula =
-          ((PortfolioBooleanFormula) formula).getFormulasPerSolver().get(solver);
+      BooleanFormula specificFormula = portfolioFormula.getFormulasPerSolver().get(solver);
 
       boolean res = solverMgr.isTrue(checkNotNull(specificFormula));
       assert creator.getSolverSpecificBooleanFormulaManagers().entrySet().stream()
-          .allMatch(e -> e.getValue().isTrue(specificFormula) == res);
+          .allMatch(
+              e ->
+                  e.getValue().isTrue(portfolioFormula.getFormulasPerSolver().get(e.getKey()))
+                      == res);
       return res;
     }
     throw new IllegalStateException("Portfolio solving without solver not allowed.");
