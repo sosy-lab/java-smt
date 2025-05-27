@@ -15,7 +15,9 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -126,8 +128,20 @@ public abstract class SolverBasedTest0 {
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig =
         Configuration.builder().setOption("solver.solver", solverToUse().toString());
-    if (solverToUse() == Solvers.OPENSMT) {
+
+    if (solverToUse() == Solvers.OPENSMT || (solverToUse() == Solvers.PORTFOLIO)) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
+    }
+
+    if ((solverToUse() == Solvers.PORTFOLIO)) {
+      // Add all of them, but allow them to be thrown out for unsupported
+      newConfig.setOption(
+          "solver.portfolio.solvers",
+          Arrays.stream(Solvers.values())
+              .filter(s -> s != Solvers.PORTFOLIO)
+              .map(Enum::name)
+              .collect(Collectors.joining(",")));
+      newConfig.setOption("solver.portfolio.removeSolverFromPortfolioWhenUnsupported", "true");
     }
     return newConfig;
   }
