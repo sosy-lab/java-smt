@@ -116,20 +116,7 @@ class OpenSMTProof extends AbstractProof {
         Object v2 = ((Deque<?>) v1).peek();
         if (v2 instanceof String) {
           if (v2.equals("res")) {
-            ((Deque<?>) v1).pop(); // remove "res"
-            String cls1 = (String) ((Deque<?>) v1).pop();
-            String cls2 = (String) ((Deque<?>) v1).pop();
-            String pivot = (String) ((Deque<?>) v1).pop();
-
-            OpenSMTSubproof res =
-                new OpenSMTSubproof(new OpenSMTProofRule("res"), this, lastSeenFormula);
-            this.addEdge(res, nodes.get(cls1));
-            this.addEdge(res, nodes.get(cls2));
-
-            OpenSMTSubproof pivotNode =
-                new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivot);
-            this.addEdge(res, pivotNode);
-
+            OpenSMTSubproof res = processRes(v1, nodes, resNodes, creator, lastSeenFormula);
             nodes.putIfAbsent((String) expression, res);
             resNodes.push(res);
           } else {
@@ -152,6 +139,81 @@ class OpenSMTProof extends AbstractProof {
             (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, "-"));
       }
     }
+  }
+
+  OpenSMTSubproof processRes(
+      Object expr,
+      Map<String, OpenSMTSubproof> nodes,
+      Deque<OpenSMTSubproof> resNodes,
+      OpenSmtFormulaCreator creator,
+      String formulaStr) {
+
+    Deque<Deque<?>> stack = new ArrayDeque<>();
+    Object current = expr;
+    OpenSMTSubproof result = null;
+
+    while (true) {
+      if (!(current instanceof Deque)) {
+        throw new IllegalArgumentException("Expected Deque in res expression but got: " + current);
+      }
+      Deque<?> deque = new ArrayDeque<>((Deque<?>) current);
+      Object op = deque.pollFirst();
+      if (!"res".equals(op)) {
+        throw new IllegalStateException("Expected 'res' at head, got: " + op);
+      }
+
+      Object first = deque.pollFirst();
+      if (first instanceof String) {
+        String cls1 = (String) first;
+        String cls2 = (String) deque.pollFirst();
+        Object rawPivot = deque.pollFirst();
+        String pivotStr =
+            rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
+
+        OpenSMTSubproof left = nodes.get(cls1);
+        OpenSMTSubproof right = nodes.get(cls2);
+        OpenSMTSubproof pivotNode =
+            new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivotStr);
+
+        OpenSMTSubproof res =
+            new OpenSMTSubproof(
+                new OpenSMTProofRule("res"), this, stack.isEmpty() ? formulaStr : null);
+        addEdge(res, left);
+        addEdge(res, right);
+        addEdge(res, pivotNode);
+        result = res;
+        break;
+
+      } else if (first instanceof Deque) {
+        stack.push(deque);
+        current = first;
+      } else {
+        throw new IllegalStateException("Unexpected operand type in res: " + first);
+      }
+    }
+
+    while (!stack.isEmpty()) {
+      Deque<?> tokens = stack.pop();
+      String cls2 = (String) tokens.pollFirst();
+      Object rawPivot = tokens.pollFirst();
+      String pivotStr =
+          rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
+
+      OpenSMTSubproof right = nodes.get(cls2);
+      OpenSMTSubproof pivotNode =
+          new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivotStr);
+
+      boolean isOuter = stack.isEmpty();
+      OpenSMTSubproof parent =
+          new OpenSMTSubproof(new OpenSMTProofRule("res"), this, isOuter ? formulaStr : null);
+
+      addEdge(parent, result);
+      addEdge(parent, right);
+      addEdge(parent, pivotNode);
+      result = parent;
+    }
+
+    return result;
   }
 
   private String serializeDeque(Deque<?> deque) {

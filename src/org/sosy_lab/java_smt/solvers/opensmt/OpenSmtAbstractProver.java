@@ -12,10 +12,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -290,41 +291,54 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
   }
 
+  // TODO perform resolution throughout the DAG to calculate formulas that might not be present.
   @Override
   public Subproof getProof() {
     // throw new UnsupportedOperationException(
     //    "Proof generation is not available for the current solver.");
     OpenSMTProof proof = new OpenSMTProof();
-    System.out.println(osmtSolver.printResolutionProofSMT2());
+    // System.out.println(osmtSolver.printResolutionProofSMT2());
     OpenSMTSubproof root = proof.generateProof(osmtSolver.printResolutionProofSMT2(), creator);
     parseFormulas(root);
     return root;
   }
 
-  private void parseFormulas(Subproof p) {
-    ((OpenSMTSubproof) p).setFormula(formulaManager.getBooleanFormulaManager().makeFalse());
-    if (!p.isLeaf()) {
-      LinkedHashSet<Subproof> children = new LinkedHashSet<>(p.getArguments());
-      Formula formula;
-      String formulaString;
-      for (Subproof child : children) {
-        formulaString = ((OpenSMTSubproof) child).sFormula;
+  // TODO: the parse method is asigning true as the formula always. This should not be.
+  private void parseFormulas(Subproof root) {
+    Deque<Subproof> stack = new ArrayDeque<>();
+    stack.push(root);
 
-        if (formulaString.startsWith("(")) {
-          formula = formulaManager.parse(formulaString);
-        } else if (formulaString.equals("-")) {
-          formula = formulaManager.getBooleanFormulaManager().makeFalse();
-        } else {
-          if (formulaManager.isValidName(formulaString)) {
-            formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
-          } else {
-            formula = formulaManager.parse("(" + formulaString + ")");
-          }
-        }
-        ((OpenSMTSubproof) child).setFormula(formula);
-        parseFormulas(child);
-        // System.out.println(formulaString);
+    while (!stack.isEmpty()) {
+      Subproof subproof = stack.pop();
+      Formula formula;
+      String formulaString = ((OpenSMTSubproof) subproof).sFormula;
+      // System.out.println(formulaString);
+
+      if (formulaString.startsWith("(")) {
+        formula = formulaManager.parse(formulaString);
         // System.out.println(formula);
+        ((OpenSMTSubproof) subproof).setFormula(formula);
+      } else if (formulaString.equals("-")) {
+        formula = formulaManager.getBooleanFormulaManager().makeFalse();
+        ((OpenSMTSubproof) subproof).setFormula(formula);
+      } else {
+        if (formulaManager.isValidName(formulaString)) {
+          formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
+          ((OpenSMTSubproof) subproof).setFormula(formula);
+        } else {
+          formula = formulaManager.parse("(" + formulaString + ")");
+          ((OpenSMTSubproof) subproof).setFormula(formula);
+        }
+      }
+
+      // ((OpenSMTSubproof) subproof).setFormula(formula);
+      // System.out.println(".");
+      // System.out.println(subproof.getFormula());
+      if (!subproof.isLeaf()) {
+        Subproof[] children = subproof.getArguments().toArray(new Subproof[0]);
+        for (int i = children.length - 1; i >= 0; i--) {
+          stack.push(children[i]);
+        }
       }
     }
   }

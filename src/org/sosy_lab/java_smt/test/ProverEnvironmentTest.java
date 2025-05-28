@@ -464,6 +464,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
+      // if (solverToUse().equals(OPENSMT)) {
+      //  System.out.println(((AbstractSubproof) proof).proofAsString());
+      // }
+
     } catch (UnsupportedOperationException e) {
       assertThat(e)
           .hasMessageThat()

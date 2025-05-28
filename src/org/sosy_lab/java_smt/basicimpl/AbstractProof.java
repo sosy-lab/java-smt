@@ -60,9 +60,11 @@ public abstract class AbstractProof implements Proof {
       this.proof = proof;
     }
 
+    // TODO: Use Optional instead of nullable
+    @Nullable
     @Override
     public Formula getFormula() {
-      return formula;
+      return this.formula;
     }
 
     @Override
