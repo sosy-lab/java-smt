@@ -37,8 +37,15 @@ class OpenSMTProof extends AbstractProof {
   }
 
   static class OpenSMTSubproof extends AbstractSubproof {
+    String sFormula;
+
     protected OpenSMTSubproof(ProofRule rule, Formula formula, AbstractProof proof) {
       super(rule, formula, proof);
+    }
+
+    protected OpenSMTSubproof(ProofRule rule, AbstractProof proof, String sFormula) {
+      super(rule, null, proof);
+      this.sFormula = sFormula;
     }
   }
 
@@ -51,7 +58,6 @@ class OpenSMTProof extends AbstractProof {
     iterStack.push(rootStack.iterator());
 
     OpenSMTSubproof result = null;
-    Formula formula = null;
     String formulaStr = "";
 
     while (!iterStack.isEmpty()) {
@@ -73,7 +79,7 @@ class OpenSMTProof extends AbstractProof {
               throw new IllegalStateException("Expected argument after 'let'");
             }
             Object letArg = currentIter.next();
-            handleLet(letArg, nodes, resNodes, creator);
+            handleLet(letArg, nodes, resNodes, creator, formulaStr);
             break;
 
           case ";":
@@ -81,27 +87,9 @@ class OpenSMTProof extends AbstractProof {
               throw new IllegalStateException("Expected formula string after ';'");
             }
             formulaStr = (String) currentIter.next();
-            formula = creator.encapsulate(creator.getEnv().parseFormula(formulaStr));
+            // formula = creator.encapsulate(creator.getEnv().parseFormula(formulaStr));
             break;
 
-          case "res":
-            String cls1 = (String) currentIter.next();
-            String cls2 = (String) currentIter.next();
-            String cls3 = (String) currentIter.next();
-
-            OpenSMTSubproof pre = resNodes.pop();
-            pre.setFormula(formula);
-            this.addEdge(pre, nodes.get(cls1));
-            this.addEdge(pre, nodes.get(cls2));
-            formula = creator.encapsulate(creator.getEnv().parseFormula(cls3));
-            OpenSMTSubproof pivot =
-                new OpenSMTSubproof(new OpenSMTProofRule("pivot"), formula, this);
-            nodes.put(cls3, pivot);
-            this.addEdge(pre, nodes.get(cls3));
-
-            if (formulaStr.equals("-")) result = pre;
-
-            break;
           default:
             break;
         }
@@ -109,7 +97,7 @@ class OpenSMTProof extends AbstractProof {
         iterStack.push(((Deque<Object>) exp).iterator());
       }
     }
-
+    result = resNodes.pop();
     assert result != null;
     return result;
   }
@@ -118,36 +106,50 @@ class OpenSMTProof extends AbstractProof {
       Object stack,
       Map<String, OpenSMTSubproof> nodes,
       Deque<OpenSMTSubproof> resNodes,
-      OpenSmtFormulaCreator creator) {
+      OpenSmtFormulaCreator creator,
+      String lastSeenFormula) {
     assert stack instanceof Deque; // no unchecked cast
-    Object exp = ((Deque<?>) stack).pop();
-    if (exp instanceof String) { // first element should be the assigned name
+    Object expression = ((Deque<?>) stack).pop();
+    if (expression instanceof String) { // first element should be the assigned name
       Object v1 = ((Deque<?>) stack).peek();
       if (v1 instanceof Deque) { // then a stack with the formula
-        Object v2 = ((Deque<?>) stack).peek();
+        Object v2 = ((Deque<?>) v1).peek();
         if (v2 instanceof String) {
           if (v2.equals("res")) {
-            OpenSMTSubproof res = new OpenSMTSubproof(new OpenSMTProofRule("res"), null, this);
+            ((Deque<?>) v1).pop(); // remove "res"
+            String cls1 = (String) ((Deque<?>) v1).pop();
+            String cls2 = (String) ((Deque<?>) v1).pop();
+            String pivot = (String) ((Deque<?>) v1).pop();
+
+            OpenSMTSubproof res =
+                new OpenSMTSubproof(new OpenSMTProofRule("res"), this, lastSeenFormula);
+            this.addEdge(res, nodes.get(cls1));
+            this.addEdge(res, nodes.get(cls2));
+
+            OpenSMTSubproof pivotNode =
+                new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivot);
+            this.addEdge(res, pivotNode);
+
+            nodes.putIfAbsent((String) expression, res);
             resNodes.push(res);
-            nodes.putIfAbsent((String) exp, res);
+          } else {
+            String s = serializeDeque((Deque<?>) v1);
+            nodes.putIfAbsent(
+                (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, s));
           }
         } else {
-          String formulaStr = serializeDeque((Deque<?>) v1);
+          String s = serializeDeque((Deque<?>) v1);
           nodes.putIfAbsent(
-              (String) exp,
-              new OpenSMTSubproof(
-                  new OpenSMTProofRule("leaf"),
-                  creator.encapsulate(creator.getEnv().parseFormula(formulaStr)),
-                  this));
+              (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, s));
         }
       } else if (v1 instanceof String) { // or a formula
+        String f = (String) v1;
         nodes.putIfAbsent(
-            (String) exp,
-            new OpenSMTSubproof(
-                new OpenSMTProofRule("leaf"),
-                creator.encapsulate(creator.getEnv().parseFormula((String) v1)), // this does not
-                // work right now
-                this));
+            (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, f));
+      } else { // this should handle when no term was assigned to the clause, meaning an empty
+        // clause was declared
+        nodes.putIfAbsent(
+            (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, "-"));
       }
     }
   }

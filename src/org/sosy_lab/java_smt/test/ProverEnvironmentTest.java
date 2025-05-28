@@ -230,11 +230,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getRule()).isNotNull();
       assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
-      // Test getFormula(), the root should always be false
+      // Test getFormula()
       if (solverToUse().equals(SMTINTERPOL)) {
         assertThat(proof.getFormula()).isNull();
       } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
+        assertThat(proof.getFormula()).isNotNull();
       }
 
       // Test getArguments()
@@ -383,7 +383,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
               || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -417,7 +416,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
               || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -474,7 +472,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
               || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
+              // || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);

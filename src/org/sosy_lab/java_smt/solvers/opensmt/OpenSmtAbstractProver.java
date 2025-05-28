@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
@@ -31,6 +33,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
+import org.sosy_lab.java_smt.solvers.opensmt.OpenSMTProof.OpenSMTSubproof;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.MainSolver;
@@ -47,6 +50,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
+  private final FormulaManager formulaManager;
 
   private boolean changedSinceLastSatQuery = false;
 
@@ -64,6 +68,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     // not get garbage collected
     osmtConfig = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
+    formulaManager = pMgr; // needed for parsing formulas in proofs
   }
 
   protected static SMTConfig getConfigInstance(
@@ -287,10 +292,41 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   public Subproof getProof() {
-    throw new UnsupportedOperationException(
-        "Proof generation is not available for the current solver.");
-    // OpenSMTProof proof = new OpenSMTProof();
-    // return proof.generateProof(osmtSolver.printResolutionProofSMT2(), creator);
+    // throw new UnsupportedOperationException(
+    //    "Proof generation is not available for the current solver.");
+    OpenSMTProof proof = new OpenSMTProof();
+    System.out.println(osmtSolver.printResolutionProofSMT2());
+    OpenSMTSubproof root = proof.generateProof(osmtSolver.printResolutionProofSMT2(), creator);
+    parseFormulas(root);
+    return root;
+  }
+
+  private void parseFormulas(Subproof p) {
+    ((OpenSMTSubproof) p).setFormula(formulaManager.getBooleanFormulaManager().makeFalse());
+    if (!p.isLeaf()) {
+      LinkedHashSet<Subproof> children = new LinkedHashSet<>(p.getArguments());
+      Formula formula;
+      String formulaString;
+      for (Subproof child : children) {
+        formulaString = ((OpenSMTSubproof) child).sFormula;
+
+        if (formulaString.startsWith("(")) {
+          formula = formulaManager.parse(formulaString);
+        } else if (formulaString.equals("-")) {
+          formula = formulaManager.getBooleanFormulaManager().makeFalse();
+        } else {
+          if (formulaManager.isValidName(formulaString)) {
+            formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
+          } else {
+            formula = formulaManager.parse("(" + formulaString + ")");
+          }
+        }
+        ((OpenSMTSubproof) child).setFormula(formula);
+        parseFormulas(child);
+        // System.out.println(formulaString);
+        // System.out.println(formula);
+      }
+    }
   }
 
   @Override
