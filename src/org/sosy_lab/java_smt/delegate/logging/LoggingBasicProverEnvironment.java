@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -36,6 +37,11 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   LoggingBasicProverEnvironment(BasicProverEnvironment<T> pWrapped, LogManager pLogger) {
     wrapped = checkNotNull(pWrapped);
     logger = checkNotNull(pLogger);
+  }
+
+  @Override
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
+    return wrapped.getShutdownManagerForProver();
   }
 
   @Override

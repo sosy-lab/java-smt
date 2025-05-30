@@ -28,16 +28,14 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
-  protected final ShutdownNotifier shutdownNotifier;
   private final BooleanFormulaManager bmgr;
 
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+    super(pShutdownNotifier, pOptions);
     bmgr = pBmgr;
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
@@ -68,7 +66,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws SolverException, InterruptedException {
     while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
+      proverShutdownManager.getNotifier().shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -88,11 +86,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
       final ImmutableList<BooleanFormula> values = valuesOfModel.build();
       callback.apply(values);
-      shutdownNotifier.shutdownIfNecessary();
+      proverShutdownManager.getNotifier().shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      shutdownNotifier.shutdownIfNecessary();
+      proverShutdownManager.getNotifier().shutdownIfNecessary();
     }
   }
 
@@ -113,7 +111,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    shutdownNotifier.shutdownIfNecessary();
+    proverShutdownManager.getNotifier().shutdownIfNecessary();
 
     if (isUnsat()) {
       return;

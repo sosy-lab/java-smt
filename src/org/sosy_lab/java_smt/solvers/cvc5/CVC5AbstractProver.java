@@ -203,7 +203,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     /* Shutdown currently not possible in CVC5. */
     Result result = solver.checkSat();
-    shutdownNotifier.shutdownIfNecessary();
+    proverShutdownManager.getNotifier().shutdownIfNecessary();
     return convertSatResult(result);
   }
 
@@ -251,4 +251,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     super.close();
   }
+
+  /* TODO: revisit once CVC5 supports interruption
+  @Override
+  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+    return proverShutdownManager;
+  }*/
 }
