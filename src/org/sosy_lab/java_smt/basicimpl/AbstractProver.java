@@ -22,6 +22,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -47,7 +49,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  protected AbstractProver(Set<ProverOptions> pOptions) {
+  // Do we even need this?
+  private final ShutdownNotifier contextShutdownNotifier;
+  protected final ShutdownManager proverShutdownManager;
+
+  protected AbstractProver(ShutdownNotifier pShutdownNotifier, Set<ProverOptions> pOptions) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
     generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
@@ -56,6 +62,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
+
+    contextShutdownNotifier = pShutdownNotifier;
+    proverShutdownManager = ShutdownManager.createWithParent(contextShutdownNotifier);
   }
 
   protected final void checkGenerateModels() {
@@ -157,5 +166,18 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.clear();
     closeAllEvaluators();
     closed = true;
+  }
+
+  @Override
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
+    return getShutdownManagerForProverImpl();
+  }
+
+  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+    // Override this with the prover specific ShutdownManagers notifier for supporting solvers.
+    // The solver should then use the prover specific ShutdownManagers notifier for stopping
+    // instead of the contexts' notifier!
+    throw new UnsupportedOperationException(
+        "The chosen solver does not support isolated prover " + "shutdown");
   }
 }

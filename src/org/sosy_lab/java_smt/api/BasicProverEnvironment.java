@@ -15,6 +15,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 /**
@@ -202,4 +204,18 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   default boolean registerUserPropagator(UserPropagator propagator) {
     return false;
   }
+
+  /**
+   * Returns the {@link ShutdownManager} registered for this {@link ProverEnvironment}. It is
+   * guaranteed to be a child of the {@link ShutdownNotifier} given to the creating {@link
+   * SolverContext}, resulting in shutdown when the {@link SolverContext}s notifier is shutting
+   * down. The notifier returned here can be shut down independently of the creating contexts
+   * notifier.
+   *
+   * @return a {@link ShutdownManager} who is the child of the {@link ShutdownNotifier} used in the
+   *     creating {@link SolverContext}, that can be used to shut down only this {@link
+   *     ProverEnvironment}.
+   * @throws UnsupportedOperationException if the solver does not support prover specific shutdown.
+   */
+  ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException;
 }
