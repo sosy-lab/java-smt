@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -124,9 +125,13 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       int[] allConstraints = getAllConstraints();
       unsat =
           !yices_check_sat_with_assumptions(
-              curEnv, DEFAULT_PARAMS, allConstraints.length, allConstraints, shutdownNotifier);
+              curEnv,
+              DEFAULT_PARAMS,
+              allConstraints.length,
+              allConstraints,
+              proverShutdownManager.getNotifier());
     } else {
-      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, shutdownNotifier);
+      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, proverShutdownManager.getNotifier());
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
         // If sat check is UNSAT and stackSizeToUnsat waS not already set,
@@ -147,7 +152,11 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     Preconditions.checkState(!closed);
     // TODO handle BooleanFormulaCollection / check for literals
     return !yices_check_sat_with_assumptions(
-        curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
+        curEnv,
+        DEFAULT_PARAMS,
+        pAssumptions.size(),
+        uncapsulate(pAssumptions),
+        proverShutdownManager.getNotifier());
   }
 
   @SuppressWarnings("resource")
@@ -208,5 +217,10 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
     super.close();
+  }
+
+  @Override
+  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+    return proverShutdownManager;
   }
 }

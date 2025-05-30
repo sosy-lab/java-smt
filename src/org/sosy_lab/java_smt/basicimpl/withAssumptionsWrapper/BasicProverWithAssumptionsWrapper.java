@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -127,5 +128,10 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       throws InterruptedException, SolverException {
     clearAssumptions();
     return delegate.allSat(pCallback, pImportant);
+  }
+
+  @Override
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
+    return delegate.getShutdownManagerForProver();
   }
 }

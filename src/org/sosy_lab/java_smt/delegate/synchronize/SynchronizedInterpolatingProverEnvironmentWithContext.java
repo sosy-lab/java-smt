@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.List;
+import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -31,6 +32,11 @@ class SynchronizedInterpolatingProverEnvironmentWithContext<T>
       FormulaManager pOtherManager) {
     super(pDelegate, pSync, pManager, pOtherManager);
     delegate = checkNotNull(pDelegate);
+  }
+
+  @Override
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
+    return delegate.getShutdownManagerForProver();
   }
 
   @Override
