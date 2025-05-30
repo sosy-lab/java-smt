@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -39,10 +38,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       new Terminator() {
         @Override
         public boolean terminate() {
-          return proverShutdownManager
-              .getNotifier()
-              .shouldShutdown(); // shutdownNotifer is defined in the
-          // superclass
+          return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
         }
       };
   private final Bitwuzla env;
@@ -123,8 +119,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN
-        && proverShutdownManager.getNotifier().shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
@@ -249,11 +244,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
             this,
             creator,
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
-  }
-
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 
   public boolean isClosed() {

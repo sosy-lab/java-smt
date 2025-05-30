@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -203,12 +202,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook =
-        new ShutdownHook(proverShutdownManager.getNotifier(), smtEngine::interrupt)) {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
+      shutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
     }
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    shutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 
@@ -261,10 +259,5 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       exprManager.delete();
     }
     super.close();
-  }
-
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }

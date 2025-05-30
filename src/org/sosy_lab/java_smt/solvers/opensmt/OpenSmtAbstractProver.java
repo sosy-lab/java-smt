@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -231,9 +230,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     changedSinceLastSatQuery = false;
 
     sstat result;
-    try (ShutdownHook listener =
-        new ShutdownHook(proverShutdownManager.getNotifier(), osmtSolver::stop)) {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+    try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
+      shutdownNotifier.shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -252,7 +250,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      shutdownNotifier.shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {
@@ -290,10 +288,5 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       osmtSolver.delete();
     }
     super.close();
-  }
-
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }

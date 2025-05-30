@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.util.Optional;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -25,11 +24,6 @@ public class DebuggingOptimizationProverEnvironment extends DebuggingBasicProver
     super(pDelegate, pDebugging);
     delegate = pDelegate;
     debugging = pDebugging;
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return delegate.getShutdownManagerForProver();
   }
 
   @Override

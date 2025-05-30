@@ -386,17 +386,6 @@ public abstract class SolverBasedTest0 {
         .isEqualTo(Solvers.Z3);
   }
 
-  /** Skip test if the solvers prover can not be shut down without also stopping the context. */
-  protected final void requireIsolatedProverShutdown() {
-    assume()
-        .withMessage(
-            "Solver %s does not support shutdown of provers without shutting down the "
-                + "context as well",
-            solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC5, Solvers.BOOLECTOR, Solvers.SMTINTERPOL);
-  }
-
   /**
    * Use this for checking assertions about BooleanFormulas with Truth: <code>
    * assertThatFormula(formula).is...()</code>.

@@ -52,6 +52,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
   protected final Deque<PersistentMap<String, BooleanFormula>> annotatedTerms = new ArrayDeque<>();
+  protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
@@ -62,10 +63,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       Script pEnv,
       Set<ProverOptions> options,
       ShutdownNotifier pShutdownNotifier) {
-    super(pShutdownNotifier, options);
+    super(options);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;
+    shutdownNotifier = pShutdownNotifier;
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
@@ -107,7 +109,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    shutdownNotifier.shutdownIfNecessary();
 
     LBool result = env.checkSat();
     switch (result) {
@@ -125,9 +127,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
             // SMTInterpol catches OOM, but we want to have it thrown.
             throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
           case CANCELLED:
-            proverShutdownManager
-                .getNotifier()
-                .shutdownIfNecessary(); // expected if we requested termination
+            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
           default:
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
@@ -244,17 +244,10 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    shutdownNotifier.shutdownIfNecessary();
     for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }
     return callback.getResult();
   }
-
-  /* TODO: the shutdownNotifier is bound to the Script. But this is done in the context. It seems
-       like it might be re-usable after a shutdown.
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
-  }*/
 }
