@@ -9,18 +9,30 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Table;
+import com.google.common.collect.Table.Cell;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Command;
+import io.github.cvc5.InputParser;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
+import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import io.github.cvc5.modes.InputLanguage;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager, Term> {
 
@@ -66,7 +78,138 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+    // Split the input string into a list of SMT-LIB2 commands
+    List<String> tokens = Tokenizer.tokenize(formulaStr);
+
+    Table<String, Sort, Term> cache = creator.getDeclaredVariables();
+
+    // Process the declarations
+    Map<String, Sort> localSymbols = new HashMap<>();
+    ImmutableList.Builder<String> processed = ImmutableList.builder();
+    for (String token : tokens) {
+      if (Tokenizer.isDeclarationToken(token)) {
+        // Parse the variable/UF declaration to get a name
+        Solver solver = new Solver(getEnvironment());
+        InputParser parser = new InputParser(solver);
+        SymbolManager symbolManager = new SymbolManager(getEnvironment());
+        parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + token, "");
+        parser.nextCommand().invoke(solver, symbolManager);
+        parser.nextCommand().invoke(solver, symbolManager);
+
+        Term parsed = symbolManager.getDeclaredTerms()[0];
+
+        String symbol = parsed.getSymbol();
+        if (symbol.startsWith("|") && symbol.endsWith("|")) {
+          // Strip quotes from the name
+          symbol = symbol.substring(1, symbol.length() - 1);
+        }
+        Sort sort = parsed.getSort();
+
+        // Check if the symbol is already defined in the variable cache
+        if (cache.containsRow(symbol)) {
+          Sort typeDefinition = cache.row(symbol).keySet().toArray(new Sort[0])[0];
+          Preconditions.checkArgument(
+              cache.contains(symbol, sort),
+              "Symbol '%s' is already used by the solver with a different type. The new type is "
+                  + "%s, but we already have a definition with type %s.",
+              symbol,
+              sort,
+              typeDefinition);
+          continue; // Skip if it's a redefinition
+        }
+
+        // Check if it collides with a definition that was parsed earlier
+        Preconditions.checkArgument(
+            !localSymbols.containsKey(symbol) || localSymbols.get(symbol).equals(sort),
+            "Symbol '%s' has already been defined by this script with a different type. The new "
+                + "type is %s, but we have already a definition with type %s.",
+            symbol,
+            sort,
+            localSymbols.get(symbol));
+
+        // Add the symbol to the local definitions for this parse
+        localSymbols.put(symbol, sort);
+      }
+      // Otherwise, keep the command
+      processed.add(token);
+    }
+
+    // Build SMT-LIB2 declarations for all variables in the cache
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    for (Cell<String, Sort, Term> c : cache.cellSet()) {
+      String symbol = c.getValue().toString();
+      List<Sort> args = ImmutableList.of();
+      Sort sort = c.getValue().getSort();
+
+      if (sort.isFunction()) {
+        args = List.of(sort.getFunctionDomainSorts());
+        sort = sort.getFunctionCodomainSort();
+      }
+      StringBuilder decl = new StringBuilder();
+      decl.append("(declare-fun").append(" ");
+      decl.append(symbol).append(" ");
+      decl.append("(");
+      for (Sort p : args) {
+        decl.append(p).append(" ");
+      }
+      decl.append(")").append(" ");
+      decl.append(sort);
+      decl.append(")");
+
+      builder.add(decl.toString());
+    }
+
+    String decls = String.join("\n", builder.build());
+    String input = String.join("\n", processed.build());
+
+    // Add the declarations to the input and parse everything
+    Solver solver = new Solver(getEnvironment());
+    InputParser parser = new InputParser(solver);
+    SymbolManager symbolManager = parser.getSymbolManager();
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, "(set-logic ALL)" + decls + input, "");
+
+    Command cmd = parser.nextCommand();
+    while (!cmd.isNull()) {
+      try {
+        Preconditions.checkArgument(
+            ImmutableList.of("set-logic", "declare-fun", "declare-const", "define-fun", "assert")
+                .contains(cmd.getCommandName()),
+            "Command %s is not supported",
+            cmd.getCommandName());
+        cmd.invoke(solver, symbolManager);
+        cmd = parser.nextCommand();
+      } catch (Throwable e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+    // Get the assertions from the input
+    Term[] asserted = solver.getAssertions();
+    Term result = asserted.length == 1 ? asserted[0] : getEnvironment().mkTerm(Kind.AND, asserted);
+
+    // Now get all declared symbols
+    Term[] declared = symbolManager.getDeclaredTerms();
+
+    // Process the symbols from the parser
+    Map<Term, Term> subst = new HashMap<>();
+    for (Term term : declared) {
+      String symbol = term.getSymbol();
+      if (symbol.startsWith("|") && symbol.endsWith("|")) {
+        // Strip quotes from the name
+        symbol = symbol.substring(1, symbol.length() - 1);
+      }
+      if (cache.containsRow(symbol)) {
+        // Symbol is from the context: add the original term to the substitution map
+        subst.put(term, cache.get(symbol, term.getSort()));
+      } else {
+        // Symbol is new, add it to the context
+        cache.put(symbol, term.getSort(), term);
+      }
+    }
+
+    // Substitute all symbols from the context with their original terms
+    return result.substitute(
+        subst.keySet().toArray(new Term[0]), subst.values().toArray(new Term[0]));
   }
 
   @Override
