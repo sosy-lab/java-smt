@@ -29,6 +29,9 @@ import org.sosy_lab.java_smt.api.UserPropagator;
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
+
+  // Z3 interruption via solverInterrupt() is re-usable, but might provide partial results if it
+  // is stopping UnsatCore generation for example.
   private final ShutdownRequestListener interruptListener;
 
   private @Nullable Z3UserPropagator propagator = null;

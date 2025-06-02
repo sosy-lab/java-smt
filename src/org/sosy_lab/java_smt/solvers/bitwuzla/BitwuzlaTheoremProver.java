@@ -35,6 +35,9 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+
+  // Bitwuzlas termination is fully reusable. Even the terminated stack can be re-used. Confirmed
+  // by Mathias Preiner.
   private final Terminator terminator =
       new Terminator() {
         @Override
