@@ -80,11 +80,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
-  private final void checkGenerateUnsatCores() {
+  private void checkGenerateUnsatCores() {
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
   }
 
-  private final void checkGenerateUnsatCoresOverAssumptions() {
+  private void checkGenerateUnsatCoresOverAssumptions() {
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
