@@ -217,5 +217,11 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    *     ProverEnvironment}.
    * @throws UnsupportedOperationException if the solver does not support prover specific shutdown.
    */
-  ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException;
+  default ShutdownManager getShutdownManagerForProver() {
+    // Override this with the prover specific ShutdownManagers notifier for supporting solvers.
+    // The solver should then use the prover specific ShutdownManagers notifier for stopping
+    // instead of the contexts' notifier!
+    throw new UnsupportedOperationException(
+        "The chosen solver does not support isolated prover shutdown");
+  }
 }
