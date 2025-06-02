@@ -211,7 +211,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * guaranteed to be a child of the {@link ShutdownNotifier} given to the creating {@link
    * SolverContext}, resulting in shutdown when the {@link SolverContext}s notifier is shutting
    * down. The notifier returned here can be shut down independently of the creating contexts
-   * notifier.
+   * notifier. JavaSMT will never attempt to shut down this manager on its own.
    *
    * @return a {@link ShutdownManager} who is the child of the {@link ShutdownNotifier} used in the
    *     creating {@link SolverContext}, that can be used to shut down only this {@link
