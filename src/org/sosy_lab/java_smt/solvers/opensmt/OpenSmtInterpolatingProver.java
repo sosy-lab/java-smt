@@ -73,8 +73,12 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
+      throws InterruptedException {
     checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");

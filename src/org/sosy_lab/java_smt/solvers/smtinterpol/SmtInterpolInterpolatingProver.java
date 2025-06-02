@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -47,7 +48,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     checkArgument(
         getAssertedConstraintIds().containsAll(pTermNamesOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -74,7 +78,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
