@@ -203,7 +203,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     /* Shutdown currently not possible in CVC5. */
     Result result = solver.checkSat();
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 

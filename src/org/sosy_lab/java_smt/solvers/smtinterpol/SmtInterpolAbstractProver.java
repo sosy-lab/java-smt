@@ -107,7 +107,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
 
     LBool result = env.checkSat();
     switch (result) {
@@ -244,7 +244,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
     for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }

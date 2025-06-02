@@ -49,8 +49,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  // Do we even need this?
-  private final ShutdownNotifier contextShutdownNotifier;
+  protected final ShutdownNotifier proverShutdownNotifier;
   protected final ShutdownManager proverShutdownManager;
 
   protected AbstractProver(ShutdownNotifier pShutdownNotifier, Set<ProverOptions> pOptions) {
@@ -63,8 +62,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
     assertedFormulas.add(LinkedHashMultimap.create());
 
-    contextShutdownNotifier = pShutdownNotifier;
-    proverShutdownManager = ShutdownManager.createWithParent(contextShutdownNotifier);
+    proverShutdownManager = ShutdownManager.createWithParent(pShutdownNotifier);
+    proverShutdownNotifier = proverShutdownManager.getNotifier();
   }
 
   protected final void checkGenerateModels() {

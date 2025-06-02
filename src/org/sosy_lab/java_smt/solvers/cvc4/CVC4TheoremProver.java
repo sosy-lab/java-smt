@@ -203,12 +203,11 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook =
-        new ShutdownHook(proverShutdownManager.getNotifier(), smtEngine::interrupt)) {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+    try (ShutdownHook hook = new ShutdownHook(proverShutdownNotifier, smtEngine::interrupt)) {
+      proverShutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
     }
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 

@@ -39,9 +39,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       new Terminator() {
         @Override
         public boolean terminate() {
-          return proverShutdownManager
-              .getNotifier()
-              .shouldShutdown();
+          return proverShutdownNotifier.shouldShutdown();
         }
       };
   private final Bitwuzla env;
@@ -122,8 +120,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN
-        && proverShutdownManager.getNotifier().shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && proverShutdownNotifier.shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");

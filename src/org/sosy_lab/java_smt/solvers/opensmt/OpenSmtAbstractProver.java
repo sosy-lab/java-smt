@@ -231,9 +231,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     changedSinceLastSatQuery = false;
 
     sstat result;
-    try (ShutdownHook listener =
-        new ShutdownHook(proverShutdownManager.getNotifier(), osmtSolver::stop)) {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+    try (ShutdownHook listener = new ShutdownHook(proverShutdownNotifier, osmtSolver::stop)) {
+      proverShutdownNotifier.shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -252,7 +251,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {

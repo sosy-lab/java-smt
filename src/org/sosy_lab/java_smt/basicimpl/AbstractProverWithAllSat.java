@@ -66,7 +66,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws SolverException, InterruptedException {
     while (!isUnsat()) {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -86,11 +86,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
       final ImmutableList<BooleanFormula> values = valuesOfModel.build();
       callback.apply(values);
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
     }
   }
 
@@ -111,7 +111,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    proverShutdownManager.getNotifier().shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
 
     if (isUnsat()) {
       return;

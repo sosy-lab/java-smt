@@ -113,7 +113,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    */
   private TerminationCallback getTerminationTest() {
     return () -> {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
       return false;
     };
   }
@@ -283,7 +283,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
     @Override
     public void callback(long[] model) throws InterruptedException {
-      proverShutdownManager.getNotifier().shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
       clientCallback.apply(
           Collections.unmodifiableList(
               Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));

@@ -129,9 +129,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
               DEFAULT_PARAMS,
               allConstraints.length,
               allConstraints,
-              proverShutdownManager.getNotifier());
+              proverShutdownNotifier);
     } else {
-      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, proverShutdownManager.getNotifier());
+      unsat = !yices_check_sat(curEnv, DEFAULT_PARAMS, proverShutdownNotifier);
       if (unsat && stackSizeToUnsat == Integer.MAX_VALUE) {
         stackSizeToUnsat = size();
         // If sat check is UNSAT and stackSizeToUnsat waS not already set,
@@ -156,7 +156,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
         DEFAULT_PARAMS,
         pAssumptions.size(),
         uncapsulate(pAssumptions),
-        proverShutdownManager.getNotifier());
+        proverShutdownNotifier);
   }
 
   @SuppressWarnings("resource")
