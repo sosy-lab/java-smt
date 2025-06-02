@@ -41,8 +41,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
         public boolean terminate() {
           return proverShutdownManager
               .getNotifier()
-              .shouldShutdown(); // shutdownNotifer is defined in the
-          // superclass
+              .shouldShutdown();
         }
       };
   private final Bitwuzla env;
