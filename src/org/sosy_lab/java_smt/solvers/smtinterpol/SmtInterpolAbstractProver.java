@@ -140,9 +140,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public org.sosy_lab.java_smt.api.Model getModel() {
-    checkState(!closed);
-    checkGenerateModels();
+  protected org.sosy_lab.java_smt.api.Model getModelImpl() {
     final Model model;
     try {
       model = env.getModel();
@@ -167,9 +165,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0(annotatedTerms.peek());
   }
 
@@ -190,10 +186,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkState(!closed);
-    checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
     for (BooleanFormula assumption : assumptions) {
@@ -224,7 +218,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }

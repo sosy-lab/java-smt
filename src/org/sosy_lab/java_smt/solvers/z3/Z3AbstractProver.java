@@ -105,8 +105,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
@@ -158,9 +157,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getUnsatCore0();
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -181,9 +178,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }

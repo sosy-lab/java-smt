@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -86,6 +88,11 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     synchronized (sync) {
       return new SynchronizedModel(delegate.getModel(), sync);
     }
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    return delegate.getModelAssignments();
   }
 
   @Override

@@ -75,6 +75,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     int status;
+    wasLastSatCheckSat = false;
     try {
       status =
           Native.optimizeCheck(
@@ -83,6 +84,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
               0, // number of assumptions
               null // assumptions
               );
+      stackChangedSinceLastQuery = false;
     } catch (Z3Exception ex) {
       throw creator.handleZ3Exception(ex);
     }
@@ -96,6 +98,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
           Native.optimizeGetReasonUnknown(z3context, z3optSolver));
       return OptStatus.UNDEF;
     } else {
+      wasLastSatCheckSat = true;
       return OptStatus.OPT;
     }
   }
@@ -139,8 +142,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions) {
     return false;
   }
 

@@ -48,7 +48,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaManager manager;
 
   private final BitwuzlaFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
@@ -143,11 +142,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * @param assumptions A list of literals.
    */
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
-
     Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
       Term term = creator.extractInfo(formula);
@@ -170,8 +166,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(
@@ -196,9 +191,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * returned <code>false</code>.
    */
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     Preconditions.checkState(!wasLastSatCheckSat);
     return getUnsatCore0();
   }
@@ -212,12 +205,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores(); // FIXME: JavaDoc say ProverOptions.GENERATE_UNSAT_CORE is not needed
-    Preconditions.checkState(!wasLastSatCheckSat);
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }

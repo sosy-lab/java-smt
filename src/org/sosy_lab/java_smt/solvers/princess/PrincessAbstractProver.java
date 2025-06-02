@@ -63,7 +63,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -158,10 +157,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
-    checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
@@ -187,15 +184,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Solving with assumptions is not supported.");
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {
@@ -205,7 +200,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) {
     throw new UnsupportedOperationException(
         "UNSAT cores over assumptions not supported by Princess");

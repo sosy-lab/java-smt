@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.statistics.TimerPool.TimerWrapper;
 
@@ -90,6 +92,11 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   public Model getModel() throws SolverException {
     stats.model.getAndIncrement();
     return new StatisticsModel(delegate.getModel(), stats);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    return delegate.getModelAssignments();
   }
 
   @Override

@@ -24,8 +24,13 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
  * provides only the common operations. In most cases, just use one of the two sub-interfaces
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
+  String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae " + "satisfiable?";
 
-  String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
+  String NO_UNSAT_CORE_HELP =
+      "UnsatCore computation failed. Are the pushed formulae " + "unsatisfiable?";
+
+  String STACK_CHANGED_HELP =
+      "Computation failed. The prover state has changed since the last " + "call to isUnsat().";
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
@@ -109,11 +114,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
-    try (Model model = getModel()) {
-      return model.asList();
-    }
-  }
+  ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
 
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that

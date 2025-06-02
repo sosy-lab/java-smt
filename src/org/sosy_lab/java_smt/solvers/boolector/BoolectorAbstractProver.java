@@ -33,7 +33,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
   private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
@@ -114,7 +113,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     for (BooleanFormula assumption : pAssumptions) {
@@ -125,8 +124,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
@@ -139,13 +137,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     throw new UnsupportedOperationException("Unsat core is not supported by Boolector.");
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> pAssumptions) {
     throw new UnsupportedOperationException(
         "Unsat core with assumptions is not supported by Boolector.");
   }

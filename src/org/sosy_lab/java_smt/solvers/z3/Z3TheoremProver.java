@@ -97,10 +97,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-
     int result;
     try {
       result =

@@ -21,6 +21,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -96,6 +97,11 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
     synchronized (sync) {
       return new SynchronizedModelWithContext(delegate.getModel(), sync, manager, otherManager);
     }
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    return delegate.getModelAssignments();
   }
 
   @Override

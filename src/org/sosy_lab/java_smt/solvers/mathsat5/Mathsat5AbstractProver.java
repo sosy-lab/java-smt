@@ -119,7 +119,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
@@ -148,8 +148,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
     checkGenerateModels();
     return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
   }
@@ -193,15 +192,13 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     long[] terms = msat_get_unsat_core(curEnv);
     return encapsulate(terms);
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
     closeAllEvaluators();

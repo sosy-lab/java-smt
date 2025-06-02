@@ -18,8 +18,10 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownManager;
@@ -27,6 +29,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -38,6 +41,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
   protected boolean closed = false;
+  protected boolean wasLastSatCheckSat = false;
+  protected boolean stackChangedSinceLastQuery = false;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -75,11 +80,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
-  protected final void checkGenerateUnsatCores() {
+  private final void checkGenerateUnsatCores() {
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
   }
 
-  protected final void checkGenerateUnsatCoresOverAssumptions() {
+  private final void checkGenerateUnsatCoresOverAssumptions() {
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
@@ -99,18 +104,68 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
     checkState(!closed);
-    closeAllEvaluators(); // TODO: needed?
+    closeAllEvaluators();
     proverShutdownNotifier.shutdownIfNecessary();
-    return isUnsatImpl();
+    wasLastSatCheckSat = !isUnsatImpl();
+    stackChangedSinceLastQuery = false;
+    return !wasLastSatCheckSat;
   }
 
   protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() {
+    checkState(!closed);
+    checkState(!proverShutdownNotifier.shouldShutdown());
+    checkState(!wasLastSatCheckSat, NO_UNSAT_CORE_HELP);
+    checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
+    checkGenerateUnsatCores();
+    return getUnsatCoreImpl();
+  }
+
+  protected abstract List<BooleanFormula> getUnsatCoreImpl();
+
+  @Override
+  public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
+    checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
+    checkGenerateUnsatCoresOverAssumptions();
+    return unsatCoreOverAssumptionsImpl(assumptions);
+  }
+
+  protected abstract Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
+      Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException;
+
+  @Override
+  public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException {
+    checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
+    return isUnsatWithAssumptionsImpl(assumptions);
+  }
+
+  protected abstract boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
+      throws SolverException, InterruptedException;
+
+  @Override
+  public final Model getModel() throws SolverException {
+    checkState(!closed);
+    checkState(!proverShutdownNotifier.shouldShutdown());
+    checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
+    checkGenerateModels();
+    return getModelImpl();
+  }
+
+  protected abstract Model getModelImpl() throws SolverException;
 
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
     proverShutdownNotifier.shutdownIfNecessary();
     pushImpl();
+    stackChangedSinceLastQuery = true;
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
@@ -121,6 +176,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(!closed);
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
+    // TODO: technically only needed if the level removed was non empty.
+    stackChangedSinceLastQuery = true;
+    wasLastSatCheckSat = false;
     popImpl();
   }
 
@@ -133,6 +191,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     proverShutdownNotifier.shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     Iterables.getLast(assertedFormulas).put(constraint, t);
+    stackChangedSinceLastQuery = true;
+    wasLastSatCheckSat = false;
     return t;
   }
 
@@ -171,6 +231,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected void closeAllEvaluators() {
     ImmutableList.copyOf(evaluators).forEach(Evaluator::close);
     evaluators.clear();
+  }
+
+  @Override
+  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    Preconditions.checkState(!closed);
+    checkState(!proverShutdownNotifier.shouldShutdown());
+    Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
+    checkState(wasLastSatCheckSat);
+    try (Model model = getModel()) {
+      return model.asList();
+    }
   }
 
   @Override

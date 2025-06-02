@@ -147,7 +147,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     // TODO handle BooleanFormulaCollection / check for literals
@@ -161,9 +161,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
@@ -190,9 +188,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0();
   }
 
@@ -201,10 +197,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    Preconditions.checkState(!isClosed());
-    checkGenerateUnsatCoresOverAssumptions();
     boolean sat = !isUnsatWithAssumptions(pAssumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
