@@ -135,6 +135,52 @@ public class TimeoutTest extends SolverBasedTest0 {
     }
   }
 
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentNewProverUsageBv()
+      throws InterruptedException, SolverException {
+    requireBitvectors();
+    requireIsolatedProverShutdown();
+
+    testBasicContextTimeoutBv(() -> context.newProverEnvironment());
+    assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      pe.push(gen.generate(8));
+      assertThrows(InterruptedException.class, pe::isUnsat);
+
+    } catch (InterruptedException expected) {
+      // We don't really know where an exception is coming from currently.
+      // TODO: define where and how exceptions are thrown if we build a new prover but shutdown
+      //  has been requested.
+      assertThat(expected).isNotNull();
+    }
+  }
+
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentNewProverUsageInt()
+      throws InterruptedException, SolverException {
+    requireIntegers();
+    requireIsolatedProverShutdown();
+
+    testBasicContextTimeoutInt(() -> context.newProverEnvironment());
+    assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
+      pe.push(gen.generate(8));
+      assertThrows(InterruptedException.class, pe::isUnsat);
+
+    } catch (InterruptedException expected) {
+      // We don't really know where an exception is coming from currently.
+      // TODO: define where and how exceptions are thrown if we build a new prover but shutdown
+      //  has been requested.
+      assertThat(expected).isNotNull();
+    }
+  }
+
   @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testInterpolationProverTimeout() throws InterruptedException {
     requireInterpolation();
