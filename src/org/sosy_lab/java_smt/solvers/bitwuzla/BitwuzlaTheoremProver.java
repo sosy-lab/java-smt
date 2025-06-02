@@ -252,7 +252,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   }
 
   @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
     return proverShutdownManager;
   }
 

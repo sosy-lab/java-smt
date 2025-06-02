@@ -293,7 +293,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
     return proverShutdownManager;
   }
 }

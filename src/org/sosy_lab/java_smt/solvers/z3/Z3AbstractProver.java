@@ -264,7 +264,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
     return proverShutdownManager;
   }
 }

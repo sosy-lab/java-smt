@@ -291,7 +291,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   }
 
   @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
     return proverShutdownManager;
   }
 }

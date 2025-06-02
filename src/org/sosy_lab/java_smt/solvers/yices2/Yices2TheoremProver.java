@@ -220,7 +220,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
+  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
     return proverShutdownManager;
   }
 }
