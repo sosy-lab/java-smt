@@ -2431,6 +2431,32 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         var -> bvmgr.equal(var, bvmgr.makeBitvector(4, 1)));
   }
 
+  @Test
+  public void testModelAfterUnsatInt() throws SolverException, InterruptedException {
+    requireIntegers();
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+      prover.push(gen.generate(8));
+
+      assertThat(prover).isUnsatisfiable();
+
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
+  @Test
+  public void testModelAfterUnsatBv() throws SolverException, InterruptedException {
+    requireBitvectors();
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+      prover.push(gen.generate(8));
+
+      assertThat(prover).isUnsatisfiable();
+
+      assertThrows(IllegalStateException.class, prover::getModel);
+    }
+  }
+
   /**
    * Build a deep nesting that is easy to solve and can not be simplified by the solver. If any part
    * of JavaSMT or the solver tries to analyse all branches of this formula, the runtime is
@@ -2459,7 +2485,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   private void evaluateInModel(BooleanFormula constraint, Formula variable, Object expectedValue)
       throws SolverException, InterruptedException {
 
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(
+            ProverOptions.GENERATE_MODELS, ProverOptions.GENERATE_UNSAT_CORE)) {
       prover.push(constraint);
       assertThat(prover).isSatisfiable();
 
