@@ -129,7 +129,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final Result result = env.check_sat();

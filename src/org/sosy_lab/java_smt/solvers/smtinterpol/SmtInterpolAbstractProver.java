@@ -100,7 +100,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
+  protected boolean isUnsatImpl() throws InterruptedException {
     checkState(!closed);
 
     // We actually terminate SmtInterpol during the analysis

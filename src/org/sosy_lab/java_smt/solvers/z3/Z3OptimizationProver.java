@@ -132,7 +132,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     logSolverStack();
     return check() == OptStatus.UNSAT;

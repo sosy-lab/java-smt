@@ -95,7 +95,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected abstract void createConfig(Map<String, String> pConfig);
 
   @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
 
     final long hook = msat_set_termination_callback(curEnv, getTerminationTest());

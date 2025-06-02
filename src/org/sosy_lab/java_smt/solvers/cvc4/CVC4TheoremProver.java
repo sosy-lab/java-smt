@@ -192,9 +192,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    closeAllEvaluators();
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     changedSinceLastSatQuery = false;
     if (!incremental) {
       for (BooleanFormula f : getAssertedFormulas()) {

@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -96,8 +97,19 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
+  public final boolean isUnsat() throws SolverException, InterruptedException {
+    checkState(!closed);
+    closeAllEvaluators(); // TODO: needed?
+    proverShutdownNotifier.shutdownIfNecessary();
+    return isUnsatImpl();
+  }
+
+  protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
+
+  @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
     pushImpl();
     assertedFormulas.add(LinkedHashMultimap.create());
   }
@@ -118,6 +130,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
+    proverShutdownNotifier.shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;

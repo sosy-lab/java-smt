@@ -225,9 +225,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    closeAllEvaluators();
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     changedSinceLastSatQuery = false;
 
     sstat result;

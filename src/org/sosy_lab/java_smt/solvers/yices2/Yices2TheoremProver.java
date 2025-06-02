@@ -118,7 +118,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode

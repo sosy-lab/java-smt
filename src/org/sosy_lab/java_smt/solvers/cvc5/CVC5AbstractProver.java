@@ -193,9 +193,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    closeAllEvaluators();
+  public boolean isUnsatImpl() throws InterruptedException, SolverException {
     changedSinceLastSatQuery = false;
     if (!incremental) {
       getAssertedFormulas().forEach(f -> solver.assertFormula(creator.extractInfo(f)));

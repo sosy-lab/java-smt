@@ -83,7 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     logSolverStack();
     int result;

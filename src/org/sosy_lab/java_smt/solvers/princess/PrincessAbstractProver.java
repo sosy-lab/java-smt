@@ -85,7 +85,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * SAT or UNSAT.
    */
   @Override
-  public boolean isUnsat() throws SolverException {
+  protected boolean isUnsatImpl() throws SolverException {
     Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     evaluatedTerms.clear();
