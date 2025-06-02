@@ -11,12 +11,15 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.BOOLECTOR;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,6 +28,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
@@ -140,21 +144,14 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testContextInterruptWithSubsequentNewProverUsageBv()
       throws InterruptedException, SolverException {
     requireBitvectors();
-    requireIsolatedProverShutdown();
 
     testBasicContextTimeoutBv(() -> context.newProverEnvironment());
     assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      pe.push(gen.generate(8));
+      assertThrows(InterruptedException.class, () -> pe.push(gen.generate(8)));
       assertThrows(InterruptedException.class, pe::isUnsat);
-
-    } catch (InterruptedException expected) {
-      // We don't really know where an exception is coming from currently.
-      // TODO: define where and how exceptions are thrown if we build a new prover but shutdown
-      //  has been requested.
-      assertThat(expected).isNotNull();
     }
   }
 
@@ -163,7 +160,6 @@ public class TimeoutTest extends SolverBasedTest0 {
   public void testContextInterruptWithSubsequentNewProverUsageInt()
       throws InterruptedException, SolverException {
     requireIntegers();
-    requireIsolatedProverShutdown();
 
     testBasicContextTimeoutInt(() -> context.newProverEnvironment());
     assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
@@ -178,6 +174,122 @@ public class TimeoutTest extends SolverBasedTest0 {
       // TODO: define where and how exceptions are thrown if we build a new prover but shutdown
       //  has been requested.
       assertThat(expected).isNotNull();
+    }
+  }
+
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  // This test re-uses provers that already existed before the shutdown.
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentProverUsageBv() throws InterruptedException {
+    requireBitvectors();
+    assume()
+        .withMessage("Boolector does not support multiple provers")
+        .that(solverToUse())
+        .isNotEqualTo(BOOLECTOR);
+
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
+        pe2.push(gen.generate(8));
+
+        testBasicContextTimeoutBv(() -> context.newProverEnvironment());
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        try {
+          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+        } catch (UnsupportedOperationException mayBeThrown) {
+          // Do nothing, we can't check for solvers that don't support this
+        }
+
+        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
+    }
+  }
+
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  // This test re-uses provers that already existed before the shutdown.
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentProverUsageInt() throws InterruptedException {
+    requireIntegers();
+
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
+        pe2.push(gen.generate(8));
+
+        testBasicContextTimeoutInt(() -> context.newProverEnvironment());
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        try {
+          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+        } catch (UnsupportedOperationException mayBeThrown) {
+          // Do nothing, we can't check for solvers that don't support this
+        }
+
+        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
+    }
+  }
+
+  // Test shutdown of prover and subsequent feature usage.
+  @Ignore
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testProverInterruptWithSubsequentFeatureUsageBv() throws InterruptedException {
+    requireBitvectors();
+    requireIsolatedProverShutdown();
+
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
+        pe2.push(gen.generate(8));
+
+        testBasicProverTimeoutWithFeatureUsageBv(() -> context.newProverEnvironment());
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        try {
+          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+        } catch (UnsupportedOperationException mayBeThrown) {
+          // Do nothing, we can't check for solvers that don't support this
+        }
+
+        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
+    }
+  }
+
+  // Test shutdown of prover and subsequent feature usage.
+  @Ignore
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentFeatureUsageInt() throws InterruptedException {
+    requireIntegers();
+    requireIsolatedProverShutdown();
+
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
+        pe2.push(gen.generate(8));
+
+        testBasicProverTimeoutWithFeatureUsageInt(
+            () ->
+                context.newProverEnvironment(
+                    ProverOptions.GENERATE_UNSAT_CORE,
+                    ProverOptions.GENERATE_MODELS,
+                    ProverOptions.GENERATE_ALL_SAT,
+                    ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        try {
+          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
+        } catch (UnsupportedOperationException mayBeThrown) {
+          // Do nothing, we can't check for solvers that don't support this
+        }
+
+        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
     }
   }
 
@@ -227,6 +339,26 @@ public class TimeoutTest extends SolverBasedTest0 {
     testBasicProverBasedTimeout(proverConstructor, gen.generate(200));
   }
 
+  /**
+   * Shuts down the shutdown manager of the prover. Throws an exception for non-supporting solvers.
+   * Will try to use all available features of the solver afterward. (Model, UnsatCore etc.)
+   */
+  private void testBasicProverTimeoutWithFeatureUsageInt(
+      Supplier<BasicProverEnvironment<?>> proverConstructor) throws InterruptedException {
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200));
+  }
+
+  /**
+   * Shuts down the shutdown manager of the prover. Throws an exception for non-supporting solvers.
+   * Will try to use all available features of the solver afterward. (Model, UnsatCore etc.)
+   */
+  private void testBasicProverTimeoutWithFeatureUsageBv(
+      Supplier<BasicProverEnvironment<?>> proverConstructor) throws InterruptedException {
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200));
+  }
+
   @SuppressWarnings("CheckReturnValue")
   private void testBasicContextBasedTimeout(
       Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
@@ -267,6 +399,37 @@ public class TimeoutTest extends SolverBasedTest0 {
       pe.push(instance);
       t.start();
       assertThrows(InterruptedException.class, pe::isUnsat);
+    }
+  }
+
+  private void testProverBasedTimeoutWithFeatures(
+      Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
+      throws InterruptedException {
+
+    // TODO: maybe add a test that solves something correctly before interrupting?
+
+    try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
+      Thread t =
+          new Thread(
+              () -> {
+                try {
+                  Thread.sleep(delay);
+                  pe.getShutdownManagerForProver().requestShutdown("Shutdown Request");
+                } catch (InterruptedException exception) {
+                  throw new UnsupportedOperationException("Unexpected interrupt", exception);
+                }
+              });
+      pe.push(instance);
+      t.start();
+      assertThrows(InterruptedException.class, pe::isUnsat);
+      assertThrows(InterruptedException.class, pe::getModel);
+      assertThrows(InterruptedException.class, pe::getUnsatCore);
+      assertThrows(
+          InterruptedException.class, () -> pe.isUnsatWithAssumptions(ImmutableList.of(instance)));
+      assertThrows(InterruptedException.class, () -> pe.addConstraint(instance));
+      assertThrows(InterruptedException.class, () -> pe.push(instance));
+      assertThrows(InterruptedException.class, pe::push);
+      assertThrows(InterruptedException.class, pe::pop);
     }
   }
 }
