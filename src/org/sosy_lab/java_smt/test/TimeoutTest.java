@@ -141,8 +141,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentNewProverUsageBv()
-      throws InterruptedException {
+  public void testContextInterruptWithSubsequentNewProverUsageBv() throws InterruptedException {
     requireBitvectors();
 
     testBasicContextTimeoutBv(() -> context.newProverEnvironment());
@@ -157,8 +156,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentNewProverUsageInt()
-      throws InterruptedException {
+  public void testContextInterruptWithSubsequentNewProverUsageInt() throws InterruptedException {
     requireIntegers();
 
     testBasicContextTimeoutInt(() -> context.newProverEnvironment());
@@ -247,6 +245,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
         testBasicProverTimeoutWithFeatureUsageBv(() -> context.newProverEnvironment());
         assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+
         try {
           assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
           assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
