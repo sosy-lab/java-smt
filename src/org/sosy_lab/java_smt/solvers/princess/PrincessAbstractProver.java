@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -68,9 +69,14 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
