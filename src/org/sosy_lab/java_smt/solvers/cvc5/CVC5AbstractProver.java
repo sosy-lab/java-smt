@@ -26,6 +26,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -51,12 +52,17 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       @SuppressWarnings("unused") int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
 
     mgr = pMgr;
     creator = pFormulaCreator;
@@ -177,7 +183,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     /* Shutdown currently not possible in CVC5. */
     Result result = solver.checkSat();
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     return convertSatResult(result);
   }
 
