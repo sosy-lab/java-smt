@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -36,8 +37,9 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       SmtInterpolFormulaManager pMgr,
       Script pScript,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, pScript, options, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pMgr, pScript, options, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -49,7 +51,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
     checkArgument(
@@ -79,7 +81,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
@@ -107,7 +109,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       }
     } catch (SMTLIBException e) {
       if ("Timeout exceeded".equals(e.getMessage())) {
-        proverShutdownNotifier.shutdownIfNecessary();
+        shutdownIfNecessary();
       }
       throw new AssertionError(e);
     }

@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
@@ -61,8 +62,9 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       SmtInterpolFormulaManager pMgr,
       Script pEnv,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pShutdownNotifier, options);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pContextShutdownNotifier, pProverShutdownNotifier, options);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;
@@ -107,7 +109,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     LBool result = env.checkSat();
     switch (result) {
@@ -125,9 +127,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
             // SMTInterpol catches OOM, but we want to have it thrown.
             throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
           case CANCELLED:
-            proverShutdownManager
-                .getNotifier()
-                .shutdownIfNecessary(); // expected if we requested termination
+            shutdownIfNecessary(); // expected if we requested termination
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
           default:
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
@@ -238,7 +238,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }
