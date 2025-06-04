@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -33,7 +34,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
   @SuppressWarnings("unused")
   private final LogManager logger;
 
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final OpenSMTOptions solverOptions;
 
   private boolean closed = false;
@@ -72,7 +73,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     creator = pCreator;
     manager = pManager;
     logger = pLogger;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     solverOptions = pSolverOptions;
   }
 
@@ -130,24 +131,37 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<SolverContext.ProverOptions> options) {
     throw new UnsupportedOperationException("OpenSMT does not support optimization.");
   }
 
   @Override
   protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtTheoremProver(
-        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
+        creator,
+        manager,
+        contextShutdownNotifier,
+        pProverShutdownNotifier,
+        pProverOptions,
+        solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<SolverContext.ProverOptions> pProverOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new OpenSmtInterpolatingProver(
-        creator, manager, shutdownNotifier, pProverOptions, solverOptions);
+        creator,
+        manager,
+        contextShutdownNotifier,
+        pProverShutdownNotifier,
+        pProverOptions,
+        solverOptions);
   }
 
   @Override

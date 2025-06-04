@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -49,10 +48,15 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       SMTConfig pConfig,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
 
     creator = pFormulaCreator;
 
@@ -204,8 +208,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
 
     sstat result;
-    try (ShutdownHook listener = new ShutdownHook(proverShutdownNotifier, osmtSolver::stop)) {
-      proverShutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook listener =
+        new ShutdownHook(contextShutdownNotifier, proverShutdownNotifier, osmtSolver::stop)) {
+      shutdownIfNecessary();
       try {
         result = osmtSolver.check();
       } catch (Exception e) {
@@ -224,7 +229,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
           throw new SolverException("OpenSMT crashed while checking satisfiability.", e);
         }
       }
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
 
     if (result.equals(sstat.Error())) {
@@ -261,10 +266,5 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       osmtSolver.delete();
     }
     super.close();
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }
