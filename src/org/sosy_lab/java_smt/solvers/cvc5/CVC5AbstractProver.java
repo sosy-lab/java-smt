@@ -162,9 +162,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 

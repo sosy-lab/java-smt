@@ -164,9 +164,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @SuppressWarnings("resource")
   @Override
-  public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return registerEvaluator(new Mathsat5Evaluator(this, creator, curEnv));
   }
 

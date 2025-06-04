@@ -151,9 +151,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 

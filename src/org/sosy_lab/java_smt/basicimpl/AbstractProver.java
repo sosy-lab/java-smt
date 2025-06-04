@@ -178,6 +178,20 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract Model getModelImpl() throws SolverException;
 
   @Override
+  public final Evaluator getEvaluator() throws SolverException {
+    checkState(!closed);
+    checkState(!shouldShutdown());
+    checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
+    checkGenerateModels();
+    return getEvaluatorImpl();
+  }
+
+  protected Evaluator getEvaluatorImpl() throws SolverException {
+    return getModel();
+  }
+
+  @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
     shutdownIfNecessary();

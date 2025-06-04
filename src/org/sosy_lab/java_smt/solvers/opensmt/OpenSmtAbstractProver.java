@@ -121,9 +121,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
