@@ -16,6 +16,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
 
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -30,7 +31,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   private final Yices2FormulaCreator creator;
   private final BooleanFormulaManager bfmgr;
-  private final ShutdownNotifier shutdownManager;
+  private final ShutdownNotifier contextShutdownManager;
 
   private static int numLoadedInstances = 0;
   private boolean closed = false;
@@ -43,7 +44,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     super(pFmgr);
     this.creator = creator;
     bfmgr = pBfmgr;
-    shutdownManager = pShutdownManager;
+    contextShutdownManager = pShutdownManager;
   }
 
   public static Yices2SolverContext create(
@@ -110,19 +111,21 @@ public class Yices2SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pOptions) {
+    return new Yices2TheoremProver(
+        creator, pOptions, bfmgr, contextShutdownManager, pProverShutdownNotifier);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Yices does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Yices does not support optimization");
   }
 
