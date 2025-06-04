@@ -14,6 +14,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -33,8 +34,9 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pShutdownNotifier, pOptions);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pContextShutdownNotifier, pProverShutdownNotifier, pOptions);
     bmgr = pBmgr;
   }
 
@@ -66,7 +68,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws SolverException, InterruptedException {
     while (!isUnsat()) {
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -86,11 +88,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
       final ImmutableList<BooleanFormula> values = valuesOfModel.build();
       callback.apply(values);
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
   }
 
@@ -111,7 +113,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     if (isUnsat()) {
       return;

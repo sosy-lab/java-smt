@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -55,10 +54,13 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  protected final ShutdownNotifier proverShutdownNotifier;
-  protected final ShutdownManager proverShutdownManager;
+  protected final @Nullable ShutdownNotifier proverShutdownNotifier;
+  protected final ShutdownNotifier contextShutdownNotifier;
 
-  protected AbstractProver(ShutdownNotifier pShutdownNotifier, Set<ProverOptions> pOptions) {
+  protected AbstractProver(
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
+      Set<ProverOptions> pOptions) {
     generateModels = pOptions.contains(ProverOptions.GENERATE_MODELS);
     generateAllSat = pOptions.contains(ProverOptions.GENERATE_ALL_SAT);
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
@@ -68,8 +70,22 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
     assertedFormulas.add(LinkedHashMultimap.create());
 
-    proverShutdownManager = ShutdownManager.createWithParent(pShutdownNotifier);
-    proverShutdownNotifier = proverShutdownManager.getNotifier();
+    contextShutdownNotifier = pContextShutdownNotifier;
+    proverShutdownNotifier = pProverShutdownNotifier;
+  }
+
+  protected final void shutdownIfNecessary() throws InterruptedException {
+    contextShutdownNotifier.shutdownIfNecessary();
+    if (proverShutdownNotifier != null) {
+      proverShutdownNotifier.shutdownIfNecessary();
+    }
+  }
+
+  protected final boolean shouldShutdown() {
+    if (proverShutdownNotifier != null) {
+      return contextShutdownNotifier.shouldShutdown() || proverShutdownNotifier.shouldShutdown();
+    }
+    return contextShutdownNotifier.shouldShutdown();
   }
 
   protected final void checkGenerateModels() {
@@ -105,7 +121,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final boolean isUnsat() throws SolverException, InterruptedException {
     checkState(!closed);
     closeAllEvaluators();
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     wasLastSatCheckSat = !isUnsatImpl();
     stackChangedSinceLastQuery = false;
     return !wasLastSatCheckSat;
@@ -116,7 +132,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkState(!closed);
-    checkState(!proverShutdownNotifier.shouldShutdown());
+    checkState(!shouldShutdown());
     checkState(!wasLastSatCheckSat, NO_UNSAT_CORE_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateUnsatCores();
@@ -129,7 +145,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkGenerateUnsatCoresOverAssumptions();
     return unsatCoreOverAssumptionsImpl(assumptions);
   }
@@ -141,7 +157,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
+    stackChangedSinceLastQuery = false;
     return isUnsatWithAssumptionsImpl(assumptions);
   }
 
@@ -151,7 +168,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final Model getModel() throws SolverException {
     checkState(!closed);
-    checkState(!proverShutdownNotifier.shouldShutdown());
+    checkState(!shouldShutdown());
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateModels();
@@ -163,7 +180,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void push() throws InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     pushImpl();
     stackChangedSinceLastQuery = true;
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -188,7 +205,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @CanIgnoreReturnValue
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
     Iterables.getLast(assertedFormulas).put(constraint, t);
     stackChangedSinceLastQuery = true;
@@ -236,7 +253,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
-    checkState(!proverShutdownNotifier.shouldShutdown());
+    checkState(!shouldShutdown());
     Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkState(wasLastSatCheckSat);
     try (Model model = getModel()) {
