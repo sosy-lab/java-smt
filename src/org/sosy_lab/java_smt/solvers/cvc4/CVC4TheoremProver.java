@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -58,11 +57,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   protected CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pBmgr, pContextShutdownNotifier, pProverShutdownNotifier);
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
@@ -173,11 +173,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook = new ShutdownHook(proverShutdownNotifier, smtEngine::interrupt)) {
-      proverShutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook hook =
+        new ShutdownHook(contextShutdownNotifier, proverShutdownNotifier, smtEngine::interrupt)) {
+      shutdownIfNecessary();
       result = smtEngine.checkSat();
     }
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     return convertSatResult(result);
   }
 
@@ -229,10 +230,5 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       exprManager.delete();
     }
     super.close();
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }
