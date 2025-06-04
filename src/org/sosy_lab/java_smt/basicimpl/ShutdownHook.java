@@ -22,13 +22,23 @@ import org.sosy_lab.common.ShutdownNotifier.ShutdownRequestListener;
  */
 public final class ShutdownHook implements ShutdownRequestListener, AutoCloseable {
 
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
+  private final @Nullable ShutdownNotifier proverShutdownNotifier;
   private final Runnable interruptCall;
 
-  public ShutdownHook(ShutdownNotifier pShutdownNotifier, Runnable pInterruptCall) {
+  public ShutdownHook(
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
+      Runnable pInterruptCall) {
     interruptCall = Preconditions.checkNotNull(pInterruptCall);
-    shutdownNotifier = Preconditions.checkNotNull(pShutdownNotifier);
-    shutdownNotifier.register(this);
+    contextShutdownNotifier = Preconditions.checkNotNull(pContextShutdownNotifier);
+    contextShutdownNotifier.register(this);
+    if (pProverShutdownNotifier != null) {
+      proverShutdownNotifier = pProverShutdownNotifier;
+      proverShutdownNotifier.register(this);
+    } else {
+      proverShutdownNotifier = null;
+    }
   }
 
   final AtomicBoolean isActiveHook = new AtomicBoolean(true);
@@ -51,6 +61,9 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
   @Override
   public void close() {
     isActiveHook.set(false);
-    shutdownNotifier.unregister(this);
+    contextShutdownNotifier.unregister(this);
+    if (proverShutdownNotifier != null) {
+      proverShutdownNotifier.unregister(this);
+    }
   }
 }
