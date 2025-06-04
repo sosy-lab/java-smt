@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.logging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -43,6 +44,14 @@ public final class LoggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... pOptions) {
+    return new LoggingProverEnvironment(
+        logger, delegate.newProverEnvironment(pProverShutdownNotifier, pOptions));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
     return new LoggingInterpolatingProverEnvironment<>(
@@ -51,9 +60,25 @@ public final class LoggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    return new LoggingInterpolatingProverEnvironment<>(
+        logger, delegate.newProverEnvironmentWithInterpolation(pProverShutdownNotifier, options));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     return new LoggingOptimizationProverEnvironment(
         logger, delegate.newOptimizationProverEnvironment(options));
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    return new LoggingOptimizationProverEnvironment(
+        logger, delegate.newOptimizationProverEnvironment(pProverShutdownNotifier, options));
   }
 
   @Override

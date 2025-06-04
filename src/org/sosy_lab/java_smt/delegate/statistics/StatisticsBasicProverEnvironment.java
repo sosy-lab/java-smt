@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -36,11 +35,6 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
     unsatTimer = stats.unsat.getNewTimer();
     allSatTimer = stats.allSat.getNewTimer();
     stats.provers.getAndIncrement();
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return delegate.getShutdownManagerForProver();
   }
 
   @Override

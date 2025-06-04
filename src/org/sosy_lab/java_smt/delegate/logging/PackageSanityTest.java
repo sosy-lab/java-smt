@@ -9,5 +9,12 @@
 package org.sosy_lab.java_smt.delegate.logging;
 
 import com.google.common.testing.AbstractPackageSanityTests;
+import org.sosy_lab.common.ShutdownManager;
 
-public class PackageSanityTest extends AbstractPackageSanityTests {}
+public class PackageSanityTest extends AbstractPackageSanityTests {
+
+  // WTF?
+  {
+    setDefault(org.sosy_lab.common.ShutdownNotifier.class, ShutdownManager.create().getNotifier());
+  }
+}
