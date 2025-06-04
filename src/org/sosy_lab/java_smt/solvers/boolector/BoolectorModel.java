@@ -80,14 +80,14 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
           "set-option");
 
   private final long btor;
-  private final BoolectorAbstractProver<?> prover;
+  private final BoolectorTheoremProver prover;
   private final BoolectorFormulaCreator bfCreator;
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
       long btor,
       BoolectorFormulaCreator creator,
-      BoolectorAbstractProver<?> pProver,
+      BoolectorTheoremProver pProver,
       Collection<Long> assertedTerms) {
     super(pProver, creator);
     this.bfCreator = creator;

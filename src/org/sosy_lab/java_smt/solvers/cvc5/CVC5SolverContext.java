@@ -20,6 +20,7 @@ import io.github.cvc5.TermManager;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -76,7 +77,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   private CVC5FormulaCreator creator;
   private final TermManager termManager;
   private final Solver solver;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final int randomSeed;
   private final CVC5Settings settings;
   private boolean closed = false;
@@ -91,7 +92,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       CVC5Settings pSettings) {
     super(pManager);
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
     termManager = pTermManager;
     solver = pSolver;
@@ -215,11 +216,19 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
+  public ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
+
+    if (pProverShutdownNotifier != null) {
+      // TODO: CVC5 does not support shutdown at all currently. Remove completely?
+      throw new UnsupportedOperationException("CVC5 does not support interruption of provers");
+    }
+
     return new CVC5TheoremProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
+        null,
         randomSeed,
         pOptions,
         getFormulaManager(),
@@ -233,11 +242,18 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pOptions) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
+
+    if (pProverShutdownNotifier != null) {
+      // TODO: CVC5 does not support shutdown at all currently. Remove completely?
+      throw new UnsupportedOperationException("CVC5 does not support interruption of provers");
+    }
+
     return new CVC5InterpolatingProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
+        null,
         randomSeed,
         pOptions,
         getFormulaManager(),
@@ -247,7 +263,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("CVC5 does not support optimization");
   }
 }

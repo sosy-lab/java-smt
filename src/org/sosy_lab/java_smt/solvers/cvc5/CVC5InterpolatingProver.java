@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -46,13 +47,21 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap,
       boolean pValidateInterpolants) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr, pFurtherOptionsMap);
+    super(
+        pFormulaCreator,
+        pContextShutdownNotifier,
+        pProverShutdownNotifier,
+        randomSeed,
+        pOptions,
+        pMgr,
+        pFurtherOptionsMap);
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
@@ -84,6 +93,9 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     checkArgument(
         getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -101,6 +113,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
+    checkState(!closed);
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
