@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -42,7 +41,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       new Terminator() {
         @Override
         public boolean terminate() {
-          return proverShutdownNotifier.shouldShutdown();
+          return shouldShutdown();
         }
       };
   private final Bitwuzla env;
@@ -55,10 +54,15 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pManager.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     manager = pManager;
     creator = pCreator;
 
@@ -122,7 +126,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN && proverShutdownNotifier.shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
@@ -237,11 +241,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
             this,
             creator,
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 
   public boolean isClosed() {
