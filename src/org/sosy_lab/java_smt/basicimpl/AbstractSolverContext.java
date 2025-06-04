@@ -14,6 +14,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -38,43 +40,83 @@ public abstract class AbstractSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    ProverEnvironment out = newProverEnvironment0(toSet(options));
+    ProverEnvironment out = newProverEnvironment0(null, toSet(options));
+    return wrapProverEnvironmentWithAssumptionsWrapper(out);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public final ProverEnvironment newProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    ProverEnvironment out = newProverEnvironment0(pProverShutdownNotifier, toSet(options));
+    return wrapProverEnvironmentWithAssumptionsWrapper(out);
+  }
+
+  // TODO: switch to 2 methods with a default exception for pProverShutdownNotifier?
+  protected abstract ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options);
+
+  private ProverEnvironment wrapProverEnvironmentWithAssumptionsWrapper(
+      ProverEnvironment pProverEnvironment) {
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
-      out = new ProverWithAssumptionsWrapper(out);
+      return new ProverWithAssumptionsWrapper(pProverEnvironment);
     }
-    return out;
+    return pProverEnvironment;
   }
-
-  protected abstract ProverEnvironment newProverEnvironment0(Set<ProverOptions> options);
 
   @SuppressWarnings("resource")
   @Override
   public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
 
-    InterpolatingProverEnvironment<?> out = newProverEnvironmentWithInterpolation0(toSet(options));
+    InterpolatingProverEnvironment<?> out =
+        newProverEnvironmentWithInterpolation0(null, toSet(options));
+    return wrapProverEnvironmentWithAssumptionsWrapper(out);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public final InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+
+    InterpolatingProverEnvironment<?> out =
+        newProverEnvironmentWithInterpolation0(pProverShutdownNotifier, toSet(options));
+    return wrapProverEnvironmentWithAssumptionsWrapper(out);
+  }
+
+  // TODO: switch to 2 methods with a default exception for pProverShutdownNotifier?
+  protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet);
+
+  private InterpolatingProverEnvironment<?> wrapProverEnvironmentWithAssumptionsWrapper(
+      InterpolatingProverEnvironment<?> pInterpolatingProverEnvironment) {
     if (!supportsAssumptionSolving()) {
       // In the case we do not already have a prover environment with assumptions,
       // we add a wrapper to it
-      out = new InterpolatingProverWithAssumptionsWrapper<>(out, fmgr);
+      return new InterpolatingProverWithAssumptionsWrapper<>(pInterpolatingProverEnvironment, fmgr);
     }
-    return out;
+    return pInterpolatingProverEnvironment;
   }
-
-  protected abstract InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet);
 
   @SuppressWarnings("resource")
   @Override
   public final OptimizationProverEnvironment newOptimizationProverEnvironment(
       ProverOptions... options) {
-    return newOptimizationProverEnvironment0(toSet(options));
+    return newOptimizationProverEnvironment0(null, toSet(options));
   }
 
+  @SuppressWarnings("resource")
+  @Override
+  public final OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    return newOptimizationProverEnvironment0(pProverShutdownNotifier, toSet(options));
+  }
+
+  // TODO: switch to 2 methods with a default exception for pProverShutdownNotifier?
   protected abstract OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet);
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet);
 
   /**
    * Whether the solver supports solving under some given assumptions (with all corresponding
