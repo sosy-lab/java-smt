@@ -278,4 +278,14 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       return String.format("{%s, %s, %s}", booleanSymbols, theorySymbols, functionSymbols);
     }
   }
+
+  // @Override
+  // public ProofNode getProof() {
+  //  api.getCertificate();
+  //  return null;
+  // }
+
+  // protected Certificate getCertificate() {
+  //   return api.getCertificate();
+  // }
 }
