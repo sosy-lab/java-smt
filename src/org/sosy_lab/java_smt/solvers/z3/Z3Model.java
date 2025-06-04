@@ -67,7 +67,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
         Native.decRef(z3context, funcDecl);
       }
     } catch (Z3Exception e) {
-      throw z3creator.handleZ3ExceptionAsRuntimeException(e);
+      // TODO: Do we need the prover shutdown notifier here?
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e, null);
     }
 
     return out.build();
@@ -388,7 +389,8 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     try {
       satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
     } catch (Z3Exception e) {
-      throw z3creator.handleZ3ExceptionAsRuntimeException(e);
+      // TODO: Do we need the prover shutdown notifier here?
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e, null);
     }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {

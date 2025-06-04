@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class Z3SolverContext extends AbstractSolverContext {
 
   private final ShutdownRequestListener interruptListener;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final LogManager logger;
   private final ExtraOptions extraOptions;
   private final Z3FormulaCreator creator;
@@ -100,7 +100,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
 
     creator = pFormulaCreator;
     interruptListener = reason -> Native.interrupt(pFormulaCreator.getEnv());
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     pShutdownNotifier.register(interruptListener);
     logger = pLogger;
     manager = pManager;
@@ -214,7 +214,8 @@ public final class Z3SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
@@ -229,18 +230,24 @@ public final class Z3SolverContext extends AbstractSolverContext {
                     || options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS))
             .buildOrThrow();
     return new Z3TheoremProver(
-        creator, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
+        creator,
+        manager,
+        options,
+        solverOptions,
+        extraOptions.logfile,
+        contextShutdownNotifier,
+        pProverShutdownNotifier);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     throw new UnsupportedOperationException("Z3 does not support interpolation");
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
@@ -249,7 +256,14 @@ public final class Z3SolverContext extends AbstractSolverContext {
             .put(OPT_PRIORITY_CONFIG_KEY, extraOptions.objectivePrioritizationMode)
             .build();
     return new Z3OptimizationProver(
-        creator, logger, manager, options, solverOptions, extraOptions.logfile, shutdownNotifier);
+        creator,
+        logger,
+        manager,
+        options,
+        solverOptions,
+        extraOptions.logfile,
+        contextShutdownNotifier,
+        pProverShutdownNotifier);
   }
 
   @Override
@@ -273,7 +287,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
       closed = true;
       long context = creator.getEnv();
       creator.forceClose();
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
       Native.closeLog();
       Native.delContext(context);
     }

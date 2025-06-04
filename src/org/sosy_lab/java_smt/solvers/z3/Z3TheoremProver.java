@@ -42,13 +42,17 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(creator, pMgr, pOptions, pLogfile, pContextShutdownNotifier, pProverShutdownNotifier);
     z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
-    proverShutdownNotifier.register(interruptListener);
+    pContextShutdownNotifier.register(interruptListener);
+    if (pProverShutdownNotifier != null) {
+      pProverShutdownNotifier.register(interruptListener);
+    }
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
@@ -65,7 +69,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     try {
       Native.solverPush(z3context, z3solver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception, proverShutdownNotifier);
     }
   }
 
@@ -93,7 +97,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     try {
       result = Native.solverCheck(z3context, z3solver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
@@ -111,7 +115,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
               assumptions.size(),
               assumptions.stream().mapToLong(creator::extractInfo).toArray());
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
@@ -120,7 +124,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   private void undefinedStatusToException(int solverStatus)
       throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
         case "canceled": // see Z3: src/tactic/tactic.cpp
@@ -143,7 +147,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     try {
       return Native.solverGetModel(z3context, z3solver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3ExceptionAsRuntimeException(e);
+      throw creator.handleZ3ExceptionAsRuntimeException(e, proverShutdownNotifier);
     }
   }
 
@@ -193,7 +197,10 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
         propagator.close();
         propagator = null;
       }
-      proverShutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
+      if (proverShutdownNotifier != null) {
+        proverShutdownNotifier.unregister(interruptListener);
+      }
     }
     super.close();
   }

@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -54,8 +53,13 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
 
@@ -135,7 +139,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3ExceptionAsRuntimeException(exception, proverShutdownNotifier);
     }
     return null;
   }
@@ -255,12 +259,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     try {
       return super.allSat(callback, important);
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }
