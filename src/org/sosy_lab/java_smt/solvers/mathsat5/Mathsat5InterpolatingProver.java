@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -57,10 +58,11 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   Mathsat5InterpolatingProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -103,7 +105,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
     checkArgument(
@@ -133,7 +135,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
       List<? extends Collection<Integer>> partitionedFormulas)
       throws SolverException, InterruptedException {
     checkState(!closed);
-    proverShutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
     Preconditions.checkArgument(

@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import org.sosy_lab.common.ShutdownManager;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
@@ -65,8 +65,9 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       Mathsat5SolverContext pContext,
       Set<ProverOptions> pOptions,
       Mathsat5FormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pShutdownNotifier, pOptions);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pContextShutdownNotifier, pProverShutdownNotifier, pOptions);
     creator = pCreator;
     curConfig = buildConfig(pOptions);
     curEnv = pContext.createEnvironment(curConfig);
@@ -113,7 +114,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    */
   private TerminationCallback getTerminationTest() {
     return () -> {
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       return false;
     };
   }
@@ -280,15 +281,10 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
     @Override
     public void callback(long[] model) throws InterruptedException {
-      proverShutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       clientCallback.apply(
           Collections.unmodifiableList(
               Lists.transform(Longs.asList(model), creator::encapsulateBoolean)));
     }
-  }
-
-  @Override
-  public ShutdownManager getShutdownManagerForProver() throws UnsupportedOperationException {
-    return proverShutdownManager;
   }
 }
