@@ -25,9 +25,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
+import org.sosy_lab.java_smt.api.BasicProverEnvironment.AllSatCallback;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
@@ -112,8 +117,11 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireBitvectors();
     requireIsolatedProverShutdown();
 
-    testBasicProverTimeoutBv(() -> context.newProverEnvironment());
+    ShutdownManager sm1 = ShutdownManager.create();
+
+    testBasicProverTimeoutBv(() -> context.newProverEnvironment(sm1.getNotifier()), sm1);
     assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
+    assertThat(sm1.getNotifier().shouldShutdown()).isTrue();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -129,8 +137,11 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
     requireIsolatedProverShutdown();
 
-    testBasicProverTimeoutInt(() -> context.newProverEnvironment());
+    ShutdownManager sm1 = ShutdownManager.create();
+
+    testBasicProverTimeoutInt(() -> context.newProverEnvironment(sm1.getNotifier()), sm1);
     assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
+    assertThat(sm1.getNotifier().shouldShutdown()).isTrue();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -138,6 +149,8 @@ public class TimeoutTest extends SolverBasedTest0 {
       assertThat(pe.isUnsat()).isTrue();
     }
   }
+
+  // TODO: add model evaluation interrupt test for context and prover interrupt
 
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   @Test(timeout = TIMEOUT_MILLISECONDS)
@@ -192,16 +205,12 @@ public class TimeoutTest extends SolverBasedTest0 {
 
         testBasicContextTimeoutBv(() -> context.newProverEnvironment());
         assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
-        try {
-          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-        } catch (UnsupportedOperationException mayBeThrown) {
-          // Do nothing, we can't check for solvers that don't support this
-        }
 
-        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
       }
+      assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+      assertThrows(InterruptedException.class, pe1::isUnsat);
     }
   }
 
@@ -218,16 +227,80 @@ public class TimeoutTest extends SolverBasedTest0 {
 
         testBasicContextTimeoutInt(() -> context.newProverEnvironment());
         assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
-        try {
-          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-        } catch (UnsupportedOperationException mayBeThrown) {
-          // Do nothing, we can't check for solvers that don't support this
-        }
 
-        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
       }
+      assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+      assertThrows(InterruptedException.class, pe1::isUnsat);
+    }
+  }
+
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  // This test re-uses provers that already existed before the shutdown with their own prover
+  // based shutdown notifiers that have not been triggered.
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentProverWithNotifierUsageBv()
+      throws InterruptedException {
+    requireBitvectors();
+    assume()
+        .withMessage("Boolector does not support multiple provers")
+        .that(solverToUse())
+        .isNotEqualTo(BOOLECTOR);
+    requireIsolatedProverShutdown();
+
+    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager sm2 = ShutdownManager.create();
+    ShutdownManager sm3 = ShutdownManager.create();
+
+    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+        pe2.push(gen.generate(8));
+
+        testBasicContextTimeoutBv(() -> context.newProverEnvironment(sm3.getNotifier()));
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm3.getNotifier().shouldShutdown()).isFalse();
+
+        assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
+      assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+      assertThrows(InterruptedException.class, pe1::isUnsat);
+    }
+  }
+
+  // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
+  // This test re-uses provers that already existed before the shutdown with their own prover
+  // based shutdown notifiers that have not been triggered.
+  @Test(timeout = TIMEOUT_MILLISECONDS)
+  public void testContextInterruptWithSubsequentProverWithNotifierUsageInt()
+      throws InterruptedException {
+    requireIntegers();
+    requireIsolatedProverShutdown();
+
+    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager sm2 = ShutdownManager.create();
+    ShutdownManager sm3 = ShutdownManager.create();
+
+    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+        pe2.push(gen.generate(8));
+
+        testBasicContextTimeoutInt(() -> context.newProverEnvironment(sm3.getNotifier()));
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm3.getNotifier().shouldShutdown()).isFalse();
+
+        assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
+        assertThrows(InterruptedException.class, pe2::isUnsat);
+      }
+      assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
+      assertThrows(InterruptedException.class, pe1::isUnsat);
     }
   }
 
@@ -238,24 +311,26 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireBitvectors();
     requireIsolatedProverShutdown();
 
-    HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
-      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
-        pe2.push(gen.generate(8));
+    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager sm2 = ShutdownManager.create();
+    ShutdownManager sm3 = ShutdownManager.create();
 
-        testBasicProverTimeoutWithFeatureUsageBv(() -> context.newProverEnvironment());
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
+      assertProverAPIUsable(pe1);
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+        assertProverAPIUsable(pe2);
+
+        testBasicProverTimeoutWithFeatureUsageBv(
+            () -> context.newProverEnvironment(sm3.getNotifier()), sm3);
         assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
 
-        try {
-          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-        } catch (UnsupportedOperationException mayBeThrown) {
-          // Do nothing, we can't check for solvers that don't support this
-        }
+        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
 
-        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
-        assertThrows(InterruptedException.class, pe2::isUnsat);
+        assertProverAPIUsable(pe2);
       }
+      assertProverAPIUsable(pe1);
     }
   }
 
@@ -266,29 +341,33 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
     requireIsolatedProverShutdown();
 
-    HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment()) {
-      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment()) {
-        pe2.push(gen.generate(8));
+    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager sm2 = ShutdownManager.create();
+    ShutdownManager sm3 = ShutdownManager.create();
+
+    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
+      assertProverAPIUsable(pe1);
+      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+        assertProverAPIUsable(pe2);
 
         testBasicProverTimeoutWithFeatureUsageInt(
             () ->
                 context.newProverEnvironment(
+                    sm3.getNotifier(),
                     ProverOptions.GENERATE_UNSAT_CORE,
                     ProverOptions.GENERATE_MODELS,
                     ProverOptions.GENERATE_ALL_SAT,
-                    ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS));
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
-        try {
-          assertThat(pe1.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-          assertThat(pe2.getShutdownManagerForProver().getNotifier().shouldShutdown()).isTrue();
-        } catch (UnsupportedOperationException mayBeThrown) {
-          // Do nothing, we can't check for solvers that don't support this
-        }
+                    ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS),
+            sm3);
 
-        assertThrows(InterruptedException.class, () -> pe1.push(gen.generate(8)));
-        assertThrows(InterruptedException.class, pe2::isUnsat);
+        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
+
+        assertProverAPIUsable(pe2);
       }
+      assertProverAPIUsable(pe1);
     }
   }
 
@@ -323,19 +402,21 @@ public class TimeoutTest extends SolverBasedTest0 {
   /**
    * Shuts down the shutdown manager of the prover. Throws an exception for non-supporting solvers.
    */
-  private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
+  private void testBasicProverTimeoutInt(
+      Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
       throws InterruptedException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    testBasicProverBasedTimeout(proverConstructor, gen.generate(200));
+    testBasicProverBasedTimeout(proverConstructor, gen.generate(200), managerToInterrupt);
   }
 
   /**
    * Shuts down the shutdown manager of the prover. Throws an exception for non-supporting solvers.
    */
-  private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
+  private void testBasicProverTimeoutBv(
+      Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
       throws InterruptedException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    testBasicProverBasedTimeout(proverConstructor, gen.generate(200));
+    testBasicProverBasedTimeout(proverConstructor, gen.generate(200), managerToInterrupt);
   }
 
   /**
@@ -343,9 +424,10 @@ public class TimeoutTest extends SolverBasedTest0 {
    * Will try to use all available features of the solver afterward. (Model, UnsatCore etc.)
    */
   private void testBasicProverTimeoutWithFeatureUsageInt(
-      Supplier<BasicProverEnvironment<?>> proverConstructor) throws InterruptedException {
+      Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
+      throws InterruptedException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200));
+    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200), managerToInterrupt);
   }
 
   /**
@@ -353,9 +435,10 @@ public class TimeoutTest extends SolverBasedTest0 {
    * Will try to use all available features of the solver afterward. (Model, UnsatCore etc.)
    */
   private void testBasicProverTimeoutWithFeatureUsageBv(
-      Supplier<BasicProverEnvironment<?>> proverConstructor) throws InterruptedException {
+      Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
+      throws InterruptedException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200));
+    testProverBasedTimeoutWithFeatures(proverConstructor, gen.generate(200), managerToInterrupt);
   }
 
   @SuppressWarnings("CheckReturnValue")
@@ -381,7 +464,9 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   private void testBasicProverBasedTimeout(
-      Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
+      Supplier<BasicProverEnvironment<?>> proverConstructor,
+      BooleanFormula instance,
+      ShutdownManager managerToInterrupt)
       throws InterruptedException {
 
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
@@ -390,7 +475,7 @@ public class TimeoutTest extends SolverBasedTest0 {
               () -> {
                 try {
                   Thread.sleep(delay);
-                  pe.getShutdownManagerForProver().requestShutdown("Shutdown Request");
+                  managerToInterrupt.requestShutdown("Shutdown Request");
                 } catch (InterruptedException exception) {
                   throw new UnsupportedOperationException("Unexpected interrupt", exception);
                 }
@@ -401,8 +486,14 @@ public class TimeoutTest extends SolverBasedTest0 {
     }
   }
 
+  /**
+   * You can hand this a TheoremProver, InterpolatingProver or OptimizationProver, and it tests all
+   * common features after interrupt.
+   */
   private void testProverBasedTimeoutWithFeatures(
-      Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
+      Supplier<BasicProverEnvironment<?>> proverConstructor,
+      BooleanFormula instance,
+      ShutdownManager managerToInterrupt)
       throws InterruptedException {
 
     // TODO: maybe add a test that solves something correctly before interrupting?
@@ -413,22 +504,134 @@ public class TimeoutTest extends SolverBasedTest0 {
               () -> {
                 try {
                   Thread.sleep(delay);
-                  pe.getShutdownManagerForProver().requestShutdown("Shutdown Request");
+                  managerToInterrupt.requestShutdown("Shutdown Request");
                 } catch (InterruptedException exception) {
                   throw new UnsupportedOperationException("Unexpected interrupt", exception);
                 }
               });
       pe.push(instance);
       t.start();
-      assertThrows(InterruptedException.class, pe::isUnsat);
-      assertThrows(InterruptedException.class, pe::getModel);
-      assertThrows(InterruptedException.class, pe::getUnsatCore);
+      assertProverAPIThrowsInterruptedException(pe);
+    }
+  }
+
+  /**
+   * This always starts with isUnsat() that should be interrupted (either while solving or before).
+   * The correct options for the usage of UnsatCore and UnsatCoreOverAssumptions have not to be set!
+   */
+  private void assertProverAPIThrowsInterruptedException(BasicProverEnvironment<?> pe) {
+    assertThrows(InterruptedException.class, pe::isUnsat);
+    assertThrows(InterruptedException.class, pe::getModel);
+    assertThrows(InterruptedException.class, pe::getModelAssignments);
+    assertThrows(InterruptedException.class, pe::getEvaluator);
+    assertThrows(InterruptedException.class, pe::getUnsatCore);
+    assertThrows(
+        InterruptedException.class,
+        () ->
+            pe.allSat(
+                new AllSatCallback<>() {
+
+                  private final List<List<BooleanFormula>> models = new ArrayList<>();
+
+                  @Override
+                  public void apply(List<BooleanFormula> pModel) {
+                    models.add(pModel);
+                  }
+
+                  @Override
+                  public List<List<BooleanFormula>> getResult() {
+                    return models;
+                  }
+                },
+                ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(
+        InterruptedException.class,
+        () -> pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(
+        InterruptedException.class,
+        () -> pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(InterruptedException.class, () -> pe.addConstraint(bmgr.makeFalse()));
+    assertThrows(InterruptedException.class, () -> pe.push(bmgr.makeFalse()));
+    assertThrows(InterruptedException.class, pe::push);
+    assertThrows(InterruptedException.class, pe::pop);
+    if (pe instanceof InterpolatingProverEnvironment) {
+      InterpolatingProverEnvironment<?> ipe = (InterpolatingProverEnvironment<?>) pe;
+      assertThrows(InterruptedException.class, () -> ipe.getInterpolant(ImmutableList.of()));
+      assertThrows(InterruptedException.class, () -> ipe.getSeqInterpolants(ImmutableList.of()));
+      assertThrows(InterruptedException.class, () -> ipe.getSeqInterpolants0(ImmutableList.of()));
       assertThrows(
-          InterruptedException.class, () -> pe.isUnsatWithAssumptions(ImmutableList.of(instance)));
-      assertThrows(InterruptedException.class, () -> pe.addConstraint(instance));
-      assertThrows(InterruptedException.class, () -> pe.push(instance));
-      assertThrows(InterruptedException.class, pe::push);
-      assertThrows(InterruptedException.class, pe::pop);
+          InterruptedException.class,
+          () -> ipe.getTreeInterpolants(ImmutableList.of(), new int[] {0}));
+      assertThrows(
+          InterruptedException.class,
+          () -> ipe.getTreeInterpolants0(ImmutableList.of(), new int[] {0}));
+    }
+    if (pe instanceof OptimizationProverEnvironment) {
+      OptimizationProverEnvironment ope = (OptimizationProverEnvironment) pe;
+      assertThrows(InterruptedException.class, () -> ope.maximize(bmgr.makeFalse()));
+      assertThrows(InterruptedException.class, () -> ope.minimize(bmgr.makeFalse()));
+      assertThrows(InterruptedException.class, ope::check);
+      assertThrows(InterruptedException.class, () -> ope.upper(1, Rational.ZERO));
+      assertThrows(InterruptedException.class, () -> ope.lower(1, Rational.ZERO));
+      assertThrows(InterruptedException.class, ope::getModel);
+    }
+  }
+
+  private void assertProverAPIUsable(BasicProverEnvironment<?> pe) {
+    assertThrows(InterruptedException.class, pe::isUnsat);
+    assertThrows(InterruptedException.class, pe::getModel);
+    assertThrows(InterruptedException.class, pe::getModelAssignments);
+    assertThrows(InterruptedException.class, pe::getEvaluator);
+    assertThrows(InterruptedException.class, pe::getUnsatCore);
+    assertThrows(
+        InterruptedException.class,
+        () ->
+            pe.allSat(
+                new AllSatCallback<>() {
+
+                  private final List<List<BooleanFormula>> models = new ArrayList<>();
+
+                  @Override
+                  public void apply(List<BooleanFormula> pModel) {
+                    models.add(pModel);
+                  }
+
+                  @Override
+                  public List<List<BooleanFormula>> getResult() {
+                    return models;
+                  }
+                },
+                ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(
+        InterruptedException.class,
+        () -> pe.unsatCoreOverAssumptions(ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(
+        InterruptedException.class,
+        () -> pe.isUnsatWithAssumptions(ImmutableList.of(bmgr.makeFalse())));
+    assertThrows(InterruptedException.class, () -> pe.addConstraint(bmgr.makeFalse()));
+    assertThrows(InterruptedException.class, () -> pe.push(bmgr.makeFalse()));
+    assertThrows(InterruptedException.class, pe::push);
+    assertThrows(InterruptedException.class, pe::pop);
+    if (pe instanceof InterpolatingProverEnvironment) {
+      InterpolatingProverEnvironment<?> ipe = (InterpolatingProverEnvironment<?>) pe;
+      assertThrows(InterruptedException.class, () -> ipe.getInterpolant(ImmutableList.of()));
+      assertThrows(InterruptedException.class, () -> ipe.getSeqInterpolants(ImmutableList.of()));
+      assertThrows(InterruptedException.class, () -> ipe.getSeqInterpolants0(ImmutableList.of()));
+      assertThrows(
+          InterruptedException.class,
+          () -> ipe.getTreeInterpolants(ImmutableList.of(), new int[] {0}));
+      assertThrows(
+          InterruptedException.class,
+          () -> ipe.getTreeInterpolants0(ImmutableList.of(), new int[] {0}));
+    }
+    if (pe instanceof OptimizationProverEnvironment) {
+      OptimizationProverEnvironment ope = (OptimizationProverEnvironment) pe;
+      assertThrows(InterruptedException.class, () -> ope.maximize(bmgr.makeFalse()));
+      assertThrows(InterruptedException.class, () -> ope.minimize(bmgr.makeFalse()));
+      assertThrows(InterruptedException.class, ope::check);
+      assertThrows(InterruptedException.class, () -> ope.upper(1, Rational.ZERO));
+      assertThrows(InterruptedException.class, () -> ope.lower(1, Rational.ZERO));
+      assertThrows(InterruptedException.class, ope::getModel);
     }
   }
 }
