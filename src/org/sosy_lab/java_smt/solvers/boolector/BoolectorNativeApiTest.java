@@ -323,7 +323,7 @@ public class BoolectorNativeApiTest {
         .isEqualTo(BtorJNI.boolector_bv_assignment(btor, x));
     assertThat(BtorJNI.boolector_bv_assignment(btor, yValue))
         .isEqualTo(BtorJNI.boolector_bv_assignment(btor, y));
-    // The assignment_helper generates the assignments in a array of arrays!
+    // The assignment_helper generates the assignments in an array of arrays!
     String[][] arrayValueHelperArray = BtorJNI.boolector_array_assignment_helper(btor, arrayValue);
     String[] arrayValueIndices = arrayValueHelperArray[0];
     Arrays.sort(arrayValueIndices);

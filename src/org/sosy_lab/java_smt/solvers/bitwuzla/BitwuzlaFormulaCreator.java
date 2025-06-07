@@ -475,7 +475,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       }
       if (f.num_indices() > 0) {
         // We need to retain the original formula as the declaration for indexed formulas,
-        // otherwise we loose the index info, but we also need to know if its a kind or term
+        // otherwise we loose the index info, but we also need to know if it's a kind or term
         decl = BitwuzlaDeclaration.create(f);
       }
 

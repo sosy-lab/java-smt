@@ -325,8 +325,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    */
   private BigInteger parseBigInt(String assignment) {
     try {
-      BigInteger bigInt = new BigInteger(assignment, 2);
-      return bigInt;
+      return new BigInteger(assignment, 2);
     } catch (NumberFormatException e) {
       char[] charArray = assignment.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
@@ -401,7 +400,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     Iterator<java.util.Map.Entry<Long, Long>> entrySetIter =
         formulaCache.row(variable).entrySet().iterator();
     if (entrySetIter.hasNext()) {
-      // If there is a non empty row for an entry, there is only one entry
+      // If there is a non-empty row for an entry, there is only one entry
       return Optional.of(entrySetIter.next().getValue());
     }
     return Optional.empty();

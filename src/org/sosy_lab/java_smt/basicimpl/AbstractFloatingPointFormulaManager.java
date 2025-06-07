@@ -34,9 +34,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
  *
  * <p>For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and {@link
  * #divide(FloatingPointFormula, FloatingPointFormula)} this class even offers an implementation
- * based on UFs. Sub-classes are supposed to override them if they can implement these operations
+ * based on UFs. Subclasses are supposed to override them if they can implement these operations
  * more precisely (for example multiplication with constants should be supported by all solvers and
- * implemented by all sub-classes).
+ * implemented by all subclasses).
  */
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
