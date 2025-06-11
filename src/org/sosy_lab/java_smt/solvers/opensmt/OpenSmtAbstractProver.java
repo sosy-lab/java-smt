@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
@@ -241,8 +240,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   protected List<BooleanFormula> getUnsatCoreImpl() {
-    Preconditions.checkState(!wasLastSatCheckSat);
-    Preconditions.checkState(!stackChangedSinceLastQuery);
     return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 

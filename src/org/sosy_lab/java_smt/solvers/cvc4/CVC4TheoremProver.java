@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
@@ -121,7 +120,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
     if (incremental) {
       assertFormula(pF);
     }
@@ -199,8 +197,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected List<BooleanFormula> getUnsatCoreImpl() {
-    Preconditions.checkState(!wasLastSatCheckSat);
-    Preconditions.checkState(!stackChangedSinceLastQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));

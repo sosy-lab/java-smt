@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
@@ -138,7 +137,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
     Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
@@ -199,8 +197,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected List<BooleanFormula> getUnsatCoreImpl() {
-    Preconditions.checkState(!stackChangedSinceLastQuery);
-    Preconditions.checkState(!wasLastSatCheckSat);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));
@@ -228,10 +224,4 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
     super.close();
   }
-
-  /* TODO: revisit once CVC5 supports interruption
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
-  }*/
 }
