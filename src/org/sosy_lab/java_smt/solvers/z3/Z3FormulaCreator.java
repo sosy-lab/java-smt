@@ -131,7 +131,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
-  protected final ShutdownNotifier shutdownNotifier;
+  protected final ShutdownNotifier contextShutdownNotifier;
 
   @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
@@ -142,10 +142,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long pStringType,
       long pRegexType,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier)
+      ShutdownNotifier pContextShutdownNotifier)
       throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     config.inject(this);
 
     if (usePhantomReferences) {
@@ -165,10 +165,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * Otherwise, the given exception is wrapped and thrown as a SolverException.
    */
   @CanIgnoreReturnValue
-  final SolverException handleZ3Exception(Z3Exception e)
+  final SolverException handleZ3Exception(
+      Z3Exception e, @Nullable ShutdownNotifier pAdditionalShutdownNotifier)
       throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
+      if (pAdditionalShutdownNotifier != null) {
+        pAdditionalShutdownNotifier.shutdownIfNecessary();
+      }
     }
     throw new SolverException("Z3 has thrown an exception", e);
   }
@@ -181,9 +185,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @return nothing, always throw a RuntimeException
    * @throws RuntimeException always thrown for the given Z3Exception
    */
-  final RuntimeException handleZ3ExceptionAsRuntimeException(Z3Exception e) {
+  final RuntimeException handleZ3ExceptionAsRuntimeException(
+      Z3Exception e, @Nullable ShutdownNotifier pAdditionalShutdownNotifier) {
     try {
-      throw handleZ3Exception(e);
+      throw handleZ3Exception(e, pAdditionalShutdownNotifier);
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
       throw sneakyThrow(e);
@@ -1080,7 +1085,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       result = Native.tacticApply(z3context, tacticObject, goal);
     } catch (Z3Exception exp) {
-      throw handleZ3Exception(exp);
+      throw handleZ3Exception(exp, null);
     }
 
     try {

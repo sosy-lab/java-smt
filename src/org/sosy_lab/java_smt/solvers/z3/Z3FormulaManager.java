@@ -192,7 +192,7 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
       try {
         return Native.simplify(getFormulaCreator().getEnv(), pF);
       } catch (Z3Exception exp) {
-        throw formulaCreator.handleZ3Exception(exp);
+        throw formulaCreator.handleZ3Exception(exp, null);
       }
     } catch (SolverException e) {
       // ignore exception and return original formula AS-IS.

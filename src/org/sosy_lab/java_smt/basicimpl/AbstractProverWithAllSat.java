@@ -14,6 +14,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
@@ -28,16 +29,15 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
-  protected final ShutdownNotifier shutdownNotifier;
   private final BooleanFormulaManager bmgr;
 
   protected AbstractProverWithAllSat(
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pContextShutdownNotifier, pProverShutdownNotifier, pOptions);
     bmgr = pBmgr;
-    shutdownNotifier = pShutdownNotifier;
   }
 
   @Override
@@ -68,7 +68,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws SolverException, InterruptedException {
     while (!isUnsat()) {
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       ImmutableList.Builder<BooleanFormula> valuesOfModel = ImmutableList.builder();
       try (Evaluator evaluator = getEvaluatorWithoutChecks()) {
@@ -88,11 +88,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
 
       final ImmutableList<BooleanFormula> values = valuesOfModel.build();
       callback.apply(values);
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
 
       BooleanFormula negatedModel = bmgr.not(bmgr.and(values));
       addConstraint(negatedModel);
-      shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
     }
   }
 
@@ -113,7 +113,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       Deque<BooleanFormula> valuesOfModel)
       throws SolverException, InterruptedException {
 
-    shutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     if (isUnsat()) {
       return;

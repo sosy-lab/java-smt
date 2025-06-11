@@ -57,10 +57,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   Mathsat5OptimizationProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -98,8 +99,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     checkState(!closed);
+    wasLastSatCheckSat = false;
     final boolean isSatisfiable = msat_check_sat(curEnv);
+    stackChangedSinceLastQuery = false;
     if (isSatisfiable) {
+      wasLastSatCheckSat = true;
       return OptStatus.OPT;
     } else {
       return OptStatus.UNSAT;
@@ -145,11 +149,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  protected Model getModelImpl() throws SolverException {
     checkState(!closed);
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
-    return super.getModel();
+    return super.getModelImpl();
   }
 }

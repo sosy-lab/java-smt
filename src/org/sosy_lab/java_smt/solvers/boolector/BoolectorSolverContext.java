@@ -62,7 +62,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private boolean closed = false;
   private final AtomicBoolean isAnyStackAlive = new AtomicBoolean(false);
 
@@ -73,7 +73,7 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
     super(pManager);
     manager = pManager;
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
   }
 
   public static BoolectorSolverContext create(
@@ -196,21 +196,28 @@ public final class BoolectorSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pOptions) {
     Preconditions.checkState(!closed, "solver context is already closed");
     return new BoolectorTheoremProver(
-        manager, creator, creator.getEnv(), shutdownNotifier, pOptions, isAnyStackAlive);
+        manager,
+        creator,
+        creator.getEnv(),
+        contextShutdownNotifier,
+        pProverShutdownNotifier,
+        pOptions,
+        isAnyStackAlive);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Boolector does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Boolector does not support optimization");
   }
 

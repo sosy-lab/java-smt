@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -40,13 +41,15 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   OpenSmtInterpolatingProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions,
       OpenSMTOptions pSolverOptions) {
     super(
         pFormulaCreator,
         pMgr,
-        pShutdownNotifier,
+        pContextShutdownNotifier,
+        pProverShutdownNotifier,
         getConfigInstance(pOptions, pSolverOptions, true),
         pOptions);
     trackedConstraints.push(0); // initialize first level
@@ -73,8 +76,12 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
+      throws InterruptedException {
     checkState(!closed);
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat);
+    checkState(!stackChangedSinceLastQuery);
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "interpolation can only be done over previously asserted formulas.");

@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -44,9 +45,10 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pMgr, creator, pApi, pShutdownNotifier, pOptions);
+    super(pMgr, creator, pApi, pContextShutdownNotifier, pProverShutdownNotifier, pOptions);
   }
 
   @Override
