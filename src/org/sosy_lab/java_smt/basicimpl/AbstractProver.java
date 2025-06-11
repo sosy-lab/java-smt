@@ -88,6 +88,16 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return contextShutdownNotifier.shouldShutdown();
   }
 
+  protected final String getShutdownReason() {
+    String msg = "Prover is not usable due to shutdown with message: ";
+    if (proverShutdownNotifier != null && proverShutdownNotifier.shouldShutdown()) {
+      return msg + contextShutdownNotifier.getReason();
+    }
+
+    checkState(contextShutdownNotifier.shouldShutdown());
+    return msg + contextShutdownNotifier.getReason();
+  }
+
   protected final void checkGenerateModels() {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
   }
@@ -132,7 +142,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public List<BooleanFormula> getUnsatCore() {
     checkState(!closed);
-    checkState(!shouldShutdown());
+    checkState(!shouldShutdown(), getShutdownReason());
     checkState(!wasLastSatCheckSat, NO_UNSAT_CORE_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateUnsatCores();
@@ -168,7 +178,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final Model getModel() throws SolverException {
     checkState(!closed);
-    checkState(!shouldShutdown());
+    checkState(!shouldShutdown(), getShutdownReason());
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateModels();
@@ -180,7 +190,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final Evaluator getEvaluator() throws SolverException {
     checkState(!closed);
-    checkState(!shouldShutdown());
+    checkState(!shouldShutdown(), getShutdownReason());
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateModels();
@@ -205,7 +215,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void pop() {
     checkState(!closed);
-    checkState(!shouldShutdown());
+    checkState(!shouldShutdown(), getShutdownReason());
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     // TODO: technically only needed if the level removed was non empty.
@@ -268,7 +278,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
     Preconditions.checkState(!closed);
-    checkState(!shouldShutdown());
+    checkState(!shouldShutdown(), getShutdownReason());
     Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkState(wasLastSatCheckSat);
     try (Model model = getModel()) {
