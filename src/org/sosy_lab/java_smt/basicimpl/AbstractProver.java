@@ -205,6 +205,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final void pop() {
     checkState(!closed);
+    checkState(!shouldShutdown());
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     // TODO: technically only needed if the level removed was non empty.
