@@ -244,11 +244,4 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     }
     return callback.getResult();
   }
-
-  /* TODO: the shutdownNotifier is bound to the Script. But this is done in the context. It seems
-       like it might be re-usable after a shutdown.
-  @Override
-  protected ShutdownManager getShutdownManagerForProverImpl() throws UnsupportedOperationException {
-    return proverShutdownManager;
-  }*/
 }
