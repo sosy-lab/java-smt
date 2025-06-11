@@ -83,7 +83,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
    */
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
     wasLastSatCheckSat = false;
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
@@ -117,7 +116,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   @Override
   protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
     for (BooleanFormula assumption : pAssumptions) {
       BtorJNI.boolector_assume(btor, BoolectorFormulaManager.getBtorTerm(assumption));
     }
@@ -127,8 +125,6 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
   @SuppressWarnings("resource")
   @Override
   protected Model getModelImpl() throws SolverException {
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
-    checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
