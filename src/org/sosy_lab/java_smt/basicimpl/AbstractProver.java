@@ -89,13 +89,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final String getShutdownReason() {
-    String msg = "Prover is not usable due to shutdown with message: ";
     if (proverShutdownNotifier != null && proverShutdownNotifier.shouldShutdown()) {
-      return msg + contextShutdownNotifier.getReason();
+      return SHUTDOWN_EXCEPTION_PREFIX + contextShutdownNotifier.getReason();
     }
 
     checkState(contextShutdownNotifier.shouldShutdown());
-    return msg + contextShutdownNotifier.getReason();
+    return SHUTDOWN_EXCEPTION_PREFIX + contextShutdownNotifier.getReason();
   }
 
   protected final void checkGenerateModels() {

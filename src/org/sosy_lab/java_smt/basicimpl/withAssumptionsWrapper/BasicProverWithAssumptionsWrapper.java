@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
@@ -36,6 +37,21 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
     solverAssumptionsAsFormula.clear();
   }
 
+  protected void clearAssumptionsWithInterruptedException() throws InterruptedException {
+    for (int i = 0; i < solverAssumptionsAsFormula.size(); i++) {
+      try {
+        delegate.pop();
+      } catch (IllegalStateException ise) {
+        if (ise.getMessage().startsWith(AbstractProver.SHUTDOWN_EXCEPTION_PREFIX)) {
+          throw new InterruptedException(
+              ise.getMessage()
+                  .replace("Prover is not usable due " + "to shutdown with message: ", ""));
+        }
+      }
+    }
+    solverAssumptionsAsFormula.clear();
+  }
+
   @Override
   public void pop() {
     clearAssumptions();
@@ -44,13 +60,16 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    clearAssumptions();
+    // This might throw the "wrong" exception because it pops the assumptions
+    // (which does not return a InterruptedException for interrupts)
+    clearAssumptionsWithInterruptedException();
+
     return delegate.addConstraint(constraint);
   }
 
   @Override
   public void push() throws InterruptedException {
-    clearAssumptions();
+    clearAssumptionsWithInterruptedException();
     delegate.push();
   }
 
@@ -61,14 +80,14 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    clearAssumptions();
+    clearAssumptionsWithInterruptedException();
     return delegate.isUnsat();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    clearAssumptions();
+    clearAssumptionsWithInterruptedException();
     solverAssumptionsAsFormula.addAll(assumptions);
     for (BooleanFormula formula : assumptions) {
       registerPushedFormula(delegate.push(formula));
@@ -125,7 +144,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   @Override
   public <R> R allSat(AllSatCallback<R> pCallback, List<BooleanFormula> pImportant)
       throws InterruptedException, SolverException {
-    clearAssumptions();
+    clearAssumptionsWithInterruptedException();
     return delegate.allSat(pCallback, pImportant);
   }
 }

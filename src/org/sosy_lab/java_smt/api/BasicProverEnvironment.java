@@ -30,6 +30,9 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   String STACK_CHANGED_HELP =
       "Computation failed. The prover state has changed since the last call to isUnsat().";
 
+  // Used as prefix concatenated with the reason in the IllegalStateException thrown for shutdowns
+  String SHUTDOWN_EXCEPTION_PREFIX = "Prover is not usable due to interrupt with message: ";
+
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the sub-type of
