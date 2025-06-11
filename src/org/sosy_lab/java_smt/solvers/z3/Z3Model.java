@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -34,12 +35,16 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final Z3FormulaCreator z3creator;
 
-  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaCreator pCreator) {
+  private final @Nullable ShutdownNotifier proverShutdownNotifier;
+
+  Z3Model(AbstractProver<?> pProver, long z3context, long z3model, Z3FormulaCreator pCreator,
+          @Nullable ShutdownNotifier pProverShutdownNotifier) {
     super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
     this.z3context = z3context;
     z3creator = pCreator;
+    proverShutdownNotifier = pProverShutdownNotifier;
   }
 
   @Override
@@ -67,8 +72,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
         Native.decRef(z3context, funcDecl);
       }
     } catch (Z3Exception e) {
-      // TODO: Do we need the prover shutdown notifier here?
-      throw z3creator.handleZ3ExceptionAsRuntimeException(e, null);
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e, proverShutdownNotifier);
     }
 
     return out.build();
@@ -389,8 +393,7 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     try {
       satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
     } catch (Z3Exception e) {
-      // TODO: Do we need the prover shutdown notifier here?
-      throw z3creator.handleZ3ExceptionAsRuntimeException(e, null);
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e, proverShutdownNotifier);
     }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {

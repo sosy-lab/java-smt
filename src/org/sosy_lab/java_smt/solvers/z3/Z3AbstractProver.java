@@ -116,7 +116,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Z3Model getEvaluatorWithoutChecks() throws SolverException {
-    return new Z3Model(this, z3context, getZ3Model(), creator);
+    return new Z3Model(this, z3context, getZ3Model(), creator, proverShutdownNotifier);
   }
 
   protected abstract long getZ3Model() throws SolverException;
