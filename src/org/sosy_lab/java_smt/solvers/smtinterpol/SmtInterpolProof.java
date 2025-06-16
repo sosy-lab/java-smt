@@ -132,12 +132,19 @@ class SmtInterpolProof extends AbstractProof {
             // This can not stay like this, the algorithm calculating the formulas to be stored is
             // needed, as what we retrieve here is simply arguments for generating a clause,
             // meaning the arguments do not have to be boolean and therefore joining them with OR
-            // causes and exception.
+            // causes an exception.
             // Term or = Util.or(creator.getEnv(), proofNode.formulas.toArray(new Term[0]));
             // formula = creator.encapsulate(creator.getFormulaType(or), or);
           } else if (!proofNode.formulas.isEmpty()) {
-            Term t = proofNode.formulas.get(0);
-            formula = creator.encapsulate(creator.getFormulaType(t), t);
+            // We only know for sure what formulas are stored in the following cases. Otherwise, we
+            // only have an input for generating the clauses after applying the RESOLUTE axioms.
+            if (proofNode.proofRule.equals(ResAxiom.RESOLUTION)
+                || proofNode.proofRule.equals(ResAxiom.ASSUME)
+                || proofNode.proofRule.equals(Rules.RUP)
+                || proofNode.proofRule.equals(Rules.PIVOT)) {
+              Term t = proofNode.formulas.get(0);
+              formula = creator.encapsulate(creator.getFormulaType(t), t);
+            }
           }
           SmtInterpolSubproof pn =
               new SmtInterpolSubproof(proofNode.proofRule, formula, this.proof);
