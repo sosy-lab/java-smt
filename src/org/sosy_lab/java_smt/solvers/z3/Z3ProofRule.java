@@ -87,7 +87,7 @@ enum Z3ProofRule implements ProofRule {
   TH_LEMMA("th_lemma", "Theory-specific lemma"),
   HYPER_RESOLVE("hyper_resolve", "Hyper-resolution with multiple premises"),
 
-  OPERATION("operation", null);
+  OPERATION("operation", "");
 
   private final String name;
   private final String formula;
