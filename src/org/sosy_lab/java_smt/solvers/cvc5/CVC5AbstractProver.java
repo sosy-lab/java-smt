@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.solvers.cvc5.CVC5Proof.generateProofImpl;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -16,7 +17,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.CVC5ApiRecoverableException;
-import io.github.cvc5.Proof;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Term;
@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -250,20 +250,19 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Subproof getProof() throws SolverException, InterruptedException {
+  public Proof getProof() throws SolverException, InterruptedException {
     checkGenerateProofs();
     checkState(!closed);
     checkState(isUnsat());
 
-    Proof[] proofs = solver.getProof();
+    io.github.cvc5.Proof[] proofs = solver.getProof();
     if (proofs == null || proofs.length == 0) {
       throw new IllegalStateException("No proof available");
     }
 
     // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
-      CVC5Proof proof = new CVC5Proof();
-      return proof.generateProofImpl(proofs[0], creator);
+      return generateProofImpl(proofs[0], creator);
     } catch (CVC5ApiException e) {
       throw new SolverException("There was a problem generating proof", e);
     }

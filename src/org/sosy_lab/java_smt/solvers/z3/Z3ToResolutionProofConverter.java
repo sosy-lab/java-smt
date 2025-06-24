@@ -17,19 +17,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.java_smt.AxiomProof;
 import org.sosy_lab.java_smt.ResProofRule.ResAxiom;
 import org.sosy_lab.java_smt.ResolutionProof;
-import org.sosy_lab.java_smt.ResolutionProof.AxiomSubproof;
-import org.sosy_lab.java_smt.ResolutionProof.ResolutionSubproof;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
-import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
-import org.sosy_lab.java_smt.solvers.z3.Z3Proof.Z3Subproof;
 
 /**
  * Converts a Z3 proof into a format based on the RESOLUTE proof format.
@@ -53,27 +51,23 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
   private final BooleanFormulaManager bfm;
 
-  private Z3Proof proof;
-
   Z3ToResolutionProofConverter(Z3FormulaManager creator) {
     formulaManager = creator;
     bfm = formulaManager.getBooleanFormulaManager();
-    proof = new Z3Proof();
   }
 
   private static final Map<Z3ProofRule, ResAxiom> ruleMapping = new HashMap<>();
 
   /**
-   * This method converts a set of Z3ProofNodes into a {@link ResolutionProof}.
+   * This method converts a set of Z3ProofNodes into a {@link
+   * org.sosy_lab.java_smt.ResolutionProof}.
    *
    * @param z3ProofNodes the nodes to be converted.
-   * @return {@link ResolutionProof}
+   * @return {@link org.sosy_lab.java_smt.ResolutionProof}
    */
-  ResolutionProof convertToResolutionProofDag(Z3Subproof[] z3ProofNodes) {
-    ResolutionProof dag = new ResolutionProof();
-    this.proof = (Z3Proof) z3ProofNodes[0].getDAG();
+  ResolutionProof convertToResolutionProofDag(Z3Proof[] z3ProofNodes) {
 
-    for (Z3Subproof z3Node : z3ProofNodes) {
+    for (Z3Proof z3Node : z3ProofNodes) {
       if (z3Node.getRule() == MODUS_PONENS) {
         continue; // process mp continue here to avoid empty if block
       } else {
@@ -83,8 +77,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
         // dag.addNode(sourceNode);
       }
     }
-
-    return dag;
+    throw new UnsupportedOperationException();
   }
 
   // This should help extract parts of a formula to better transform proof rules.
@@ -166,13 +159,13 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   /**
-   * Converts a {@link Z3Subproof} into either a {@link ResolutionSubproof} or a {@link
-   * AxiomSubproof}, depending on its rule.
+   * Converts a {@link Z3Proof} into either a {@link ResolutionProof} or a {@link AxiomProof},
+   * depending on its rule.
    *
-   * @param node the {@link Z3Subproof} to convert
-   * @return the resulting {@link Subproof}
+   * @param node the {@link Z3Proof} to convert
+   * @return the resulting {@link Proof}
    */
-  Subproof handleNode(Z3Subproof node) {
+  Proof handleNode(Z3Proof node) {
     Z3ProofRule rule = (Z3ProofRule) node.getRule();
 
     switch (rule) {
@@ -307,52 +300,51 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     }
   }
 
-  Subproof handleTrue(Z3Subproof node) {
+  Proof handleTrue(Z3Proof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    AxiomSubproof pn = new AxiomSubproof(ResAxiom.TRUE_POSITIVE, formula, proof);
+    AxiomProof pn = new AxiomProof(ResAxiom.TRUE_POSITIVE, formula);
     return pn;
   }
 
-  Subproof handleAsserted(Z3Subproof node) {
+  Proof handleAsserted(Z3Proof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    AxiomSubproof pn = new AxiomSubproof(ResAxiom.ASSUME, formula, proof);
+    AxiomProof pn = new AxiomProof(ResAxiom.ASSUME, formula);
     return pn;
   }
 
-  Subproof handleModusPonens(Z3Subproof node) {
+  Proof handleModusPonens(Z3Proof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     BooleanFormula pivot =
-        (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
-    ResolutionSubproof pn = new ResolutionSubproof(formula, pivot, proof);
-    Subproof c1 = handleNode((Z3Subproof) node.getArguments().stream().findFirst().get());
-    Subproof c2 = handleNode((Z3Subproof) new ArrayList<>(node.getArguments()).get(1));
+        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
+    ResolutionProof pn = new ResolutionProof(formula, pivot);
+    Proof c1 = handleNode((Z3Proof) node.getChildren().stream().findFirst().get());
+    Proof c2 = handleNode((Z3Proof) new ArrayList<>(node.getChildren()).get(1));
     return pn;
   }
 
-  Subproof handleReflexivity(Z3Subproof node) {
+  Proof handleReflexivity(Z3Proof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
-    AxiomSubproof pn = new AxiomSubproof(ResAxiom.REFLEXIVITY, formula, proof);
+    AxiomProof pn = new AxiomProof(ResAxiom.REFLEXIVITY, formula);
     return pn;
   }
 
-  Subproof handleSymmetry(Z3Subproof node) {
+  Proof handleSymmetry(Z3Proof node) {
     BooleanFormula formula = (BooleanFormula) node.getFormula();
     BooleanFormula pivot =
-        (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
+        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
     BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
 
-    ResolutionSubproof pn = new ResolutionSubproof(formula, pivot, proof);
-    AxiomSubproof sn = new AxiomSubproof(ResAxiom.SYMMETRY, snFormula, proof);
+    ResolutionProof pn = new ResolutionProof(formula, pivot);
+    AxiomProof sn = new AxiomProof(ResAxiom.SYMMETRY, snFormula);
     pn.addChild(sn);
-    pn.addChild(handleNode((Z3Subproof) node.getArguments().stream().findFirst().get()));
+    pn.addChild(handleNode((Z3Proof) node.getChildren().stream().findFirst().get()));
     return pn;
   }
 
-  Subproof handleTransitivity(Z3Subproof node) {
+  Proof handleTransitivity(Z3Proof node) {
 
-    BooleanFormula t1 =
-        (BooleanFormula) node.getArguments().stream().findFirst().get().getFormula();
-    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getArguments()).get(1).getFormula();
+    BooleanFormula t1 = (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
+    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula();
     BooleanFormula formula = (BooleanFormula) node.getFormula();
 
     List<BooleanFormula> equivalenceOperands1 = extractEquivalenceOperands(t1);
@@ -363,13 +355,13 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     BooleanFormula transRes = formula;
     BooleanFormula transClause = bfm.or(bfm.not(t1), bfm.not(t2), formula);
 
-    AxiomSubproof pn = new AxiomSubproof(ResAxiom.TRANSITIVITY, transClause, proof);
+    AxiomProof pn = new AxiomProof(ResAxiom.TRANSITIVITY, transClause);
 
-    ResolutionSubproof transResNode = new ResolutionSubproof(transRes, t2, proof);
-    ResolutionSubproof trnAnte1 = new ResolutionSubproof(t2, t2, proof);
+    ResolutionProof transResNode = new ResolutionProof(transRes, t2);
+    ResolutionProof trnAnte1 = new ResolutionProof(t2, t2);
     BooleanFormula trn2Formula = bfm.or(bfm.not(t2), transRes);
-    ResolutionSubproof trnAnte2 = new ResolutionSubproof(trn2Formula, t1, proof);
-    ResolutionSubproof trnAnte2Ante = new ResolutionSubproof(t1, t1, proof);
+    ResolutionProof trnAnte2 = new ResolutionProof(trn2Formula, t1);
+    ResolutionProof trnAnte2Ante = new ResolutionProof(t1, t1);
 
     transResNode.addChild(trnAnte1);
     transResNode.addChild(trnAnte2);
@@ -379,27 +371,27 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return transResNode;
   }
 
-  Subproof handleTransitivityStar(Z3Subproof node) {
+  Proof handleTransitivityStar(Z3Proof node) {
     BooleanFormula resPivot = null;
     Collection<BooleanFormula> formulas = new ArrayList<>();
     List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
-    int numChildren = node.getArguments().size();
+    int numChildren = node.getChildren().size();
 
     for (int i = 0; i < numChildren; i++) {
       Collection<BooleanFormula> newCollection = new ArrayList<>();
       formulas.add(
-          bfm.not((BooleanFormula) new ArrayList<>(node.getArguments()).get(i).getFormula()));
+          bfm.not((BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula()));
       if (i == numChildren - 1) {
-        resPivot = (BooleanFormula) new ArrayList<>(node.getArguments()).get(i).getFormula();
+        resPivot = (BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula();
       }
     }
 
     assert resPivot != null;
-    ResolutionSubproof resNode = new ResolutionSubproof(node.getFormula(), resPivot, proof);
+    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
 
     formulas.add((BooleanFormula) node.getFormula());
     BooleanFormula transitivityFormula = bfm.or(formulas);
-    AxiomSubproof sn = new AxiomSubproof(ResAxiom.TRANSITIVITY, transitivityFormula, proof);
+    AxiomProof sn = new AxiomProof(ResAxiom.TRANSITIVITY, transitivityFormula);
 
     for (int i = 0; i < formulas.size() - 2; i++) {
       // ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
@@ -409,168 +401,168 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
-  Subproof handleMonotonicity(Z3Subproof node) {
+  Proof handleMonotonicity(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleQuantIntro(Z3Subproof node) {
+  Proof handleQuantIntro(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleBind(Z3Subproof node) {
+  Proof handleBind(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleDistributivity(Z3Subproof node) {
+  Proof handleDistributivity(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleAndElim(Z3Subproof node) {
+  Proof handleAndElim(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleNotOrElim(Z3Subproof node) {
+  Proof handleNotOrElim(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleRewrite(Z3Subproof node) {
+  Proof handleRewrite(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleRewriteStar(Z3Subproof node) {
+  Proof handleRewriteStar(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handlePullQuant(Z3Subproof node) {
+  Proof handlePullQuant(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleElimUnusedVars(Z3Subproof node) {
+  Proof handleElimUnusedVars(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handlePushQuant(Z3Subproof node) {
+  Proof handlePushQuant(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleDer(Z3Subproof node) {
+  Proof handleDer(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleQuantInst(Z3Subproof node) {
+  Proof handleQuantInst(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleHypothesis(Z3Subproof node) {
+  Proof handleHypothesis(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleLemma(Z3Subproof node) {
+  Proof handleLemma(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleUnitResolution(Z3Subproof node) {
+  Proof handleUnitResolution(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleIffTrue(Z3Subproof node) {
+  Proof handleIffTrue(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleIffFalse(Z3Subproof node) {
+  Proof handleIffFalse(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleCommutativity(Z3Subproof node) {
+  Proof handleCommutativity(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleDefAxiom(Z3Subproof node) {
+  Proof handleDefAxiom(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleAssumptionAdd(Z3Subproof node) {
+  Proof handleAssumptionAdd(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleLemmaAdd(Z3Subproof node) {
+  Proof handleLemmaAdd(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleRedundantDel(Z3Subproof node) {
+  Proof handleRedundantDel(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleClauseTrail(Z3Subproof node) {
+  Proof handleClauseTrail(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleDefIntro(Z3Subproof node) {
+  Proof handleDefIntro(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleApplyDef(Z3Subproof node) {
+  Proof handleApplyDef(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleIffOeq(Z3Subproof node) {
+  Proof handleIffOeq(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleNnfPos(Z3Subproof node) {
+  Proof handleNnfPos(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleNnfNeg(Z3Subproof node) {
+  Proof handleNnfNeg(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleSkolemize(Z3Subproof node) {
+  Proof handleSkolemize(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleModusPonensOeq(Z3Subproof node) {
+  Proof handleModusPonensOeq(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleThLemma(Z3Subproof node) {
+  Proof handleThLemma(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleHyperResolve(Z3Subproof node) {
+  Proof handleHyperResolve(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleOperation(Z3Subproof node) {
+  Proof handleOperation(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Subproof handleDefault(Z3Subproof node) {
+  Proof handleDefault(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
   // This is for debugging purposes.
-  void printProof(Subproof node, int indentLevel) {
+  void printProof(Proof node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
 
-    if (node instanceof AxiomSubproof) {
-      AxiomSubproof sourceNode = (AxiomSubproof) node;
+    if (node instanceof AxiomProof) {
+      AxiomProof sourceNode = (AxiomProof) node;
       System.out.println(indent + "Formula: " + sourceNode.getFormula());
       System.out.println(indent + "Rule: " + sourceNode.getRule());
-      System.out.println(indent + "No. Children: " + sourceNode.getArguments().size());
+      System.out.println(indent + "No. Children: " + sourceNode.getChildren().size());
       int i = 0;
-      for (Subproof child : sourceNode.getArguments()) {
+      for (Proof child : sourceNode.getChildren()) {
         System.out.println(indent + "Child " + ++i + ":");
         printProof(child, indentLevel + 1);
       }
-    } else if (node instanceof ResolutionSubproof) {
-      ResolutionSubproof resolutionNode = (ResolutionSubproof) node;
+    } else if (node instanceof ResolutionProof) {
+      ResolutionProof resolutionNode = (ResolutionProof) node;
       System.out.println(indent + "Formula: " + resolutionNode.getFormula());
       System.out.println(indent + "Pivot: " + resolutionNode.getPivot());
       System.out.println(indent + "Rule: " + resolutionNode.getRule());
-      System.out.println(indent + "No. Children: " + resolutionNode.getArguments().size());
+      System.out.println(indent + "No. Children: " + resolutionNode.getChildren().size());
       int i = 0;
-      for (Subproof child : resolutionNode.getArguments()) {
+      for (Proof child : resolutionNode.getChildren()) {
         System.out.println(indent + "Child " + ++i + ":");
         printProof(child, indentLevel + 1);
       }

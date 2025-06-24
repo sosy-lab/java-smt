@@ -48,15 +48,13 @@ import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolProof.SmtInterpolProofNodeCreator;
-import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolProof.SmtInterpolProofNodeCreator.ProvitionalProofNode;
-import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolProof.SmtInterpolSubproof;
+import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolProofNodeCreator.ProvitionalProofNode;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
@@ -227,7 +225,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Subproof getProof() throws InterruptedException {
+  public Proof getProof() throws InterruptedException {
     checkState(!closed);
     checkGenerateProofs();
     checkState(isUnsat());
@@ -244,10 +242,9 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     }
 
     SmtInterpolProofNodeCreator pc =
-        new SmtInterpolProofNodeCreator(
-            (SmtInterpolFormulaCreator) this.creator, new SmtInterpolProof());
+        new SmtInterpolProofNodeCreator((SmtInterpolFormulaCreator) this.creator);
     ProvitionalProofNode ppn = pc.createPPNDag(tProof);
-    Subproof proof = pc.createProof(ppn);
+    Proof proof = pc.createProof(ppn);
     // Before being able to perfom resolution, we need to calculate the formulas resulting from
     // applying the axioms, as it stands, just the input for the axiom is stored.
     // clausifyResChain(proof, mgr.getBooleanFormulaManager());
@@ -310,25 +307,25 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
   @SuppressWarnings("unused")
-  private void clausifyResChain(Subproof root, BooleanFormulaManager bfmgr) {
-    Map<Subproof, Boolean> visited = new HashMap<>(); // Track visited nodes
-    ArrayDeque<Subproof> stack = new ArrayDeque<>();
+  private void clausifyResChain(Proof root, BooleanFormulaManager bfmgr) {
+    Map<Proof, Boolean> visited = new HashMap<>(); // Track visited nodes
+    ArrayDeque<Proof> stack = new ArrayDeque<>();
 
     stack.push(root); // Start with the root node
     visited.put(root, Boolean.FALSE); // Mark root as unvisited
 
     while (!stack.isEmpty()) {
-      Subproof node = stack.peek(); // Look at the top node, but don't pop yet
+      Proof node = stack.peek(); // Look at the top node, but don't pop yet
 
       if (visited.get(node).equals(Boolean.FALSE)) {
         // First time visiting this node
         visited.put(node, Boolean.TRUE); // Mark node as visited
 
         // Push all children onto stack
-        Set<Subproof> children = node.getArguments();
-        List<Subproof> childrenList = new ArrayList<>(children);
+        Set<Proof> children = node.getChildren();
+        List<Proof> childrenList = new ArrayList<>(children);
         for (int i = childrenList.size() - 1; i >= 0; i--) {
-          Subproof child = childrenList.get(i);
+          Proof child = childrenList.get(i);
           if (!visited.containsKey(child)) {
             stack.push(child); // Only push unvisited children
             visited.put(child, Boolean.FALSE); // Mark child as unvisited
@@ -347,9 +344,9 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   // process proof nodes and compute formulas for res-chain nodes
-  private void processResChain(Subproof node, BooleanFormulaManager bfmgr) {
-    Set<Subproof> childrenSet = node.getArguments();
-    List<Subproof> children = new ArrayList<>(childrenSet);
+  private void processResChain(Proof node, BooleanFormulaManager bfmgr) {
+    Set<Proof> childrenSet = node.getChildren();
+    List<Proof> children = new ArrayList<>(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula
     if (node.getRule().equals(ResAxiom.RESOLUTION)) {
@@ -370,7 +367,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       }
 
       // Store the resolved formula in the current node
-      ((SmtInterpolSubproof) node).setFormula(current);
+      ((SmtInterpolProof) node).setFormula(current);
     }
   }
 

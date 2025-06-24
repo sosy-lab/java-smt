@@ -26,6 +26,7 @@ import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
@@ -44,10 +45,10 @@ class Mathsat5Proof extends AbstractProof {
    * @param rootProof The root proof object.
    * @return The proof node.
    */
-  public Mathsat5Subproof fromMsatProof(ProverEnvironment pProver, long rootProof) {
+  protected static Mathsat5Proof fromMsatProof(ProverEnvironment pProver, long rootProof) {
 
     Deque<MsatProofFrame> stack = new ArrayDeque<>();
-    Map<Long, Mathsat5Subproof> computed = new HashMap<>();
+    Map<Long, Mathsat5Proof> computed = new HashMap<>();
 
     stack.push(new MsatProofFrame(rootProof));
 
@@ -102,11 +103,11 @@ class Mathsat5Proof extends AbstractProof {
           proofRule = new Mathsat5ProofRule(rule);
         }
 
-        Mathsat5Subproof node;
+        Mathsat5Proof node;
         Mathsat5TheoremProver prover = (Mathsat5TheoremProver) pProver;
         Formula formula = generateFormula(frame, prover, proofRule);
 
-        node = new Mathsat5Subproof(proofRule, formula, this);
+        node = new Mathsat5Proof(proofRule, formula);
 
         // Retrieve computed child nodes and attach them. In this case the subtraction is due to
         // the processing of the theory-lemma rule.
@@ -117,7 +118,7 @@ class Mathsat5Proof extends AbstractProof {
 
           long child = msat_proof_get_child(frame.getProof(), i);
 
-          Mathsat5Subproof childNode = computed.get(child);
+          Mathsat5Proof childNode = computed.get(child);
           if (childNode != null) {
             node.addChild(childNode);
           }
@@ -129,7 +130,7 @@ class Mathsat5Proof extends AbstractProof {
   }
 
   @Nullable
-  private Formula generateFormula(
+  private static Formula generateFormula(
       MsatProofFrame frame, Mathsat5TheoremProver prover, ProofRule rule) {
     Mathsat5FormulaCreator formulaCreator = prover.creator;
     Formula formula = null;
@@ -174,20 +175,17 @@ class Mathsat5Proof extends AbstractProof {
     }
   }
 
-  static class Mathsat5Subproof extends AbstractSubproof {
+  protected Mathsat5Proof(@Nullable ProofRule rule, Formula formula) {
+    super(rule, formula);
+  }
 
-    protected Mathsat5Subproof(@Nullable ProofRule rule, Formula formula, Mathsat5Proof proof) {
-      super(rule, formula, proof);
-    }
+  @Override
+  protected void addChild(Proof pProof) {
+    super.addChild(pProof);
+  }
 
-    @Override
-    protected void addChild(Subproof subproof) {
-      super.addChild(subproof);
-    }
-
-    @Override
-    public String proofAsString() {
-      return super.proofAsString();
-    }
+  @Override
+  public String proofAsString() {
+    return super.proofAsString();
   }
 }

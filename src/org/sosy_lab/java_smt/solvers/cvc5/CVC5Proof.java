@@ -11,27 +11,26 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import io.github.cvc5.CVC5ApiException;
-import io.github.cvc5.Proof;
 import io.github.cvc5.Term;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 
-public class CVC5Proof extends AbstractProof {
+public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
 
-  CVC5Subproof generateProofImpl(Proof pProof, CVC5FormulaCreator formulaCreator)
+  static CVC5Proof generateProofImpl(io.github.cvc5.Proof pProof, CVC5FormulaCreator formulaCreator)
       throws CVC5ApiException {
 
     // boolean skippedScope = false;
 
     Deque<CVC5Frame> stack = new ArrayDeque<>();
 
-    Map<Proof, CVC5Subproof> computed = new HashMap<>();
+    Map<io.github.cvc5.Proof, CVC5Proof> computed = new HashMap<>();
 
     stack.push(new CVC5Frame(pProof));
 
@@ -44,7 +43,7 @@ public class CVC5Proof extends AbstractProof {
         frame.setAsVisited(true);
 
         for (int i = frame.getNumArgs() - 1; i >= 0; i--) {
-          Proof child = frame.getProof().getChildren()[i];
+          io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
           if (!computed.containsKey(child)) {
             stack.push(new CVC5Frame(child));
           }
@@ -69,9 +68,9 @@ public class CVC5Proof extends AbstractProof {
         // Generate formula
         Term term = frame.getProof().getResult();
         Formula pFormula = formulaCreator.encapsulate(formulaCreator.getFormulaType(term), term);
-        CVC5Subproof pn = new CVC5Subproof(proofRule, pFormula, this);
+        CVC5Proof pn = new CVC5Proof(proofRule, pFormula);
         for (int i = 0; i < numChildren; i++) {
-          Proof child = frame.getProof().getChildren()[i];
+          io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
 
           if (computed.containsKey(child)) {
             pn.addChild(computed.get(child));
@@ -83,31 +82,28 @@ public class CVC5Proof extends AbstractProof {
     return computed.get(pProof);
   }
 
-  private static class CVC5Frame extends ProofFrame<Proof> {
-    CVC5Frame(Proof proof) {
+  private static class CVC5Frame extends ProofFrame<io.github.cvc5.Proof> {
+    CVC5Frame(io.github.cvc5.Proof proof) {
       super(proof);
     }
   }
 
-  public static class CVC5Subproof extends AbstractSubproof {
+  public CVC5Proof(ProofRule pProofRule, Formula formula) {
 
-    public CVC5Subproof(ProofRule pProofRule, Formula formula, AbstractProof proof) {
+    super(pProofRule, formula);
+  }
 
-      super(pProofRule, formula, proof);
-    }
+  @Override
+  protected void addChild(Proof pProof) {
+    super.addChild(pProof);
+  }
 
-    @Override
-    protected void addChild(Subproof pSubproof) {
-      super.addChild(pSubproof);
-    }
+  // private static Proof changeRoot(Proof root) {
+  //  return root.getArguments()[0];
+  //    }
 
-    // private static Proof changeRoot(Proof root) {
-    //  return root.getArguments()[0];
-    //    }
-
-    @Override
-    public String proofAsString() {
-      return super.proofAsString();
-    }
+  @Override
+  public String proofAsString() {
+    return super.proofAsString();
   }
 }

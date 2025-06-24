@@ -10,40 +10,27 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-import java.util.Collection;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
 /**
- * A DAG representing a proof. Each node in the DAG is a {@link Subproof} and each edge is a
- * directed edge from a parent node to a child node.
+ * A proof node in the proof DAG of a proof.
+ *
+ * @author Gabriel Carpio
  */
 public interface Proof {
 
-  /** Get all proof steps in the proof. */
-  Collection<Subproof> getSubproofs();
+  /** Get the children of the proof node. */
+  Set<Proof> getChildren();
+
+  boolean isLeaf();
 
   /**
-   * A proof node in the proof DAG of a proof.
+   * Get the formula of the proof node.
    *
-   * @author Gabriel Carpio
+   * @return The formula of the proof node.
    */
-  interface Subproof {
+  Formula getFormula();
 
-    /** Get the children of the proof node. */
-    Set<Subproof> getArguments();
-
-    boolean isLeaf();
-
-    /**
-     * Get the formula of the proof node.
-     *
-     * @return The formula of the proof node.
-     */
-    Formula getFormula();
-
-    ProofRule getRule();
-
-    Proof getDAG();
-  }
+  ProofRule getRule();
 }

@@ -43,7 +43,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
@@ -223,7 +223,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -238,12 +238,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -322,7 +322,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertTrue(prover.isUnsat());
 
       // Retrieve and verify proof
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Root formula check
@@ -337,12 +337,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
       // Arguments check
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Leaf check
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -372,7 +372,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(tru);
       assertThat(prover.isUnsat()).isFalse();
 
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
     } catch (UnsupportedOperationException e) {
@@ -405,7 +405,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
     } catch (UnsupportedOperationException e) {
@@ -440,7 +440,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -455,12 +455,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -502,7 +502,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -517,12 +517,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -533,7 +533,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof secondProof = prover.getProof();
+      Proof secondProof = prover.getProof();
       assertThat(secondProof).isNotNull();
 
       // Test getRule()
@@ -548,8 +548,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(secondProof.getArguments()).isNotNull();
-      assertThat(secondProof.getArguments()).isNotEmpty();
+      assertThat(secondProof.getChildren()).isNotNull();
+      assertThat(secondProof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(secondProof.isLeaf()).isFalse();
@@ -596,7 +596,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -611,12 +611,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
 
@@ -633,7 +633,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof secondProof = prover.getProof();
+      Proof secondProof = prover.getProof();
       assertThat(secondProof).isNotNull();
 
       // Test getRule()
@@ -648,8 +648,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(secondProof.getArguments()).isNotNull();
-      assertThat(secondProof.getArguments()).isNotEmpty();
+      assertThat(secondProof.getChildren()).isNotNull();
+      assertThat(secondProof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(secondProof.isLeaf()).isFalse();
@@ -660,7 +660,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // System.out.println(((AbstractSubproof) proof).proofAsString());
 
       assertNotEquals(proof, secondProof);
-      assertNotEquals(proof.getDAG(), secondProof.getDAG());
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)
@@ -689,7 +688,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
 
       // Z3 always has proof generation on
       if (solverToUse().equals(Z3)) {
@@ -739,7 +738,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -754,12 +753,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
     }
@@ -789,7 +788,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Subproof proof = prover.getProof();
+      Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
 
       // Test getRule()
@@ -804,21 +803,21 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       }
 
       // Test getArguments()
-      assertThat(proof.getArguments()).isNotNull();
-      assertThat(proof.getArguments()).isNotEmpty();
+      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proof.getChildren()).isNotEmpty();
 
       // Test isLeaf()
       assertThat(proof.isLeaf()).isFalse();
-      Subproof leaf = findanyProofLeaf(proof);
+      Proof leaf = findanyProofLeaf(proof);
       assertThat(leaf).isNotNull();
       assertThat(leaf.isLeaf()).isTrue();
     }
   }
 
-  private Subproof findanyProofLeaf(Subproof pn) {
+  private Proof findanyProofLeaf(Proof pn) {
     if (pn.isLeaf()) {
       return pn;
     }
-    return findanyProofLeaf(pn.getArguments().stream().findFirst().get());
+    return findanyProofLeaf(pn.getChildren().stream().findFirst().get());
   }
 }

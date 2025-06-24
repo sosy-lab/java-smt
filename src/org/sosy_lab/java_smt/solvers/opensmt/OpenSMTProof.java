@@ -36,28 +36,26 @@ class OpenSMTProof extends AbstractProof {
     }
   }
 
-  static class OpenSMTSubproof extends AbstractSubproof {
-    String sFormula;
+  String sFormula;
 
-    protected OpenSMTSubproof(ProofRule rule, Formula formula, AbstractProof proof) {
-      super(rule, formula, proof);
-    }
-
-    protected OpenSMTSubproof(ProofRule rule, AbstractProof proof, String sFormula) {
-      super(rule, null, proof);
-      this.sFormula = sFormula;
-    }
+  protected OpenSMTProof(ProofRule rule, Formula formula) {
+    super(rule, formula);
   }
 
-  OpenSMTSubproof generateProof(String proof, OpenSmtFormulaCreator creator) {
-    Deque<OpenSMTSubproof> resNodes = new ArrayDeque<>();
-    Map<String, OpenSMTSubproof> nodes = new HashMap<>();
+  protected OpenSMTProof(ProofRule rule, String sFormula) {
+    super(rule, null);
+    this.sFormula = sFormula;
+  }
+
+  static OpenSMTProof generateProof(String proof, OpenSmtFormulaCreator creator) {
+    Deque<OpenSMTProof> resNodes = new ArrayDeque<>();
+    Map<String, OpenSMTProof> nodes = new HashMap<>();
     Deque<Object> rootStack = ProofParser.parse(ProofParser.tokenize(proof));
 
     Deque<Iterator<Object>> iterStack = new ArrayDeque<>();
     iterStack.push(rootStack.iterator());
 
-    OpenSMTSubproof result = null;
+    OpenSMTProof result = null;
     String formulaStr = "";
 
     while (!iterStack.isEmpty()) {
@@ -102,10 +100,10 @@ class OpenSMTProof extends AbstractProof {
     return result;
   }
 
-  void handleLet(
+  static void handleLet(
       Object stack,
-      Map<String, OpenSMTSubproof> nodes,
-      Deque<OpenSMTSubproof> resNodes,
+      Map<String, OpenSMTProof> nodes,
+      Deque<OpenSMTProof> resNodes,
       OpenSmtFormulaCreator creator,
       String lastSeenFormula) {
     assert stack instanceof Deque; // no unchecked cast
@@ -116,41 +114,38 @@ class OpenSMTProof extends AbstractProof {
         Object v2 = ((Deque<?>) v1).peek();
         if (v2 instanceof String) {
           if (v2.equals("res")) {
-            OpenSMTSubproof res = processRes(v1, nodes, resNodes, creator, lastSeenFormula);
+            OpenSMTProof res = processRes(v1, nodes, resNodes, creator, lastSeenFormula);
             nodes.putIfAbsent((String) expression, res);
             resNodes.push(res);
           } else {
             String s = serializeDeque((Deque<?>) v1);
             nodes.putIfAbsent(
-                (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, s));
+                (String) expression, new OpenSMTProof(new OpenSMTProofRule("leaf"), s));
           }
         } else {
           String s = serializeDeque((Deque<?>) v1);
-          nodes.putIfAbsent(
-              (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, s));
+          nodes.putIfAbsent((String) expression, new OpenSMTProof(new OpenSMTProofRule("leaf"), s));
         }
       } else if (v1 instanceof String) { // or a formula
         String f = (String) v1;
-        nodes.putIfAbsent(
-            (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, f));
+        nodes.putIfAbsent((String) expression, new OpenSMTProof(new OpenSMTProofRule("leaf"), f));
       } else { // this should handle when no term was assigned to the clause, meaning an empty
         // clause was declared
-        nodes.putIfAbsent(
-            (String) expression, new OpenSMTSubproof(new OpenSMTProofRule("leaf"), this, "-"));
+        nodes.putIfAbsent((String) expression, new OpenSMTProof(new OpenSMTProofRule("leaf"), "-"));
       }
     }
   }
 
-  OpenSMTSubproof processRes(
+  static OpenSMTProof processRes(
       Object expr,
-      Map<String, OpenSMTSubproof> nodes,
-      Deque<OpenSMTSubproof> resNodes,
+      Map<String, OpenSMTProof> nodes,
+      Deque<OpenSMTProof> resNodes,
       OpenSmtFormulaCreator creator,
       String formulaStr) {
 
     Deque<Deque<?>> stack = new ArrayDeque<>();
     Object current = expr;
-    OpenSMTSubproof result = null;
+    OpenSMTProof result = null;
 
     while (true) {
       if (!(current instanceof Deque)) {
@@ -170,17 +165,15 @@ class OpenSMTProof extends AbstractProof {
         String pivotStr =
             rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
 
-        OpenSMTSubproof left = nodes.get(cls1);
-        OpenSMTSubproof right = nodes.get(cls2);
-        OpenSMTSubproof pivotNode =
-            new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivotStr);
+        OpenSMTProof left = nodes.get(cls1);
+        OpenSMTProof right = nodes.get(cls2);
+        OpenSMTProof pivotNode = new OpenSMTProof(new OpenSMTProofRule("pivot"), pivotStr);
 
-        OpenSMTSubproof res =
-            new OpenSMTSubproof(
-                new OpenSMTProofRule("res"), this, stack.isEmpty() ? formulaStr : null);
-        addEdge(res, left);
-        addEdge(res, right);
-        addEdge(res, pivotNode);
+        OpenSMTProof res =
+            new OpenSMTProof(new OpenSMTProofRule("res"), stack.isEmpty() ? formulaStr : null);
+        res.addChild(left);
+        res.addChild(right);
+        res.addChild(pivotNode);
         result = res;
         break;
 
@@ -199,30 +192,29 @@ class OpenSMTProof extends AbstractProof {
       String pivotStr =
           rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
 
-      OpenSMTSubproof right = nodes.get(cls2);
-      OpenSMTSubproof pivotNode =
-          new OpenSMTSubproof(new OpenSMTProofRule("pivot"), this, pivotStr);
+      OpenSMTProof right = nodes.get(cls2);
+      OpenSMTProof pivotNode = new OpenSMTProof(new OpenSMTProofRule("pivot"), pivotStr);
 
       boolean isOuter = stack.isEmpty();
-      OpenSMTSubproof parent =
-          new OpenSMTSubproof(new OpenSMTProofRule("res"), this, isOuter ? formulaStr : null);
+      OpenSMTProof parent =
+          new OpenSMTProof(new OpenSMTProofRule("res"), isOuter ? formulaStr : null);
 
-      addEdge(parent, result);
-      addEdge(parent, right);
-      addEdge(parent, pivotNode);
+      parent.addChild(result);
+      parent.addChild(right);
+      parent.addChild(pivotNode);
       result = parent;
     }
 
     return result;
   }
 
-  private String serializeDeque(Deque<?> deque) {
+  private static String serializeDeque(Deque<?> deque) {
     StringBuilder sb = new StringBuilder();
     serializeHelper(deque, sb);
     return sb.toString();
   }
 
-  private void serializeHelper(Object obj, StringBuilder sb) {
+  private static void serializeHelper(Object obj, StringBuilder sb) {
     if (obj instanceof Deque) {
       sb.append("(");
       Deque<?> inner = (Deque<?>) obj;

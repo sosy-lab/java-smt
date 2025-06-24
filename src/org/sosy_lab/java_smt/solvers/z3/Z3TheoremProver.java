@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static org.sosy_lab.java_smt.solvers.z3.Z3Proof.generateProofImpl;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3.Native;
@@ -25,7 +27,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.UserPropagator;
-import org.sosy_lab.java_smt.api.proofs.Proof.Subproof;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
@@ -148,7 +150,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public Subproof getProof() throws SolverException, InterruptedException {
+  public Proof getProof() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(this.isUnsat());
     long proofAst;
@@ -157,8 +159,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
     } catch (Z3Exception e) {
       throw creator.handleZ3Exception(e);
     }
-    Z3Proof proof = new Z3Proof();
-    return proof.generateProofImpl(proofAst, creator);
+    return generateProofImpl(proofAst, creator);
+  }
+
+  public long getZ3solver() {
+    return z3solver;
   }
 
   @Override

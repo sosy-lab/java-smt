@@ -18,6 +18,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
@@ -30,40 +31,37 @@ public class Z3Proof extends AbstractProof {
     }
   }
 
-  public static class Z3Subproof extends AbstractSubproof {
+  Z3Proof(Formula pFormula, ProofRule pProofRule) {
+    super(pProofRule, pFormula);
+  }
 
-    Z3Subproof(Formula pFormula, ProofRule pProofRule, AbstractProof pProof) {
-      super(pProofRule, pFormula, pProof);
-    }
+  @Override
+  protected void addChild(Proof child) {
+    super.addChild(child);
+  }
 
-    @Override
-    protected void addChild(Subproof child) {
-      super.addChild(child);
-    }
-
-    @Override
-    public String proofAsString() {
-      return super.proofAsString();
-    }
+  @Override
+  public String proofAsString() {
+    return super.proofAsString();
   }
 
   /**
    * This transformation omits one level of the proofs from Z3, as the leaves in that case are the
    * operands of the boolean formulas used as the very first proof steps in the whole proof .E.g.,
-   * when asserting (or (not q2) q1) that produces a single {@link Z3Subproof}, but the input for
-   * that is a whole subtree from Z3 composed of the asseertion, the OR operation and the operands.
+   * when asserting (or (not q2) q1) that produces a single {@link Z3Proof}, but the input for that
+   * is a whole subtree from Z3 composed of the asseertion, the OR operation and the operands.
    *
    * @param rootProof The root of proof DAG to be converted
    * @param formulaCreator The {@link FormulaCreator} to be able to produce the {@link Formula}s
-   * @return The root of converted proof DAG as {@link Z3Subproof}
+   * @return The root of converted proof DAG as {@link Z3Proof}
    */
-  Z3Subproof generateProofImpl(long rootProof, Z3FormulaCreator formulaCreator) {
+  static Z3Proof generateProofImpl(long rootProof, Z3FormulaCreator formulaCreator) {
     long z3context = formulaCreator.getEnv();
     // proof ast to be processed wrapped inside a frame
     Deque<Frame> stack = new ArrayDeque<>();
 
     // proof ast has been converted into ProofNode
-    Map<Long, Z3Subproof> computed = new HashMap<>();
+    Map<Long, Z3Proof> computed = new HashMap<>();
 
     stack.push(new Frame(rootProof));
 
@@ -111,7 +109,7 @@ public class Z3Proof extends AbstractProof {
         int declKind =
             Native.getDeclKind(z3context, Native.getAppDecl(z3context, frame.getProof()));
         ProofRule proofRule = getPRfromDK(declKind);
-        Z3Subproof node = new Z3Subproof(formula, proofRule, this);
+        Z3Proof node = new Z3Proof(formula, proofRule);
 
         for (int i = 0; i < numArgs - 1; i++) {
           long arg = Native.getAppArg(z3context, frame.getProof(), i);

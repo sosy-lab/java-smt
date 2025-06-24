@@ -10,11 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import com.google.common.base.Preconditions;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -35,104 +31,82 @@ public abstract class AbstractProof implements Proof {
   //    protected abstract Proof generateProof();
   // }
 
-  protected final Map<Subproof, LinkedHashSet<Subproof>> edges = new HashMap<>();
+  private final Set<Proof> children = new LinkedHashSet<>();
+  private ProofRule rule;
+  @Nullable protected Formula formula;
 
-  protected void addEdge(Subproof source, Subproof target) {
-    Preconditions.checkNotNull(source);
-    Preconditions.checkNotNull(target);
-    edges.putIfAbsent(source, new LinkedHashSet<>());
-    edges.get(source).add(target);
+  protected AbstractProof(ProofRule rule, Formula formula) {
+    this.rule = rule;
+    this.formula = formula;
+  }
+
+  // TODO: Use Optional instead of nullable
+  @Nullable
+  @Override
+  public Formula getFormula() {
+    return this.formula;
   }
 
   @Override
-  public Collection<Subproof> getSubproofs() {
-    return edges.keySet();
+  public Set<Proof> getChildren() {
+    return this.children;
   }
 
-  public abstract static class AbstractSubproof implements Subproof {
-    private final AbstractProof proof;
-    private ProofRule rule;
-    @Nullable protected Formula formula;
+  protected void addChild(Proof child) {
+    this.children.add(child);
+  }
 
-    protected AbstractSubproof(ProofRule rule, Formula formula, AbstractProof proof) {
-      this.rule = rule;
-      this.formula = formula;
-      this.proof = proof;
+  @Override
+  public ProofRule getRule() {
+    return rule;
+  }
+
+  @Override
+  public boolean isLeaf() {
+    return getChildren().isEmpty();
+  }
+
+  // void setRule(ProofRule rule) {
+  //  this.rule = rule;
+  // }
+
+  public void setFormula(Formula pFormula) {
+    formula = pFormula;
+  }
+
+  // use this for debugging
+  public String proofAsString() {
+    return proofAsString(0);
+  }
+
+  protected String proofAsString(int indentLevel) {
+    StringBuilder sb = new StringBuilder();
+    String indent = "  ".repeat(indentLevel);
+
+    Formula f = getFormula();
+    String sFormula;
+    if (f != null) {
+      sFormula = f.toString();
+    } else {
+      sFormula = "null";
     }
 
-    // TODO: Use Optional instead of nullable
-    @Nullable
-    @Override
-    public Formula getFormula() {
-      return this.formula;
-    }
+    sb.append(indent).append("Formula: ").append(sFormula).append("\n");
+    sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
+    sb.append(indent)
+        .append("No. Children: ")
+        .append(this.isLeaf() ? 0 : getChildren().size())
+        .append("\n");
+    sb.append(indent).append("leaf: ").append(isLeaf()).append("\n");
 
-    @Override
-    public Set<Subproof> getArguments() {
-      return this.proof.edges.get(this);
-    }
-
-    protected void addChild(Subproof child) {
-      this.proof.addEdge(this, child);
-    }
-
-    @Override
-    public ProofRule getRule() {
-      return rule;
-    }
-
-    @Override
-    public boolean isLeaf() {
-      return getArguments() == null;
-    }
-
-    // void setRule(ProofRule rule) {
-    //  this.rule = rule;
-    // }
-
-    public void setFormula(Formula pFormula) {
-      formula = pFormula;
-    }
-
-    @Override
-    public Proof getDAG() {
-      return proof;
-    }
-
-    // use this for debugging
-    public String proofAsString() {
-      return proofAsString(0);
-    }
-
-    protected String proofAsString(int indentLevel) {
-      StringBuilder sb = new StringBuilder();
-      String indent = "  ".repeat(indentLevel);
-
-      Formula f = getFormula();
-      String sFormula;
-      if (f != null) {
-        sFormula = f.toString();
-      } else {
-        sFormula = "null";
+    int i = 0;
+    if (!isLeaf()) {
+      for (Proof child : getChildren()) {
+        sb.append(indent).append("Child ").append(++i).append(":\n");
+        sb.append(((AbstractProof) child).proofAsString(indentLevel + 1));
       }
-
-      sb.append(indent).append("Formula: ").append(sFormula).append("\n");
-      sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
-      sb.append(indent)
-          .append("No. Children: ")
-          .append(this.isLeaf() ? 0 : getArguments().size())
-          .append("\n");
-      sb.append(indent).append("leaf: ").append(isLeaf()).append("\n");
-
-      int i = 0;
-      if (!isLeaf()) {
-        for (Subproof child : getArguments()) {
-          sb.append(indent).append("Child ").append(++i).append(":\n");
-          sb.append(((AbstractSubproof) child).proofAsString(indentLevel + 1));
-        }
-      }
-
-      return sb.toString();
     }
+
+    return sb.toString();
   }
 }
