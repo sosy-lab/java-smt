@@ -8,12 +8,16 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import static org.sosy_lab.java_smt.solvers.opensmt.OpenSMTProof.generateProof;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +27,13 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
@@ -46,6 +52,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
+  private final FormulaManager formulaManager;
 
   private boolean changedSinceLastSatQuery = false;
 
@@ -63,6 +70,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     // not get garbage collected
     osmtConfig = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
+    formulaManager = pMgr; // needed for parsing formulas in proofs
   }
 
   static SMTConfig getConfigInstance(
@@ -78,6 +86,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     config.setOption(":produce-unsat-cores", optUnsatCore);
     config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
+    config.setOption(
+        ":produce-proofs", new SMTOption(pOptions.contains(ProverOptions.GENERATE_PROOFS)));
     if (interpolation) {
       config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
       config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
@@ -280,6 +290,58 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+  }
+
+  // TODO perform resolution throughout the DAG to calculate formulas that might not be present.
+  @Override
+  public Proof getProof() {
+    // throw new UnsupportedOperationException(
+    //    "Proof generation is not available for the current solver.");
+
+    // System.out.println(osmtSolver.printResolutionProofSMT2());
+    OpenSMTProof root = generateProof(osmtSolver.printResolutionProofSMT2(), creator);
+    parseFormulas(root);
+    return root;
+  }
+
+  // TODO: the parse method is asigning true as the formula always. This should not be.
+  private void parseFormulas(Proof root) {
+    Deque<Proof> stack = new ArrayDeque<>();
+    stack.push(root);
+
+    while (!stack.isEmpty()) {
+      Proof proof = stack.pop();
+      Formula formula;
+      String formulaString = ((OpenSMTProof) proof).sFormula;
+      // System.out.println(formulaString);
+
+      if (formulaString.startsWith("(")) {
+        formula = formulaManager.parse(formulaString);
+        // System.out.println(formula);
+        ((OpenSMTProof) proof).setFormula(formula);
+      } else if (formulaString.equals("-")) {
+        formula = formulaManager.getBooleanFormulaManager().makeFalse();
+        ((OpenSMTProof) proof).setFormula(formula);
+      } else {
+        if (formulaManager.isValidName(formulaString)) {
+          formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
+          ((OpenSMTProof) proof).setFormula(formula);
+        } else {
+          formula = formulaManager.parse("(" + formulaString + ")");
+          ((OpenSMTProof) proof).setFormula(formula);
+        }
+      }
+
+      // ((OpenSMTSubproof) subproof).setFormula(formula);
+      // System.out.println(".");
+      // System.out.println(subproof.getFormula());
+      if (!proof.isLeaf()) {
+        Proof[] children = proof.getChildren().toArray(new Proof[0]);
+        for (int i = children.length - 1; i >= 0; i--) {
+          stack.push(children[i]);
+        }
+      }
+    }
   }
 
   @Override
