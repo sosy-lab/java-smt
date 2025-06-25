@@ -18,7 +18,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
@@ -42,10 +41,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       try {
         delegate.pop();
       } catch (IllegalStateException ise) {
-        if (ise.getMessage().startsWith(AbstractProver.SHUTDOWN_EXCEPTION_PREFIX)) {
-          throw new InterruptedException(
-              ise.getMessage()
-                  .replace("Prover is not usable due " + "to shutdown with message: ", ""));
+        if (ise.getMessage().startsWith(SHUTDOWN_EXCEPTION_PREFIX)) {
+          throw new InterruptedException(ise.getMessage().replace(SHUTDOWN_EXCEPTION_PREFIX, ""));
         }
       }
     }
