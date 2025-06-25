@@ -89,10 +89,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   private void checkShutdownState() {
-    // Refaster forced me to do this!
     if (shouldShutdown()) {
       String reason = getShutdownReason();
-      checkState(!shouldShutdown(), reason);
+      // Refaster forced me to do this!
+      checkState(!shouldShutdown(), /* TODO make lazy */ reason);
     }
   }
 
