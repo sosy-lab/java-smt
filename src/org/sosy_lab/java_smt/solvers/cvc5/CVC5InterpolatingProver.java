@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext.CVC5Settings;
 
 public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
@@ -52,8 +53,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
-      ImmutableMap<String, String> pFurtherOptionsMap,
-      boolean pValidateInterpolants) {
+      CVC5Settings settings) {
     super(
         pFormulaCreator,
         pContextShutdownNotifier,
@@ -61,13 +61,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
         randomSeed,
         pOptions,
         pMgr,
-        pFurtherOptionsMap);
+        settings.getFurtherOptions());
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
-    validateInterpolants = pValidateInterpolants;
-    furtherOptionsMap = pFurtherOptionsMap;
+    validateInterpolants = settings.isValidateInterpolants();
+    furtherOptionsMap = settings.getFurtherOptions();
   }
 
   /**

@@ -39,7 +39,7 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public final class CVC5SolverContext extends AbstractSolverContext {
 
   @Options(prefix = "solver.cvc5")
-  private static final class CVC5Settings {
+  public static final class CVC5Settings {
 
     @Option(
         secure = true,
@@ -70,6 +70,14 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         throw new InvalidConfigurationException(
             "Invalid CVC5 option in \"" + furtherOptions + "\": " + e.getMessage(), e);
       }
+    }
+
+    ImmutableMap<String, String> getFurtherOptions() {
+      return furtherOptionsMap;
+    }
+
+    boolean isValidateInterpolants() {
+      return validateInterpolants;
     }
   }
 
@@ -257,8 +265,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         randomSeed,
         pOptions,
         getFormulaManager(),
-        settings.furtherOptionsMap,
-        settings.validateInterpolants);
+        settings);
   }
 
   @Override
