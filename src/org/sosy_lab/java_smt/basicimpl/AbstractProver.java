@@ -92,7 +92,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   public void checkShutdownState() {
     if (shouldShutdown()) {
-      throw new IllegalStateException(MoreStrings.lazyString(this::getShutdownReason).toString());
+      throw new IllegalStateException(getShutdownReason());
     }
   }
 
