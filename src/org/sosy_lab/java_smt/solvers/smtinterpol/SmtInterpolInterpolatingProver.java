@@ -54,9 +54,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
     shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkInterpolationArguments(pTermNamesOfA);
 
     // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly

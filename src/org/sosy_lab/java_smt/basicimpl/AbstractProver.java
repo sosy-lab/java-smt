@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
@@ -264,6 +265,19 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       builder.addAll(level.values());
     }
     return builder.build();
+  }
+
+  protected void checkInterpolationArguments(Collection<T> formulasOfA) {
+    checkArgument(
+        getAssertedConstraintIds().containsAll(formulasOfA),
+        "interpolation can only be done over previously asserted formulas. Missing IDs: %s",
+        MoreStrings.lazyString(
+                () ->
+                    formulasOfA.stream()
+                        .filter(e -> !getAssertedConstraintIds().contains(e))
+                        .collect(ImmutableSet.toImmutableSet())
+                        .toString())
+            .toString());
   }
 
   /**

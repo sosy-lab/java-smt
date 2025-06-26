@@ -59,9 +59,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
     Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkInterpolationArguments(pTermNamesOfA);
 
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
 

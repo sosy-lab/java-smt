@@ -108,9 +108,7 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
     shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkInterpolationArguments(formulasOfA);
 
     int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;

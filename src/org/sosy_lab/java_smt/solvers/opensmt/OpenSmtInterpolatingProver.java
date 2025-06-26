@@ -82,9 +82,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
     shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkInterpolationArguments(formulasOfA);
 
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
