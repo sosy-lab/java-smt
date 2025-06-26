@@ -96,9 +96,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     shutdownIfNecessary();
     checkState(!wasLastSatCheckSat);
     checkState(!stackChangedSinceLastQuery);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkInterpolationArguments(pFormulasOfA);
 
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
