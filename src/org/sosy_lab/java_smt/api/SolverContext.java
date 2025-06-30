@@ -111,13 +111,13 @@ public interface SolverContext extends AutoCloseable {
    *     consider implementing the {@link InterpolatingProverEnvironment} interface, and return an
    *     Object of this type here.
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that stops the prover returned by
-   *     this method. The prover is not usable anymore after a shutdown has been requested and only
-   *     ever returns {@link InterruptedException}s. The context can be used normally and new
-   *     provers can be created and used. If a {@link ShutdownNotifier} has been given to the
-   *     context that is used to call this method, both notifiers can be used to stop the prover
-   *     returned by this method. Note that once a shutdown-request has been given to the contexts
-   *     {@link ShutdownNotifier}, no prover can ever be used again on that context instance.
-   *     Solvers that don't support isolated prover shutdown throw a {@link
+   *     this method. The prover is not usable anymore after a shutdown has been requested and in
+   *     the following its methods only throw {@link InterruptedException}s. The context can be used
+   *     normally and new provers can be created and used. If a {@link ShutdownNotifier} has been
+   *     given to the context that is used to call this method, both notifiers can be used to stop
+   *     the prover returned by this method. Note that once a shutdown-request has been given to the
+   *     contexts {@link ShutdownNotifier}, no prover can ever be used again on that context
+   *     instance. Solvers that don't support isolated prover shutdown throw a {@link
    *     UnsupportedOperationException} for this method and {@link
    *     #newProverEnvironment(ProverOptions...)} should be used instead.
    * @param options Options specified for the prover environment. All the options specified in
@@ -142,13 +142,13 @@ public interface SolverContext extends AutoCloseable {
    * this (except for provers also connected via the given {@link ShutdownNotifier}).
    *
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that stops the prover returned by
-   *     this method. The prover is not usable anymore after a shutdown has been requested and only
-   *     ever returns {@link InterruptedException}s. The context can be used normally and new
-   *     provers can be created and used. If a {@link ShutdownNotifier} has been given to the
-   *     context that is used to call this method, both notifiers can be used to stop the prover
-   *     returned by this method. Note that once a shutdown-request has been given to the contexts
-   *     {@link ShutdownNotifier}, no prover can ever be used again on that context instance.
-   *     Solvers that don't support isolated prover shutdown throw a {@link
+   *     this method. The prover is not usable anymore after a shutdown has been requested and in
+   *     the following its methods only throw {@link InterruptedException}s. The context can be used
+   *     normally and new provers can be created and used. If a {@link ShutdownNotifier} has been
+   *     given to the context that is used to call this method, both notifiers can be used to stop
+   *     the prover returned by this method. Note that once a shutdown-request has been given to the
+   *     contexts {@link ShutdownNotifier}, no prover can ever be used again on that context
+   *     instance. Solvers that don't support isolated prover shutdown throw a {@link
    *     UnsupportedOperationException} for this method and {@link
    *     #newProverEnvironment(ProverOptions...)} should be used instead.
    * @param options Options specified for the prover environment. All the options specified in
