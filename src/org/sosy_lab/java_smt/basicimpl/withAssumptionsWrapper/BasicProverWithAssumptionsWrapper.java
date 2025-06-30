@@ -22,6 +22,11 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironment<T>>
     implements BasicProverEnvironment<T> {
 
+  // Used as prefix concatenated with the reason in the IllegalStateException thrown for shutdowns
+  // Keep in sync with AbstractProver.SHUTDOWN_EXCEPTION_PREFIX
+  private static final String SHUTDOWN_EXCEPTION_PREFIX =
+      "Prover is not usable due to interrupt with message: ";
+
   protected final P delegate;
   protected final List<BooleanFormula> solverAssumptionsAsFormula = new ArrayList<>();
 

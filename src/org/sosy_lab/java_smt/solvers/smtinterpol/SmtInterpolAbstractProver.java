@@ -38,7 +38,6 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -147,7 +146,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       model = env.getModel();
     } catch (SMTLIBException e) {
       if (e.getMessage().contains("Context is inconsistent")) {
-        throw new IllegalStateException(BasicProverEnvironment.NO_MODEL_HELP, e);
+        throw new IllegalStateException(NO_MODEL_HELP, e);
       } else {
         // new stacktrace, but only the library calls are missing.
         throw e;

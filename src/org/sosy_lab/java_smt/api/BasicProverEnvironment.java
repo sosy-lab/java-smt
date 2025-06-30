@@ -22,20 +22,10 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
  * provides only the common operations. In most cases, just use one of the two sub-interfaces
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
-  String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
-
-  String NO_UNSAT_CORE_HELP =
-      "UnsatCore computation failed. Are the pushed formulae unsatisfiable?";
-
-  String STACK_CHANGED_HELP =
-      "Computation failed. The prover state has changed since the last call to isUnsat().";
-
-  // Used as prefix concatenated with the reason in the IllegalStateException thrown for shutdowns
-  String SHUTDOWN_EXCEPTION_PREFIX = "Prover is not usable due to interrupt with message: ";
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
-   * value may be used to identify this formula later on in a query (this depends on the sub-type of
+   * value may be used to identify this formula later on in a query (this depends on the subtype of
    * the environment).
    */
   @Nullable
