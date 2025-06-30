@@ -105,7 +105,11 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException;
+  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+    try (Model model = getModel()) {
+      return model.asList();
+    }
+  }
 
   /**
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
