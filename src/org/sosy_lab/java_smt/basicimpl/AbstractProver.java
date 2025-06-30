@@ -270,14 +270,20 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected void checkInterpolationArguments(Collection<T> formulasOfA) {
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas. Missing IDs: %s",
-        MoreStrings.lazyString(
-                () ->
-                    formulasOfA.stream()
-                        .filter(e -> !getAssertedConstraintIds().contains(e))
-                        .collect(ImmutableSet.toImmutableSet())
-                        .toString())
-            .toString());
+        "Interpolation can only be done over previously asserted formulas. %s",
+        MoreStrings.lazyString(() -> getErrorString(formulasOfA)).toString());
+  }
+
+  private String getErrorString(Collection<T> formulasOfA) {
+    ImmutableSet.Builder<T> builder = ImmutableSet.builder();
+    for (T formula : formulasOfA) {
+      if (formula == null) {
+        return "Null element found, but not allowed.";
+      } else {
+        builder.add(formula);
+      }
+    }
+    return "Missing IDs: " + builder.build();
   }
 
   /**
