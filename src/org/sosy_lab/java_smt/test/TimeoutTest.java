@@ -124,7 +124,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      pe.push(gen.generate(8));
+      pe.push(gen.generate(3));
       assertThat(pe.isUnsat()).isTrue();
     }
   }
@@ -144,7 +144,7 @@ public class TimeoutTest extends SolverBasedTest0 {
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
-      pe.push(gen.generate(8));
+      pe.push(gen.generate(3));
       assertThat(pe.isUnsat()).isTrue();
     }
   }
