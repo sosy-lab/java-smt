@@ -65,7 +65,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     mgr = pMgr;
     creator = pFormulaCreator;
-    incremental = !enableSL;
+    incremental = !isSeparationLogicEnabled();
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
 
     TermManager termManager = creator.getEnv();
@@ -218,7 +218,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       assertedTerms.clear();
       solver.deletePointer();
     }

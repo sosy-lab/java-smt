@@ -62,21 +62,21 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public int maximize(Formula objective) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeMaximize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public int minimize(Formula objective) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeMinimize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     int status;
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     try {
       status =
           Native.optimizeCheck(
@@ -85,7 +85,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
               0, // number of assumptions
               null // assumptions
               );
-      stackChangedSinceLastQuery = false;
+      setStackNotChangedSinceLastQuery();
     } catch (Z3Exception ex) {
       throw creator.handleZ3Exception(ex, proverShutdownNotifier);
     }
@@ -99,7 +99,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
           Native.optimizeGetReasonUnknown(z3context, z3optSolver));
       return OptStatus.UNDEF;
     } else {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       return OptStatus.OPT;
     }
   }
@@ -137,7 +137,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     logSolverStack();
     return check() == OptStatus.UNSAT;
   }
@@ -162,7 +162,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   private Optional<Rational> round(int handle, Rational epsilon, RoundingFunction direction) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     // Z3 exposes the rounding result as a tuple (infinity, number, epsilon)
     long vector = direction.round(z3context, z3optSolver, handle);
@@ -216,13 +216,13 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   /** Dumps the optimized objectives and the constraints on the solver in the SMT-lib format. */
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeToString(z3context, z3optSolver);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Native.optimizeDecRef(z3context, z3optSolver);
     }
     super.close();

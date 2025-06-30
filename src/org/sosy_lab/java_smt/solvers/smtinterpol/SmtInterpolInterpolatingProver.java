@@ -50,10 +50,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
     shutdownIfNecessary();
-    checkState(!wasLastSatCheckSat);
-    checkState(!stackChangedSinceLastQuery);
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     checkInterpolationArguments(pTermNamesOfA);
 
     // SMTInterpol is not able to handle the trivial cases,
@@ -78,10 +78,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
     shutdownIfNecessary();
-    checkState(!wasLastSatCheckSat);
-    checkState(!stackChangedSinceLastQuery);
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
@@ -121,7 +121,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 
     if (termNames.size() == 1) {

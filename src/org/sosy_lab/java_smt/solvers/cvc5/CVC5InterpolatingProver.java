@@ -92,10 +92,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
     shutdownIfNecessary();
-    checkState(!wasLastSatCheckSat);
-    checkState(!stackChangedSinceLastQuery);
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     checkInterpolationArguments(pFormulasOfA);
 
     final Set<Term> assertedFormulas =
@@ -111,10 +111,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
     shutdownIfNecessary();
-    checkState(!wasLastSatCheckSat);
-    checkState(!stackChangedSinceLastQuery);
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(

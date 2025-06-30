@@ -97,7 +97,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     final long hook = msat_set_termination_callback(curEnv, getTerminationTest());
     try {
@@ -122,7 +122,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     checkForLiterals(pAssumptions);
 
     final long hook = msat_set_termination_callback(curEnv, getTerminationTest());
@@ -181,7 +181,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public int size() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(
         msat_num_backtrack_points(curEnv) == super.size(),
         "prover-size %s does not match stack-size %s",
@@ -221,7 +221,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   @Override
   public ImmutableMap<String, String> getStatistics() {
     // Mathsat sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     final String stats = msat_get_search_stats(curEnv);
     return ImmutableMap.copyOf(
         Splitter.on("\n").trimResults().omitEmptyStrings().withKeyValueSeparator(" ").split(stats));
@@ -229,21 +229,22 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       msat_destroy_env(curEnv);
       msat_destroy_config(curConfig);
     }
     super.close();
   }
 
+  @Override
   protected boolean isClosed() {
-    return closed;
+    return super.isClosed();
   }
 
   @Override
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     checkGenerateAllSat();
     closeAllEvaluators();
 

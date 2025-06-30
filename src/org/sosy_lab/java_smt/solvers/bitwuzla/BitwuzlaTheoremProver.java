@@ -99,7 +99,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     Term formula = creator.extractInfo(constraint);
     env.assert_formula(formula);
     for (Term t : creator.getConstraintsForTerm(formula)) {
@@ -122,7 +122,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
     if (resultValue == Result.SAT) {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
@@ -136,8 +136,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+    Preconditions.checkState(!isClosed());
+    setLastSatCheckUnsat();
     final Result result = env.check_sat();
     return readSATResult(result);
   }
@@ -174,7 +174,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @SuppressWarnings("resource")
   @Override
   protected Model getModelImpl() throws SolverException {
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    Preconditions.checkState(wasLastSatCheckSat(), NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(
         registerEvaluator(
@@ -199,7 +199,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   protected List<BooleanFormula> getUnsatCoreImpl() {
-    Preconditions.checkState(!wasLastSatCheckSat);
+    Preconditions.checkState(!wasLastSatCheckSat());
     return getUnsatCore0();
   }
 
@@ -225,8 +225,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   public void close() {
-    if (!closed) {
-      closed = true;
+    if (!isClosed()) {
       env.delete();
     }
     super.close();
@@ -243,7 +242,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
-  public boolean isClosed() {
-    return closed;
+  @Override
+  protected boolean isClosed() {
+    return super.isClosed();
   }
 }

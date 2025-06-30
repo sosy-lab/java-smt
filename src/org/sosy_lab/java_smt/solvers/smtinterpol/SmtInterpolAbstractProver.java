@@ -71,8 +71,9 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
+  @Override
   protected boolean isClosed() {
-    return closed;
+    return super.isClosed();
   }
 
   @Override
@@ -89,7 +90,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();
@@ -103,7 +104,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   protected boolean isUnsatImpl() throws InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
 
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
@@ -209,7 +210,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       annotatedTerms.clear();
       env.resetAssertions();
       env.exit();
@@ -226,7 +227,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!closed);
+    checkState(!isClosed());
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];

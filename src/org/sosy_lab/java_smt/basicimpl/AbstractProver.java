@@ -38,12 +38,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private final boolean generateModels;
   private final boolean generateAllSat;
-  protected final boolean generateUnsatCores;
+  private final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
-  protected final boolean enableSL;
-  protected boolean closed = false;
-  protected boolean wasLastSatCheckSat = false;
-  protected boolean stackChangedSinceLastQuery = false;
+  private final boolean enableSL;
+  private boolean closed = false;
+  private boolean wasLastSatCheckSat = false;
+  private boolean stackChangedSinceLastQuery = false;
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -94,6 +94,39 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     if (shouldShutdown()) {
       throw new IllegalStateException(getShutdownReason());
     }
+  }
+
+  protected boolean isGenerateUnsatCores() {
+    return generateUnsatCores;
+  }
+
+  // Maybe even make this public?
+  protected boolean isClosed() {
+    return closed;
+  }
+
+  protected boolean isSeparationLogicEnabled() {
+    return enableSL;
+  }
+
+  protected boolean stackChangedSinceLastQuery() {
+    return stackChangedSinceLastQuery;
+  }
+
+  protected void setStackNotChangedSinceLastQuery() {
+    stackChangedSinceLastQuery = false;
+  }
+
+  protected boolean wasLastSatCheckSat() {
+    return wasLastSatCheckSat;
+  }
+
+  protected void setLastSatCheckSat() {
+    wasLastSatCheckSat = true;
+  }
+
+  protected void setLastSatCheckUnsat() {
+    wasLastSatCheckSat = false;
   }
 
   /**
@@ -306,7 +339,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     checkShutdownState();
     Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkState(wasLastSatCheckSat);

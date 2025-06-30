@@ -81,10 +81,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
     curEnv = yices_new_context(curCfg);
   }
 
-  boolean isClosed() {
-    return closed;
-  }
-
   @Override
   protected void popImpl() {
     if (size() < stackSizeToUnsat) { // constraintStack and Yices stack have same level.
@@ -97,7 +93,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pConstraint)
       throws InterruptedException {
-    if (!generateUnsatCores) { // unsat core does not work with incremental mode
+    if (!isGenerateUnsatCores()) { // unsat core does not work with incremental mode
       int constraint = creator.extractInfo(pConstraint);
       yices_assert_formula(curEnv, constraint);
     }
@@ -119,9 +115,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     boolean unsat;
-    if (generateUnsatCores) { // unsat core does not work with incremental mode
+    if (isGenerateUnsatCores()) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
       unsat =
           !yices_check_sat_with_assumptions(
@@ -151,7 +147,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     // TODO handle BooleanFormulaCollection / check for literals
     return !yices_check_sat_with_assumptions(
         curEnv,
@@ -208,11 +204,16 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       yices_free_context(curEnv);
       yices_free_config(curCfg);
       stackSizeToUnsat = Integer.MAX_VALUE;
     }
     super.close();
+  }
+
+  @Override
+  protected boolean isClosed() {
+    return super.isClosed();
   }
 }

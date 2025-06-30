@@ -58,7 +58,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
 
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> pTermNamesOfA) throws SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     checkInterpolationArguments(pTermNamesOfA);
 
     Set<Integer> indexesOfA = ImmutableSet.copyOf(pTermNamesOfA);
@@ -76,7 +76,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       final List<? extends Collection<Integer>> pPartitions) throws SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(
         !pPartitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
@@ -118,7 +118,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),

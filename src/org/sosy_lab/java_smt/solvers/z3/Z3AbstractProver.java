@@ -127,7 +127,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -145,14 +145,14 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -203,7 +203,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   @Override
   public ImmutableMap<String, String> getStatistics() {
     // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
@@ -245,7 +245,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       if (storedConstraints != null) {
         storedConstraints.clear();
       }

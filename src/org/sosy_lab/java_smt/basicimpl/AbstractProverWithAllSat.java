@@ -43,7 +43,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     checkGenerateAllSat();
 
     push();

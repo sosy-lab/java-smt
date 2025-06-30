@@ -65,7 +65,7 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       // Free resources of callback
       BtorJNI.boolector_free_termination(terminationCallbackHelper);
       // remove the whole stack, including the initial level from the constructor call.
@@ -83,10 +83,10 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
    */
   @Override
   protected boolean isUnsatImpl() throws SolverException, InterruptedException {
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       return false;
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
@@ -159,12 +159,13 @@ class BoolectorTheoremProver extends AbstractProverWithAllSat<Void> implements P
    *
    * @return bool return value.
    */
+  @Override
   protected boolean isClosed() {
-    return closed;
+    return super.isClosed();
   }
 
   private long addTerminationCallback() {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkState(!isClosed(), "solver context is already closed");
     return BtorJNI.boolector_set_termination(btor, this::shouldShutdown);
   }
 }

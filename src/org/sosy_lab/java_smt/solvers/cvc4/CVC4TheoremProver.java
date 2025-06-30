@@ -65,7 +65,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
-    incremental = !enableSL;
+    incremental = !isSeparationLogicEnabled();
 
     setOptions(randomSeed, pOptions);
   }
@@ -218,7 +218,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();

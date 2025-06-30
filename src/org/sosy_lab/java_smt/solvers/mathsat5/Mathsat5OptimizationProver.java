@@ -78,7 +78,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    checkState(!closed);
+    checkState(!isClosed());
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -88,7 +88,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int minimize(Formula objective) {
-    checkState(!closed);
+    checkState(!isClosed());
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -98,12 +98,12 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    checkState(!closed);
-    wasLastSatCheckSat = false;
+    checkState(!isClosed());
+    setLastSatCheckUnsat();
     final boolean isSatisfiable = msat_check_sat(curEnv);
-    stackChangedSinceLastQuery = false;
+    setStackNotChangedSinceLastQuery();
     if (isSatisfiable) {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       return OptStatus.OPT;
     } else {
       return OptStatus.UNSAT;
@@ -124,13 +124,13 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    checkState(!closed);
+    checkState(!isClosed());
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    checkState(!closed);
+    checkState(!isClosed());
     return getValue(handle, epsilon);
   }
 
@@ -150,7 +150,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   protected Model getModelImpl() throws SolverException {
-    checkState(!closed);
+    checkState(!isClosed());
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }

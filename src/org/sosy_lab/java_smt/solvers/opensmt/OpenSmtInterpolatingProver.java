@@ -78,10 +78,10 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
       throws InterruptedException {
-    checkState(!closed);
+    checkState(!isClosed());
     shutdownIfNecessary();
-    checkState(!wasLastSatCheckSat);
-    checkState(!stackChangedSinceLastQuery);
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     checkInterpolationArguments(formulasOfA);
 
     return creator.encapsulateBoolean(
@@ -91,7 +91,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    checkState(!closed);
+    checkState(!isClosed());
     checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
