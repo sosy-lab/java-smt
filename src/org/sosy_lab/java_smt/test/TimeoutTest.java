@@ -93,7 +93,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     Fuzzer fuzzer = new Fuzzer(mgr, new Random(0));
     String msg = "ShutdownRequest";
     BooleanFormula test = fuzzer.fuzz(20, 3);
-    shutdownManager.requestShutdown(msg);
+    contextShutdownManager.requestShutdown(msg);
     assertThrows(msg, InterruptedException.class, () -> mgr.applyTactic(test, Tactic.NNF));
   }
 
@@ -116,11 +116,13 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireBitvectors();
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
 
-    testBasicProverTimeoutBv(() -> context.newProverEnvironment(sm1.getNotifier()), sm1);
-    assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-    assertThat(sm1.getNotifier().shouldShutdown()).isTrue();
+    testBasicProverTimeoutBv(
+        () -> context.newProverEnvironment(proverShutdownManager1.getNotifier()),
+        proverShutdownManager1);
+    assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+    assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isTrue();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -136,11 +138,13 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
 
-    testBasicProverTimeoutInt(() -> context.newProverEnvironment(sm1.getNotifier()), sm1);
-    assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-    assertThat(sm1.getNotifier().shouldShutdown()).isTrue();
+    testBasicProverTimeoutInt(
+        () -> context.newProverEnvironment(proverShutdownManager1.getNotifier()),
+        proverShutdownManager1);
+    assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+    assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isTrue();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -157,7 +161,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireBitvectors();
 
     testBasicContextTimeoutBv(() -> context.newProverEnvironment());
-    assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+    assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -172,7 +176,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
 
     testBasicContextTimeoutInt(() -> context.newProverEnvironment());
-    assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+    assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     try (BasicProverEnvironment<?> pe = context.newProverEnvironment()) {
@@ -203,7 +207,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         pe2.push(gen.generate(8));
 
         testBasicContextTimeoutBv(() -> context.newProverEnvironment());
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
 
         assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
@@ -225,7 +229,7 @@ public class TimeoutTest extends SolverBasedTest0 {
         pe2.push(gen.generate(8));
 
         testBasicContextTimeoutInt(() -> context.newProverEnvironment());
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
 
         assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
@@ -248,20 +252,23 @@ public class TimeoutTest extends SolverBasedTest0 {
         .isNotEqualTo(BOOLECTOR);
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
-    ShutdownManager sm2 = ShutdownManager.create();
-    ShutdownManager sm3 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager2 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager3 = ShutdownManager.create();
 
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
-    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
-      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+    try (BasicProverEnvironment<?> pe1 =
+        context.newProverEnvironment(proverShutdownManager1.getNotifier())) {
+      try (BasicProverEnvironment<?> pe2 =
+          context.newProverEnvironment(proverShutdownManager2.getNotifier())) {
         pe2.push(gen.generate(8));
 
-        testBasicContextTimeoutBv(() -> context.newProverEnvironment(sm3.getNotifier()));
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isFalse();
+        testBasicContextTimeoutBv(
+            () -> context.newProverEnvironment(proverShutdownManager3.getNotifier()));
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isFalse();
 
         assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
@@ -280,20 +287,23 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
-    ShutdownManager sm2 = ShutdownManager.create();
-    ShutdownManager sm3 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager2 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager3 = ShutdownManager.create();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
-    try (BasicProverEnvironment<?> pe1 = context.newProverEnvironment(sm1.getNotifier())) {
-      try (BasicProverEnvironment<?> pe2 = context.newProverEnvironment(sm2.getNotifier())) {
+    try (BasicProverEnvironment<?> pe1 =
+        context.newProverEnvironment(proverShutdownManager1.getNotifier())) {
+      try (BasicProverEnvironment<?> pe2 =
+          context.newProverEnvironment(proverShutdownManager2.getNotifier())) {
         pe2.push(gen.generate(8));
 
-        testBasicContextTimeoutInt(() -> context.newProverEnvironment(sm3.getNotifier()));
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isFalse();
+        testBasicContextTimeoutInt(
+            () -> context.newProverEnvironment(proverShutdownManager3.getNotifier()));
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isFalse();
 
         assertThrows(InterruptedException.class, () -> pe2.push(gen.generate(8)));
         assertThrows(InterruptedException.class, pe2::isUnsat);
@@ -310,14 +320,14 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireBitvectors();
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
-    ShutdownManager sm2 = ShutdownManager.create();
-    ShutdownManager sm3 = ShutdownManager.create();
-    ShutdownManager sm4 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager2 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager3 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager4 = ShutdownManager.create();
 
     try (BasicProverEnvironment<?> pe1 =
         context.newProverEnvironment(
-            sm1.getNotifier(),
+            proverShutdownManager1.getNotifier(),
             ProverOptions.GENERATE_UNSAT_CORE,
             ProverOptions.GENERATE_MODELS,
             ProverOptions.GENERATE_ALL_SAT,
@@ -325,7 +335,7 @@ public class TimeoutTest extends SolverBasedTest0 {
       assertProverAPIUsable(pe1);
       try (BasicProverEnvironment<?> pe2 =
           context.newProverEnvironment(
-              sm2.getNotifier(),
+              proverShutdownManager2.getNotifier(),
               ProverOptions.GENERATE_UNSAT_CORE,
               ProverOptions.GENERATE_MODELS,
               ProverOptions.GENERATE_ALL_SAT,
@@ -335,18 +345,18 @@ public class TimeoutTest extends SolverBasedTest0 {
         testBasicProverTimeoutWithFeatureUsageBv(
             () ->
                 context.newProverEnvironment(
-                    sm3.getNotifier(),
+                    proverShutdownManager3.getNotifier(),
                     ProverOptions.GENERATE_UNSAT_CORE,
                     ProverOptions.GENERATE_MODELS,
                     ProverOptions.GENERATE_ALL_SAT,
                     ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS),
-            sm3);
+            proverShutdownManager3);
 
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm4.getNotifier().shouldShutdown()).isFalse();
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager4.getNotifier().shouldShutdown()).isFalse();
 
         boolean notifier4Shutdown = true;
 
@@ -354,12 +364,12 @@ public class TimeoutTest extends SolverBasedTest0 {
           testBasicProverTimeoutWithFeatureUsageBv(
               () ->
                   context.newProverEnvironmentWithInterpolation(
-                      sm4.getNotifier(),
+                      proverShutdownManager4.getNotifier(),
                       ProverOptions.GENERATE_UNSAT_CORE,
                       ProverOptions.GENERATE_MODELS,
                       ProverOptions.GENERATE_ALL_SAT,
                       ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS),
-              sm4);
+              proverShutdownManager4);
         } catch (UnsupportedOperationException ignore) {
           // Do nothing, not supported
           notifier4Shutdown = false;
@@ -367,11 +377,12 @@ public class TimeoutTest extends SolverBasedTest0 {
 
         // TODO: optimization (or prover gen as test param?)
 
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm4.getNotifier().shouldShutdown()).isEqualTo(notifier4Shutdown);
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager4.getNotifier().shouldShutdown())
+            .isEqualTo(notifier4Shutdown);
 
         assertProverAPIUsable(pe2);
       }
@@ -386,14 +397,14 @@ public class TimeoutTest extends SolverBasedTest0 {
     requireIntegers();
     requireIsolatedProverShutdown();
 
-    ShutdownManager sm1 = ShutdownManager.create();
-    ShutdownManager sm2 = ShutdownManager.create();
-    ShutdownManager sm3 = ShutdownManager.create();
-    ShutdownManager sm4 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager1 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager2 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager3 = ShutdownManager.create();
+    ShutdownManager proverShutdownManager4 = ShutdownManager.create();
 
     try (BasicProverEnvironment<?> pe1 =
         context.newProverEnvironment(
-            sm1.getNotifier(),
+            proverShutdownManager1.getNotifier(),
             ProverOptions.GENERATE_UNSAT_CORE,
             ProverOptions.GENERATE_MODELS,
             ProverOptions.GENERATE_ALL_SAT,
@@ -403,29 +414,29 @@ public class TimeoutTest extends SolverBasedTest0 {
 
       try (BasicProverEnvironment<?> pe2 =
           context.newProverEnvironment(
-              sm2.getNotifier(),
+              proverShutdownManager2.getNotifier(),
               ProverOptions.GENERATE_UNSAT_CORE,
               ProverOptions.GENERATE_MODELS,
               ProverOptions.GENERATE_ALL_SAT,
               ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
         assertProverAPIUsable(pe2);
 
-        // Test Shutdown of prover with notifier sm3
+        // Test Shutdown of prover with notifier proverShutdownManager3
         testBasicProverTimeoutWithFeatureUsageInt(
             () ->
                 context.newProverEnvironment(
-                    sm3.getNotifier(),
+                    proverShutdownManager3.getNotifier(),
                     ProverOptions.GENERATE_UNSAT_CORE,
                     ProverOptions.GENERATE_MODELS,
                     ProverOptions.GENERATE_ALL_SAT,
                     ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS),
-            sm3);
+            proverShutdownManager3);
 
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm4.getNotifier().shouldShutdown()).isFalse();
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager4.getNotifier().shouldShutdown()).isFalse();
 
         boolean notifier4Shutdown = true;
 
@@ -433,30 +444,32 @@ public class TimeoutTest extends SolverBasedTest0 {
           testBasicProverTimeoutWithFeatureUsageInt(
               () ->
                   context.newProverEnvironmentWithInterpolation(
-                      sm4.getNotifier(),
+                      proverShutdownManager4.getNotifier(),
                       ProverOptions.GENERATE_UNSAT_CORE,
                       ProverOptions.GENERATE_MODELS,
                       ProverOptions.GENERATE_ALL_SAT,
                       ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS),
-              sm4);
+              proverShutdownManager4);
         } catch (UnsupportedOperationException ignore) {
           // Do nothing, not supported
           notifier4Shutdown = false;
         }
 
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm4.getNotifier().shouldShutdown()).isEqualTo(notifier4Shutdown);
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager4.getNotifier().shouldShutdown())
+            .isEqualTo(notifier4Shutdown);
 
         // TODO: optimization (or prover gen as test param?)
 
-        assertThat(shutdownManager.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm1.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm2.getNotifier().shouldShutdown()).isFalse();
-        assertThat(sm3.getNotifier().shouldShutdown()).isTrue();
-        assertThat(sm4.getNotifier().shouldShutdown()).isEqualTo(notifier4Shutdown);
+        assertThat(contextShutdownManager.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager1.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager2.getNotifier().shouldShutdown()).isFalse();
+        assertThat(proverShutdownManager3.getNotifier().shouldShutdown()).isTrue();
+        assertThat(proverShutdownManager4.getNotifier().shouldShutdown())
+            .isEqualTo(notifier4Shutdown);
 
         assertProverAPIUsable(pe2);
       }
@@ -543,7 +556,7 @@ public class TimeoutTest extends SolverBasedTest0 {
             () -> {
               try {
                 Thread.sleep(delay);
-                shutdownManager.requestShutdown("Shutdown Request");
+                contextShutdownManager.requestShutdown("Shutdown Request");
               } catch (InterruptedException exception) {
                 throw new UnsupportedOperationException("Unexpected interrupt", exception);
               }

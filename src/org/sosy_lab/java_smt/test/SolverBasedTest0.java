@@ -104,10 +104,10 @@ public abstract class SolverBasedTest0 {
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
   protected @Nullable EnumerationFormulaManager emgr;
-  protected ShutdownManager shutdownManager = ShutdownManager.create();
+  protected ShutdownManager contextShutdownManager = ShutdownManager.create();
 
-  protected ShutdownNotifier shutdownNotifierToUse() {
-    return shutdownManager.getNotifier();
+  protected ShutdownNotifier contextShutdownNotifierToUse() {
+    return contextShutdownManager.getNotifier();
   }
 
   /**
@@ -136,7 +136,7 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws InvalidConfigurationException {
     config = createTestConfigBuilder().build();
 
-    factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
+    factory = new SolverContextFactory(config, logger, contextShutdownNotifierToUse());
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
