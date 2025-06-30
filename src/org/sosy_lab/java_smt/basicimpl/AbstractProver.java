@@ -36,13 +36,13 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
-  protected final String NO_MODEL_HELP =
+  protected static final String NO_MODEL_HELP =
       "Model computation failed. Are the pushed formulae satisfiable?";
 
-  private final String NO_UNSAT_CORE_HELP =
+  private static final String NO_UNSAT_CORE_HELP =
       "UnsatCore computation failed. Are the pushed formulae unsatisfiable?";
 
-  private final String STACK_CHANGED_HELP =
+  private static final String STACK_CHANGED_HELP =
       "Computation failed. The prover state has changed since the last call to isUnsat().";
 
   // Used as prefix concatenated with the reason in the IllegalStateException thrown for shutdowns
