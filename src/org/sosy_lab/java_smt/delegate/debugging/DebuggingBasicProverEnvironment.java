@@ -81,6 +81,7 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+    debugging.assertThreadLocal();
     return delegate.getModelAssignments();
   }
 
