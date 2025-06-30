@@ -52,7 +52,6 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.AllSatModelCallback;
-import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationCallback;
 
 /** Common base class for {@link Mathsat5TheoremProver} and {@link Mathsat5InterpolatingProver}. */
 abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
@@ -99,7 +98,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     Preconditions.checkState(!isClosed());
 
-    final long hook = msat_set_termination_callback(curEnv, getTerminationTest());
+    final long hook = msat_set_termination_callback(curEnv, this::getTerminationTest);
     try {
       return !msat_check_sat(curEnv);
     } finally {
@@ -112,11 +111,9 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
    * callback can be registered upfront, i.e., before calling a possibly expensive computation in
    * the solver to allow a proper shutdown.
    */
-  private TerminationCallback getTerminationTest() {
-    return () -> {
-      shutdownIfNecessary();
-      return false;
-    };
+  private boolean getTerminationTest() throws InterruptedException {
+    shutdownIfNecessary();
+    return false;
   }
 
   @Override
@@ -125,7 +122,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     Preconditions.checkState(!isClosed());
     checkForLiterals(pAssumptions);
 
-    final long hook = msat_set_termination_callback(curEnv, getTerminationTest());
+    final long hook = msat_set_termination_callback(curEnv, this::getTerminationTest);
     try {
       return !msat_check_sat_with_assumptions(curEnv, getMsatTerm(pAssumptions));
     } finally {
