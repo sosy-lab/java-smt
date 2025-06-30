@@ -68,9 +68,8 @@ public interface SolverContext extends AutoCloseable {
 
   /**
    * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack and can be
-   * used to check formulas for unsatisfiability. Allows the shutdown of the prover instance
-   * returned with the given {@link ShutdownNotifier}, without stopping other provers of the context
-   * calling this (except for provers also connected via the given {@link ShutdownNotifier}).
+   * used to check formulas for unsatisfiability. The returned prover instance can be shut down
+   * using the given {@link ShutdownNotifier}.
    *
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that stops the prover returned by
    *     this method. The prover is not usable anymore after a shutdown has been requested and only
@@ -102,10 +101,8 @@ public interface SolverContext extends AutoCloseable {
 
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
-   * and allows generating and retrieve interpolants for unsatisfiable formulas. Allows the shutdown
-   * of the prover instance returned with the given {@link ShutdownNotifier}, without stopping other
-   * provers of the context calling this (except for provers also connected via the given {@link
-   * ShutdownNotifier}).
+   * and allows generating and retrieve interpolants for unsatisfiable formulas. The returned prover
+   * instance can be shut down using the given {@link ShutdownNotifier}.
    *
    * @implNote If the SMT solver is able to handle satisfiability tests with assumptions please
    *     consider implementing the {@link InterpolatingProverEnvironment} interface, and return an
@@ -137,9 +134,8 @@ public interface SolverContext extends AutoCloseable {
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
-   * and allows solving optimization queries. Allows the shutdown of the prover instance returned
-   * with the given {@link ShutdownNotifier}, without stopping other provers of the context calling
-   * this (except for provers also connected via the given {@link ShutdownNotifier}).
+   * and allows solving optimization queries. The returned prover instance can be shut down using
+   * the given {@link ShutdownNotifier}.
    *
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that stops the prover returned by
    *     this method. The prover is not usable anymore after a shutdown has been requested and in
