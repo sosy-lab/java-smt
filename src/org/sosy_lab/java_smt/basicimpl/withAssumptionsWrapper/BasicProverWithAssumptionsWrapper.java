@@ -48,6 +48,8 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
       } catch (IllegalStateException ise) {
         if (ise.getMessage().startsWith(SHUTDOWN_EXCEPTION_PREFIX)) {
           throw new InterruptedException(ise.getMessage().replace(SHUTDOWN_EXCEPTION_PREFIX, ""));
+        } else {
+          throw ise;
         }
       }
     }
