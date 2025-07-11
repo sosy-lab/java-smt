@@ -53,6 +53,9 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "Algorithm for LRA interpolation")
     int algLra = 0;
 
+    @Option(secure = true, description = "Simplify interpolants before they are returned")
+    int simplifyInterpolants = 0;
+
     final int randomSeed;
 
     OpenSMTOptions(Configuration config, int pRandomSeed) throws InvalidConfigurationException {

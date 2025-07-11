@@ -82,6 +82,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
       config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
       config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
+      config.setOption(
+          ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }
     return config;
   }
