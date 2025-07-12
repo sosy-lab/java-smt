@@ -133,7 +133,7 @@ public final class Tokenizer {
     }
     if (level != 0) {
       // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("brackets do not match, too many open brackets");
     }
     return builder.build();
   }
