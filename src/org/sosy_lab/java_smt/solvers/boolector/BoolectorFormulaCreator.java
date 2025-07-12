@@ -206,7 +206,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
   // Hopefully a helpful template for when visitor gets implemented
   // Btor only has bitvec arrays and ufs with bitvecs and arrays of bitvecs
   // (and quantifier with bitvecs only)
-  @SuppressWarnings("unused")
+  @SuppressWarnings({"deprecation", "unused"})
   private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) {
     if (BtorJNI.boolector_is_const(getEnv(), f)) {
       // Handles all constants (bitvec, bool)

@@ -382,6 +382,7 @@ class PrincessFormulaCreator
     return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {

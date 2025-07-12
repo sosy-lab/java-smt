@@ -42,15 +42,6 @@ final class FormulaTransformationVisitorImpl implements FormulaVisitor<Void> {
   }
 
   @Override
-  public Void visitBoundVariable(Formula f, int deBruijnIdx) {
-    Preconditions.checkNotNull(f);
-
-    // Bound variable transformation is not allowed.
-    pCache.put(f, f);
-    return null;
-  }
-
-  @Override
   public Void visitConstant(Formula f, Object value) {
     Preconditions.checkNotNull(f);
     pCache.put(f, delegate.visitConstant(f, value));

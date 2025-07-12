@@ -38,11 +38,22 @@ public interface FormulaVisitor<R> {
    * Visit a variable bound by a quantifier. The variable can have any sort (both boolean and
    * non-boolean).
    *
+   * <p>This method is deprecated because bound variables are no longer explicitly visited. When
+   * entering a quantified formula, bound variables are seen as free variables, as documented in
+   * {@link #visitQuantifier}. When entering the body of a quantified formula, bound variables are
+   * replaced by free variables, and are visited with {@link #visitFreeVariable}.
+   *
    * @param f Formula representing the variable.
    * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used to find the
    *     matching quantifier.
    */
-  R visitBoundVariable(Formula f, int deBruijnIdx);
+  @Deprecated(since = "2025.07, because bound variables are never created or used in the visitor")
+  default R visitBoundVariable(Formula f, int deBruijnIdx) {
+    throw new UnsupportedOperationException(
+        "Bound variables are no longer explicitly visited in JavaSMT. "
+            + "Use a combination of 'visitQuantifier' (for the whole quantified formula) and "
+            + "'visitFreeVariable' (in the body) instead.");
+  }
 
   /**
    * Visit a constant, such as "true"/"false", a numeric constant like "1" or "1.0", a String

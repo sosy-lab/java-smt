@@ -393,6 +393,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     return bitwuzlaSortToType(pType);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, Term f)
       throws UnsupportedOperationException {

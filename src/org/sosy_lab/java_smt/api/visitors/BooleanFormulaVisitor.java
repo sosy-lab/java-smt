@@ -31,8 +31,22 @@ public interface BooleanFormulaVisitor<R> {
    */
   R visitConstant(boolean value);
 
-  /** Visit a boolean variable bound by a quantifier. */
-  R visitBoundVar(BooleanFormula var, int deBruijnIdx);
+  /**
+   * Visit a boolean variable bound by a quantifier.
+   *
+   * <p>Since JavaSMT no longer explicitly visits bound variables, and never has done so for most
+   * solvers, this method will be removed in the future. Bound variables are available when visiting
+   * a quantified formula, and can be accessed in {@link #visitQuantifier}. When entering the body
+   * of a quantified formula, bound variables are seen as free variables, as documented in {@link
+   * FormulaVisitor#visitQuantifier}.
+   */
+  @Deprecated(since = "2025.07, because bound variables are never created or used in the visitor")
+  default R visitBoundVar(BooleanFormula var, int deBruijnIdx) {
+    throw new UnsupportedOperationException(
+        "Bound variables are no longer explicitly visited in JavaSMT. "
+            + "Use a combination of 'visitQuantifier' (for the whole quantified formula) and "
+            + "'visitAtom' (for variables in the body) instead.");
+  }
 
   /**
    * Visit a NOT-expression.

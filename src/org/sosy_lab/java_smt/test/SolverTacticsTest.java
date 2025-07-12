@@ -248,12 +248,6 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     }
 
     @Override
-    public Void visitBoundVar(BooleanFormula f, int deBruijnIdx) {
-      started = true;
-      return null;
-    }
-
-    @Override
     public Void visitAtom(BooleanFormula pAtom, FunctionDeclaration<BooleanFormula> decl) {
       started = true;
       return null;
@@ -355,12 +349,6 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
 
     @Override
     public Void visitConstant(boolean value) {
-      wasLastVisitNot = false;
-      return null;
-    }
-
-    @Override
-    public Void visitBoundVar(BooleanFormula var, int deBruijnIdx) {
       wasLastVisitNot = false;
       return null;
     }
