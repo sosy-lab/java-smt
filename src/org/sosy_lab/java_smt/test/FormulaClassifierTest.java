@@ -137,6 +137,27 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
+  public void test_LRA_2() {
+    requireParser();
+    requireRationals();
+    requireQuantifiers();
+    requireRationals();
+    String query =
+        NUMERAL_VARS
+            + "(assert (and "
+            + "(exists ((a Real) (b Real)) (= (+ y y) (+ a b))) "
+            + "(exists ((a Real) (b Real)) (= (+ y y) (- a b))) "
+            + "))";
+    classifier.visit(mgr.parse(query));
+    if (solverToUse() == Solvers.PRINCESS) {
+      // Princess rewrites the formula and uses '-1' for the negation -> Integer arithmetic
+      assertThat(classifier.toString()).isEqualTo("LIRA");
+    } else {
+      assertThat(classifier.toString()).isEqualTo("LRA");
+    }
+  }
+
+  @Test
   public void test_ABVIRA() {
     requireParser();
     requireArrays();
