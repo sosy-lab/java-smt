@@ -41,6 +41,7 @@ public interface BooleanFormulaVisitor<R> {
    * FormulaVisitor#visitQuantifier}.
    */
   @Deprecated(since = "2025.07, because bound variables are never created or used in the visitor")
+  @SuppressWarnings("unused")
   default R visitBoundVar(BooleanFormula var, int deBruijnIdx) {
     throw new UnsupportedOperationException(
         "Bound variables are no longer explicitly visited in JavaSMT. "
