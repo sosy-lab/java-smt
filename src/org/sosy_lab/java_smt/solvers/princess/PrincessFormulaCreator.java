@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asJavaCollection;
@@ -547,13 +546,17 @@ class PrincessFormulaCreator
 
     // substitute the bound variable with index 0 with a new variable, and un-shift the remaining
     // de-Bruijn indices, such that the next nested bound variable has index 0.
-    IFormula substitutedBody = IFormula.subst(body, toITermSeq(substitutionVariable).toList(), -1);
+    IFormula substitutedBody = IFormula.subst(body, asScalaList(substitutionVariable), -1);
 
     return visitor.visitQuantifier(
         f,
         quantifier,
-        List.of(encapsulateWithTypeOf(substitutionVariable)),
+        ImmutableList.of(encapsulateWithTypeOf(substitutionVariable)),
         encapsulateBoolean(substitutedBody));
+  }
+
+  private static scala.collection.immutable.List<ITerm> asScalaList(ITerm substitutionVariable) {
+    return scala.collection.immutable.List$.MODULE$.empty().$colon$colon(substitutionVariable);
   }
 
   /**
