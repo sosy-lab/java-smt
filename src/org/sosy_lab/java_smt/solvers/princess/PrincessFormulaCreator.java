@@ -546,7 +546,7 @@ class PrincessFormulaCreator
 
     // substitute the bound variable with index 0 with a new variable, and un-shift the remaining
     // de-Bruijn indices, such that the next nested bound variable has index 0.
-    IFormula substitutedBody = IFormula.subst(body, asScalaList(substitutionVariable), -1);
+    IFormula substitutedBody = IExpression.subst(body, asScalaList(substitutionVariable), -1);
 
     return visitor.visitQuantifier(
         f,
