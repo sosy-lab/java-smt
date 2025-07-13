@@ -11,10 +11,10 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asJavaCollection;
-import static scala.collection.JavaConverters.asScala;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
@@ -54,10 +54,10 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -185,8 +185,10 @@ class PrincessFormulaCreator
    */
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
 
-  // Keeps track of the bound/free variables created when visiting quantified terms.
-  private final UniqueIdGenerator boundVariablesId = new UniqueIdGenerator();
+  /** This map keeps track of the bound/free variables created when visiting quantified terms. */
+  // TODO should we use a WeakHashMap?
+  //  We do not cleanup in other places, too, and the number of quantified formulas is small.
+  private final Map<IFormula, String> boundVariableNames = new LinkedHashMap<>();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
     super(
@@ -538,20 +540,30 @@ class PrincessFormulaCreator
 
     // Princess uses de-Bruijn indices, so we have index 0 here for the most outer quantified scope
     IVariable boundVariable = input.sort().boundVariable(0);
-    String boundVariableName = "__JAVASMT__BOUND_VARIABLE_" + boundVariablesId.getFreshId();
+    String boundVariableName = getFreshVariableNameForBody(body);
+
     // Currently, Princess supports only non-boolean bound variables, so we can cast to ITerm.
     ITerm substitutionVariable = (ITerm) makeVariable(boundVariable.sort(), boundVariableName);
 
-    // substitute the bound variable with a new variable,
-    // and un-shift the remaining de-Bruijn indices.
-    IFormula substitutedBody =
-        IFormula.subst(body, asScala(List.of(substitutionVariable)).toList(), -1);
+    // substitute the bound variable with index 0 with a new variable, and un-shift the remaining
+    // de-Bruijn indices, such that the next nested bound variable has index 0.
+    IFormula substitutedBody = IFormula.subst(body, toITermSeq(substitutionVariable).toList(), -1);
 
     return visitor.visitQuantifier(
         f,
         quantifier,
         List.of(encapsulateWithTypeOf(substitutionVariable)),
         encapsulateBoolean(substitutedBody));
+  }
+
+  /**
+   * Get a fresh variable name for the given formula. We compute the same variable name for the same
+   * body, such that a user gets the same substituted body when visiting a quantified formulas
+   * several times.
+   */
+  private String getFreshVariableNameForBody(IFormula body) {
+    return boundVariableNames.computeIfAbsent(
+        body, k -> "__JAVASMT__BOUND_VARIABLE_" + boundVariableNames.size());
   }
 
   private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
