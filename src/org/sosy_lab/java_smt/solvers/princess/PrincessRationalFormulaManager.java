@@ -8,17 +8,17 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
+import ap.parser.IFormula;
 import ap.parser.IFunApp;
-import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.theories.rationals.Rationals;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -27,7 +27,7 @@ public class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  private PrincessIntegerFormulaManager ifmgr;
+  private final PrincessIntegerFormulaManager ifmgr;
 
   PrincessRationalFormulaManager(
       PrincessFormulaCreator pCreator,
@@ -108,29 +108,71 @@ public class PrincessRationalFormulaManager
   }
 
   @Override
+  protected ITerm toType(IExpression param) {
+    ITerm number = (ITerm) param;
+    return formulaCreator.getFormulaType(number).isIntegerType()
+        ? Rationals.int2ring(number)
+        : number;
+  }
+
+  @Override
   protected IExpression floor(IExpression number) {
     throw new UnsupportedOperationException("floor is not supported in Princess");
   }
 
   @Override
+  protected ITerm negate(IExpression number) {
+    return Rationals.minus(toType(number));
+  }
+
+  @Override
+  protected ITerm add(IExpression number1, IExpression number2) {
+    return Rationals.plus(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected ITerm subtract(IExpression number1, IExpression number2) {
+    return Rationals.minus(toType(number1), toType(number2));
+  }
+
+  @Override
   protected IExpression multiply(IExpression number1, IExpression number2) {
-    FormulaType<?> sort1 = getFormulaCreator().getFormulaType(number1);
-    FormulaType<?> sort2 = getFormulaCreator().getFormulaType(number1);
-
-    IExpression result = PrincessEnvironment.rationalTheory.mul((ITerm) number1, (ITerm) number2);
-
-    if (result instanceof IIntLit && ((IIntLit) result).value().equals(IdealInt.apply(0))) {
-      // If the result is (integer) zero we may have lost our type
-      // Check the type of both arguments and convert the result back to rational if needed
-      if (sort1.isRationalType() || sort2.isRationalType()) {
-        result = PrincessEnvironment.rationalTheory.int2ring((IIntLit) result);
-      }
-    }
-    return result;
+    return Rationals.mul(toType(number1), toType(number2));
   }
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
-    return PrincessEnvironment.rationalTheory.div((ITerm) number1, (ITerm) number2);
+    return Rationals.div(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected IFormula equal(IExpression number1, IExpression number2) {
+    return super.equal(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected IExpression distinctImpl(List<IExpression> operands) {
+    List<IExpression> castedOps = operands.stream().map(this::toType).collect(Collectors.toList());
+    return super.distinctImpl(castedOps);
+  }
+
+  @Override
+  protected IFormula greaterThan(IExpression number1, IExpression number2) {
+    return Rationals.gt(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected IFormula greaterOrEquals(IExpression number1, IExpression number2) {
+    return Rationals.geq(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected IFormula lessThan(IExpression number1, IExpression number2) {
+    return Rationals.lt(toType(number1), toType(number2));
+  }
+
+  @Override
+  protected IFormula lessOrEquals(IExpression number1, IExpression number2) {
+    return Rationals.leq(toType(number1), toType(number2));
   }
 }

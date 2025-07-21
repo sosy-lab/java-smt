@@ -124,11 +124,6 @@ public class SolverConcurrencyTest {
           .that(solver)
           .isNotEqualTo(Solvers.MATHSAT5);
     }
-
-    assume()
-        .withMessage("Solver does not support concurrency without concurrent context.")
-        .that(solver)
-        .isNotEqualTo(Solvers.CVC5);
   }
 
   private void requireConcurrentMultipleStackSupport() {
@@ -303,7 +298,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -540,7 +535,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
@@ -563,7 +558,7 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "continuousRunningThreadFormulaTransferTranslateTest",
         () -> {
-          // Start the threads such that they each get a unqiue id
+          // Start the threads such that they each get an unqiue id
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);

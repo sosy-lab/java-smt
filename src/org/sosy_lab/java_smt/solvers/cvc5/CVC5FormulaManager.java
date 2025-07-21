@@ -248,26 +248,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     }
 
     // now add the final assert
-    out.append("(assert ");
-    // Formerly in CVC4:
-    // f.toString() does expand all nested sub-expressions and causes exponential overhead.
-    // f.toStream() uses LET-expressions and is exactly what we want.
-    // However, in CVC5 toStream() does no longer exists.
-    // TODO: either toString() will do, or we may need iterator().
-    /*
-    try (OutputStream stream =
-        new OutputStream() {
-
-          @Override
-          public void write(int chr) throws IOException {
-            out.append((char) chr);
-          }
-        }) {
-      f.toStream(stream);
-    }
-    */
-    out.append(f.toString());
-    out.append(')');
+    out.append("(assert ").append(f).append(')');
     return out.toString();
   }
 

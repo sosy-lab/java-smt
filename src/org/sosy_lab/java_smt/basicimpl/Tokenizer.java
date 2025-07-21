@@ -47,7 +47,7 @@ public final class Tokenizer {
           inComment = false;
           if (level > 0) {
             // If we're in an expression we need to replace the entire comment (+ the newline) with
-            // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
+            // some whitespace. Otherwise, symbols might get merged across line-wraps. This is not
             // a problem at the top-level where all terms are surrounded by brackets.
             token.append(c);
           }

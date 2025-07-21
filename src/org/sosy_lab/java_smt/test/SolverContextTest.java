@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.test.SolverContextFactoryTest.IS_WINDOWS;
 
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
@@ -88,7 +87,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
 
-    // Z3 seems to allows simple operations, but not deterministically, so better lets abort here.
+    // Z3 seems to allow simple operations, but not deterministically, so better lets abort here.
     // Simple checks could even be ok (comparison against constants like TRUE/FALSE).
     assume()
         .withMessage(
@@ -149,10 +148,6 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testCVC5WithValidOptionsTimeLimit()
       throws InvalidConfigurationException, InterruptedException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
-    assume()
-        .withMessage("CVC5 has an issue with creating and closing a second context on Windows.")
-        .that(IS_WINDOWS)
-        .isFalse();
 
     //  tlimit-per is time limit in ms of wall clock time per query
     var configValid =

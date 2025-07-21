@@ -31,7 +31,6 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,25 +101,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     if (existingVar != null) {
       return existingVar;
     }
-    if (variablesCache.containsRow(name)) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type "
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
+    Preconditions.checkArgument(
+        !variablesCache.containsRow(name),
+        "Symbol %s requested with type %s, but already used with type %s",
+        name,
+        sort,
+        variablesCache.row(name).keySet());
     Term newVar = termManager.mkConst(sort, name);
     variablesCache.put(name, sort, newVar);
     return newVar;
@@ -801,7 +787,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     final Sort type = expForType.getSort();
     final Sort valueType = value.getSort();
 
-    // Variables are Kind.CONSTANT and can't be check with isIntegerValue() or getIntegerValue()
+    // Variables are Kind.CONSTANT and can't be checked with isIntegerValue() or getIntegerValue()
     // etc. but only with solver.getValue() and its String serialization
     try {
       if (value.getKind() == Kind.VARIABLE) {

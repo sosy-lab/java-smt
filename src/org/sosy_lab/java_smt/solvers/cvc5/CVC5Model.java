@@ -74,7 +74,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       Sort sort = expr.getSort();
       Kind kind = expr.getKind();
       if (kind == Kind.VARIABLE || sort.isFunction()) {
-        // We don't care about functions, as thats just the function definition and the nested
+        // We don't care about functions, as that's just the function definition and the nested
         // lambda term
         // We don't care about bound vars (not in a UF), as they don't return a value.
         return;
@@ -124,7 +124,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
           // Remember if we encountered bound variables
           boundFound = true;
           // Bound vars are extremely volatile in CVC5. Nearly every call to them ends in an
-          // exception. Also we don't want to substitute them with their non bound values.
+          // exception. Also, we don't want to substitute them with their non bound values.
           argumentInterpretationBuilder.add(child.toString());
         } else {
           argumentInterpretationBuilder.add(evaluateImpl(child));
@@ -270,7 +270,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       }
     }
 
-    String nameStr = "";
+    String nameStr;
     if (pKeyTerm.hasSymbol()) {
       nameStr = pKeyTerm.getSymbol();
     } else {

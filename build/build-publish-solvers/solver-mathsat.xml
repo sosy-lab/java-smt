@@ -87,7 +87,7 @@ SPDX-License-Identifier: Apache-2.0
         -->
         <echo>
             Lets copy the files for architecture x64 into main directory, for backwards compatibility.
-            Afterwards, please execute the SVN command from above.
+            Afterward, please execute the SVN command from above.
         </echo>
         <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
             <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">

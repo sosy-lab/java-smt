@@ -48,7 +48,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <!-- macro for pushing a JavaSMT file into a Maven repository
-         (push into the staging area, from there manual publication is required afterwards) -->
+         (push into the staging area, from there manual publication is required afterward) -->
     <macrodef name="stage-javasmt-file">
       <attribute name="filename"/>
       <attribute name="fileending"/>
@@ -82,7 +82,7 @@ SPDX-License-Identifier: Apache-2.0
     </macrodef>
 
     <!-- macro for pushing solvers into a Maven repository
-         (push into the staging area, from there manual publication is required afterwards) -->
+         (push into the staging area, from there manual publication is required afterward) -->
     <macrodef name="stage-solver-file">
       <!-- 'filename' is only used for reading file from file-system, not used "in" Maven -->
       <attribute name="filename"/>
@@ -238,6 +238,8 @@ SPDX-License-Identifier: Apache-2.0
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="so"/>
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-arm64" filedirectory="${libDir.arm64}" fileending="so"/>
         <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="dll"/>
+        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-x64" filedirectory="${libDir.x64}" fileending="dylib"/>
+        <stage-solver-file filename="libcvc5jni" classifier="libcvc5jni-arm64" filedirectory="${libDir.arm64}" fileending="dylib"/>
     </target>
 
     <!--
