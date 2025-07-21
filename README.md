@@ -52,6 +52,7 @@ JavaSMT can express formulas in the following theories:
  - Array
  - Uninterpreted Function
  - String and RegEx
+ - Separation Logic (experimental)
 
 The concrete support for a certain theory depends on the underlying SMT solver.
 Only a few SMT solvers provide support for theories like Arrays, Floating Point, String or RegEx.
@@ -101,6 +102,7 @@ The following features are supported (depending on the used SMT solver):
  - Multiple independent contexts
  - Model generation
  - Interpolation, including tree and sequential structure
+ - Unsatisfiable core generation
  - Formula transformation using built-in tactics
  - Formula introspection using visitors
 
