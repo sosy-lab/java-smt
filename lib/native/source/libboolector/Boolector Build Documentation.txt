@@ -28,7 +28,7 @@ There are 2 files, both located in boolector/src/, that need (potential) editing
 
 MakeFile:
 CMakeLists.c needs to include ALL JNI .c files you want in its set(libboolector_src_files ...) list at the beginning. (interface_wrap.c should be there!)
-Additionally it needs to find the JNI libs and set the path for linking.
+Additionally, it needs to find the JNI libs and set the path for linking.
 Example:
 
 	find_package(JNI)
@@ -71,7 +71,7 @@ To compile you need to follow these steps EVERY time since Boolector does not sa
 
 
 If you choose to use SWIG (Java/C):
-(Careful, you need to check your methods later anyway, SWIG tends to make mistakes. Example: it gives pointers back instead of the object, or a Jlong instead of an Jint etc.)
+(Careful, you need to check your methods later anyway, SWIG tends to make mistakes. Example: it gives pointers back instead of the object, or a Jlong instead of a Jint etc.)
 Download: http://www.swig.org/download.html && Install Guide: https://github.com/swig/swig/wiki/Getting-Started
 
 Create an interface file (example: exampleinterface.i)

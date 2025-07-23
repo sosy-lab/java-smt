@@ -27,10 +27,10 @@ import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.lang.ref.PhantomReference;
 import java.lang.ref.ReferenceQueue;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -559,11 +559,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         int deBruijnIdx = Native.getIndexValue(environment, f);
         return visitor.visitBoundVariable(formula, deBruijnIdx);
       case Z3_QUANTIFIER_AST:
-        BooleanFormula body = encapsulateBoolean(Native.getQuantifierBody(environment, f));
-        Quantifier q =
-            Native.isQuantifierForall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
-        return visitor.visitQuantifier((BooleanFormula) formula, q, getBoundVars(f), body);
-
+        return visitQuantifier(visitor, (BooleanFormula) formula, f);
       case Z3_SORT_AST:
       case Z3_FUNC_DECL_AST:
       case Z3_UNKNOWN_AST:
@@ -586,17 +582,32 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     }
   }
 
-  private List<Formula> getBoundVars(long f) {
-    int numBound = Native.getQuantifierNumBound(environment, f);
-    List<Formula> boundVars = new ArrayList<>(numBound);
+  private <R> R visitQuantifier(FormulaVisitor<R> pVisitor, BooleanFormula pFormula, Long pF) {
+    int numBound = Native.getQuantifierNumBound(environment, pF);
+    long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
-      long varName = Native.getQuantifierBoundName(environment, f, i);
-      long varSort = Native.getQuantifierBoundSort(environment, f, i);
-      boundVars.add(
-          encapsulate(
-              getFormulaTypeFromSort(varSort), Native.mkConst(environment, varName, varSort)));
+      long varName = Native.getQuantifierBoundName(environment, pF, i);
+      long varSort = Native.getQuantifierBoundSort(environment, pF, i);
+      long freeVar = Native.mkConst(environment, varName, varSort);
+      Native.incRef(environment, freeVar);
+      freeVars[i] = freeVar;
     }
-    return boundVars;
+
+    // For every bound variable (de-Bruijn index from 0 to numBound), we replace the bound variable
+    // with its free version.
+    long body = Native.getQuantifierBody(environment, pF);
+    long substBody = Native.substituteVars(environment, body, numBound, freeVars);
+
+    Quantifier q =
+        Native.isQuantifierForall(environment, pF) ? Quantifier.FORALL : Quantifier.EXISTS;
+
+    return pVisitor.visitQuantifier(
+        pFormula,
+        q,
+        Longs.asList(freeVars).stream()
+            .map(this::encapsulateWithTypeOf)
+            .collect(Collectors.toList()),
+        encapsulateBoolean(substBody));
   }
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
@@ -959,7 +970,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
-      //  - an sign for posiive/negative infinity,
+      //  - a sign for positive/negative infinity,
       //  - "11..11" as exponent,
       //  - "00..00" as mantissa.
       String sign = getSign(pValue).isNegative() ? "1" : "0";

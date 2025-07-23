@@ -229,13 +229,13 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(smgr.in(x, smgr.intersection(smgr.range('a', 'z'), regexAllChar)))
         .isSatisfiable();
 
-    BooleanFormula inRange = smgr.in(x, smgr.range('a', 'Δ'));
-    BooleanFormula inRange2 = smgr.in(x, smgr.intersection(smgr.range('a', 'Δ'), regexAllChar));
     if (solverToUse() == Solvers.CVC4) {
       // CVC4 has issues with range and special Unicode characters when solving constraints
-      assertThrows(AssertionError.class, () -> assertThatFormula(inRange).isSatisfiable());
-      assertThrows(AssertionError.class, () -> assertThatFormula(inRange2).isSatisfiable());
+      assertThrows(IllegalArgumentException.class, () -> smgr.range('a', 'Δ'));
     } else {
+      BooleanFormula inRange = smgr.in(x, smgr.range('a', 'Δ'));
+      BooleanFormula inRange2 = smgr.in(x, smgr.intersection(smgr.range('a', 'Δ'), regexAllChar));
+
       assertThatFormula(inRange).isSatisfiable();
       assertThatFormula(inRange2).isSatisfiable();
     }
@@ -307,6 +307,75 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertEqual(empty, smgr.concat(empty));
     assertEqual(empty, smgr.concat(empty, empty));
     assertEqual(empty, smgr.concat(ImmutableList.of(empty, empty, empty, empty)));
+  }
+
+  @Test
+  public void testStringRange() throws SolverException, InterruptedException {
+    StringFormula var = smgr.makeVariable("str");
+
+    // Try something simple:
+    // StringFormulaManager.range("a","b") should not be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("a"), smgr.makeString("b"))))
+        .isSatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('a', 'b'))).isSatisfiable();
+
+    // Check again with a single element interval:
+    // StringFormulaManager.range("a","a") should not be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("a"), smgr.makeString("a"))))
+        .isSatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('a', 'a'))).isSatisfiable();
+
+    // Check again for Unicode characters:
+    // StringFormulaManager.range("ꯍ","ꯎ") should not be empty
+    if (solver != Solvers.CVC4) {
+      // FIXME CVC4 only support ASCII characters for range()
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("ꯍ"), smgr.makeString("ꯎ"))))
+          .isSatisfiable();
+      assertThatFormula(smgr.in(var, smgr.range('ꯍ', 'ꯎ'))).isSatisfiable();
+    }
+
+    // And once more with Unicode characters that are not in the BMP:
+    // StringFormulaManager.range("𠃋","𠃋") should not be empty
+    if (solver != Solvers.PRINCESS && solver != Solvers.CVC4) {
+      // FIXME CVC4 only support ASCII characters for range()
+      // FIXME Princess can't handle surrogate pairs
+      assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("𠃋"), smgr.makeString("𠃋"))))
+          .isSatisfiable();
+    }
+
+    // Check some corner cases:
+    // StringFormulaManager.range("b", "a") should be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("b"), smgr.makeString("a"))))
+        .isUnsatisfiable();
+    assertThatFormula(smgr.in(var, smgr.range('b', 'a'))).isUnsatisfiable();
+
+    // Only 'singleton' Strings (= Strings with one character) are allowed:
+    // StringFormulaManager.range("", "a") should be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString(""), smgr.makeString("a"))))
+        .isUnsatisfiable();
+
+    // Try again with two characters:
+    // StringFormulaManager.range("aa", "ab") should be empty
+    assertThatFormula(smgr.in(var, smgr.range(smgr.makeString("aa"), smgr.makeString("ab"))))
+        .isUnsatisfiable();
+
+    // Now use variables for the bounds:
+    // StringFormulaManager.range(lower, "b") should be empty iff "b" < lower
+    StringFormula lower = smgr.makeVariable("lower");
+    if (solver != Solvers.PRINCESS && solver != Solvers.CVC4) {
+      // FIXME CVC4 only supports String constants as bounds and will fail for variables
+      // FIXME Princess will crash when using variables as bounds
+      assertThatFormula(
+              bmgr.and(
+                  smgr.equal(lower, smgr.makeString("a")),
+                  smgr.in(var, smgr.range(lower, smgr.makeString("b")))))
+          .isSatisfiable();
+      assertThatFormula(
+              bmgr.and(
+                  smgr.equal(lower, smgr.makeString("c")),
+                  smgr.in(var, smgr.range(lower, smgr.makeString("b")))))
+          .isUnsatisfiable();
+    }
   }
 
   @Test
@@ -1412,7 +1481,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     // If a string has a char at a specified position, a substring beginning with the same index
     // must have the same char, independent of the length of the substring.
-    // But its not really relevant to check out of bounds cases, hence the exclusion.
+    // But it's not really relevant to check out-of-bounds cases, hence the exclusion.
     // So we test substring length 1 (== charAt) and larger
     assertThatFormula(
             bmgr.and(
@@ -1474,10 +1543,9 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   public void testStringVariableReplaceSubstring() throws SolverException, InterruptedException {
     requireVariableStringLiterals();
 
-    assume()
-        .withMessage("Regression from Z3 4.13.4 to 4.14.0")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3);
+    // TODO: Z3 had a regression from Z3 4.13.4 to 4.14.0 in the first implication, running
+    //  indefinitely. We fixed this by reordering the arguments of the AND expression in the left
+    //  hand side of the implication. Check if this is persisting after 4.14.0 and possibly report.
 
     // I couldn't find stronger constraints in the implication that don't run endlessly.....
     StringFormula original = smgr.makeVariable("original");
@@ -1489,25 +1557,25 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // comes after the prefix is replaced
     assertThatFormula(
             bmgr.and(
-                smgr.prefix(prefix, original),
-                imgr.equal(
-                    smgr.length(prefix),
-                    smgr.indexOf(
-                        original,
-                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
-                        imgr.makeNumber(0))),
                 imgr.greaterThan(smgr.length(original), smgr.length(prefix)),
                 imgr.greaterThan(smgr.length(prefix), imgr.makeNumber(0)),
                 imgr.greaterThan(
                     smgr.length(
                         smgr.substring(original, smgr.length(prefix), smgr.length(original))),
                     imgr.makeNumber(0)),
+                imgr.equal(
+                    smgr.length(prefix),
+                    smgr.indexOf(
+                        original,
+                        smgr.substring(original, smgr.length(prefix), smgr.length(original)),
+                        imgr.makeNumber(0))),
                 smgr.equal(
                     replaced,
                     smgr.replace(
                         original,
                         smgr.substring(original, smgr.length(prefix), smgr.length(original)),
-                        replacement))))
+                        replacement)),
+                smgr.prefix(prefix, original)))
         .implies(
             smgr.equal(
                 replacement, smgr.substring(replaced, smgr.length(prefix), smgr.length(replaced))));
@@ -1595,7 +1663,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     // with replacement (result = replaces; replacement > 0 and != the replaced) results in a
     // string that is equal to the concat of the 2 remaining start strings and the replaced one
     // replaced
-    // This is tested with 2 different implications, 1 that only checks whether or not the
+    // This is tested with 2 different implications, 1 that only checks whether the
     // replacement is contained in the string and not in the original and vice verse for the
     // replaced String
     BooleanFormula formula =
@@ -1780,7 +1848,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     StringFormula concat = smgr.concat(backslash, u, curlyOpen, sevenB, curlyClose);
     StringFormula complete = makeStringEscaped("\\u{7B}");
 
-    // Concatting parts of unicode does not result in the unicode char!
+    // Concatenating parts of Unicode does not result in the Unicode char!
     assertDistinct(concat, complete);
   }
 

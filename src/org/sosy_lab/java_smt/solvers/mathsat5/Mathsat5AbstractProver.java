@@ -84,7 +84,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
     if (generateUnsatCore) {
       config.put("theory.bv.eager", "false");
     }
-    createConfig(config); // ask sub-classes for their options
+    createConfig(config); // ask subclasses for their options
 
     long cfg = msat_create_config();
     for (Map.Entry<String, String> entry : config.entrySet()) {

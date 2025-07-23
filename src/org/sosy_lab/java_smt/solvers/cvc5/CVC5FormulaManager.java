@@ -13,16 +13,16 @@ import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
-import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term> {
+class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager, Term> {
 
   private final CVC5FormulaCreator creator;
 
@@ -105,26 +105,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, Solver, Term
     }
 
     // now add the final assert
-    out.append("(assert ");
-    // Formerly in CVC4:
-    // f.toString() does expand all nested sub-expressions and causes exponential overhead.
-    // f.toStream() uses LET-expressions and is exactly what we want.
-    // However, in CVC5 toStream() does no longer exists.
-    // TODO: either toString() will do, or we may need iterator().
-    /*
-    try (OutputStream stream =
-        new OutputStream() {
-
-          @Override
-          public void write(int chr) throws IOException {
-            out.append((char) chr);
-          }
-        }) {
-      f.toStream(stream);
-    }
-    */
-    out.append(f.toString());
-    out.append(')');
+    out.append("(assert ").append(f).append(')');
     return out.toString();
   }
 

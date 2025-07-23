@@ -16,7 +16,7 @@ public class DebuggingRationalFormulaManager
     extends DebuggingNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  public DebuggingRationalFormulaManager(
+  DebuggingRationalFormulaManager(
       RationalFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     super(pDelegate, pDebugging);
   }

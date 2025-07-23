@@ -196,7 +196,7 @@ public abstract class FloatingPointNumber {
         "Can not represent floating point number %s as Java-based double value.",
         this);
     if (isIEEE754SinglePrecision()) {
-      // lets be nice to the user and automatically convert from single to double precision
+      // let's be nice to the user and automatically convert from single to double precision
       return floatValue();
     }
     var bits = getBits();

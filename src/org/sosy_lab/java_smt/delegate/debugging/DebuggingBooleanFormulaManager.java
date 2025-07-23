@@ -25,8 +25,7 @@ public class DebuggingBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingBooleanFormulaManager(
-      BooleanFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingBooleanFormulaManager(BooleanFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

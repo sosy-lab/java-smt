@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -95,14 +94,13 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @SuppressWarnings("resource")
   @Test
   public void nonLocalThreadTest() {
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     ExecutorService exec = Executors.newSingleThreadExecutor();
     Future<?> result =
         exec.submit(
             () -> {
-              // Generate a non trivial problem for our tests
+              // Generate a non-trivial problem for our tests
               BooleanFormula varA = debugBmgr.makeVariable("a");
               BooleanFormula formula = debugBmgr.and(varA, debugBmgr.not(varA));
 
@@ -141,9 +139,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   public void noSharedFormulasTest()
       throws InterruptedException, SolverException, InvalidConfigurationException {
     requireIntegers();
-
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     try (SolverContext newContext = debugFactory.generateContext()) {
       BooleanFormulaManager newBmgr = newContext.getFormulaManager().getBooleanFormulaManager();
@@ -153,7 +149,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
       // We expect debug mode to throw an exception for all solvers, except CVC4, CVC5 and Yices
-      if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2).contains(solverToUse())) {
+      if (!List.of(Solvers.CVC4, Solvers.YICES2).contains(solverToUse())) {
         assertThrows(IllegalArgumentException.class, () -> checkFormulaInDebugContext(formula));
       } else {
         checkFormulaInDebugContext(formula);
@@ -175,9 +171,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void noSharedDeclarationsTest() throws InvalidConfigurationException {
     requireIntegers();
-
-    // Fails for Boolector as debug mode requires visitor support
-    assume().that(solverToUse()).isNotEqualTo(Solvers.BOOLECTOR);
+    requireVisitor();
 
     try (SolverContext newContext = debugFactory.generateContext()) {
       UFManager newFmgr = newContext.getFormulaManager().getUFManager();
@@ -186,7 +180,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
               "id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
 
       // We expect debug mode to throw an exception for all solvers, except Princess, CVC4 and Yices
-      if (!List.of(Solvers.PRINCESS, Solvers.CVC5, Solvers.YICES2).contains(solverToUse())) {
+      if (!List.of(Solvers.PRINCESS, Solvers.YICES2).contains(solverToUse())) {
         assertThrows(IllegalArgumentException.class, () -> checkDeclarationInDebugContext(id));
       } else {
         checkDeclarationInDebugContext(id);
@@ -195,9 +189,8 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   }
 
   /** Try to add a formula from a different solver to our solver context. */
-  @Test(expected = IllegalArgumentException.class)
-  public void noSharingBetweenSolversTest()
-      throws InvalidConfigurationException, InterruptedException, SolverException {
+  @Test
+  public void noSharingBetweenSolversTest() throws InvalidConfigurationException {
     Solvers otherSolver =
         solverToUse() == Solvers.SMTINTERPOL ? Solvers.PRINCESS : Solvers.SMTINTERPOL;
 
@@ -206,9 +199,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       BooleanFormula formula = otherBmgr.makeFalse();
 
       try (BasicProverEnvironment<?> prover = debugContext.newProverEnvironment()) {
-        // This should fail for all solvers
-        prover.push(formula);
-        assertThat(prover).isUnsatisfiable();
+        assertThrows(IllegalArgumentException.class, () -> prover.push(formula));
       }
     }
   }

@@ -576,6 +576,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testQuantifiedUF() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     // create query: "(var == 1) && exists bound : (bound == 0 && var == func(bound))"
     // then check that the model contains an evaluation "func(0) := 1"
@@ -631,6 +635,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testQuantifiedUF2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
@@ -1857,6 +1865,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void quantifierTestShort() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    assume()
+        .withMessage("Yices2 quantifier support is very limited at the moment")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     IntegerFormula ctr = imgr.makeVariable("x");
     BooleanFormula body = imgr.equal(ctr, imgr.makeNumber(0));
@@ -2319,7 +2331,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      assertThrows(IllegalStateException.class, prover::getModel);
     }
   }
 
@@ -2327,7 +2339,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testGenerateModelsOption2() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
-      assertThrows(IllegalStateException.class, () -> prover.getModelAssignments());
+      assertThrows(IllegalStateException.class, prover::getModelAssignments);
     }
   }
 

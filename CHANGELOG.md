@@ -158,7 +158,7 @@ The visitation of quantified formulas was improved.
 ## JavaSMT 3.9.0
 
 This release contains a larger update of Princess and more JUnit tests.
-The PrettyPrinter is switched from a boolean parameter to a options enum.
+The PrettyPrinter is switched from a boolean parameter to an options enum.
 The example projects for Maven are updated with newer solver versions.
 
 ### Updated solvers:
@@ -181,7 +181,7 @@ if disk space is a critical point.
 
 ### Updated solvers:
  - MathSAT5 5.6.5 (inculding binary for Windows)
- - Z3 4.8.9 (including binaries for Windows and MacOS)
+ - Z3 4.8.9 (including binaries for Windows and macOS)
 
 ## JavaSMT 3.6.1
 

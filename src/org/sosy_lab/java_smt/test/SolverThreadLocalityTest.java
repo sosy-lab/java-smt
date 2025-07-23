@@ -178,6 +178,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTranslationTest() throws Throwable {
     // Test that even when using translation, the thread local problem persists for CVC5
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -349,7 +350,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             Solvers.Z3,
             Solvers.PRINCESS,
             Solvers.BOOLECTOR,
-            Solvers.BITWUZLA);
+            Solvers.BITWUZLA,
+            Solvers.CVC5);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.

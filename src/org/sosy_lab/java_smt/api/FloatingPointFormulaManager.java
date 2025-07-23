@@ -298,8 +298,16 @@ public interface FloatingPointFormulaManager {
 
   FloatingPointFormula abs(FloatingPointFormula number);
 
+  /**
+   * Returns the maximum value of the two given floating-point numbers. If one of the numbers is
+   * NaN, the other number is returned.
+   */
   FloatingPointFormula max(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns the minimum value of the two given floating-point numbers. If one of the numbers is
+   * NaN, the other number is returned.
+   */
   FloatingPointFormula min(FloatingPointFormula number1, FloatingPointFormula number2);
 
   FloatingPointFormula sqrt(FloatingPointFormula number);
@@ -345,36 +353,118 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a term for assigning one floating-point term to another. This means both terms are
-   * considered equal afterwards. This method is the same as the method <code>equal</code> for other
-   * theories.
+   * considered equal afterward, based on their bit pattern (i.e., <code>0.0 != -0
+   * .0</code> and <code>NaN ==/!= NaN</code>, depending on the bit pattern of each NaN). This
+   * method is the same as the method <code>equal</code> for other theories.
    */
   BooleanFormula assignment(FloatingPointFormula number1, FloatingPointFormula number2);
 
   /**
    * Create a term for comparing the equality of two floating-point terms, according to standard
-   * floating-point semantics (i.e., NaN != NaN). Be careful to not use this method when you really
-   * need {@link #assignment(FloatingPointFormula, FloatingPointFormula)}.
+   * floating-point semantics (i.e., <code>NaN != NaN</code> and <code>0.0 == -0.0</code>). Be
+   * careful to not use this method when you really need {@link #assignment(FloatingPointFormula,
+   * FloatingPointFormula)}.
    */
   BooleanFormula equalWithFPSemantics(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is greater than another FP number. If one of the numbers is NaN,
+   * the result is always false.
+   */
   BooleanFormula greaterThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is greater or equal than another FP number. If one of the numbers
+   * is NaN, the result is always false.
+   */
   BooleanFormula greaterOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is less than another FP number. If one of the numbers is NaN, the
+   * result is always false.
+   */
   BooleanFormula lessThan(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Returns whether an FP number is less or equal than another FP number. If one of the numbers is
+   * NaN, the result is always false.
+   */
   BooleanFormula lessOrEquals(FloatingPointFormula number1, FloatingPointFormula number2);
 
+  /**
+   * Check whether a floating-point number is NaN.
+   *
+   * <p>The bit patterns for NaN in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (irrelevant for NaN)
+   *   <li>exponent=11...11 (all bits are 1)
+   *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
+   */
   BooleanFormula isNaN(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is positive or negative infinity.
+   *
+   * <p>The bit patterns for infinity in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for +Inf, 1 for -Inf)
+   *   <li>exponent=11...11 (all bits are 1)
+   *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
+   */
   BooleanFormula isInfinity(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is positive or negative zero.
+   *
+   * <p>The bit patterns for zero in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for +0, 1 for -0)
+   *   <li>exponent=00...00 (all bits are 0)
+   *   <li>mantissa=00...00 (all bits are 0)
+   * </ul>
+   */
   BooleanFormula isZero(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is normal FP number.
+   *
+   * <p>The bit patterns for normal FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
+   *   <li>exponent!=00...00 and exponent!=11...11 (exponent is not all 0 or all 1)
+   *   <li>mantissa=? (mantissa is irrelevant)
+   * </ul>
+   */
   BooleanFormula isNormal(FloatingPointFormula number);
 
+  /**
+   * Checks whether a formula is subnormal FP number.
+   *
+   * <p>The bit patterns for subnormal FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=? (0 for positive numbers, 1 for negative numbers)
+   *   <li>exponent=00...00 (exponent is all 0)
+   *   <li>mantissa!=00...00 (mantissa is not all 0)
+   * </ul>
+   */
   BooleanFormula isSubnormal(FloatingPointFormula number);
 
-  /** checks whether a formula is negative, including -0.0. */
+  /**
+   * Checks whether a formula is negative, including -0.0.
+   *
+   * <p>The bit patterns for negative FP numbers in SMTLIB are identical to IEEE 754:
+   *
+   * <ul>
+   *   <li>sign=1 (1 for negative numbers)
+   *   <li>number is not NaN, i.e., exponent=11...11 implies mantissa=00...00
+   * </ul>
+   */
   BooleanFormula isNegative(FloatingPointFormula number);
 }

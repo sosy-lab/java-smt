@@ -9,6 +9,8 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_declare_function;
@@ -22,12 +24,17 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_b
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_forall;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_modular_congruence;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_variable;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_pop_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_push_backtrack_point;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_term;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -72,11 +79,10 @@ public abstract class Mathsat5AbstractNativeApiTest {
     assertThat(msat_get_fp_type_mant_width(env, type)).isEqualTo(23);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void fpExpWidthIllegal() {
     long type = msat_get_integer_type(env);
-    msat_get_fp_type_exp_width(env, type);
+    assertThrows(IllegalArgumentException.class, () -> msat_get_fp_type_exp_width(env, type));
   }
 
   @Test
@@ -118,5 +124,57 @@ public abstract class Mathsat5AbstractNativeApiTest {
     msat_assert_formula(env, msat_make_equal(env, t2, msat_make_number(env, "45")));
     assertThat(msat_check_sat(env)).isFalse(); // 4 != 45 mod 42
     msat_pop_backtrack_point(env);
+  }
+
+  /*
+   * msat_to_smtlib2() can not export quantified formulas, use msat_to_smtlib2_ext() instead.
+   * Output is the following, but we can't guarantee the naming of the definitions to be consistent:
+   * (set-info :source |printed by MathSAT|)
+   * (define-fun .def_14 ((x Int)) Bool (= x 1))
+   * (define-fun .def_15 () Bool (forall ((x Int)) (.def_14 x)))
+   * (assert .def_15)
+   */
+  @Test
+  public void quantifierToSmtlib2() {
+    String expectedSMTLib2FormulaPattern =
+        "Bool \\(forall \\(\\(x Int\\)\\) \\(\\.def_\\d{2} x\\)\\)";
+    String expectedSMTLib2Def = "((x Int)) Bool (= x 1)";
+
+    long type = msat_get_integer_type(env);
+    long xFun = msat_declare_function(env, "x", type);
+    long x = msat_make_constant(env, xFun);
+    long one = msat_make_int_number(env, 1);
+    // x = 1, x unbound
+    long body = msat_make_equal(env, x, one);
+    // Make bound x and substitute
+    long boundX = msat_make_variable(env, "x", type);
+    long substBody = msat_apply_substitution(env, body, 1, new long[] {x}, new long[] {boundX});
+
+    long quantifiedFormula = msat_make_forall(env, boundX, substBody);
+    String smtlib2OfFormula = msat_to_smtlib2_ext(env, quantifiedFormula, "", 1);
+
+    assertThat(smtlib2OfFormula).matches("(?s).*" + expectedSMTLib2FormulaPattern + ".*");
+    assertThat(smtlib2OfFormula).contains(expectedSMTLib2Def);
+  }
+
+  // Test msat_to_smtlib2_term()
+  @Test
+  public void smtlib2ToTerm() {
+    String expectedSMTLib2 = "(forall ((x Int)) (= x 1))";
+
+    long type = msat_get_integer_type(env);
+    long xFun = msat_declare_function(env, "x", type);
+    long x = msat_make_constant(env, xFun);
+    long one = msat_make_int_number(env, 1);
+    // x = 1, x unbound
+    long body = msat_make_equal(env, x, one);
+    // Make bound x and substitute
+    long boundX = msat_make_variable(env, "x", type);
+    long substBody = msat_apply_substitution(env, body, 1, new long[] {x}, new long[] {boundX});
+
+    long quantifiedFormula = msat_make_forall(env, boundX, substBody);
+    String smtlib2OfFormula = msat_to_smtlib2_term(env, quantifiedFormula);
+
+    assertThat(smtlib2OfFormula).isEqualTo(expectedSMTLib2);
   }
 }

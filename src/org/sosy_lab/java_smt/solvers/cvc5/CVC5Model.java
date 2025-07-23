@@ -16,15 +16,17 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
+import io.github.cvc5.TermManager;
 import java.util.Collection;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
-public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
+public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   private final ImmutableList<ValueAssignment> model;
+  private final TermManager termManager;
   private final Solver solver;
   private final ImmutableList<Term> assertedExpressions;
 
@@ -37,6 +39,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
     super(pProver, pCreator);
+    termManager = pCreator.getEnv();
     solver = pProver.solver;
     mgr = pMgr;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
@@ -70,7 +73,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
       Sort sort = expr.getSort();
       Kind kind = expr.getKind();
       if (kind == Kind.VARIABLE || sort.isFunction()) {
-        // We don't care about functions, as thats just the function definition and the nested
+        // We don't care about functions, as that's just the function definition and the nested
         // lambda term
         // We don't care about bound vars (not in a UF), as they don't return a value.
         return;
@@ -120,7 +123,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
           // Remember if we encountered bound variables
           boundFound = true;
           // Bound vars are extremely volatile in CVC5. Nearly every call to them ends in an
-          // exception. Also we don't want to substitute them with their non bound values.
+          // exception. Also, we don't want to substitute them with their non bound values.
           argumentInterpretationBuilder.add(child.toString());
         } else {
           argumentInterpretationBuilder.add(evaluateImpl(child));
@@ -159,7 +162,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =
-        creator.encapsulateBoolean(solver.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
+        creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
     Object value = creator.convertValue(pKeyTerm, valueTerm);
 
     return new ValueAssignment(
@@ -177,7 +180,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
       }
     }
 
-    String nameStr = "";
+    String nameStr;
     if (pKeyTerm.hasSymbol()) {
       nameStr = pKeyTerm.getSymbol();
     } else {
@@ -193,7 +196,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, Solver> {
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
     Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
     BooleanFormula equation =
-        creator.encapsulateBoolean(solver.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
+        creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
     Object value = creator.convertValue(pKeyTerm, valueTerm);
     return new ValueAssignment(
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());

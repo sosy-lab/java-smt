@@ -19,7 +19,7 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build-publish-solvers/solver-cvc5.xml"/>
     <import file="build-publish-solvers/solver-mathsat.xml"/>
     <import file="build-publish-solvers/solver-opensmt.xml"/>
-    <import file="build-publish-solvers/solvers-yices.xml"/>
+    <import file="build-publish-solvers/solver-yices.xml"/>
     <import file="build-publish-solvers/solver-z3.xml"/>
 
 </project>
