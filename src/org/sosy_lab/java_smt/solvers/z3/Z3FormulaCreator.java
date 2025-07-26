@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -58,6 +57,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3ArrayFormula;
@@ -933,7 +933,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Rational ratValue = Rational.ofString(Native.getNumeralString(environment, value));
         return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
-        return unescapeUnicodeForSmtlib(Native.getString(environment, value));
+        String str = Native.getString(environment, value);
+        return AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str);
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {

@@ -38,7 +38,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
               + "((?<codePoint>[0-9a-fA-F]{4})"
               + "|"
               // or curly brackets like "\\u{61}"
-              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})}))");
+              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})\\}))");
 
   protected AbstractStringFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
@@ -60,28 +60,29 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   @Override
   public StringFormula makeString(String value) {
     checkArgument(
-        areAllCodePointsInRange(value),
-        "String constant is out of supported Unicode range (Plane 0-2).");
+        areAllCodePointsInRange(value, 0, 0x2FFFF),
+        "String constants may only contain Unicode characters from the first three planes "
+            + "(codepoints 0x00000 to 0x2FFFF).");
     return wrapString(makeStringImpl(value));
   }
 
-  /** returns whether all Unicode characters in Planes 0-2. */
-  private static boolean areAllCodePointsInRange(String str) {
-    return str.codePoints().allMatch(AbstractStringFormulaManager::isCodePointInRange);
-  }
-
-  private static boolean isCodePointInRange(int codePoint) {
-    return 0x00000 <= codePoint && codePoint <= 0x2FFFF;
+  /** Check if the codepoints of all characters in the String are in range. */
+  private static boolean areAllCodePointsInRange(String str, int lower, int upper) {
+    return str.codePoints().allMatch(codePoint -> lower <= codePoint && codePoint <= upper);
   }
 
   /** Replace Unicode letters in UTF16 representation with their escape sequences. */
-  protected static String escapeUnicodeForSmtlib(String input) {
+  public static String escapeUnicodeForSmtlib(String input) {
     StringBuilder sb = new StringBuilder();
     for (int codePoint : input.codePoints().toArray()) {
-      if (0x20 <= codePoint && codePoint <= 0x7E) {
+      if (codePoint == 0x5c) { // 0x5c is s single backslash, as char: '\\'
+        // Backslashes must be escaped, otherwise they may get substituted when reading back
+        // the results from the model
+        sb.append("\\u{5c}");
+      } else if (0x20 <= codePoint && codePoint <= 0x7E) {
         sb.appendCodePoint(codePoint); // normal printable chars
       } else {
-        sb.append("\\u{").append(String.format("%05X", codePoint)).append("}");
+        sb.append("\\u{").append(Integer.toHexString(codePoint)).append("}");
       }
     }
     return sb.toString();
@@ -98,9 +99,15 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
       }
       int codePoint = Integer.parseInt(hexCodePoint, 16);
       checkArgument(
-          isCodePointInRange(codePoint),
+          0 <= codePoint && codePoint <= 0x2FFFF,
           "SMTLIB does only specify Unicode letters from Planes 0-2");
-      matcher.appendReplacement(sb, Character.toString(codePoint));
+      String replacement = Character.toString(codePoint);
+      if (replacement.equals("\\")) {
+        // Matcher.appendReplacement considers '\' as special character.
+        // Substitute with '\\' instead
+        replacement = "\\\\";
+      }
+      matcher.appendReplacement(sb, replacement);
     }
     matcher.appendTail(sb);
     return sb.toString();
