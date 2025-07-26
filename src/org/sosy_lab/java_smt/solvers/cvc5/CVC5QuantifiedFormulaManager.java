@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import io.github.cvc5.Kind;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
@@ -63,22 +65,21 @@ public class CVC5QuantifiedFormulaManager
    */
   @Override
   public Term mkQuantifier(Quantifier pQ, List<Term> pVars, Term pBody) {
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable list for quantifier.");
-    } else {
-      List<Term> boundVars = new ArrayList<>();
-      Term substBody = pBody;
-      // every free needs a bound copy. As the internal Id is different for every variable, even
-      // with the same name, this is fine.
-      for (Term var : pVars) {
-        Term boundCopy = ((CVC5FormulaCreator) formulaCreator).makeBoundCopy(var);
-        boundVars.add(boundCopy);
-        substBody = substBody.substitute(var, boundCopy);
-      }
+    checkArgument(
+        !pVars.isEmpty(), "Missing variables for quantifier '%s' and body '%s'.", pQ, pBody);
 
-      Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
-      Term boundVarsList = termManager.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
-      return termManager.mkTerm(quant, boundVarsList, substBody);
+    List<Term> boundVars = new ArrayList<>();
+    Term substBody = pBody;
+    // every free needs a bound copy. As the internal Id is different for every variable, even
+    // with the same name, this is fine.
+    for (Term var : pVars) {
+      Term boundCopy = ((CVC5FormulaCreator) formulaCreator).makeBoundCopy(var);
+      boundVars.add(boundCopy);
+      substBody = substBody.substitute(var, boundCopy);
     }
+
+    Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
+    Term boundVarsList = termManager.mkTerm(Kind.VARIABLE_LIST, boundVars.toArray(new Term[0]));
+    return termManager.mkTerm(quant, boundVarsList, substBody);
   }
 }

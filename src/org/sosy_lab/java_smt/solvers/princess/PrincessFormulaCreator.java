@@ -38,7 +38,6 @@ import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.IVariable;
-import ap.terfor.conjunctions.Quantifier;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
@@ -53,8 +52,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -66,6 +65,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -183,6 +183,11 @@ class PrincessFormulaCreator
    * the reason, except distinct sort objects).
    */
   private final Table<Sort, Sort, Sort> arraySortCache = HashBasedTable.create();
+
+  /** This map keeps track of the bound/free variables created when visiting quantified terms. */
+  // TODO should we use a WeakHashMap?
+  //  We do not cleanup in other places, too, and the number of quantified formulas is small.
+  private final Map<IFormula, String> boundVariableNames = new LinkedHashMap<>();
 
   PrincessFormulaCreator(PrincessEnvironment pEnv) {
     super(
@@ -382,6 +387,7 @@ class PrincessFormulaCreator
     return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (input instanceof IIntLit) {
@@ -397,19 +403,7 @@ class PrincessFormulaCreator
       return visitor.visitConstant(f, convertValue(input));
 
     } else if (input instanceof IQuantified) {
-      // this is a quantifier
-
-      BooleanFormula body = encapsulateBoolean(((IQuantified) input).subformula());
-      return visitor.visitQuantifier(
-          (BooleanFormula) f,
-          ((IQuantified) input).quan().equals(Quantifier.apply(true)) ? FORALL : EXISTS,
-
-          // Princess does not hold any metadata about bound variables,
-          // so we can't get meaningful list here.
-          // HOWEVER, passing this list to QuantifiedFormulaManager#mkQuantifier
-          // works as expected.
-          new ArrayList<>(),
-          body);
+      return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
 
     } else if (input instanceof IVariable) {
       // variable bound by a quantifier
@@ -536,6 +530,43 @@ class PrincessFormulaCreator
         args.build(),
         FunctionDeclarationImpl.of(
             getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
+  }
+
+  private <R> R visitQuantifier(FormulaVisitor<R> visitor, BooleanFormula f, IQuantified input) {
+    Quantifier quantifier =
+        input.quan().equals(ap.terfor.conjunctions.Quantifier.apply(true)) ? FORALL : EXISTS;
+    IFormula body = input.subformula();
+
+    // Princess uses de-Bruijn indices, so we have index 0 here for the most outer quantified scope
+    IVariable boundVariable = input.sort().boundVariable(0);
+    String boundVariableName = getFreshVariableNameForBody(body);
+
+    // Currently, Princess supports only non-boolean bound variables, so we can cast to ITerm.
+    ITerm substitutionVariable = (ITerm) makeVariable(boundVariable.sort(), boundVariableName);
+
+    // substitute the bound variable with index 0 with a new variable, and un-shift the remaining
+    // de-Bruijn indices, such that the next nested bound variable has index 0.
+    IFormula substitutedBody = IExpression.subst(body, asScalaList(substitutionVariable), -1);
+
+    return visitor.visitQuantifier(
+        f,
+        quantifier,
+        ImmutableList.of(encapsulateWithTypeOf(substitutionVariable)),
+        encapsulateBoolean(substitutedBody));
+  }
+
+  private static scala.collection.immutable.List<ITerm> asScalaList(ITerm substitutionVariable) {
+    return scala.collection.immutable.List$.MODULE$.empty().$colon$colon(substitutionVariable);
+  }
+
+  /**
+   * Get a fresh variable name for the given formula. We compute the same variable name for the same
+   * body, such that a user gets the same substituted body when visiting a quantified formulas
+   * several times.
+   */
+  private String getFreshVariableNameForBody(IFormula body) {
+    return boundVariableNames.computeIfAbsent(
+        body, k -> "__JAVASMT__BOUND_VARIABLE_" + boundVariableNames.size());
   }
 
   private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {

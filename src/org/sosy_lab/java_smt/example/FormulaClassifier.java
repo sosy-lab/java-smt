@@ -254,12 +254,6 @@ public class FormulaClassifier {
     }
 
     @Override
-    public Integer visitBoundVariable(Formula pF, int pDeBruijnIdx) {
-      checkType(pF);
-      return 1;
-    }
-
-    @Override
     public Integer visitConstant(Formula pF, Object pValue) {
       checkType(pF);
       return 0;

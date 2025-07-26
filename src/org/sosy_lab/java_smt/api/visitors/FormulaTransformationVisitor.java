@@ -34,11 +34,6 @@ public abstract class FormulaTransformationVisitor implements FormulaVisitor<For
   }
 
   @Override
-  public Formula visitBoundVariable(Formula f, int deBruijnIdx) {
-    return f;
-  }
-
-  @Override
   public Formula visitConstant(Formula f, Object value) {
     return f;
   }

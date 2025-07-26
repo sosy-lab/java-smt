@@ -369,6 +369,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
     checkState(!f.isNull());

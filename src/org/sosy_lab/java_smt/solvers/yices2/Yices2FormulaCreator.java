@@ -324,6 +324,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
     return bound;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> pVisitor, Formula pFormula, Integer pF) {
     int constructor = yices_term_constructor(pF);

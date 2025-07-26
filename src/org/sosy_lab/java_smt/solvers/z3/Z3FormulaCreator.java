@@ -484,6 +484,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return symbolToString(symbol);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
