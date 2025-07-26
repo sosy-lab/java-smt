@@ -212,17 +212,18 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     // Greek Capital Letter Delta
     assertThatFormula(smgr.in(makeStringEscaped("\\u0394"), regexAllChar)).isTautological();
-    assertThatFormula(smgr.in(makeStringEscaped("Δ"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(smgr.makeString("Δ"), regexAllChar)).isTautological();
     // CJK Compatibility Ideograph from Basic Multilingual Plane.
     assertThatFormula(smgr.in(makeStringEscaped("\\u{fa6a}"), regexAllChar)).isTautological();
+    assertThatFormula(smgr.in(smgr.makeString("頻"), regexAllChar)).isTautological();
     // Xiangqi Black Horse from Supplementary Multilingual Plane
     assertThatFormula(smgr.in(makeStringEscaped("\\u{1fa6a}"), regexAllChar)).isTautological();
 
     // Combining characters are not matched as one character.
-    assertThatFormula(smgr.in(makeStringEscaped("ab"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(makeStringEscaped("abcdefgh"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(makeStringEscaped("a\\u0336"), regexAllChar)).isUnsatisfiable();
-    assertThatFormula(smgr.in(makeStringEscaped("\\n"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("abcdefgh"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("a\u0336"), regexAllChar)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("\\n"), regexAllChar)).isUnsatisfiable();
 
     StringFormula x = smgr.makeVariable("x");
     assertThatFormula(smgr.in(x, smgr.range('a', 'z'))).isSatisfiable();
@@ -966,7 +967,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   /**
-   * Test escapecharacter treatment. Escape characters are treated as a single char! Example:
+   * Test escape-character treatment. Escape characters are treated as a single char! Example:
    * "a\u1234T" has "a" at position 0, "\u1234" at position 1 and "T" at position 2
    *
    * <p>SMTLIB2 uses an escape sequence for the numerals of the sort: {1234}.
@@ -988,8 +989,8 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     String workaround = "au{1234}";
     StringFormula au1234WOEscapeCurly = smgr.makeString(workaround);
     StringFormula backSlash = smgr.makeString("\\");
-    StringFormula u1234 = makeStringEscaped("\\u{1234}");
-    StringFormula au1234b = makeStringEscaped("a\\u{1234}b");
+    StringFormula u1234 = smgr.makeString("ሴ");
+    StringFormula au1234b = smgr.makeString("aሴb");
 
     assertEqual(smgr.length(backSlash), imgr.makeNumber(1));
     assertEqual(smgr.charAt(au1234b, imgr.makeNumber(0)), a);
@@ -1019,20 +1020,21 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void testUnicodeEscaping() throws SolverException, InterruptedException {
     // SMTLIB has different representations for the same symbol
-    assertEqual(a, makeStringEscaped("\u0061"));
+    assertEqual(a, smgr.makeString("\u0061"));
     assertEqual(a, makeStringEscaped("\\u0061"));
     assertEqual(a, makeStringEscaped("\\u{61}"));
     assertEqual(a, makeStringEscaped("\\u{00061}"));
     assertEqual(smgr.length(a), imgr.makeNumber(1));
 
-    StringFormula u0 = makeStringEscaped("\\u0000");
-    assertEqual(u0, makeStringEscaped("\u0000"));
+    StringFormula u0 = smgr.makeString("\u0000");
+    assertEqual(u0, makeStringEscaped("\\u0000"));
     assertEqual(u0, makeStringEscaped("\\u{0}"));
     assertEqual(u0, makeStringEscaped("\\u{00000}"));
     assertEqual(smgr.length(u0), imgr.makeNumber(1));
 
-    StringFormula u1 = makeStringEscaped("\\u1234");
-    assertEqual(u1, makeStringEscaped("\u1234"));
+    StringFormula u1 = smgr.makeString("ሴ");
+    assertEqual(u1, smgr.makeString("\u1234"));
+    assertEqual(u1, makeStringEscaped("\\u1234"));
     assertEqual(u1, makeStringEscaped("\\u{1234}"));
     assertEqual(u1, makeStringEscaped("\\u{01234}"));
     assertEqual(smgr.length(u1), imgr.makeNumber(1));
@@ -1853,8 +1855,19 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   @Test
-  public void testStringSimpleRegex() {
-    // TODO
+  public void testStringSimpleRegex() throws SolverException, InterruptedException {
+    RegexFormula aStarB =
+        smgr.concatRegex(ImmutableList.of(smgr.closure(smgr.makeRegex("a")), smgr.makeRegex("b")));
+
+    assertThatFormula(smgr.in(smgr.makeString("b"), aStarB)).isTautological();
+    assertThatFormula(smgr.in(smgr.makeString("ab"), aStarB)).isTautological();
+    assertThatFormula(smgr.in(smgr.makeString("aaaaab"), aStarB)).isTautological();
+    assertThatFormula(smgr.in(smgr.makeString("aaaaaaaaaab"), aStarB)).isTautological();
+
+    assertThatFormula(smgr.in(smgr.makeString(""), aStarB)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("a"), aStarB)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("abaaab"), aStarB)).isUnsatisfiable();
+    assertThatFormula(smgr.in(smgr.makeString("abb"), aStarB)).isUnsatisfiable();
   }
 
   @Test

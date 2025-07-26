@@ -75,14 +75,14 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   public static String escapeUnicodeForSmtlib(String input) {
     StringBuilder sb = new StringBuilder();
     for (int codePoint : input.codePoints().toArray()) {
-      if (codePoint == 0x5c) {
+      if (codePoint == 0x5c) { // 0x5c is s single backslash, as char: '\\'
         // Backslashes must be escaped, otherwise they may get substituted when reading back
         // the results from the model
         sb.append("\\u{5c}");
       } else if (0x20 <= codePoint && codePoint <= 0x7E) {
         sb.appendCodePoint(codePoint); // normal printable chars
       } else {
-        sb.append("\\u{").append(String.format("%x", codePoint)).append("}");
+        sb.append("\\u{").append(Integer.toHexString(codePoint)).append("}");
       }
     }
     return sb.toString();
