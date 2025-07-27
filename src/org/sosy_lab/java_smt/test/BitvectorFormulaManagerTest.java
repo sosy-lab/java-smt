@@ -463,12 +463,18 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByBV() throws SolverException, InterruptedException {
-    int[] bitsizes =
-        switch (solverToUse()) {
-          case PRINCESS -> new int[] {2, 3}; // Princess is too slow for larger bitvectors
-          case Z3 -> new int[] {2, 3, 4, 8}; // Z3 is too slow for larger bitvectors since v4.15.0
-          default -> new int[] {2, 3, 4, 8, 13, 25, 31};
-        };
+    int[] bitsizes;
+    switch (solverToUse()) {
+      case PRINCESS:
+        bitsizes = new int[] {2, 3}; // Princess is too slow for larger bitvectors
+        break;
+      case Z3:
+        bitsizes = new int[] {2, 3, 4, 8}; // Z3 is too slow for larger bitvectors since v4.15.0
+        break;
+      default:
+        bitsizes = new int[] {2, 3, 4, 8, 13, 25, 31};
+        break;
+    }
 
     for (int bitsize : bitsizes) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
