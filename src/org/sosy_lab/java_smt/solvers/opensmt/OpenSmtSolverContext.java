@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.IntegerOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
@@ -53,6 +54,7 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "Algorithm for LRA interpolation")
     int algLra = 0;
 
+    @IntegerOption(min = 0, max = 4)
     @Option(
         secure = true,
         description =
