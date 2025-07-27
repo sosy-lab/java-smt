@@ -463,12 +463,20 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByBV() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("Princess is too slow for this test")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
+    int[] bitsizes;
+    switch (solverToUse()) {
+      case PRINCESS:
+        bitsizes = new int[] {2, 3}; // Princess is too slow for larger bitvectors
+        break;
+      case Z3:
+        bitsizes = new int[] {2, 3, 4, 8}; // Z3 is too slow for larger bitvectors since v4.15.0
+        break;
+      default:
+        bitsizes = new int[] {2, 3, 4, 8, 13, 25, 31};
+        break;
+    }
 
-    for (int bitsize : new int[] {8, 13, 25, 31}) {
+    for (int bitsize : bitsizes) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
       BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
       BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
@@ -598,6 +606,16 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, five), zero)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, three), two)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, minusThree), minusOne)).isTautological();
+  }
+
+  @Test
+  public void bvModulo2() throws SolverException, InterruptedException {
+    BitvectorFormula one = bvmgr.makeBitvector(2, 1);
+    BitvectorFormula two = bvmgr.makeBitvector(2, 2);
+    BitvectorFormula three = bvmgr.makeBitvector(2, 3);
+
+    // check that SMOD works for small bitvectors: 1_2 % 2_2 == 3_2 or 01 % 10 == 11
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(one, two), three)).isTautological();
   }
 
   @Test
