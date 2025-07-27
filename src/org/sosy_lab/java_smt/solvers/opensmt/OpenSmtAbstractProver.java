@@ -79,9 +79,12 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
     if (interpolation) {
-      config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
-      config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
-      config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
+      config.setOption(
+          ":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool.getValue()));
+      config.setOption(
+          ":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf.getValue()));
+      config.setOption(
+          ":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra.getValue()));
       config.setOption(
           ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }

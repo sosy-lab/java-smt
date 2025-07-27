@@ -26,6 +26,9 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.api.LogicFactory;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.Core;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.LA;
+import org.sosy_lab.java_smt.solvers.opensmt.interpolationAlgorithms.UF;
 
 public final class OpenSmtSolverContext extends AbstractSolverContext {
   private final OpenSmtFormulaCreator creator;
@@ -46,13 +49,13 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     Logics logic = Logics.QF_AUFLIRA;
 
     @Option(secure = true, description = "Algorithm for boolean interpolation")
-    int algBool = 0;
+    Core algBool = Core.MCMILLAN;
 
     @Option(secure = true, description = "Algorithm for UF interpolation")
-    int algUf = 0;
+    UF algUf = UF.STRONG;
 
     @Option(secure = true, description = "Algorithm for LRA interpolation")
-    int algLra = 0;
+    LA algLra = LA.STRONG;
 
     @IntegerOption(min = 0, max = 4)
     @Option(
