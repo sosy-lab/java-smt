@@ -53,7 +53,11 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "Algorithm for LRA interpolation")
     int algLra = 0;
 
-    @Option(secure = true, description = "Simplify interpolants before they are returned")
+    @Option(
+        secure = true,
+        description =
+            "Level of simplification for interpolants,"
+                + "ranging from 0 (no simplification) to 4 (maximum simplification).")
     int simplifyInterpolants = 0;
 
     final int randomSeed;
