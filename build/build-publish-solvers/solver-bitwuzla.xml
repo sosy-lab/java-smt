@@ -85,6 +85,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--static"/>
             <arg value="--wipe"/>
             <arg value="--fpexp"/>
+            <arg value="--aiger"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.installPath}"/>
         </exec>
@@ -109,6 +110,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--static"/>
             <arg value="--wipe"/>
             <arg value="--fpexp"/>
+            <arg value="--aiger"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.installPath}"/>
         </exec>
@@ -133,6 +135,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="--static"/>
             <arg value="--wipe"/>
             <arg value="--fpexp"/>
+            <arg value="--aiger"/>
             <arg value="--prefix"/>
             <arg value="${bitwuzla.installPath}"/>
         </exec>
