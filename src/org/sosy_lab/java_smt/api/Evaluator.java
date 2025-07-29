@@ -43,6 +43,9 @@ public interface Evaluator extends AutoCloseable {
    * will replace all symbols from the formula with their model values and then simplify the formula
    * into a simple formula, e.g., consisting only of a numeral expression.
    *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
+   *
    * @param formula Input formula to be evaluated.
    * @return evaluation of the given formula or <code>null</code> if the solver does not provide a
    *     better evaluation.
@@ -58,6 +61,9 @@ public interface Evaluator extends AutoCloseable {
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
    *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
+   *
    * @param formula Input formula
    * @return Either of: - Number (Rational/Double/BigInteger/Long/Integer) - Boolean
    * @throws IllegalArgumentException if a formula has unexpected type, e.g. Array.
@@ -68,6 +74,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for integer formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable BigInteger evaluate(IntegerFormula formula);
 
@@ -75,6 +84,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable Rational evaluate(RationalFormula formula);
 
@@ -82,6 +94,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable Boolean evaluate(BooleanFormula formula);
 
@@ -89,6 +104,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable BigInteger evaluate(BitvectorFormula formula);
 
@@ -96,6 +114,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for string formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable String evaluate(StringFormula formula);
 
@@ -103,6 +124,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for enumeration formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable String evaluate(EnumerationFormula formula);
 
@@ -110,6 +134,9 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for floating-point formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula);
 
