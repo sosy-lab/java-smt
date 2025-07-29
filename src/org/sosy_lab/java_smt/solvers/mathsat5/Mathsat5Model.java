@@ -13,7 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_dest
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_is_array_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_array_read;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_create_iterator_with_sneaky_solver_exception;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_eval;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_has_next;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_model_iterator_next;
@@ -53,7 +53,7 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
 
-    long modelIterator = msat_model_create_iterator(model);
+    long modelIterator = msat_model_create_iterator_with_sneaky_solver_exception(model);
     while (msat_model_iterator_has_next(modelIterator)) {
       long[] key = new long[1];
       long[] value = new long[1];
