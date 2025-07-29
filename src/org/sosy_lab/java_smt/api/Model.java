@@ -49,13 +49,21 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       within a quantified context, some value assignments can be missing in the iteration.
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
     return asList().iterator();
   }
 
-  /** Build a list of assignments that stays valid after closing the model. */
+  /**
+   * Build a list of assignments that stays valid after closing the model.
+   *
+   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
+   * Throwable}.
+   */
   ImmutableList<ValueAssignment> asList();
 
   /**
