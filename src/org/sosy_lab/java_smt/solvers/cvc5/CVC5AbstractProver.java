@@ -150,7 +150,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModel() throws SolverException {
+  public CVC5Model getModel() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
@@ -185,7 +185,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     return super.getModelAssignments();

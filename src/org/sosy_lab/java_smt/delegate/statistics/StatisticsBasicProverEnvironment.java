@@ -81,7 +81,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     stats.model.getAndIncrement();
     return new StatisticsModel(delegate.getModel(), stats);
   }

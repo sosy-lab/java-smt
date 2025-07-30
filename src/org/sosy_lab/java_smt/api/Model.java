@@ -50,12 +50,21 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
    *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+   * <p>Warning: this might throw {@link SolverException} or {@link InterruptedException} as {@link
+   * RuntimeException} as checked exceptions are not supported by this method.
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
-    return asList().iterator();
+    try {
+      return asList().iterator();
+    } catch (SolverException | InterruptedException pE) {
+      throw sneakyThrow(pE);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   /**
@@ -64,7 +73,7 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
    * Throwable}.
    */
-  ImmutableList<ValueAssignment> asList();
+  ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException;
 
   /**
    * Pretty-printing of the model values.

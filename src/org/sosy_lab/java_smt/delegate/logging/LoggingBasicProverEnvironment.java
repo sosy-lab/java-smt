@@ -87,14 +87,15 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     Model m = wrapped.getModel();
     logger.log(Level.FINE, "model", m);
     return m;
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;
