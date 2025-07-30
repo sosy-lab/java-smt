@@ -26,6 +26,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -94,7 +95,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
-  protected abstract void pushImpl() throws InterruptedException;
+  protected abstract void pushImpl() throws InterruptedException, SolverException;
 
   @Override
   public final void pop() {
@@ -116,7 +117,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint)
-      throws InterruptedException;
+      throws InterruptedException, SolverException;
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();

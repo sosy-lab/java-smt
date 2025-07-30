@@ -122,7 +122,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
@@ -135,7 +135,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception);
     }
     return null;
   }
