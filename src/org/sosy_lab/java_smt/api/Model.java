@@ -69,9 +69,6 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
 
   /**
    * Build a list of assignments that stays valid after closing the model.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
    */
   ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException;
 

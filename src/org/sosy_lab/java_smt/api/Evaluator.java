@@ -68,9 +68,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for integer formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
    */
   @Nullable BigInteger evaluate(IntegerFormula formula)
       throws SolverException, InterruptedException;
@@ -79,9 +76,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable Rational evaluate(RationalFormula formula) throws SolverException, InterruptedException;
 
@@ -89,9 +84,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable Boolean evaluate(BooleanFormula formula) throws SolverException, InterruptedException;
 
@@ -99,9 +92,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable BigInteger evaluate(BitvectorFormula formula)
       throws SolverException, InterruptedException;
@@ -110,9 +101,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for string formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable String evaluate(StringFormula formula) throws SolverException, InterruptedException;
 
@@ -120,9 +109,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for enumeration formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable String evaluate(EnumerationFormula formula)
       throws SolverException, InterruptedException;
@@ -131,9 +118,7 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for floating-point formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
+
    */
   @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula)
       throws SolverException, InterruptedException;

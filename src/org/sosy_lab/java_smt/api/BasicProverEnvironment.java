@@ -29,9 +29,6 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the subtype of
    * the environment).
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
    */
   @Nullable
   @CanIgnoreReturnValue
@@ -48,9 +45,6 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   /**
    * Add a constraint to the latest backtracking point.
-   *
-   * <p>Warning: this might throw an unchecked {@link SolverException} as an extension of {@link
-   * Throwable}.
    */
   @Nullable
   @CanIgnoreReturnValue
