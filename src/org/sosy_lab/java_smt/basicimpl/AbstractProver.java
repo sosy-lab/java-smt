@@ -89,7 +89,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public final void push() throws InterruptedException {
+  public final void push() throws InterruptedException, SolverException {
     checkState(!closed);
     pushImpl();
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -109,7 +109,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   @CanIgnoreReturnValue
-  public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public final @Nullable T addConstraint(BooleanFormula constraint)
+      throws InterruptedException, SolverException {
     checkState(!closed);
     T t = addConstraintImpl(constraint);
     Iterables.getLast(assertedFormulas).put(constraint, t);

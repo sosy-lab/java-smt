@@ -262,7 +262,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   @SuppressWarnings({"unchecked", "resource"})
   @Test
-  public <T> void nonLocalInterpolationTest() throws InterruptedException, ExecutionException {
+  public <T> void nonLocalInterpolationTest()
+      throws InterruptedException, ExecutionException, SolverException {
     requireIntegers();
     requireInterpolation();
     assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
