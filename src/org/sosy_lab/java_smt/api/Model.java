@@ -57,8 +57,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
   default Iterator<ValueAssignment> iterator() {
     try {
       return asList().iterator();
-    } catch (SolverException | InterruptedException pE) {
-      throw sneakyThrow(pE);
+    } catch (SolverException | InterruptedException ex) {
+      throw sneakyThrow(ex);
     }
   }
 
