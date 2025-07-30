@@ -50,8 +50,9 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
    *
-   * <p>Warning: this might throw {@link SolverException} or {@link InterruptedException} as {@link
-   * RuntimeException} as checked exceptions are not supported by this method.
+   * <p>Warning: This method may throw the checked exceptions SolverException (in case of solver
+   * failures) and InterruptedException (in case of shutdown requests) although these exceptions are
+   * not declared with throws.
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
