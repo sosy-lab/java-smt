@@ -180,6 +180,32 @@ try (SolverContext context = SolverContextFactory.createSolverContext(
   }
 }
 ```
+You can find several example implementations in the folder `org/sosy_lab/java_smt/example`.
+These include examples for the usage of many of JavaSMTs solvers and features, for example:
+- AllSatExample: showcasing the usage of the AllSat feature, returning all satisfiable 
+  assignments for an input query. JavaSMT is capable of returning AllSat for many solvers even 
+  without them directly supporting this feature.
+- FormulaClassifier: showcases the usage of our formula visitor to classify the logic of an 
+  input SMT file.
+- Interpolation: presents how to utilize Craig-, sequential-, and tree-interpolation.
+- OptimizationFormulaWeights: shows how the weighting of constraints can be optimized in 
+  optimization solving, helping the solver in finding a result.
+- OptimizationIntReal: presents optimization solving for integer and real logics.
+- PrettyPrinter: showcases how to parse user-given SMT input into a pretty format.
+- SimpleUserPropagator: shows an example of a user propagator, prohibiting variables and/or 
+  expressions from being set to true. This can be used to guide an SMT solver in its 
+  solving process. More examples can be found in the folder `nqueens_user_propagator`.
+- SolverOverviewTable: prints out all available SMT solvers, including their theories and 
+  features. This can be used to determine which solvers are available on any machine executing it.
+
+Furthermore, JavaSMT provides users with additional features available for many solvers:
+- Debug-Mode: 
+- Synchronization: 
+- Statistics: 
+- Logging: 
+- Assumption solving: 
+- AllSat: 
+- Formula visitation: 
 
 ## Authors
 
