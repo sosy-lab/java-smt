@@ -43,9 +43,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   void pop();
 
-  /**
-   * Add a constraint to the latest backtracking point.
-   */
+  /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
   T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException;

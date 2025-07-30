@@ -76,7 +76,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for rational formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable Rational evaluate(RationalFormula formula) throws SolverException, InterruptedException;
 
@@ -84,7 +83,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for boolean formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable Boolean evaluate(BooleanFormula formula) throws SolverException, InterruptedException;
 
@@ -92,7 +90,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for bitvector formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable BigInteger evaluate(BitvectorFormula formula)
       throws SolverException, InterruptedException;
@@ -101,7 +98,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for string formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable String evaluate(StringFormula formula) throws SolverException, InterruptedException;
 
@@ -109,7 +105,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for enumeration formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable String evaluate(EnumerationFormula formula)
       throws SolverException, InterruptedException;
@@ -118,7 +113,6 @@ public interface Evaluator extends AutoCloseable {
    * Type-safe evaluation for floating-point formulas.
    *
    * <p>The formula does not need to be a variable, we also allow complex expression.
-
    */
   @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula)
       throws SolverException, InterruptedException;
