@@ -199,13 +199,39 @@ These include examples for the usage of many of JavaSMTs solvers and features, f
   features. This can be used to determine which solvers are available on any machine executing it.
 
 Furthermore, JavaSMT provides users with additional features available for many solvers:
-- Debug-Mode: 
-- Synchronization: 
-- Statistics: 
-- Logging: 
-- Assumption solving: 
-- AllSat: 
-- Formula visitation: 
+- Debug-Mode: setting the option `useDebugMode=true`, in the configuration used to create a
+  `SolverContext`, applies additional checks to catch common usage errors. The checks 
+  performed by this option are solver-sensitive and throw exceptions on operations that 
+  are disallowed by a particular solver. For example, for most solvers, adding a constraint to a 
+  `ProverEnvironment` may only be allowed iff the constraint has been built by the same 
+  `SolverContext` that also created the used `ProverEnvironment`. Violating this rule while in 
+  debug-mode with a solver that does not allow this throws a `IllegalArgumentException` with 
+  information about the problem.
+- Synchronization: setting the option `synchronize=true`, in the configuration used to create a
+  `SolverContext`, all solver actions are synchronized with the owning instance being the 
+  `SolverContext`. This allows concurrent access, but strictly sequentializes all operations.
+- Statistics: setting the option `collectStatistics=true`, in the configuration used to create a
+  `SolverContext`, counts all operations and interactions towards the SMT solver of this context. 
+  These statistics can be access in the `SolverContext`.
+- Logging: setting the option `useLogger=true`, in the configuration used to create a 
+  `SolverContext`, logs all solver actions. Logging operations might slow down 
+  usage of JavaSMT though.
+- Assumption solving: in case an SMT solver does not support assumption solving natively, we 
+  automatically add this feature seamlessly through a self-developed layer. No difference in usage 
+  can be observed from a users' perspective.
+- AllSat: in case an SMT solver does not support assumption solving natively, we
+  automatically add this feature seamlessly through a self-developed layer. No difference in usage
+  can be observed from a users' perspective.
+- Formula visitation: we allow the inspection, traversal, and modification of formulas through 
+  our formula-visitor, as long as the chosen SMT solver supports this feature. Users can utilize 
+  many pre-built features based on this visitor like 
+  `BooleanFormulaManager.toDisjunctionArgs()`, returning a set of formulas such that a 
+  disjunction over them is equivalent to the input formula, or `FormulaManager.
+  extractVariablesAndUFs()`, which can be used to extract the names of all free variables and 
+  UFs in a formula. The visitor-pattern can also be used with user-defined operations.
+
+Many more options are available to configure SMT solvers by setting them in the `Configuration` 
+given to an `SolverContext`, including SMT solvers native configuration options.
 
 ## Authors
 
