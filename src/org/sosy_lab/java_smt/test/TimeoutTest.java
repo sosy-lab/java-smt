@@ -633,11 +633,10 @@ public class TimeoutTest extends SolverBasedTest0 {
   private void assertProverAPIThrowsInterruptedException(BasicProverEnvironment<?> pe)
       throws SolverException {
     assertThrows(InterruptedException.class, pe::isUnsat);
-    // TODO: let all the API in prover throw interrupted?
-    assertThrows(IllegalStateException.class, pe::getModel);
-    assertThrows(IllegalStateException.class, pe::getModelAssignments);
-    assertThrows(IllegalStateException.class, pe::getEvaluator);
-    assertThrows(IllegalStateException.class, pe::getUnsatCore);
+    assertThrows(InterruptedException.class, pe::getModel);
+    assertThrows(InterruptedException.class, pe::getModelAssignments);
+    assertThrows(InterruptedException.class, pe::getEvaluator);
+    assertThrows(InterruptedException.class, pe::getUnsatCore);
     try {
       pe.allSat(
           new AllSatCallback<>() {
@@ -671,7 +670,7 @@ public class TimeoutTest extends SolverBasedTest0 {
     assertThrows(InterruptedException.class, () -> pe.addConstraint(bmgr.makeFalse()));
     assertThrows(InterruptedException.class, () -> pe.push(bmgr.makeFalse()));
     assertThrows(InterruptedException.class, pe::push);
-    assertThrows(IllegalStateException.class, pe::pop);
+    assertThrows(InterruptedException.class, pe::pop);
     if (pe instanceof InterpolatingProverEnvironment) {
       InterpolatingProverEnvironment<?> ipe = (InterpolatingProverEnvironment<?>) pe;
       assertThrows(InterruptedException.class, () -> ipe.getInterpolant(ImmutableList.of()));
