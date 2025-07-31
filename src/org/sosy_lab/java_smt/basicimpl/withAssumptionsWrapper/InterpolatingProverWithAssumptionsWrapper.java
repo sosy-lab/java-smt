@@ -86,12 +86,6 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
     solverAssumptionsFromPush.clear();
   }
 
-  @Override
-  protected void clearAssumptionsWithInterruptedException() throws InterruptedException {
-    super.clearAssumptionsWithInterruptedException();
-    solverAssumptionsFromPush.clear();
-  }
-
   final class RemoveAssumptionsFromFormulaVisitor extends BooleanFormulaTransformationVisitor {
 
     private RemoveAssumptionsFromFormulaVisitor() {

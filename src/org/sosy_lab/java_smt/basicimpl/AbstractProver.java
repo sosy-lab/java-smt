@@ -45,8 +45,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private static final String STACK_CHANGED_HELP =
       "Computation failed. The prover state has changed since the last call to isUnsat().";
 
-  // Used as prefix concatenated with the reason in the IllegalStateException thrown for shutdowns
-  // Keep in sync with BasicProverWithAssumptionsWrapper.SHUTDOWN_EXCEPTION_PREFIX
+  // Used as prefix concatenated with the reason in the IllegalStateException
   private static final String SHUTDOWN_EXCEPTION_PREFIX =
       "Prover is not usable due to interrupt with message: ";
 
