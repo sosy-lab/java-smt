@@ -69,7 +69,9 @@ public interface SolverContext extends AutoCloseable {
   /**
    * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack and can be
    * used to check formulas for unsatisfiability. The returned prover instance can be shut down
-   * using the given {@link ShutdownNotifier}.
+   * using the given {@link ShutdownNotifier}. Solvers that don't support isolated prover shutdown
+   * throw a {@link UnsupportedOperationException} for this method and {@link
+   * #newProverEnvironment(ProverOptions...)} should be used instead.
    *
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that can be used to stop the prover
    *     returned by this method. The prover is not usable anymore after a shutdown has been
@@ -79,9 +81,6 @@ public interface SolverContext extends AutoCloseable {
    *     when creating the context.
    * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
-   * @throws UnsupportedOperationException Solvers that don't support isolated prover shutdown throw
-   *     a {@link UnsupportedOperationException} for this method and {@link
-   *     #newProverEnvironment(ProverOptions...)} should be used instead.
    */
   ProverEnvironment newProverEnvironment(
       ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
@@ -101,7 +100,9 @@ public interface SolverContext extends AutoCloseable {
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
    * and allows generating and retrieve interpolants for unsatisfiable formulas. The returned prover
-   * instance can be shut down using the given {@link ShutdownNotifier}.
+   * instance can be shut down using the given {@link ShutdownNotifier}. Solvers that don't support
+   * isolated prover shutdown throw a {@link UnsupportedOperationException} for this method and
+   * {@link #newProverEnvironment(ProverOptions...)} should be used instead.
    *
    * @implNote If the SMT solver is able to handle satisfiability tests with assumptions please
    *     consider implementing the {@link InterpolatingProverEnvironment} interface, and return an
@@ -114,9 +115,6 @@ public interface SolverContext extends AutoCloseable {
    *     when creating the context.
    * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
-   * @throws UnsupportedOperationException Solvers that don't support isolated prover shutdown throw
-   *     a {@link UnsupportedOperationException} for this method and {@link
-   *     #newProverEnvironment(ProverOptions...)} should be used instead.
    */
   InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
@@ -133,7 +131,9 @@ public interface SolverContext extends AutoCloseable {
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
    * and allows solving optimization queries. The returned prover instance can be shut down using
-   * the given {@link ShutdownNotifier}.
+   * the given {@link ShutdownNotifier}. Solvers that don't support isolated prover shutdown throw a
+   * {@link UnsupportedOperationException} for this method and {@link
+   * #newProverEnvironment(ProverOptions...)} should be used instead.
    *
    * @param pProverShutdownNotifier a {@link ShutdownNotifier} that can be used to stop the prover
    *     returned by this method. The prover is not usable anymore after a shutdown has been
@@ -143,9 +143,6 @@ public interface SolverContext extends AutoCloseable {
    *     when creating the context.
    * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
-   * @throws UnsupportedOperationException Solvers that don't support isolated prover shutdown throw
-   *     a {@link UnsupportedOperationException} for this method and {@link
-   *     #newProverEnvironment(ProverOptions...)} should be used instead.
    */
   OptimizationProverEnvironment newOptimizationProverEnvironment(
       ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
