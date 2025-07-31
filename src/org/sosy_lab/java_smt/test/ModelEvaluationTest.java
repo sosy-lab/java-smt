@@ -236,7 +236,8 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
     return constraints;
   }
 
-  private BooleanFormula getNewConstraints(int i, Evaluator m) {
+  private BooleanFormula getNewConstraints(int i, Evaluator m)
+      throws SolverException, InterruptedException {
     BooleanFormula x = bmgr.makeVariable("x" + i);
     // prover.push(m.evaluate(x) ? bmgr.not(x) : x);
     return m.evaluate(x) ? x : bmgr.not(x);

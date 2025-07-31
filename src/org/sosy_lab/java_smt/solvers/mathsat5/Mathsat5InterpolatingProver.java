@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_itp_group;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_interpolant;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -56,10 +58,11 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   Mathsat5InterpolatingProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -99,11 +102,13 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) throws SolverException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
+      throws SolverException, InterruptedException {
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
+    checkInterpolationArguments(formulasOfA);
 
     int[] groupsOfA = Ints.toArray(formulasOfA);
     long itp;
@@ -125,7 +130,12 @@ class Mathsat5InterpolatingProver extends Mathsat5AbstractProver<Integer>
 
   @Override
   public List<BooleanFormula> getSeqInterpolants(
-      List<? extends Collection<Integer>> partitionedFormulas) throws SolverException {
+      List<? extends Collection<Integer>> partitionedFormulas)
+      throws SolverException, InterruptedException {
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     Preconditions.checkArgument(
         !partitionedFormulas.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();

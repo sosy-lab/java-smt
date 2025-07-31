@@ -780,7 +780,26 @@ final class Mathsat5NativeApi {
 
   public static native void msat_destroy_model(long model);
 
+  /**
+   * Only to be used in tests. Use msat_model_create_iterator_with_sneaky_solver_exception()
+   * instead, to throw a better exception in case of failures.
+   */
   public static native long msat_model_create_iterator(long model);
+
+  /**
+   * This method returns the result of msat_model_create_iterator(), however it throws a
+   * IllegalArgumentException due to a problem, it throws a SolverException, reflecting the problem
+   * better.
+   */
+  static long msat_model_create_iterator_with_solver_exception(long model) throws SolverException {
+    try {
+      return msat_model_create_iterator(model);
+    } catch (IllegalArgumentException iae) {
+      // This is not a bug in our or user code, but a problem of MathSAT. The context can still be
+      // used.
+      throw new SolverException(iae.getMessage() + ", model not available");
+    }
+  }
 
   /**
    * Evaluates the input term in the given model.

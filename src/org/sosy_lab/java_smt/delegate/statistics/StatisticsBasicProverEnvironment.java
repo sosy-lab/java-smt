@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.statistics;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.delegate.statistics.TimerPool.TimerWrapper;
 
@@ -36,19 +38,20 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     stats.pop.getAndIncrement();
     delegate.pop();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint)
+      throws InterruptedException, SolverException {
     stats.constraint.getAndIncrement();
     return delegate.addConstraint(pConstraint);
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     stats.push.getAndIncrement();
     delegate.push();
   }
@@ -81,13 +84,19 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     stats.model.getAndIncrement();
     return new StatisticsModel(delegate.getModel(), stats);
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
+    return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     stats.unsatCore.getAndIncrement();
     return delegate.getUnsatCore();
   }

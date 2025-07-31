@@ -8,9 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -29,7 +27,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -41,7 +38,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   private final CVC4FormulaCreator creator;
   SmtEngine smtEngine; // final except for SL theory
-  private boolean changedSinceLastSatQuery = false;
 
   /**
    * The local exprManager allows to set options per Prover (and not globally). See <a
@@ -60,15 +56,16 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   protected CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pBmgr, pContextShutdownNotifier, pProverShutdownNotifier);
 
     creator = pFormulaCreator;
     smtEngine = new SmtEngine(exprManager);
-    incremental = !enableSL;
+    incremental = !isSeparationLogicEnabled();
 
     setOptions(randomSeed, pOptions);
   }
@@ -109,7 +106,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void pushImpl() throws InterruptedException {
-    setChanged();
     if (incremental) {
       smtEngine.push();
     }
@@ -117,7 +113,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void popImpl() {
-    setChanged();
     if (incremental) {
       smtEngine.pop();
     }
@@ -125,8 +120,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    Preconditions.checkState(!closed);
-    setChanged();
     if (incremental) {
       assertFormula(pF);
     }
@@ -144,10 +137,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    checkGenerateModels();
+  protected CVC4Model getModelImpl() throws SolverException, InterruptedException {
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
@@ -159,9 +149,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
-    checkGenerateModels();
+  public Evaluator getEvaluatorImpl() {
     return getEvaluatorWithoutChecks();
   }
 
@@ -171,30 +159,9 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 
-  private void setChanged() {
-    closeAllEvaluators();
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      if (!incremental) {
-        // create a new clean smtEngine
-        smtEngine = new SmtEngine(exprManager);
-      }
-    }
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
-  }
-
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    closeAllEvaluators();
-    changedSinceLastSatQuery = false;
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     if (!incremental) {
       for (BooleanFormula f : getAssertedFormulas()) {
         assertFormula(f);
@@ -202,11 +169,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     }
 
     Result result;
-    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook hook =
+        new ShutdownHook(contextShutdownNotifier, proverShutdownNotifier, smtEngine::interrupt)) {
+      shutdownIfNecessary();
       result = smtEngine.checkSat();
     }
-    shutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     return convertSatResult(result);
   }
 
@@ -228,10 +196,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));
@@ -240,20 +205,20 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       exportMapping.delete();
       // smtEngine.delete();
       exprManager.delete();

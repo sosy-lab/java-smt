@@ -24,10 +24,11 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
   Mathsat5TheoremProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -38,7 +39,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   @Override
   @Nullable
   protected Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     closeAllEvaluators();
     msat_assert_formula(curEnv, getMsatTerm(constraint));
     return null;

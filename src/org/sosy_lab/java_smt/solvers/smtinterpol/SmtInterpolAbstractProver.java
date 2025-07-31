@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
-import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -52,7 +52,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   protected final FormulaCreator<Term, Sort, Script, FunctionSymbol> creator;
   protected final SmtInterpolFormulaManager mgr;
   protected final Deque<PersistentMap<String, BooleanFormula>> annotatedTerms = new ArrayDeque<>();
-  protected final ShutdownNotifier shutdownNotifier;
 
   private static final String PREFIX = "term_"; // for termnames
   private static final UniqueIdGenerator termIdGenerator =
@@ -62,17 +61,18 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
       SmtInterpolFormulaManager pMgr,
       Script pEnv,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(options);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pContextShutdownNotifier, pProverShutdownNotifier, options);
     mgr = pMgr;
     creator = pMgr.getFormulaCreator();
     env = pEnv;
-    shutdownNotifier = pShutdownNotifier;
     annotatedTerms.add(PathCopyingPersistentTreeMap.of());
   }
 
+  @Override
   protected boolean isClosed() {
-    return closed;
+    return super.isClosed();
   }
 
   @Override
@@ -89,7 +89,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     // create a term-name, used for unsat-core or interpolation, otherwise there is no overhead.
     String termName = generateTermName();
@@ -102,14 +102,14 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
-    checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException {
+    checkState(!isClosed());
 
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    shutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
 
     LBool result = env.checkSat();
     switch (result) {
@@ -127,7 +127,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
             // SMTInterpol catches OOM, but we want to have it thrown.
             throw new OutOfMemoryError("Out of memory during SMTInterpol operation");
           case CANCELLED:
-            shutdownNotifier.shutdownIfNecessary(); // expected if we requested termination
+            shutdownIfNecessary(); // expected if we requested termination
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
           default:
             throw new SMTLIBException("checkSat returned UNKNOWN with unexpected reason " + reason);
@@ -140,15 +140,13 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public org.sosy_lab.java_smt.api.Model getModel() {
-    checkState(!closed);
-    checkGenerateModels();
+  protected org.sosy_lab.java_smt.api.Model getModelImpl() {
     final Model model;
     try {
       model = env.getModel();
     } catch (SMTLIBException e) {
       if (e.getMessage().contains("Context is inconsistent")) {
-        throw new IllegalStateException(BasicProverEnvironment.NO_MODEL_HELP, e);
+        throw new IllegalStateException(NO_MODEL_HELP, e);
       } else {
         // new stacktrace, but only the library calls are missing.
         throw e;
@@ -167,9 +165,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     return getUnsatCore0(annotatedTerms.peek());
   }
 
@@ -190,10 +186,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkState(!closed);
-    checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
     for (BooleanFormula assumption : assumptions) {
@@ -215,7 +209,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       annotatedTerms.clear();
       env.resetAssertions();
       env.exit();
@@ -224,7 +218,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Assumption-solving is not supported.");
   }
@@ -232,7 +226,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!closed);
+    checkState(!isClosed());
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];
@@ -244,7 +238,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
     // so we check here, too.
-    shutdownNotifier.shutdownIfNecessary();
+    shutdownIfNecessary();
     for (Term[] model : env.checkAllsat(importantTerms)) {
       callback.apply(Collections3.transformedImmutableListCopy(model, creator::encapsulateBoolean));
     }

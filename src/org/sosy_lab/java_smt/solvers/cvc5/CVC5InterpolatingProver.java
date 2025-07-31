@@ -25,12 +25,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.solvers.cvc5.CVC5SolverContext.CVC5Settings;
 
 public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     implements InterpolatingProverEnvironment<String> {
@@ -46,19 +48,26 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
 
   CVC5InterpolatingProver(
       CVC5FormulaCreator pFormulaCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       int randomSeed,
       Set<ProverOptions> pOptions,
       FormulaManager pMgr,
-      ImmutableMap<String, String> pFurtherOptionsMap,
-      boolean pValidateInterpolants) {
-    super(pFormulaCreator, pShutdownNotifier, randomSeed, pOptions, pMgr, pFurtherOptionsMap);
+      CVC5Settings settings) {
+    super(
+        pFormulaCreator,
+        pContextShutdownNotifier,
+        pProverShutdownNotifier,
+        randomSeed,
+        pOptions,
+        pMgr,
+        settings.getFurtherOptions());
     mgr = pMgr;
     solverOptions = pOptions;
     seed = randomSeed;
     bmgr = (CVC5BooleanFormulaManager) mgr.getBooleanFormulaManager();
-    validateInterpolants = pValidateInterpolants;
-    furtherOptionsMap = pFurtherOptionsMap;
+    validateInterpolants = settings.isValidateInterpolants();
+    furtherOptionsMap = settings.getFurtherOptions();
   }
 
   /**
@@ -83,10 +92,11 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
+    checkInterpolationArguments(pFormulasOfA);
 
     final Set<Term> assertedFormulas =
         transformedImmutableSetCopy(getAssertedFormulas(), creator::extractInfo);
@@ -101,6 +111,10 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
