@@ -296,7 +296,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkArgument(
         getAssertedConstraintIds().containsAll(formulasOfA),
         "Interpolation can only be done over previously asserted formulas. %s",
-        MoreStrings.lazyString(() -> getErrorString(formulasOfA)).toString());
+        MoreStrings.lazyString(() -> getErrorString(formulasOfA)));
   }
 
   private String getErrorString(Collection<T> formulasOfA) {
