@@ -62,8 +62,6 @@ public final class ShutdownHook implements ShutdownRequestListener, AutoCloseabl
   public void close() {
     isActiveHook.set(false);
     contextShutdownNotifier.unregister(this);
-    if (proverShutdownNotifier != null) {
-      proverShutdownNotifier.unregister(this);
-    }
+    proverShutdownNotifier.unregister(this);
   }
 }

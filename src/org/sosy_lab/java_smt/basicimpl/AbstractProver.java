@@ -65,7 +65,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   private static final String TEMPLATE = "Please set the prover option %s.";
 
-  protected final @Nullable ShutdownNotifier proverShutdownNotifier;
+  protected final ShutdownNotifier proverShutdownNotifier;
   protected final ShutdownNotifier contextShutdownNotifier;
 
   protected AbstractProver(
@@ -82,21 +82,21 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.add(LinkedHashMultimap.create());
 
     contextShutdownNotifier = pContextShutdownNotifier;
-    proverShutdownNotifier = pProverShutdownNotifier;
+
+    if (pProverShutdownNotifier == null) {
+      proverShutdownNotifier = ShutdownNotifier.createDummy();
+    } else {
+      proverShutdownNotifier = pProverShutdownNotifier;
+    }
   }
 
   protected final void shutdownIfNecessary() throws InterruptedException {
     contextShutdownNotifier.shutdownIfNecessary();
-    if (proverShutdownNotifier != null) {
-      proverShutdownNotifier.shutdownIfNecessary();
-    }
+    proverShutdownNotifier.shutdownIfNecessary();
   }
 
   protected final boolean shouldShutdown() {
-    if (proverShutdownNotifier != null) {
-      return contextShutdownNotifier.shouldShutdown() || proverShutdownNotifier.shouldShutdown();
-    }
-    return contextShutdownNotifier.shouldShutdown();
+    return contextShutdownNotifier.shouldShutdown() || proverShutdownNotifier.shouldShutdown();
   }
 
   protected boolean isGenerateUnsatCores() {

@@ -700,14 +700,10 @@ public final class Yices2NativeApi {
         new ShutdownHook(
             contextShutdownNotifier, proverShutdownNotifier, () -> yices_stop_search(pCtx))) {
       contextShutdownNotifier.shutdownIfNecessary();
-      if (proverShutdownNotifier != null) {
-        proverShutdownNotifier.shutdownIfNecessary();
-      }
+      proverShutdownNotifier.shutdownIfNecessary();
       result = satCheck.get(); // the expensive computation
     }
-    if (proverShutdownNotifier != null) {
-      proverShutdownNotifier.shutdownIfNecessary();
-    }
+    proverShutdownNotifier.shutdownIfNecessary();
     contextShutdownNotifier.shutdownIfNecessary();
     return check_result(result);
   }

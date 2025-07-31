@@ -198,9 +198,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
         propagator = null;
       }
       contextShutdownNotifier.unregister(interruptListener);
-      if (proverShutdownNotifier != null) {
-        proverShutdownNotifier.unregister(interruptListener);
-      }
+      proverShutdownNotifier.unregister(interruptListener);
     }
     super.close();
   }
