@@ -87,7 +87,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
 
-    // Z3 seems to allows simple operations, but not deterministically, so better lets abort here.
+    // Z3 seems to allow simple operations, but not deterministically, so better lets abort here.
     // Simple checks could even be ok (comparison against constants like TRUE/FALSE).
     assume()
         .withMessage(
@@ -146,7 +146,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test(timeout = 5000)
   @SuppressWarnings({"try", "CheckReturnValue"})
   public void testCVC5WithValidOptionsTimeLimit()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
 
     //  tlimit-per is time limit in ms of wall clock time per query

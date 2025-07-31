@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -58,6 +57,7 @@ import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.z3.Z3Formula.Z3ArrayFormula;
@@ -162,7 +162,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
-   * Otherwise, the given exception is wrapped and thrown as a SolverException.
+   * Otherwise, the given exception is wrapped and thrown as a SolverException. If a {@link
+   * ShutdownNotifier} besides the context {@link ShutdownNotifier} exists, give it to
+   * pAdditionalShutdownNotifier, else null for that argument.
    */
   @CanIgnoreReturnValue
   final SolverException handleZ3Exception(
@@ -489,6 +491,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return symbolToString(symbol);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula formula, final Long f) {
     switch (Z3_ast_kind.fromInt(Native.getAstKind(environment, f))) {
@@ -937,7 +940,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         Rational ratValue = Rational.ofString(Native.getNumeralString(environment, value));
         return ratValue.isIntegral() ? ratValue.getNum() : ratValue;
       } else if (type.isStringType()) {
-        return unescapeUnicodeForSmtlib(Native.getString(environment, value));
+        String str = Native.getString(environment, value);
+        return AbstractStringFormulaManager.unescapeUnicodeForSmtlib(str);
       } else if (type.isBitvectorType()) {
         return new BigInteger(Native.getNumeralString(environment, value));
       } else if (type.isFloatingPointType()) {
@@ -974,7 +978,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
-      //  - an sign for posiive/negative infinity,
+      //  - a sign for positive/negative infinity,
       //  - "11..11" as exponent,
       //  - "00..00" as mantissa.
       String sign = getSign(pValue).isNegative() ? "1" : "0";

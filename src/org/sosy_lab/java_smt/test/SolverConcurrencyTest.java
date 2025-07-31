@@ -406,7 +406,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentIntegerStack()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     requireIntegers();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
@@ -439,7 +439,7 @@ public class SolverConcurrencyTest {
    */
   @Test
   public void testConcurrentBitvectorStack()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     requireBitvectors();
     requireConcurrentMultipleStackSupport();
     SolverContext context = initSolver();
@@ -558,7 +558,7 @@ public class SolverConcurrencyTest {
     assertConcurrency(
         "continuousRunningThreadFormulaTransferTranslateTest",
         () -> {
-          // Start the threads such that they each get a unqiue id
+          // Start the threads such that they each get an unqiue id
           final int id = idGenerator.getFreshId();
           int nextBucket = (id + 1) % NUMBER_OF_THREADS;
           final BlockingQueue<ContextAndFormula> ownBucket = bucketQueue.get(id);

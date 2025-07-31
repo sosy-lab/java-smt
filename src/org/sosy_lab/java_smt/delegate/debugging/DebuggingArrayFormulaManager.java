@@ -22,8 +22,7 @@ public class DebuggingArrayFormulaManager implements ArrayFormulaManager {
   private final ArrayFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingArrayFormulaManager(
-      ArrayFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingArrayFormulaManager(ArrayFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }

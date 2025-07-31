@@ -25,7 +25,7 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
   private final FloatingPointFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingFloatingPointFormulaManager(
+  DebuggingFloatingPointFormulaManager(
       FloatingPointFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;

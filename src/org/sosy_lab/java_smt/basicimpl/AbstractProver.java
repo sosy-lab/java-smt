@@ -233,7 +233,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws SolverException, InterruptedException;
 
   @Override
-  public final Model getModel() throws SolverException {
+  public final Model getModel() throws SolverException, InterruptedException {
     checkState(!closed);
     checkShutdownState();
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
@@ -242,10 +242,10 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return getModelImpl();
   }
 
-  protected abstract Model getModelImpl() throws SolverException;
+  protected abstract Model getModelImpl() throws SolverException, InterruptedException;
 
   @Override
-  public final Evaluator getEvaluator() throws SolverException {
+  public final Evaluator getEvaluator() throws SolverException, InterruptedException {
     checkState(!closed);
     checkShutdownState();
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
@@ -254,12 +254,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return getEvaluatorImpl();
   }
 
-  protected Evaluator getEvaluatorImpl() throws SolverException {
+  protected Evaluator getEvaluatorImpl() throws SolverException, InterruptedException {
     return getModel();
   }
 
   @Override
-  public final void push() throws InterruptedException {
+  public final void push() throws InterruptedException, SolverException {
     checkState(!closed);
     shutdownIfNecessary();
     pushImpl();
@@ -267,12 +267,12 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
-  protected abstract void pushImpl() throws InterruptedException;
+  protected abstract void pushImpl() throws InterruptedException, SolverException;
 
   @Override
-  public final void pop() {
+  public final void pop() throws InterruptedException {
     checkState(!closed);
-    checkShutdownState();
+    shutdownIfNecessary();
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     // TODO: technically only needed if the level removed was non empty.
@@ -285,7 +285,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   @Override
   @CanIgnoreReturnValue
-  public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public final @Nullable T addConstraint(BooleanFormula constraint)
+      throws InterruptedException, SolverException {
     checkState(!closed);
     shutdownIfNecessary();
     T t = addConstraintImpl(constraint);
@@ -296,7 +297,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint)
-      throws InterruptedException;
+      throws InterruptedException, SolverException;
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();
@@ -352,7 +353,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     checkShutdownState();
     Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);

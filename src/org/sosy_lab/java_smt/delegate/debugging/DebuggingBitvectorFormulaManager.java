@@ -22,7 +22,7 @@ public class DebuggingBitvectorFormulaManager implements BitvectorFormulaManager
   private final BitvectorFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingBitvectorFormulaManager(
+  DebuggingBitvectorFormulaManager(
       BitvectorFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;

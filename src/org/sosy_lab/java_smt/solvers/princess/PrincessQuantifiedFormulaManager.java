@@ -14,12 +14,11 @@ import static scala.collection.JavaConverters.asScala;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
-import ap.parser.ISortedQuantified;
 import ap.terfor.ConstantTerm;
 import ap.terfor.conjunctions.Quantifier.ALL$;
 import ap.terfor.conjunctions.Quantifier.EX$;
 import ap.types.Sort;
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
 import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
@@ -40,24 +39,17 @@ class PrincessQuantifiedFormulaManager
 
   @Override
   public IExpression mkQuantifier(Quantifier q, List<IExpression> vars, IExpression body) {
+    checkArgument(!vars.isEmpty(), "Missing variables for quantifier '%s' and body '%s'.", q, body);
+
     checkArgument(body instanceof IFormula);
     ap.terfor.conjunctions.Quantifier pq = (q == Quantifier.FORALL) ? ALL$.MODULE$ : EX$.MODULE$;
-    if (vars.isEmpty()) {
 
-      // Body already contains bound variables.
-      return new ISortedQuantified(pq, PrincessEnvironment.INTEGER_SORT, (IFormula) body);
-    } else {
-      // TODO: add support for boolean quantification!
-      return IExpression.quanConsts(pq, asScala(toConstantTerm(vars)), (IFormula) body);
-    }
+    // TODO: add support for boolean quantification!
+    return IExpression.quanConsts(pq, asScala(toConstantTerms(vars)), (IFormula) body);
   }
 
-  private List<ConstantTerm> toConstantTerm(List<IExpression> lst) {
-    List<ConstantTerm> retVal = new ArrayList<>(lst.size());
-    for (IExpression f : lst) {
-      retVal.add(((IConstant) f).c());
-    }
-    return retVal;
+  private List<ConstantTerm> toConstantTerms(List<IExpression> lst) {
+    return Lists.transform(lst, f -> ((IConstant) f).c());
   }
 
   @Override

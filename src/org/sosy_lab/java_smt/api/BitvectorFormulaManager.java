@@ -34,7 +34,7 @@ public interface BitvectorFormulaManager {
    * Convert/Cast/Interpret a numeral formula into a bitvector with given size.
    *
    * <p>If the numeral formula is too large for the given length, we cut off the largest bits and
-   * only use the lest significant bits.
+   * only use the least significant bits.
    */
   BitvectorFormula makeBitvector(int length, IntegerFormula pI);
 

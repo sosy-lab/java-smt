@@ -938,7 +938,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     // quantifier-free equivalent: (and (= b2 #x00000006)
     //                                  (= a3 #x00000000))
 
-    // Z3 fails this currently. Remove once thats not longer the case!
+    // Z3 fails this currently. Remove once that's not longer the case!
     assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     int width = 32;
 

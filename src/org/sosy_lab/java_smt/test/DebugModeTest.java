@@ -100,7 +100,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     Future<?> result =
         exec.submit(
             () -> {
-              // Generate a non trivial problem for our tests
+              // Generate a non-trivial problem for our tests
               BooleanFormula varA = debugBmgr.makeVariable("a");
               BooleanFormula formula = debugBmgr.and(varA, debugBmgr.not(varA));
 

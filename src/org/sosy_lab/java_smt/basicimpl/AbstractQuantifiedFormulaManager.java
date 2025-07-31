@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.Lists;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -41,6 +43,8 @@ public abstract class AbstractQuantifiedFormulaManager<TFormulaInfo, TType, TEnv
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
+    checkArgument(
+        !pVariables.isEmpty(), "Missing variables for quantifier '%s' and body '%s'.", q, pBody);
     return wrap(
         mkQuantifier(q, Lists.transform(pVariables, this::extractInfo), extractInfo(pBody)));
   }

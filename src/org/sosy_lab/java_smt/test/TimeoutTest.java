@@ -98,13 +98,13 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testProverTimeoutInt() throws InterruptedException {
+  public void testProverTimeoutInt() throws InterruptedException, SolverException {
     requireIntegers();
     testBasicContextTimeoutInt(() -> context.newProverEnvironment());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testProverTimeoutBv() throws InterruptedException {
+  public void testProverTimeoutBv() throws InterruptedException, SolverException {
     requireBitvectors();
     testBasicContextTimeoutBv(() -> context.newProverEnvironment());
   }
@@ -157,7 +157,8 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentNewProverUsageBv() throws InterruptedException {
+  public void testContextInterruptWithSubsequentNewProverUsageBv()
+      throws InterruptedException, SolverException {
     requireBitvectors();
 
     testBasicContextTimeoutBv(() -> context.newProverEnvironment());
@@ -172,7 +173,8 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentNewProverUsageInt() throws InterruptedException {
+  public void testContextInterruptWithSubsequentNewProverUsageInt()
+      throws InterruptedException, SolverException {
     requireIntegers();
 
     testBasicContextTimeoutInt(() -> context.newProverEnvironment());
@@ -194,7 +196,8 @@ public class TimeoutTest extends SolverBasedTest0 {
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   // This test re-uses provers that already existed before the shutdown.
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentProverUsageBv() throws InterruptedException {
+  public void testContextInterruptWithSubsequentProverUsageBv()
+      throws InterruptedException, SolverException {
     requireBitvectors();
     assume()
         .withMessage("Boolector does not support multiple provers")
@@ -220,7 +223,8 @@ public class TimeoutTest extends SolverBasedTest0 {
   // Test shutdown of context-wide shutdown manager. No prover should be usable afterward!
   // This test re-uses provers that already existed before the shutdown.
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testContextInterruptWithSubsequentProverUsageInt() throws InterruptedException {
+  public void testContextInterruptWithSubsequentProverUsageInt()
+      throws InterruptedException, SolverException {
     requireIntegers();
 
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
@@ -244,7 +248,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   // based shutdown notifiers that have not been triggered.
   @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testContextInterruptWithSubsequentProverWithNotifierUsageBv()
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     requireBitvectors();
     assume()
         .withMessage("Boolector does not support multiple provers")
@@ -283,7 +287,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   // based shutdown notifiers that have not been triggered.
   @Test(timeout = TIMEOUT_MILLISECONDS)
   public void testContextInterruptWithSubsequentProverWithNotifierUsageInt()
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     requireIntegers();
     requireIsolatedProverShutdown();
 
@@ -478,14 +482,14 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testInterpolationProverTimeout() throws InterruptedException {
+  public void testInterpolationProverTimeout() throws InterruptedException, SolverException {
     requireInterpolation();
     requireIntegers();
     testBasicContextTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testOptimizationProverTimeout() throws InterruptedException {
+  public void testOptimizationProverTimeout() throws InterruptedException, SolverException {
     requireOptimization();
     requireIntegers();
     testBasicContextTimeoutInt(() -> context.newOptimizationProverEnvironment());
@@ -493,14 +497,14 @@ public class TimeoutTest extends SolverBasedTest0 {
 
   /** Shuts down the shutdown manager of the context. */
   private void testBasicContextTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     testBasicContextBasedTimeout(proverConstructor, gen.generate(200));
   }
 
   /** Shuts down the shutdown manager of the context. */
   private void testBasicContextTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     testBasicContextBasedTimeout(proverConstructor, gen.generate(200));
   }
@@ -510,7 +514,7 @@ public class TimeoutTest extends SolverBasedTest0 {
    */
   private void testBasicProverTimeoutInt(
       Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     testBasicProverBasedTimeout(proverConstructor, gen.generate(200), managerToInterrupt);
   }
@@ -520,7 +524,7 @@ public class TimeoutTest extends SolverBasedTest0 {
    */
   private void testBasicProverTimeoutBv(
       Supplier<BasicProverEnvironment<?>> proverConstructor, ShutdownManager managerToInterrupt)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     testBasicProverBasedTimeout(proverConstructor, gen.generate(200), managerToInterrupt);
   }
@@ -550,7 +554,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   private void testBasicContextBasedTimeout(
       Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     Thread t =
         new Thread(
             () -> {
@@ -573,7 +577,7 @@ public class TimeoutTest extends SolverBasedTest0 {
       Supplier<BasicProverEnvironment<?>> proverConstructor,
       BooleanFormula instance,
       ShutdownManager managerToInterrupt)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
 
     try (BasicProverEnvironment<?> pe = proverConstructor.get()) {
       Thread t =

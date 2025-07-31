@@ -81,7 +81,7 @@ public class InterpolatingProverWithAssumptionsWrapper<T>
   }
 
   @Override
-  protected void clearAssumptions() {
+  protected void clearAssumptions() throws InterruptedException {
     super.clearAssumptions();
     solverAssumptionsFromPush.clear();
   }

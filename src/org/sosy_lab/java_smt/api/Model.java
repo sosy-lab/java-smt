@@ -49,14 +49,27 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       within a quantified context, some value assignments can be missing in the iteration.
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
+   *
+   * <p>Warning: This method may throw the checked exceptions SolverException (in case of solver
+   * failures) and InterruptedException (in case of shutdown requests) although these exceptions are
+   * not declared with throws.
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
-    return asList().iterator();
+    try {
+      return asList().iterator();
+    } catch (SolverException | InterruptedException ex) {
+      throw sneakyThrow(ex);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   /** Build a list of assignments that stays valid after closing the model. */
-  ImmutableList<ValueAssignment> asList();
+  ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException;
 
   /**
    * Pretty-printing of the model values.
@@ -85,8 +98,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the application of the UF with arguments.
      *
-     * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
-     * {@link #value} during a model evaluation, but we provide assignments like <code>
+     * <p>For arrays, we use the selection-statement with an index. We do not support Array theory
+     * as {@link #value} during a model evaluation, but we provide assignments like <code>
      * select(arr, 12) := 34</code> where <code>arr</code> itself is a plain symbol (without an
      * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
@@ -107,8 +120,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the arguments.
      *
-     * <p>For arrays we use the index of a selection or an empty list for wildcard-selection, if the
-     * whole array is filled with a constant value. In the latter case any additionally given
+     * <p>For arrays, we use the index of a selection or an empty list for wildcard-selection, if
+     * the whole array is filled with a constant value. In the latter case any additionally given
      * array-assignment overrides the wildcard-selection for the given index. Example: "arr=0,
      * arr[2]=3" corresponds to an array {0,0,3,0,...}.
      */
@@ -120,7 +133,7 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      * <p>For UFs we use their name without parameters. Parameters are given as {@link
      * #argumentsInterpretation}.
      *
-     * <p>For arrays we use the name without any index. The index is given as {@link
+     * <p>For arrays, we use the name without any index. The index is given as {@link
      * #argumentsInterpretation}, if required.
      */
     private final String name;

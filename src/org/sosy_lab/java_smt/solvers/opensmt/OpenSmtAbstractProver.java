@@ -65,7 +65,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
   }
 
-  protected static SMTConfig getConfigInstance(
+  static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));

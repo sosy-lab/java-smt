@@ -27,7 +27,7 @@ public class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  private PrincessIntegerFormulaManager ifmgr;
+  private final PrincessIntegerFormulaManager ifmgr;
 
   PrincessRationalFormulaManager(
       PrincessFormulaCreator pCreator,
