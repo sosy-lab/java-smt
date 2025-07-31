@@ -91,7 +91,7 @@ public class BasicProverWithAssumptionsWrapper<T, P extends BasicProverEnvironme
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return delegate.getUnsatCore();
   }
 

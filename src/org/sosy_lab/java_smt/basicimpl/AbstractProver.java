@@ -45,10 +45,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   private static final String STACK_CHANGED_HELP =
       "Computation failed. The prover state has changed since the last call to isUnsat().";
 
-  // Used as prefix concatenated with the reason in the IllegalStateException
-  private static final String SHUTDOWN_EXCEPTION_PREFIX =
-      "Prover is not usable due to interrupt with message: ";
-
   private final boolean generateModels;
   private final boolean generateAllSat;
   private final boolean generateUnsatCores;
@@ -103,12 +99,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return contextShutdownNotifier.shouldShutdown();
   }
 
-  public void checkShutdownState() {
-    if (shouldShutdown()) {
-      throw new IllegalStateException(getShutdownReason());
-    }
-  }
-
   protected boolean isGenerateUnsatCores() {
     return generateUnsatCores;
   }
@@ -140,18 +130,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected void setLastSatCheckUnsat() {
     wasLastSatCheckSat = false;
-  }
-
-  /**
-   * Only to be called when at least one of the shutdown notifiers is supposed to be shutting down!
-   * Throws an Exception if no shutdown is requested!
-   */
-  protected final String getShutdownReason() {
-    if (proverShutdownNotifier != null && proverShutdownNotifier.shouldShutdown()) {
-      return SHUTDOWN_EXCEPTION_PREFIX + proverShutdownNotifier.getReason();
-    }
-
-    return SHUTDOWN_EXCEPTION_PREFIX + contextShutdownNotifier.getReason();
   }
 
   protected final void checkGenerateModels() {
@@ -196,9 +174,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     checkState(!closed);
-    checkShutdownState();
+    shutdownIfNecessary();
     checkState(!wasLastSatCheckSat, NO_UNSAT_CORE_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateUnsatCores();
@@ -234,7 +212,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final Model getModel() throws SolverException, InterruptedException {
     checkState(!closed);
-    checkShutdownState();
+    shutdownIfNecessary();
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateModels();
@@ -246,7 +224,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   @Override
   public final Evaluator getEvaluator() throws SolverException, InterruptedException {
     checkState(!closed);
-    checkShutdownState();
+    shutdownIfNecessary();
     checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkGenerateModels();
@@ -355,7 +333,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public ImmutableList<Model.ValueAssignment> getModelAssignments()
       throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
-    checkShutdownState();
+    shutdownIfNecessary();
     Preconditions.checkState(!stackChangedSinceLastQuery, STACK_CHANGED_HELP);
     checkState(wasLastSatCheckSat);
     try (Model model = getModel()) {

@@ -103,7 +103,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     List<BooleanFormula> unsatCore = wrapped.getUnsatCore();
     logger.log(Level.FINE, "unsat-core", unsatCore);
     return unsatCore;

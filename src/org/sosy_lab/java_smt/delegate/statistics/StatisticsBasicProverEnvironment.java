@@ -96,7 +96,7 @@ class StatisticsBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     stats.unsatCore.getAndIncrement();
     return delegate.getUnsatCore();
   }

@@ -116,7 +116,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
    * returned <code>false</code>.
    */
-  List<BooleanFormula> getUnsatCore();
+  List<BooleanFormula> getUnsatCore() throws InterruptedException;
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen

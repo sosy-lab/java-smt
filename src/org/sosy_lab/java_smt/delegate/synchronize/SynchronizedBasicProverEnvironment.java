@@ -92,7 +92,7 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     synchronized (sync) {
       return delegate.getUnsatCore();
     }

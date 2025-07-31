@@ -106,7 +106,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return translate(delegate.getUnsatCore(), otherManager, manager);
   }
 

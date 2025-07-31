@@ -88,7 +88,7 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     debugging.assertThreadLocal();
     return delegate.getUnsatCore();
   }
