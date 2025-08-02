@@ -57,6 +57,12 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "Algorithm for LRA interpolation")
     LA algLra = LA.STRONG;
 
+    /**
+     * This option controls the level of simplification applied to interpolants.
+     *
+     * <p>For details, please see the original sources:
+     * https://github.com/usi-verification-and-security/opensmt/blob/7cef5bc983d7774874ffc177f06516c4e0f411f4/src/proof/InterpolationContext.cc#L933-L960
+     */
     @IntegerOption(min = 0, max = 4)
     @Option(
         secure = true,
