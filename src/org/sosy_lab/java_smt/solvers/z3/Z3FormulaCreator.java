@@ -177,31 +177,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     throw new SolverException("Z3 has thrown an exception", e);
   }
 
-  /**
-   * This method handles a Z3Exception, however it only throws a RuntimeException. This method is
-   * used in places where we cannot throw a checked exception in JavaSMT due to API restrictions.
-   *
-   * @param e the Z3Exception to handle
-   * @return nothing, always throw a RuntimeException
-   * @throws RuntimeException always thrown for the given Z3Exception
-   */
-  final RuntimeException handleZ3ExceptionAsRuntimeException(
-      Z3Exception e, ShutdownNotifier pAdditionalShutdownNotifier) {
-    try {
-      throw handleZ3Exception(e, pAdditionalShutdownNotifier);
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      throw sneakyThrow(e);
-    } catch (SolverException ex) {
-      throw sneakyThrow(e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
-    throw (E) e;
-  }
-
   @Override
   public Long makeVariable(Long type, String varName) {
     long z3context = getEnv();
