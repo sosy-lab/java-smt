@@ -36,14 +36,14 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
 
   private final Z3FormulaCreator z3creator;
 
-  private final @Nullable ShutdownNotifier proverShutdownNotifier;
+  private final ShutdownNotifier proverShutdownNotifier;
 
   Z3Model(
       AbstractProver<?> pProver,
       long z3context,
       long z3model,
       Z3FormulaCreator pCreator,
-      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+      ShutdownNotifier pProverShutdownNotifier) {
     super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;

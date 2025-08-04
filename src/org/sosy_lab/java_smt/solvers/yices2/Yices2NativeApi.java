@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.yices2;
 
 import java.util.function.Supplier;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
@@ -661,7 +660,7 @@ public final class Yices2NativeApi {
       long ctx,
       long params,
       ShutdownNotifier contextShutdownNotifier,
-      @Nullable ShutdownNotifier proverShutdownNotifier)
+      ShutdownNotifier proverShutdownNotifier)
       throws IllegalStateException, InterruptedException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context(ctx, params),
@@ -679,7 +678,7 @@ public final class Yices2NativeApi {
       int size,
       int[] assumptions,
       ShutdownNotifier contextShutdownNotifier,
-      @Nullable ShutdownNotifier proverShutdownNotifier)
+      ShutdownNotifier proverShutdownNotifier)
       throws InterruptedException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context_with_assumptions(ctx, params, size, assumptions),
@@ -693,7 +692,7 @@ public final class Yices2NativeApi {
       Supplier<Integer> satCheck,
       long pCtx,
       ShutdownNotifier contextShutdownNotifier,
-      @Nullable ShutdownNotifier proverShutdownNotifier)
+      ShutdownNotifier proverShutdownNotifier)
       throws InterruptedException {
     int result;
     try (ShutdownHook hook =

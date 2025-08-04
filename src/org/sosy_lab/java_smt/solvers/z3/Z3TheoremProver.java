@@ -50,9 +50,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
     pContextShutdownNotifier.register(interruptListener);
-    if (pProverShutdownNotifier != null) {
-      pProverShutdownNotifier.register(interruptListener);
-    }
+    proverShutdownNotifier.register(interruptListener);
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);

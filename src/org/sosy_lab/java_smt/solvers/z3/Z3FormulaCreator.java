@@ -168,13 +168,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    */
   @CanIgnoreReturnValue
   final SolverException handleZ3Exception(
-      Z3Exception e, @Nullable ShutdownNotifier pAdditionalShutdownNotifier)
+      Z3Exception e, ShutdownNotifier pAdditionalShutdownNotifier)
       throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
       contextShutdownNotifier.shutdownIfNecessary();
-      if (pAdditionalShutdownNotifier != null) {
-        pAdditionalShutdownNotifier.shutdownIfNecessary();
-      }
+      pAdditionalShutdownNotifier.shutdownIfNecessary();
     }
     throw new SolverException("Z3 has thrown an exception", e);
   }
@@ -188,7 +186,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
    * @throws RuntimeException always thrown for the given Z3Exception
    */
   final RuntimeException handleZ3ExceptionAsRuntimeException(
-      Z3Exception e, @Nullable ShutdownNotifier pAdditionalShutdownNotifier) {
+      Z3Exception e, ShutdownNotifier pAdditionalShutdownNotifier) {
     try {
       throw handleZ3Exception(e, pAdditionalShutdownNotifier);
     } catch (InterruptedException ex) {
