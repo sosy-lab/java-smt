@@ -23,8 +23,9 @@ class SmtInterpolTheoremProver extends SmtInterpolAbstractProver<Void>
       SmtInterpolFormulaManager pMgr,
       Script pEnv,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, pEnv, options, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pMgr, pEnv, options, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override

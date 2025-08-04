@@ -22,6 +22,7 @@ import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.io.IO;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -37,10 +38,11 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
       SmtInterpolFormulaManager pMgr,
       Script pScript,
       Set<ProverOptions> pOptions,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Map<String, Object> pGlobalOptions,
       Path pLogfile) {
-    super(pMgr, pScript, pOptions, pShutdownNotifier);
+    super(pMgr, pScript, pOptions, pContextShutdownNotifier, pProverShutdownNotifier);
     try {
       out = initializeLoggerForInterpolation(pGlobalOptions, pLogfile);
     } catch (IOException e) {
@@ -77,7 +79,7 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     out.println("(get-unsat-core)");
     return super.getUnsatCore();
   }
@@ -90,9 +92,9 @@ class LoggingSmtInterpolInterpolatingProver extends SmtInterpolInterpolatingProv
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
+  protected boolean isUnsatImpl() throws InterruptedException {
     out.print("(check-sat)");
-    boolean isUnsat = super.isUnsat();
+    boolean isUnsat = super.isUnsatImpl();
     out.println(" ; " + (isUnsat ? "UNSAT" : "SAT"));
     return isUnsat;
   }

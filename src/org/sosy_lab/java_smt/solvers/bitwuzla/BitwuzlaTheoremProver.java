@@ -34,11 +34,14 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Terminator;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements ProverEnvironment {
+
+  // Bitwuzlas termination is fully reusable. Even the terminated stack can be re-used. Confirmed
+  // by Mathias Preiner.
   private final Terminator terminator =
       new Terminator() {
         @Override
         public boolean terminate() {
-          return shutdownNotifier.shouldShutdown(); // shutdownNotifer is defined in the superclass
+          return shouldShutdown();
         }
       };
   private final Bitwuzla env;
@@ -47,15 +50,19 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaManager manager;
 
   private final BitwuzlaFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions,
       Options pSolverOptions) {
-    super(pOptions, pManager.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pManager.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     manager = pManager;
     creator = pCreator;
 
@@ -92,7 +99,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     Term formula = creator.extractInfo(constraint);
     env.assert_formula(formula);
     for (Term t : creator.getConstraintsForTerm(formula)) {
@@ -115,11 +122,11 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
     if (resultValue == Result.SAT) {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
-    } else if (resultValue == Result.UNKNOWN && shutdownNotifier.shouldShutdown()) {
+    } else if (resultValue == Result.UNKNOWN && shouldShutdown()) {
       throw new InterruptedException();
     } else {
       throw new SolverException("Bitwuzla returned UNKNOWN.");
@@ -128,9 +135,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    Preconditions.checkState(!isClosed());
+    setLastSatCheckUnsat();
     final Result result = env.check_sat();
     return readSATResult(result);
   }
@@ -142,11 +149,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * @param assumptions A list of literals.
    */
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
-
     Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
       Term term = creator.extractInfo(formula);
@@ -169,9 +173,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+  protected Model getModelImpl() throws SolverException {
+    Preconditions.checkState(wasLastSatCheckSat(), NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(
         registerEvaluator(
@@ -195,10 +198,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    * returned <code>false</code>.
    */
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
-    Preconditions.checkState(!wasLastSatCheckSat);
+  protected List<BooleanFormula> getUnsatCoreImpl() {
+    Preconditions.checkState(!wasLastSatCheckSat());
     return getUnsatCore0();
   }
 
@@ -211,12 +212,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    *     assumptions which is unsatisfiable with the original constraints otherwise.
    */
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    Preconditions.checkNotNull(assumptions);
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores(); // FIXME: JavaDoc say ProverOptions.GENERATE_UNSAT_CORE is not needed
-    Preconditions.checkState(!wasLastSatCheckSat);
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }
@@ -228,8 +225,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   public void close() {
-    if (!closed) {
-      closed = true;
+    if (!isClosed()) {
       env.delete();
     }
     super.close();
@@ -246,7 +242,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
-  public boolean isClosed() {
-    return closed;
+  @Override
+  protected boolean isClosed() {
+    return super.isClosed();
   }
 }

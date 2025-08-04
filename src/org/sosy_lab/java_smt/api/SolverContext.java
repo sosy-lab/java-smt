@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import com.google.common.collect.ImmutableMap;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
@@ -66,15 +67,57 @@ public interface SolverContext extends AutoCloseable {
   ProverEnvironment newProverEnvironment(ProverOptions... options);
 
   /**
-   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
-   * and allows generating and retrieve interpolants for unsatisfiable formulas. If the SMT solver
-   * is able to handle satisfiability tests with assumptions please consider implementing the {@link
-   * InterpolatingProverEnvironment} interface, and return an Object of this type here.
+   * Create a fresh new {@link ProverEnvironment} which encapsulates an assertion stack and can be
+   * used to check formulas for unsatisfiability. The returned prover instance can be shut down
+   * using the given {@link ShutdownNotifier}. Solvers that don't support isolated prover shutdown
+   * throw a {@link UnsupportedOperationException} for this method and {@link
+   * #newProverEnvironment(ProverOptions...)} should be used instead.
    *
+   * @param pProverShutdownNotifier a {@link ShutdownNotifier} that can be used to stop the prover
+   *     returned by this method. The prover is not usable anymore after a shutdown has been
+   *     requested. The context is uneffected by prover shutdown, and can be used to create new
+   *     provers. Note that as for all provers, the prover returned by this method can also be shut
+   *     down by a shutdown of the whole context using the {@link ShutdownNotifier} that was given
+   *     when creating the context.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  ProverEnvironment newProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
+   * and allows generating and retrieve interpolants for unsatisfiable formulas.
+   *
+   * @implNote If the SMT solver is able to handle satisfiability tests with assumptions please
+   *     consider implementing the {@link InterpolatingProverEnvironment} interface, and return an
+   *     Object of this type here.
    * @param options Options specified for the prover environment. All the options specified in
    *     {@link ProverOptions} are turned off by default.
    */
   InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
+   * and allows generating and retrieve interpolants for unsatisfiable formulas. The returned prover
+   * instance can be shut down using the given {@link ShutdownNotifier}. Solvers that don't support
+   * isolated prover shutdown throw a {@link UnsupportedOperationException} for this method and
+   * {@link #newProverEnvironment(ProverOptions...)} should be used instead.
+   *
+   * @implNote If the SMT solver is able to handle satisfiability tests with assumptions please
+   *     consider implementing the {@link InterpolatingProverEnvironment} interface, and return an
+   *     Object of this type here.
+   * @param pProverShutdownNotifier a {@link ShutdownNotifier} that can be used to stop the prover
+   *     returned by this method. The prover is not usable anymore after a shutdown has been
+   *     requested. The context is uneffected by prover shutdown, and can be used to create new
+   *     provers. Note that as for all provers, the prover returned by this method can also be shut
+   *     down by a shutdown of the whole context using the {@link ShutdownNotifier} that was given
+   *     when creating the context.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
 
   /**
    * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
@@ -84,6 +127,25 @@ public interface SolverContext extends AutoCloseable {
    *     {@link ProverOptions} are turned off by default.
    */
   OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options);
+
+  /**
+   * Create a fresh new {@link OptimizationProverEnvironment} which encapsulates an assertion stack
+   * and allows solving optimization queries. The returned prover instance can be shut down using
+   * the given {@link ShutdownNotifier}. Solvers that don't support isolated prover shutdown throw a
+   * {@link UnsupportedOperationException} for this method and {@link
+   * #newProverEnvironment(ProverOptions...)} should be used instead.
+   *
+   * @param pProverShutdownNotifier a {@link ShutdownNotifier} that can be used to stop the prover
+   *     returned by this method. The prover is not usable anymore after a shutdown has been
+   *     requested. The context is uneffected by prover shutdown, and can be used to create new
+   *     provers. Note that as for all provers, the prover returned by this method can also be shut
+   *     down by a shutdown of the whole context using the {@link ShutdownNotifier} that was given
+   *     when creating the context.
+   * @param options Options specified for the prover environment. All the options specified in
+   *     {@link ProverOptions} are turned off by default.
+   */
+  OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options);
 
   /**
    * Get version information out of the solver.

@@ -54,7 +54,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             .setOption("solver.solver", solverToUse().toString())
             .setOption("solver.useDebugMode", String.valueOf(true))
             .build();
-    debugFactory = new SolverContextFactory(debugConfig, logger, shutdownNotifierToUse());
+    debugFactory = new SolverContextFactory(debugConfig, logger, contextShutdownNotifierToUse());
     debugContext = debugFactory.generateContext();
 
     FormulaManager debugMgr = debugContext.getFormulaManager();

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
+import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -49,6 +50,15 @@ public class DebuggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    debugging.assertThreadLocal();
+    return new DebuggingProverEnvironment(
+        delegate.newProverEnvironment(pProverShutdownNotifier, options), debugging);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
     debugging.assertThreadLocal();
@@ -58,10 +68,29 @@ public class DebuggingSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    debugging.assertThreadLocal();
+    return new DebuggingInterpolatingProverEnvironment<>(
+        delegate.newProverEnvironmentWithInterpolation(pProverShutdownNotifier, options),
+        debugging);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... options) {
     debugging.assertThreadLocal();
     return new DebuggingOptimizationProverEnvironment(
         delegate.newOptimizationProverEnvironment(options), debugging);
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... options) {
+    debugging.assertThreadLocal();
+    return new DebuggingOptimizationProverEnvironment(
+        delegate.newOptimizationProverEnvironment(pProverShutdownNotifier, options), debugging);
   }
 
   @Override

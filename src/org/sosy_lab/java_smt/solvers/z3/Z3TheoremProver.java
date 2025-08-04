@@ -29,6 +29,9 @@ import org.sosy_lab.java_smt.api.UserPropagator;
 class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   private final long z3solver;
+
+  // Z3 interruption via solverInterrupt() is re-usable, but might provide partial results if it
+  // is stopping UnsatCore generation for example.
   private final ShutdownRequestListener interruptListener;
 
   private @Nullable Z3UserPropagator propagator = null;
@@ -39,13 +42,15 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(creator, pMgr, pOptions, pLogfile, pContextShutdownNotifier, pProverShutdownNotifier);
     z3solver = Native.mkSolver(z3context);
     Native.solverIncRef(z3context, z3solver);
 
     interruptListener = reason -> Native.solverInterrupt(z3context, z3solver);
-    shutdownNotifier.register(interruptListener);
+    pContextShutdownNotifier.register(interruptListener);
+    proverShutdownNotifier.register(interruptListener);
 
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
@@ -57,12 +62,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected void pushImpl() {
+  protected void pushImpl() throws SolverException, InterruptedException {
     push0();
     try {
       Native.solverPush(z3context, z3solver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception, proverShutdownNotifier);
     }
   }
 
@@ -83,24 +88,22 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    Preconditions.checkState(!isClosed());
     logSolverStack();
     int result;
     try {
       result = Native.solverCheck(z3context, z3solver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-
     int result;
     try {
       result =
@@ -110,7 +113,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
               assumptions.size(),
               assumptions.stream().mapToLong(creator::extractInfo).toArray());
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
     undefinedStatusToException(result);
     return result == Z3_lbool.Z3_L_FALSE.toInt();
@@ -119,7 +122,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   private void undefinedStatusToException(int solverStatus)
       throws SolverException, InterruptedException {
     if (solverStatus == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       final String reason = Native.solverGetReasonUnknown(z3context, z3solver);
       switch (reason) {
         case "canceled": // see Z3: src/tactic/tactic.cpp
@@ -138,17 +141,17 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected long getZ3Model() {
+  protected long getZ3Model() throws SolverException, InterruptedException {
     try {
       return Native.solverGetModel(z3context, z3solver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3ExceptionAsRuntimeException(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
   }
 
   @Override
   public int size() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkState(
         Native.solverGetNumScopes(z3context, z3solver) == super.size(),
         "prover-size %s does not match stack-size %s",
@@ -164,7 +167,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public boolean registerUserPropagator(UserPropagator prop) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     if (propagator != null) {
       propagator.close();
     }
@@ -175,13 +178,13 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
 
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.solverToString(z3context, z3solver);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Preconditions.checkArgument(
           Native.solverGetNumScopes(z3context, z3solver) >= 0,
           "a negative number of scopes is not allowed");
@@ -192,7 +195,8 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
         propagator.close();
         propagator = null;
       }
-      shutdownNotifier.unregister(interruptListener);
+      contextShutdownNotifier.unregister(interruptListener);
+      proverShutdownNotifier.unregister(interruptListener);
     }
     super.close();
   }
