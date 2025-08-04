@@ -401,6 +401,22 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
+  // There seems to be no equivalent singular axiom in RESOLUTE for the encoding of the
+  // Z3_MONOTONICITY Proof Rule:
+  // " Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
+  //
+  //          T1: (R t_1 s_1)
+  //          ...
+  //          Tn: (R t_n s_n)
+  //          [monotonicity T1 ... Tn]: (R (f t_1 ... t_n) (f s_1 ... s_n))
+  //
+  //     Remark: if t_i == s_i, then the antecedent Ti is suppressed.
+  //     That is, reflexivity proofs are suppressed to save space."
+  //     from: https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h
+  // Possible strategy: use the oracle proof rule from RESOLUTE. Possibility: introduce the
+  // oracle_(rule) proof rule, e.g.: oracle_Z3_monotonicity to be able to introduce the rule as a
+  // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
+  // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
   Proof handleMonotonicity(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
