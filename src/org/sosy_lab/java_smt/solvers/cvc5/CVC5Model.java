@@ -206,4 +206,12 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   public ImmutableList<ValueAssignment> asList() {
     return model;
   }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Term f) {
+    Preconditions.checkState(!isClosed());
+    Term evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
+  }
 }

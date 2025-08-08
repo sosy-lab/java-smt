@@ -235,4 +235,12 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     return bitwuzlaEnv.get_value(formula);
   }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Term f) {
+    Preconditions.checkState(!isClosed());
+    Term evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
+  }
 }
