@@ -150,7 +150,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public CVC5Model getModel() throws SolverException, InterruptedException {
+  public CVC5Model getModel() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
@@ -185,11 +185,15 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments()
-      throws SolverException, InterruptedException {
+  public ImmutableList<ValueAssignment> getModelAssignments() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
+    try {
+      return super.getModelAssignments();
+    } catch (SolverException | InterruptedException e) {
+      // These can not be thrown in OpenSMT2 model, so we can safely ignore this
+      throw new AssertionError(e);
+    }
   }
 
   @Override
