@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
@@ -35,8 +34,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
       CVC4TheoremProver pProver,
       CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
-      Collection<Expr> pAssertedExpressions)
-      throws SolverException, InterruptedException {
+      Collection<Expr> pAssertedExpressions) {
     super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
@@ -62,8 +60,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
   }
 
-  private ImmutableList<ValueAssignment> generateModel()
-      throws SolverException, InterruptedException {
+  private ImmutableList<ValueAssignment> generateModel() {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
@@ -75,8 +72,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   }
 
   // TODO this method is highly recursive and should be rewritten with a proper visitor
-  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr)
-      throws SolverException, InterruptedException {
+  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
     if (expr.isConst() || expr.isNull()) {
       // We don't care about consts.
       return;
@@ -99,8 +95,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     }
   }
 
-  private ValueAssignment getAssignment(Expr pKeyTerm)
-      throws SolverException, InterruptedException {
+  private ValueAssignment getAssignment(Expr pKeyTerm) {
     List<Object> argumentInterpretation = new ArrayList<>();
     for (Expr param : pKeyTerm) {
       argumentInterpretation.add(evaluateImpl(param));
@@ -123,5 +118,13 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   @Override
   public ImmutableList<ValueAssignment> asList() {
     return model;
+  }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Expr f) {
+    Preconditions.checkState(!isClosed());
+    Expr evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
   }
 }
