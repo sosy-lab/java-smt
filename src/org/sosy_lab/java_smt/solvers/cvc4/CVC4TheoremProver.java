@@ -144,7 +144,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() throws SolverException, InterruptedException {
+  public CVC4Model getModel() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
@@ -187,7 +187,12 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
+    try {
+      return super.getModelAssignments();
+    } catch (SolverException | InterruptedException e) {
+      // These can not be thrown in OpenSMT2 model, so we can safely ignore this
+      throw new AssertionError(e);
+    }
   }
 
   @Override
