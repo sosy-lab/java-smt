@@ -150,7 +150,12 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
+    try {
+      return super.getModelAssignments();
+    } catch (SolverException | InterruptedException e) {
+      // These can not be thrown in OpenSMT2 model, so we can safely ignore this
+      throw new AssertionError(e);
+    }
   }
 
   /**
