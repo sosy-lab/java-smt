@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -22,7 +23,6 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -45,7 +45,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException {
+  public ImmutableList<ValueAssignment> asList() {
 
     Set<FunctionSymbol> usedSymbols = new LinkedHashSet<>();
     for (Term assertedTerm : assertedTerms) {
@@ -96,8 +96,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
    * @param upperIndices indices for multi-dimensional arrays
    */
   private Collection<ValueAssignment> getArrayAssignment(
-      String symbol, Term key, Term array, List<Object> upperIndices)
-      throws SolverException, InterruptedException {
+      String symbol, Term key, Term array, List<Object> upperIndices) {
     assert array.getSort().isArraySort();
     Collection<ValueAssignment> assignments = new ArrayList<>();
     Term evaluation = model.evaluate(array);
@@ -139,8 +138,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   }
 
   /** Get all modeled assignments for the UF. */
-  private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol)
-      throws SolverException, InterruptedException {
+  private Collection<ValueAssignment> getUFAssignments(FunctionSymbol symbol) {
     final Collection<ValueAssignment> assignments = new ArrayList<>();
     final String name = unescape(symbol.getApplicationString());
 
@@ -159,8 +157,7 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
     return assignments;
   }
 
-  private ValueAssignment getAssignment(String key, ApplicationTerm term)
-      throws SolverException, InterruptedException {
+  private ValueAssignment getAssignment(String key, ApplicationTerm term) {
     Term value = model.evaluate(term);
     List<Object> argumentInterpretation = new ArrayList<>();
     for (Term param : term.getParameters()) {
@@ -187,5 +184,13 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   @Override
   protected Term evalImpl(Term formula) {
     return model.evaluate(formula);
+  }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Term f) {
+    Preconditions.checkState(!isClosed());
+    Term evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
   }
 }
