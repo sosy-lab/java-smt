@@ -126,7 +126,7 @@ public abstract class AbstractEvaluator<TFormulaInfo, TType, TEnv> implements Ev
    * into a Java object as far as possible, i.e., try to match a primitive or simple type.
    */
   @Nullable
-  protected final Object evaluateImpl(TFormulaInfo f) throws SolverException, InterruptedException {
+  protected Object evaluateImpl(TFormulaInfo f) throws SolverException, InterruptedException {
     Preconditions.checkState(!isClosed());
     TFormulaInfo evaluatedF = evalImpl(f);
     return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
