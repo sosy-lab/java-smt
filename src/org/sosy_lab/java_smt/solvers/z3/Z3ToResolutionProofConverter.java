@@ -371,32 +371,44 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return transResNode;
   }
 
+  // RESOLUTE has the transitivity axiom which we are using to create the transitivity leaf and
+  // encode the transitivity star rule from Z3. The original proven formulas from the premises for
+  // the Z3 proof are then used to perform resolution iteratively on the transitivity clause for the
+  // resolution proof. The resulting node has the same formula as the initial node from Z3 but also
+  // includes the pivot used in the last resolution step.
   Proof handleTransitivityStar(Z3Proof node) {
-    BooleanFormula resPivot = null;
-    Collection<BooleanFormula> formulas = new ArrayList<>();
-    List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
+    Formula resPivot;
+    List<BooleanFormula> formulas = new ArrayList<>();
+    List<Proof> children = new ArrayList<>(node.getChildren());
     int numChildren = node.getChildren().size();
 
     for (int i = 0; i < numChildren; i++) {
       Collection<BooleanFormula> newCollection = new ArrayList<>();
-      formulas.add(
-          bfm.not((BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula()));
-      if (i == numChildren - 1) {
-        resPivot = (BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula();
-      }
+      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
     }
-
-    assert resPivot != null;
-    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
 
     formulas.add((BooleanFormula) node.getFormula());
     BooleanFormula transitivityFormula = bfm.or(formulas);
     AxiomProof sn = new AxiomProof(ResAxiom.TRANSITIVITY, transitivityFormula);
+    resPivot = children.get(numChildren - 1).getFormula();
+    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
 
-    for (int i = 0; i < formulas.size() - 2; i++) {
-      // ResolutionProofNode pn1 = new ResolutionProofNode(transitivityFormula.,
-      // formulaList.get(i))
+    Proof childNode = sn;
+    for (int i = 0; i < numChildren - 1; i++) {
+
+      resPivot = children.get(i).getFormula();
+
+      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
+
+      formulas.remove(0);
+      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
+      rp.addChild(childNode);
+      rp.addChild(children.get(i));
+      childNode = rp;
     }
+
+    resNode.addChild(childNode);
+    resNode.addChild(children.get(numChildren - 1));
 
     return resNode;
   }
@@ -418,6 +430,17 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
   // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
   Proof handleMonotonicity(Z3Proof node) {
+    BooleanFormula resPivot;
+    Collection<BooleanFormula> formulas = new ArrayList<>();
+    List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
+    int numChildren = node.getChildren().size();
+
+    for (int i = 0; i < numChildren; i++) {
+      Collection<BooleanFormula> newCollection = new ArrayList<>();
+      formulas.add(
+          bfm.not((BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula()));
+    }
+
     throw new UnsupportedOperationException();
   }
 
