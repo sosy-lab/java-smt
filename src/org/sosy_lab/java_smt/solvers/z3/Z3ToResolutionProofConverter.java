@@ -430,24 +430,61 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
   // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
   Proof handleMonotonicity(Z3Proof node) {
-    BooleanFormula resPivot;
-    Collection<BooleanFormula> formulas = new ArrayList<>();
-    List<Collection<BooleanFormula>> formulaList = new ArrayList<>();
+    Formula resPivot;
+    List<BooleanFormula> formulas = new ArrayList<>();
+    List<Proof> children = new ArrayList<>(node.getChildren());
     int numChildren = node.getChildren().size();
 
     for (int i = 0; i < numChildren; i++) {
       Collection<BooleanFormula> newCollection = new ArrayList<>();
-      formulas.add(
-          bfm.not((BooleanFormula) new ArrayList<>(node.getChildren()).get(i).getFormula()));
+      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
     }
 
-    throw new UnsupportedOperationException();
-  }
+    formulas.add((BooleanFormula) node.getFormula());
+    BooleanFormula axiomFormula = bfm.or(formulas);
+    AxiomProof sn = new AxiomProof(ResAxiom.ORACLE, axiomFormula);
+    resPivot = children.get(numChildren - 1).getFormula();
+    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
 
+    Proof childNode = sn;
+    for (int i = 0; i < numChildren - 1; i++) {
+
+      resPivot = children.get(i).getFormula();
+
+      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
+
+      formulas.remove(0);
+      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
+      rp.addChild(childNode);
+      rp.addChild(children.get(i));
+      childNode = rp;
+    }
+
+    resNode.addChild(childNode);
+    resNode.addChild(children.get(numChildren - 1));
+
+    return resNode;
+  }
+  // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+  // Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
+  //
+  //    T1: (R t_1 s_1)
+  //    ...
+  // Tn: (R t_n s_n)
+  //    [monotonicity T1 ... Tn]: (R (f t_1 ... t_n) (f s_1 ... s_n))
+  //
+  // Remark: if t_i == s_i, then the antecedent Ti is suppressed.
+  // That is, reflexivity proofs are suppressed to save space.
   Proof handleQuantIntro(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
+  // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+  // Z3_OP_PR_BIND: Given a proof p,
+  // produces a proof of lambda x . p, where x are free variables in p.
+  //
+  //     T1: f
+  //     [proof-bind T1] forall (x) f
   Proof handleBind(Z3Proof node) {
     throw new UnsupportedOperationException();
   }

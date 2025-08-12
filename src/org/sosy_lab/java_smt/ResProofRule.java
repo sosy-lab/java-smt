@@ -120,7 +120,11 @@ public final class ResProofRule {
     DT_ACYCLIC("dt_acyclic", "(~ (= (cons ... x ...) x))"),
     DT_MATCH(
         "dt_match",
-        "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))");
+        "(= (match t ((p1 x1) c1) ...) (ite ((_ is p1) t) (let (x1 (sel1 t)) c1) ...))"),
+    ORACLE("oracle",
+        "'The oracle rule can be used to introduce clauses that cannot be easily explained."
+            + " It should be used as a last resort, if a full low-level proof is too tedious, "
+            + "or if the axioms for the theory are missing'");
 
     private final String name;
     private final String formula;
