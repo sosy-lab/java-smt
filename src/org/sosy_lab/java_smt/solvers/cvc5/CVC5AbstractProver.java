@@ -8,7 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.solvers.cvc5.CVC5Proof.generateProofImpl;
+
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -37,6 +39,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -93,6 +96,9 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       pSolver.setOption("produce-unsat-cores", "true");
     }
+    if (pOptions.contains(ProverOptions.GENERATE_PROOFS)) {
+      pSolver.setOption("produce-proofs", "true");
+    }
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");
 
@@ -137,7 +143,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
@@ -151,8 +157,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   public CVC5Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!closed);
+    checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
@@ -166,7 +172,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -186,15 +192,15 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!closed);
+    checkState(!changedSinceLastSatQuery);
     return super.getModelAssignments();
   }
 
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
@@ -221,9 +227,9 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));
@@ -241,6 +247,25 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Proof getProof() throws SolverException, InterruptedException {
+    checkGenerateProofs();
+    checkState(!closed);
+    checkState(isUnsat());
+
+    io.github.cvc5.Proof[] proofs = solver.getProof();
+    if (proofs == null || proofs.length == 0) {
+      throw new IllegalStateException("No proof available");
+    }
+
+    // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
+    try {
+      return generateProofImpl(proofs[0], creator);
+    } catch (CVC5ApiException e) {
+      throw new SolverException("There was a problem generating proof", e);
+    }
   }
 
   @Override
