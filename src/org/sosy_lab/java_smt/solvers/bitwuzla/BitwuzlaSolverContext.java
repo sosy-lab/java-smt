@@ -172,7 +172,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     BitwuzlaQuantifiedFormulaManager quantifierTheory =
         new BitwuzlaQuantifiedFormulaManager(creator);
     BitwuzlaFloatingPointManager floatingPointTheory =
-        new BitwuzlaFloatingPointManager(creator, pFloatingPointRoundingMode);
+        new BitwuzlaFloatingPointManager(creator, pFloatingPointRoundingMode, bitvectorTheory);
     BitwuzlaArrayFormulaManager arrayTheory = new BitwuzlaArrayFormulaManager(creator);
     BitwuzlaFormulaManager manager =
         new BitwuzlaFormulaManager(
