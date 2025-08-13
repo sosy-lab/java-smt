@@ -61,8 +61,10 @@ class Mathsat5FloatingPointFormulaManager
   private final long roundingMode;
 
   Mathsat5FloatingPointFormulaManager(
-      Mathsat5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      Mathsat5FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Mathsat5BitvectorFormulaManager pBvFormulaManager) {
+    super(pCreator, pBvFormulaManager);
 
     mathsatEnv = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
@@ -221,6 +223,16 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     return Mathsat5NativeApi.msat_make_fp_as_ieeebv(mathsatEnv, pNumber);
+  }
+
+  @Override
+  protected int getMantissaSizeImpl(Long f) {
+    throw new UnsupportedOperationException("implement me");
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Long f) {
+    throw new UnsupportedOperationException("implement me");
   }
 
   @Override

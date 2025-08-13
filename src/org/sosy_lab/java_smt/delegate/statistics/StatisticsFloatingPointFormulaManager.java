@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManager {
 
@@ -164,6 +165,13 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
     stats.fpOperations.getAndIncrement();
     return delegate.toIeeeBitvector(pNumber);
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.toIeeeBitvector(number, bitvectorConstantName);
   }
 
   @Override

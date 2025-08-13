@@ -26,8 +26,10 @@ class Z3FloatingPointFormulaManager
   private final long roundingMode;
 
   Z3FloatingPointFormulaManager(
-      Z3FormulaCreator creator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(creator);
+      Z3FormulaCreator creator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Z3BitvectorFormulaManager pBvFormulaManager) {
+    super(creator, pBvFormulaManager);
     z3context = creator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -313,5 +315,15 @@ class Z3FloatingPointFormulaManager
   @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
     return Native.mkFpaRoundToIntegral(z3context, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeImpl(Long f) {
+    throw new UnsupportedOperationException("implement me");
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Long f) {
+    throw new UnsupportedOperationException("implement me");
   }
 }

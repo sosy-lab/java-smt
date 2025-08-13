@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import com.google.common.base.Preconditions;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -45,10 +45,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private final Map<FloatingPointRoundingMode, TFormulaInfo> roundingModes;
 
+  private final AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bvMgr;
+
   protected AbstractFloatingPointFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
+      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr) {
     super(pCreator);
     roundingModes = new HashMap<>();
+    bvMgr = pBvMgr;
   }
 
   protected abstract TFormulaInfo getDefaultRoundingMode();
@@ -145,7 +149,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   protected static boolean isNegativeZero(Double pN) {
-    Preconditions.checkNotNull(pN);
+    checkNotNull(pN);
     return Double.valueOf("-0.0").equals(pN);
   }
 
@@ -256,7 +260,43 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
   }
 
-  protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
+  protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
+    throw new UnsupportedOperationException(
+        "The chosen solver does not support transforming "
+            + "FloatingPointFormula to IEEE bitvectors. Try using "); // TODO: finish
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula f, String bitvectorConstantName) {
+
+    int mantissaSize = getMantissaSize(f);
+    int exponentSize = getExponentSize(f);
+    BitvectorFormula bvFormula =
+        bvMgr.makeVariable(mantissaSize + exponentSize, bitvectorConstantName);
+
+    FloatingPointFormula fromIeeeBitvector =
+        fromIeeeBitvector(
+            bvFormula, FloatingPointType.getFloatingPointType(exponentSize, mantissaSize));
+
+    // assignment() allows a value to be NaN etc.
+    // Note: All fp.to_* functions are unspecified for NaN and infinity input values!
+    BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
+
+    return BitvectorFormulaAndBooleanFormula.of(bvFormula, additionalConstraint);
+  }
+
+  protected int getMantissaSize(FloatingPointFormula f) {
+    return getMantissaSizeImpl(extractInfo(f));
+  }
+
+  protected abstract int getMantissaSizeImpl(TFormulaInfo f);
+
+  protected int getExponentSize(FloatingPointFormula f) {
+    return getExponentSizeImpl(extractInfo(f));
+  }
+
+  protected abstract int getExponentSizeImpl(TFormulaInfo f);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
@@ -518,5 +558,29 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       values[size - 1 - i] = integer.testBit(i) ? '1' : '0';
     }
     return String.copyValueOf(values);
+  }
+
+  public static class BitvectorFormulaAndBooleanFormula {
+    private final BitvectorFormula bitvectorFormula;
+    private final BooleanFormula booleanFormula;
+
+    private BitvectorFormulaAndBooleanFormula(
+        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
+      bitvectorFormula = checkNotNull(pBitvectorFormula);
+      booleanFormula = checkNotNull(pBooleanFormula);
+    }
+
+    protected static BitvectorFormulaAndBooleanFormula of(
+        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
+      return new BitvectorFormulaAndBooleanFormula(pBitvectorFormula, pBooleanFormula);
+    }
+
+    public BitvectorFormula getBitvectorFormula() {
+      return bitvectorFormula;
+    }
+
+    public BooleanFormula getBooleanFormula() {
+      return booleanFormula;
+    }
   }
 }

@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 /**
  * Floating point operations.
@@ -285,10 +286,34 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
-   * sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
+
+  /**
+   * Create a formula that produces a representation of the given floating-point value as a
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * This implementation can be used independently of {@link
+   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
+   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
+   * is not defined. In case you want to define how to handle those values, please use TODO This
+   * method is based on a suggestion in the SMTLib2 standard ( <a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
+   *
+   * <p>(declare-fun b () (_ BitVec m))
+   *
+   * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
+   * @return {@link BitvectorFormulaAndBooleanFormula} consisting of the transformed input
+   *     floating-point as a {@link BitvectorFormula} and the additional constraint as {@link
+   *     BooleanFormula}.
+   */
+  BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 

@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaManager {
 
@@ -183,6 +184,14 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   public BitvectorFormula toIeeeBitvector(FloatingPointFormula pNumber) {
     synchronized (sync) {
       return delegate.toIeeeBitvector(pNumber);
+    }
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName) {
+    synchronized (sync) {
+      return delegate.toIeeeBitvector(number, bitvectorConstantName);
     }
   }
 

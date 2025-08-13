@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 public class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
@@ -204,6 +205,17 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     BitvectorFormula result = delegate.toIeeeBitvector(number);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    BitvectorFormulaAndBooleanFormula res = delegate.toIeeeBitvector(number, bitvectorConstantName);
+    debugging.addFormulaTerm(res.getBitvectorFormula());
+    debugging.addFormulaTerm(res.getBooleanFormula());
+    return res;
   }
 
   @Override

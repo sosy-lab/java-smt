@@ -35,8 +35,10 @@ public class CVC5FloatingPointFormulaManager
   private final Term roundingMode;
 
   protected CVC5FloatingPointFormulaManager(
-      CVC5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      CVC5FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      CVC5BitvectorFormulaManager pBvFormulaManager) {
+    super(pCreator, pBvFormulaManager);
     termManager = pCreator.getEnv();
     solver = pCreator.getSolver();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
@@ -444,5 +446,15 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term round(Term pFormula, FloatingPointRoundingMode pRoundingMode) {
     return termManager.mkTerm(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeImpl(Term f) {
+    throw new UnsupportedOperationException("implement me");
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Term f) {
+    throw new UnsupportedOperationException("implement me");
   }
 }

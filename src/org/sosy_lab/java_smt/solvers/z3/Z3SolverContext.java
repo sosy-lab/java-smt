@@ -186,7 +186,7 @@ public final class Z3SolverContext extends AbstractSolverContext {
     Z3BitvectorFormulaManager bitvectorTheory =
         new Z3BitvectorFormulaManager(creator, booleanTheory);
     Z3FloatingPointFormulaManager floatingPointTheory =
-        new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
+        new Z3FloatingPointFormulaManager(creator, pFloatingPointRoundingMode, bitvectorTheory);
     Z3QuantifiedFormulaManager quantifierManager = new Z3QuantifiedFormulaManager(creator);
     Z3ArrayFormulaManager arrayManager = new Z3ArrayFormulaManager(creator);
     Z3StringFormulaManager stringTheory = new Z3StringFormulaManager(creator);
