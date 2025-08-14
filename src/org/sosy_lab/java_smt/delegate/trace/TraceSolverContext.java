@@ -10,7 +10,8 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -36,7 +37,12 @@ public class TraceSolverContext implements SolverContext {
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    return new TraceProverEnvironment(delegate.newProverEnvironment(options), logger);
+    return logger.logDef(
+        "context",
+        String.format(
+            "newProverEnvironment(%s)",
+            Joiner.on(", ").join(FluentIterable.from(options).transform(Enum::toString))),
+        () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), logger));
   }
 
   @SuppressWarnings("resource")
@@ -64,6 +70,6 @@ public class TraceSolverContext implements SolverContext {
 
   @Override
   public void close() {
-    delegate.close();
+    logger.logStmt("context", "close()", delegate::close);
   }
 }
