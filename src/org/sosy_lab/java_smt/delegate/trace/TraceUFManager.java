@@ -37,7 +37,7 @@ public class TraceUFManager implements UFManager {
             "declareUF(\"%s\", %s, ImmutableList.of(%s))",
             name,
             logger.printFormulaType(returnType),
-            Joiner.on(", ").join(FluentIterable.from(args).transform(logger::printFormulaType))),
+            FluentIterable.from(args).transform(logger::printFormulaType).join(Joiner.on(", "))),
         () -> delegate.declareUF(name, returnType, args));
   }
 
@@ -55,7 +55,7 @@ public class TraceUFManager implements UFManager {
         String.format(
             "callUF(%s, ImmutableList.of(%s))",
             logger.toVariable(funcType),
-            Joiner.on(", ").join(FluentIterable.from(args).transform(logger::toVariable))),
+            FluentIterable.from(args).transform(logger::toVariable).join(Joiner.on(", "))),
         () -> delegate.callUF(funcType, args));
   }
 
