@@ -25,13 +25,13 @@ public class TraceLogger {
   private final Map<Object, String> valueMap = new HashMap<>();
   private final List<String> trace = new ArrayList<>();
 
-  /** Returns a fresh variable */
+  /** Returns a fresh variable. */
   private String newVariable() {
     return "var" + id++;
   }
 
   /**
-   * Bind an object to a variable
+   * Bind an object to a variable.
    *
    * <p>Use {@link #toVariable(Object)} to get the variable name for a tracked object
    */
@@ -40,7 +40,7 @@ public class TraceLogger {
   }
 
   /**
-   * Returns the variable name of a tracked object
+   * Returns the variable name of a tracked object.
    *
    * <p>Use {@link #mapVariable(String, Object)} to bind an object to a variable
    */
@@ -48,48 +48,48 @@ public class TraceLogger {
     return valueMap.get(f);
   }
 
-  /** Add a definition to the log */
+  /** Add a definition to the log. */
   private void appendDef(String pVar, String pExpr) {
     trace.add(String.format("var %s = %s;", pVar, pExpr));
   }
 
-  /** Add a statement to the log */
+  /** Add a statement to the log. */
   private void appendStmt(String pStmt) {
     trace.add(String.format("%s;", pStmt));
   }
 
-  /** Log an API call with return value */
-  public <TE> TE logDef(String prefix, String method, Callable<TE> closure) {
+  /** Log an API call with return value. */
+  public <R> R logDef(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
     appendDef(var, prefix + "." + method);
     try {
-      TE f = closure.call();
+      R f = closure.call();
       mapVariable(var, f);
       return f;
 
-    } catch (Exception pE) {
-      throw new RuntimeException(pE);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
-  /** Just like {@link Runnable}, but allows checked exceptions */
+  /** Just like {@link Runnable}, but allows checked exceptions. */
   public interface CheckedRunnable {
     void run() throws Exception;
   }
 
-  /** Log an API call without return value */
+  /** Log an API call without return value. */
   public void logStmt(String prefix, String method, CheckedRunnable closure) {
     appendStmt(prefix + "." + method);
     try {
       closure.run();
-    } catch (Exception pE) {
-      throw new RuntimeException(pE);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
   }
 
   /**
    * Takes a {@link org.sosy_lab.java_smt.api.FormulaType} and returns a Java expression to
-   * construct this type
+   * construct this type.
    */
   public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
     if (pType.isIntegerType()) {
