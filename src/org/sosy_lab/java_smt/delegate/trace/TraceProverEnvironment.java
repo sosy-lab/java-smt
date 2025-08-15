@@ -62,6 +62,7 @@ public class TraceProverEnvironment implements ProverEnvironment {
     throw new UnsupportedOperationException();
   }
 
+  @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
     return logger.logDef(
