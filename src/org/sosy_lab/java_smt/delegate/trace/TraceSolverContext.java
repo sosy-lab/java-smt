@@ -24,9 +24,11 @@ public class TraceSolverContext implements SolverContext {
   private final TraceLogger logger;
 
   public TraceSolverContext(SolverContext pDelegate) {
-
     delegate = pDelegate;
-    logger = new TraceLogger();
+    // FIXME Move the files to the output folder?
+    logger =
+        new TraceLogger(
+            "trace" + Integer.toUnsignedString(System.identityHashCode(this)) + ".java");
   }
 
   @Override

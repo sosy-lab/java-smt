@@ -10,10 +10,12 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import com.google.common.base.Joiner;
-import java.util.ArrayList;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
@@ -23,7 +25,16 @@ public class TraceLogger {
   private long id = 0;
 
   private final Map<Object, String> valueMap = new HashMap<>();
-  private final List<String> trace = new ArrayList<>();
+  private final BufferedWriter output;
+
+  TraceLogger(String pFile) {
+    // FIXME Check if the file already exists
+    try {
+      output = Files.newBufferedWriter(Paths.get(pFile), Charset.defaultCharset());
+    } catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
+  }
 
   /** Returns a fresh variable. */
   private String newVariable() {
@@ -49,20 +60,22 @@ public class TraceLogger {
   }
 
   /** Add a definition to the log. */
-  private void appendDef(String pVar, String pExpr) {
-    trace.add(String.format("var %s = %s;", pVar, pExpr));
+  private void appendDef(String pVar, String pExpr) throws IOException {
+    output.append(String.format("var %s = %s;%n", pVar, pExpr));
+    output.flush();
   }
 
   /** Add a statement to the log. */
-  private void appendStmt(String pStmt) {
-    trace.add(String.format("%s;", pStmt));
+  private void appendStmt(String pStmt) throws IOException {
+    output.append(String.format("%s;%n", pStmt));
+    output.flush();
   }
 
   /** Log an API call with return value. */
   public <R> R logDef(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
-    appendDef(var, prefix + "." + method);
     try {
+      appendDef(var, prefix + "." + method);
       R f = closure.call();
       mapVariable(var, f);
       return f;
@@ -79,8 +92,8 @@ public class TraceLogger {
 
   /** Log an API call without return value. */
   public void logStmt(String prefix, String method, CheckedRunnable closure) {
-    appendStmt(prefix + "." + method);
     try {
+      appendStmt(prefix + "." + method);
       closure.run();
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -97,9 +110,5 @@ public class TraceLogger {
     }
     // FIXME Handle other cases
     throw new IllegalArgumentException("Unsupported formula type: " + pType);
-  }
-
-  public String getLog() {
-    return Joiner.on('\n').join(trace);
   }
 }
