@@ -43,7 +43,10 @@ public class TraceSolverContext implements SolverContext {
         "context",
         String.format(
             "newProverEnvironment(%s)",
-            Joiner.on(", ").join(FluentIterable.from(options).transform(Enum::toString))),
+            Joiner.on(", ")
+                .join(
+                    FluentIterable.from(options)
+                        .transform(v -> "SolverContext" + ".ProverOptions." + v.name()))),
         () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), logger));
   }
 
