@@ -75,7 +75,7 @@ public class TraceArrayFormulaManager implements ArrayFormulaManager {
   public <TI extends Formula, TE extends Formula> BooleanFormula equivalence(
       ArrayFormula<TI, TE> pArray1, ArrayFormula<TI, TE> pArray2) {
     return logger.logDef(
-        "mgr.getArrayFormulaManager",
+        "mgr.getArrayFormulaManager()",
         String.format(
             "equivalence(%s, %s)", logger.toVariable(pArray1), logger.toVariable(pArray2)),
         () -> delegate.equivalence(pArray1, pArray2));
