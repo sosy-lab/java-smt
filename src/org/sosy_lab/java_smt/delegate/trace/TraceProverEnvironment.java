@@ -64,8 +64,8 @@ public class TraceProverEnvironment implements ProverEnvironment {
 
   @Override
   public Model getModel() throws SolverException {
-    // FIXME Add tracing for the model
-    return logger.logDef(logger.toVariable(this), "getModel()", delegate::getModel);
+    return logger.logDef(
+        logger.toVariable(this), "getModel()", () -> new TraceModel(delegate.getModel(), logger));
   }
 
   @Override
