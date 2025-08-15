@@ -51,7 +51,7 @@ public class TraceSolverContext implements SolverContext {
       logger.appendDef(
           "config",
           "Configuration.builder()."
-              + FluentIterable.from(options.build().entrySet())
+              + FluentIterable.from(options.buildOrThrow().entrySet())
                   .transform(
                       (Entry<String, String> e) ->
                           String.format("setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
