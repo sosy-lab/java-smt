@@ -52,13 +52,11 @@ public class TraceSolverContext implements SolverContext {
       logger.appendDef(
           "config",
           "Configuration.builder()."
-              + Joiner.on(".")
-                  .join(
-                      FluentIterable.from(options.build().entrySet())
-                          .transform(
-                              (Entry<String, String> e) ->
-                                  String.format(
-                                      "setOption(\"%s\", \"%s\")", e.getKey(), e.getValue())))
+              + FluentIterable.from(options.build().entrySet())
+                  .transform(
+                      (Entry<String, String> e) ->
+                          String.format("setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
+                  .join(Joiner.on("."))
               + ".build()");
       logger.appendDef("logger", "LogManager.createNullLogManager()");
       logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
@@ -82,10 +80,9 @@ public class TraceSolverContext implements SolverContext {
         "context",
         String.format(
             "newProverEnvironment(%s)",
-            Joiner.on(", ")
-                .join(
-                    FluentIterable.from(options)
-                        .transform(v -> "SolverContext" + ".ProverOptions." + v.name()))),
+            FluentIterable.from(options)
+                .transform(v -> "SolverContext" + ".ProverOptions." + v.name())
+                .join(Joiner.on(", "))),
         () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), logger));
   }
 

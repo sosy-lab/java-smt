@@ -14,7 +14,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -30,7 +30,7 @@ public class TraceLogger {
   TraceLogger(String pFile) {
     // FIXME Check if the file already exists
     try {
-      output = Files.newBufferedWriter(Paths.get(pFile), Charset.defaultCharset());
+      output = Files.newBufferedWriter(Path.of(pFile), Charset.defaultCharset());
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
