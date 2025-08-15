@@ -41,7 +41,6 @@ public class TraceSolverContext implements SolverContext {
     ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
     for (String s : props.lines().toArray(String[]::new)) {
       List<String> parts = Splitter.on(" = ").splitToList(s);
-      ;
       if (parts.get(0).startsWith("solver") && !parts.get(0).equals("solver.trace")) {
         options.put(parts.get(0), parts.get(1));
       }
