@@ -11,7 +11,13 @@
 package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map.Entry;
+import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -23,12 +29,45 @@ public class TraceSolverContext implements SolverContext {
   private final SolverContext delegate;
   private final TraceLogger logger;
 
-  public TraceSolverContext(SolverContext pDelegate) {
+  public TraceSolverContext(SolverContext pDelegate, Configuration config) {
     delegate = pDelegate;
     // FIXME Move the files to the output folder?
     logger =
         new TraceLogger(
             "trace" + Integer.toUnsignedString(System.identityHashCode(this)) + ".java");
+
+    // Get relevant options from the configuration
+    String props = config.asPropertiesString();
+    ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
+    for (String s : props.lines().toArray(String[]::new)) {
+      List<String> parts = Splitter.on(" = ").splitToList(s);
+      ;
+      if (parts.get(0).startsWith("solver") && !parts.get(0).equals("solver.trace")) {
+        options.put(parts.get(0), parts.get(1));
+      }
+    }
+
+    // Write code for creating a solver context to the trace log
+    try {
+      logger.appendDef(
+          "config",
+          "Configuration.builder()."
+              + Joiner.on(".")
+                  .join(
+                      FluentIterable.from(options.build().entrySet())
+                          .transform(
+                              (Entry<String, String> e) ->
+                                  String.format(
+                                      "setOption(\"%s\", \"%s\")", e.getKey(), e.getValue())))
+              + ".build()");
+      logger.appendDef("logger", "LogManager.createNullLogManager()");
+      logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
+      logger.appendDef(
+          "context", "SolverContextFactory.createSolverContext(config, logger, notifier)");
+      logger.appendDef("mgr", "context.getFormulaManager()");
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

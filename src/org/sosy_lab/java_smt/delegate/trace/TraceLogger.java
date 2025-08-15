@@ -60,13 +60,13 @@ public class TraceLogger {
   }
 
   /** Add a definition to the log. */
-  private void appendDef(String pVar, String pExpr) throws IOException {
+  public void appendDef(String pVar, String pExpr) throws IOException {
     output.append(String.format("var %s = %s;%n", pVar, pExpr));
     output.flush();
   }
 
   /** Add a statement to the log. */
-  private void appendStmt(String pStmt) throws IOException {
+  public void appendStmt(String pStmt) throws IOException {
     output.append(String.format("%s;%n", pStmt));
     output.flush();
   }
