@@ -21,6 +21,7 @@ import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 public class TraceLogger {
   private long id = 0;
@@ -112,6 +113,12 @@ public class TraceLogger {
     if (pType.isBitvectorType()) {
       BitvectorType bvType = (BitvectorType) pType;
       return String.format("FormulaType.getBitvectorTypeWithSize(%s)", bvType.getSize());
+    }
+    if (pType.isFloatingPointType()) {
+      FloatingPointType fpType = (FloatingPointType) pType;
+      return String.format(
+          "FormulaType.getFloatingPointType(%s, %s)",
+          fpType.getExponentSize(), fpType.getMantissaSize());
     }
     // FIXME Handle other cases
     throw new IllegalArgumentException("Unsupported formula type: " + pType);

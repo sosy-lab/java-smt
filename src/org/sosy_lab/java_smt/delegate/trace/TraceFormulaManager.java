@@ -73,7 +73,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceFloatingPointFormulaManager(delegate.getFloatingPointFormulaManager(), logger);
   }
 
   @Override
