@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 
 public class TraceLogger {
   private long id = 0;
@@ -107,6 +108,10 @@ public class TraceLogger {
   public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
     if (pType.isIntegerType()) {
       return "FormulaType.IntegerType";
+    }
+    if (pType.isBitvectorType()) {
+      BitvectorType bvType = (BitvectorType) pType;
+      return String.format("FormulaType.getBitvectorTypeWithSize(%s)", bvType.getSize());
     }
     // FIXME Handle other cases
     throw new IllegalArgumentException("Unsupported formula type: " + pType);

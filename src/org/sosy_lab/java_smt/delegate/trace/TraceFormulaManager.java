@@ -68,7 +68,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceBitvectorFormulaManager(delegate.getBitvectorFormulaManager(), logger);
   }
 
   @Override
