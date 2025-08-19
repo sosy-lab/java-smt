@@ -29,7 +29,7 @@ public class TraceSolverContext implements SolverContext {
   private final SolverContext delegate;
   private final TraceLogger logger;
 
-  public TraceSolverContext(SolverContext pDelegate, Configuration config) {
+  public TraceSolverContext(Solvers pSolver, Configuration config, SolverContext pDelegate) {
     delegate = pDelegate;
     // FIXME Move the files to the output folder?
     logger =
@@ -41,7 +41,9 @@ public class TraceSolverContext implements SolverContext {
     ImmutableMap.Builder<String, String> options = ImmutableMap.builder();
     for (String s : props.lines().toArray(String[]::new)) {
       List<String> parts = Splitter.on(" = ").splitToList(s);
-      if (parts.get(0).startsWith("solver") && !parts.get(0).equals("solver.trace")) {
+      if (parts.get(0).startsWith("solver")
+          && !parts.get(0).equals("solver.trace")
+          && !parts.get(0).equals("solver.solver")) {
         options.put(parts.get(0), parts.get(1));
       }
     }
@@ -60,7 +62,11 @@ public class TraceSolverContext implements SolverContext {
       logger.appendDef("logger", "LogManager.createNullLogManager()");
       logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
       logger.appendDef(
-          "context", "SolverContextFactory.createSolverContext(config, logger, notifier)");
+          "context",
+          "SolverContextFactory.createSolverContext(config, logger, notifier, "
+              + "SolverContextFactory.Solvers."
+              + pSolver.name()
+              + ")");
       logger.appendDef("mgr", "context.getFormulaManager()");
     } catch (IOException e) {
       throw new RuntimeException(e);
