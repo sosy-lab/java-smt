@@ -479,14 +479,30 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-  // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+// From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
   // Z3_OP_PR_BIND: Given a proof p,
   // produces a proof of lambda x . p, where x are free variables in p.
   //
   //     T1: f
   //     [proof-bind T1] forall (x) f
+  // Could not find a way to encode this with given axioms from RESOLUTE, so the default solution
+  // is to use oracle to prove "NOT f OR (forall (x) f)" and use f as pivot from the proof of f to
+  // resolve into "forall (x) f".
   Proof handleBind(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    Proof child = children.get(0);
+    BooleanFormula f = (BooleanFormula) child.getFormula();
+
+    BooleanFormula forallF = (BooleanFormula) node.getFormula();
+
+    BooleanFormula axiomFormula = bfm.or(bfm.not(f), forallF);
+    AxiomProof axiom = new AxiomProof(ResAxiom.ORACLE, axiomFormula);
+
+    ResolutionProof resNode = new ResolutionProof(forallF, f);
+    resNode.addChild(axiom);
+    resNode.addChild(child);
+
+    return resNode;
   }
 
   Proof handleDistributivity(Z3Proof node) {
