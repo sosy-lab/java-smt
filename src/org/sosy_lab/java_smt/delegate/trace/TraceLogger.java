@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
@@ -109,6 +110,12 @@ public class TraceLogger {
   public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
     if (pType.isIntegerType()) {
       return "FormulaType.IntegerType";
+    }
+    if (pType.isArrayType()) {
+      ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
+      return String.format(
+          "FormulaType.getArrayType(%s, %s)",
+          printFormulaType(arrayType.getIndexType()), printFormulaType(arrayType.getElementType()));
     }
     if (pType.isBitvectorType()) {
       BitvectorType bvType = (BitvectorType) pType;
