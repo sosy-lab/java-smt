@@ -14,7 +14,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map.Entry;
 import org.sosy_lab.common.configuration.Configuration;
@@ -49,28 +48,24 @@ public class TraceSolverContext implements SolverContext {
     }
 
     // Write code for creating a solver context to the trace log
-    try {
-      logger.appendDef(
-          "config",
-          "Configuration.builder()."
-              + FluentIterable.from(options.buildOrThrow().entrySet())
-                  .transform(
-                      (Entry<String, String> e) ->
-                          String.format("setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
-                  .join(Joiner.on("."))
-              + ".build()");
-      logger.appendDef("logger", "LogManager.createNullLogManager()");
-      logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
-      logger.appendDef(
-          "context",
-          "SolverContextFactory.createSolverContext(config, logger, notifier, "
-              + "SolverContextFactory.Solvers."
-              + pSolver.name()
-              + ")");
-      logger.appendDef("mgr", "context.getFormulaManager()");
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    logger.appendDef(
+        "config",
+        "Configuration.builder()."
+            + FluentIterable.from(options.buildOrThrow().entrySet())
+                .transform(
+                    (Entry<String, String> e) ->
+                        String.format("setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
+                .join(Joiner.on("."))
+            + ".build()");
+    logger.appendDef("logger", "LogManager.createNullLogManager()");
+    logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
+    logger.appendDef(
+        "context",
+        "SolverContextFactory.createSolverContext(config, logger, notifier, "
+            + "SolverContextFactory.Solvers."
+            + pSolver.name()
+            + ")");
+    logger.appendDef("mgr", "context.getFormulaManager()");
   }
 
   @Override

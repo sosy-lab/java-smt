@@ -63,15 +63,23 @@ public class TraceLogger {
   }
 
   /** Add a definition to the log. */
-  public void appendDef(String pVar, String pExpr) throws IOException {
-    output.append(String.format("var %s = %s;%n", pVar, pExpr));
-    output.flush();
+  public void appendDef(String pVar, String pExpr) {
+    try {
+      output.append(String.format("var %s = %s;%n", pVar, pExpr));
+      output.flush();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /** Add a statement to the log. */
-  public void appendStmt(String pStmt) throws IOException {
-    output.append(String.format("%s;%n", pStmt));
-    output.flush();
+  public void appendStmt(String pStmt) {
+    try {
+      output.append(String.format("%s;%n", pStmt));
+      output.flush();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /** Log an API call with return value. */
