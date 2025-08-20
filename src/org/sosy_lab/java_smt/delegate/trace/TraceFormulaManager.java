@@ -27,6 +27,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -148,14 +149,65 @@ public class TraceFormulaManager implements FormulaManager {
     throw new UnsupportedOperationException();
   }
 
+  private class TraceVisitor<T> implements FormulaVisitor<T> {
+    private final FormulaVisitor<T> delegateVisitor;
+
+    private TraceVisitor(FormulaVisitor<T> pDelegate) {
+      delegateVisitor = pDelegate;
+    }
+
+    @Override
+    public T visitFreeVariable(Formula f, String name) {
+      return delegateVisitor.visitFreeVariable(f, name);
+    }
+
+    @Override
+    public T visitConstant(Formula f, Object value) {
+      return delegateVisitor.visitConstant(f, value);
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public T visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      for (int i = 0; i <= args.size(); i++) {
+        var value = i == 0 ? functionDeclaration : args.get(i - 1);
+        var unused =
+            logger.logDef(
+                "mgr",
+                String.format("visit(%s, new ExtractingVisitor(%s))", logger.toVariable(f), i),
+                () -> value);
+      }
+      return delegateVisitor.visitFunction(f, args, functionDeclaration);
+    }
+
+    @SuppressWarnings("unused")
+    @Override
+    public T visitQuantifier(
+        BooleanFormula f,
+        Quantifier quantifier,
+        List<Formula> boundVariables,
+        BooleanFormula body) {
+      for (int i = 0; i <= boundVariables.size(); i++) {
+        var value = i == boundVariables.size() ? body : boundVariables.get(i - 1);
+        var unused =
+            logger.logDef(
+                "mgr",
+                String.format("visit(%s, new ExtractingVisitor(%s))", logger.toVariable(f), i),
+                () -> value);
+      }
+      return delegateVisitor.visitQuantifier(f, quantifier, boundVariables, body);
+    }
+  }
+
   @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
-    throw new UnsupportedOperationException();
+    return delegate.visit(f, new TraceVisitor<>(rFormulaVisitor));
   }
 
   @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
-    throw new UnsupportedOperationException();
+    delegate.visitRecursively(f, new TraceVisitor<>(rFormulaVisitor));
   }
 
   @Override
