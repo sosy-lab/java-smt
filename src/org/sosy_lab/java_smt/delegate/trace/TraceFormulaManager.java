@@ -130,12 +130,15 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+    return logger.logDef("mgr", String.format("parse(\"%s\")", s), () -> delegate.parse(s));
   }
 
   @Override
   public Appender dumpFormula(BooleanFormula pT) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr",
+        String.format("dumpFormula(%s)", logger.toVariable(pT)),
+        () -> delegate.dumpFormula(pT));
   }
 
   @Override
