@@ -152,7 +152,7 @@ public class TraceFormulaManager implements FormulaManager {
     throw new UnsupportedOperationException();
   }
 
-  private class TraceVisitor<T> implements FormulaVisitor<T> {
+  private final class TraceVisitor<T> implements FormulaVisitor<T> {
     private final FormulaVisitor<T> delegateVisitor;
 
     private TraceVisitor(FormulaVisitor<T> pDelegate) {
