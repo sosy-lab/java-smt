@@ -59,7 +59,11 @@ public class TraceLogger {
    * <p>Use {@link #mapVariable(String, Object)} to bind an object to a variable
    */
   public String toVariable(Object f) {
-    return valueMap.get(f);
+    String r = valueMap.get(f);
+    if (r == null) {
+      throw new IllegalArgumentException("Object not tracked");
+    }
+    return r;
   }
 
   /** Add a definition to the log. */
