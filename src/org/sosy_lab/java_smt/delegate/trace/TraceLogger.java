@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Preconditions;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -60,9 +61,7 @@ class TraceLogger {
    */
   public String toVariable(Object f) {
     String r = valueMap.get(f);
-    if (r == null) {
-      throw new IllegalArgumentException("Object not tracked");
-    }
+    Preconditions.checkArgument(r != null, "Object not tracked");
     return r;
   }
 
