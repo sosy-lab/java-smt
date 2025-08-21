@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
-public class TraceLogger {
+class TraceLogger {
   private long id = 0;
 
   private final Map<Object, String> valueMap = new HashMap<>();
