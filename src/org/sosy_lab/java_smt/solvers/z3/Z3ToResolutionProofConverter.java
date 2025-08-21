@@ -543,7 +543,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     List<Proof> children = new ArrayList<>(node.getChildren());
     Proof child = children.get(0);
 
-    BooleanFormula T1 = (BooleanFormula) child.getFormula();
+    BooleanFormula t1 = (BooleanFormula) child.getFormula();
     BooleanFormula li = (BooleanFormula) node.getFormula();
 
     BooleanFormula axiomFormula = bfm.or(bfm.not(T1), li);
@@ -556,9 +556,33 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return res;
   }
 
+ // Z3_OP_PR_NOT_OR_ELIM: Given a proof for (not (or l_1 ... l_n)), produces a proof for (not l_i).
+  //
+  //         T1: (not (or l_1 ... l_n))
+  //         [not-or-elim T1]: (not l_i)
+  // This is exactly the RESOLUTE axiom "or+": (+(or l_1 ... l_n) -(l_i))
+  // Introduce node with said axiom and use the proof T1 to resolve the conjunction and prove not
+  // l_i through resolution  
   Proof handleNotOrElim(Z3Proof node) {
-    throw new UnsupportedOperationException();
+
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    Proof child = children.get(0);
+    BooleanFormula t1 = (BooleanFormula) child.getFormula();
+
+    BooleanFormula notLi = (BooleanFormula) node.getFormula();
+
+    BooleanFormula orFormula = bfm.not(t1);
+
+    BooleanFormula axiomFormula = bfm.or(orFormula, notLi);
+    AxiomProof axiom = new AxiomProof(ResAxiom.OR_POSITIVE, axiomFormula);
+
+    ResolutionProof resNode = new ResolutionProof(notLi, orFormula);
+    resNode.addChild(axiom);
+    resNode.addChild(child);
+
+    return resNode;
   }
+
 
   Proof handleRewrite(Z3Proof node) {
     throw new UnsupportedOperationException();
