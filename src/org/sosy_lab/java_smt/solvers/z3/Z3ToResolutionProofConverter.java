@@ -505,12 +505,55 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
-  Proof handleDistributivity(Z3Proof node) {
-    throw new UnsupportedOperationException();
+// From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+  //  - Z3_OP_PR_DISTRIBUTIVITY: Distributivity proof object.
+  //          Given that f (= or) distributes over g (= and), produces a proof for
+  //          \nicebox{
+  //          (= (f a (g c d))
+  //             (g (f a c) (f a d)))
+  //          }
+  //          If f and g are associative, this proof also justifies the following equality:
+  //          \nicebox{
+  //          (= (f (g a b) (g c d))
+  //             (g (f a c) (f a d) (f b c) (f b d)))
+  //          }
+  //          where each f and g can have arbitrary number of arguments.
+  //
+  //          This proof object has no antecedents.
+  //          Remark. This rule is used by the CNF conversion pass and
+  //          instantiated by f = or, and g = and.
+  // For now skip this node and take the next step in the proof, RESOLUTE uses a combination of
+  // axioms to do CNF conversion and does not need a proof of distributivity. If this proof rule
+  // from Z3 is used for CNF conversion the next step could be useful for the resolution based
+  // proof
+  void handleDistributivity(Z3Proof node) {
+    // do nothing
+    // the parent node should be a proof step for CNF conversion that is more relevant to RESOLUTE
   }
 
+  // Z3_OP_PR_AND_ELIM: Given a proof for (and l_1 ... l_n), produces a proof for l_i
+  //
+  //        T1: (and l_1 ... l_n)
+  //        [and-elim T1]: l_i
+  // This is exactly the RESOLUTE axiom "and-": (-(and l_1 ... l_n) +(l_i))
+  // Introduce node with said axiom and use the proof T1 to resolve the conjunction and prove l_i
+  // through resolution
   Proof handleAndElim(Z3Proof node) {
-    throw new UnsupportedOperationException();
+
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    Proof child = children.get(0);
+
+    BooleanFormula T1 = (BooleanFormula) child.getFormula();
+    BooleanFormula li = (BooleanFormula) node.getFormula();
+
+    BooleanFormula axiomFormula = bfm.or(bfm.not(T1), li);
+    AxiomProof axiom = new AxiomProof(ResAxiom.AND_NEGATIVE, axiomFormula);
+
+    ResolutionProof res = new ResolutionProof(li, T1);
+    res.addChild(axiom);
+    res.addChild(child);
+
+    return res;
   }
 
   Proof handleNotOrElim(Z3Proof node) {
