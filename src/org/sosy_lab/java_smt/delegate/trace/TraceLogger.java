@@ -120,8 +120,14 @@ class TraceLogger {
    * construct this type.
    */
   public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
+    if (pType.isBooleanType()) {
+      return "FormulaType.BooleanType";
+    }
     if (pType.isIntegerType()) {
       return "FormulaType.IntegerType";
+    }
+    if (pType.isRationalType()) {
+      return "FormulaType.RationalType";
     }
     if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrayType = (ArrayFormulaType<?, ?>) pType;
