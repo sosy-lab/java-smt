@@ -50,12 +50,12 @@ public class TraceSolverContext implements SolverContext {
     // Write code for creating a solver context to the trace log
     logger.appendDef(
         "config",
-        "Configuration.builder()."
+        "Configuration.builder()"
             + FluentIterable.from(options.buildOrThrow().entrySet())
                 .transform(
                     (Entry<String, String> e) ->
-                        String.format("setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
-                .join(Joiner.on("."))
+                        String.format(".setOption(\"%s\", \"%s\")", e.getKey(), e.getValue()))
+                .join(Joiner.on(""))
             + ".build()");
     logger.appendDef("logger", "LogManager.createNullLogManager()");
     logger.appendDef("notifier", "ShutdownNotifier.createDummy()");
