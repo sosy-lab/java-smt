@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
@@ -129,7 +130,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
-    throw new UnsupportedOperationException();
+    return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
 
   @Override
@@ -156,7 +157,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toDisjunction() {
-    throw new UnsupportedOperationException();
+    return Collectors.collectingAndThen(Collectors.toList(), this::or);
   }
 
   @Override
