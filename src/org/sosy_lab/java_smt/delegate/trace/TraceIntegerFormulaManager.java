@@ -81,7 +81,7 @@ public class TraceIntegerFormulaManager implements IntegerFormulaManager {
 
   @Override
   public IntegerFormula makeNumber(String pI) {
-    throw new UnsupportedOperationException();
+    return makeNumber(new BigInteger(pI));
   }
 
   @Override
