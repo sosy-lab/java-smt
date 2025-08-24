@@ -696,7 +696,10 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException, SolverException {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr",
+        String.format("applyTactic(%s, %s)", logger.toVariable(input), "Tactic" + tactic.name()),
+        () -> delegate.applyTactic(input, tactic));
   }
 
   @Override
