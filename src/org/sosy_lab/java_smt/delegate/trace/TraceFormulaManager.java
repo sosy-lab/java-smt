@@ -880,7 +880,7 @@ public class TraceFormulaManager implements FormulaManager {
       throws InterruptedException, SolverException {
     return logger.logDef(
         "mgr",
-        String.format("applyTactic(%s, %s)", logger.toVariable(input), "Tactic" + tactic.name()),
+        String.format("applyTactic(%s, %s)", logger.toVariable(input), "Tactic." + tactic.name()),
         () -> delegate.applyTactic(input, tactic));
   }
 
