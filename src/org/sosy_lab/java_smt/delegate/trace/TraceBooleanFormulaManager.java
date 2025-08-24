@@ -164,19 +164,40 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
-    throw new UnsupportedOperationException();
+    return logger.logDefDiscard(
+        "mgr",
+        String.format(
+            "visit(%s, new DefaultBooleanFormulaVisitor<>() {"
+                + "protected Formula visitDefault(Formula f) {"
+                + "return %s;"
+                + "}})",
+            logger.toVariable(pFormula), logger.toVariable(pFormula)),
+        () -> delegate.visit(pFormula, visitor));
   }
 
   @Override
   public void visitRecursively(
       BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor) {
-    throw new UnsupportedOperationException();
+    logger.logStmtDiscard(
+        "mgr",
+        String.format(
+            "visitRecursively(%s, new DefaultBooleanFormulaVisitor<>() {"
+                + "protected TraversalProcess visitDefault(Formula f) {"
+                + "return TraversalProcess.CONTINUE;"
+                + "}})",
+            logger.toVariable(f)),
+        () -> delegate.visitRecursively(f, rFormulaVisitor));
   }
 
   @Override
   public BooleanFormula transformRecursively(
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
-    throw new UnsupportedOperationException();
+    return logger.logDefDiscard(
+        "mgr",
+        String.format(
+            "transformRecursively(%s, new BooleanFormulaTransformationVisitor(%s) {})",
+            logger.toVariable(f), "mgr"),
+        () -> delegate.transformRecursively(f, pVisitor));
   }
 
   @Override
