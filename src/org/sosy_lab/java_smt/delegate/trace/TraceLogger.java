@@ -17,6 +17,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -31,7 +32,7 @@ class TraceLogger {
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
 
-  private long backtrackPoint = -1;
+  private final Stack<Long> lastLines = new Stack<>();
 
   TraceLogger(TraceFormulaManager pMgr, String pFile) {
     mgr = pMgr;
@@ -76,7 +77,7 @@ class TraceLogger {
   /** Add a definition to the log. */
   public void appendDef(String pVar, String pExpr) {
     try {
-      backtrackPoint = output.length();
+      lastLines.push(output.length());
       output.write(String.format("var %s = %s;%n", pVar, pExpr).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -86,7 +87,7 @@ class TraceLogger {
   /** Add a statement to the log. */
   public void appendStmt(String pStmt) {
     try {
-      backtrackPoint = output.length();
+      lastLines.push(output.length());
       output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -94,13 +95,12 @@ class TraceLogger {
   }
 
   public void undoLast() {
-    Preconditions.checkArgument(backtrackPoint >= 0, "Cannot undo last trace");
+    Preconditions.checkArgument(!lastLines.isEmpty(), "Cannot undo last trace");
     try {
-      output.setLength(backtrackPoint);
+      output.setLength(lastLines.pop());
     } catch (IOException pE) {
       throw new RuntimeException(pE);
     }
-    backtrackPoint = -1;
   }
 
   /** Log an API call with return value. */
