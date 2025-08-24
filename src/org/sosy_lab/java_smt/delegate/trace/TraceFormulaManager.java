@@ -12,6 +12,7 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -341,13 +342,13 @@ public class TraceFormulaManager implements FormulaManager {
         */
         case BV_EXTRACT:
           {
-            String[] tokens = declaration.getName().split("_");
+            List<String> tokens = Splitter.on('_').splitToList(declaration.getName());
             return (T)
                 getBitvectorFormulaManager()
                     .extract(
                         (BitvectorFormula) args.get(0),
-                        Integer.parseInt(tokens[1]),
-                        Integer.parseInt(tokens[2]));
+                        Integer.parseInt(tokens.get(1)),
+                        Integer.parseInt(tokens.get(2)));
           }
         case BV_CONCAT:
           return (T)
