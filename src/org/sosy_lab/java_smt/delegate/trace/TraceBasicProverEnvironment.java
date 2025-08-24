@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +61,12 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    return logger.logDefKeep(
+        logger.toVariable(this),
+        String.format(
+            "isUnsatWithAssumptions" + "(ImmutableList.of(%s))",
+            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))),
+        () -> delegate.isUnsatWithAssumptions(assumptions));
   }
 
   @SuppressWarnings("resource")
