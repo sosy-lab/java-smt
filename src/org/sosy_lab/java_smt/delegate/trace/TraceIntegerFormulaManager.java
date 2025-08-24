@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -50,7 +52,11 @@ public class TraceIntegerFormulaManager implements IntegerFormulaManager {
 
   @Override
   public IntegerFormula modulo(IntegerFormula numerator, IntegerFormula denominator) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format(
+            "modulo(%s, %s)", logger.toVariable(numerator), logger.toVariable(denominator)),
+        () -> delegate.modulo(numerator, denominator));
   }
 
   @Override
@@ -115,7 +121,12 @@ public class TraceIntegerFormulaManager implements IntegerFormulaManager {
 
   @Override
   public IntegerFormula sum(List<IntegerFormula> operands) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format(
+            "sum(%s)",
+            FluentIterable.from(operands).transform(logger::toVariable).join(Joiner.on(", "))),
+        () -> delegate.sum(operands));
   }
 
   @Override
@@ -153,7 +164,12 @@ public class TraceIntegerFormulaManager implements IntegerFormulaManager {
 
   @Override
   public BooleanFormula distinct(List<IntegerFormula> pNumbers) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format(
+            "distinct(%s)",
+            FluentIterable.from(pNumbers).transform(logger::toVariable).join(Joiner.on(", "))),
+        () -> delegate.distinct(pNumbers));
   }
 
   @Override
