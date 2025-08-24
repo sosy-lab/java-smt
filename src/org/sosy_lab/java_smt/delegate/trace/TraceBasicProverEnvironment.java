@@ -43,10 +43,14 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    return logger.logDefKeep(
-        logger.toVariable(this),
-        String.format("addConstraint(%s)", logger.toVariable(constraint)),
-        () -> delegate.addConstraint(constraint));
+    String var = logger.newVariable();
+    logger.appendDef(
+        var,
+        String.format(
+            "%s.addConstraint(%s)", logger.toVariable(this), logger.toVariable(constraint)));
+    T f = delegate.addConstraint(constraint);
+    logger.mapVariable(var, f);
+    return f;
   }
 
   @Override
@@ -61,27 +65,36 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    return logger.logDefKeep(logger.toVariable(this), "isUnsat()", delegate::isUnsat);
+    String var = logger.newVariable();
+    logger.appendDef(var, String.format("%s.isUnsat()", logger.toVariable(this)));
+    boolean unsat = delegate.isUnsat();
+    logger.mapVariable(var, unsat);
+    return unsat;
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return logger.logDefKeep(
-        logger.toVariable(this),
+    String var = logger.newVariable();
+    logger.appendDef(
+        var,
         String.format(
-            "isUnsatWithAssumptions" + "(ImmutableList.of(%s))",
-            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))),
-        () -> delegate.isUnsatWithAssumptions(assumptions));
+            "%s.isUnsatWithAssumptions(ImmutableList.of(%s))",
+            logger.toVariable(this),
+            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))));
+    boolean unsat = delegate.isUnsatWithAssumptions(assumptions);
+    logger.mapVariable(var, unsat);
+    return unsat;
   }
 
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    return logger.logDefKeep(
-        logger.toVariable(this),
-        "getModel()",
-        () -> new TraceModel(delegate.getModel(), mgr, logger));
+    String var = logger.newVariable();
+    logger.appendDef(var, String.format("%s.getModel()", logger.toVariable(this)));
+    Model model = new TraceModel(delegate.getModel(), mgr, logger);
+    logger.mapVariable(var, model);
+    return model;
   }
 
   @Override
