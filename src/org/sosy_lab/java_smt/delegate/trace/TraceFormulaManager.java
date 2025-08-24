@@ -316,6 +316,10 @@ public class TraceFormulaManager implements FormulaManager {
               return (T)
                   getBitvectorFormulaManager()
                       .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
+            } else if (declaration.getArgumentTypes().get(1).isArrayType()) {
+              return (T)
+                  getArrayFormulaManager()
+                      .equivalence((ArrayFormula) args.get(0), (ArrayFormula) args.get(1));
             } else {
               throw new UnsupportedOperationException(
                   String.format(
