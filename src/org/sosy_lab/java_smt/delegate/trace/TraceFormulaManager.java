@@ -228,6 +228,7 @@ public class TraceFormulaManager implements FormulaManager {
     } else {
       // TODO Check that the number of arguments matches the arity of the operation
       // TODO Figure out how to handle rounding mode for floats
+      // FIXME Handle rational formulas
       switch (declaration.getKind()) {
         case AND:
           return (T)
@@ -254,9 +255,11 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getBooleanFormulaManager()
                   .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
+        // TODO We only have 'distinct' for some theories
+        /*
         case DISTINCT:
-          // TODO We only have 'distinct' for some theories
           break;
+        */
         case STORE:
           return (T)
               getArrayFormulaManager().store((ArrayFormula) args.get(0), args.get(1), args.get(2));
@@ -267,7 +270,6 @@ public class TraceFormulaManager implements FormulaManager {
               getArrayFormulaManager()
                   .makeArray((ArrayFormulaType) declaration.getType(), args.get(0));
         case UMINUS:
-          // FIXME Handle rational formulas
           return (T) getIntegerFormulaManager().negate((IntegerFormula) args.get(0));
         case SUB:
           return (T)
@@ -330,6 +332,7 @@ public class TraceFormulaManager implements FormulaManager {
                       declaration.getArgumentTypes().get(0)));
             }
           }
+        // TODO
         /*
         case EQ_ZERO:
           break;
@@ -354,12 +357,12 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getBitvectorFormulaManager()
                   .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        case BV_SIGN_EXTENSION:
-          // TODO
+        // TODO
+        /*case BV_SIGN_EXTENSION:
           break;
         case BV_ZERO_EXTENSION:
-          // TODO
           break;
+        */
         case BV_NOT:
           return (T) getBitvectorFormulaManager().not((BitvectorFormula) args.get(0));
         case BV_NEG:
@@ -471,12 +474,13 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getBitvectorFormulaManager()
                   .rotateRight((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
+        // TODO
+        /*
         case BV_ROTATE_LEFT_BY_INT:
-          // TODO
           break;
         case BV_ROTATE_RIGHT_BY_INT:
-          // TODO
           break;
+        */
         case BV_UCASTTO_FP:
           return (T)
               getFloatingPointFormulaManager()
@@ -544,6 +548,8 @@ public class TraceFormulaManager implements FormulaManager {
               getFloatingPointFormulaManager()
                   .equalWithFPSemantics(
                       (FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
+        // TODO
+        /*
         case FP_ROUND_EVEN:
           break;
         case FP_ROUND_AWAY:
@@ -554,6 +560,7 @@ public class TraceFormulaManager implements FormulaManager {
           break;
         case FP_ROUND_ZERO:
           break;
+        */
         case FP_ROUND_TO_INTEGRAL:
           {
             var rm = (FloatingPointRoundingModeFormula) args.get(1);
@@ -596,6 +603,7 @@ public class TraceFormulaManager implements FormulaManager {
               getFloatingPointFormulaManager()
                   .fromIeeeBitvector(
                       (BitvectorFormula) args.get(0), (FloatingPointType) declaration.getType());
+        // TODO
         /*
         case STR_CONCAT:
           break;
@@ -661,7 +669,6 @@ public class TraceFormulaManager implements FormulaManager {
                   declaration.getKind(), declaration.getName()));
       }
     }
-    throw new UnsupportedOperationException();
   }
 
   @Override
