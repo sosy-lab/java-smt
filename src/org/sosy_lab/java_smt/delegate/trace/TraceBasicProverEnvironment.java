@@ -86,13 +86,23 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException();
+    logger.appendStmt(String.format("%s.getUnsatCore()", logger.toVariable(this)));
+    List<BooleanFormula> core = delegate.getUnsatCore();
+    logger.undoLast();
+    return FluentIterable.from(core).transform(mgr::rebuild).toList();
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    logger.appendStmt(
+        String.format(
+            "%s.getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
+            logger.toVariable(this),
+            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))));
+    Optional<List<BooleanFormula>> maybeCore = delegate.unsatCoreOverAssumptions(assumptions);
+    logger.undoLast();
+    return maybeCore.map(core -> FluentIterable.from(core).transform(mgr::rebuild).toList());
   }
 
   @Override
