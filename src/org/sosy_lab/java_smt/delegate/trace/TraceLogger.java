@@ -174,6 +174,21 @@ class TraceLogger {
   }
 
   /**
+   * Variant of {@link #logStmt(String, String, CheckedRunnable)} that will remove the call from the
+   * log after it returned successfully.
+   */
+  public void logStmtDiscard(String prefix, String method, CheckedRunnable closure) {
+    try {
+      appendStmt(prefix + "." + method);
+      closure.run();
+      undoLast();
+    } catch (Exception e) {
+      Throwables.throwIfUnchecked(e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
    * Takes a {@link org.sosy_lab.java_smt.api.FormulaType} and returns a Java expression to
    * construct this type.
    */

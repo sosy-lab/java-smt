@@ -665,8 +665,10 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
-    // FIXME Add proper tracing
-    return delegate.getFormulaType(formula);
+    return logger.logDefDiscard(
+        "mgr",
+        String.format("getFormulaType(%s)", logger.toVariable(formula)),
+        () -> delegate.getFormulaType(formula));
   }
 
   @Override
@@ -698,28 +700,55 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
-    return delegate.visit(f, rFormulaVisitor);
+    return logger.logDefDiscard(
+        "mgr",
+        String.format(
+            "visit(%s, new DefaultFormulaVisitor<>() {"
+                + "protected Formula visitDefault(Formula f) {"
+                + "return f;"
+                + "}})",
+            logger.toVariable(f)),
+        () -> delegate.visit(f, rFormulaVisitor));
   }
 
   @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
-    delegate.visitRecursively(f, rFormulaVisitor);
+    logger.logStmtDiscard(
+        "mgr",
+        String.format(
+            "visitRecursively(%s, new DefaultFormulaVisitor<>() {"
+                + "protected TraversalProcess visitDefault(Formula f) {"
+                + "return TraversalProcess.CONTINUE;"
+                + "}})",
+            logger.toVariable(f)),
+        () -> delegate.visitRecursively(f, rFormulaVisitor));
   }
 
   @Override
   public <T extends Formula> T transformRecursively(
       T f, FormulaTransformationVisitor pFormulaVisitor) {
-    return delegate.transformRecursively(f, pFormulaVisitor);
+    return logger.logDefDiscard(
+        "mgr",
+        String.format(
+            "transformRecursively(%s, new FormulaTransformationVisitor(%s) {})",
+            logger.toVariable(f), "mgr"),
+        () -> delegate.transformRecursively(f, pFormulaVisitor));
   }
 
   @Override
   public ImmutableMap<String, Formula> extractVariables(Formula f) {
-    return delegate.extractVariables(f);
+    return logger.logDefDiscard(
+        "mgr",
+        String.format("extractVariables(%s)", logger.toVariable(f)),
+        () -> delegate.extractVariables(f));
   }
 
   @Override
   public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
-    return delegate.extractVariablesAndUFs(f);
+    return logger.logDefDiscard(
+        "mgr",
+        String.format("extractVariablesAndUFs(%s)", logger.toVariable(f)),
+        () -> delegate.extractVariablesAndUFs(f));
   }
 
   @Override
