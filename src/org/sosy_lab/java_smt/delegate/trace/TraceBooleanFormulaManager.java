@@ -156,7 +156,10 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula xor(BooleanFormula bits1, BooleanFormula bits2) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getBooleanFormulaManager()",
+        String.format("xor(%s, %s)", logger.toVariable(bits1), logger.toVariable(bits2)),
+        () -> delegate.xor(bits1, bits2));
   }
 
   @Override
