@@ -27,8 +27,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   private final FloatingPointFormulaManager delegate;
   private final TraceLogger logger;
 
-  public TraceFloatingPointFormulaManager(
-      FloatingPointFormulaManager pDelegate, TraceLogger pLogger) {
+  TraceFloatingPointFormulaManager(FloatingPointFormulaManager pDelegate, TraceLogger pLogger) {
     delegate = pDelegate;
     logger = pLogger;
   }
