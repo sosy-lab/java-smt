@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -27,18 +28,36 @@ import org.sosy_lab.java_smt.api.StringFormula;
 
 public class TraceModel implements Model {
   private final Model delegate;
+
+  private final TraceFormulaManager mgr;
   private final TraceLogger logger;
 
-  TraceModel(Model pDelegate, TraceLogger pLogger) {
+  TraceModel(Model pDelegate, TraceFormulaManager pMgr, TraceLogger pLogger) {
     delegate = pDelegate;
+    mgr = pMgr;
     logger = pLogger;
   }
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    // FIXME We need to introduce local variables for all terms in the model so that they can be
-    //  referenced later
-    return logger.logDefKeep(logger.toVariable(this), "asList()", delegate::asList);
+    logger.appendStmt(String.format("%s.asList()", logger.toVariable(this)));
+    ImmutableList<ValueAssignment> result = delegate.asList();
+    logger.undoLast();
+    return FluentIterable.from(result)
+        .transform(
+            (ValueAssignment assigment) -> {
+              var key = mgr.rebuild(assigment.getKey());
+              var val = mgr.rebuild(assigment.getValueAsFormula());
+              var map = mgr.rebuild(assigment.getAssignmentAsFormula());
+              return new ValueAssignment(
+                  key,
+                  val,
+                  map,
+                  assigment.getName(),
+                  assigment.getValue(),
+                  assigment.getArgumentsInterpretation());
+            })
+        .toList();
   }
 
   @Override

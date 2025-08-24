@@ -86,7 +86,7 @@ public class TraceSolverContext implements SolverContext {
             FluentIterable.from(options)
                 .transform(v -> "SolverContext" + ".ProverOptions." + v.name())
                 .join(Joiner.on(", "))),
-        () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), logger));
+        () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), mgr, logger));
   }
 
   @SuppressWarnings("resource")

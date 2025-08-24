@@ -23,10 +23,16 @@ import org.sosy_lab.java_smt.api.SolverException;
 
 public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   private final BasicProverEnvironment<T> delegate;
+
+  private final TraceFormulaManager mgr;
   private final TraceLogger logger;
 
-  TraceBasicProverEnvironment(BasicProverEnvironment<T> pDelegate, TraceLogger pLogger) {
+  TraceBasicProverEnvironment(
+      BasicProverEnvironment<T> pDelegate,
+      TraceFormulaManager pFormulaManager,
+      TraceLogger pLogger) {
     delegate = pDelegate;
+    mgr = pFormulaManager;
     logger = pLogger;
   }
 
@@ -73,7 +79,9 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   @Override
   public Model getModel() throws SolverException {
     return logger.logDefKeep(
-        logger.toVariable(this), "getModel()", () -> new TraceModel(delegate.getModel(), logger));
+        logger.toVariable(this),
+        "getModel()",
+        () -> new TraceModel(delegate.getModel(), mgr, logger));
   }
 
   @Override

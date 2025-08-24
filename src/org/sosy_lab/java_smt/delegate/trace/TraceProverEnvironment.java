@@ -15,7 +15,10 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 
 public class TraceProverEnvironment extends TraceBasicProverEnvironment<Void>
     implements ProverEnvironment {
-  TraceProverEnvironment(BasicProverEnvironment<Void> pDelegate, TraceLogger pLogger) {
-    super(pDelegate, pLogger);
+  TraceProverEnvironment(
+      BasicProverEnvironment<Void> pDelegate,
+      TraceFormulaManager pFormulaManager,
+      TraceLogger pLogger) {
+    super(pDelegate, pFormulaManager, pLogger);
   }
 }
