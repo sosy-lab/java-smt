@@ -699,7 +699,10 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T simplify(T input) throws InterruptedException {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr",
+        String.format("simplify(%s)", logger.toVariable(input)),
+        () -> delegate.simplify(input));
   }
 
   @Override
