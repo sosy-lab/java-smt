@@ -719,7 +719,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
-    throw new UnsupportedOperationException();
+    return delegate.extractVariablesAndUFs(f);
   }
 
   @Override
