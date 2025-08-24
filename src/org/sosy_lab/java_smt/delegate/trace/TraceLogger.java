@@ -109,11 +109,11 @@ class TraceLogger {
     try {
       appendDef(var, prefix + "." + method);
       R f = closure.call();
-      if (!isTracked(f)) {
-        mapVariable(var, f);
+      if (isTracked(f)) {
+        undoLast();
         return f;
       } else {
-        undoLast();
+        mapVariable(var, f);
         return mgr.rebuild(f);
       }
     } catch (Exception e) {
