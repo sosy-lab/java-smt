@@ -54,7 +54,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(BigDecimal n, FloatingPointType type) {
-    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_AWAY);
+    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
