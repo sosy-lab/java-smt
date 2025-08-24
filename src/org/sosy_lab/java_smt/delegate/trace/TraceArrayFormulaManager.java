@@ -68,7 +68,14 @@ public class TraceArrayFormulaManager implements ArrayFormulaManager {
           FTI extends FormulaType<TI>,
           FTE extends FormulaType<TE>>
       ArrayFormula<TI, TE> makeArray(FTI pIndexType, FTE pElementType, TE defaultElement) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getArrayFormulaManager()",
+        String.format(
+            "makeArray(\"%s\", %s, %s)",
+            logger.printFormulaType(pIndexType),
+            logger.printFormulaType(pElementType),
+            logger.toVariable(defaultElement)),
+        () -> delegate.makeArray(pIndexType, pElementType, defaultElement));
   }
 
   @Override
