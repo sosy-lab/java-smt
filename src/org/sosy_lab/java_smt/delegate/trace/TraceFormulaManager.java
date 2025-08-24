@@ -215,6 +215,115 @@ public class TraceFormulaManager implements FormulaManager {
     return f;
   }
 
+  private int getArity(FunctionDeclarationKind pKind) {
+    switch (pKind) {
+      case AND:
+      case OR:
+      case IFF:
+      case XOR:
+      case IMPLIES:
+      case DISTINCT:
+      case SUB:
+      case ADD:
+      case DIV:
+      case MUL:
+      case LT:
+      case LTE:
+      case GT:
+      case GTE:
+      case EQ:
+      case BV_CONCAT:
+      case BV_OR:
+      case BV_AND:
+      case BV_XOR:
+      case BV_SUB:
+      case BV_ADD:
+      case BV_MUL:
+        return -1;
+
+      case FP_ROUND_EVEN:
+      case FP_ROUND_AWAY:
+      case FP_ROUND_POSITIVE:
+      case FP_ROUND_NEGATIVE:
+      case FP_ROUND_ZERO:
+        return 0;
+
+      case NOT:
+      case UMINUS:
+      case EQ_ZERO:
+      case GTE_ZERO:
+      case FLOOR:
+      case TO_REAL:
+      case CONST:
+      case BV_EXTRACT:
+      case BV_SIGN_EXTENSION:
+      case BV_ZERO_EXTENSION:
+      case BV_NOT:
+      case BV_NEG:
+      case BV_ROTATE_LEFT_BY_INT:
+      case BV_ROTATE_RIGHT_BY_INT:
+      case FP_NEG:
+      case FP_ABS:
+      case FP_IS_NAN:
+      case FP_IS_INF:
+      case FP_IS_ZERO:
+      case FP_IS_NEGATIVE:
+      case FP_IS_SUBNORMAL:
+      case FP_IS_NORMAL:
+      case FP_AS_IEEEBV:
+      case FP_FROM_IEEEBV:
+        return 1;
+
+      case SELECT:
+      case MODULO:
+      case BV_SDIV:
+      case BV_UDIV:
+      case BV_SREM:
+      case BV_UREM:
+      case BV_SMOD:
+      case BV_ULT:
+      case BV_SLT:
+      case BV_ULE:
+      case BV_SLE:
+      case BV_UGT:
+      case BV_SGT:
+      case BV_UGE:
+      case BV_SGE:
+      case BV_SHL:
+      case BV_LSHR:
+      case BV_ASHR:
+      case BV_ROTATE_LEFT:
+      case BV_ROTATE_RIGHT:
+      case BV_UCASTTO_FP:
+      case BV_SCASTTO_FP:
+      case FP_MAX:
+      case FP_MIN:
+      case FP_SQRT:
+      case FP_REM:
+      case FP_LT:
+      case FP_LE:
+      case FP_GE:
+      case FP_GT:
+      case FP_EQ:
+      case FP_ROUND_TO_INTEGRAL:
+      case FP_CASTTO_FP:
+      case FP_CASTTO_SBV:
+      case FP_CASTTO_UBV:
+        return 2;
+
+      case ITE:
+      case STORE:
+      case FP_SUB:
+      case FP_ADD:
+      case FP_DIV:
+      case FP_MUL:
+        return 3;
+
+      default:
+        throw new IllegalArgumentException(String.format("Unsupported kind: %s", pKind));
+    }
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T extends Formula> T makeApplication(
@@ -229,6 +338,15 @@ public class TraceFormulaManager implements FormulaManager {
       // TODO Check that the number of arguments matches the arity of the operation
       // TODO Figure out how to handle rounding mode for floats
       // FIXME Handle rational formulas
+      Preconditions.checkArgument(
+          getArity(declaration.getKind()) == -1
+              ? args.size() > 1
+              : args.size() == getArity(declaration.getKind()),
+          "Term \"%s\" (%s): expecting %s arguments, but found %s",
+          declaration.getName(),
+          declaration.getKind(),
+          getArity(declaration.getKind()),
+          args.size());
       switch (declaration.getKind()) {
         case AND:
           return (T)
