@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -116,11 +117,12 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula and(Collection<BooleanFormula> bits) {
-    BooleanFormula f = makeTrue();
-    for (BooleanFormula bf : bits) {
-      f = and(bf, f);
-    }
-    return f;
+    return logger.logDef(
+        "mgr.getBooleanFormulaManager()",
+        String.format(
+            "and(%s)",
+            FluentIterable.from(bits).transform(logger::toVariable).join(Joiner.on(", "))),
+        () -> delegate.and(bits));
   }
 
   @Override
@@ -143,11 +145,12 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> bits) {
-    BooleanFormula f = makeFalse();
-    for (BooleanFormula bf : bits) {
-      f = or(bf, f);
-    }
-    return f;
+    return logger.logDef(
+        "mgr.getBooleanFormulaManager()",
+        String.format(
+            "or(%s)",
+            FluentIterable.from(bits).transform(logger::toVariable).join(Joiner.on(", "))),
+        () -> delegate.or(bits));
   }
 
   @Override
