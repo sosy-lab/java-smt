@@ -215,8 +215,8 @@ public class TraceFormulaManager implements FormulaManager {
     return f;
   }
 
-  private int getArity(FunctionDeclarationKind pKind) {
-    switch (pKind) {
+  private <T extends Formula> int getArity(FunctionDeclaration<T> pDeclaration) {
+    switch (pDeclaration.getKind()) {
       case AND:
       case OR:
       case IFF:
@@ -320,7 +320,9 @@ public class TraceFormulaManager implements FormulaManager {
         return 3;
 
       default:
-        throw new IllegalArgumentException(String.format("Unsupported kind: %s", pKind));
+        throw new IllegalArgumentException(
+            String.format(
+                "Unsupported kind: \"%s\" (%s)", pDeclaration.getName(), pDeclaration.getKind()));
     }
   }
 
@@ -339,13 +341,11 @@ public class TraceFormulaManager implements FormulaManager {
       // TODO Figure out how to handle rounding mode for floats
       // TODO Handle rational formulas
       Preconditions.checkArgument(
-          getArity(declaration.getKind()) == -1
-              ? args.size() > 1
-              : args.size() == getArity(declaration.getKind()),
+          getArity(declaration) == -1 ? args.size() > 1 : args.size() == getArity(declaration),
           "Term \"%s\" (%s): expecting %s arguments, but found %s",
           declaration.getName(),
           declaration.getKind(),
-          getArity(declaration.getKind()),
+          getArity(declaration),
           args.size());
       switch (declaration.getKind()) {
         case AND:
