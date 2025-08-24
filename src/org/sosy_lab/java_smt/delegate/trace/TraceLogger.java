@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
@@ -116,6 +117,7 @@ class TraceLogger {
         return mgr.rebuild(f);
       }
     } catch (Exception e) {
+      Throwables.throwIfUnchecked(e);
       throw new RuntimeException(e);
     }
   }
@@ -133,6 +135,7 @@ class TraceLogger {
       mapVariable(var, f);
       return f;
     } catch (Exception e) {
+      Throwables.throwIfUnchecked(e);
       throw new RuntimeException(e);
     }
   }
@@ -149,6 +152,7 @@ class TraceLogger {
       undoLast();
       return f;
     } catch (Exception e) {
+      Throwables.throwIfUnchecked(e);
       throw new RuntimeException(e);
     }
   }
@@ -164,6 +168,7 @@ class TraceLogger {
       appendStmt(prefix + "." + method);
       closure.run();
     } catch (Exception e) {
+      Throwables.throwIfUnchecked(e);
       throw new RuntimeException(e);
     }
   }
