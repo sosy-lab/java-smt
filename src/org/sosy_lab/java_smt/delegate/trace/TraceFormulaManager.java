@@ -10,7 +10,9 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
@@ -761,7 +763,19 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public <T extends Formula> T substitute(
       T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr",
+        String.format(
+            "substitute(%s, ImmutableMap.ofEntries(%s))",
+            logger.toVariable(f),
+            FluentIterable.from(fromToMapping.entrySet())
+                .transform(
+                    entry ->
+                        String.format(
+                            "Map.entry(%s, %s)",
+                            logger.toVariable(entry.getKey()), logger.toVariable(entry.getValue())))
+                .join(Joiner.on(", "))),
+        () -> delegate.substitute(f, fromToMapping));
   }
 
   @Override
