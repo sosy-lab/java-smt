@@ -93,7 +93,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public UFManager getUFManager() {
-    return new TraceUFManager(delegate.getUFManager(), logger);
+    return new TraceUFManager(delegate.getUFManager(), this, logger);
   }
 
   @Override

@@ -12,19 +12,24 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.UFManager;
 
 public class TraceUFManager implements UFManager {
   private final UFManager delegate;
+
+  private final FormulaManager mgr;
   private final TraceLogger logger;
 
-  TraceUFManager(UFManager pDelegate, TraceLogger pLogger) {
+  TraceUFManager(UFManager pDelegate, FormulaManager pMgr, TraceLogger pLogger) {
     delegate = pDelegate;
+    mgr = pMgr;
     logger = pLogger;
   }
 
@@ -81,12 +86,16 @@ public class TraceUFManager implements UFManager {
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, List<Formula> pArgs) {
-    throw new UnsupportedOperationException();
+    ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
+    for (Formula f : pArgs) {
+      builder.add(mgr.getFormulaType(f));
+    }
+    return callUF(declareUF(name, pReturnType, builder.build()), pArgs);
   }
 
   @Override
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    throw new UnsupportedOperationException();
+    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
   }
 }
