@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.collect.FluentIterable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -23,10 +24,14 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   private final BooleanFormulaManager delegate;
+
+  private final TraceFormulaManager mgr;
   private final TraceLogger logger;
 
-  TraceBooleanFormulaManager(BooleanFormulaManager pDelegate, TraceLogger pLogger) {
+  TraceBooleanFormulaManager(
+      BooleanFormulaManager pDelegate, TraceFormulaManager pMgr, TraceLogger pLogger) {
     delegate = pDelegate;
+    mgr = pMgr;
     logger = pLogger;
   }
 
@@ -202,11 +207,19 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
-    throw new UnsupportedOperationException();
+    logger.appendStmt(
+        String.format("mgr.toConjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
+    Set<BooleanFormula> set = delegate.toConjunctionArgs(f, flatten);
+    logger.undoLast();
+    return FluentIterable.from(set).transform(mgr::rebuild).toSet();
   }
 
   @Override
   public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
-    throw new UnsupportedOperationException();
+    logger.appendStmt(
+        String.format("mgr.toDisjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
+    Set<BooleanFormula> set = delegate.toDisjunctionArgs(f, flatten);
+    logger.undoLast();
+    return FluentIterable.from(set).transform(mgr::rebuild).toSet();
   }
 }

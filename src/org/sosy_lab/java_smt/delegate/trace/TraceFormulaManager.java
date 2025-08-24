@@ -76,7 +76,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
-    return new TraceBooleanFormulaManager(delegate.getBooleanFormulaManager(), logger);
+    return new TraceBooleanFormulaManager(delegate.getBooleanFormulaManager(), this, logger);
   }
 
   @Override
