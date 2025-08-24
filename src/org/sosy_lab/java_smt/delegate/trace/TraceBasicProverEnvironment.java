@@ -35,7 +35,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("addConstraint(%s)", logger.toVariable(constraint)),
         () -> delegate.addConstraint(constraint));
@@ -53,7 +53,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    return logger.logDef(logger.toVariable(this), "isUnsat()", delegate::isUnsat);
+    return logger.logDefKeep(logger.toVariable(this), "isUnsat()", delegate::isUnsat);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this), "getModel()", () -> new TraceModel(delegate.getModel(), logger));
   }
 

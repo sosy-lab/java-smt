@@ -31,14 +31,21 @@ public class TraceUFManager implements UFManager {
   @Override
   public <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, List<FormulaType<?>> args) {
-    return logger.logDef(
-        "mgr.getUFManager()",
+    String var = logger.newVariable();
+    logger.appendDef(
+        var,
         String.format(
-            "declareUF(\"%s\", %s, ImmutableList.of(%s))",
+            "mgr.getUFManager().declareUF(\"%s\", %s, ImmutableList.of(%s))",
             name,
             logger.printFormulaType(returnType),
-            FluentIterable.from(args).transform(logger::printFormulaType).join(Joiner.on(", "))),
-        () -> delegate.declareUF(name, returnType, args));
+            FluentIterable.from(args).transform(logger::printFormulaType).join(Joiner.on(", "))));
+    FunctionDeclaration<T> f = delegate.declareUF(name, returnType, args);
+    if (logger.isTracked(f)) {
+      logger.undoLast();
+    } else {
+      logger.mapVariable(var, f);
+    }
+    return f;
   }
 
   @Override
@@ -50,13 +57,20 @@ public class TraceUFManager implements UFManager {
   @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
-    return logger.logDef(
-        "mgr.getUFManager()",
+    String var = logger.newVariable();
+    logger.appendDef(
+        var,
         String.format(
             "callUF(%s, ImmutableList.of(%s))",
             logger.toVariable(funcType),
-            FluentIterable.from(args).transform(logger::toVariable).join(Joiner.on(", "))),
-        () -> delegate.callUF(funcType, args));
+            FluentIterable.from(args).transform(logger::toVariable).join(Joiner.on(", "))));
+    T f = delegate.callUF(funcType, args);
+    if (logger.isTracked(f)) {
+      logger.undoLast();
+    } else {
+      logger.mapVariable(var, f);
+    }
+    return f;
   }
 
   @Override

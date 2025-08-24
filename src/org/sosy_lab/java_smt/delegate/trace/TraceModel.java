@@ -38,7 +38,7 @@ public class TraceModel implements Model {
   public ImmutableList<ValueAssignment> asList() {
     // FIXME We need to introduce local variables for all terms in the model so that they can be
     //  referenced later
-    return logger.logDef(logger.toVariable(this), "asList()", delegate::asList);
+    return logger.logDefKeep(logger.toVariable(this), "asList()", delegate::asList);
   }
 
   @Override
@@ -51,7 +51,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable Object evaluate(Formula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -59,7 +59,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable BigInteger evaluate(IntegerFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -67,7 +67,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable Rational evaluate(RationalFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -75,7 +75,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable Boolean evaluate(BooleanFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -83,7 +83,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable BigInteger evaluate(BitvectorFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -91,7 +91,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable String evaluate(StringFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -99,7 +99,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable String evaluate(EnumerationFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));
@@ -107,7 +107,7 @@ public class TraceModel implements Model {
 
   @Override
   public @Nullable FloatingPointNumber evaluate(FloatingPointFormula formula) {
-    return logger.logDef(
+    return logger.logDefKeep(
         logger.toVariable(this),
         String.format("evaluate(%s)", logger.toVariable(formula)),
         () -> delegate.evaluate(formula));

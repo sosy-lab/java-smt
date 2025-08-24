@@ -68,7 +68,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public boolean isTrue(BooleanFormula formula) {
-    return logger.logDef(
+    return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
         String.format("isTrue(%s)", logger.toVariable(formula)),
         () -> delegate.isTrue(formula));
@@ -76,7 +76,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public boolean isFalse(BooleanFormula formula) {
-    return logger.logDef(
+    return logger.logDefDiscard(
         "mgr.getBooleanFormulaManager()",
         String.format("isFalse(%s)", logger.toVariable(formula)),
         () -> delegate.isFalse(formula));

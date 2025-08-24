@@ -27,13 +27,16 @@ import org.sosy_lab.java_smt.api.SolverContext;
 public class TraceSolverContext implements SolverContext {
   private final SolverContext delegate;
   private final TraceLogger logger;
+  private final TraceFormulaManager mgr;
 
   public TraceSolverContext(Solvers pSolver, Configuration config, SolverContext pDelegate) {
     delegate = pDelegate;
     // FIXME Move the files to the output folder?
+    mgr = new TraceFormulaManager(delegate.getFormulaManager());
     logger =
         new TraceLogger(
-            "trace" + Integer.toUnsignedString(System.identityHashCode(this)) + ".java");
+            mgr, "trace" + Integer.toUnsignedString(System.identityHashCode(this)) + ".java");
+    mgr.setLogger(logger);
 
     // Get relevant options from the configuration
     String props = config.asPropertiesString();
@@ -70,13 +73,13 @@ public class TraceSolverContext implements SolverContext {
 
   @Override
   public FormulaManager getFormulaManager() {
-    return new TraceFormulaManager(delegate.getFormulaManager(), logger);
+    return mgr;
   }
 
   @SuppressWarnings("resource")
   @Override
   public ProverEnvironment newProverEnvironment(ProverOptions... options) {
-    return logger.logDef(
+    return logger.logDefKeep(
         "context",
         String.format(
             "newProverEnvironment(%s)",

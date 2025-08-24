@@ -11,11 +11,9 @@
 package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Preconditions;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -26,22 +24,26 @@ import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 class TraceLogger {
+  private final TraceFormulaManager mgr;
   private long id = 0;
 
   private final Map<Object, String> valueMap = new HashMap<>();
-  private final BufferedWriter output;
+  private final RandomAccessFile output;
 
-  TraceLogger(String pFile) {
+  private long backtrackPoint = -1;
+
+  TraceLogger(TraceFormulaManager pMgr, String pFile) {
+    mgr = pMgr;
     // FIXME Check if the file already exists
     try {
-      output = Files.newBufferedWriter(Path.of(pFile), Charset.defaultCharset());
+      output = new RandomAccessFile(pFile, "rw");
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
   }
 
   /** Returns a fresh variable. */
-  private String newVariable() {
+  public String newVariable() {
     return "var" + id++;
   }
 
@@ -50,8 +52,13 @@ class TraceLogger {
    *
    * <p>Use {@link #toVariable(Object)} to get the variable name for a tracked object
    */
-  private void mapVariable(String pVar, Object f) {
+  public void mapVariable(String pVar, Object f) {
     valueMap.putIfAbsent(f, pVar);
+  }
+
+  /** Returns <code>true</code> if the object is tracked. */
+  public boolean isTracked(Object f) {
+    return valueMap.containsKey(f);
   }
 
   /**
@@ -61,15 +68,15 @@ class TraceLogger {
    */
   public String toVariable(Object f) {
     String r = valueMap.get(f);
-    Preconditions.checkArgument(r != null, "Object not tracked");
+    Preconditions.checkArgument(r != null, "Object not tracked: %s", f);
     return r;
   }
 
   /** Add a definition to the log. */
   public void appendDef(String pVar, String pExpr) {
     try {
-      output.append(String.format("var %s = %s;%n", pVar, pExpr));
-      output.flush();
+      backtrackPoint = output.length();
+      output.write(String.format("var %s = %s;%n", pVar, pExpr).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -78,22 +85,69 @@ class TraceLogger {
   /** Add a statement to the log. */
   public void appendStmt(String pStmt) {
     try {
-      output.append(String.format("%s;%n", pStmt));
-      output.flush();
+      backtrackPoint = output.length();
+      output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
+  public void undoLast() {
+    Preconditions.checkArgument(backtrackPoint >= 0, "Cannot undo last trace");
+    try {
+      output.setLength(backtrackPoint);
+    } catch (IOException pE) {
+      throw new RuntimeException(pE);
+    }
+    backtrackPoint = -1;
+  }
+
   /** Log an API call with return value. */
-  public <R> R logDef(String prefix, String method, Callable<R> closure) {
+  public <R extends Formula> R logDef(String prefix, String method, Callable<R> closure) {
+    String var = newVariable();
+    try {
+      appendDef(var, prefix + "." + method);
+      R f = closure.call();
+      if (!isTracked(f)) {
+        mapVariable(var, f);
+        return f;
+      } else {
+        undoLast();
+        return mgr.rebuild(f);
+      }
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Variant of {@link #logDef(String, String, Callable)} that will always keep the call in the log.
+   *
+   * <p>Use this version if the called function has side effects
+   */
+  public <R> R logDefKeep(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
     try {
       appendDef(var, prefix + "." + method);
       R f = closure.call();
       mapVariable(var, f);
       return f;
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
 
+  /**
+   * Variant of {@link #logDef(String, String, Callable)} that will always remove the call from the
+   * log after it returned successfully.
+   */
+  public <R> R logDefDiscard(String prefix, String method, Callable<R> closure) {
+    String var = newVariable();
+    try {
+      appendDef(var, prefix + "." + method);
+      R f = closure.call();
+      undoLast();
+      return f;
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

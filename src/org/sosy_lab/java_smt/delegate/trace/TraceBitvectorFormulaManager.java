@@ -79,7 +79,7 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
 
   @Override
   public int getLength(BitvectorFormula number) {
-    return logger.logDef(
+    return logger.logDefDiscard(
         "mgr.getBitvectorFormulaManager()",
         String.format("getLength(%s)", logger.toVariable(number)),
         () -> delegate.getLength(number));
