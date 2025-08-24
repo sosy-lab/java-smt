@@ -60,7 +60,12 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   @Override
   public FloatingPointFormula makeNumber(
       BigDecimal n, FloatingPointType type, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    throw new UnsupportedOperationException();
+    return logger.logDef(
+        "mgr.getFloatingPointFormulaManager()",
+        String.format(
+            "makeNumber(new BigDecimal(\"%s\"), %s, %s)",
+            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
+        () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
   @Override
