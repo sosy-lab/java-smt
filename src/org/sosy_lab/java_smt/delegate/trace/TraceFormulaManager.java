@@ -789,16 +789,16 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public boolean isValidName(String variableName) {
-    throw new UnsupportedOperationException();
+    return delegate.isValidName(variableName);
   }
 
   @Override
   public String escape(String variableName) {
-    throw new UnsupportedOperationException();
+    return delegate.escape(variableName);
   }
 
   @Override
   public String unescape(String variableName) {
-    throw new UnsupportedOperationException();
+    return delegate.unescape(variableName);
   }
 }
