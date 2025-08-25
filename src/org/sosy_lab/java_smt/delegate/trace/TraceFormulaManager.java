@@ -187,6 +187,7 @@ public class TraceFormulaManager implements FormulaManager {
       return f;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
@@ -338,7 +339,7 @@ public class TraceFormulaManager implements FormulaManager {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
