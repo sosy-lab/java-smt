@@ -30,6 +30,11 @@ public interface FunctionDeclaration<E extends Formula> {
   String getName();
 
   /**
+   * @return List of indices for the function
+   */
+  ImmutableList<Integer> getIndices();
+
+  /**
    * @return Sort of the function output.
    */
   FormulaType<E> getType();
