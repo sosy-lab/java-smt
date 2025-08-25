@@ -37,6 +37,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_UREM;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_XOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_BV_ZEXT;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_DIVIDE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_EQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FLOOR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_ABS;
@@ -405,6 +406,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
       case MSAT_TAG_TIMES:
         return FunctionDeclarationKind.MUL;
+      case MSAT_TAG_DIVIDE:
+        return FunctionDeclarationKind.DIV;
       case MSAT_TAG_PLUS:
         return FunctionDeclarationKind.ADD;
       case MSAT_TAG_LEQ:
