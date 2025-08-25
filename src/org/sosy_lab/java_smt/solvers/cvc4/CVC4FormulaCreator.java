@@ -26,6 +26,7 @@ import edu.stanford.CVC4.FunctionType;
 import edu.stanford.CVC4.Integer;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.RoundingMode;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import edu.stanford.CVC4.vectorType;
@@ -334,8 +335,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isFloatingPoint()) {
         return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstRoundingMode());
+        return visitor.visitConstant(formula, convertRoundingMode(f));
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
       } else if (type.isArray()) {
@@ -624,6 +624,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (valueType.isFloatingPoint()) {
       return convertFloatingPoint(value);
 
+    } else if (valueType.isRoundingMode()) {
+      return convertRoundingMode(value);
+
     } else if (valueType.isString()) {
       return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
@@ -658,5 +661,22 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         new BigInteger(mant, 2),
         expWidth,
         mantWidth);
+  }
+
+  private FloatingPointRoundingMode convertRoundingMode(Expr pExpr) {
+    RoundingMode rm = pExpr.getConstRoundingMode();
+    if (rm.equals(RoundingMode.roundNearestTiesToAway)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (rm.equals(RoundingMode.roundNearestTiesToEven)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (rm.equals(RoundingMode.roundTowardNegative)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (rm.equals(RoundingMode.roundTowardPositive)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (rm.equals(RoundingMode.roundTowardZero)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(String.format("Unknown rounding mode: %s", pExpr));
+    }
   }
 }

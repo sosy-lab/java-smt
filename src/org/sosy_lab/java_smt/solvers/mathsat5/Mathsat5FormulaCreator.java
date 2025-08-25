@@ -71,7 +71,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -341,6 +340,20 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, true);
     } else if (msat_term_is_false(environment, f)) {
       return visitor.visitConstant(formula, false);
+    } else if (msat_is_fp_roundingmode_type(environment, msat_term_get_type(f))) {
+      long decl = msat_term_get_decl(f);
+      switch (msat_decl_get_name(decl)) {
+        case "`fprounding_even`":
+          return visitor.visitConstant(formula, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+        case "`fprounding_plus_inf`":
+          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_POSITIVE);
+        case "`fprounding_minus_inf`":
+          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_NEGATIVE);
+        case "`fprounding_zero`":
+          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_ZERO);
+        default:
+          throw new IllegalArgumentException("Unknown rounding mode " + msat_decl_get_name(decl));
+      }
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
@@ -524,22 +537,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_IS_SUBNORMAL;
       case MSAT_TAG_FP_ISNORMAL:
         return FunctionDeclarationKind.FP_IS_NORMAL;
-
-      case MSAT_TAG_UNKNOWN:
-        switch (msat_decl_get_name(decl)) {
-          case "`fprounding_even`":
-            return FunctionDeclarationKind.FP_ROUND_EVEN;
-          case "`fprounding_plus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-          case "`fprounding_minus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-          case "`fprounding_zero`":
-            return FunctionDeclarationKind.FP_ROUND_ZERO;
-
-          default:
-            return FunctionDeclarationKind.OTHER;
-        }
-
       case MSAT_TAG_FLOOR:
         return FunctionDeclarationKind.FLOOR;
 
