@@ -15,9 +15,10 @@ import com.google.common.base.Throwables;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.util.concurrent.Callable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -32,7 +33,7 @@ class TraceLogger {
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
 
-  private final Stack<Long> lastLines = new Stack<>();
+  private final Deque<Long> lastLines = new ArrayDeque<>();
 
   TraceLogger(TraceFormulaManager pMgr, String pFile) {
     mgr = pMgr;
