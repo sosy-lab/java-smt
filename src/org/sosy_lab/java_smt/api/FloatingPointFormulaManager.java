@@ -34,6 +34,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
  */
 public interface FloatingPointFormulaManager {
 
+  /** Creates a formula for the given floating point rounding mode */
+  FloatingPointRoundingModeFormula makeRoundingMode(FloatingPointRoundingMode pRoundingMode);
+
   /**
    * Creates a floating point formula representing the given double value with the specified type.
    */

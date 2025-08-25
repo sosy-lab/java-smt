@@ -127,6 +127,8 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -289,6 +291,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
     assert getFormulaType(pTerm).isFloatingPointType();
     return new Mathsat5FloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType();
+    return new Mathsat5FloatingPointRoundingModeFormula(pTerm);
   }
 
   @Override

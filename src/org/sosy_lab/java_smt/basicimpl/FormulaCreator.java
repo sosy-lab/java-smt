@@ -160,6 +160,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return new FloatingPointFormulaImpl<>(pTerm);
   }
 
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(TFormulaInfo pTerm) {
+    checkArgument(
+        getFormulaType(pTerm).isFloatingPointRoundingModeType(),
+        "Floatingpoint rounding mode formula has unexpected type: %s",
+        getFormulaType(pTerm));
+    return new FloatingPointRoundingModeFormulaImpl<>(pTerm);
+  }
+
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
     checkArgument(
