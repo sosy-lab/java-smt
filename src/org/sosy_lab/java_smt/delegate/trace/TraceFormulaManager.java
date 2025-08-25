@@ -211,6 +211,8 @@ public class TraceFormulaManager implements FormulaManager {
     T f = delegate.makeVariable(formulaType, name);
     if (logger.isTracked(f)) {
       logger.undoLast();
+    } else {
+      logger.mapVariable(var, f);
     }
     return f;
   }
