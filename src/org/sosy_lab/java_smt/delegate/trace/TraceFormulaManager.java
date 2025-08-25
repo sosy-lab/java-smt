@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -39,7 +40,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
@@ -71,7 +74,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceRationalFormulaManager(delegate.getRationalFormulaManager(), logger);
   }
 
   @Override
@@ -166,6 +169,13 @@ public class TraceFormulaManager implements FormulaManager {
                   "mgr.getIntegerFormulaManager()",
                   String.format("makeNumber(%s)", value),
                   () -> delegate.getIntegerFormulaManager().makeNumber((BigInteger) value));
+          Preconditions.checkArgument(g.equals(f));
+        } else if (f instanceof RationalFormula && value instanceof Rational) {
+          var g =
+              logger.logDef(
+                  "mgr.getRationalFormulaManager()",
+                  String.format("makeNumber(%s)", value),
+                  () -> delegate.getRationalFormulaManager().makeNumber((Rational) value));
           Preconditions.checkArgument(g.equals(f));
         } else {
           throw new IllegalArgumentException(
@@ -396,35 +406,64 @@ public class TraceFormulaManager implements FormulaManager {
               getArrayFormulaManager()
                   .makeArray((ArrayFormulaType) declaration.getType(), args.get(0));
         case UMINUS:
-          return (T) getIntegerFormulaManager().negate((IntegerFormula) args.get(0));
+          {
+            if (declaration.getType().isIntegerType()) {
+              return (T) getIntegerFormulaManager().negate((IntegerFormula) args.get(0));
+            } else {
+              return (T) getRationalFormulaManager().negate((NumeralFormula) args.get(0));
+            }
+          }
         case SUB:
           {
             Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getIntegerFormulaManager()
-                    .subtract((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            if (declaration.getType().isIntegerType()) {
+              return (T)
+                  getIntegerFormulaManager()
+                      .subtract((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            } else {
+              return (T)
+                  getRationalFormulaManager()
+                      .subtract((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            }
           }
         case ADD:
           {
             Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getIntegerFormulaManager()
-                    .add((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            if (declaration.getType().isIntegerType()) {
+              return (T)
+                  getIntegerFormulaManager()
+                      .add((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            } else {
+              return (T)
+                  getRationalFormulaManager()
+                      .add((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            }
           }
         case DIV:
           {
             Preconditions.checkArgument(args.size() == 2);
-
-            return (T)
-                getIntegerFormulaManager()
-                    .divide((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            if (declaration.getType().isIntegerType()) {
+              return (T)
+                  getIntegerFormulaManager()
+                      .divide((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            } else {
+              return (T)
+                  getRationalFormulaManager()
+                      .divide((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            }
           }
         case MUL:
           {
             Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getIntegerFormulaManager()
-                    .multiply((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            if (declaration.getType().isIntegerType()) {
+              return (T)
+                  getIntegerFormulaManager()
+                      .multiply((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            } else {
+              return (T)
+                  getRationalFormulaManager()
+                      .multiply((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            }
           }
         case MODULO:
           return (T)
@@ -434,29 +473,29 @@ public class TraceFormulaManager implements FormulaManager {
           {
             Preconditions.checkArgument(args.size() == 2);
             return (T)
-                getIntegerFormulaManager()
-                    .lessThan((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+                getRationalFormulaManager()
+                    .lessThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case LTE:
           {
             Preconditions.checkArgument(args.size() == 2);
             return (T)
-                getIntegerFormulaManager()
-                    .lessOrEquals((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+                getRationalFormulaManager()
+                    .lessOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case GT:
           {
             Preconditions.checkArgument(args.size() == 2);
             return (T)
-                getIntegerFormulaManager()
-                    .greaterThan((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+                getRationalFormulaManager()
+                    .greaterThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case GTE:
           {
             Preconditions.checkArgument(args.size() == 2);
             return (T)
-                getIntegerFormulaManager()
-                    .greaterOrEquals((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+                getRationalFormulaManager()
+                    .greaterOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case EQ:
           {
@@ -465,15 +504,15 @@ public class TraceFormulaManager implements FormulaManager {
               return (T)
                   getBooleanFormulaManager()
                       .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(1).isIntegerType()) {
+            } else if (declaration.getArgumentTypes().get(0).isNumeralType()) {
               return (T)
-                  getIntegerFormulaManager()
-                      .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(1).isBitvectorType()) {
+                  getRationalFormulaManager()
+                      .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
               return (T)
                   getBitvectorFormulaManager()
                       .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(1).isArrayType()) {
+            } else if (declaration.getArgumentTypes().get(0).isArrayType()) {
               return (T)
                   getArrayFormulaManager()
                       .equivalence((ArrayFormula) args.get(0), (ArrayFormula) args.get(1));
@@ -490,11 +529,17 @@ public class TraceFormulaManager implements FormulaManager {
           break;
         case GTE_ZERO:
           break;
-        case FLOOR:
-          break;
         case TO_REAL:
           break;
         */
+        case FLOOR:
+          {
+            if (args.get(0) instanceof IntegerFormula) {
+              return (T) getIntegerFormulaManager().floor((IntegerFormula) args.get(0));
+            } else {
+              return (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
+            }
+          }
         case BV_EXTRACT:
           {
             List<String> tokens = Splitter.on('_').splitToList(declaration.getName());
