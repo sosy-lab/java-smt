@@ -799,16 +799,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_GT;
       case Z3_OP_FPA_EQ:
         return FunctionDeclarationKind.FP_EQ;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
-        return FunctionDeclarationKind.FP_ROUND_EVEN;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
-        return FunctionDeclarationKind.FP_ROUND_AWAY;
-      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
-        return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
-        return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-      case Z3_OP_FPA_RM_TOWARD_ZERO:
-        return FunctionDeclarationKind.FP_ROUND_ZERO;
       case Z3_OP_FPA_ROUND_TO_INTEGRAL:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
       case Z3_OP_FPA_TO_FP_UNSIGNED:
