@@ -22,6 +22,7 @@ import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_ast_kind;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_param_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.lang.ref.PhantomReference;
@@ -492,7 +493,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return visitor.visitConstant(formula, convertValue(f));
       case Z3_APP_AST:
         int arity = Native.getAppNumArgs(environment, f);
-        int declKind = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
+        long decl = Native.getAppDecl(environment, f);
+        int declKind = Native.getDeclKind(environment, decl);
 
         if (arity == 0) {
           // constants
@@ -538,6 +540,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           }
         }
 
+        ImmutableList.Builder<Integer> indexBuilder = ImmutableList.builder();
+        for (int p = 0; p < Native.getDeclNumParameters(environment, decl); p++) {
+          int kind = Native.getDeclParameterKind(environment, decl, p);
+          if (kind == Z3_param_kind.Z3_PK_UINT.toInt()) {
+            indexBuilder.add(Native.getDeclIntParameter(environment, decl, p));
+          }
+        }
+
         // Function application with zero or more parameters
         ImmutableList.Builder<Formula> args = ImmutableList.builder();
         ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
@@ -553,6 +563,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             FunctionDeclarationImpl.of(
                 getAppName(f),
                 getDeclarationKind(f),
+                indexBuilder.build(),
                 argTypes.build(),
                 getFormulaType(f),
                 Native.getAppDecl(environment, f)));
