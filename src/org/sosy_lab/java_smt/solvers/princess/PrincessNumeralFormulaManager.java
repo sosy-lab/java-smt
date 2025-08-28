@@ -44,4 +44,9 @@ abstract class PrincessNumeralFormulaManager<
   protected IExpression distinctImpl(List<IExpression> pNumbers) {
     return IExpression.distinct(asScala(Iterables.filter(pNumbers, ITerm.class)));
   }
+
+  @Override
+  public IExpression toRational(IExpression formula) {
+    return PrincessEnvironment.rationalTheory.int2ring((ITerm) formula);
+  }
 }

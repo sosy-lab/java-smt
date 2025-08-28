@@ -174,4 +174,9 @@ abstract class SmtInterpolNumeralFormulaManager<
   public Term lessOrEquals(Term pNumber1, Term pNumber2) {
     return env.term("<=", pNumber1, pNumber2);
   }
+
+  @Override
+  public Term toRational(Term formula) {
+    return env.term("to_real", formula);
+  }
 }

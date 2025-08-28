@@ -135,4 +135,9 @@ abstract class Mathsat5NumeralFormulaManager<
   protected Long floor(Long pNumber) {
     return msat_make_floor(mathsatEnv, pNumber);
   }
+
+  @Override
+  protected Long toRational(Long pNumber) {
+    return pNumber;
+  }
 }

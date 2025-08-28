@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -159,5 +160,11 @@ class StatisticsNumeralFormulaManager<
   public IntegerFormula floor(ParamFormulaType pNumber) {
     stats.numericOperations.getAndIncrement();
     return delegate.floor(pNumber);
+  }
+
+  @Override
+  public RationalFormula toRational(ParamFormulaType formula) {
+    stats.numericOperations.getAndIncrement();
+    return delegate.toRational(formula);
   }
 }

@@ -136,4 +136,9 @@ abstract class Yices2NumeralFormulaManager<
   protected Integer floor(Integer pNumber) {
     return yices_floor(pNumber);
   }
+
+  @Override
+  public Integer toRational(Integer formula) {
+    return formula;
+  }
 }

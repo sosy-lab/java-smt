@@ -186,4 +186,9 @@ abstract class CVC4NumeralFormulaManager<
       return exprManager.mkExpr(Kind.DISTINCT, param);
     }
   }
+
+  @Override
+  public Expr toRational(Expr formula) {
+    return exprManager.mkExpr(Kind.TO_REAL, formula);
+  }
 }

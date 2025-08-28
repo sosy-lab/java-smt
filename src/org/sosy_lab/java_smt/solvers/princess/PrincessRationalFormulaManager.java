@@ -54,18 +54,14 @@ public class PrincessRationalFormulaManager
     return false;
   }
 
-  protected IExpression fromInteger(ITerm i) {
-    return PrincessEnvironment.rationalTheory.int2ring(i);
-  }
-
   @Override
   protected IExpression makeNumberImpl(long i) {
-    return fromInteger(ifmgr.makeNumberImpl(i));
+    return toRational(ifmgr.makeNumberImpl(i));
   }
 
   @Override
   protected IExpression makeNumberImpl(BigInteger i) {
-    return fromInteger(ifmgr.makeNumberImpl(i));
+    return toRational(ifmgr.makeNumberImpl(i));
   }
 
   @Override

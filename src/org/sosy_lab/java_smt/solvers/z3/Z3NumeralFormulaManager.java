@@ -123,4 +123,9 @@ abstract class Z3NumeralFormulaManager<
   protected Long lessOrEquals(Long pNumber1, Long pNumber2) {
     return Native.mkLe(z3context, pNumber1, pNumber2);
   }
+
+  @Override
+  protected Long toRational(Long number) {
+    return Native.mkInt2real(z3context, number);
+  }
 }

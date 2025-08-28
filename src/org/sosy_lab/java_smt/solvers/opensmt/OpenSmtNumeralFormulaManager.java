@@ -122,4 +122,9 @@ abstract class OpenSmtNumeralFormulaManager<
   protected PTRef distinctImpl(List<PTRef> pParam) {
     return osmtLogic.mkDistinct(new VectorPTRef(pParam));
   }
+
+  @Override
+  public PTRef toRational(PTRef formula) {
+    throw new UnsupportedOperationException("OpenSMT does not support mixed integer-real logic");
+  }
 }

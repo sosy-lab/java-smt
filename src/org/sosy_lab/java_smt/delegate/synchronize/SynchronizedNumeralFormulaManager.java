@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 
@@ -179,6 +180,13 @@ class SynchronizedNumeralFormulaManager<
   public IntegerFormula floor(ParamFormulaType pNumber) {
     synchronized (sync) {
       return delegate.floor(pNumber);
+    }
+  }
+
+  @Override
+  public RationalFormula toRational(ParamFormulaType formula) {
+    synchronized (sync) {
+      return delegate.toRational(formula);
     }
   }
 }

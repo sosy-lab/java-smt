@@ -195,4 +195,9 @@ abstract class CVC5NumeralFormulaManager<
           Kind.DISTINCT, pParam.stream().map(this::toType).toArray(Term[]::new));
     }
   }
+
+  @Override
+  public Term toRational(Term formula) {
+    return termManager.mkTerm(Kind.TO_REAL, formula);
+  }
 }

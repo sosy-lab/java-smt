@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
 /**
  * This interface represents the Numeral Theory.
@@ -106,4 +107,6 @@ public interface NumeralFormulaManager<
    * <p>For rational formulas, SMTlib2 denotes this operation as {@code to_int}.
    */
   IntegerFormula floor(ParamFormulaType formula);
+
+  RationalFormula toRational(ParamFormulaType number);
 }

@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 /**
@@ -445,4 +446,16 @@ public abstract class AbstractNumeralFormulaManager<
   protected TFormulaInfo toType(TFormulaInfo param) {
     return param;
   }
+
+  @Override
+  public RationalFormula toRational(ParamFormulaType number) {
+    if (number instanceof RationalFormula) {
+      return (RationalFormula) number;
+    } else {
+      return getFormulaCreator()
+          .encapsulate(FormulaType.RationalType, toRational(extractInfo(number)));
+    }
+  }
+
+  protected abstract TFormulaInfo toRational(TFormulaInfo number);
 }

@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
 
 @SuppressWarnings("ClassTypeParameterName")
@@ -222,6 +223,15 @@ public class DebuggingNumeralFormulaManager<
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(formula);
     IntegerFormula result = delegate.floor(formula);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public RationalFormula toRational(ParamFormulaType formula) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(formula);
+    RationalFormula result = delegate.toRational(formula);
     debugging.addFormulaTerm(result);
     return result;
   }
