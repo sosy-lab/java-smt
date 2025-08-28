@@ -71,7 +71,7 @@ public class TraceArrayFormulaManager implements ArrayFormulaManager {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
         String.format(
-            "makeArray(\"%s\", %s, %s)",
+            "makeArray(%s, %s, %s)",
             logger.printFormulaType(pIndexType),
             logger.printFormulaType(pElementType),
             logger.toVariable(defaultElement)),

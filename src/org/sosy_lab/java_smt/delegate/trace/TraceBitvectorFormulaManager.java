@@ -31,7 +31,7 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeBitvector(int length, long pI) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeBitvector(%s, %s)", length, pI),
+        String.format("makeBitvector(%s, %sL)", length, pI),
         () -> delegate.makeBitvector(length, pI));
   }
 

@@ -48,8 +48,21 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
         "mgr.getFloatingPointFormulaManager()",
         String.format(
             "makeNumber(%s, %s, %s)",
-            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
+            toString(n), logger.printFormulaType(type),
+            printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
+  }
+
+  private String toString(double number) {
+    if (Double.isNaN(number)) {
+      return "Double.NaN";
+    } else if (Double.isInfinite(number)) {
+      return number > 0 ? "Double.POSITIVE_INFINITY" : "Double.NEGATIVE_INFINITY";
+    } else if (number == 0.0 && Double.doubleToRawLongBits(number) == Double.doubleToRawLongBits(-0.0)) {
+      return "-0.0";
+    } else {
+      return Double.toString(number);
+    }
   }
 
   @Override
