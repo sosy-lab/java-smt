@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -309,9 +307,7 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BooleanFormula distinct(List<BitvectorFormula> pBits) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format(
-            "distinct(ImmutableList.of(%s))",
-            FluentIterable.from(pBits).transform(logger::toVariable).join(Joiner.on(", "))),
+        String.format("distinct(ImmutableList.of(%s))", logger.toVariables(pBits)),
         () -> delegate.distinct(pBits));
   }
 }

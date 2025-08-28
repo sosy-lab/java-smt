@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -80,8 +78,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
         var,
         String.format(
             "%s.isUnsatWithAssumptions(ImmutableList.of(%s))",
-            logger.toVariable(this),
-            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))));
+            logger.toVariable(this), logger.toVariables(assumptions)));
     boolean unsat = delegate.isUnsatWithAssumptions(assumptions);
     logger.mapVariable(var, unsat);
     return unsat;
@@ -102,7 +99,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     logger.appendStmt(String.format("%s.getUnsatCore()", logger.toVariable(this)));
     List<BooleanFormula> core = delegate.getUnsatCore();
     logger.undoLast();
-    return FluentIterable.from(core).transform(mgr::rebuild).toList();
+    return mgr.rebuildAll(core);
   }
 
   @Override
@@ -111,11 +108,10 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     logger.appendStmt(
         String.format(
             "%s.getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
-            logger.toVariable(this),
-            FluentIterable.from(assumptions).transform(logger::toVariable).join(Joiner.on(", "))));
+            logger.toVariable(this), logger.toVariables(assumptions)));
     Optional<List<BooleanFormula>> maybeCore = delegate.unsatCoreOverAssumptions(assumptions);
     logger.undoLast();
-    return maybeCore.map(core -> FluentIterable.from(core).transform(mgr::rebuild).toList());
+    return maybeCore.map(mgr::rebuildAll);
   }
 
   @Override

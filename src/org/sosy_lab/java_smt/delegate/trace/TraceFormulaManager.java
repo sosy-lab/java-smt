@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -211,6 +212,14 @@ public class TraceFormulaManager implements FormulaManager {
 
   public <T extends Formula> T rebuild(T f) {
     return delegate.transformRecursively(f, new TraceFormulaManager.Rebuilder(this));
+  }
+
+  public <T extends Formula> List<T> rebuildAll(List<T> formulas) {
+    return FluentIterable.from(formulas).transform(this::rebuild).toList();
+  }
+
+  public <T extends Formula> Set<T> rebuildAll(Set<T> formulas) {
+    return FluentIterable.from(formulas).transform(this::rebuild).toSet();
   }
 
   @Override

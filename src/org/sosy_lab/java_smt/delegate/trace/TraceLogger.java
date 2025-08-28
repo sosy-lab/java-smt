@@ -10,8 +10,10 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -77,6 +79,11 @@ class TraceLogger {
     String r = valueMap.get(f);
     Preconditions.checkArgument(r != null, "Object not tracked: %s", f);
     return r;
+  }
+
+  /** Returns a comma-separated list of variable names for the given objects. */
+  public String toVariables(Iterable<?> objects) {
+    return FluentIterable.from(objects).transform(this::toVariable).join(Joiner.on(", "));
   }
 
   /** Add a definition of a new object to the log. */

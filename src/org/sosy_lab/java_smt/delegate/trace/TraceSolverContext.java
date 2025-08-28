@@ -114,7 +114,7 @@ public class TraceSolverContext implements SolverContext {
         String.format(
             "newProverEnvironment(%s)",
             FluentIterable.from(options)
-                .transform(v -> "SolverContext" + ".ProverOptions." + v.name())
+                .transform(v -> "SolverContext.ProverOptions." + v.name())
                 .join(Joiner.on(", "))),
         () -> new TraceProverEnvironment(delegate.newProverEnvironment(options), mgr, logger));
   }

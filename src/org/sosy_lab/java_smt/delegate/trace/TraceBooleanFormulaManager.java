@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
@@ -109,19 +107,14 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula and(BooleanFormula formula1, BooleanFormula formula2) {
-    return logger.logDef(
-        "mgr.getBooleanFormulaManager()",
-        String.format("and(%s, %s)", logger.toVariable(formula1), logger.toVariable(formula2)),
-        () -> delegate.and(formula1, formula2));
+    return and(Arrays.asList(formula1, formula2));
   }
 
   @Override
   public BooleanFormula and(Collection<BooleanFormula> bits) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "and(%s)",
-            FluentIterable.from(bits).transform(logger::toVariable).join(Joiner.on(", "))),
+        String.format("and(%s)", logger.toVariables(bits)),
         () -> delegate.and(bits));
   }
 
@@ -137,19 +130,14 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(BooleanFormula formula1, BooleanFormula formula2) {
-    return logger.logDef(
-        "mgr.getBooleanFormulaManager()",
-        String.format("or(%s, %s)", logger.toVariable(formula1), logger.toVariable(formula2)),
-        () -> delegate.or(formula1, formula2));
+    return or(Arrays.asList(formula1, formula2));
   }
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> bits) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format(
-            "or(%s)",
-            FluentIterable.from(bits).transform(logger::toVariable).join(Joiner.on(", "))),
+        String.format("or(%s)", logger.toVariables(bits)),
         () -> delegate.or(bits));
   }
 
@@ -215,7 +203,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
         String.format("mgr.toConjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
     Set<BooleanFormula> set = delegate.toConjunctionArgs(f, flatten);
     logger.undoLast();
-    return FluentIterable.from(set).transform(mgr::rebuild).toSet();
+    return mgr.rebuildAll(set);
   }
 
   @Override
@@ -224,6 +212,6 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
         String.format("mgr.toDisjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
     Set<BooleanFormula> set = delegate.toDisjunctionArgs(f, flatten);
     logger.undoLast();
-    return FluentIterable.from(set).transform(mgr::rebuild).toSet();
+    return mgr.rebuildAll(set);
   }
 }

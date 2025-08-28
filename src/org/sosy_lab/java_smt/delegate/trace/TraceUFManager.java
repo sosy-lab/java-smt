@@ -67,8 +67,7 @@ public class TraceUFManager implements UFManager {
         var,
         String.format(
             "callUF(%s, ImmutableList.of(%s))",
-            logger.toVariable(funcType),
-            FluentIterable.from(args).transform(logger::toVariable).join(Joiner.on(", "))));
+            logger.toVariable(funcType), logger.toVariables(args)));
     T f = delegate.callUF(funcType, args);
     if (logger.isTracked(f)) {
       logger.undoLast();

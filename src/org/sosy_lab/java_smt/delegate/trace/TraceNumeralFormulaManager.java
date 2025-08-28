@@ -10,8 +10,6 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -76,9 +74,7 @@ public abstract class TraceNumeralFormulaManager<
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
     return logger.logDef(
         "mgr.getIntegerFormulaManager()",
-        String.format(
-            "sum(%s)",
-            FluentIterable.from(operands).transform(logger::toVariable).join(Joiner.on(", "))),
+        String.format("sum(%s)", logger.toVariables(operands)),
         () -> delegate.sum(operands));
   }
 
@@ -119,9 +115,7 @@ public abstract class TraceNumeralFormulaManager<
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
     return logger.logDef(
         "mgr.getIntegerFormulaManager()",
-        String.format(
-            "distinct(%s)",
-            FluentIterable.from(pNumbers).transform(logger::toVariable).join(Joiner.on(", "))),
+        String.format("distinct(%s)", logger.toVariables(pNumbers)),
         () -> delegate.distinct(pNumbers));
   }
 
