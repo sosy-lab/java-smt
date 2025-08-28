@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 class TraceLogger {
   private final TraceFormulaManager mgr;
-  private UniqueIdGenerator id = new UniqueIdGenerator();
+  private final UniqueIdGenerator id = new UniqueIdGenerator();
 
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
@@ -41,7 +41,7 @@ class TraceLogger {
     mgr = pMgr;
     mgr.setLogger(this);
 
-    // FIXME Check if the file already exists
+    // FIXME Check if the file already exists -> quite unlikely, lets ignore this case.
     try {
       output = new RandomAccessFile(pFile, "rw");
     } catch (IOException e) {
@@ -94,8 +94,8 @@ class TraceLogger {
     try {
       lastLines.push(output.length());
       output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (IOException pIOException) {
+      throw new RuntimeException(pIOException);
     }
   }
 
