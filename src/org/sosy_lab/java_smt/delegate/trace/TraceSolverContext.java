@@ -14,9 +14,18 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.MoreFiles;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map.Entry;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.FileOption;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.Option;
+import org.sosy_lab.common.configuration.Options;
+import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -24,20 +33,41 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 
+@Options
 public class TraceSolverContext implements SolverContext {
   private final SolverContext delegate;
   private final TraceLogger logger;
   private final TraceFormulaManager mgr;
 
-  public TraceSolverContext(Solvers pSolver, Configuration config, SolverContext pDelegate) {
-    delegate = pDelegate;
-    // FIXME Move the files to the output folder?
-    mgr = new TraceFormulaManager(delegate.getFormulaManager());
-    logger =
-        new TraceLogger(
-            mgr, "trace" + Integer.toUnsignedString(System.identityHashCode(this)) + ".java");
-    mgr.setLogger(logger);
+  @Option(
+      secure = true,
+      name = "solver.tracefile",
+      description = "Export solver interaction as Java code into a file.")
+  @FileOption(FileOption.Type.OUTPUT_FILE)
+  private @Nullable PathTemplate tracefileTemplate =
+      PathTemplate.ofFormatString("traces/trace_%s.java");
 
+  public TraceSolverContext(Solvers pSolver, Configuration config, SolverContext pDelegate)
+      throws InvalidConfigurationException {
+    config.inject(this);
+    delegate = pDelegate;
+    mgr = new TraceFormulaManager(delegate.getFormulaManager());
+
+    // initialize the trace logger and create the trace file,
+    // nanotime is used to avoid collisions, and it is sorted by time.
+    final Path tracefile = tracefileTemplate.getPath(String.valueOf(System.nanoTime()));
+    try {
+      MoreFiles.createParentDirectories(tracefile);
+    } catch (IOException e) {
+      throw new InvalidConfigurationException("Could not create directory for trace files", e);
+    }
+    logger = new TraceLogger(mgr, tracefile.toFile());
+
+    this.initializeJavaSMT(config, pSolver);
+  }
+
+  /** Write the header code for using JavaSMT, e.g., to initialize the context and solver. */
+  private void initializeJavaSMT(Configuration config, Solvers pSolver) {
     // Get relevant options from the configuration
     String props = config.asPropertiesString();
     ImmutableMap.Builder<String, String> options = ImmutableMap.builder();

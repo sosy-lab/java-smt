@@ -12,6 +12,7 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +21,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -28,15 +30,17 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 class TraceLogger {
   private final TraceFormulaManager mgr;
-  private long id = 0;
+  private UniqueIdGenerator id = new UniqueIdGenerator();
 
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
 
   private final Deque<Long> lastLines = new ArrayDeque<>();
 
-  TraceLogger(TraceFormulaManager pMgr, String pFile) {
+  TraceLogger(TraceFormulaManager pMgr, File pFile) {
     mgr = pMgr;
+    mgr.setLogger(this);
+
     // FIXME Check if the file already exists
     try {
       output = new RandomAccessFile(pFile, "rw");
@@ -47,7 +51,7 @@ class TraceLogger {
 
   /** Returns a fresh variable. */
   public String newVariable() {
-    return "var" + id++;
+    return "var" + id.getFreshId();
   }
 
   /**
@@ -75,7 +79,7 @@ class TraceLogger {
     return r;
   }
 
-  /** Add a definition to the log. */
+  /** Add a definition of a new object to the log. */
   public void appendDef(String pVar, String pExpr) {
     try {
       lastLines.push(output.length());
