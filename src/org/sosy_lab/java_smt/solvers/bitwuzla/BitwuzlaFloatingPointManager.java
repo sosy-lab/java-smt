@@ -71,6 +71,16 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
+  public FloatingPointFormula makeNumber(
+      Rational n,
+      FormulaType.FloatingPointType type,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumber(num.divide(den), type, pFloatingPointRoundingMode);
+  }
+
+  @Override
   protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
     return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
   }
