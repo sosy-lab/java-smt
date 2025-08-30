@@ -46,9 +46,13 @@ public class TraceIntegerFormulaManager
 
   @Override
   public IntegerFormula makeNumber(Rational pRational) {
-    var num = makeNumber(pRational.getNum());
-    var den = makeNumber(pRational.getDen());
-    return divide(num, den);
+    if (pRational.isIntegral()) {
+      return makeNumber(pRational.getNum());
+    } else {
+      var num = makeNumber(pRational.getNum());
+      var den = makeNumber(pRational.getDen());
+      return divide(num, den);
+    }
   }
 
   @Override
