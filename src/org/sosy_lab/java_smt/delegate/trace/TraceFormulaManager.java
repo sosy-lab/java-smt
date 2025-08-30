@@ -32,7 +32,6 @@ import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
-import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -740,19 +739,19 @@ public class TraceFormulaManager implements FormulaManager {
               getFloatingPointFormulaManager()
                   .min((FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
         case FP_SQRT:
-          return (T) getFloatingPointFormulaManager().sqrt((FloatingPointFormula) args.get(0));
+          return (T) getFloatingPointFormulaManager().sqrt((FloatingPointFormula) args.get(1));
         case FP_SUB:
           return (T)
               getFloatingPointFormulaManager()
-                  .subtract((FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
+                  .subtract((FloatingPointFormula) args.get(1), (FloatingPointFormula) args.get(2));
         case FP_ADD:
           return (T)
               getFloatingPointFormulaManager()
-                  .add((FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
+                  .add((FloatingPointFormula) args.get(1), (FloatingPointFormula) args.get(2));
         case FP_DIV:
           return (T)
               getFloatingPointFormulaManager()
-                  .divide((FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
+                  .divide((FloatingPointFormula) args.get(1), (FloatingPointFormula) args.get(2));
         case FP_REM:
           return (T)
               getFloatingPointFormulaManager()
@@ -761,7 +760,7 @@ public class TraceFormulaManager implements FormulaManager {
         case FP_MUL:
           return (T)
               getFloatingPointFormulaManager()
-                  .multiply((FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
+                  .multiply((FloatingPointFormula) args.get(1), (FloatingPointFormula) args.get(2));
         case FP_LT:
           return (T)
               getFloatingPointFormulaManager()
@@ -800,15 +799,11 @@ public class TraceFormulaManager implements FormulaManager {
           break;
         */
         case FP_ROUND_TO_INTEGRAL:
-          {
-            var rm = (FloatingPointRoundingModeFormula) args.get(1);
-            System.out.println("Rounding Mode: " + rm);
-            return (T)
-                getFloatingPointFormulaManager()
-                    .round(
-                        (FloatingPointFormula) args.get(0),
-                        FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
-          }
+          return (T)
+              getFloatingPointFormulaManager()
+                  .round(
+                      (FloatingPointFormula) args.get(1),
+                      FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
         case FP_IS_NAN:
           return (T) getFloatingPointFormulaManager().isNaN((FloatingPointFormula) args.get(0));
         case FP_IS_INF:
