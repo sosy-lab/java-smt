@@ -31,28 +31,34 @@ public class TraceIntegerFormulaManager
 
   @Override
   public IntegerFormula makeNumber(double number) {
-    return makeNumber(BigDecimal.valueOf(number));
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format("makeNumber(%s)", number),
+        () -> delegate.makeNumber(number));
   }
 
   @Override
   public IntegerFormula makeNumber(BigDecimal number) {
-    return makeNumber(Rational.ofBigDecimal(number));
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format("makeNumber(new BigDecimal(\"%s\"))", number),
+        () -> delegate.makeNumber(number));
   }
 
   @Override
   public IntegerFormula makeNumber(String pI) {
-    return makeNumber(new BigDecimal(pI));
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format("makeNumber(\"%s\")", pI),
+        () -> delegate.makeNumber(pI));
   }
 
   @Override
   public IntegerFormula makeNumber(Rational pRational) {
-    if (pRational.isIntegral()) {
-      return makeNumber(pRational.getNum());
-    } else {
-      var num = makeNumber(pRational.getNum());
-      var den = makeNumber(pRational.getDen());
-      return divide(num, den);
-    }
+    return logger.logDef(
+        "mgr.getIntegerFormulaManager()",
+        String.format("makeNumber(Rational.of(\"%s\"))", pRational),
+        () -> delegate.makeNumber(pRational));
   }
 
   @Override
