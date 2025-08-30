@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -53,12 +54,13 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     delegate.pop();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint)
+      throws InterruptedException, SolverException {
     BooleanFormula constraint;
     synchronized (sync) {
       constraint = otherManager.translateFrom(pConstraint, manager);
@@ -67,7 +69,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     delegate.push();
   }
 
@@ -91,14 +93,20 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     synchronized (sync) {
       return new SynchronizedModelWithContext(delegate.getModel(), sync, manager, otherManager);
     }
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
+    return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     return translate(delegate.getUnsatCore(), otherManager, manager);
   }
 

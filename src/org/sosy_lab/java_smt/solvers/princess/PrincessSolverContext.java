@@ -74,7 +74,13 @@ public final class PrincessSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
+
+    if (pProverShutdownNotifier != null) {
+      throw new UnsupportedOperationException("Shutdown is not supported for Princess.");
+    }
+
     if (options.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
       throw new UnsupportedOperationException(
           "Princess does not support unsat core generation with assumptions yet");
@@ -85,14 +91,19 @@ public final class PrincessSolverContext extends AbstractSolverContext {
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
+
+    if (pProverShutdownNotifier != null) {
+      throw new UnsupportedOperationException("Shutdown is not supported for Princess.");
+    }
+
     return (PrincessInterpolatingProver)
         creator.getEnv().getNewProver(true, manager, creator, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     throw new UnsupportedOperationException("Princess does not support optimization");
   }
 

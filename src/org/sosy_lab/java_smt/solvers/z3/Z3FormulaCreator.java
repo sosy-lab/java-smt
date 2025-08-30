@@ -132,7 +132,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   // todo: getters for statistic.
   private final Timer cleanupTimer = new Timer();
-  protected final ShutdownNotifier shutdownNotifier;
+  protected final ShutdownNotifier contextShutdownNotifier;
 
   @SuppressWarnings("ParameterNumber")
   Z3FormulaCreator(
@@ -143,10 +143,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       long pStringType,
       long pRegexType,
       Configuration config,
-      ShutdownNotifier pShutdownNotifier)
+      ShutdownNotifier pContextShutdownNotifier)
       throws InvalidConfigurationException {
     super(pEnv, pBoolType, pIntegerType, pRealType, pStringType, pRegexType);
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pContextShutdownNotifier;
     config.inject(this);
 
     if (usePhantomReferences) {
@@ -163,39 +163,19 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   /**
    * This method throws an {@link InterruptedException} if Z3 was interrupted by a shutdown hook.
-   * Otherwise, the given exception is wrapped and thrown as a SolverException.
+   * Otherwise, the given exception is wrapped and thrown as a SolverException. If a {@link
+   * ShutdownNotifier} besides the context {@link ShutdownNotifier} exists, give it to
+   * pAdditionalShutdownNotifier, else null for that argument.
    */
   @CanIgnoreReturnValue
-  final SolverException handleZ3Exception(Z3Exception e)
+  final SolverException handleZ3Exception(
+      Z3Exception e, ShutdownNotifier pAdditionalShutdownNotifier)
       throws SolverException, InterruptedException {
     if (Z3_INTERRUPT_ERRORS.contains(e.getMessage())) {
-      shutdownNotifier.shutdownIfNecessary();
+      contextShutdownNotifier.shutdownIfNecessary();
+      pAdditionalShutdownNotifier.shutdownIfNecessary();
     }
     throw new SolverException("Z3 has thrown an exception", e);
-  }
-
-  /**
-   * This method handles a Z3Exception, however it only throws a RuntimeException. This method is
-   * used in places where we cannot throw a checked exception in JavaSMT due to API restrictions.
-   *
-   * @param e the Z3Exception to handle
-   * @return nothing, always throw a RuntimeException
-   * @throws RuntimeException always thrown for the given Z3Exception
-   */
-  final RuntimeException handleZ3ExceptionAsRuntimeException(Z3Exception e) {
-    try {
-      throw handleZ3Exception(e);
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-      throw sneakyThrow(e);
-    } catch (SolverException ex) {
-      throw sneakyThrow(e);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
-    throw (E) e;
   }
 
   @Override
@@ -1085,7 +1065,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     try {
       result = Native.tacticApply(z3context, tacticObject, goal);
     } catch (Z3Exception exp) {
-      throw handleZ3Exception(exp);
+      throw handleZ3Exception(exp, null);
     }
 
     try {

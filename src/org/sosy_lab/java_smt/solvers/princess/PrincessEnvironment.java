@@ -179,7 +179,7 @@ class PrincessEnvironment {
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
 
   /**
    * The wrapped API is the first created API. It will never be used outside this class and never be
@@ -199,7 +199,7 @@ class PrincessEnvironment {
     config.inject(this);
 
     basicLogfile = pBasicLogfile;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
 
     // this api is only used local in this environment, no need for interpolation
@@ -226,9 +226,12 @@ class PrincessEnvironment {
 
     PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
-      prover = new PrincessInterpolatingProver(mgr, creator, newApi, shutdownNotifier, pOptions);
+      prover =
+          new PrincessInterpolatingProver(
+              mgr, creator, newApi, contextShutdownNotifier, null, pOptions);
     } else {
-      prover = new PrincessTheoremProver(mgr, creator, newApi, shutdownNotifier, pOptions);
+      prover =
+          new PrincessTheoremProver(mgr, creator, newApi, contextShutdownNotifier, null, pOptions);
     }
     registeredProvers.add(prover);
     return prover;
@@ -403,7 +406,7 @@ class PrincessEnvironment {
           appendTo0(out);
         } catch (scala.MatchError e) {
           // exception might be thrown in case of interrupt, then we wrap it in an interrupt.
-          if (shutdownNotifier.shouldShutdown()) {
+          if (contextShutdownNotifier.shouldShutdown()) {
             InterruptedException interrupt = new InterruptedException();
             interrupt.addSuppressed(e);
             throwCheckedAsUnchecked(interrupt);

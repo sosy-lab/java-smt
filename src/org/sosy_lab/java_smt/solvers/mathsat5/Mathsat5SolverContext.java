@@ -46,7 +46,6 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
-import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.TerminationCallback;
 
 public final class Mathsat5SolverContext extends AbstractSolverContext {
 
@@ -95,8 +94,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   private final Mathsat5Settings settings;
   private final long randomSeed;
 
-  private final ShutdownNotifier shutdownNotifier;
-  private final TerminationCallback terminationTest;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final Mathsat5FormulaCreator creator;
   private boolean closed = false;
 
@@ -118,14 +116,8 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     this.mathsatConfig = mathsatConfig;
     this.settings = settings;
     this.randomSeed = randomSeed;
-    this.shutdownNotifier = shutdownNotifier;
+    this.contextShutdownNotifier = shutdownNotifier;
     this.creator = creator;
-
-    terminationTest =
-        () -> {
-          shutdownNotifier.shutdownIfNecessary();
-          return false;
-        };
   }
 
   private static void logLicenseInfo(LogManager logger) {
@@ -260,23 +252,27 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5TheoremProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5TheoremProver(
+        this, contextShutdownNotifier, pProverShutdownNotifier, creator, options);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5InterpolatingProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5InterpolatingProver(
+        this, contextShutdownNotifier, pProverShutdownNotifier, creator, options);
   }
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
-    return new Mathsat5OptimizationProver(this, shutdownNotifier, creator, options);
+    return new Mathsat5OptimizationProver(
+        this, contextShutdownNotifier, pProverShutdownNotifier, creator, options);
   }
 
   @Override
@@ -297,15 +293,6 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       msat_destroy_env(creator.getEnv());
       msat_destroy_config(mathsatConfig);
     }
-  }
-
-  /**
-   * Get a termination callback for the current context. The callback can be registered upfront,
-   * i.e., before calling a possibly expensive computation in the solver to allow a proper shutdown.
-   */
-  TerminationCallback getTerminationTest() {
-    Preconditions.checkState(!closed, "solver context is already closed");
-    return terminationTest;
   }
 
   @Override

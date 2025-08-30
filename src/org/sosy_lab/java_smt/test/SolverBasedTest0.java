@@ -104,10 +104,10 @@ public abstract class SolverBasedTest0 {
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
   protected @Nullable EnumerationFormulaManager emgr;
-  protected ShutdownManager shutdownManager = ShutdownManager.create();
+  protected ShutdownManager contextShutdownManager = ShutdownManager.create();
 
-  protected ShutdownNotifier shutdownNotifierToUse() {
-    return shutdownManager.getNotifier();
+  protected ShutdownNotifier contextShutdownNotifierToUse() {
+    return contextShutdownManager.getNotifier();
   }
 
   /**
@@ -136,7 +136,7 @@ public abstract class SolverBasedTest0 {
   public final void initSolver() throws InvalidConfigurationException {
     config = createTestConfigBuilder().build();
 
-    factory = new SolverContextFactory(config, logger, shutdownNotifierToUse());
+    factory = new SolverContextFactory(config, logger, contextShutdownNotifierToUse());
     try {
       context = factory.generateContext();
     } catch (InvalidConfigurationException e) {
@@ -384,6 +384,17 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support user propagation", solverToUse())
         .that(solverToUse())
         .isEqualTo(Solvers.Z3);
+  }
+
+  /** Skip test if the solvers prover can not be shut down without also stopping the context. */
+  protected final void requireIsolatedProverShutdown() {
+    assume()
+        .withMessage(
+            "Solver %s does not support shutdown of provers without shutting down the "
+                + "context as well",
+            solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.BOOLECTOR, Solvers.SMTINTERPOL);
   }
 
   /**

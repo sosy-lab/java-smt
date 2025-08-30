@@ -92,7 +92,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
   }
 
   private final SmtInterpolSettings settings;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final SmtInterpolFormulaManager manager;
 
   private SmtInterpolSolverContext(
@@ -101,7 +101,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
       SmtInterpolSettings pSettings) {
     super(pManager);
     settings = pSettings;
-    shutdownNotifier = checkNotNull(pShutdownNotifier);
+    contextShutdownNotifier = checkNotNull(pShutdownNotifier);
     manager = pManager;
   }
 
@@ -226,26 +226,46 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
   @SuppressWarnings("resource")
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
+
+    if (pProverShutdownNotifier != null) {
+      // TODO: check re-usability of SMTInterpol after shutdown.
+      throw new UnsupportedOperationException(
+          "Isolated prover shutdown is not supported for "
+              + "SMTInterpol. Please use the context-bound ShutdownNotifier instead.");
+    }
+
     Script newScript = createNewScript(options);
-    return new SmtInterpolTheoremProver(manager, newScript, options, shutdownNotifier);
+    return new SmtInterpolTheoremProver(manager, newScript, options, contextShutdownNotifier, null);
   }
 
   @SuppressWarnings("resource")
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
+
+    if (pProverShutdownNotifier != null) {
+      // TODO: check re-usability of SMTInterpol after shutdown.
+      throw new UnsupportedOperationException(
+          "Isolated prover shutdown is not supported for "
+              + "SMTInterpol. Please use the context-bound ShutdownNotifier instead.");
+    }
+
     Script newScript = createNewScript(options);
     final SmtInterpolInterpolatingProver prover;
     if (settings.smtLogfile == null) {
-      prover = new SmtInterpolInterpolatingProver(manager, newScript, options, shutdownNotifier);
+      prover =
+          new SmtInterpolInterpolatingProver(
+              manager, newScript, options, contextShutdownNotifier, null);
     } else {
       prover =
           new LoggingSmtInterpolInterpolatingProver(
               manager,
               newScript,
               options,
-              shutdownNotifier,
+              contextShutdownNotifier,
+              null,
               settings.optionsMap,
               settings.smtLogfile.getFreshPath());
     }
@@ -254,7 +274,7 @@ public final class SmtInterpolSolverContext extends AbstractSolverContext {
 
   @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> options) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     throw new UnsupportedOperationException("SMTInterpol does not support optimization");
   }
 

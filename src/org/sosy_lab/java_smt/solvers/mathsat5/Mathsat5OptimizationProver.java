@@ -57,10 +57,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   Mathsat5OptimizationProver(
       Mathsat5SolverContext pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Mathsat5FormulaCreator creator,
       Set<ProverOptions> options) {
-    super(pMgr, options, creator, pShutdownNotifier);
+    super(pMgr, options, creator, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -77,7 +78,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int maximize(Formula objective) {
-    checkState(!closed);
+    checkState(!isClosed());
     long objectiveId = msat_make_maximize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -87,7 +88,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public int minimize(Formula objective) {
-    checkState(!closed);
+    checkState(!isClosed());
     long objectiveId = msat_make_minimize(curEnv, getMsatTerm(objective));
     msat_assert_objective(curEnv, objectiveId);
     int id = idGenerator.getFreshId(); // mapping needed to avoid long-int-conversion
@@ -97,9 +98,12 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    checkState(!closed);
+    checkState(!isClosed());
+    setLastSatCheckUnsat();
     final boolean isSatisfiable = msat_check_sat(curEnv);
+    setStackNotChangedSinceLastQuery();
     if (isSatisfiable) {
+      setLastSatCheckSat();
       return OptStatus.OPT;
     } else {
       return OptStatus.UNSAT;
@@ -120,13 +124,13 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
 
   @Override
   public Optional<Rational> upper(int handle, Rational epsilon) {
-    checkState(!closed);
+    checkState(!isClosed());
     return getValue(handle, epsilon);
   }
 
   @Override
   public Optional<Rational> lower(int handle, Rational epsilon) {
-    checkState(!closed);
+    checkState(!isClosed());
     return getValue(handle, epsilon);
   }
 
@@ -145,11 +149,11 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public Model getModel() throws SolverException {
-    checkState(!closed);
+  protected Model getModelImpl() throws SolverException {
+    checkState(!isClosed());
     if (!objectiveMap.isEmpty()) {
       msat_load_objective_model(curEnv, objectiveMap.values().iterator().next());
     }
-    return super.getModel();
+    return super.getModelImpl();
   }
 }

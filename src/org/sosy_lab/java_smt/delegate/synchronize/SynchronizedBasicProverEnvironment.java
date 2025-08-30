@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.synchronize;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
 
@@ -32,21 +34,22 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     synchronized (sync) {
       delegate.pop();
     }
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula pConstraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula pConstraint)
+      throws InterruptedException, SolverException {
     synchronized (sync) {
       return delegate.addConstraint(pConstraint);
     }
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     synchronized (sync) {
       delegate.push();
     }
@@ -76,14 +79,20 @@ class SynchronizedBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     synchronized (sync) {
       return new SynchronizedModel(delegate.getModel(), sync);
     }
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
+    return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     synchronized (sync) {
       return delegate.getUnsatCore();
     }

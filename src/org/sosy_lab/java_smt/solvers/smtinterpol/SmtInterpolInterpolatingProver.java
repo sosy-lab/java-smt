@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
@@ -35,8 +37,9 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       SmtInterpolFormulaManager pMgr,
       Script pScript,
       Set<ProverOptions> options,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pMgr, pScript, options, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(pMgr, pScript, options, pContextShutdownNotifier, pProverShutdownNotifier);
   }
 
   @Override
@@ -47,10 +50,11 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(pTermNamesOfA),
-        "interpolation can only be done over previously asserted formulas.");
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
+    checkInterpolationArguments(pTermNamesOfA);
 
     // SMTInterpol is not able to handle the trivial cases,
     // so we need to check them explicitly
@@ -74,7 +78,10 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
@@ -100,7 +107,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
       }
     } catch (SMTLIBException e) {
       if ("Timeout exceeded".equals(e.getMessage())) {
-        shutdownNotifier.shutdownIfNecessary();
+        shutdownIfNecessary();
       }
       throw new AssertionError(e);
     }
@@ -114,7 +121,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   }
 
   private Term buildConjunctionOfNamedTerms(Collection<String> termNames) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     Preconditions.checkArgument(!termNames.isEmpty());
 
     if (termNames.size() == 1) {

@@ -96,6 +96,25 @@ public class SynchronizedSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public ProverEnvironment newProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... pOptions) {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedProverEnvironmentWithContext(
+            otherContext.newProverEnvironment(pProverShutdownNotifier, pOptions),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedProverEnvironment(
+            delegate.newProverEnvironment(pProverShutdownNotifier, pOptions), delegate);
+      }
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... pOptions) {
     synchronized (sync) {
@@ -115,12 +134,44 @@ public class SynchronizedSolverContext implements SolverContext {
 
   @SuppressWarnings("resource")
   @Override
+  public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... pOptions) {
+    synchronized (sync) {
+      if (useSeperateProvers) {
+        SolverContext otherContext = createOtherContext();
+        return new SynchronizedInterpolatingProverEnvironmentWithContext<>(
+            otherContext.newProverEnvironmentWithInterpolation(pProverShutdownNotifier, pOptions),
+            sync,
+            delegate.getFormulaManager(),
+            otherContext.getFormulaManager());
+      } else {
+        return new SynchronizedInterpolatingProverEnvironment<>(
+            delegate.newProverEnvironmentWithInterpolation(pProverShutdownNotifier, pOptions),
+            delegate);
+      }
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
   public OptimizationProverEnvironment newOptimizationProverEnvironment(ProverOptions... pOptions) {
     synchronized (sync) {
       // seperate prover environment not available, because we can not translate arbitrary formulae.
       // if (useSeperateProvers) { }
       return new SynchronizedOptimizationProverEnvironment(
           delegate.newOptimizationProverEnvironment(pOptions), delegate);
+    }
+  }
+
+  @SuppressWarnings("resource")
+  @Override
+  public OptimizationProverEnvironment newOptimizationProverEnvironment(
+      ShutdownNotifier pProverShutdownNotifier, ProverOptions... pOptions) {
+    synchronized (sync) {
+      // seperate prover environment not available, because we can not translate arbitrary formulae.
+      // if (useSeperateProvers) { }
+      return new SynchronizedOptimizationProverEnvironment(
+          delegate.newOptimizationProverEnvironment(pProverShutdownNotifier, pOptions), delegate);
     }
   }
 

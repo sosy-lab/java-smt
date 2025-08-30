@@ -137,7 +137,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
         createTestConfigBuilder()
             .setOption("solver.cvc5.furtherOptions", "solve-bv-as-int=bitwise")
             .build();
-    var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    var factory2 = new SolverContextFactory(config2, logger, contextShutdownNotifierToUse());
     try (var context2 = factory2.generateContext()) {
       // create and ignore
     }
@@ -146,13 +146,14 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test(timeout = 5000)
   @SuppressWarnings({"try", "CheckReturnValue"})
   public void testCVC5WithValidOptionsTimeLimit()
-      throws InvalidConfigurationException, InterruptedException {
+      throws InvalidConfigurationException, InterruptedException, SolverException {
     assume().that(solverToUse()).isEqualTo(Solvers.CVC5);
 
     //  tlimit-per is time limit in ms of wall clock time per query
     var configValid =
         createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "tlimit-per=1").build();
-    var factoryWOption = new SolverContextFactory(configValid, logger, shutdownNotifierToUse());
+    var factoryWOption =
+        new SolverContextFactory(configValid, logger, contextShutdownNotifierToUse());
     try (SolverContext contextWTimeLimit = factoryWOption.generateContext()) {
       FormulaManager fmgrTimeLimit = contextWTimeLimit.getFormulaManager();
       HardIntegerFormulaGenerator hifg =
@@ -172,7 +173,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
 
     var config2 =
         createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "foo=bar").build();
-    var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    var factory2 = new SolverContextFactory(config2, logger, contextShutdownNotifierToUse());
     assertThrows(InvalidConfigurationException.class, factory2::generateContext);
   }
 }

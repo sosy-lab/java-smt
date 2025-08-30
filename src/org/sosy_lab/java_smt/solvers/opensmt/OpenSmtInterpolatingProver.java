@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.List;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -40,13 +41,15 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   OpenSmtInterpolatingProver(
       OpenSmtFormulaCreator pFormulaCreator,
       FormulaManager pMgr,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions,
       OpenSMTOptions pSolverOptions) {
     super(
         pFormulaCreator,
         pMgr,
-        pShutdownNotifier,
+        pContextShutdownNotifier,
+        pProverShutdownNotifier,
         getConfigInstance(pOptions, pSolverOptions, true),
         pOptions);
     trackedConstraints.push(0); // initialize first level
@@ -73,11 +76,13 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA) {
-    checkState(!closed);
-    checkArgument(
-        getAssertedConstraintIds().containsAll(formulasOfA),
-        "interpolation can only be done over previously asserted formulas.");
+  public BooleanFormula getInterpolant(Collection<Integer> formulasOfA)
+      throws InterruptedException {
+    checkState(!isClosed());
+    shutdownIfNecessary();
+    checkState(!wasLastSatCheckSat());
+    checkState(!stackChangedSinceLastQuery());
+    checkInterpolationArguments(formulasOfA);
 
     return creator.encapsulateBoolean(
         osmtSolver.getInterpolationContext().getSingleInterpolant(new VectorInt(formulasOfA)));
@@ -86,7 +91,7 @@ class OpenSmtInterpolatingProver extends OpenSmtAbstractProver<Integer>
   @Override
   public List<BooleanFormula> getSeqInterpolants(
       List<? extends Collection<Integer>> partitionedFormulas) {
-    checkState(!closed);
+    checkState(!isClosed());
     checkArgument(!partitionedFormulas.isEmpty(), "Interpolation sequence must not be empty");
     final ImmutableSet<Integer> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(

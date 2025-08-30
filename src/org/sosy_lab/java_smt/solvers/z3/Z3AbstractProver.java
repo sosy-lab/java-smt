@@ -53,8 +53,13 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
       Z3FormulaManager pMgr,
       Set<ProverOptions> pOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     creator = pCreator;
     z3context = creator.getEnv();
 
@@ -104,26 +109,25 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
+  protected Model getModelImpl() throws SolverException, InterruptedException {
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
-  protected Z3Model getEvaluatorWithoutChecks() throws SolverException {
-    return new Z3Model(this, z3context, getZ3Model(), creator);
+  protected Z3Model getEvaluatorWithoutChecks() throws SolverException, InterruptedException {
+    return new Z3Model(this, z3context, getZ3Model(), creator, proverShutdownNotifier);
   }
 
-  protected abstract long getZ3Model() throws SolverException;
+  protected abstract long getZ3Model() throws SolverException, InterruptedException;
 
   protected abstract void assertContraint(long constraint);
 
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
-    Preconditions.checkState(!closed);
+  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException, SolverException {
+    Preconditions.checkState(!isClosed());
     long e = creator.extractInfo(f);
     try {
       if (storedConstraints != null) { // Unsat core generation is on.
@@ -135,20 +139,20 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception, proverShutdownNotifier);
     }
     return null;
   }
 
   protected void push0() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     if (storedConstraints != null) {
       storedConstraints.push(storedConstraints.peek());
     }
   }
 
   protected void pop0() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     if (storedConstraints != null) {
       storedConstraints.pop();
     }
@@ -157,9 +161,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   protected abstract long getUnsatCore0();
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
@@ -180,9 +182,8 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    checkGenerateUnsatCoresOverAssumptions();
     if (!isUnsatWithAssumptions(assumptions)) {
       return Optional.empty();
     }
@@ -202,7 +203,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
   @Override
   public ImmutableMap<String, String> getStatistics() {
     // Z3 sigsevs if you try to get statistics for closed environments
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
     Set<String> seenKeys = new HashSet<>();
@@ -244,7 +245,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       if (storedConstraints != null) {
         storedConstraints.clear();
       }
@@ -258,7 +259,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
     try {
       return super.allSat(callback, important);
     } catch (Z3Exception e) {
-      throw creator.handleZ3Exception(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
   }
 }

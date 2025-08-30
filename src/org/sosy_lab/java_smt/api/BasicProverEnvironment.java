@@ -23,8 +23,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
  */
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
-  String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
-
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
    * value may be used to identify this formula later on in a query (this depends on the subtype of
@@ -32,7 +30,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    */
   @Nullable
   @CanIgnoreReturnValue
-  default T push(BooleanFormula f) throws InterruptedException {
+  default T push(BooleanFormula f) throws InterruptedException, SolverException {
     push();
     return addConstraint(f);
   }
@@ -41,12 +39,12 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Remove one backtracking point/level from the current stack. This removes the latest level
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
    */
-  void pop();
+  void pop() throws InterruptedException;
 
   /** Add a constraint to the latest backtracking point. */
   @Nullable
   @CanIgnoreReturnValue
-  T addConstraint(BooleanFormula constraint) throws InterruptedException;
+  T addConstraint(BooleanFormula constraint) throws InterruptedException, SolverException;
 
   /**
    * Create a new backtracking point, i.e., a new level on the assertion stack. Each level can hold
@@ -55,7 +53,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>If formulas are added before creating the first backtracking point, they can not be removed
    * via a POP-operation.
    */
-  void push() throws InterruptedException;
+  void push() throws InterruptedException, SolverException;
 
   /**
    * Get the number of backtracking points/levels on the current stack.
@@ -87,7 +85,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>A model might contain additional symbols with their evaluation, if a solver uses its own
    * temporary symbols. There should be at least a value-assignment for each free symbol.
    */
-  Model getModel() throws SolverException;
+  Model getModel() throws SolverException, InterruptedException;
 
   /**
    * Get a temporary view on the current satisfying assignment. This should be called only
@@ -95,7 +93,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * should no longer be used as soon as any constraints are added to, pushed, or popped from the
    * prover stack.
    */
-  default Evaluator getEvaluator() throws SolverException {
+  default Evaluator getEvaluator() throws SolverException, InterruptedException {
     return getModel();
   }
 
@@ -107,7 +105,8 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * <p>Note that if you need to iterate multiple times over the model it may be more efficient to
    * use this method instead of {@link #getModel()} (depending on the solver).
    */
-  default ImmutableList<Model.ValueAssignment> getModelAssignments() throws SolverException {
+  default ImmutableList<Model.ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     try (Model model = getModel()) {
       return model.asList();
     }
@@ -117,11 +116,12 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * Get an unsat core. This should be called only immediately after an {@link #isUnsat()} call that
    * returned <code>false</code>.
    */
-  List<BooleanFormula> getUnsatCore();
+  List<BooleanFormula> getUnsatCore() throws InterruptedException;
 
   /**
    * Returns an UNSAT core (if it exists, otherwise {@code Optional.empty()}), over the chosen
-   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work.
+   * assumptions. Does NOT require the {@link ProverOptions#GENERATE_UNSAT_CORE} option to work, but
+   * {@link ProverOptions#GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS}.
    *
    * @param assumptions Selected assumptions
    * @return Empty optional if the constraints with assumptions are satisfiable, subset of

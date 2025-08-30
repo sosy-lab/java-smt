@@ -656,34 +656,54 @@ public final class Yices2NativeApi {
   /**
    * @param params Set to 0 for default search parameters.
    */
-  public static boolean yices_check_sat(long ctx, long params, ShutdownNotifier shutdownNotifier)
+  public static boolean yices_check_sat(
+      long ctx,
+      long params,
+      ShutdownNotifier contextShutdownNotifier,
+      ShutdownNotifier proverShutdownNotifier)
       throws IllegalStateException, InterruptedException {
     return satCheckWithShutdownNotifier(
-        () -> yices_check_context(ctx, params), ctx, shutdownNotifier);
+        () -> yices_check_context(ctx, params),
+        ctx,
+        contextShutdownNotifier,
+        proverShutdownNotifier);
   }
 
   /**
    * @param params Set to 0 for default search parameters.
    */
   public static boolean yices_check_sat_with_assumptions(
-      long ctx, long params, int size, int[] assumptions, ShutdownNotifier shutdownNotifier)
+      long ctx,
+      long params,
+      int size,
+      int[] assumptions,
+      ShutdownNotifier contextShutdownNotifier,
+      ShutdownNotifier proverShutdownNotifier)
       throws InterruptedException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context_with_assumptions(ctx, params, size, assumptions),
         ctx,
-        shutdownNotifier);
+        contextShutdownNotifier,
+        proverShutdownNotifier);
   }
 
   @SuppressWarnings("try")
   private static boolean satCheckWithShutdownNotifier(
-      Supplier<Integer> satCheck, long pCtx, ShutdownNotifier shutdownNotifier)
+      Supplier<Integer> satCheck,
+      long pCtx,
+      ShutdownNotifier contextShutdownNotifier,
+      ShutdownNotifier proverShutdownNotifier)
       throws InterruptedException {
     int result;
-    try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, () -> yices_stop_search(pCtx))) {
-      shutdownNotifier.shutdownIfNecessary();
+    try (ShutdownHook hook =
+        new ShutdownHook(
+            contextShutdownNotifier, proverShutdownNotifier, () -> yices_stop_search(pCtx))) {
+      contextShutdownNotifier.shutdownIfNecessary();
+      proverShutdownNotifier.shutdownIfNecessary();
       result = satCheck.get(); // the expensive computation
     }
-    shutdownNotifier.shutdownIfNecessary();
+    proverShutdownNotifier.shutdownIfNecessary();
+    contextShutdownNotifier.shutdownIfNecessary();
     return check_result(result);
   }
 

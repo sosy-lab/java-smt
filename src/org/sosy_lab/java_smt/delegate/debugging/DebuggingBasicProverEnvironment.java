@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
+import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
 
 class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
@@ -30,20 +32,21 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public void pop() {
+  public void pop() throws InterruptedException {
     debugging.assertThreadLocal();
     delegate.pop();
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula constraint)
+      throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(constraint);
     return delegate.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     debugging.assertThreadLocal();
     delegate.push();
   }
@@ -72,13 +75,20 @@ class DebuggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     debugging.assertThreadLocal();
     return new DebuggingModel(delegate.getModel(), debugging);
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
+    debugging.assertThreadLocal();
+    return delegate.getModelAssignments();
+  }
+
+  @Override
+  public List<BooleanFormula> getUnsatCore() throws InterruptedException {
     debugging.assertThreadLocal();
     return delegate.getUnsatCore();
   }

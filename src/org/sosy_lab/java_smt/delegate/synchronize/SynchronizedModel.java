@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
 
 class SynchronizedModel implements Model {
@@ -37,70 +38,77 @@ class SynchronizedModel implements Model {
   }
 
   @Override
-  public <T extends Formula> @Nullable T eval(T pFormula) {
+  public <T extends Formula> @Nullable T eval(T pFormula)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.eval(pFormula);
     }
   }
 
   @Override
-  public @Nullable Object evaluate(Formula pF) {
+  public @Nullable Object evaluate(Formula pF) throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable BigInteger evaluate(IntegerFormula pF) {
+  public @Nullable BigInteger evaluate(IntegerFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable Rational evaluate(RationalFormula pF) {
+  public @Nullable Rational evaluate(RationalFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable Boolean evaluate(BooleanFormula pF) {
+  public @Nullable Boolean evaluate(BooleanFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable BigInteger evaluate(BitvectorFormula pF) {
+  public @Nullable BigInteger evaluate(BitvectorFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable String evaluate(StringFormula pF) {
+  public @Nullable String evaluate(StringFormula pF) throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable String evaluate(EnumerationFormula pF) {
+  public @Nullable String evaluate(EnumerationFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public @Nullable FloatingPointNumber evaluate(FloatingPointFormula pF) {
+  public @Nullable FloatingPointNumber evaluate(FloatingPointFormula pF)
+      throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.evaluate(pF);
     }
   }
 
   @Override
-  public ImmutableList<ValueAssignment> asList() {
+  public ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException {
     synchronized (sync) {
       return delegate.asList();
     }

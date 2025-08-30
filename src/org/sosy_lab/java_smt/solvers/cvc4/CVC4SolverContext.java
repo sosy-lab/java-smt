@@ -16,6 +16,7 @@ import edu.stanford.CVC4.SmtEngine;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -31,7 +32,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC4FormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
   private final int randomSeed;
 
   private CVC4SolverContext(
@@ -41,7 +42,7 @@ public final class CVC4SolverContext extends AbstractSolverContext {
       int pRandomSeed) {
     super(manager);
     this.creator = creator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
   }
 
@@ -128,10 +129,12 @@ public final class CVC4SolverContext extends AbstractSolverContext {
   }
 
   @Override
-  public ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
+  public ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pOptions) {
     return new CVC4TheoremProver(
         creator,
-        shutdownNotifier,
+        contextShutdownNotifier,
+        pProverShutdownNotifier,
         randomSeed,
         pOptions,
         getFormulaManager().getBooleanFormulaManager());
@@ -144,13 +147,13 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("CVC4 does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("CVC4 does not support optimization");
   }
 }

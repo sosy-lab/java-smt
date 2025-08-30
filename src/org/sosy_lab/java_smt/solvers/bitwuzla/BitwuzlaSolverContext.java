@@ -132,7 +132,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   private final BitwuzlaFormulaManager manager;
   private final BitwuzlaFormulaCreator creator;
-  private final ShutdownNotifier shutdownNotifier;
+  private final ShutdownNotifier contextShutdownNotifier;
 
   private final Options solverOptions;
 
@@ -146,7 +146,7 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     super(pManager);
     manager = pManager;
     creator = pCreator;
-    shutdownNotifier = pShutdownNotifier;
+    contextShutdownNotifier = pShutdownNotifier;
     solverOptions = pOptions;
   }
 
@@ -290,21 +290,23 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   }
 
   @Override
-  protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
+  protected ProverEnvironment newProverEnvironment0(
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> options) {
     Preconditions.checkState(!closed, "solver context is already closed");
 
-    return new BitwuzlaTheoremProver(manager, creator, shutdownNotifier, options, solverOptions);
+    return new BitwuzlaTheoremProver(
+        manager, creator, contextShutdownNotifier, pProverShutdownNotifier, options, solverOptions);
   }
 
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
-      Set<ProverOptions> pF) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pF) {
     throw new UnsupportedOperationException("Bitwuzla does not support interpolation");
   }
 
   @Override
   protected OptimizationProverEnvironment newOptimizationProverEnvironment0(
-      Set<ProverOptions> pSet) {
+      @Nullable ShutdownNotifier pProverShutdownNotifier, Set<ProverOptions> pSet) {
     throw new UnsupportedOperationException("Bitwuzla does not support optimization");
   }
 

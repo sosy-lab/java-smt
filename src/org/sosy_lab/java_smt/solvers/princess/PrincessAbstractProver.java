@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -63,15 +64,19 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
       PrincessFormulaCreator creator,
       SimpleAPI pApi,
-      ShutdownNotifier pShutdownNotifier,
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier,
       Set<ProverOptions> pOptions) {
-    super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
+    super(
+        pOptions,
+        pMgr.getBooleanFormulaManager(),
+        pContextShutdownNotifier,
+        pProverShutdownNotifier);
     this.mgr = pMgr;
     this.creator = creator;
     this.api = checkNotNull(pApi);
@@ -85,13 +90,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * SAT or UNSAT.
    */
   @Override
-  public boolean isUnsat() throws SolverException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+  protected boolean isUnsatImpl() throws SolverException {
+    Preconditions.checkState(!isClosed());
+    setLastSatCheckUnsat();
     evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
-      wasLastSatCheckSat = true;
+      setLastSatCheckSat();
       evaluatedTerms.add(api.partialModelAsFormula());
       return false;
     } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
@@ -106,8 +111,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+    Preconditions.checkState(!isClosed());
+    setLastSatCheckUnsat();
 
     final int formulaId = idGenerator.getFreshId();
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
@@ -121,7 +126,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @Override
   protected final void pushImpl() {
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     api.push();
     trackingStack.push(new Level());
     partitions.push(partitions.peek());
@@ -129,7 +134,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @Override
   protected void popImpl() {
-    wasLastSatCheckSat = false;
+    setLastSatCheckUnsat();
     api.pop();
 
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
@@ -158,10 +163,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
-    checkGenerateModels();
+  protected Model getModelImpl() throws SolverException {
+    Preconditions.checkState(wasLastSatCheckSat(), NO_MODEL_HELP);
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
@@ -187,15 +190,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     throw new UnsupportedOperationException("Solving with assumptions is not supported.");
   }
 
   @Override
-  public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
-    checkGenerateUnsatCores();
+  protected List<BooleanFormula> getUnsatCoreImpl() {
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
     for (Object partitionId : core) {
@@ -205,7 +206,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   }
 
   @Override
-  public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
+  protected Optional<List<BooleanFormula>> unsatCoreOverAssumptionsImpl(
       Collection<BooleanFormula> assumptions) {
     throw new UnsupportedOperationException(
         "UNSAT cores over assumptions not supported by Princess");
@@ -215,7 +216,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public void close() {
     checkNotNull(api);
     checkNotNull(mgr);
-    if (!closed) {
+    if (!isClosed()) {
       api.shutDown();
       api.reset(); // cleanup memory, even if we keep a reference to "api" and "mgr"
       creator.getEnv().unregisterStack(this);
@@ -228,13 +229,13 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
     T result = super.allSat(callback, important);
-    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
+    setLastSatCheckUnsat(); // we do not know about the current state, thus we reset the flag.
     return result;
   }
 
   /** add external definition: boolean variable. */
   void addSymbol(IFormula f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     api.addBooleanVariable(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().booleanSymbols.add(f);
@@ -243,7 +244,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   /** add external definition: theory variable (integer, rational, string, etc.). */
   void addSymbol(ITerm f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     api.addConstant(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().theorySymbols.add(f);
@@ -252,7 +253,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   /** add external definition: uninterpreted function. */
   void addSymbol(IFunction f) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     api.addFunction(f);
     if (!trackingStack.isEmpty()) {
       trackingStack.peek().functionSymbols.add(f);

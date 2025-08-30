@@ -43,8 +43,9 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
       Set<ProverOptions> pOptions,
       ImmutableMap<String, Object> pSolverOptions,
       @Nullable PathCounterTemplate pLogfile,
-      ShutdownNotifier pShutdownNotifier) {
-    super(creator, pMgr, pOptions, pLogfile, pShutdownNotifier);
+      ShutdownNotifier pContextShutdownNotifier,
+      @Nullable ShutdownNotifier pProverShutdownNotifier) {
+    super(creator, pMgr, pOptions, pLogfile, pContextShutdownNotifier, pProverShutdownNotifier);
     z3optSolver = Native.mkOptimize(z3context);
     Native.optimizeIncRef(z3context, z3optSolver);
     logger = pLogger;
@@ -61,20 +62,21 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
 
   @Override
   public int maximize(Formula objective) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeMaximize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public int minimize(Formula objective) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeMinimize(z3context, z3optSolver, creator.extractInfo(objective));
   }
 
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     int status;
+    setLastSatCheckUnsat();
     try {
       status =
           Native.optimizeCheck(
@@ -83,30 +85,32 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
               0, // number of assumptions
               null // assumptions
               );
+      setStackNotChangedSinceLastQuery();
     } catch (Z3Exception ex) {
-      throw creator.handleZ3Exception(ex);
+      throw creator.handleZ3Exception(ex, proverShutdownNotifier);
     }
     if (status == Z3_lbool.Z3_L_FALSE.toInt()) {
       return OptStatus.UNSAT;
     } else if (status == Z3_lbool.Z3_L_UNDEF.toInt()) {
-      creator.shutdownNotifier.shutdownIfNecessary();
+      shutdownIfNecessary();
       logger.log(
           Level.INFO,
           "Solver returned an unknown status, explanation: ",
           Native.optimizeGetReasonUnknown(z3context, z3optSolver));
       return OptStatus.UNDEF;
     } else {
+      setLastSatCheckSat();
       return OptStatus.OPT;
     }
   }
 
   @Override
-  protected void pushImpl() {
+  protected void pushImpl() throws SolverException, InterruptedException {
     push0();
     try {
       Native.optimizePush(z3context, z3optSolver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception, proverShutdownNotifier);
     }
   }
 
@@ -132,15 +136,14 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    Preconditions.checkState(!isClosed());
     logSolverStack();
     return check() == OptStatus.UNSAT;
   }
 
   @Override
-  public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
-      throws SolverException, InterruptedException {
+  protected boolean isUnsatWithAssumptionsImpl(Collection<BooleanFormula> assumptions) {
     return false;
   }
 
@@ -159,7 +162,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   private Optional<Rational> round(int handle, Rational epsilon, RoundingFunction direction) {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
 
     // Z3 exposes the rounding result as a tuple (infinity, number, epsilon)
     long vector = direction.round(z3context, z3optSolver, handle);
@@ -197,11 +200,11 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   }
 
   @Override
-  protected long getZ3Model() {
+  protected long getZ3Model() throws SolverException, InterruptedException {
     try {
       return Native.optimizeGetModel(z3context, z3optSolver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3ExceptionAsRuntimeException(e);
+      throw creator.handleZ3Exception(e, proverShutdownNotifier);
     }
   }
 
@@ -213,13 +216,13 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   /** Dumps the optimized objectives and the constraints on the solver in the SMT-lib format. */
   @Override
   public String toString() {
-    Preconditions.checkState(!closed);
+    Preconditions.checkState(!isClosed());
     return Native.optimizeToString(z3context, z3optSolver);
   }
 
   @Override
   public void close() {
-    if (!closed) {
+    if (!isClosed()) {
       Native.optimizeDecRef(z3context, z3optSolver);
     }
     super.close();
