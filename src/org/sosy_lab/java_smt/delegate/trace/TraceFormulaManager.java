@@ -171,6 +171,13 @@ public class TraceFormulaManager implements FormulaManager {
                   String.format("makeNumber(%s)", value),
                   () -> delegate.getIntegerFormulaManager().makeNumber((BigInteger) value));
           Preconditions.checkArgument(g.equals(f));
+        } else if (f instanceof RationalFormula && value instanceof BigInteger) {
+          var g =
+              logger.logDef(
+                  "mgr.getRationalFormulaManager()",
+                  String.format("makeNumber(%s)", value),
+                  () -> delegate.getRationalFormulaManager().makeNumber((BigInteger) value));
+          Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof RationalFormula && value instanceof Rational) {
           var g =
               logger.logDef(
