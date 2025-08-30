@@ -95,9 +95,10 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void roundingModeVisitor() {
-    FloatingPointFormula var =
+    FloatingPointFormula variable =
         fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
-    FloatingPointFormula f = fpmgr.sqrt(var, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+    FloatingPointFormula original =
+        fpmgr.sqrt(variable, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
 
     for (FloatingPointRoundingMode rm : FloatingPointRoundingMode.values()) {
       if (solver == Solvers.MATHSAT5 && rm == FloatingPointRoundingMode.NEAREST_TIES_AWAY) {
@@ -105,10 +106,10 @@ public class FloatingPointFormulaManagerTest
         continue;
       }
       // Build a term with a different rounding mode, then replace it in the visitor
-      FloatingPointFormula g =
+      FloatingPointFormula substituted =
           (FloatingPointFormula)
               mgr.visit(
-                  fpmgr.sqrt(var, rm),
+                  fpmgr.sqrt(variable, rm),
                   new FormulaVisitor<Formula>() {
                     @Override
                     public Formula visitFreeVariable(Formula f, String name) {
@@ -149,7 +150,7 @@ public class FloatingPointFormulaManagerTest
                   });
 
       // Check that after the substitution the rounding mode is the default again
-      assertThat(f).isEqualTo(g);
+      assertThat(original).isEqualTo(substituted);
     }
   }
 
