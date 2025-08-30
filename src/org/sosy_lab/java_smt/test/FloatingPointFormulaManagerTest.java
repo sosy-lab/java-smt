@@ -130,7 +130,7 @@ public class FloatingPointFormulaManagerTest
                         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
                       assertThat(functionDeclaration.getKind())
                           .isEqualTo(FunctionDeclarationKind.FP_SQRT);
-                      assertThat(args.size()).isEqualTo(2);
+                      assertThat(args).hasSize(2);
                       return mgr.makeApplication(
                           functionDeclaration,
                           mgr.visit(args.get(0), this),
