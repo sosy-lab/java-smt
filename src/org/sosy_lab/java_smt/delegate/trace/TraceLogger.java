@@ -101,8 +101,8 @@ class TraceLogger {
     try {
       lastLines.push(output.length());
       output.write(String.format("%s;%n", pStmt).getBytes(StandardCharsets.UTF_8));
-    } catch (IOException pIOException) {
-      throw new RuntimeException(pIOException);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 
@@ -110,8 +110,8 @@ class TraceLogger {
     Preconditions.checkArgument(!lastLines.isEmpty(), "Cannot undo last trace");
     try {
       output.setLength(lastLines.pop());
-    } catch (IOException pE) {
-      throw new RuntimeException(pE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
   }
 

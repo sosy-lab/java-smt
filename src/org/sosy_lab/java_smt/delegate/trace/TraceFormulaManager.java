@@ -10,6 +10,9 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -221,11 +224,11 @@ public class TraceFormulaManager implements FormulaManager {
   }
 
   public <T extends Formula> List<T> rebuildAll(List<T> formulas) {
-    return FluentIterable.from(formulas).transform(this::rebuild).toList();
+    return transformedImmutableListCopy(formulas, this::rebuild);
   }
 
   public <T extends Formula> Set<T> rebuildAll(Set<T> formulas) {
-    return FluentIterable.from(formulas).transform(this::rebuild).toSet();
+    return transformedImmutableSetCopy(formulas, this::rebuild);
   }
 
   @Override
