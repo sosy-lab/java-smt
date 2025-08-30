@@ -19,6 +19,8 @@ import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
@@ -27,7 +29,10 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
+import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -88,6 +93,8 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 @SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "test code")
 public abstract class SolverBasedTest0 {
 
+  @Rule public TestName testName = new TestName();
+
   protected Configuration config;
   protected final LogManager logger = LogManager.createTestLogManager();
 
@@ -123,14 +130,26 @@ public abstract class SolverBasedTest0 {
     return Logics.QF_AUFLIRA;
   }
 
-  protected ConfigurationBuilder createTestConfigBuilder() {
+  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+    String tracefile =
+        String.format(
+            "traces/%s/trace_%s_%s.java",
+            this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
+
     ConfigurationBuilder newConfig =
         Configuration.builder()
             .setOption("solver.solver", solverToUse().toString())
-            .setOption("solver.trace", "true");
+            .setOption("solver.trace", "true")
+            .setOption("solver.tracefile", tracefile);
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
+
+    Configuration configForFiles = Configuration.builder().setOption("output.path", "./").build();
+    FileTypeConverter fileTypeConverter = FileTypeConverter.create(configForFiles);
+    Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
+    newConfig.addConverter(PathTemplate.class, fileTypeConverter);
+
     return newConfig;
   }
 
