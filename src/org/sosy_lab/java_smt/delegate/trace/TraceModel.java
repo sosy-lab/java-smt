@@ -44,6 +44,8 @@ public class TraceModel implements Model {
     ImmutableList<ValueAssignment> result = delegate.asList();
     logger.undoLast();
     return FluentIterable.from(result)
+        // TODO Fix this in the Z3 model
+        .filter((ValueAssignment assignment) -> !assignment.getName().startsWith("#"))
         .transform(
             (ValueAssignment assigment) -> {
               var key = mgr.rebuild(assigment.getKey());
