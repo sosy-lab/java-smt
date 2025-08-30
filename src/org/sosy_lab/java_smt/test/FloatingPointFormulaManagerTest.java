@@ -96,7 +96,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void roundingModeVisitor() {
     FloatingPointFormula variable =
-        fpmgr.makeVariable("a", FloatingPointType.getSinglePrecisionFloatingPointType());
+        fpmgr.makeVariable("a", FormulaType.getSinglePrecisionFloatingPointType());
     FloatingPointFormula original =
         fpmgr.sqrt(variable, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
 
