@@ -104,6 +104,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_minus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_nearest_even;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_plus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_zero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
@@ -341,18 +345,17 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_term_is_false(environment, f)) {
       return visitor.visitConstant(formula, false);
     } else if (msat_is_fp_roundingmode_type(environment, msat_term_get_type(f))) {
-      long decl = msat_term_get_decl(f);
-      switch (msat_decl_get_name(decl)) {
-        case "`fprounding_even`":
-          return visitor.visitConstant(formula, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
-        case "`fprounding_plus_inf`":
-          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_POSITIVE);
-        case "`fprounding_minus_inf`":
-          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_NEGATIVE);
-        case "`fprounding_zero`":
-          return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_ZERO);
-        default:
-          throw new IllegalArgumentException("Unknown rounding mode " + msat_decl_get_name(decl));
+      if (msat_term_is_fp_roundingmode_nearest_even(environment, f)) {
+        return visitor.visitConstant(formula, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+      } else if (msat_term_is_fp_roundingmode_plus_inf(environment, f)) {
+        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_POSITIVE);
+      } else if (msat_term_is_fp_roundingmode_minus_inf(environment, f)) {
+        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_NEGATIVE);
+      } else if (msat_term_is_fp_roundingmode_zero(environment, f)) {
+        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_ZERO);
+      } else {
+        throw new IllegalArgumentException(
+            "Unknown rounding mode " + msat_decl_get_name(msat_term_get_decl(f)));
       }
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
