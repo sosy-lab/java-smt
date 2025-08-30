@@ -785,19 +785,6 @@ public class TraceFormulaManager implements FormulaManager {
               getFloatingPointFormulaManager()
                   .equalWithFPSemantics(
                       (FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
-        // TODO
-        /*
-        case FP_ROUND_EVEN:
-          break;
-        case FP_ROUND_AWAY:
-          break;
-        case FP_ROUND_POSITIVE:
-          break;
-        case FP_ROUND_NEGATIVE:
-          break;
-        case FP_ROUND_ZERO:
-          break;
-        */
         case FP_ROUND_TO_INTEGRAL:
           return (T)
               getFloatingPointFormulaManager()
