@@ -65,6 +65,20 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
     assertThat(mgr.getFormulaType(f.apply(arg)).isIntegerType()).isTrue();
   }
 
+  /**
+   * Same as binary testRationalOperation(), but we expect both arguments, and result to be integer
+   * terms.
+   */
+  private void testIntegerOperation(
+      BiFunction<IntegerFormula, IntegerFormula, IntegerFormula> f,
+      IntegerFormula arg1,
+      IntegerFormula arg2,
+      IntegerFormula expected)
+      throws SolverException, InterruptedException {
+    assertThatFormula(imgr.equal(f.apply(arg1, arg2), expected)).isTautological();
+    assertThat(mgr.getFormulaType(f.apply(arg1, arg2)).isIntegerType()).isTrue();
+  }
+
   @Test
   public void createIntegerNumberTest() throws SolverException, InterruptedException {
     IntegerFormula num1 = imgr.makeNumber(1.0);
@@ -169,6 +183,7 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void divideTest() throws SolverException, InterruptedException {
+    testIntegerOperation(imgr::divide, imgr.makeNumber(5), imgr.makeNumber(2), imgr.makeNumber(2));
     testRationalOperation(
         rmgr::divide, imgr.makeNumber(1), imgr.makeNumber(2), rmgr.makeNumber(0.5));
     testRationalOperation(
