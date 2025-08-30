@@ -119,7 +119,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public EnumerationFormulaManager getEnumerationFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceEnumerationFormulaManager(delegate.getEnumerationFormulaManager(), logger);
   }
 
   private class Rebuilder extends FormulaTransformationVisitor {
