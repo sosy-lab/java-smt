@@ -55,12 +55,6 @@ public class TraceUFManager implements UFManager {
   }
 
   @Override
-  public <T extends Formula> FunctionDeclaration<T> declareUF(
-      String name, FormulaType<T> returnType, FormulaType<?>... args) {
-    return declareUF(name, returnType, Arrays.asList(args));
-  }
-
-  @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
     if (funcType.getKind().equals(FunctionDeclarationKind.UF)) {
@@ -73,11 +67,6 @@ public class TraceUFManager implements UFManager {
     } else {
       return mgr.makeApplication(funcType, args);
     }
-  }
-
-  @Override
-  public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return callUF(funcType, Arrays.asList(args));
   }
 
   @Override

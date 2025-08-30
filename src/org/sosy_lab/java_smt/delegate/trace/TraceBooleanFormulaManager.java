@@ -119,11 +119,6 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public BooleanFormula and(BooleanFormula... bits) {
-    return and(Arrays.asList(bits));
-  }
-
-  @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
     return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
@@ -139,11 +134,6 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
         "mgr.getBooleanFormulaManager()",
         String.format("or(%s)", logger.toVariables(bits)),
         () -> delegate.or(bits));
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... bits) {
-    return or(Arrays.asList(bits));
   }
 
   @Override
