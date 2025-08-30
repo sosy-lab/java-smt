@@ -520,10 +520,17 @@ public class TraceFormulaManager implements FormulaManager {
               return (T)
                   getBooleanFormulaManager()
                       .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(0).isNumeralType()) {
-              return (T)
-                  getRationalFormulaManager()
-                      .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            } else if (declaration.getArgumentTypes().get(1).isNumeralType()) {
+              if (declaration.getArgumentTypes().get(0).isRationalType()
+                  || declaration.getArgumentTypes().get(1).isRationalType()) {
+                return (T)
+                    getRationalFormulaManager()
+                        .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+              } else {
+                return (T)
+                    getIntegerFormulaManager()
+                        .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+              }
             } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
               return (T)
                   getBitvectorFormulaManager()
