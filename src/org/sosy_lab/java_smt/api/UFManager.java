@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -18,8 +18,10 @@ public interface UFManager {
       String name, FormulaType<T> returnType, List<FormulaType<?>> args);
 
   /** Declare an uninterpreted function. */
-  <T extends Formula> FunctionDeclaration<T> declareUF(
-      String name, FormulaType<T> returnType, FormulaType<?>... args);
+  default <T extends Formula> FunctionDeclaration<T> declareUF(
+      String name, FormulaType<T> returnType, FormulaType<?>... args) {
+    return declareUF(name, returnType, List.of(args));
+  }
 
   /**
    * Create an uninterpreted function call.
@@ -35,7 +37,9 @@ public interface UFManager {
   /**
    * @see #callUF(FunctionDeclaration, List)
    */
-  <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args);
+  default <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
+    return callUF(funcType, List.of(args));
+  }
 
   /**
    * Declares and calls an uninterpreted function with exactly the given name.
@@ -52,5 +56,8 @@ public interface UFManager {
   /**
    * @see #declareAndCallUF(String, FormulaType, List)
    */
-  <T extends Formula> T declareAndCallUF(String name, FormulaType<T> pReturnType, Formula... pArgs);
+  default <T extends Formula> T declareAndCallUF(
+      String name, FormulaType<T> pReturnType, Formula... pArgs) {
+    return declareAndCallUF(name, pReturnType, List.of(pArgs));
+  }
 }

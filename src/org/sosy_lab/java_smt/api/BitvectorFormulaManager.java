@@ -413,4 +413,8 @@ public interface BitvectorFormulaManager {
 
   /** All given bitvectors are pairwise unequal. */
   BooleanFormula distinct(List<BitvectorFormula> pBits);
+
+  default BooleanFormula distinct(BitvectorFormula... pBits) {
+    return distinct(List.of(pBits));
+  }
 }
