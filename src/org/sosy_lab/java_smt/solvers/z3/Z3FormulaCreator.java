@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.microsoft.z3.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -613,16 +614,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
     final int arity = Native.getArity(environment, Native.getAppDecl(environment, f));
-    assert arity > 0
-        : String.format(
-            "Unexpected arity '%s' for formula '%s' for handling a function application.",
-            arity, Native.astToString(environment, f));
     if (getAppName(f).equals("div0")) {
       // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
       return FunctionDeclarationKind.OTHER;
     }
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
+
+    assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
+        : String.format(
+            "Unexpected arity '%s' for formula '%s' for handling a function application.",
+            arity, Native.astToString(environment, f));
+
     switch (decl) {
       case Z3_OP_AND:
         return FunctionDeclarationKind.AND;
