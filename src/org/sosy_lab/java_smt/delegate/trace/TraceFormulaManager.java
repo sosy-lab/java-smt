@@ -195,14 +195,14 @@ public class TraceFormulaManager implements FormulaManager {
       return f;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       if (!logger.isTracked(f)) {
         Formula g = makeApplication(functionDeclaration, args);
-        // FIXME Remove the assertion? Argument order can change, f.ex (and a b) becomes (and b a)
-        // Preconditions.checkArgument(g.equals(f));
+        if (!g.equals(f)) {
+          Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        }
       }
       return f;
     }
