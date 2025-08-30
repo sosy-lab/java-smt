@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.UFManager;
 
 public class TraceUFManager implements UFManager {
@@ -62,19 +63,23 @@ public class TraceUFManager implements UFManager {
   @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
-    String var = logger.newVariable();
-    logger.appendDef(
-        var,
-        String.format(
-            "callUF(%s, ImmutableList.of(%s))",
-            logger.toVariable(funcType), logger.toVariables(args)));
-    T f = delegate.callUF(funcType, args);
-    if (logger.isTracked(f)) {
-      logger.undoLast();
+    if (funcType.getKind().equals(FunctionDeclarationKind.UF)) {
+      String var = logger.newVariable();
+      logger.appendDef(
+          var,
+          String.format(
+              "callUF(%s, ImmutableList.of(%s))",
+              logger.toVariable(funcType), logger.toVariables(args)));
+      T f = delegate.callUF(funcType, args);
+      if (logger.isTracked(f)) {
+        logger.undoLast();
+      } else {
+        logger.mapVariable(var, f);
+      }
+      return f;
     } else {
-      logger.mapVariable(var, f);
+      return mgr.makeApplication(funcType, args);
     }
-    return f;
   }
 
   @Override
