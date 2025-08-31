@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_abs;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_bits_number;
@@ -228,12 +230,12 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected int getMantissaSizeImpl(Long f) {
-    throw new UnsupportedOperationException("implement me");
+    return msat_get_fp_type_mant_width(mathsatEnv, msat_term_get_type(f));
   }
 
   @Override
   protected int getExponentSizeImpl(Long f) {
-    throw new UnsupportedOperationException("implement me");
+    return msat_get_fp_type_exp_width(mathsatEnv, msat_term_get_type(f));
   }
 
   @Override
