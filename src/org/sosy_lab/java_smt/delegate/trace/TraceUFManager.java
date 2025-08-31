@@ -64,19 +64,12 @@ public class TraceUFManager implements UFManager {
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
     if (funcType.getKind().equals(FunctionDeclarationKind.UF)) {
-      String var = logger.newVariable();
-      logger.appendDef(
-          var,
+      return logger.logDef(
+          "mgr.getUFManager",
           String.format(
               "callUF(%s, ImmutableList.of(%s))",
-              logger.toVariable(funcType), logger.toVariables(args)));
-      T f = delegate.callUF(funcType, args);
-      if (logger.isTracked(f)) {
-        logger.undoLast();
-      } else {
-        logger.mapVariable(var, f);
-      }
-      return f;
+              logger.toVariable(funcType), logger.toVariables(args)),
+          () -> delegate.callUF(funcType, args));
     } else {
       return mgr.makeApplication(funcType, args);
     }
