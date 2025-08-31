@@ -26,11 +26,26 @@ public abstract class FunctionDeclarationImpl<F extends Formula, T>
   public static <F extends Formula, T> FunctionDeclaration<F> of(
       String name,
       FunctionDeclarationKind kind,
+      List<Integer> pIndices,
       List<FormulaType<?>> pArgumentTypes,
       FormulaType<F> pReturnType,
       T pDeclaration) {
     return new AutoValue_FunctionDeclarationImpl<>(
-        kind, name, pReturnType, ImmutableList.copyOf(pArgumentTypes), pDeclaration);
+        kind,
+        name,
+        ImmutableList.copyOf(pIndices),
+        pReturnType,
+        ImmutableList.copyOf(pArgumentTypes),
+        pDeclaration);
+  }
+
+  public static <F extends Formula, T> FunctionDeclaration<F> of(
+      String name,
+      FunctionDeclarationKind kind,
+      List<FormulaType<?>> pArgumentTypes,
+      FormulaType<F> pReturnType,
+      T pDeclaration) {
+    return of(name, kind, ImmutableList.of(), pArgumentTypes, pReturnType, pDeclaration);
   }
 
   /**
