@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.collect.ImmutableMap;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -274,6 +275,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
       FloatingPointFormula f, String bitvectorConstantName) {
+    return toIeeeBitvector(f, bitvectorConstantName, ImmutableMap.of());
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula f,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
 
     int mantissaSize = getMantissaSize(f);
     int exponentSize = getExponentSize(f);
@@ -289,19 +298,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     // standard, what solvers return might be distinct.
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
-    return BitvectorFormulaAndBooleanFormula.of(bvFormula, additionalConstraint);
-  }
-
-  @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula f,
-      String bitvectorConstantName,
-      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
-
-    BitvectorFormulaAndBooleanFormula toIeeeBvAndConstraint =
-        toIeeeBitvector(f, bitvectorConstantName);
-
-    BitvectorFormula toIeeeBv = toIeeeBvAndConstraint.getBitvectorFormula();
+    BitvectorFormula toIeeeBv = bvFormula;
     for (Entry<FloatingPointFormula, BitvectorFormula> entry :
         specialFPConstantHandling.entrySet()) {
       FloatingPointFormula fpConst = entry.getKey();
@@ -311,8 +308,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       toIeeeBv = bMgr.ifThenElse(assumption, entry.getValue(), toIeeeBv);
     }
 
-    return BitvectorFormulaAndBooleanFormula.of(
-        toIeeeBv, toIeeeBvAndConstraint.getBooleanFormula());
+    return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
   }
 
   protected int getMantissaSize(FloatingPointFormula f) {
