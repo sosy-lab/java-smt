@@ -451,11 +451,13 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected int getMantissaSizeImpl(Term f) {
-    throw new UnsupportedOperationException("implement me");
+    Sort sort = f.getSort();
+    return sort.getFloatingPointSignificandSize();
   }
 
   @Override
   protected int getExponentSizeImpl(Term f) {
-    throw new UnsupportedOperationException("implement me");
+    Sort sort = f.getSort();
+    return sort.getFloatingPointExponentSize();
   }
 }
