@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
@@ -391,11 +393,15 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected int getMantissaSizeImpl(Expr f) {
-    throw new UnsupportedOperationException("implement me");
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    return (int) ((edu.stanford.CVC4.FloatingPointType) type).getSignificandSize();
   }
 
   @Override
   protected int getExponentSizeImpl(Expr f) {
-    throw new UnsupportedOperationException("implement me");
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    return (int) ((edu.stanford.CVC4.FloatingPointType) type).getExponentSize();
   }
 }
