@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -213,6 +214,25 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(number);
     BitvectorFormulaAndBooleanFormula res = delegate.toIeeeBitvector(number, bitvectorConstantName);
+    debugging.addFormulaTerm(res.getBitvectorFormula());
+    debugging.addFormulaTerm(res.getBooleanFormula());
+    return res;
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    specialFPConstantHandling.forEach(
+        (key, value) -> {
+          debugging.assertFormulaInContext(key);
+          debugging.assertFormulaInContext(value);
+        });
+    BitvectorFormulaAndBooleanFormula res =
+        delegate.toIeeeBitvector(number, bitvectorConstantName, specialFPConstantHandling);
     debugging.addFormulaTerm(res.getBitvectorFormula());
     debugging.addFormulaTerm(res.getBooleanFormula());
     return res;

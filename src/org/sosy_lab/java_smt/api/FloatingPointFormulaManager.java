@@ -12,6 +12,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -298,8 +299,9 @@ public interface FloatingPointFormulaManager {
    * This implementation can be used independently of {@link
    * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
    * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
-   * is not defined. In case you want to define how to handle those values, please use TODO This
-   * method is based on a suggestion in the SMTLib2 standard ( <a
+   * is not defined, and returned values are solver dependent. In case you want to define how to
+   * handle those values, please use {@link #toIeeeBitvector(FloatingPointFormula, String, Map)}.
+   * This method is based on a suggestion in the SMTLib2 standard ( <a
    * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
    *
    * <p>(declare-fun b () (_ BitVec m))
@@ -314,6 +316,36 @@ public interface FloatingPointFormulaManager {
    */
   BitvectorFormulaAndBooleanFormula toIeeeBitvector(
       FloatingPointFormula number, String bitvectorConstantName);
+
+  /**
+   * Create a formula that produces a representation of the given floating-point value as a
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * This implementation can be used independently of {@link
+   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
+   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
+   * can be defined using the specialFPConstantHandling parameter. This method is based on a
+   * suggestion in the SMTLib2 standard ( <a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
+   *
+   * <p>(declare-fun b () (_ BitVec m))
+   *
+   * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
+   * @param specialFPConstantHandling a {@link Map} defining the returned {@link BitvectorFormula}
+   *     for special {@link FloatingPointFormula} constant values like Nan. For an empty {@link
+   *     Map}, or missing mappings, this method behaves like {@link
+   *     #toIeeeBitvector(FloatingPointFormula, String)}.
+   * @return {@link BitvectorFormulaAndBooleanFormula} consisting of the transformed input
+   *     floating-point as a {@link BitvectorFormula} and the additional constraint as {@link
+   *     BooleanFormula}.
+   */
+  BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 

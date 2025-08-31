@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -172,6 +173,14 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
       FloatingPointFormula number, String bitvectorConstantName) {
     stats.fpOperations.getAndIncrement();
     return delegate.toIeeeBitvector(number, bitvectorConstantName);
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
+    return delegate.toIeeeBitvector(number, bitvectorConstantName, specialFPConstantHandling);
   }
 
   @Override

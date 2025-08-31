@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -47,12 +48,16 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private final AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bvMgr;
 
+  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bMgr;
+
   protected AbstractFloatingPointFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
-      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr) {
+      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr,
+      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBMgr) {
     super(pCreator);
     roundingModes = new HashMap<>();
     bvMgr = pBvMgr;
+    bMgr = pBMgr;
   }
 
   protected abstract TFormulaInfo getDefaultRoundingMode();
@@ -280,10 +285,34 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
             bvFormula, FloatingPointType.getFloatingPointType(exponentSize, mantissaSize));
 
     // assignment() allows a value to be NaN etc.
-    // Note: All fp.to_* functions are unspecified for NaN and infinity input values!
+    // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
+    // standard, what solvers return might be distinct.
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
     return BitvectorFormulaAndBooleanFormula.of(bvFormula, additionalConstraint);
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula f,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
+
+    BitvectorFormulaAndBooleanFormula toIeeeBvAndConstraint =
+        toIeeeBitvector(f, bitvectorConstantName);
+
+    BitvectorFormula toIeeeBv = toIeeeBvAndConstraint.getBitvectorFormula();
+    for (Entry<FloatingPointFormula, BitvectorFormula> entry :
+        specialFPConstantHandling.entrySet()) {
+      FloatingPointFormula fpConst = entry.getKey();
+      // TODO: can we check that fpConst is a special number here?
+      BooleanFormula assumption = assignment(fpConst, f);
+      // TODO: do we want to enforce the size of the BV? Decide and put into JavaDoc!
+      toIeeeBv = bMgr.ifThenElse(assumption, entry.getValue(), toIeeeBv);
+    }
+
+    return BitvectorFormulaAndBooleanFormula.of(
+        toIeeeBv, toIeeeBvAndConstraint.getBooleanFormula());
   }
 
   protected int getMantissaSize(FloatingPointFormula f) {
