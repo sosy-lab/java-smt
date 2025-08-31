@@ -320,11 +320,11 @@ class Z3FloatingPointFormulaManager
 
   @Override
   protected int getMantissaSizeImpl(Long f) {
-    throw new UnsupportedOperationException("implement me");
+    return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
   }
 
   @Override
   protected int getExponentSizeImpl(Long f) {
-    throw new UnsupportedOperationException("implement me");
+    return Native.fpaGetSbits(z3context, Native.getSort(z3context, f));
   }
 }
