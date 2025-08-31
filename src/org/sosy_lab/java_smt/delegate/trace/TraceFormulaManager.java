@@ -555,9 +555,10 @@ public class TraceFormulaManager implements FormulaManager {
           break;
         case GTE_ZERO:
           break;
-        case TO_REAL:
-          break;
         */
+        case TO_REAL:
+          return (T)
+              getRationalFormulaManager().sum(ImmutableList.of((NumeralFormula) args.get(0)));
         case FLOOR:
           {
             if (args.get(0) instanceof IntegerFormula) {
