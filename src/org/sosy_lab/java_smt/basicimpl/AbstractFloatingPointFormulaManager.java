@@ -272,7 +272,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
     throw new UnsupportedOperationException(
         "The chosen solver does not support transforming "
-            + "FloatingPointFormula to IEEE bitvectors. Try using "); // TODO: finish
+            + "FloatingPointFormula to IEEE bitvectors. Try using the fallback "
+            + "methods toIeeeBitvector"
+            + "(FloatingPointFormula, String) and/or "
+            + "toIeeeBitvector(FloatingPointFormula, String, Map)");
   }
 
   @Override
@@ -292,9 +295,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BitvectorFormula bvFormula =
         bvMgr.makeVariable(mantissaSize + exponentSize, bitvectorConstantName);
 
+    // When building new Fp types, we don't include the sign bit
     FloatingPointFormula fromIeeeBitvector =
         fromIeeeBitvector(
-            bvFormula, FloatingPointType.getFloatingPointType(exponentSize, mantissaSize));
+            bvFormula, FloatingPointType.getFloatingPointType(exponentSize, mantissaSize - 1));
 
     // assignment() allows a value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
@@ -328,7 +332,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
       BitvectorFormula bvTerm = entry.getValue();
       checkArgument(
-          bvMgr.getBitvectorWidth(bvTerm) == bvMgr.getBitvectorWidth(bvFormula),
+          bvMgr.getLength(bvTerm) == bvMgr.getLength(bvFormula),
           "The size of the bitvector terms used as mapped values needs to be equal to the size of"
               + " the bitvector returned by this method");
 
@@ -341,13 +345,15 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
   }
 
-  protected int getMantissaSize(FloatingPointFormula f) {
+  @Override
+  public int getMantissaSize(FloatingPointFormula f) {
     return getMantissaSizeImpl(extractInfo(f));
   }
 
   protected abstract int getMantissaSizeImpl(TFormulaInfo f);
 
-  protected int getExponentSize(FloatingPointFormula f) {
+  @Override
+  public int getExponentSize(FloatingPointFormula f) {
     return getExponentSizeImpl(extractInfo(f));
   }
 
