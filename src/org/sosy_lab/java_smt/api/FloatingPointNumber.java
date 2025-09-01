@@ -23,6 +23,7 @@ import java.util.BitSet;
 @AutoValue
 public abstract class FloatingPointNumber {
 
+  // Mantissas do not include the sign bit
   public static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
   public static final int SINGLE_PRECISION_MANTISSA_SIZE = 23;
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
