@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.BitVectorRotateLeft;
@@ -260,12 +258,5 @@ public class CVC4BitvectorFormulaManager
     vectorExpr param = new vectorExpr();
     pParam.forEach(param::add);
     return exprManager.mkExpr(Kind.DISTINCT, param);
-  }
-
-  @Override
-  protected int getBitvectorWidthImpl(Expr bitvector) {
-    Type type = bitvector.getType();
-    checkArgument(type.isBitVector());
-    return (int) ((edu.stanford.CVC4.BitVectorType) type).getSize();
   }
 }

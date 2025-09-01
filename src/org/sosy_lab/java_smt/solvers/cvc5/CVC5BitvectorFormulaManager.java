@@ -298,9 +298,4 @@ public class CVC5BitvectorFormulaManager
   protected Term distinctImpl(List<Term> pParam) {
     return termManager.mkTerm(Kind.DISTINCT, pParam.toArray(new Term[0]));
   }
-
-  @Override
-  protected int getBitvectorWidthImpl(Term bitvector) {
-    return bitvector.getSort().getBitVectorSize();
-  }
 }

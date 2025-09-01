@@ -200,9 +200,4 @@ class PrincessBitvectorFormulaManager
       return ModuloArithmetic$.MODULE$.zero_extend(pExtensionBits, (ITerm) pNumber);
     }
   }
-
-  @Override
-  protected int getBitvectorWidthImpl(IExpression bitvector) {
-    return bitvector.length();
-  }
 }

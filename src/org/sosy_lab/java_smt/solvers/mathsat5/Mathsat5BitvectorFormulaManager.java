@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_bv_type_size;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_and;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_ashr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_bv_concat;
@@ -42,7 +41,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_from_ubv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_int_to_bv;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_term_ite;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 
 import java.math.BigInteger;
 import java.util.function.Function;
@@ -78,11 +76,6 @@ class Mathsat5BitvectorFormulaManager
     } else {
       return msat_make_bv_zext(mathsatEnv, pExtensionBits, pNumber);
     }
-  }
-
-  @Override
-  protected int getBitvectorWidthImpl(Long bitvector) {
-    return msat_get_bv_type_size(mathsatEnv, msat_term_get_type(bitvector));
   }
 
   @Override

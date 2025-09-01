@@ -203,9 +203,4 @@ public class BitwuzlaBitvectorFormulaManager
       return termManager.mk_term(Kind.BV_ZERO_EXTEND, pNumber, pExtensionBits);
     }
   }
-
-  @Override
-  protected int getBitvectorWidthImpl(Term pNumber) {
-    return pNumber.sort().bv_size();
-  }
 }

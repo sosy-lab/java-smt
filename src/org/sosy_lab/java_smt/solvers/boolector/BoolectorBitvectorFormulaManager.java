@@ -12,7 +12,6 @@ import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_add;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_and;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_concat;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_eq;
-import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_get_width;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_mul;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_neg;
 import static org.sosy_lab.java_smt.solvers.boolector.BtorJNI.boolector_not;
@@ -235,10 +234,5 @@ class BoolectorBitvectorFormulaManager
     } else {
       return boolector_uext(btor, bitVec, extensionBits);
     }
-  }
-
-  @Override
-  protected int getBitvectorWidthImpl(Long bitvector) {
-    return boolector_get_width(btor, bitvector);
   }
 }

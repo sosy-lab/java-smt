@@ -34,13 +34,11 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvslt_a
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsmod;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsrem;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvsub;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvxor2;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_bvbin;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_left;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_rotate_right;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_sign_extend;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_of_term;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_zero_extend;
 
 import com.google.common.base.Preconditions;
@@ -227,11 +225,6 @@ public class Yices2BitvectorFormulaManager
     } else {
       return yices_zero_extend(pNumber, pExtensionBits);
     }
-  }
-
-  @Override
-  protected int getBitvectorWidthImpl(Integer bitvector) {
-    return yices_bvtype_size(yices_type_of_term(bitvector));
   }
 
   @Override
