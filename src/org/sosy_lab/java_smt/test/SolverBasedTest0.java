@@ -259,6 +259,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
   protected final boolean solverSupportsNativeFPToBitvector() {
     requireFloats();
     try {
