@@ -83,7 +83,7 @@ public class BitwuzlaFloatingPointManager
     Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
     Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
 
-    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSize());
+    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSizeWithoutSignBit());
     Term mantissaTerm = termManager.mk_bv_value(mantissaSort, mantissa.toString(2));
 
     return termManager.mk_fp_value(signTerm, expTerm, mantissaTerm);
@@ -133,7 +133,7 @@ public class BitwuzlaFloatingPointManager
           pRoundingMode,
           pNumber,
           targetType.getExponentSize(),
-          targetType.getMantissaSize() + 1);
+          targetType.getMantissaSizeWithSignBit());
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       if (pSigned) {
@@ -170,14 +170,14 @@ public class BitwuzlaFloatingPointManager
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize() + 1);
+            pTargetType.getMantissaSizeWithSignBit());
       } else {
         return termManager.mk_term(
             Kind.FP_TO_FP_FROM_UBV,
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize() + 1);
+            pTargetType.getMantissaSizeWithSignBit());
       }
 
     } else {
@@ -192,7 +192,7 @@ public class BitwuzlaFloatingPointManager
         Kind.FP_TO_FP_FROM_BV,
         pNumber,
         pTargetType.getExponentSize(),
-        pTargetType.getMantissaSize() + 1);
+        pTargetType.getMantissaSizeWithSignBit());
   }
 
   @Override

@@ -102,7 +102,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Sort getFloatingPointType(FloatingPointType type) {
-    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
+    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithSignBit());
   }
 
   @Override
@@ -171,7 +171,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
       int mantissa = pSort.fp_sig_size() - 1;
-      return FormulaType.getFloatingPointType(exponent, mantissa);
+      return FormulaType.getFloatingPointTypeWithoutSignBit(exponent, mantissa);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -380,7 +380,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       }
       int exp = sort.fp_exp_size();
       int man = sort.fp_sig_size() - 1;
-      return (FormulaType<T>) FormulaType.getFloatingPointType(exp, man);
+      return (FormulaType<T>) FormulaType.getFloatingPointTypeWithoutSignBit(exp, man);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
