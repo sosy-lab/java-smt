@@ -213,7 +213,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_is_bv_type(env, type)) {
       return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
     } else if (msat_is_fp_type(env, type)) {
-      return FormulaType.getFloatingPointType(
+      return FormulaType.getFloatingPointTypeWithoutSignBit(
           msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
     } else if (msat_is_fp_roundingmode_type(env, type)) {
       return FormulaType.FloatingPointRoundingModeType;
@@ -241,7 +241,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FloatingPointType pType) {
-    return msat_get_fp_type(getEnv(), pType.getExponentSize(), pType.getMantissaSize());
+    // MathSAT5 automatically adds 1 to the mantissa, as it expects it to be without it.
+    return msat_get_fp_type(
+        getEnv(), pType.getExponentSize(), pType.getMantissaSizeWithSignBit() - 1);
   }
 
   @SuppressWarnings("unchecked")
@@ -575,13 +577,14 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
-    int mantWidth = Integer.parseInt(matcher.group(3));
+    // The term representation in MathSAT5 does not include the sign bit
+    int mantWidthWithoutSignBit = Integer.parseInt(matcher.group(3));
 
-    Sign sign = Sign.of(bits.testBit(expWidth + mantWidth));
-    BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
-    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidthWithoutSignBit));
+    BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutSignBit, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutSignBit);
 
-    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidth);
+    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidthWithoutSignBit);
   }
 
   /**
