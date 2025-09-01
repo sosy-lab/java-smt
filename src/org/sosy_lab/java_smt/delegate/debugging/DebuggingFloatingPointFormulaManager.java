@@ -525,10 +525,10 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
   }
 
   @Override
-  public int getMantissaSize(FloatingPointFormula number) {
+  public int getMantissaSizeWithSignBit(FloatingPointFormula number) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(number);
-    return delegate.getMantissaSize(number);
+    return delegate.getMantissaSizeWithSignBit(number);
   }
 
   @Override

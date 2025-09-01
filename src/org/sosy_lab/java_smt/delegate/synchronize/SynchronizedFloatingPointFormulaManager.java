@@ -422,9 +422,9 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
-  public int getMantissaSize(FloatingPointFormula pNumber) {
+  public int getMantissaSizeWithSignBit(FloatingPointFormula pNumber) {
     synchronized (sync) {
-      return delegate.getMantissaSize(pNumber);
+      return delegate.getMantissaSizeWithSignBit(pNumber);
     }
   }
 
