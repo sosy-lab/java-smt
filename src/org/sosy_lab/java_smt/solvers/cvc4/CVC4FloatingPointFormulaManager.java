@@ -10,13 +10,13 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
-import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FloatingPoint;
 import edu.stanford.CVC4.FloatingPointConvertSort;
 import edu.stanford.CVC4.FloatingPointSize;
 import edu.stanford.CVC4.FloatingPointToFPFloatingPoint;
+import edu.stanford.CVC4.FloatingPointToFPIEEEBitVector;
 import edu.stanford.CVC4.FloatingPointToFPSignedBitVector;
 import edu.stanford.CVC4.FloatingPointToFPUnsignedBitVector;
 import edu.stanford.CVC4.FloatingPointToSBV;
@@ -52,8 +52,8 @@ public class CVC4FloatingPointFormulaManager
 
   private static FloatingPointSize getFPSize(FloatingPointType pType) {
     long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSize();
-    return new FloatingPointSize(pExponentSize, pMantissaSize + 1); // plus sign bit
+    long pMantissaSize = pType.getMantissaSizeWithSignBit();
+    return new FloatingPointSize(pExponentSize, pMantissaSize);
   }
 
   @Override
@@ -89,11 +89,11 @@ public class CVC4FloatingPointFormulaManager
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     final String signStr = sign.isNegative() ? "1" : "0";
     final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
-    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSizeWithoutSignBit());
     final String bitvecStr = signStr + exponentStr + mantissaStr;
     final BitVector bitVector = new BitVector(bitvecStr, 2);
     final FloatingPoint fp =
-        new FloatingPoint(type.getExponentSize(), type.getMantissaSize() + 1, bitVector);
+        new FloatingPoint(type.getExponentSize(), type.getMantissaSizeWithSignBit(), bitVector);
     return exprManager.mkConst(fp);
   }
 
@@ -109,7 +109,7 @@ public class CVC4FloatingPointFormulaManager
 
     final Rational rat = toRational(pN);
     final BigInteger upperBound =
-        getBiggestNumberBeforeInf(pType.getMantissaSize(), pType.getExponentSize());
+        getBiggestNumberBeforeInf(pType.getMantissaSizeWithSignBit(), pType.getExponentSize());
 
     if (rat.greater(Rational.fromDecimal(upperBound.negate().toString()))
         && rat.less(Rational.fromDecimal(upperBound.toString()))) {
@@ -218,7 +218,7 @@ public class CVC4FloatingPointFormulaManager
 
     } else if (formulaType.isBitvectorType()) {
       long pExponentSize = pTargetType.getExponentSize();
-      long pMantissaSize = pTargetType.getMantissaSize();
+      long pMantissaSize = pTargetType.getMantissaSizeWithSignBit();
       FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize + 1);
       FloatingPointConvertSort fpConvert = new FloatingPointConvertSort(fpSize);
       final Expr op;
@@ -358,31 +358,30 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr fromIeeeBitvectorImpl(Expr bitvector, FloatingPointType pTargetType) {
-    int mantissaSize = pTargetType.getMantissaSize();
-    int exponentSize = pTargetType.getExponentSize();
-    int size = pTargetType.getTotalSize();
-    assert size == mantissaSize + exponentSize + 1;
-
-    Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
-    Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
-    Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
-
-    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, bitvector);
-    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, bitvector);
-    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, bitvector);
-
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
-  }
-
-  @Override
-  protected Expr toIeeeBitvectorImpl(Expr pNumber) {
-    // TODO possible work-around: use a tmp-variable "TMP" and add an
-    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
-    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
+    // This is just named weird, but the CVC4 doc say this is IEEE BV -> FP
+    FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(getFPSize(pTargetType));
+    Expr op = exprManager.mkConst(new FloatingPointToFPIEEEBitVector(fpConvertSort));
+    return exprManager.mkExpr(op, bitvector);
   }
 
   @Override
   protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
     return exprManager.mkExpr(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeImpl(Expr f) {
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
+    return (int) fpType.getSignificandSize();
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Expr f) {
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
+    return (int) fpType.getExponentSize();
   }
 }
