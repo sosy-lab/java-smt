@@ -377,42 +377,9 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // resolution proof. The resulting node has the same formula as the initial node from Z3 but also
   // includes the pivot used in the last resolution step.
   Proof handleTransitivityStar(Z3Proof node) {
-    Formula resPivot;
-    List<BooleanFormula> formulas = new ArrayList<>();
-    List<Proof> children = new ArrayList<>(node.getChildren());
-    int numChildren = node.getChildren().size();
-
-    for (int i = 0; i < numChildren; i++) {
-      Collection<BooleanFormula> newCollection = new ArrayList<>();
-      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
-    }
-
-    formulas.add((BooleanFormula) node.getFormula());
-    BooleanFormula transitivityFormula = bfm.or(formulas);
-    AxiomProof sn = new AxiomProof(ResAxiom.TRANSITIVITY, transitivityFormula);
-    resPivot = children.get(numChildren - 1).getFormula();
-    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
-
-    Proof childNode = sn;
-    for (int i = 0; i < numChildren - 1; i++) {
-
-      resPivot = children.get(i).getFormula();
-
-      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
-
-      formulas.remove(0);
-      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
-      rp.addChild(childNode);
-      rp.addChild(children.get(i));
-      childNode = rp;
-    }
-
-    resNode.addChild(childNode);
-    resNode.addChild(children.get(numChildren - 1));
-
-    return resNode;
+    return iterativeResolution(node, ResAxiom.TRANSITIVITY);
   }
-
+  
   // There seems to be no equivalent singular axiom in RESOLUTE for the encoding of the
   // Z3_MONOTONICITY Proof Rule:
   // " Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
@@ -429,42 +396,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // oracle_(rule) proof rule, e.g.: oracle_Z3_monotonicity to be able to introduce the rule as a
   // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
   // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
-  Proof handleMonotonicity(Z3Proof node) {
-    Formula resPivot;
-    List<BooleanFormula> formulas = new ArrayList<>();
-    List<Proof> children = new ArrayList<>(node.getChildren());
-    int numChildren = node.getChildren().size();
-
-    for (int i = 0; i < numChildren; i++) {
-      Collection<BooleanFormula> newCollection = new ArrayList<>();
-      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
-    }
-
-    formulas.add((BooleanFormula) node.getFormula());
-    BooleanFormula axiomFormula = bfm.or(formulas);
-    AxiomProof sn = new AxiomProof(ResAxiom.ORACLE, axiomFormula);
-    resPivot = children.get(numChildren - 1).getFormula();
-    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
-
-    Proof childNode = sn;
-    for (int i = 0; i < numChildren - 1; i++) {
-
-      resPivot = children.get(i).getFormula();
-
-      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
-
-      formulas.remove(0);
-      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
-      rp.addChild(childNode);
-      rp.addChild(children.get(i));
-      childNode = rp;
-    }
-
-    resNode.addChild(childNode);
-    resNode.addChild(children.get(numChildren - 1));
-
-    return resNode;
+ Proof handleMonotonicity(Z3Proof node) {
+    return iterativeResolution(node, ResAxiom.ORACLE);
   }
+  
   // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
   // Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
   //
@@ -616,51 +551,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Since this is also a rewrite, use the assume axiom here for the clause NOT (AND p0 ... pn)
   // OR (= t s) where pi is an antecedent. This lets us resolve all the antecedents with this
   // clause and conclude (= t s)
-  Proof handleRewriteStar(Z3Proof node) {
-
-    Formula resPivot;
-    List<BooleanFormula> formulas = new ArrayList<>();
-    List<Proof> children = new ArrayList<>(node.getChildren());
-    int numChildren = children.size();
-
-    // negate each antecedent for the disjunction
-    for (int i = 0; i < numChildren; i++) {
-      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
-    }
-
-    // add the conclusion (= t s) at the end
-    formulas.add((BooleanFormula) node.getFormula());
-
-    // create the axiom clause: ¬p0 ∨ ... ∨ ¬pn ∨ (= t s)
-    BooleanFormula axiomFormula = bfm.or(formulas);
-    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, axiomFormula);
-
-    // initialize pivot to the last antecedent
-    resPivot = children.get(numChildren - 1).getFormula();
-    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
-
-    // iterative resolution: combine axiom with each antecedent
-    Proof childNode = axiom;
-    for (int i = 0; i < numChildren - 1; i++) {
-
-      resPivot = children.get(i).getFormula();
-
-      // sanity check: first element in formulas should match negated pivot
-      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
-
-      // remove the first negated antecedent from the disjunction for next resolution step
-      formulas.remove(0);
-      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
-      rp.addChild(childNode);
-      rp.addChild(children.get(i));
-      childNode = rp;
-    }
-
-    // attach final resolution node
-    resNode.addChild(childNode);
-    resNode.addChild(children.get(numChildren - 1));
-
-    return resNode;
+   Proof handleRewriteStar(Z3Proof node) {
+    return iterativeResolution(node, ResAxiom.ASSUME);
   }
 
   Proof handlePullQuant(Z3Proof node) {
@@ -771,6 +663,41 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
+ //Creates a subtree of resolution rule applications
+  private ResolutionProof iterativeResolution(Z3Proof node, ResAxiom axiom) {
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    int n = children.size();
+    List<BooleanFormula> formulas = new ArrayList<>();
+
+    for (int i = 0; i < n; i++) {
+      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
+    }
+
+    formulas.add((BooleanFormula) node.getFormula());
+
+    BooleanFormula axiomFormula = bfm.or(formulas);
+    AxiomProof ax = new AxiomProof(axiom, axiomFormula);
+
+    Formula resPivot = children.get(n - 1).getFormula();
+    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
+
+    Proof childNode = ax;
+    for (int i = 0; i < n - 1; i++) {
+      resPivot = children.get(i).getFormula();
+      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
+      formulas.remove(0);
+      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
+      rp.addChild(childNode);
+      rp.addChild(children.get(i));
+      childNode = rp;
+    }
+
+    resNode.addChild(childNode);
+    resNode.addChild(children.get(n - 1));
+
+    return resNode;
+  }
+  
   // This is for debugging purposes.
   void printProof(Proof node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
