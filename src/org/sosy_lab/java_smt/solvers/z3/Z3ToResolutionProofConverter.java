@@ -203,7 +203,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
         return handleBind(node);
 
       case DISTRIBUTIVITY:
-        return handleDistributivity(node);
+        handleDistributivity(node);
 
       case AND_ELIM:
         return handleAndElim(node);
