@@ -101,7 +101,8 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getMathSign(),
-        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+        getFloatingPointType(
+            number.getExponentSize(), number.getMantissaSize()));
   }
 
   /**
@@ -530,13 +531,11 @@ public interface FloatingPointFormulaManager {
   BooleanFormula isNegative(FloatingPointFormula number);
 
   /**
-   * Returns the size of the mantissa (also called a coefficient or significant), including the
-   * sign bit, for the given {@link FloatingPointFormula}.
+   * Returns the size of the mantissa (also called a coefficient or significant), including the sign
+   * bit, for the given {@link FloatingPointFormula}.
    */
-  int getMantissaSize(FloatingPointFormula number);
+  int getMantissaSizeWithSignBit(FloatingPointFormula number);
 
-  /**
-   * Returns the size of the exponent for the given {@link FloatingPointFormula}.
-   */
+  /** Returns the size of the exponent for the given {@link FloatingPointFormula}. */
   int getExponentSize(FloatingPointFormula number);
 }

@@ -290,7 +290,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       String bitvectorConstantName,
       Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
 
-    int mantissaSize = getMantissaSize(f);
+    int mantissaSize = getMantissaSizeWithSignBit(f);
     int exponentSize = getExponentSize(f);
     BitvectorFormula bvFormula =
         bvMgr.makeVariable(mantissaSize + exponentSize, bitvectorConstantName);
@@ -346,7 +346,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   @Override
-  public int getMantissaSize(FloatingPointFormula f) {
+  public int getMantissaSizeWithSignBit(FloatingPointFormula f) {
     return getMantissaSizeImpl(extractInfo(f));
   }
 
