@@ -78,7 +78,7 @@ public class CVC5FloatingPointFormulaManager
       return termManager.mkFloatingPoint(
           termManager.mkBitVector(1, sign == Sign.NEGATIVE ? 1 : 0),
           termManager.mkBitVector(type.getExponentSize(), exponent.toString(16), 16),
-          termManager.mkBitVector(type.getMantissaSize(), mantissa.toString(16), 16));
+          termManager.mkBitVector(type.getMantissaSizeWithoutSignBit(), mantissa.toString(16), 16));
 
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException("You tried creating a invalid bitvector", e);
@@ -90,7 +90,7 @@ public class CVC5FloatingPointFormulaManager
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
         return termManager.mkFloatingPointNegZero(
-            pType.getExponentSize(), pType.getMantissaSize() + 1);
+            pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
       }
     } catch (CVC5ApiException | NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
@@ -102,7 +102,7 @@ public class CVC5FloatingPointFormulaManager
           termManager.mkOp(
               Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
               pType.getExponentSize(),
-              pType.getMantissaSize() + 1);
+              pType.getMantissaSizeWithSignBit());
       Term term =
           termManager.mkTerm(realToFp, pRoundingMode, termManager.mkReal(rationalValue.toString()));
       // simplification removes the cast from real to fp and return a bit-precise fp-number.
@@ -111,8 +111,8 @@ public class CVC5FloatingPointFormulaManager
       throw new IllegalArgumentException(
           "You tried creating a invalid floating point with exponent size "
               + pType.getExponentSize()
-              + ", mantissa size "
-              + pType.getMantissaSize()
+              + ", mantissa size (including sign bit)"
+              + pType.getMantissaSizeWithSignBit()
               + " and value "
               + pN
               + ".",
@@ -152,13 +152,13 @@ public class CVC5FloatingPointFormulaManager
   protected Term makePlusInfinityImpl(FloatingPointType pType) {
     try {
       return termManager.mkFloatingPointPosInf(
-          pType.getExponentSize(), pType.getMantissaSize() + 1);
+          pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid positive floating point +infinity with exponent size "
               + pType.getExponentSize()
               + " and mantissa size "
-              + pType.getMantissaSize()
+              + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
     }
@@ -168,13 +168,13 @@ public class CVC5FloatingPointFormulaManager
   protected Term makeMinusInfinityImpl(FloatingPointType pType) {
     try {
       return termManager.mkFloatingPointNegInf(
-          pType.getExponentSize(), pType.getMantissaSize() + 1);
+          pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid negative floating point -infinity with exponent size "
               + pType.getExponentSize()
               + " and mantissa size "
-              + pType.getMantissaSize()
+              + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
     }
@@ -183,13 +183,14 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term makeNaNImpl(FloatingPointType pType) {
     try {
-      return termManager.mkFloatingPointNaN(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return termManager.mkFloatingPointNaN(
+          pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid NaN with exponent size "
               + pType.getExponentSize()
               + " and mantissa size "
-              + pType.getMantissaSize()
+              + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
     }
@@ -205,7 +206,7 @@ public class CVC5FloatingPointFormulaManager
             termManager.mkOp(
                 Kind.FLOATINGPOINT_TO_FP_FROM_FP,
                 ((FloatingPointType) pTargetType).getExponentSize(),
-                ((FloatingPointType) pTargetType).getMantissaSize() + 1);
+                ((FloatingPointType) pTargetType).getMantissaSizeWithSignBit());
         return termManager.mkTerm(fpToFp, pRoundingMode, pNumber);
 
       } else if (pTargetType.isBitvectorType()) {
@@ -246,7 +247,7 @@ public class CVC5FloatingPointFormulaManager
             termManager.mkOp(
                 Kind.FLOATINGPOINT_TO_FP_FROM_REAL,
                 pTargetType.getExponentSize(),
-                pTargetType.getMantissaSize() + 1);
+                pTargetType.getMantissaSizeWithSignBit());
 
         return termManager.mkTerm(realToFp, pRoundingMode, pNumber);
 
@@ -256,14 +257,14 @@ public class CVC5FloatingPointFormulaManager
               termManager.mkOp(
                   Kind.FLOATINGPOINT_TO_FP_FROM_SBV,
                   pTargetType.getExponentSize(),
-                  pTargetType.getMantissaSize() + 1);
+                  pTargetType.getMantissaSizeWithSignBit());
           return termManager.mkTerm(realToSBv, pRoundingMode, pNumber);
         } else {
           Op realToUBv =
               termManager.mkOp(
                   Kind.FLOATINGPOINT_TO_FP_FROM_UBV,
                   pTargetType.getExponentSize(),
-                  pTargetType.getMantissaSize() + 1);
+                  pTargetType.getMantissaSizeWithSignBit());
           return termManager.mkTerm(realToUBv, pRoundingMode, pNumber);
         }
 
@@ -278,7 +279,7 @@ public class CVC5FloatingPointFormulaManager
               + " into a FloatingPoint with exponent size "
               + pTargetType.getExponentSize()
               + " and mantissa size "
-              + pTargetType.getMantissaSize()
+              + pTargetType.getMantissaSizeWithSignBit()
               + ".",
           e);
     }
@@ -409,36 +410,16 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term bitvector, FloatingPointType pTargetType) {
-    int mantissaSize = pTargetType.getMantissaSize();
-    int exponentSize = pTargetType.getExponentSize();
-    int size = pTargetType.getTotalSize();
-    assert size == mantissaSize + exponentSize + 1;
-
-    Op signExtract;
-    Op exponentExtract;
-    Op mantissaExtract;
     try {
-      signExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 1, size - 1);
-      exponentExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSize);
-      mantissaExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSize - 1, 0);
-    } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException(
-          "You tried creating a invalid bitvector extract in term " + bitvector + ".", e);
+      return termManager.mkTerm(
+          termManager.mkOp(
+              Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
+              pTargetType.getExponentSize(),
+              pTargetType.getMantissaSizeWithSignBit()),
+          bitvector);
+    } catch (CVC5ApiException pE) {
+      throw new RuntimeException(pE);
     }
-
-    Term sign = termManager.mkTerm(signExtract, bitvector);
-    Term exponent = termManager.mkTerm(exponentExtract, bitvector);
-    Term mantissa = termManager.mkTerm(mantissaExtract, bitvector);
-
-    return termManager.mkTerm(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
-  }
-
-  @Override
-  protected Term toIeeeBitvectorImpl(Term pNumber) {
-    // TODO possible work-around: use a tmp-variable "TMP" and add an
-    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
-    // --> This has to be done on user-side, not in JavaSMT.
-    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 
   @Override
