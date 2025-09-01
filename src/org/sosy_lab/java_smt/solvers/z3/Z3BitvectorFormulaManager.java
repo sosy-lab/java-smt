@@ -202,4 +202,9 @@ class Z3BitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Lo
   protected Long distinctImpl(List<Long> pBits) {
     return Native.mkDistinct(z3context, pBits.size(), Longs.toArray(pBits));
   }
+
+  @Override
+  protected int getBitvectorWidthImpl(Long bitvector) {
+    return Native.getBvSortSize(z3context, Native.getSort(z3context, bitvector));
+  }
 }

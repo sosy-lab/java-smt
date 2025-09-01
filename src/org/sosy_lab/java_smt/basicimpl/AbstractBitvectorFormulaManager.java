@@ -439,4 +439,10 @@ public abstract class AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv,
     }
     return bmgr.andImpl(lst);
   }
+
+  protected final int getBitvectorWidth(BitvectorFormula bitvector) {
+    return getBitvectorWidthImpl(extractInfo(bitvector));
+  }
+
+  protected abstract int getBitvectorWidthImpl(TFormulaInfo bitvector);
 }
