@@ -8,15 +8,18 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -298,14 +301,41 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     // standard, what solvers return might be distinct.
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
+    // Build special numbers so that we can compare them in the map
+    FloatingPointType precision =
+        FloatingPointType.getFloatingPointType(exponentSize, mantissaSize);
+    Set<FloatingPointFormula> specialNumbers =
+        ImmutableSet.of(
+            makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
+
     BitvectorFormula toIeeeBv = bvFormula;
     for (Entry<FloatingPointFormula, BitvectorFormula> entry :
         specialFPConstantHandling.entrySet()) {
       FloatingPointFormula fpConst = entry.getKey();
-      // TODO: can we check that fpConst is a special number here?
+
+      // We check that FP const special numbers are used (info from SMTLib2-standard)
+      // NaN has multiple possible definitions.
+      // +/- Infinity each has 2; e.g., +infinity for sort (_ FloatingPoint 2 3) is represented
+      //  equivalently by (_ +oo 2 3) and (fp #b0 #b11 #b00).
+      // -0 only has one representation; i.e. (_ -zero 3 2) abbreviates (fp #b1 #b000 #b0), and
+      //  is therefore disallowed.
+      // This automatically checks the correct precision as well!
+      checkArgument(
+          specialNumbers.contains(fpConst),
+          "You are only allowed to specify a mapping for special FP numbers with more than one"
+              + " well-defined bitvector representation, i.e. NaN and +/- Infinity. Their precision"
+              + " has to match the precision of the formula to be represented as bitvector.");
+
+      BitvectorFormula bvTerm = entry.getValue();
+      checkArgument(
+          bvMgr.getBitvectorWidth(bvTerm) == bvMgr.getBitvectorWidth(bvFormula),
+          "The size of the bitvector terms used as mapped values needs to be equal to the size of"
+              + " the bitvector returned by this method");
+
       BooleanFormula assumption = assignment(fpConst, f);
-      // TODO: do we want to enforce the size of the BV? Decide and put into JavaDoc!
-      toIeeeBv = bMgr.ifThenElse(assumption, entry.getValue(), toIeeeBv);
+      toIeeeBv = bMgr.ifThenElse(assumption, bvTerm, toIeeeBv);
+      // TODO: add tests for this and the other method, find out typical returns and add tests,
+      //  then add to doc.
     }
 
     return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);

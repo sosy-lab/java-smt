@@ -335,9 +335,13 @@ public interface FloatingPointFormulaManager {
    * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
    * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
    * @param specialFPConstantHandling a {@link Map} defining the returned {@link BitvectorFormula}
-   *     for special {@link FloatingPointFormula} constant values like Nan. For an empty {@link
-   *     Map}, or missing mappings, this method behaves like {@link
-   *     #toIeeeBitvector(FloatingPointFormula, String)}.
+   *     for special {@link FloatingPointFormula} constant numbers. You are only allowed to specify
+   *     a mapping for special FP numbers with more than one well-defined bitvector representation,
+   *     i.e. NaN and +/- Infinity. The width of the mapped bitvector values has to match the
+   *     expected width of the bitvector return value. The {@link FloatingPointType}, i.e.
+   *     precision, of the key FP numbers has to match the {@link FloatingPointType} of the
+   *     parameter {@code number}. For an empty {@link Map}, or missing mappings, this method
+   *     behaves like {@link #toIeeeBitvector(FloatingPointFormula, String)}.
    * @return {@link BitvectorFormulaAndBooleanFormula} consisting of the transformed input
    *     floating-point as a {@link BitvectorFormula} and the additional constraint as {@link
    *     BooleanFormula}.
