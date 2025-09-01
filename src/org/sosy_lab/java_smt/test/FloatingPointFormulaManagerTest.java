@@ -15,6 +15,7 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 public class FloatingPointFormulaManagerTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -434,7 +436,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void specialValueFunctionsFrom32Bits2() throws SolverException, InterruptedException {
     requireBitvectors();
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     final FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
     final BitvectorFormula signBit = bvmgr.extract(fpmgr.toIeeeBitvector(x), 31, 31);
@@ -479,7 +481,7 @@ public class FloatingPointFormulaManagerTest
   @Test
   public void specialValueFunctionsFrom64Bits2() throws SolverException, InterruptedException {
     requireBitvectors();
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     final FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
     final BitvectorFormula signBit = bvmgr.extract(fpmgr.toIeeeBitvector(x), 63, 63);
@@ -523,6 +525,192 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(x))
         .isEquivalentTo(
             bmgr.and(bmgr.not(fpmgr.isNaN(x)), bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))));
+  }
+
+  // Same as specialValueFunctionsFrom32Bits2, but with fallback toIeeeBitvector() implementation.
+  @Test
+  public void specialValueFunctionsFrom32Bits2ToIeeeFallback()
+      throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    final FloatingPointFormula x = fpmgr.makeVariable("x32", singlePrecType);
+    BitvectorFormulaAndBooleanFormula xToIeeeAndAddConstraint =
+        fpmgr.toIeeeBitvector(x, "bvConst_x");
+    BitvectorFormula xToIeee = xToIeeeAndAddConstraint.getBitvectorFormula();
+    final BitvectorFormula signBit = bvmgr.extract(xToIeee, 31, 31);
+    final BitvectorFormula exponent = bvmgr.extract(xToIeee, 30, 23);
+    final BitvectorFormula mantissa = bvmgr.extract(xToIeee, 22, 0);
+    final BooleanFormula additionalConstraint = xToIeeeAndAddConstraint.getBooleanFormula();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isInfinity(x),
+                    bmgr.or(
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(32, 0x7f80_0000L)),
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(32, 0xff80_0000L))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isZero(x),
+                    bmgr.or(
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(32, 0x0000_0000)),
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(32, 0x8000_0000L))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNormal(x),
+                    bmgr.and(
+                        bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(8, 0))),
+                        bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(8, -1)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isSubnormal(x),
+                    bmgr.and(
+                        bvmgr.equal(exponent, bvmgr.makeBitvector(8, 0)),
+                        bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(23, 0)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNaN(x),
+                    bmgr.and(
+                        bvmgr.equal(exponent, bvmgr.makeBitvector(8, -1)),
+                        bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(23, 0)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNegative(x),
+                    bmgr.and(
+                        bmgr.not(fpmgr.isNaN(x)),
+                        bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))))))
+        .isTautological();
+  }
+
+  // Same as specialValueFunctionsFrom64Bits2, but with fallback toIeeeBitvector() implementation.
+  @Test
+  public void specialValueFunctionsFrom64Bits2ToIeeeFallback()
+      throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    final FloatingPointFormula x = fpmgr.makeVariable("x64", doublePrecType);
+    BitvectorFormulaAndBooleanFormula xToIeeeAndAddConstraint =
+        fpmgr.toIeeeBitvector(x, "bvConst_x");
+    BitvectorFormula xToIeee = xToIeeeAndAddConstraint.getBitvectorFormula();
+    final BitvectorFormula signBit = bvmgr.extract(xToIeee, 63, 63);
+    final BitvectorFormula exponent = bvmgr.extract(xToIeee, 62, 52);
+    final BitvectorFormula mantissa = bvmgr.extract(xToIeee, 51, 0);
+    final BooleanFormula additionalConstraint = xToIeeeAndAddConstraint.getBooleanFormula();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isInfinity(x),
+                    bmgr.or(
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(64, 0x7ff0_0000_0000_0000L)),
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(64, 0xfff0_0000_0000_0000L))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isZero(x),
+                    bmgr.or(
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(64, 0x0000_0000_0000_0000L)),
+                        bvmgr.equal(xToIeee, bvmgr.makeBitvector(64, 0x8000_0000_0000_0000L))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNormal(x),
+                    bmgr.and(
+                        bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(11, 0))),
+                        bmgr.not(bvmgr.equal(exponent, bvmgr.makeBitvector(11, -1)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isSubnormal(x),
+                    bmgr.and(
+                        bvmgr.equal(exponent, bvmgr.makeBitvector(11, 0)),
+                        bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(52, 0)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNaN(x),
+                    bmgr.and(
+                        bvmgr.equal(exponent, bvmgr.makeBitvector(11, -1)),
+                        bmgr.not(bvmgr.equal(mantissa, bvmgr.makeBitvector(52, 0)))))))
+        .isTautological();
+
+    assertThatFormula(
+            bmgr.implication(
+                additionalConstraint,
+                bmgr.equivalence(
+                    fpmgr.isNegative(x),
+                    bmgr.and(
+                        bmgr.not(fpmgr.isNaN(x)),
+                        bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))))))
+        .isTautological();
+  }
+
+  @Test
+  public void floatingPointSinglePrecisionSizeWithBvTransformationTest() {
+    requireBitvectors();
+    int fpSinglePrecSize = 32;
+    var bv32 = bvmgr.makeBitvector(fpSinglePrecSize, 0);
+    assertThat(bvmgr.getLength(bv32)).isEqualTo(fpSinglePrecSize);
+
+    requireFloats();
+    var singlePrec = FormulaType.getSinglePrecisionFloatingPointType();
+    var fpSinglePrec = fpmgr.makeNumber(0.0, singlePrec);
+    // Sizes of the type and the actual term should match
+    assertThat(fpmgr.getExponentSize(fpSinglePrec)).isEqualTo(8);
+    assertThat(fpmgr.getMantissaSize(fpSinglePrec)).isEqualTo(24);
+    assertThat(singlePrec.getExponentSize()).isEqualTo(8);
+    assertThat(singlePrec.getMantissaSize()).isEqualTo(24);
+    assertThat(singlePrec.getExponentSize() + singlePrec.getMantissaSize())
+        .isEqualTo(fpSinglePrecSize);
+    assertThat(singlePrec.getTotalSize())
+        .isEqualTo(singlePrec.getExponentSize() + singlePrec.getMantissaSize());
+
+    assertThat(bvmgr.getLength(fpmgr.toIeeeBitvector(fpSinglePrec, "dummy1").getBitvectorFormula()))
+        .isEqualTo(fpSinglePrecSize);
+    assertThat(
+            bvmgr.getLength(
+                fpmgr
+                    .toIeeeBitvector(fpSinglePrec, "dummy2", ImmutableMap.of())
+                    .getBitvectorFormula()))
+        .isEqualTo(fpSinglePrecSize);
+
+    if (solverSupportsNativeFPToBitvector()) {
+      assertThat(bvmgr.getLength(fpmgr.toIeeeBitvector(fpSinglePrec))).isEqualTo(fpSinglePrecSize);
+    }
   }
 
   @Test
@@ -982,7 +1170,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpIeeeConversionTypes() {
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThat(mgr.getFormulaType(fpmgr.toIeeeBitvector(var)))
@@ -991,7 +1179,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void fpIeeeConversion() throws SolverException, InterruptedException {
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     FloatingPointFormula var = fpmgr.makeVariable("var", singlePrecType);
     assertThatFormula(
@@ -1002,7 +1190,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void ieeeFpConversion() throws SolverException, InterruptedException {
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     BitvectorFormula var = bvmgr.makeBitvector(32, 123456789);
     assertThatFormula(
@@ -1072,7 +1260,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion32() throws SolverException, InterruptedException {
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     proveForAll(
         // makeBV(value.bits) == fromFP(makeFP(value.float))
@@ -1085,7 +1273,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void checkIeeeFp2BvConversion64() throws SolverException, InterruptedException {
-    requireFPToBitvector();
+    requireNativeFPToBitvector();
 
     proveForAll(
         // makeBV(value.bits) == fromFP(makeFP(value.float))
