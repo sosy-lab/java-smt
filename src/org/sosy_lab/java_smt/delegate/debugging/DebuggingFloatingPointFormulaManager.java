@@ -523,4 +523,18 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     debugging.addFormulaTerm(result);
     return result;
   }
+
+  @Override
+  public int getMantissaSize(FloatingPointFormula number) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    return delegate.getMantissaSize(number);
+  }
+
+  @Override
+  public int getExponentSize(FloatingPointFormula number) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    return delegate.getExponentSize(number);
+  }
 }

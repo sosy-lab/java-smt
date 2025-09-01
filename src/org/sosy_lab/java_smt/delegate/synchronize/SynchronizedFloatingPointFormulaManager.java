@@ -420,4 +420,18 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
       return delegate.isNegative(pNumber);
     }
   }
+
+  @Override
+  public int getMantissaSize(FloatingPointFormula pNumber) {
+    synchronized (sync) {
+      return delegate.getMantissaSize(pNumber);
+    }
+  }
+
+  @Override
+  public int getExponentSize(FloatingPointFormula pNumber) {
+    synchronized (sync) {
+      return delegate.getExponentSize(pNumber);
+    }
+  }
 }
