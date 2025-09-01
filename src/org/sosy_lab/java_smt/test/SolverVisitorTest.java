@@ -311,6 +311,57 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void integerDivisionVisit() {
+    requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // Princess will rewrite the term
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula c = imgr.makeNumber(7);
+
+    if (solver.equals(Solvers.MATHSAT5)) {
+      // MathSAT will rewrite if we don't use a variable in the denominator
+      checkKind(imgr.divide(x, y), FunctionDeclarationKind.DIV);
+    } else {
+      // Otherwise, just use a constant to support solvers that don't have non-linear arithmetics
+      checkKind(imgr.divide(x, c), FunctionDeclarationKind.DIV);
+    }
+  }
+
+  @Test
+  public void integerToBitvectorConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    // TODO Find out if mod_cast/int_cast could be mapped to (S)BV_TO_INT and INT_TO_BV
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    checkKind(bvmgr.makeBitvector(8, x), FunctionDeclarationKind.INT_TO_BV);
+  }
+
+  @Test
+  public void bitvectorToIntegerConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // CVC4, CVC5 and Z3 will rewrite SBV_TO_INT to a term that only uses unsigned integers
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.CVC5);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    BitvectorFormula y = bvmgr.makeVariable(8, "y");
+
+    checkKind(bvmgr.toIntegerFormula(y, true), FunctionDeclarationKind.SBV_TO_INT);
+    checkKind(bvmgr.toIntegerFormula(y, false), FunctionDeclarationKind.UBV_TO_INT);
+  }
+
+  @Test
   public void arrayVisit() {
     requireArrays();
     requireIntegers();
