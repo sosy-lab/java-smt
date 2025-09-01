@@ -584,12 +584,83 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
 
+ // Z3_OP_PR_REWRITE: A proof for a local rewriting step (= t s).
+  //        The head function symbol of t is interpreted.
+  //
+  //        This proof object has no antecedents.
+  //        The conclusion of a rewrite rule is either an equality (= t s),
+  //        an equivalence (iff t s), or equi-satisfiability (~ t s).
+  //        Remark: if f is bool, then = is iff.
+  //        Examples:
+  //        \nicebox{
+  //        (= (+ x 0) x)
+  //        (= (+ x 1 2) (+ 3 x))
+  //        (iff (or x false) x)
+  //        }
+  // the assume axiom should produce a proof that is semantically equivalent
   Proof handleRewrite(Z3Proof node) {
-    throw new UnsupportedOperationException();
+
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+
+    return axiom;
   }
 
+  // Z3_OP_PR_REWRITE_STAR: A proof for rewriting an expression t into an expression s.
+  //       This proof object can have n antecedents.
+  //       The antecedents are proofs for equalities used as substitution rules.
+  //       The proof rule is used in a few cases. The cases are:
+  //         - When applying contextual simplification (CONTEXT_SIMPLIFIER=true)
+  //         - When converting bit-vectors to Booleans (BIT2BOOL=true)
+  // Since this is also a rewrite, use the assume axiom here for the clause NOT (AND p0 ... pn)
+  // OR (= t s) where pi is an antecedent. This lets us resolve all the antecedents with this
+  // clause and conclude (= t s)
   Proof handleRewriteStar(Z3Proof node) {
-    throw new UnsupportedOperationException();
+
+    Formula resPivot;
+    List<BooleanFormula> formulas = new ArrayList<>();
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    int numChildren = children.size();
+
+    // negate each antecedent for the disjunction
+    for (int i = 0; i < numChildren; i++) {
+      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
+    }
+
+    // add the conclusion (= t s) at the end
+    formulas.add((BooleanFormula) node.getFormula());
+
+    // create the axiom clause: ¬p0 ∨ ... ∨ ¬pn ∨ (= t s)
+    BooleanFormula axiomFormula = bfm.or(formulas);
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, axiomFormula);
+
+    // initialize pivot to the last antecedent
+    resPivot = children.get(numChildren - 1).getFormula();
+    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
+
+    // iterative resolution: combine axiom with each antecedent
+    Proof childNode = axiom;
+    for (int i = 0; i < numChildren - 1; i++) {
+
+      resPivot = children.get(i).getFormula();
+
+      // sanity check: first element in formulas should match negated pivot
+      assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
+
+      // remove the first negated antecedent from the disjunction for next resolution step
+      formulas.remove(0);
+      ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);
+      rp.addChild(childNode);
+      rp.addChild(children.get(i));
+      childNode = rp;
+    }
+
+    // attach final resolution node
+    resNode.addChild(childNode);
+    resNode.addChild(children.get(numChildren - 1));
+
+    return resNode;
   }
 
   Proof handlePullQuant(Z3Proof node) {
