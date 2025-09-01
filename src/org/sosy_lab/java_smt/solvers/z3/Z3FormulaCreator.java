@@ -241,7 +241,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointType(
+        return FormulaType.getFloatingPointTypeWithoutSignBit(
             Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
@@ -420,7 +420,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
+    long fpSort =
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithSignBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -967,7 +968,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           expo,
           mant,
           pType.getExponentSize(),
-          pType.getMantissaSize());
+          pType.getMantissaSizeWithSignBit());
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
@@ -976,9 +977,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       //  - "00..00" as mantissa.
       String sign = getSign(pValue).isNegative() ? "1" : "0";
       return FloatingPointNumber.of(
-          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
+          sign
+              + "1".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithSignBit()),
           pType.getExponentSize(),
-          pType.getMantissaSize());
+          pType.getMantissaSizeWithSignBit());
 
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
@@ -988,9 +991,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       //  - "11..11" as exponent,
       //  - an unspecified mantissa (we choose all "1").
       return FloatingPointNumber.of(
-          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
+          "0"
+              + "1".repeat(pType.getExponentSize())
+              + "1".repeat(pType.getMantissaSizeWithSignBit()),
           pType.getExponentSize(),
-          pType.getMantissaSize());
+          pType.getMantissaSizeWithSignBit());
 
     } else {
       Sign sign = getSign(pValue);
@@ -1003,7 +1008,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           new BigInteger(exponent),
           new BigInteger(mantissa),
           pType.getExponentSize(),
-          pType.getMantissaSize());
+          pType.getMantissaSizeWithSignBit());
     }
   }
 
