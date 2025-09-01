@@ -74,6 +74,32 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
+  public void testSpecialNumberIdentity() {
+    assertThat(fpmgr.makeNaN(singlePrecType)).isEqualTo(nan);
+    assertThat(fpmgr.makePlusInfinity(singlePrecType)).isEqualTo(posInf);
+    assertThat(fpmgr.makeMinusInfinity(singlePrecType)).isEqualTo(negInf);
+    assertThat(fpmgr.makeNumber(0.0, singlePrecType)).isEqualTo(zero);
+    assertThat(fpmgr.makeNumber(-0.0, singlePrecType)).isEqualTo(negZero);
+
+    assertThat(fpmgr.makeNaN(doublePrecType)).isEqualTo(fpmgr.makeNaN(doublePrecType));
+    assertThat(fpmgr.makePlusInfinity(doublePrecType))
+        .isEqualTo(fpmgr.makePlusInfinity(doublePrecType));
+    assertThat(fpmgr.makeMinusInfinity(doublePrecType))
+        .isEqualTo(fpmgr.makeMinusInfinity(doublePrecType));
+    assertThat(fpmgr.makeNumber(0.0, doublePrecType))
+        .isEqualTo(fpmgr.makeNumber(0.0, doublePrecType));
+    assertThat(fpmgr.makeNumber(-0.0, doublePrecType))
+        .isEqualTo(fpmgr.makeNumber(-0.0, doublePrecType));
+
+    // Different precisions should not be equal
+    assertThat(fpmgr.makeNaN(doublePrecType)).isNotEqualTo(nan);
+    assertThat(fpmgr.makePlusInfinity(doublePrecType)).isNotEqualTo(posInf);
+    assertThat(fpmgr.makeMinusInfinity(doublePrecType)).isNotEqualTo(negInf);
+    assertThat(fpmgr.makeNumber(0.0, doublePrecType)).isNotEqualTo(zero);
+    assertThat(fpmgr.makeNumber(-0.0, doublePrecType)).isNotEqualTo(negZero);
+  }
+
+  @Test
   public void floatingPointType() {
     FloatingPointType type = FormulaType.getFloatingPointType(23, 42);
     FloatingPointFormula var = fpmgr.makeVariable("x", type);
