@@ -219,7 +219,7 @@ public class CVC4FloatingPointFormulaManager
     } else if (formulaType.isBitvectorType()) {
       long pExponentSize = pTargetType.getExponentSize();
       long pMantissaSize = pTargetType.getMantissaSizeWithSignBit();
-      FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize + 1);
+      FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize);
       FloatingPointConvertSort fpConvert = new FloatingPointConvertSort(fpSize);
       final Expr op;
       if (pSigned) {
