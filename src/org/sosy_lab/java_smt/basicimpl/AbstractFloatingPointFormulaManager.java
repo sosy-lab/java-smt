@@ -292,16 +292,17 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       String bitvectorConstantName,
       Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
 
-    int mantissaSizeWithSignBit = getMantissaSizeWithSignBit(f);
-    int exponentSize = getExponentSize(f);
+    FormulaType.FloatingPointType fpType =
+        (FloatingPointType) getFormulaCreator().getFormulaType(f);
+    int mantissaSizeWithSignBit = fpType.getMantissaSizeWithSignBit();
+    int exponentSize = fpType.getExponentSize();
     BitvectorFormula bvFormula =
         bvMgr.makeVariable(mantissaSizeWithSignBit + exponentSize, bitvectorConstantName);
 
     // When building new Fp types, we don't include the sign bit
     FloatingPointFormula fromIeeeBitvector =
         fromIeeeBitvector(
-            bvFormula,
-            getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1));
+            bvFormula, getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1));
 
     // assignment() allows a value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
@@ -309,8 +310,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
     // Build special numbers so that we can compare them in the map
-    FloatingPointType precision =
-        getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
+    FloatingPointType precision = getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
     Set<FloatingPointFormula> specialNumbers =
         ImmutableSet.of(
             makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
