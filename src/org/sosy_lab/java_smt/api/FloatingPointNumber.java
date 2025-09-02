@@ -105,6 +105,14 @@ public abstract class FloatingPointNumber {
   }
 
   /**
+   * Returns the size of the precision, i.e. the size of the exponent + the size of the mantissa
+   * including sign bit.
+   */
+  public int getTotalPrecisionSize() {
+    return getMantissaSizeWithSignBit() + getExponentSize();
+  }
+
+  /**
    * Get a floating-point number with the given sign, exponent, and mantissa.
    *
    * @param sign the sign-bit of the floating-point number as specified by IEEE 754, aka FALSE for
@@ -246,7 +254,7 @@ public abstract class FloatingPointNumber {
     var exponentSize = getExponentSize();
     var mantissa = getMantissa();
     var exponent = getExponent();
-    var bits = new BitSet(exponentSize + mantissaSizeWithoutSign + 1);
+    var bits = new BitSet(getTotalPrecisionSize());
     if (getMathSign().isNegative()) {
       bits.set(exponentSize + mantissaSizeWithoutSign); // if negative, set first bit to 1
     }
@@ -265,7 +273,7 @@ public abstract class FloatingPointNumber {
    */
   @Override
   public final String toString() {
-    var length = getExponentSize() + getMantissaSizeWithSignBit();
+    var length = getTotalPrecisionSize();
     var str = new StringBuilder(length);
     var bits = getBits();
     for (int i = 0; i < length; i++) {
