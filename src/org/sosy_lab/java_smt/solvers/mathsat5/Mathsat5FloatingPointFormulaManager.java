@@ -250,17 +250,6 @@ class Mathsat5FloatingPointFormulaManager
   }
 
   @Override
-  protected int getMantissaSizeImpl(Long f) {
-    // The mantissa includes the sign bit according to the SMTLib2 standard, but MathSAT does not.
-    return msat_get_fp_type_mant_width(mathsatEnv, msat_term_get_type(f)) + 1;
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Long f) {
-    return msat_get_fp_type_exp_width(mathsatEnv, msat_term_get_type(f));
-  }
-
-  @Override
   protected Long negate(Long pNumber) {
     return msat_make_fp_neg(mathsatEnv, pNumber);
   }
