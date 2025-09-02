@@ -99,7 +99,7 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getMathSign(),
-        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+        getFloatingPointType(number.getExponentSize(), number.getMantissaSizeWithoutSignBit()));
   }
 
   /**
