@@ -484,7 +484,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
   private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
     FloatingPointNumber fp =
-        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSizeWithSignBit());
+        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSizeWithoutSignBit());
 
     ConstantsVisitor visitor = new ConstantsVisitor();
     mgr.visit(fpmgr.makeNumber(value, prec), visitor);
