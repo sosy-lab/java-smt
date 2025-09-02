@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.ImmutableMap;
@@ -269,6 +270,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
   }
 
+  @SuppressWarnings("unused")
   protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
     throw new UnsupportedOperationException(
         "The chosen solver does not support transforming "
@@ -299,7 +301,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     FloatingPointFormula fromIeeeBitvector =
         fromIeeeBitvector(
             bvFormula,
-            FloatingPointType.getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1));
+            getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1));
 
     // assignment() allows a value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
@@ -308,7 +310,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
     // Build special numbers so that we can compare them in the map
     FloatingPointType precision =
-        FloatingPointType.getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
+        getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
     Set<FloatingPointFormula> specialNumbers =
         ImmutableSet.of(
             makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
@@ -620,7 +622,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return String.copyValueOf(values);
   }
 
-  public static class BitvectorFormulaAndBooleanFormula {
+  public static final class BitvectorFormulaAndBooleanFormula {
     private final BitvectorFormula bitvectorFormula;
     private final BooleanFormula booleanFormula;
 
@@ -630,7 +632,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       booleanFormula = checkNotNull(pBooleanFormula);
     }
 
-    protected static BitvectorFormulaAndBooleanFormula of(
+    private static BitvectorFormulaAndBooleanFormula of(
         BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
       return new BitvectorFormulaAndBooleanFormula(pBitvectorFormula, pBooleanFormula);
     }
