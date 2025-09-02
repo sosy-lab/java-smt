@@ -552,7 +552,8 @@ public abstract class FormulaType<T extends Formula> {
     } else if (t.startsWith("FloatingPoint<")) {
       // FloatingPoint<exp=11,mant=52>
       List<String> exman = Splitter.on(',').limit(2).splitToList(t.substring(14, t.length() - 1));
-      return FormulaType.getFloatingPointTypeWithoutSignBit(
+      // SMTLIB2 standard expects the sign bit to be part of the mantissa
+      return FormulaType.getFloatingPointTypeWithSignBit(
           Integer.parseInt(exman.get(0).substring(4)), Integer.parseInt(exman.get(1).substring(5)));
     } else if (t.startsWith("Bitvector<")) {
       // Bitvector<32>
