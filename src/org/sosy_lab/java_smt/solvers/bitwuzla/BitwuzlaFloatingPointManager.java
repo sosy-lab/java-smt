@@ -148,7 +148,7 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
-  protected int getMantissaSizeImpl(Term fp) {
+  protected int getMantissaSizeWithSignBitImpl(Term fp) {
     return fp.sort().fp_sig_size();
   }
 

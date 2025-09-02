@@ -375,7 +375,7 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected int getMantissaSizeImpl(Expr f) {
+  protected int getMantissaSizeWithSignBitImpl(Expr f) {
     Type type = f.getType();
     checkArgument(type.isFloatingPoint());
     edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
