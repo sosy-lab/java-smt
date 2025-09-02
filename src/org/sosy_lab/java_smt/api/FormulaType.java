@@ -295,8 +295,13 @@ public abstract class FormulaType<T extends Formula> {
     /**
      * Returns the size of the mantissa (also called a coefficient or significant), excluding the
      * sign bit.
+     *
+     * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
+     *     include the sign bit, but this does not. Use {@link #getMantissaSizeWithoutSignBit()}
+     *     instead if you want the mantissa without the sign bit, and {@link
+     *     #getMantissaSizeWithSignBit()} if you want it to include the sign bit.
      */
-    // TODO: mark as soon to be deprecated
+    @Deprecated(since = "6.0", forRemoval = true)
     public int getMantissaSize() {
       return mantissaSize;
     }
