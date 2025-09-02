@@ -109,7 +109,7 @@ public class CVC4FloatingPointFormulaManager
 
     final Rational rat = toRational(pN);
     final BigInteger upperBound =
-        getBiggestNumberBeforeInf(pType.getMantissaSizeWithSignBit(), pType.getExponentSize());
+        getBiggestNumberBeforeInf(pType.getMantissaSizeWithoutSignBit(), pType.getExponentSize());
 
     if (rat.greater(Rational.fromDecimal(upperBound.negate().toString()))
         && rat.less(Rational.fromDecimal(upperBound.toString()))) {
