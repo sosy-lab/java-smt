@@ -409,14 +409,14 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
-  protected Term fromIeeeBitvectorImpl(Term bitvector, FloatingPointType pTargetType) {
+  protected Term fromIeeeBitvectorImpl(Term pBitvector, FloatingPointType pTargetType) {
     try {
       return termManager.mkTerm(
           termManager.mkOp(
               Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
               pTargetType.getExponentSize(),
               pTargetType.getMantissaSizeWithSignBit()),
-          bitvector);
+          pBitvector);
     } catch (CVC5ApiException pE) {
       throw new RuntimeException(pE);
     }
