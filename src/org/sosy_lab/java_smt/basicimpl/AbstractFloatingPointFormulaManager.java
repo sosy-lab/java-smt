@@ -307,7 +307,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
     // Build special numbers so that we can compare them in the map
     FloatingPointType precision =
-        FloatingPointType.getFloatingPointType(exponentSize, mantissaSize);
+        FloatingPointType.getFloatingPointType(exponentSize, mantissaSize - 1);
     Set<FloatingPointFormula> specialNumbers =
         ImmutableSet.of(
             makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
