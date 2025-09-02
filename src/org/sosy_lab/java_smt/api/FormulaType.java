@@ -245,7 +245,8 @@ public abstract class FormulaType<T extends Formula> {
    */
   public static FloatingPointType getFloatingPointTypeWithSignBit(
       int exponentSize, int mantissaSizeWithSignBit) {
-    return new FloatingPointType(exponentSize, mantissaSizeWithSignBit);
+    // We save the mantissa without the sign bit internally
+    return new FloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
   }
 
   /**
