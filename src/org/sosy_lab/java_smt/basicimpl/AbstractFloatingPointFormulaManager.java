@@ -338,8 +338,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
       BooleanFormula assumption = assignment(fpConst, f);
       toIeeeBv = bMgr.ifThenElse(assumption, bvTerm, toIeeeBv);
-      // TODO: add tests for this and the other method, find out typical returns and add tests,
-      //  then add to doc.
     }
 
     return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
