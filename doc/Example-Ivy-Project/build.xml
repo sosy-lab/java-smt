@@ -36,22 +36,49 @@ SPDX-License-Identifier: Apache-2.0
         <ivy:retrieve pattern="lib/java/[conf]/([arch]/)[artifact](-[classifier]).[ext]"/>
     </target>
 
-    <target name="install" depends="resolve">
+    <target name="copy" depends="resolve" description="--> copy solver libraries">
         <mkdir dir="lib/native/x86_64-windows"/>
-        <copy todir="lib/native/x86_64-windows">
-            <fileset dir="lib/java/default/x64">
-                <include name="*.dll"/>
+        <copy todir="lib/native/x86_64-windows" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.dll"/>
+                <exclude name="arm64/*.dll"/>
             </fileset>
         </copy>
         <mkdir dir="lib/native/arm64-windows"/>
-        <copy todir="lib/native/arm64-windows">
-            <fileset dir="lib/java/default/arm64">
-                <include name="*.dll"/>
+        <copy todir="lib/native/arm64-windows" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.dll"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/x86_64-linux"/>
+        <copy todir="lib/native/x86_64-linux" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.so"/>
+                <exclude name="arm64/*.so"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-linux"/>
+        <copy todir="lib/native/arm64-linux" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.so"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/x86_64-macos"/>
+        <copy todir="lib/native/x86_64-macos" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.dylib"/>
+                <exclude name="arm64/*.dylib"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-macos"/>
+        <copy todir="lib/native/arm64-macos" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.dll"/>
             </fileset>
         </copy>
     </target>
 
-    <target name="compile" depends="install" description="--> compile the project">
+    <target name="compile" depends="copy" description="--> compile the project">
         <mkdir dir="build"/>
         <path id="classpath.build">
             <pathelement location="build"/>
@@ -87,11 +114,9 @@ SPDX-License-Identifier: Apache-2.0
                 <include name="build/**"/>
                 <include name="lib/ivy.jar"/>
                 <include name="lib/java/**"/>
-                <include name="lib/native/x86_64-windows/**"/>
-                <include name="lib/native/arm64-windows/**"/>
+                <include name="lib/native/**"/>
                 <include name="${project.jar}"/>
             </fileset>
-            <fileset dir="lib/java"/>
         </delete>
     </target>
 </project>
