@@ -11,6 +11,6 @@ SPDX-License-Identifier: Apache-2.0
 <ivy-module version="2.0">
     <info organisation="${project.organization}" module="${project.module}"/>
     <dependencies>
-        <dependency org="org.sosy_lab" name="java-smt" rev="5.0.1-362-g3846f26ca" conf="default->runtime-x64,runtime-arm64"/>
+        <dependency org="org.sosy_lab" name="java-smt" rev="5.0.1-618-ga6bdbf912" conf="default->runtime-x64,runtime-arm64"/>
     </dependencies>
 </ivy-module>
