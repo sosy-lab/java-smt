@@ -244,7 +244,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   public Long getFloatingPointType(FloatingPointType pType) {
     // MathSAT5 automatically adds 1 to the mantissa, as it expects it to be without it.
     return msat_get_fp_type(
-        getEnv(), pType.getExponentSize(), pType.getMantissaSizeWithSignBit() - 1);
+        getEnv(), pType.getExponentSize(), pType.getMantissaSizeWithoutSignBit());
   }
 
   @SuppressWarnings("unchecked")
