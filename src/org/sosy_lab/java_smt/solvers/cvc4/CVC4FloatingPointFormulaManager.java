@@ -358,13 +358,15 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr fromIeeeBitvectorImpl(Expr pBitvector, FloatingPointType pTargetType) {
-    int mantissaSize = pTargetType.getMantissaSizeWithoutSignBit();
+    int mantissaSizeWithoutSignBit = pTargetType.getMantissaSizeWithoutSignBit();
     int size = pTargetType.getTotalSize();
-    assert size == pTargetType.getMantissaSizeWithoutSignBit() + pTargetType.getExponentSize();
+    assert size == mantissaSizeWithoutSignBit + pTargetType.getExponentSize();
 
     Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
-    Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
-    Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
+    Expr exponentExtract =
+        exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSizeWithoutSignBit));
+    Expr mantissaExtract =
+        exprManager.mkConst(new BitVectorExtract(mantissaSizeWithoutSignBit - 1, 0));
 
     Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, pBitvector);
     Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, pBitvector);
