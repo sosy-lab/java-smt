@@ -254,6 +254,17 @@ public abstract class SolverBasedTest0 {
     }
   }
 
+  @SuppressWarnings("CheckReturnValue")
+  protected final boolean solverSupportsNativeFPToBitvector() {
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+      return true;
+    } catch (UnsupportedOperationException e) {
+      return false;
+    }
+  }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
