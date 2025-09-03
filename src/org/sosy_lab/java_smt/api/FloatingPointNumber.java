@@ -91,7 +91,8 @@ public abstract class FloatingPointNumber {
    *     #getMantissaSizeWithSignBit()} if you want it to include the sign bit.
    */
   @Deprecated(since = "6.0", forRemoval = true)
-  public int getMantissaSize() {
+  @InlineMe(replacement = "this.getMantissaSizeWithoutSignBit()")
+  public final int getMantissaSize() {
     return getMantissaSizeWithoutSignBit();
   }
 
