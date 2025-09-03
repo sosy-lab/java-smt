@@ -170,8 +170,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // UFs play by different rules. For them, we need to extract the domain
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
-      int mantissa = pSort.fp_sig_size() - 1;
-      return FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(exponent, mantissa);
+      int mantissaWithSignBit = pSort.fp_sig_size();
+      return FormulaType.getFloatingPointTypeFromSizesWithSignBit(exponent, mantissaWithSignBit);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -379,8 +379,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
             "FloatingPointFormula with actual type " + sort + ": " + pFormula);
       }
       int exp = sort.fp_exp_size();
-      int man = sort.fp_sig_size() - 1;
-      return (FormulaType<T>) FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(exp, man);
+      int mantissaWithSignBit = sort.fp_sig_size();
+      return (FormulaType<T>)
+          FormulaType.getFloatingPointTypeFromSizesWithSignBit(exp, mantissaWithSignBit);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
@@ -590,9 +591,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return new BigInteger(term.to_bv(), 2);
     }
     if (sort.is_fp()) {
-      int sizeExponent = sort.fp_exp_size();
-      int sizeMantissa = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
+      int exponentSize = sort.fp_exp_size();
+      int mantissaSizeWithoutSignBit = sort.fp_sig_size() - 1;
+      return FloatingPointNumber.of(term.to_bv(), exponentSize, mantissaSizeWithoutSignBit);
     }
     throw new AssertionError("Unknown value type.");
   }
