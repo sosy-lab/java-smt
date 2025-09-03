@@ -224,7 +224,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
       // CVC5 wants the sign bit as part of the mantissa. We add that manually in creation.
-      return FormulaType.getFloatingPointTypeWithoutSignBit(
+      return FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(
           sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize() - 1);
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;

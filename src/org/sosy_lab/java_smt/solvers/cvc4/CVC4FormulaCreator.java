@@ -154,7 +154,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
-          FormulaType.getFloatingPointTypeWithSignBit(
+          FormulaType.getFloatingPointTypeFromSizesWithSignBit(
               (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with sign bit
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
@@ -181,7 +181,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointTypeWithSignBit(
+      return FormulaType.getFloatingPointTypeFromSizesWithSignBit(
           (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with sign bit
     } else if (t.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;

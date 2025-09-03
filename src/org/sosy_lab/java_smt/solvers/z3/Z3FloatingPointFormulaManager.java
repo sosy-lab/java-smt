@@ -21,7 +21,7 @@ class Z3FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
 
   private static final FloatingPointType highPrec =
-      FormulaType.getFloatingPointTypeWithoutSignBit(15, 112);
+      FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(15, 112);
 
   private final long z3context;
   private final long roundingMode;

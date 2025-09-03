@@ -478,7 +478,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               32,
               '0'));
       checkFloatConstant(
-          FormulaType.getFloatingPointTypeWithoutSignBit(5, 10), entry.getKey(), entry.getValue());
+          FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 10),
+          entry.getKey(),
+          entry.getValue());
     }
   }
 
@@ -581,7 +583,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    var fpType = FormulaType.getFloatingPointTypeWithoutSignBit(5, 10);
+    var fpType = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 10);
     var visitor =
         new DefaultFormulaVisitor<Void>() {
           @Override
