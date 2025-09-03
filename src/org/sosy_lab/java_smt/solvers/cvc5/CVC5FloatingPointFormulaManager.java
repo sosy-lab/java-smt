@@ -412,7 +412,8 @@ public class CVC5FloatingPointFormulaManager
   protected Term fromIeeeBitvectorImpl(Term pBitvector, FloatingPointType pTargetType) {
     int mantissaSizeWithoutSignBit = pTargetType.getMantissaSizeWithoutSignBit();
     int size = pTargetType.getTotalSize();
-    assert size == mantissaSizeWithoutSignBit + pTargetType.getExponentSize();
+    // total size = mantissa without sign bit + sign bit + exponent
+    assert size == mantissaSizeWithoutSignBit + 1 + pTargetType.getExponentSize();
 
     Op signExtract;
     Op exponentExtract;

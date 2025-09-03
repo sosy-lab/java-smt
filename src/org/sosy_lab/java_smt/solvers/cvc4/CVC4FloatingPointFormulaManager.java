@@ -360,7 +360,8 @@ public class CVC4FloatingPointFormulaManager
   protected Expr fromIeeeBitvectorImpl(Expr pBitvector, FloatingPointType pTargetType) {
     int mantissaSizeWithoutSignBit = pTargetType.getMantissaSizeWithoutSignBit();
     int size = pTargetType.getTotalSize();
-    assert size == mantissaSizeWithoutSignBit + pTargetType.getExponentSize();
+    // total size = mantissa without sign bit + sign bit + exponent
+    assert size == mantissaSizeWithoutSignBit + 1 + pTargetType.getExponentSize();
 
     Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
     Expr exponentExtract =
