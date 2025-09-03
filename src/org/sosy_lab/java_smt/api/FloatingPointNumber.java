@@ -25,9 +25,9 @@ public abstract class FloatingPointNumber {
 
   // Mantissas do not include the sign bit
   public static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
-  public static final int SINGLE_PRECISION_MANTISSA_SIZE = 23;
+  public static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT = 23;
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
-  public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
+  public static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT = 52;
 
   public enum Sign {
     POSITIVE,
@@ -214,9 +214,10 @@ public abstract class FloatingPointNumber {
    */
   public boolean isIEEE754SinglePrecision() {
     // Mantissa does not include the sign bit internally
-    return getTotalSize() == SINGLE_PRECISION_EXPONENT_SIZE + SINGLE_PRECISION_MANTISSA_SIZE + 1
+    return getTotalSize()
+            == SINGLE_PRECISION_EXPONENT_SIZE + SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT + 1
         && getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
-        && getMantissaSizeWithoutSignBit() == SINGLE_PRECISION_MANTISSA_SIZE;
+        && getMantissaSizeWithoutSignBit() == SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
   }
 
   /**
@@ -227,9 +228,10 @@ public abstract class FloatingPointNumber {
    */
   public boolean isIEEE754DoublePrecision() {
     // Mantissa does not include the sign bit internally
-    return getTotalSize() == DOUBLE_PRECISION_EXPONENT_SIZE + DOUBLE_PRECISION_MANTISSA_SIZE + 1
+    return getTotalSize()
+            == DOUBLE_PRECISION_EXPONENT_SIZE + DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT + 1
         && getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
-        && getMantissaSizeWithoutSignBit() == DOUBLE_PRECISION_MANTISSA_SIZE;
+        && getMantissaSizeWithoutSignBit() == DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
   }
 
   /** compute a representation as Java-based float value, if possible. */

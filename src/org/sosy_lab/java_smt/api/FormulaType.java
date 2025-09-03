@@ -9,9 +9,9 @@
 package org.sosy_lab.java_smt.api;
 
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -288,18 +288,20 @@ public abstract class FormulaType<T extends Formula> {
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
-        new FloatingPointType(SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE);
+        new FloatingPointType(
+            SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
     private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE =
-        new FloatingPointType(DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE);
+        new FloatingPointType(
+            DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
 
     private final int exponentSize;
     // The SMTLib2 standard defines the mantissa size as including the sign bit. We do not include
     // it here though.
-    private final int mantissaSize;
+    private final int mantissaSizeWithoutSignBit;
 
-    private FloatingPointType(int pExponentSize, int pMantissaSize) {
+    private FloatingPointType(int pExponentSize, int pMantissaSizeWithoutSignBit) {
       exponentSize = pExponentSize;
-      mantissaSize = pMantissaSize;
+      mantissaSizeWithoutSignBit = pMantissaSizeWithoutSignBit;
     }
 
     @Override
@@ -323,7 +325,7 @@ public abstract class FormulaType<T extends Formula> {
      */
     @Deprecated(since = "6.0", forRemoval = true)
     public int getMantissaSize() {
-      return mantissaSize;
+      return mantissaSizeWithoutSignBit;
     }
 
     /**
@@ -331,7 +333,7 @@ public abstract class FormulaType<T extends Formula> {
      * sign bit.
      */
     public int getMantissaSizeWithoutSignBit() {
-      return mantissaSize;
+      return mantissaSizeWithoutSignBit;
     }
 
     /**
@@ -339,7 +341,7 @@ public abstract class FormulaType<T extends Formula> {
      * sign bit.
      */
     public int getMantissaSizeWithSignBit() {
-      return mantissaSize + 1;
+      return mantissaSizeWithoutSignBit + 1;
     }
 
     /**
@@ -347,12 +349,12 @@ public abstract class FormulaType<T extends Formula> {
      * (including the sign bit).
      */
     public int getTotalSize() {
-      return exponentSize + mantissaSize + 1;
+      return exponentSize + mantissaSizeWithoutSignBit + 1;
     }
 
     @Override
     public int hashCode() {
-      return (31 + exponentSize) * 31 + mantissaSize;
+      return (31 + exponentSize) * 31 + mantissaSizeWithoutSignBit;
     }
 
     @Override
@@ -364,7 +366,8 @@ public abstract class FormulaType<T extends Formula> {
         return false;
       }
       FloatingPointType other = (FloatingPointType) obj;
-      return this.exponentSize == other.exponentSize && this.mantissaSize == other.mantissaSize;
+      return this.exponentSize == other.exponentSize
+          && this.mantissaSizeWithoutSignBit == other.mantissaSizeWithoutSignBit;
     }
 
     @Override
