@@ -157,7 +157,7 @@ public class CVC5FloatingPointFormulaManager
       throw new IllegalArgumentException(
           "You tried creating a invalid positive floating point +infinity with exponent size "
               + pType.getExponentSize()
-              + " and mantissa size "
+              + " and mantissa size (including the sign bit)"
               + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
@@ -173,7 +173,7 @@ public class CVC5FloatingPointFormulaManager
       throw new IllegalArgumentException(
           "You tried creating a invalid negative floating point -infinity with exponent size "
               + pType.getExponentSize()
-              + " and mantissa size "
+              + " and mantissa size (including the sign bit)"
               + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
@@ -189,7 +189,7 @@ public class CVC5FloatingPointFormulaManager
       throw new IllegalArgumentException(
           "You tried creating a invalid NaN with exponent size "
               + pType.getExponentSize()
-              + " and mantissa size "
+              + " and mantissa size (including the sign bit)"
               + pType.getMantissaSizeWithSignBit()
               + ".",
           e);
@@ -278,7 +278,7 @@ public class CVC5FloatingPointFormulaManager
               + pNumber
               + " into a FloatingPoint with exponent size "
               + pTargetType.getExponentSize()
-              + " and mantissa size "
+              + " and mantissa size (including the sign bit)"
               + pTargetType.getMantissaSizeWithSignBit()
               + ".",
           e);

@@ -80,10 +80,10 @@ public class FloatingPointFormulaManagerTest
     FloatingPointFormula var = fpmgr.makeVariable("x", type);
     FloatingPointType result = (FloatingPointType) mgr.getFormulaType(var);
 
-    assertWithMessage("exponent size")
+    assertWithMessage("exponent sizes not equal")
         .that(result.getExponentSize())
         .isEqualTo(type.getExponentSize());
-    assertWithMessage("mantissa size")
+    assertWithMessage("mantissa sizes not equal")
         .that(result.getMantissaSizeWithSignBit())
         .isEqualTo(type.getMantissaSizeWithSignBit());
   }
