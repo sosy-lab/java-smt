@@ -242,8 +242,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+        return FormulaType.getFloatingPointTypeFromSizesWithSignBit(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
