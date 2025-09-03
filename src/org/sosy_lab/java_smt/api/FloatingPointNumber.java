@@ -213,8 +213,9 @@ public abstract class FloatingPointNumber {
    * @return true for IEEE-754 single precision type, false otherwise.
    */
   public boolean isIEEE754SinglePrecision() {
-    // Mantissa does not include the sign bit
-    return getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
+    // Mantissa does not include the sign bit internally
+    return getTotalSize() == SINGLE_PRECISION_EXPONENT_SIZE + SINGLE_PRECISION_MANTISSA_SIZE + 1
+        && getExponentSize() == SINGLE_PRECISION_EXPONENT_SIZE
         && getMantissaSizeWithoutSignBit() == SINGLE_PRECISION_MANTISSA_SIZE;
   }
 
@@ -225,8 +226,9 @@ public abstract class FloatingPointNumber {
    * @return true for IEEE-754 double precision type, false otherwise.
    */
   public boolean isIEEE754DoublePrecision() {
-    // Mantissa does not include the sign bit
-    return getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
+    // Mantissa does not include the sign bit internally
+    return getTotalSize() == DOUBLE_PRECISION_EXPONENT_SIZE + DOUBLE_PRECISION_MANTISSA_SIZE + 1
+        && getExponentSize() == DOUBLE_PRECISION_EXPONENT_SIZE
         && getMantissaSizeWithoutSignBit() == DOUBLE_PRECISION_MANTISSA_SIZE;
   }
 
