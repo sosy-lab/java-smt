@@ -410,16 +410,35 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term pBitvector, FloatingPointType pTargetType) {
+    int mantissaSize = pTargetType.getMantissaSizeWithoutSignBit();
+    int size = pTargetType.getTotalSize();
+    assert size == pTargetType.getMantissaSizeWithoutSignBit() + pTargetType.getExponentSize();
+
+    Op signExtract;
+    Op exponentExtract;
+    Op mantissaExtract;
     try {
-      return termManager.mkTerm(
-          termManager.mkOp(
-              Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
-              pTargetType.getExponentSize(),
-              pTargetType.getMantissaSizeWithSignBit()),
-          pBitvector);
-    } catch (CVC5ApiException pE) {
-      throw new RuntimeException(pE);
+      signExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 1, size - 1);
+      exponentExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSize);
+      mantissaExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSize - 1, 0);
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          "You tried creating a invalid bitvector extract in term " + pBitvector + ".", e);
     }
+
+    Term sign = termManager.mkTerm(signExtract, pBitvector);
+    Term exponent = termManager.mkTerm(exponentExtract, pBitvector);
+    Term mantissa = termManager.mkTerm(mantissaExtract, pBitvector);
+
+    return termManager.mkTerm(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
+  }
+
+  @Override
+  protected Term toIeeeBitvectorImpl(Term pNumber) {
+    // TODO possible work-around: use a tmp-variable "TMP" and add an
+    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
+    // --> This has to be done on user-side, not in JavaSMT.
+    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 
   @Override
