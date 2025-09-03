@@ -256,12 +256,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
   }
 
-  @SuppressWarnings("unused")
-  protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
-    throw new UnsupportedOperationException(
-        "Solver does not support transformation from "
-            + "floating-point numbers to IEEE bitvector");
-  }
+  protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
