@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.delegate.debugging;
 
 import com.google.common.base.Preconditions;
-import java.util.List;
+import com.google.common.collect.ImmutableList;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -54,7 +54,7 @@ class DebuggingAssertions {
 
   /** Assert that the function declaration belongs to this context. */
   public void assertDeclarationInContext(FunctionDeclaration<?> pFunctionDeclaration) {
-    if (List.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
+    if (ImmutableList.of(FunctionDeclarationKind.VAR, FunctionDeclarationKind.UF)
         .contains(pFunctionDeclaration.getKind())) {
       Preconditions.checkArgument(
           debugInfo.getDeclaredFunctions().contains(pFunctionDeclaration),

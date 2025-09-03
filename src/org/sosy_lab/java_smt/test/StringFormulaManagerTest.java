@@ -99,7 +99,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   private void assertDistinct(IntegerFormula num1, IntegerFormula num2)
       throws SolverException, InterruptedException {
-    assertThatFormula(imgr.distinct(List.of(num1, num2))).isTautological();
+    assertThatFormula(imgr.distinct(ImmutableList.of(num1, num2))).isTautological();
   }
 
   private void assertEqual(StringFormula str1, StringFormula str2)
@@ -1041,7 +1041,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
     if (solverToUse() == Solvers.PRINCESS) {
       for (String invalidStr :
-          List.of(
+          ImmutableList.of(
               "\\u{10000}",
               Character.toString(0x10000),
               "\\u{2FFFF}",

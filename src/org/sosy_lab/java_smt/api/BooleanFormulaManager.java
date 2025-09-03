@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collector;
 import org.sosy_lab.java_smt.api.visitors.BooleanFormulaTransformationVisitor;
@@ -113,7 +113,7 @@ public interface BooleanFormulaManager {
    * @see #and(BooleanFormula, BooleanFormula)
    */
   default BooleanFormula and(BooleanFormula... bits) {
-    return and(List.of(bits));
+    return and(ImmutableList.copyOf(bits));
   }
 
   /** Return a stream {@link Collector} that creates a conjunction of all elements in the stream. */
@@ -137,7 +137,7 @@ public interface BooleanFormulaManager {
    * @see #or(BooleanFormula, BooleanFormula)
    */
   default BooleanFormula or(BooleanFormula... bits) {
-    return or(List.of(bits));
+    return or(ImmutableList.copyOf(bits));
   }
 
   /** Return a stream {@link Collector} that creates a disjunction of all elements in the stream. */
