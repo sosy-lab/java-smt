@@ -126,10 +126,11 @@ public class CVC4FloatingPointFormulaManager
   }
 
   // TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code>
-  private static BigInteger getBiggestNumberBeforeInf(int mantissa, int exponent) {
+  private static BigInteger getBiggestNumberBeforeInf(int mantissaWithoutSignBit, int exponent) {
     int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
     BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);
-    int mantissaExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact() - 2 - mantissa;
+    int mantissaExponent =
+        BigInteger.valueOf(2).pow(exponent - 1).intValueExact() - 2 - mantissaWithoutSignBit;
     if (mantissaExponent >= 0) { // ignore negative mantissaExponent
       upperBoundExponent = upperBoundExponent.subtract(BigInteger.valueOf(2).pow(mantissaExponent));
     }
