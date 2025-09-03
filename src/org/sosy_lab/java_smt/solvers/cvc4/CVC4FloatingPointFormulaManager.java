@@ -17,7 +17,6 @@ import edu.stanford.CVC4.FloatingPoint;
 import edu.stanford.CVC4.FloatingPointConvertSort;
 import edu.stanford.CVC4.FloatingPointSize;
 import edu.stanford.CVC4.FloatingPointToFPFloatingPoint;
-import edu.stanford.CVC4.FloatingPointToFPIEEEBitVector;
 import edu.stanford.CVC4.FloatingPointToFPSignedBitVector;
 import edu.stanford.CVC4.FloatingPointToFPUnsignedBitVector;
 import edu.stanford.CVC4.FloatingPointToSBV;
@@ -358,20 +357,27 @@ public class CVC4FloatingPointFormulaManager
   }
 
   @Override
-  protected Expr fromIeeeBitvectorImpl(Expr bitvector, FloatingPointType pTargetType) {
+  protected Expr fromIeeeBitvectorImpl(Expr pBitvector, FloatingPointType pTargetType) {
     int mantissaSize = pTargetType.getMantissaSizeWithoutSignBit();
     int size = pTargetType.getTotalSize();
-    assert size == pTargetType.getTotalSize();
+    assert size == pTargetType.getMantissaSizeWithoutSignBit() + pTargetType.getExponentSize();
 
     Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
     Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
     Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
 
-    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, bitvector);
-    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, bitvector);
-    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, bitvector);
+    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, pBitvector);
+    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, pBitvector);
+    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, pBitvector);
 
     return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
+  }
+
+  @Override
+  protected Expr toIeeeBitvectorImpl(Expr pNumber) {
+    // TODO possible work-around: use a tmp-variable "TMP" and add an
+    // additional constraint "pNumer == fromIeeeBitvectorImpl(TMP)" for it in all use-cases.
+    throw new UnsupportedOperationException("FP to IEEE-BV is not supported");
   }
 
   @Override
