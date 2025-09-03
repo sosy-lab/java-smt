@@ -12,6 +12,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithSignBit;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutSignBit;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -76,7 +78,7 @@ public class FloatingPointFormulaManagerTest
 
   @Test
   public void floatingPointType() {
-    FloatingPointType type = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(23, 42);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutSignBit(23, 42);
     FloatingPointFormula var = fpmgr.makeVariable("x", type);
     FloatingPointType result = (FloatingPointType) mgr.getFormulaType(var);
 
@@ -259,9 +261,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType,
-          doublePrecType,
-          FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 6),
+          singlePrecType, doublePrecType, getFloatingPointTypeFromSizesWithoutSignBit(5, 6),
         }) {
 
       final FloatingPointFormula numFive = fpmgr.makeNumber(5, prec);
@@ -285,9 +285,7 @@ public class FloatingPointFormulaManagerTest
 
     for (FloatingPointType prec :
         new FloatingPointType[] {
-          singlePrecType,
-          doublePrecType,
-          FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 6),
+          singlePrecType, doublePrecType, getFloatingPointTypeFromSizesWithoutSignBit(5, 6),
         }) {
 
       final FloatingPointFormula num = fpmgr.makeNumber(42, prec);
@@ -541,7 +539,7 @@ public class FloatingPointFormulaManagerTest
     checkEqualityOfNumberConstantsFor(3.4028234663852886e+38, doublePrecType);
 
     // check unequality for large types
-    FloatingPointType nearDouble = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(12, 52);
+    FloatingPointType nearDouble = getFloatingPointTypeFromSizesWithoutSignBit(12, 52);
     FloatingPointFormula h1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(309).multiply(BigDecimal.valueOf(1.0001)), nearDouble);
     FloatingPointFormula h2 =
@@ -549,7 +547,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.equalWithFPSemantics(h1, h2)).isUnsatisfiable();
 
     // check equality for short types
-    FloatingPointType smallType = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(4, 4);
+    FloatingPointType smallType = getFloatingPointTypeFromSizesWithoutSignBit(4, 4);
     FloatingPointFormula i1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(50).multiply(BigDecimal.valueOf(1.001)), smallType);
     FloatingPointFormula i2 =
@@ -578,7 +576,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(ni2)).isTautological();
 
     // check equality for short types
-    FloatingPointType smallType2 = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(4, 4);
+    FloatingPointType smallType2 = getFloatingPointTypeFromSizesWithoutSignBit(4, 4);
     FloatingPointFormula j1 =
         fpmgr.makeNumber(BigDecimal.TEN.pow(500).multiply(BigDecimal.valueOf(1.001)), smallType2);
     FloatingPointFormula j2 =
@@ -609,8 +607,7 @@ public class FloatingPointFormulaManagerTest
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
     if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
       // check unequality for very large types
-      FloatingPointType largeType =
-          FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(100, 100);
+      FloatingPointType largeType = getFloatingPointTypeFromSizesWithoutSignBit(100, 100);
       FloatingPointFormula k1 =
           fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
       FloatingPointFormula k2 =
@@ -647,8 +644,7 @@ public class FloatingPointFormulaManagerTest
 
   private void checkNearInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
-    FloatingPointType type =
-        FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(exponent, mantissa);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutSignBit(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
     FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value - 1), type);
@@ -683,8 +679,7 @@ public class FloatingPointFormulaManagerTest
 
   private void checkNearMinusInf(int mantissa, int exponent, long value)
       throws SolverException, InterruptedException {
-    FloatingPointType type =
-        FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(exponent, mantissa);
+    FloatingPointType type = getFloatingPointTypeFromSizesWithoutSignBit(exponent, mantissa);
     FloatingPointFormula fp1 = fpmgr.makeNumber(BigDecimal.valueOf(value), type);
     assertThatFormula(fpmgr.isInfinity(fp1)).isTautological();
     FloatingPointFormula fp2 = fpmgr.makeNumber(BigDecimal.valueOf(value + 1), type);
@@ -1269,10 +1264,10 @@ public class FloatingPointFormulaManagerTest
 
     // The same as above, but build the precision by hand with the different APIs
     FloatingPointType fpTypeWithSignBit =
-        FloatingPointType.getFloatingPointTypeFromSizesWithSignBit(
+        getFloatingPointTypeFromSizesWithSignBit(
             singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithSignBit());
     FloatingPointType fpTypeWithoutSignBit =
-        FloatingPointType.getFloatingPointTypeFromSizesWithoutSignBit(
+        getFloatingPointTypeFromSizesWithoutSignBit(
             singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithoutSignBit());
     assertThat(fpTypeWithSignBit).isEqualTo(singlePrecType);
     assertThat(fpTypeWithoutSignBit).isEqualTo(singlePrecType);
@@ -1366,10 +1361,10 @@ public class FloatingPointFormulaManagerTest
 
     // The same as above, but build the precision by hand with the different APIs
     FloatingPointType fpTypeWithSignBit =
-        FloatingPointType.getFloatingPointTypeFromSizesWithSignBit(
+        getFloatingPointTypeFromSizesWithSignBit(
             doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithSignBit());
     FloatingPointType fpTypeWithoutSignBit =
-        FloatingPointType.getFloatingPointTypeFromSizesWithoutSignBit(
+        getFloatingPointTypeFromSizesWithoutSignBit(
             doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithoutSignBit());
     assertThat(fpTypeWithSignBit).isEqualTo(doublePrecType);
     assertThat(fpTypeWithoutSignBit).isEqualTo(doublePrecType);

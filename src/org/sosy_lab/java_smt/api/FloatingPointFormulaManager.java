@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
-import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutSignBit;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -99,7 +99,8 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getMathSign(),
-        getFloatingPointType(number.getExponentSize(), number.getMantissaSizeWithoutSignBit()));
+        getFloatingPointTypeFromSizesWithoutSignBit(
+            number.getExponentSize(), number.getMantissaSizeWithoutSignBit()));
   }
 
   /**
