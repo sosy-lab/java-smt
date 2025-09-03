@@ -35,6 +35,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_term;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_equals;
 
 import org.junit.After;
 import org.junit.Ignore;
@@ -77,6 +78,44 @@ public abstract class Mathsat5AbstractNativeApiTest {
   public void fpMantWidth() {
     long type = msat_get_fp_type(env, 8, 23);
     assertThat(msat_get_fp_type_mant_width(env, type)).isEqualTo(23);
+  }
+
+  /*
+   * MathSAT5, compared to all other solvers and the standard, does not expect the sign bit to be
+   *  included in the mantissa!
+   */
+  @Test
+  public void fpMantissaDoesNotIncludeSignBit() {
+    int totalBVSize = 32;
+    long bvNumber = msat_make_bv_number(env, "42", totalBVSize, 10);
+    long bvType = msat_term_get_type(bvNumber);
+    assertThat(msat_get_bv_type_size(env, bvType)).isEqualTo(totalBVSize);
+    assertThat(msat_get_bv_type_size(env, msat_term_get_type(bvNumber))).isEqualTo(totalBVSize);
+
+    int exponent = 8;
+    int mantissaWithoutSign = 23; // excluding sign bit
+    long fpSinglePrecType = msat_get_fp_type(env, exponent, mantissaWithoutSign);
+    assertThat(msat_get_fp_type_mant_width(env, fpSinglePrecType)).isEqualTo(mantissaWithoutSign);
+    assertThat(msat_get_fp_type_exp_width(env, fpSinglePrecType)).isEqualTo(exponent);
+    // total size is exp + man + 1
+    assertThat(
+            msat_get_fp_type_mant_width(env, fpSinglePrecType)
+                + msat_get_fp_type_exp_width(env, fpSinglePrecType)
+                + 1)
+        .isEqualTo(totalBVSize);
+
+    long bvToFpSinglePrec =
+        Mathsat5NativeApi.msat_make_fp_from_ieeebv(env, exponent, mantissaWithoutSign, bvNumber);
+    assertThat(msat_type_equals(msat_term_get_type(bvToFpSinglePrec), fpSinglePrecType)).isTrue();
+    assertThat(msat_get_fp_type_mant_width(env, msat_term_get_type(bvToFpSinglePrec)))
+        .isEqualTo(mantissaWithoutSign);
+    assertThat(msat_get_fp_type_exp_width(env, msat_term_get_type(bvToFpSinglePrec)))
+        .isEqualTo(exponent);
+
+    long bvToFpSinglePrecToBv = Mathsat5NativeApi.msat_make_fp_as_ieeebv(env, bvToFpSinglePrec);
+    assertThat(msat_type_equals(msat_term_get_type(bvToFpSinglePrecToBv), bvType)).isTrue();
+    assertThat(msat_get_bv_type_size(env, msat_term_get_type(bvToFpSinglePrecToBv)))
+        .isEqualTo(totalBVSize);
   }
 
   @Test
