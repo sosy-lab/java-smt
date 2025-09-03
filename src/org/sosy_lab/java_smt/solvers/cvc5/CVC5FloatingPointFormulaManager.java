@@ -410,17 +410,18 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term pBitvector, FloatingPointType pTargetType) {
-    int mantissaSize = pTargetType.getMantissaSizeWithoutSignBit();
+    int mantissaSizeWithoutSignBit = pTargetType.getMantissaSizeWithoutSignBit();
     int size = pTargetType.getTotalSize();
-    assert size == pTargetType.getMantissaSizeWithoutSignBit() + pTargetType.getExponentSize();
+    assert size == mantissaSizeWithoutSignBit + pTargetType.getExponentSize();
 
     Op signExtract;
     Op exponentExtract;
     Op mantissaExtract;
     try {
       signExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 1, size - 1);
-      exponentExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSize);
-      mantissaExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSize - 1, 0);
+      exponentExtract =
+          termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSizeWithoutSignBit);
+      mantissaExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSizeWithoutSignBit - 1, 0);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "You tried creating a invalid bitvector extract in term " + pBitvector + ".", e);
