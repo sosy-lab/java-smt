@@ -209,12 +209,18 @@ public abstract class FormulaType<T extends Formula> {
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
    * The mantissa size is expected to not include the sign bit.
    *
+   * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the sign bit, but this method expects the mantissa argument without the sign bit.
+   *     Use {@link #getFloatingPointTypeFromSizesWithoutSignBit(int, int)} instead if you want to
+   *     construct a {@link FloatingPointType} with the constructing method treating the mantissa
+   *     argument without the sign bit, and {@link #getFloatingPointTypeFromSizesWithSignBit(int,
+   *     int)} if you want it to include the sign bit in the size of the mantissa argument.
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithoutSignBit size of the mantissa (also called a coefficient or
    *     significant), excluding the sign bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
-  // TODO: mark as soon to be deprecated
+  @Deprecated(since = "6.0", forRemoval = true)
   public static FloatingPointType getFloatingPointType(
       int exponentSize, int mantissaSizeWithoutSignBit) {
     return getFloatingPointTypeFromSizesWithoutSignBit(exponentSize, mantissaSizeWithoutSignBit);
@@ -222,8 +228,14 @@ public abstract class FormulaType<T extends Formula> {
 
   /**
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
-   * The mantissa size is expected to not include the sign bit. The total size is therefore equal to
-   * mantissa + exponent + 1.
+   * The mantissa size is expected to not include the sign bit. The total size of the constructed
+   * type is equal to the addition of the two arguments plus one, as in: total size == exponentSize
+   * + mantissaSizeWithoutSignBit + 1.
+   *
+   * <p>Using the arguments e and m, calling this method with
+   * getFloatingPointTypeFromSizesWithoutSignBit (e, m) returns a type equal to a type constructed
+   * by {@link #getFloatingPointTypeFromSizesWithSignBit(int, int)} with the same arguments e and m
+   * as before, but m incremented by 1, as in getFloatingPointTypeFromSizesWithSignBit(e, m + 1).
    *
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithoutSignBit size of the mantissa (also called a coefficient or
@@ -237,8 +249,14 @@ public abstract class FormulaType<T extends Formula> {
 
   /**
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
-   * The mantissa size is expected to include the sign bit. The total size is therefore equal to
-   * mantissa + exponent.
+   * The mantissa size is expected to include the sign bit. The total size of the constructed type
+   * is equal to the addition of the two arguments, as in: total size == exponentSize +
+   * mantissaSizeWithSignBit.
+   *
+   * <p>Using the arguments e and m, calling this method with
+   * getFloatingPointTypeFromSizesWithSignBit(e, m) returns a type equal to a type constructed by
+   * {@link #getFloatingPointTypeFromSizesWithoutSignBit(int, int)} with the same arguments e and m
+   * as before, but m decremented by 1, as in getFloatingPointTypeFromSizesWithoutSignBit(e, m - 1).
    *
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithSignBit size of the mantissa (also called a coefficient or significant),
