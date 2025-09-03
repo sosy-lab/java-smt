@@ -24,6 +24,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
@@ -88,39 +89,39 @@ public class TimeoutTest extends SolverBasedTest0 {
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testProverTimeoutInt() throws InterruptedException {
+  public void testProverTimeoutInt() throws InterruptedException, SolverException {
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newProverEnvironment());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testProverTimeoutBv() throws InterruptedException {
+  public void testProverTimeoutBv() throws InterruptedException, SolverException {
     requireBitvectors();
     testBasicProverTimeoutBv(() -> context.newProverEnvironment());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testInterpolationProverTimeout() throws InterruptedException {
+  public void testInterpolationProverTimeout() throws InterruptedException, SolverException {
     requireInterpolation();
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newProverEnvironmentWithInterpolation());
   }
 
   @Test(timeout = TIMEOUT_MILLISECONDS)
-  public void testOptimizationProverTimeout() throws InterruptedException {
+  public void testOptimizationProverTimeout() throws InterruptedException, SolverException {
     requireOptimization();
     requireIntegers();
     testBasicProverTimeoutInt(() -> context.newOptimizationProverEnvironment());
   }
 
   private void testBasicProverTimeoutInt(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardIntegerFormulaGenerator gen = new HardIntegerFormulaGenerator(imgr, bmgr);
     testBasicProverTimeout(proverConstructor, gen.generate(200));
   }
 
   private void testBasicProverTimeoutBv(Supplier<BasicProverEnvironment<?>> proverConstructor)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     HardBitvectorFormulaGenerator gen = new HardBitvectorFormulaGenerator(bvmgr, bmgr);
     testBasicProverTimeout(proverConstructor, gen.generate(200));
   }
@@ -128,7 +129,7 @@ public class TimeoutTest extends SolverBasedTest0 {
   @SuppressWarnings("CheckReturnValue")
   private void testBasicProverTimeout(
       Supplier<BasicProverEnvironment<?>> proverConstructor, BooleanFormula instance)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     Thread t =
         new Thread(
             () -> {

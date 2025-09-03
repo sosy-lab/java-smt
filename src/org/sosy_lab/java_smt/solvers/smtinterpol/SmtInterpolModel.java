@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
@@ -183,5 +184,13 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   @Override
   protected Term evalImpl(Term formula) {
     return model.evaluate(formula);
+  }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Term f) {
+    Preconditions.checkState(!isClosed());
+    Term evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
   }
 }

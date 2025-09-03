@@ -194,7 +194,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest2() throws InterruptedException {
+  public void stackTest2() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -203,7 +203,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest3() throws InterruptedException {
+  public void stackTest3() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     assertThat(stack.size()).isEqualTo(1);
@@ -216,7 +216,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest4() throws InterruptedException {
+  public void stackTest4() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     stack.push();
@@ -262,7 +262,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void stackTest5() throws InterruptedException {
+  public void stackTest5() throws InterruptedException, SolverException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
     stack.push();
     stack.pop();
@@ -508,7 +508,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
   }
 
   @Test
-  public void avoidDualStacksIfNotSupported() throws InterruptedException {
+  public void avoidDualStacksIfNotSupported() throws InterruptedException, SolverException {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
         .that(solver)

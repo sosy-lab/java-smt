@@ -39,7 +39,7 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public @Nullable T push(BooleanFormula f) throws InterruptedException {
+  public @Nullable T push(BooleanFormula f) throws InterruptedException, SolverException {
     logger.log(Level.FINE, "up to level " + level++);
     logger.log(Level.FINE, "formula pushed:", f);
     return wrapped.push(f);
@@ -52,12 +52,13 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
+  public @Nullable T addConstraint(BooleanFormula constraint)
+      throws InterruptedException, SolverException {
     return wrapped.addConstraint(constraint);
   }
 
   @Override
-  public void push() throws InterruptedException {
+  public void push() throws InterruptedException, SolverException {
     logger.log(Level.FINE, "up to level " + level++);
     wrapped.push();
   }
@@ -87,14 +88,15 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     Model m = wrapped.getModel();
     logger.log(Level.FINE, "model", m);
     return m;
   }
 
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
+  public ImmutableList<ValueAssignment> getModelAssignments()
+      throws SolverException, InterruptedException {
     ImmutableList<ValueAssignment> m = wrapped.getModelAssignments();
     logger.log(Level.FINE, "model", m);
     return m;

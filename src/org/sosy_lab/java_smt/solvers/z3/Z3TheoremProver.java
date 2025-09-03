@@ -57,12 +57,12 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected void pushImpl() {
+  protected void pushImpl() throws SolverException, InterruptedException {
     push0();
     try {
       Native.solverPush(z3context, z3solver);
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception);
     }
   }
 
@@ -138,11 +138,11 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  protected long getZ3Model() {
+  protected long getZ3Model() throws SolverException, InterruptedException {
     try {
       return Native.solverGetModel(z3context, z3solver);
     } catch (Z3Exception e) {
-      throw creator.handleZ3ExceptionAsRuntimeException(e);
+      throw creator.handleZ3Exception(e);
     }
   }
 

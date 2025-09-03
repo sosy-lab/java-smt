@@ -104,25 +104,25 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
 
   @SuppressWarnings("resource")
   @Override
-  public Model getModel() throws SolverException {
+  public Model getModel() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
-  protected Z3Model getEvaluatorWithoutChecks() throws SolverException {
+  protected Z3Model getEvaluatorWithoutChecks() throws SolverException, InterruptedException {
     return new Z3Model(this, z3context, getZ3Model(), creator);
   }
 
-  protected abstract long getZ3Model() throws SolverException;
+  protected abstract long getZ3Model() throws SolverException, InterruptedException;
 
   protected abstract void assertContraint(long constraint);
 
   protected abstract void assertContraintAndTrack(long constraint, long symbol);
 
   @Override
-  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException {
+  protected Void addConstraintImpl(BooleanFormula f) throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
@@ -135,7 +135,7 @@ abstract class Z3AbstractProver extends AbstractProverWithAllSat<Void> {
         assertContraint(e);
       }
     } catch (Z3Exception exception) {
-      throw creator.handleZ3ExceptionAsRuntimeException(exception);
+      throw creator.handleZ3Exception(exception);
     }
     return null;
   }

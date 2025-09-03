@@ -119,4 +119,12 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   public ImmutableList<ValueAssignment> asList() {
     return model;
   }
+
+  // Direct copy of evaluateImpl() without exceptions
+  @Override
+  protected final Object evaluateImpl(Expr f) {
+    Preconditions.checkState(!isClosed());
+    Expr evaluatedF = evalImpl(f);
+    return evaluatedF == null ? null : creator.convertValue(f, evaluatedF);
+  }
 }

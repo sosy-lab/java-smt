@@ -49,14 +49,27 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
    *       within a quantified context, some value assignments can be missing in the iteration.
    *       Please use a direct evaluation query to get the evaluation in such a case.
    * </ul>
+   *
+   * <p>Warning: This method may throw the checked exceptions SolverException (in case of solver
+   * failures) and InterruptedException (in case of shutdown requests) although these exceptions are
+   * not declared with throws.
    */
   @Override
   default Iterator<ValueAssignment> iterator() {
-    return asList().iterator();
+    try {
+      return asList().iterator();
+    } catch (SolverException | InterruptedException ex) {
+      throw sneakyThrow(ex);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <E extends Throwable> RuntimeException sneakyThrow(Throwable e) throws E {
+    throw (E) e;
   }
 
   /** Build a list of assignments that stays valid after closing the model. */
-  ImmutableList<ValueAssignment> asList();
+  ImmutableList<ValueAssignment> asList() throws SolverException, InterruptedException;
 
   /**
    * Pretty-printing of the model values.
