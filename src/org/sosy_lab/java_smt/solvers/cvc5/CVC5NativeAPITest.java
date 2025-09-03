@@ -12,7 +12,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
@@ -1031,7 +1030,7 @@ public class CVC5NativeAPITest {
 
     // UnsatCores are iterable
     for (Term e : unsatCore) {
-      assertThat(e.toString()).isIn(ImmutableList.of("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 

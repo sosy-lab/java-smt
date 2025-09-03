@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.BitVectorType;
@@ -766,7 +765,7 @@ public class CVC4NativeAPITest {
 
     // UnsatCores are iterable
     for (Expr e : unsatCore) {
-      assertThat(e.toString()).isIn(ImmutableList.of("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 
