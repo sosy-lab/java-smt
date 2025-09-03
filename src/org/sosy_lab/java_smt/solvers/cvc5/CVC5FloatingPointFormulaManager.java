@@ -416,9 +416,9 @@ public class CVC5FloatingPointFormulaManager
               pTargetType.getExponentSize(),
               pTargetType.getMantissaSize() + 1), // add sign bit
           pBitvector);
-    } catch (CVC5ApiException pCVC5ApiException) {
+    } catch (CVC5ApiException cvc5ApiException) {
       // This seems to only be thrown for wrong exponent and mantissa sizes
-      throw new RuntimeException(pCVC5ApiException);
+      throw new RuntimeException(cvc5ApiException);
     }
   }
 
