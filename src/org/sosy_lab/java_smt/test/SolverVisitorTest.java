@@ -556,7 +556,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
     checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
     checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
-    if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
+    if (!ImmutableList.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
         .contains(solverToUse())) { // CVC4/CVC5 and bitwuzla do not support this operation
       // On Bitwuzla we replaces "fp_to_bv(fpTerm)" with "newVar" and the adds the assertion
       // "fpTerm = bv_to_fp(newVar)" as a side condition. Unfortunately this workaround will not
@@ -589,7 +589,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
           }
         };
 
-    for (int num : List.of(0, 1, 4, 16, 256, 1024)) {
+    for (int num : ImmutableList.of(0, 1, 4, 16, 256, 1024)) {
       Formula bv2fp = fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(16, num), fpType);
       mgr.visit(bv2fp, visitor);
       Formula fp2bv = fpmgr.toIeeeBitvector(fpmgr.makeNumber(num, fpType));

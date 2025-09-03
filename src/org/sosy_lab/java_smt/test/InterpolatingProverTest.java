@@ -344,7 +344,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // sequential interpolation should always work as expected
     checkItpSequence(ImmutableList.of(A, B, C), itpSeq);
-    checkItpSequence(ImmutableList.of(A, B, C), List.of(itp1, itp2));
+    checkItpSequence(ImmutableList.of(A, B, C), ImmutableList.of(itp1, itp2));
   }
 
   @Test

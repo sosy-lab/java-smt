@@ -14,6 +14,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -392,9 +393,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula a = bvmgr.makeVariable(4, "a");
     BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
 
-    assertThatFormula(bvmgr.distinct(List.of(a, num3))).isSatisfiable();
-    assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
-    assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(a, num3))).isSatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(a, a))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(num3, num3))).isUnsatisfiable();
   }
 
   @Test

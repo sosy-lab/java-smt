@@ -856,7 +856,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("As of now, only Z3 supports partial model evaluation")
         .that(solver)
-        .isIn(ImmutableList.of(Solvers.Z3));
+        .isEqualTo(Solvers.Z3);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
