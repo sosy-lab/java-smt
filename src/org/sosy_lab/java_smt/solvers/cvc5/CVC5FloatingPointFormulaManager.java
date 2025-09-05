@@ -420,7 +420,7 @@ public class CVC5FloatingPointFormulaManager
       // This seems to only be thrown for wrong exponent and mantissa sizes (e.g. negative
       // numbers, size not equal to BV size etc.). We check for this beforehand, so this should
       // not be thrown.
-      throw new RuntimeException(cvc5ApiException);
+      throw new IllegalArgumentException(cvc5ApiException);
     }
   }
 
