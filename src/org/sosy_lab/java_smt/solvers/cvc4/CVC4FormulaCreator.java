@@ -629,8 +629,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fp = fpExpr.getConstFloatingPoint();
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
-    final var mantWidthWithoutSignBit = Ints.checkedCast(fpType.significandWidth() - 1); // without
-    // sign bit
+    // CVC4 returns the mantissa with the sign bit, hence - 1
+    final var mantWidthWithoutSignBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");
     final var exp = matcher.group("exp");

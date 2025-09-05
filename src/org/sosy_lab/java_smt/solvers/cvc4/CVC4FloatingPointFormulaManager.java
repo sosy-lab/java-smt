@@ -49,11 +49,8 @@ public class CVC4FloatingPointFormulaManager
 
   // TODO Is there a difference in `FloatingPointSize` and `FloatingPointType` in CVC4?
   // They are both just pairs of `exponent size` and `significant size`.
-
   private static FloatingPointSize getFPSize(FloatingPointType pType) {
-    long pExponentSize = pType.getExponentSize();
-    long pMantissaSize = pType.getMantissaSizeWithSignBit();
-    return new FloatingPointSize(pExponentSize, pMantissaSize);
+    return new FloatingPointSize(pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
   }
 
   @Override
@@ -129,8 +126,7 @@ public class CVC4FloatingPointFormulaManager
   private static BigInteger getBiggestNumberBeforeInf(int mantissaWithoutSignBit, int exponent) {
     int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
     BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);
-    int mantissaExponent =
-        BigInteger.valueOf(2).pow(exponent - 1).intValueExact() - 2 - mantissaWithoutSignBit;
+    int mantissaExponent = boundExponent - 2 - mantissaWithoutSignBit;
     if (mantissaExponent >= 0) { // ignore negative mantissaExponent
       upperBoundExponent = upperBoundExponent.subtract(BigInteger.valueOf(2).pow(mantissaExponent));
     }
