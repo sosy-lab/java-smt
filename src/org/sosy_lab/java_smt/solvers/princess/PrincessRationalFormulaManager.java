@@ -135,7 +135,7 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
-    return Rationals.div(toType(number1), toType(number2));
+    return Rationals.divWithSpecialZero(toType(number1), toType(number2));
   }
 
   @Override
