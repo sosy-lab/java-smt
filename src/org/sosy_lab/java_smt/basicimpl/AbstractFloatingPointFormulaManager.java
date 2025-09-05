@@ -24,6 +24,7 @@ import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -245,6 +246,11 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
+    Preconditions.checkArgument(
+        bvType.getSize() == pTargetType.getTotalSize(),
+        "The total size of the used FloatingPointType has to match the size of the bitvector"
+            + " given");
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 
