@@ -477,13 +477,16 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               Integer.toBinaryString(Float.floatToRawIntBits(entry.getKey().floatValue())),
               32,
               '0'));
-      checkFloatConstant(FormulaType.getFloatingPointType(5, 10), entry.getKey(), entry.getValue());
+      checkFloatConstant(
+          FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 10),
+          entry.getKey(),
+          entry.getValue());
     }
   }
 
   private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
     FloatingPointNumber fp =
-        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize());
+        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSizeWithoutSignBit());
 
     ConstantsVisitor visitor = new ConstantsVisitor();
     mgr.visit(fpmgr.makeNumber(value, prec), visitor);
@@ -580,7 +583,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    var fpType = FormulaType.getFloatingPointType(5, 10);
+    var fpType = FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(5, 10);
     var visitor =
         new DefaultFormulaVisitor<Void>() {
           @Override
