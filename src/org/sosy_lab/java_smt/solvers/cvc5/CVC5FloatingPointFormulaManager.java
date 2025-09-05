@@ -417,7 +417,9 @@ public class CVC5FloatingPointFormulaManager
               pTargetType.getMantissaSize() + 1), // add sign bit
           pBitvector);
     } catch (CVC5ApiException cvc5ApiException) {
-      // This seems to only be thrown for wrong exponent and mantissa sizes
+      // This seems to only be thrown for wrong exponent and mantissa sizes (e.g. negative
+      // numbers, size not equal to BV size etc.). We check for this beforehand, so this should
+      // not be thrown.
       throw new RuntimeException(cvc5ApiException);
     }
   }

@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -249,8 +250,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
     Preconditions.checkArgument(
         bvType.getSize() == pTargetType.getTotalSize(),
-        "The total size of the used FloatingPointType has to match the size of the bitvector"
-            + " given");
+        MoreStrings.lazyString(
+            () ->
+                String.format(
+                    "The total size of the used FloatingPointType %s has to match the size of "
+                        + "the bitvector argument %s",
+                    pTargetType.getTotalSize(), bvType.getSize())));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 
