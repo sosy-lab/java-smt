@@ -971,7 +971,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           expo,
           mant,
           pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+          pType.getMantissaSizeWithoutSignBit());
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
@@ -982,9 +982,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FloatingPointNumber.of(
           sign
               + "1".repeat(pType.getExponentSize())
-              + "0".repeat(pType.getMantissaSizeWithSignBit()),
+              + "0".repeat(pType.getMantissaSizeWithoutSignBit()),
           pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+          pType.getMantissaSizeWithoutSignBit());
 
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
@@ -996,9 +996,9 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FloatingPointNumber.of(
           "0"
               + "1".repeat(pType.getExponentSize())
-              + "1".repeat(pType.getMantissaSizeWithSignBit()),
+              + "1".repeat(pType.getMantissaSizeWithoutSignBit()),
           pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+          pType.getMantissaSizeWithoutSignBit());
 
     } else {
       Sign sign = getSign(pValue);
@@ -1011,7 +1011,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           new BigInteger(exponent),
           new BigInteger(mantissa),
           pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+          pType.getMantissaSizeWithoutSignBit());
     }
   }
 
