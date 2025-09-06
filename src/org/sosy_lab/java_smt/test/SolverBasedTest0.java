@@ -47,6 +47,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -104,6 +105,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
   protected @Nullable EnumerationFormulaManager emgr;
+  protected @Nullable SLFormulaManager slmgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -191,6 +193,11 @@ public abstract class SolverBasedTest0 {
       emgr = mgr.getEnumerationFormulaManager();
     } catch (UnsupportedOperationException e) {
       emgr = null;
+    }
+    try {
+      slmgr = mgr.getSLFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      slmgr = null;
     }
   }
 
@@ -303,6 +310,13 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
         .that(emgr)
+        .isNotNull();
+  }
+
+  protected final void requireSeparationLogic() {
+    assume()
+        .withMessage("Solver %s does not support the theory of separation logic", solverToUse())
+        .that(slmgr)
         .isNotNull();
   }
 
