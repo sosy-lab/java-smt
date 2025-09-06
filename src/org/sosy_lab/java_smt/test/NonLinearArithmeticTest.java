@@ -206,14 +206,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
         .that(solverToUse())
         .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
 
-    if (formulaType.isRationalType()) {
-      // Division by zero does not work for rationals with Princess.
-      assume()
-          .withMessage("Solver %s does not support division by zero", solverToUse())
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
-
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T zero = nmgr.makeNumber(0);
