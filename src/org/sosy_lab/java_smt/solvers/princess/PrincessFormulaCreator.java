@@ -387,7 +387,7 @@ class PrincessFormulaCreator
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
 
-    } else if (input instanceof IFunApp && (isValue((IFunApp) input))) {
+    } else if (input instanceof IFunApp && isValue((IFunApp) input)) {
       return visitor.visitConstant(f, convertValue(input));
 
     } else if (input instanceof IQuantified) {
