@@ -11,11 +11,15 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.EXISTS;
 import static org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier.FORALL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.BOOL_SORT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.INTEGER_SORT;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asJavaCollection;
 
 import ap.basetypes.IdealInt;
+import ap.parser.ConstantSubstVisitor;
+import ap.parser.ExpressionReplacingVisitor;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -38,22 +42,29 @@ import ap.parser.ITerm;
 import ap.parser.ITermITE;
 import ap.parser.ITimes;
 import ap.parser.IVariable;
+import ap.parser.Rewriter;
+import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
+import ap.theories.nia.GroebnerMultiplication;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
+import ap.types.Sort.MultipleValueBool$;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -70,10 +81,17 @@ import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBitvectorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBooleanDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessConstArrayDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessEquationDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIntegerDivisionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIntegerModuloDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessModularCongruenceDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalDivisionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
 import scala.Enumeration;
+import scala.collection.JavaConverters;
 
 class PrincessFormulaCreator
     extends FormulaCreator<IExpression, Sort, PrincessEnvironment, PrincessFunctionDeclaration> {
@@ -82,7 +100,14 @@ class PrincessFormulaCreator
   // Java-SMT kind
   private static final Map<IFunction, FunctionDeclarationKind> theoryFunctionKind = new HashMap<>();
   private static final Map<Predicate, FunctionDeclarationKind> theoryPredKind = new HashMap<>();
+
   private static final Set<String> CONSTANT_UFS = ImmutableSet.of("str_cons", "str_empty");
+
+  // Get the symbol for multiplication
+  private final IFunction symbolMul = GroebnerMultiplication.mul();
+
+  // We use a list of patterns to match complex operations like division in the visitor
+  private final List<Pattern> patterns = precompile();
 
   static {
     theoryFunctionKind.put(ModuloArithmetic.bv_concat(), FunctionDeclarationKind.BV_CONCAT);
@@ -376,26 +401,320 @@ class PrincessFormulaCreator
     return true;
   }
 
+  /** Cast integer terms to rational, if needed. */
+  private ITerm toReal(ITerm number) {
+    return getFormulaType(number).isIntegerType() ? Rationals.int2ring(number) : number;
+  }
+
+  private static class Pair<A, B> {
+    private final A a;
+    private final B b;
+
+    Pair(A pA, B pB) {
+      a = pA;
+      b = pB;
+    }
+
+    public A getA() {
+      return a;
+    }
+
+    public B getB() {
+      return b;
+    }
+  }
+
+  /** Merge two substitutions, returns {@link Optional#empty()} when there is a conflict. */
+  private <A, B> Optional<Map<A, B>> merge(
+      Optional<Map<A, B>> maybeSubst1, Optional<Map<A, B>> maybeSubst2) {
+    if (maybeSubst1.isPresent() && maybeSubst2.isPresent()) {
+      var subst1 = maybeSubst1.get();
+      var subst2 = maybeSubst2.get();
+
+      ImmutableMap.Builder<A, B> builder = ImmutableMap.builder();
+      for (var k : Sets.union(subst1.keySet(), subst2.keySet())) {
+        if (subst1.containsKey(k)) {
+          if (subst2.containsKey(k) && !subst1.get(k).equals(subst2.get(k))) {
+            return Optional.empty();
+          }
+          builder.put(k, subst1.get(k));
+        } else {
+          builder.put(k, subst2.get(k));
+        }
+      }
+      return Optional.of(builder.build());
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  /**
+   * Simple term unification.
+   *
+   * <p>Assumes that the left term is more general. Will return {@link Optional#empty()} if the
+   * terms can't be unified. Otherwise, returns a substitution for the constant symbols in the left
+   * term.
+   */
+  private Pair<Optional<Map<ConstantTerm, IExpression>>, IExpression> unify(
+      IExpression t1, IExpression t2) {
+    if (t1.equals(t2)) {
+      return new Pair<>(Optional.of(Map.of()), t1);
+    } else if (t1 instanceof IConstant) {
+      return new Pair<>(Optional.of(Map.of(((IConstant) t1).c(), t2)), t2);
+    } else if (t1.getClass().equals(t2.getClass()) && t1.length() == t2.length()) {
+      // Recursively check the subterms
+      Optional<Map<ConstantTerm, IExpression>> subst = Optional.of(ImmutableMap.of());
+      ImmutableList.Builder<IExpression> terms = ImmutableList.builder();
+      for (var i = 0; i < t1.length(); i++) {
+        Pair<Optional<Map<ConstantTerm, IExpression>>, IExpression> r =
+            unify(t1.apply(i), t2.apply(i));
+        subst = merge(subst, r.getA());
+
+        if (subst.isEmpty()) {
+          return new Pair<>(Optional.empty(), t1);
+        }
+        terms.add(r.getB());
+      }
+
+      // Check if the left term is equal to the right after the subtrees were unified
+      IExpression t = t1.update(toSeq(terms.build()));
+      if (t.equals(t2)) {
+        return new Pair<>(subst, t2);
+      }
+    }
+    return new Pair<>(Optional.empty(), t1);
+  }
+
+  /**
+   * Rewrite terms of the form <code>((_ ITimes k) b)</code> as <code>(multiply (Expression.i k) b)
+   * </code>.
+   *
+   * <p>This will later allow us to replace the first argument with a variable
+   */
+  private IExpression rewriteMult(IExpression t) {
+    return Rewriter.rewrite(
+        t,
+        v -> {
+          if (v instanceof ITimes) {
+            var times = (ITimes) v;
+            return new IFunApp(
+                symbolMul, toSeq(ImmutableList.of(IExpression.i(times.coeff()), times.subterm())));
+          } else {
+            return v;
+          }
+        });
+  }
+
+  /**
+   * Rewrite negative integer literals as <code>-1 * a</code>.
+   *
+   * <p>Will skip <code>-1</code> terms while rewriting
+   */
+  private IExpression rewriteNegated(IExpression t) {
+    return Rewriter.rewrite(
+        t,
+        v -> {
+          if (v instanceof IIntLit) {
+            var lit = ((IIntLit) v);
+            if (!lit.value().isUnit() && lit.value().signum() < 0) {
+              return new ITimes(IdealInt.apply(-1), IExpression.abs(lit));
+            }
+          }
+          return v;
+        });
+  }
+
+  /**
+   * A pattern, consisting of an operation, it's arguments, and the resulting Princess term.
+   *
+   * <p>The princess term will be generalized, and by matching it to a given formula one can invert
+   * the operation and derive the original arguments.
+   */
+  private static class Pattern {
+    private final PrincessFunctionDeclaration decl;
+    private final List<IExpression> args;
+    private final IExpression term;
+
+    Pattern(PrincessFunctionDeclaration pDecl, List<IExpression> pArgs, IExpression pTerm) {
+      decl = pDecl;
+      args = pArgs;
+      term = pTerm;
+    }
+  }
+
+  private Pattern buildPattern(PrincessFunctionDeclaration pDeclaration, List<IExpression> pArgs) {
+    return buildPattern(pDeclaration, pArgs, false);
+  }
+
+  /**
+   * Helper function to build patterns.
+   *
+   * <p>If the last argument is set to <code>true</code>, we will generalize any constant terms in
+   * the arguments.
+   */
+  private Pattern buildPattern(
+      PrincessFunctionDeclaration pDeclaration, List<IExpression> pArgs, boolean pFinal) {
+    var term = rewriteNegated(rewriteMult(pDeclaration.makeApp(environment, pArgs)));
+    if (pFinal) {
+      ImmutableList.Builder<IExpression> builder = ImmutableList.builder();
+      for (var c : pArgs) {
+        if (c instanceof IConstant) {
+          // If the argument is already a variable, just keep it
+          builder.add(c);
+        } else if (c instanceof ITimes) {
+          // If it's a term (c * t), where c is an integer coefficient, and t is another integer
+          // literal, we replace t in (c * t) with a new variable
+          // Specifically, this can be used to generalize negative integer constants by first
+          // shifting the minus sign outside, and then replacing the nested integer term
+          var times = (ITimes) c;
+          if (times.apply(0) instanceof IIntLit) {
+            var newVar =
+                (ITerm) makeVariable(INTEGER_SORT, "@" + Integer.toUnsignedString(c.hashCode()));
+            term = ExpressionReplacingVisitor.apply(term, times.apply(0), newVar);
+            builder.add(new ITimes(times.coeff(), newVar));
+          } else {
+            throw new IllegalArgumentException();
+          }
+        } else {
+          // If we have an integer constant as argument, replace it with a new variable and
+          // update the term
+          var newVar =
+              (ITerm) makeVariable(INTEGER_SORT, "@" + Integer.toUnsignedString(c.hashCode()));
+          term = ExpressionReplacingVisitor.apply(term, c, newVar);
+          builder.add(newVar);
+        }
+      }
+      return new Pattern(pDeclaration, builder.build(), term);
+    } else {
+      return new Pattern(pDeclaration, pArgs, term);
+    }
+  }
+
+  private List<Pattern> precompile() {
+    // Define two variable to match integer arguments
+    ITerm symbolInt1 = (ITerm) makeVariable(PrincessEnvironment.INTEGER_SORT, "@1integer");
+    ITerm symbolInt2 = (ITerm) makeVariable(PrincessEnvironment.INTEGER_SORT, "@2integer");
+
+    // Define two variables for real arguments
+    ITerm symbolReal1 = (ITerm) makeVariable(PrincessEnvironment.FRACTION_SORT, "@1real");
+    ITerm symbolReal2 = (ITerm) makeVariable(PrincessEnvironment.FRACTION_SORT, "@2real");
+
+    return ImmutableList.of(
+        // Rational.divide
+        buildPattern(
+            PrincessRationalDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolReal1, toReal(symbolInt2)),
+            true),
+        buildPattern(
+            PrincessRationalDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolReal1, symbolReal2)),
+        // Integer.divide
+        buildPattern(
+            PrincessIntegerDivisionDeclaration.INSTANCE,
+            ImmutableList.of(IExpression.i(2), symbolInt2),
+            true),
+        buildPattern(
+            PrincessIntegerDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(2))),
+        buildPattern(
+            PrincessIntegerDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(2).unary_$minus())),
+        buildPattern(
+            PrincessIntegerDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(3)),
+            true),
+        buildPattern(
+            PrincessIntegerDivisionDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(3).unary_$minus()),
+            true),
+        // Integer.modulo
+        buildPattern(
+            PrincessIntegerModuloDeclaration.INSTANCE, ImmutableList.of(symbolInt1, symbolInt2)),
+        buildPattern(
+            PrincessIntegerModuloDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(2))),
+        buildPattern(
+            PrincessIntegerModuloDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(2).unary_$minus()),
+            true),
+        buildPattern(
+            PrincessIntegerModuloDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(3)),
+            true),
+        buildPattern(
+            PrincessIntegerModuloDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, IExpression.i(3).unary_$minus()),
+            true),
+        // Integer.modularCongruence
+        buildPattern(
+            PrincessModularCongruenceDeclaration.INSTANCE,
+            ImmutableList.of(symbolInt1, symbolInt2, IExpression.i(3)),
+            true));
+  }
+
   @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
-    if (input instanceof IIntLit) {
+    IExpression re = rewriteNegated(rewriteMult(input));
+
+    // Check if one of the patterns matches
+    for (Pattern p : patterns) {
+      Optional<Map<ConstantTerm, IExpression>> subst = unify(p.term, re).getA();
+
+      if (subst.isPresent()) {
+        ImmutableList.Builder<Formula> args = ImmutableList.builder();
+        ImmutableList.Builder<FormulaType<?>> sorts = ImmutableList.builder();
+
+        for (IExpression arg : p.args) {
+          ImmutableMap.Builder<ConstantTerm, ITerm> builder = ImmutableMap.builder();
+          for (var entry : subst.get().entrySet()) {
+            builder.put(entry.getKey(), (ITerm) entry.getValue());
+          }
+          IExpression updated =
+              ConstantSubstVisitor.apply(arg, JavaConverters.asScala(builder.build()));
+          updated =
+              Rewriter.rewrite(
+                  updated,
+                  v -> {
+                    if (v instanceof ITimes) {
+                      var times = (ITimes) v;
+                      if (times.apply(0) instanceof IIntLit) {
+                        var lit = (IIntLit) times.apply(0);
+                        return IExpression.i(times.coeff().$times(lit.value()));
+                      }
+                    }
+                    return v;
+                  });
+
+          args.add(encapsulateWithTypeOf(updated));
+          sorts.add(getFormulaType(updated));
+        }
+
+        return visitor.visitFunction(
+            f,
+            args.build(),
+            FunctionDeclarationImpl.of(
+                p.decl.getName(), p.decl.getKind(), sorts.build(), getFormulaType(f), p.decl));
+      }
+    }
+
+    if (input instanceof IFunApp && isValue((IFunApp) input)) {
+      // Is it a rational value?
+      return visitor.visitConstant(f, convertValue(input));
+
+    } else if (input instanceof IIntLit) {
+      // Is it an integer value?
       IdealInt value = ((IIntLit) input).value();
       return visitor.visitConstant(f, value.bigIntValue());
 
     } else if (input instanceof IBoolLit) {
+      // Is it a boolean value?
       IBoolLit literal = (IBoolLit) input;
       return visitor.visitConstant(f, literal.value());
 
-    } else if (input instanceof IFunApp && isValue((IFunApp) input)) {
-      return visitor.visitConstant(f, convertValue(input));
-
     } else if (input instanceof IQuantified) {
+      // Is it a quantifier?
       return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
-
-    } else if (input instanceof IVariable) {
-      // variable bound by a quantifier
-      return visitor.visitBoundVariable(f, ((IVariable) input).index());
 
     } else if (((input instanceof IAtom) && asJavaCollection(((IAtom) input).args()).isEmpty())
         || input instanceof IConstant) {
@@ -403,7 +722,8 @@ class PrincessFormulaCreator
       return visitor.visitFreeVariable(f, input.toString());
 
     } else if (input instanceof ITimes) {
-      // Princess encodes multiplication as "linear coefficient and factor" with arity 1.
+      // Princess encodes nonlinear multiplication as (coefficient* t), where "coefficient" is
+      // an integer constant and "t" is the only subterm
       assert input.length() == 1;
 
       ITimes multiplication = (ITimes) input;
@@ -498,7 +818,15 @@ class PrincessFormulaCreator
       if (kind == FunctionDeclarationKind.UF) {
         solverDeclaration = new PrincessIFunctionDeclaration(((IFunApp) input).fun());
       } else if (kind == FunctionDeclarationKind.MUL) {
-        solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+        if (getFormulaType(input.apply(0)).isRationalType()) {
+          solverDeclaration = PrincessRationalMultiplyDeclaration.INSTANCE;
+        } else if (getFormulaType(input.apply(0)).isIntegerType()) {
+          solverDeclaration = PrincessMultiplyDeclaration.INSTANCE;
+        } else {
+          throw new IllegalArgumentException();
+        }
+      } else if (kind == FunctionDeclarationKind.CONST) {
+        solverDeclaration = new PrincessConstArrayDeclaration(environment, (IFunApp) input);
       } else {
         solverDeclaration = new PrincessByExampleDeclaration(input);
       }
@@ -607,19 +935,14 @@ class PrincessFormulaCreator
         return FunctionDeclarationKind.CONST;
       } else if (fun == ModuloArithmetic.mod_cast()) {
         return FunctionDeclarationKind.OTHER;
-      } else if (fun == ModuloArithmetic.int_cast()) {
-        return FunctionDeclarationKind.OTHER;
+      } else if (((IFunApp) input).fun().equals(Rationals.fromRing())) {
+        return FunctionDeclarationKind.TO_REAL;
       } else {
         return FunctionDeclarationKind.UF;
       }
     } else if (input instanceof IAtom) {
       final Predicate pred = ((IAtom) input).pred();
-      final FunctionDeclarationKind theoryKind = theoryPredKind.get(pred);
-      if (theoryKind != null) {
-        return theoryKind;
-      } else {
-        return FunctionDeclarationKind.UF;
-      }
+      return theoryPredKind.getOrDefault(pred, FunctionDeclarationKind.UF);
     } else if (isBinaryFunction(input, IBinJunctor.And())) {
       return FunctionDeclarationKind.AND;
     } else if (isBinaryFunction(input, IBinJunctor.Or())) {

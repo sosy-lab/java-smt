@@ -22,6 +22,8 @@ import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalDivisionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
 
 public class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
@@ -130,7 +132,8 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression multiply(IExpression number1, IExpression number2) {
-    return Rationals.mul(toType(number1), toType(number2));
+    return PrincessRationalMultiplyDeclaration.INSTANCE.makeApp(
+        getFormulaCreator().getEnv(), ImmutableList.of(toType(number1), toType(number2)));
   }
 
   @Override
@@ -138,7 +141,8 @@ public class PrincessRationalFormulaManager
     // SMT-LIB allows division by zero, so we use divWithSpecialZero here.
     // If the divisor is zero, divWithSpecialZero will evaluate to a unary UF `ratDivZero`,
     // otherwise it is the normal division
-    return Rationals.divWithSpecialZero(toType(number1), toType(number2));
+    return PrincessRationalDivisionDeclaration.INSTANCE.makeApp(
+        getFormulaCreator().getEnv(), ImmutableList.of(toType(number1), toType(number2)));
   }
 
   @Override
