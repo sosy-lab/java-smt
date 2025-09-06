@@ -50,6 +50,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   protected final Deque<PersistentMap<String, Term>> assertedTerms = new ArrayDeque<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
+  //  --> No, CVC5 aborts on addConstraint.
   protected final boolean incremental;
 
   protected CVC5AbstractProver(
@@ -84,15 +85,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       throw new AssertionError("Unexpected exception", e);
     }
 
-    if (incremental) {
-      pSolver.setOption("incremental", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      pSolver.setOption("produce-models", "true");
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      pSolver.setOption("produce-unsat-cores", "true");
-    }
+    pSolver.setOption("incremental", incremental ? "true" : "false");
+    pSolver.setOption("produce-models", generateModels ? "true" : "false");
+    pSolver.setOption("produce-unsat-cores", generateUnsatCores ? "true" : "false");
+
     pSolver.setOption("produce-assertions", "true");
     pSolver.setOption("dump-models", "true");
 
@@ -105,6 +101,15 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
     pSolver.setOption("full-saturate-quant", "true");
+
+    // if no logic is set in CVC5, select the broadest logic available: "ALL"
+    if (!solver.isLogicSet()) {
+      try {
+        solver.setLogic("ALL");
+      } catch (CVC5ApiException e) {
+        throw new AssertionError("Unexpected exception", e);
+      }
+    }
   }
 
   @Override
