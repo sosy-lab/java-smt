@@ -135,6 +135,9 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
+    // SMT-LIB allows division by zero, so we use divWithSpecialZero here.
+    // If the divisor is zero, divWithSpecialZero will evaluate to a unary UF `ratDivZero`,
+    // otherwise it is the normal division
     return Rationals.divWithSpecialZero(toType(number1), toType(number2));
   }
 
