@@ -903,12 +903,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testToCodePointInRange() throws SolverException, InterruptedException {
-    // TODO report to developers
-    assume()
-        .withMessage("Solver %s crashes", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     StringFormula str = smgr.makeVariable("str");
     IntegerFormula cp = smgr.toCodePoint(str);
     BooleanFormula invalidStr = imgr.equal(cp, imgr.makeNumber(-1));
