@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import javax.annotation.Nonnull;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -55,7 +54,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
   private final int randomSeed;
-  private final ImmutableSet<ProverOptions> options;
   private final ImmutableMap<String, String> furtherOptionsMap;
   protected Solver solver; // final in incremental mode, non-final in non-incremental mode
   private boolean changedSinceLastSatQuery = false;
@@ -79,24 +77,20 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     mgr = pMgr;
     creator = pFormulaCreator;
-    options = ImmutableSet.copyOf(pOptions);
     furtherOptionsMap = pFurtherOptionsMap;
     randomSeed = pRandomSeed;
     incremental = !enableSL;
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
 
     if (incremental) {
-      solver = getNewSolver(randomSeed, options, furtherOptionsMap);
+      solver = getNewSolver();
     }
   }
 
-  protected Solver getNewSolver(
-      int randomSeed,
-      Set<ProverOptions> pOptions,
-      ImmutableMap<String, String> pFurtherOptionsMap) {
+  protected Solver getNewSolver() {
     Solver newSolver = new Solver(creator.getEnv());
     try {
-      CVC5SolverContext.setSolverOptions(newSolver, randomSeed, pFurtherOptionsMap);
+      CVC5SolverContext.setSolverOptions(newSolver, randomSeed, furtherOptionsMap);
     } catch (CVC5ApiRecoverableException e) {
       // We've already used these options in CVC5SolverContext, so there should be no exception
       throw new AssertionError("Unexpected exception", e);
@@ -226,7 +220,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       if (solver != null) {
         solver.deletePointer(); // cleanup
       }
-      solver = getNewSolver(randomSeed, options, furtherOptionsMap);
+      solver = getNewSolver();
 
       ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
       if (enableSL) {
@@ -237,18 +231,15 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     Result result;
     try {
-      result = checkSat();
-    } catch (CVC5ApiException e) {
+      result = solver.checkSat();
+    } catch (Exception e) {
+      // we actually only want to catch CVC5ApiException, but need to catch all.
       throw new SolverException("CVC5 failed during satisfiability check", e);
     } finally {
       /* Shutdown currently not possible in CVC5. */
       shutdownNotifier.shutdownIfNecessary();
     }
     return convertSatResult(result);
-  }
-
-  private Result checkSat() throws CVC5ApiException {
-    return solver.checkSat();
   }
 
   private void declareHeap(ImmutableSet<BooleanFormula> pAssertedFormulas) throws SolverException {
@@ -278,9 +269,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     solver.declareSepHeap(heapSort, elementSort);
   }
 
-  @Nonnull
   private Multimap<Sort, Sort> getHeapSorts(ImmutableSet<BooleanFormula> pAssertedFormulas)
-      throws CVC5ApiException, SolverException {
+      throws CVC5ApiException {
     final Deque<Term> waitlist = new ArrayDeque<>();
     for (BooleanFormula f : pAssertedFormulas) {
       waitlist.add(creator.extractInfo(f));

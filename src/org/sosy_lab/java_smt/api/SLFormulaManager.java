@@ -17,11 +17,11 @@ package org.sosy_lab.java_smt.api;
  * complains at runtime!
  *
  * @see <a href="https://en.wikipedia.org/wiki/Separation_logic">Separation Logic</a>
- * @see <a href="https://cacm.acm.org/research/separation-logic/>Separation Logic</a>
+ * @see <a href="https://cacm.acm.org/research/separation-logic/">Separation Logic</a>
  * @see <a
  *     href="https://www.cs.cmu.edu/afs/cs.cmu.edu/project/fox-19/member/jcr/www15818As2011/cs818A3-11.html">15-818A3
  *     Introduction to Separation Logic (6 units) Spring 2011</a>
- * @see <a href="https://www.philipzucker.com/executable-seperation>Modeling Separation Logic with
+ * @see <a href="https://www.philipzucker.com/executable-seperation">Modeling Separation Logic with
  *     Python Dicts and Z3</a>
  */
 @SuppressWarnings("MethodTypeParameterName")
@@ -52,7 +52,7 @@ public interface SLFormulaManager {
   /**
    * Creates a formula representing the "magic wand" (-*) operator in separation logic. The "magic
    * wand" operator asserts that if the first formula holds, then the second formula can be added to
-   * the heap without conflict. It is a form of implication (=>) that takes into account the
+   * the heap without conflict. It is a form of implication (=&gt;) that takes into account the
    * disjointness of memory regions.
    *
    * @return a Boolean formula representing the "magic wand" of {@code f1} and {@code f2}.
