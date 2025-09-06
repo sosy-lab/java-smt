@@ -428,8 +428,8 @@ class PrincessFormulaCreator
   private <A, B> Optional<Map<A, B>> merge(
       Optional<Map<A, B>> maybeSubst1, Optional<Map<A, B>> maybeSubst2) {
     if (maybeSubst1.isPresent() && maybeSubst2.isPresent()) {
-      var subst1 = maybeSubst1.get();
-      var subst2 = maybeSubst2.get();
+      var subst1 = maybeSubst1.orElseThrow();
+      var subst2 = maybeSubst2.orElseThrow();
 
       ImmutableMap.Builder<A, B> builder = ImmutableMap.builder();
       for (var k : Sets.union(subst1.keySet(), subst2.keySet())) {
@@ -442,7 +442,7 @@ class PrincessFormulaCreator
           builder.put(k, subst2.get(k));
         }
       }
-      return Optional.of(builder.build());
+      return Optional.of(builder.buildOrThrow());
     } else {
       return Optional.empty();
     }
@@ -458,9 +458,9 @@ class PrincessFormulaCreator
   private Pair<Optional<Map<ConstantTerm, IExpression>>, IExpression> unify(
       IExpression t1, IExpression t2) {
     if (t1.equals(t2)) {
-      return new Pair<>(Optional.of(Map.of()), t1);
+      return new Pair<>(Optional.of(ImmutableMap.of()), t1);
     } else if (t1 instanceof IConstant) {
-      return new Pair<>(Optional.of(Map.of(((IConstant) t1).c(), t2)), t2);
+      return new Pair<>(Optional.of(ImmutableMap.of(((IConstant) t1).c(), t2)), t2);
     } else if (t1.getClass().equals(t2.getClass()) && t1.length() == t2.length()) {
       // Recursively check the subterms
       Optional<Map<ConstantTerm, IExpression>> subst = Optional.of(ImmutableMap.of());
@@ -667,11 +667,11 @@ class PrincessFormulaCreator
 
         for (IExpression arg : p.args) {
           ImmutableMap.Builder<ConstantTerm, ITerm> builder = ImmutableMap.builder();
-          for (var entry : subst.get().entrySet()) {
+          for (var entry : subst.orElseThrow().entrySet()) {
             builder.put(entry.getKey(), (ITerm) entry.getValue());
           }
           IExpression updated =
-              ConstantSubstVisitor.apply(arg, JavaConverters.asScala(builder.build()));
+              ConstantSubstVisitor.apply(arg, JavaConverters.asScala(builder.buildOrThrow()));
           updated =
               Rewriter.rewrite(
                   updated,
