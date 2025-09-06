@@ -670,7 +670,14 @@ class PrincessEnvironment {
       }
     } else {
       if (sortedVariablesCache.containsKey(varname)) {
-        return sortedVariablesCache.get(varname);
+        ITerm found = sortedVariablesCache.get(varname);
+        Preconditions.checkArgument(
+            getFormulaType(found).equals(getFormulaTypeFromSort(type)),
+            "Can't declare variable \"%s\" with type %s. It has already been declared with type %s",
+            varname,
+            getFormulaTypeFromSort(type),
+            getFormulaType(found));
+        return found;
       } else {
         ITerm var = api.createConstant(varname, type);
         addSymbol(var);
@@ -683,6 +690,7 @@ class PrincessEnvironment {
   /** This function declares a new functionSymbol with the given argument types and result. */
   public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
+      // FIXME Check that the old declaration has the right type
       return functionsCache.get(name);
     } else {
       IFunction funcDecl =
