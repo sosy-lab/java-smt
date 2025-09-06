@@ -149,12 +149,7 @@ public class FormulaClassifierTest extends SolverBasedTest0.ParameterizedSolverB
             + "(exists ((a Real) (b Real)) (= (+ y y) (- a b))) "
             + "))";
     classifier.visit(mgr.parse(query));
-    if (solverToUse() == Solvers.PRINCESS) {
-      // Princess rewrites the formula and uses '-1' for the negation -> Integer arithmetic
-      assertThat(classifier.toString()).isEqualTo("LIRA");
-    } else {
-      assertThat(classifier.toString()).isEqualTo("LRA");
-    }
+    assertThat(classifier.toString()).isEqualTo("LRA");
   }
 
   @Test

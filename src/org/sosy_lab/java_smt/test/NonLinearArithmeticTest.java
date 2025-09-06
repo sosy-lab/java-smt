@@ -206,14 +206,6 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
         .that(solverToUse())
         .isNoneOf(Solvers.YICES2, Solvers.OPENSMT);
 
-    if (formulaType.isRationalType()) {
-      // Division by zero does not work for rationals with Princess.
-      assume()
-          .withMessage("Solver %s does not support division by zero", solverToUse())
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
-
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
     T zero = nmgr.makeNumber(0);
@@ -224,6 +216,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
+
+    // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
+    BooleanFormula g =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(4)));
+
+    assertThatFormula(g).isUnsatisfiable();
   }
 
   @Test
