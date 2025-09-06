@@ -45,6 +45,14 @@ public class CVC4SLFormulaManager extends AbstractSLFormulaManager<Expr, Type, E
 
   @Override
   protected Expr makeNilElement(Type pType) {
+    // TODO CVC4 bindings for Java do not support creation of SEP_NIL via mkTerm.
+    //  It is unclear whether this method ever worked.
+    //  CVC4 is deprecated and we will not investigate here.
+    //
+    // Executing this method will cause the following exception:
+    //     Illegal argument detected: CVC4::Expr CVC4::ExprManager::mkExpr(CVC4::Kind, CVC4::Expr)
+    //     `kind' is a bad argument; ... Only operator-style expressions are made with mkExpr();
+    //     to make variables and constants, see mkVar(), mkBoundVar(), and mkConst().
     return exprManager.mkExpr(Kind.SEP_NIL, pType.mkGroundTerm());
   }
 }
