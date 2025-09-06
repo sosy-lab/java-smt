@@ -639,8 +639,11 @@ class PrincessFormulaCreator
       IIntFormula f = (IIntFormula) input;
       if (f.rel().equals(IIntRelation.EqZero())) {
         final Sort sort = Sort$.MODULE$.sortOf(((IIntFormula) input).t());
-        if (sort == PrincessEnvironment.BOOL_SORT) {
-          // this is really a Boolean formula, it has to be UF
+        if (sort == Sort.MultipleValueBool$.MODULE$) {
+          // Princess does not allow UFs to have return sort 'Bool'
+          // Instead, the function returns 'MultiplyValueBool' which is really an integer. The
+          // predicate (=0 (uf ...)) is then wrapped around the function application to get a
+          // (boolean) formula
           return FunctionDeclarationKind.UF;
         } else if (sort == PrincessEnvironment.INTEGER_SORT) {
           return FunctionDeclarationKind.EQ_ZERO;
@@ -667,7 +670,9 @@ class PrincessFormulaCreator
   @Override
   public PrincessFunctionDeclaration declareUFImpl(
       String pName, Sort pReturnType, List<Sort> args) {
-    return new PrincessIFunctionDeclaration(environment.declareFun(pName, pReturnType, args));
+    return new PrincessIFunctionDeclaration(
+        environment.declareFun(
+            pName, pReturnType.equals(BOOL_SORT) ? MultipleValueBool$.MODULE$ : pReturnType, args));
   }
 
   @Override

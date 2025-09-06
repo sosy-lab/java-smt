@@ -22,6 +22,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IIntRelation;
 import ap.parser.IPlus;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
@@ -337,6 +338,15 @@ class PrincessEnvironment {
         IFunction fun = ((IFunApp) var).fun();
         functionsCache.put(fun.name(), fun);
         addFunction(fun);
+      } else if (var instanceof IIntFormula
+          && ((IIntFormula) var).rel().equals(IIntRelation.EqZero())
+          && ((IIntFormula) var).apply(0) instanceof IFunApp) {
+        // Functions with return type Bool are wrapped in a predicate as (=0 (uf ...))
+        IFunction fun = ((IFunApp) var.apply(0)).fun();
+        functionsCache.put(fun.name(), fun);
+        addFunction(fun);
+      } else {
+        throw new IllegalArgumentException();
       }
     }
     return formulas;
