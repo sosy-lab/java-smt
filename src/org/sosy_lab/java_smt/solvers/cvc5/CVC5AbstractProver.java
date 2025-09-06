@@ -8,15 +8,23 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.Collections2;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.CVC5ApiRecoverableException;
+import io.github.cvc5.Kind;
 import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
+import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import io.github.cvc5.UnknownExplanation;
@@ -24,9 +32,11 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -52,6 +62,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   // TODO: does CVC5 support separation logic in incremental mode?
   //  --> No, CVC5 aborts on addConstraint.
   protected final boolean incremental;
+
+  // Separation Logic supports only one heap with one sort. Let's store them here.
+  private Sort heapSort = null;
+  private Sort elementSort = null;
 
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
@@ -142,7 +156,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula pF) {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
@@ -156,8 +170,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   public CVC5Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!closed);
+    checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
@@ -171,7 +185,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -191,25 +205,129 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!closed);
+    checkState(!changedSinceLastSatQuery);
     return super.getModelAssignments();
   }
 
   @Override
   @SuppressWarnings("try")
   public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedFormulas().forEach(f -> solver.assertFormula(creator.extractInfo(f)));
+      ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
+      if (enableSL) {
+        declareHeap(assertedFormulas);
+      }
+      assertedFormulas.forEach(f -> solver.assertFormula(creator.extractInfo(f)));
     }
 
-    /* Shutdown currently not possible in CVC5. */
-    Result result = solver.checkSat();
-    shutdownNotifier.shutdownIfNecessary();
+    Result result;
+    try {
+      result = checkSat();
+    } catch (CVC5ApiException e) {
+      throw new SolverException("CVC5 failed during satisfiability check", e);
+    } finally {
+      /* Shutdown currently not possible in CVC5. */
+      shutdownNotifier.shutdownIfNecessary();
+    }
     return convertSatResult(result);
+  }
+
+  private Result checkSat() throws CVC5ApiException {
+    return solver.checkSat();
+  }
+
+  private void declareHeap(ImmutableSet<BooleanFormula> pAssertedFormulas) throws SolverException {
+    // get heap sort from asserted terms
+    final Multimap<Sort, Sort> heapSorts;
+    try {
+      heapSorts = getHeapSorts(pAssertedFormulas);
+    } catch (CVC5ApiException e) {
+      throw new SolverException("CVC5 failed during heap sort collection", e);
+    }
+
+    // if there are no heaps, skip the rest
+    if (heapSorts.isEmpty()) {
+      return;
+    }
+
+    // if there are multiple heaps with different sorts, we cannot handle this
+    if (heapSorts.size() > 1) {
+      throw new SolverException(
+          "CVC5 SL support is limited to one heap with one sort. Found heaps with sorts: "
+              + heapSorts);
+    }
+
+    // get the (only) heap sort
+    final Sort newHeapSort = checkNotNull(Iterables.getOnlyElement(heapSorts.keySet()));
+    final Sort newElementSort = checkNotNull(Iterables.getOnlyElement(heapSorts.get(newHeapSort)));
+
+    // if we already have a heap, check that the sorts are the same
+    if (heapSort != null) {
+      checkState(elementSort != null, "Heap sort and element sort must both be defined.");
+      if (!heapSort.equals(newHeapSort) || !elementSort.equals(newElementSort)) {
+        throw new SolverException(
+            "CVC5 SL support is limited to one heap with one sort. Already declared heap with"
+                + " sorts: "
+                + heapSort
+                + "->"
+                + elementSort
+                + ", but found heap with sorts: "
+                + newHeapSort
+                + "->"
+                + newElementSort);
+      }
+    } else {
+      checkState(elementSort == null, "Heap sort and element sort must both be undefined.");
+      heapSort = newHeapSort;
+      elementSort = newElementSort;
+
+      // then declare the heap in the solver, once before the first sat check
+      solver.declareSepHeap(heapSort, elementSort);
+    }
+  }
+
+  @Nonnull
+  private Multimap<Sort, Sort> getHeapSorts(ImmutableSet<BooleanFormula> pAssertedFormulas)
+      throws CVC5ApiException, SolverException {
+    final Deque<Term> waitlist = new ArrayDeque<>();
+    for (BooleanFormula f : pAssertedFormulas) {
+      waitlist.add(creator.extractInfo(f));
+    }
+
+    // traverse all subterms of assertedFormulas and collect heap sorts
+    final Multimap<Sort, Sort> heapSorts = HashMultimap.create();
+    boolean requiresHeapSort = false;
+    final Set<Term> finished = new HashSet<>();
+    while (!waitlist.isEmpty()) {
+      final Term current = waitlist.pop();
+      if (finished.add(current)) {
+        // If current is a SEP_PTO, collect the heap sort from its children,
+        // we ignore all other SL terms (like SEP_EMP, SEP_STAR, SEP_WAND).
+        // SEP_EMP would be interesting, but does not provide the heap sort and element sort.
+        if (current.getKind() == Kind.SEP_PTO) {
+          heapSorts.put(current.getChild(0).getSort(), current.getChild(1).getSort());
+        } else if (current.getKind() == Kind.SEP_EMP) {
+          // SEP_EMP is sortless, but we need to declare the heap sort in CVC5.
+          requiresHeapSort = true;
+        }
+        // add all children to the waitlist
+        for (int i = 0; i < current.getNumChildren(); i++) {
+          waitlist.push(current.getChild(i));
+        }
+      }
+    }
+
+    // if we found SEP_EMP but no SEP_PTO, we still need a heap sort
+    if (requiresHeapSort && heapSorts.isEmpty()) {
+      // use Integer->Integer as default heap sort
+      heapSorts.put(creator.getIntegerType(), creator.getIntegerType());
+    }
+
+    return heapSorts;
   }
 
   private boolean convertSatResult(Result result) throws InterruptedException, SolverException {
@@ -226,9 +344,9 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
+    checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
+    checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));
