@@ -26,7 +26,6 @@ import io.github.cvc5.Result;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
-import io.github.cvc5.TermManager;
 import io.github.cvc5.UnknownExplanation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -55,75 +54,81 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
-  protected final Solver solver;
+  private final int randomSeed;
+  private final ImmutableSet<ProverOptions> options;
+  private final ImmutableMap<String, String> furtherOptionsMap;
+  protected Solver solver; // final in incremental mode, non-final in non-incremental mode
   private boolean changedSinceLastSatQuery = false;
   protected final Deque<PersistentMap<String, Term>> assertedTerms = new ArrayDeque<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
-  //  --> No, CVC5 aborts on addConstraint.
+  //  --> No. In incremental mode, CVC5 aborts when calling addConstraint(...).
+  //  This means, we have to use non-incremental mode when SL is enabled.
+  //  This also means, that push/pop are not supported when SL is enabled and we implement
+  //  our own stack for asserted terms, and use a different solver instance for each sat check.
   protected final boolean incremental;
-
-  // Separation Logic supports only one heap with one sort. Let's store them here.
-  private Sort heapSort = null;
-  private Sort elementSort = null;
 
   protected CVC5AbstractProver(
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      @SuppressWarnings("unused") int randomSeed,
-      Set<ProverOptions> pOptions,
+      int pRandomSeed,
+      ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
     mgr = pMgr;
     creator = pFormulaCreator;
+    options = ImmutableSet.copyOf(pOptions);
+    furtherOptionsMap = pFurtherOptionsMap;
+    randomSeed = pRandomSeed;
     incremental = !enableSL;
     assertedTerms.add(PathCopyingPersistentTreeMap.of());
 
-    TermManager termManager = creator.getEnv();
-    solver = new Solver(termManager);
-
-    setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, solver);
+    if (incremental) {
+      solver = getNewSolver(randomSeed, options, furtherOptionsMap);
+    }
   }
 
-  protected void setSolverOptions(
+  protected Solver getNewSolver(
       int randomSeed,
       Set<ProverOptions> pOptions,
-      ImmutableMap<String, String> pFurtherOptionsMap,
-      Solver pSolver) {
+      ImmutableMap<String, String> pFurtherOptionsMap) {
+    Solver newSolver = new Solver(creator.getEnv());
     try {
-      CVC5SolverContext.setSolverOptions(pSolver, randomSeed, pFurtherOptionsMap);
+      CVC5SolverContext.setSolverOptions(newSolver, randomSeed, pFurtherOptionsMap);
     } catch (CVC5ApiRecoverableException e) {
       // We've already used these options in CVC5SolverContext, so there should be no exception
       throw new AssertionError("Unexpected exception", e);
     }
 
-    pSolver.setOption("incremental", incremental ? "true" : "false");
-    pSolver.setOption("produce-models", generateModels ? "true" : "false");
-    pSolver.setOption("produce-unsat-cores", generateUnsatCores ? "true" : "false");
+    newSolver.setOption("incremental", incremental ? "true" : "false");
+    newSolver.setOption("produce-models", generateModels ? "true" : "false");
+    newSolver.setOption("produce-unsat-cores", generateUnsatCores ? "true" : "false");
 
-    pSolver.setOption("produce-assertions", "true");
-    pSolver.setOption("dump-models", "true");
+    newSolver.setOption("produce-assertions", "true");
+    newSolver.setOption("dump-models", "true");
 
     // Set Strings option to enable all String features (such as lessOrEquals)
-    pSolver.setOption("strings-exp", "true");
+    newSolver.setOption("strings-exp", "true");
 
     // Enable experimental array features
     // Needed when array constants (= with default element) are used
-    pSolver.setOption("arrays-exp", "true");
+    newSolver.setOption("arrays-exp", "true");
 
     // Enable more complete quantifier solving (for more info see CVC5QuantifiedFormulaManager)
-    pSolver.setOption("full-saturate-quant", "true");
+    newSolver.setOption("full-saturate-quant", "true");
 
     // if no logic is set in CVC5, select the broadest logic available: "ALL"
-    if (!solver.isLogicSet()) {
+    if (!newSolver.isLogicSet()) {
       try {
-        solver.setLogic("ALL");
+        newSolver.setLogic("ALL");
       } catch (CVC5ApiException e) {
         throw new AssertionError("Unexpected exception", e);
       }
     }
+
+    return newSolver;
   }
 
   @Override
@@ -217,6 +222,12 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
+      // in non-incremental mode, we need to create a new solver instance for each sat check
+      if (solver != null) {
+        solver.deletePointer(); // cleanup
+      }
+      solver = getNewSolver(randomSeed, options, furtherOptionsMap);
+
       ImmutableSet<BooleanFormula> assertedFormulas = getAssertedFormulas();
       if (enableSL) {
         declareHeap(assertedFormulas);
@@ -261,33 +272,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
               + heapSorts);
     }
 
-    // get the (only) heap sort
-    final Sort newHeapSort = checkNotNull(Iterables.getOnlyElement(heapSorts.keySet()));
-    final Sort newElementSort = checkNotNull(Iterables.getOnlyElement(heapSorts.get(newHeapSort)));
-
-    // if we already have a heap, check that the sorts are the same
-    if (heapSort != null) {
-      checkState(elementSort != null, "Heap sort and element sort must both be defined.");
-      if (!heapSort.equals(newHeapSort) || !elementSort.equals(newElementSort)) {
-        throw new SolverException(
-            "CVC5 SL support is limited to one heap with one sort. Already declared heap with"
-                + " sorts: "
-                + heapSort
-                + "->"
-                + elementSort
-                + ", but found heap with sorts: "
-                + newHeapSort
-                + "->"
-                + newElementSort);
-      }
-    } else {
-      checkState(elementSort == null, "Heap sort and element sort must both be undefined.");
-      heapSort = newHeapSort;
-      elementSort = newElementSort;
-
-      // then declare the heap in the solver, once before the first sat check
-      solver.declareSepHeap(heapSort, elementSort);
-    }
+    // get the (only) heap sort, and declare it in the solver, once before the first sat check
+    final Sort heapSort = checkNotNull(Iterables.getOnlyElement(heapSorts.keySet()));
+    final Sort elementSort = checkNotNull(Iterables.getOnlyElement(heapSorts.get(heapSort)));
+    solver.declareSepHeap(heapSort, elementSort);
   }
 
   @Nonnull

@@ -48,7 +48,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       CVC5FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int randomSeed,
-      Set<ProverOptions> pOptions,
+      ImmutableSet<ProverOptions> pOptions,
       FormulaManager pMgr,
       ImmutableMap<String, String> pFurtherOptionsMap,
       boolean pValidateInterpolants) {
@@ -66,13 +66,13 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
    * produce-interpolants which is set here. From CVC5AbstractProver Line 66
    */
   @Override
-  protected void setSolverOptions(
+  protected Solver getNewSolver(
       int randomSeed,
       Set<ProverOptions> pOptions,
-      ImmutableMap<String, String> pFurtherOptionsMap,
-      Solver pSolver) {
-    super.setSolverOptions(randomSeed, pOptions, pFurtherOptionsMap, pSolver);
-    pSolver.setOption("produce-interpolants", "true");
+      ImmutableMap<String, String> pFurtherOptionsMap) {
+    Solver newSolver = super.getNewSolver(randomSeed, pOptions, pFurtherOptionsMap);
+    newSolver.setOption("produce-interpolants", "true");
+    return newSolver;
   }
 
   @Override
@@ -184,8 +184,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term phiMinus = bmgr.andImpl(formulasB);
 
     // Uses a separate Solver instance to leave the original solver-context unmodified
-    Solver itpSolver = new Solver(termManager);
-    setSolverOptions(seed, solverOptions, furtherOptionsMap, itpSolver);
+    Solver itpSolver = getNewSolver(seed, solverOptions, furtherOptionsMap);
 
     Term interpolant;
     try {
@@ -225,9 +224,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
         Sets.difference(interpolantSymbols, intersection));
 
     // build and check both Craig interpolation formulas with the generated interpolant.
-    Solver validationSolver = new Solver(termManager);
     // interpolation option is not required for validation
-    super.setSolverOptions(seed, solverOptions, furtherOptionsMap, validationSolver);
+    Solver validationSolver = getNewSolver(seed, solverOptions, furtherOptionsMap);
     try {
       validationSolver.push();
       validationSolver.assertFormula(termManager.mkTerm(Kind.IMPLIES, phiPlus, interpolant));
