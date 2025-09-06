@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.truth.Truth.assert_;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.truth.Fact;
 import com.google.common.truth.FailureMetadata;
 import com.google.common.truth.SimpleSubjectBuilder;
@@ -69,9 +70,12 @@ public final class BooleanFormulaSubject extends Subject {
     return assert_().about(booleanFormulasOf(context));
   }
 
-  private void checkIsUnsat(final BooleanFormula subject, final Fact expected)
+  private void checkIsUnsat(
+      final BooleanFormula subject, final Fact expected, ProverOptions... options)
       throws SolverException, InterruptedException {
-    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+    options =
+        FluentIterable.of(ProverOptions.GENERATE_MODELS, options).toArray(ProverOptions.class);
+    try (ProverEnvironment prover = context.newProverEnvironment(options)) {
 
       prover.push(subject);
       if (prover.isUnsat()) {
@@ -94,7 +98,8 @@ public final class BooleanFormulaSubject extends Subject {
   /**
    * Check that the subject is unsatisfiable. Will show a model (satisfying assignment) on failure.
    */
-  public void isUnsatisfiable() throws SolverException, InterruptedException {
+  public void isUnsatisfiable(ProverOptions... options)
+      throws SolverException, InterruptedException {
     if (context.getFormulaManager().getBooleanFormulaManager().isTrue(formulaUnderTest)) {
       failWithoutActual(
           Fact.fact("expected to be", "unsatisfiable"),
@@ -102,11 +107,11 @@ public final class BooleanFormulaSubject extends Subject {
       return;
     }
 
-    checkIsUnsat(formulaUnderTest, Fact.simpleFact("expected to be unsatisfiable"));
+    checkIsUnsat(formulaUnderTest, Fact.simpleFact("expected to be unsatisfiable"), options);
   }
 
   /** Check that the subject is satisfiable. Will show an unsat core on failure. */
-  public void isSatisfiable() throws SolverException, InterruptedException {
+  public void isSatisfiable(ProverOptions... options) throws SolverException, InterruptedException {
     final BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
     if (bmgr.isFalse(formulaUnderTest)) {
       failWithoutActual(
@@ -115,14 +120,14 @@ public final class BooleanFormulaSubject extends Subject {
       return;
     }
 
-    try (ProverEnvironment prover = context.newProverEnvironment()) {
+    try (ProverEnvironment prover = context.newProverEnvironment(options)) {
       prover.push(formulaUnderTest);
       if (!prover.isUnsat()) {
         return; // success
       }
     }
 
-    reportUnsatCoreForUnexpectedUnsatisfiableFormula();
+    reportUnsatCoreForUnexpectedUnsatisfiableFormula(options);
   }
 
   /**
@@ -160,10 +165,11 @@ public final class BooleanFormulaSubject extends Subject {
     reportUnsatCoreForUnexpectedUnsatisfiableFormula();
   }
 
-  private void reportUnsatCoreForUnexpectedUnsatisfiableFormula()
+  private void reportUnsatCoreForUnexpectedUnsatisfiableFormula(ProverOptions... options)
       throws InterruptedException, SolverException, AssertionError {
-    try (ProverEnvironment prover =
-        context.newProverEnvironment(ProverOptions.GENERATE_UNSAT_CORE)) {
+    options =
+        FluentIterable.of(ProverOptions.GENERATE_UNSAT_CORE, options).toArray(ProverOptions.class);
+    try (ProverEnvironment prover = context.newProverEnvironment(options)) {
       // Try to report unsat core for failure message if the solver supports it.
       for (BooleanFormula part :
           context
@@ -199,7 +205,8 @@ public final class BooleanFormulaSubject extends Subject {
    * satisfiability of the subject and unsatisfiability of the negated subject in two steps to
    * improve error messages.
    */
-  public void isTautological() throws SolverException, InterruptedException {
+  public void isTautological(ProverOptions... options)
+      throws SolverException, InterruptedException {
     if (context.getFormulaManager().getBooleanFormulaManager().isFalse(formulaUnderTest)) {
       failWithoutActual(
           Fact.fact("expected to be", "tautological"),
@@ -208,7 +215,8 @@ public final class BooleanFormulaSubject extends Subject {
     }
     checkIsUnsat(
         context.getFormulaManager().getBooleanFormulaManager().not(formulaUnderTest),
-        Fact.fact("expected to be", "tautological"));
+        Fact.fact("expected to be", "tautological"),
+        options);
   }
 
   /**
