@@ -216,6 +216,14 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
+
+    // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
+    BooleanFormula g =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
+            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(4)));
+
+    assertThatFormula(g).isUnsatisfiable();
   }
 
   @Test
