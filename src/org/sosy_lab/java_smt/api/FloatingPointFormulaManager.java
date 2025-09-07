@@ -275,8 +275,8 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that interprets the given bitvector as a floating-point value in the IEEE
-   * format, according to the given type. The sum of the sizes of exponent and mantissa of the
-   * target type plus 1 (for the hidden bit) needs to be equal to the size of the bitvector.
+   * format, according to the given type. The sum of the sizes of exponent and mantissa (including
+   * the hidden bit) of the target type needs to be equal to the size of the bitvector.
    *
    * <p>Note: This method will return a value that is (numerically) far away from the original
    * value. This method is completely different from {@link #castFrom}, which will produce a
@@ -287,7 +287,7 @@ public interface FloatingPointFormulaManager {
   /**
    * Create a formula that produces a representation of the given floating-point value as a
    * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
-   * sizes of the exponent and mantissa of the input formula plus 1 (for the hidden bit).
+   * sizes of the exponent and mantissa (including the hidden bit) of the input formula.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
 
