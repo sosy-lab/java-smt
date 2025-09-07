@@ -208,6 +208,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
+    T c = nmgr.makeVariable("c");
+
     T zero = nmgr.makeNumber(0);
 
     BooleanFormula f =
@@ -220,8 +222,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
     // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
     BooleanFormula g =
         bmgr.and(
-            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(2)),
-            nmgr.equal(nmgr.divide(a, zero), nmgr.makeNumber(4)));
+            nmgr.equal(nmgr.divide(a, zero), b),
+            nmgr.equal(nmgr.divide(a, zero), c),
+            bmgr.not(nmgr.equal(b, c)));
 
     assertThatFormula(g).isUnsatisfiable();
   }
