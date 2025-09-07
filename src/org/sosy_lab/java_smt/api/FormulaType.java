@@ -9,9 +9,9 @@
 package org.sosy_lab.java_smt.api;
 
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -208,75 +208,80 @@ public abstract class FormulaType<T extends Formula> {
 
   /**
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
-   * The mantissa size is expected to not include the sign bit.
+   * The mantissa size is expected to not include the hidden bit.
    *
    * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
-   *     include the sign bit, but this method expects the mantissa argument without the sign bit.
-   *     Use {@link #getFloatingPointTypeFromSizesWithoutSignBit(int, int)} instead if you want to
-   *     construct a {@link FloatingPointType} with the constructing method treating the mantissa
-   *     argument without the sign bit, and {@link #getFloatingPointTypeFromSizesWithSignBit(int,
-   *     int)} if you want it to include the sign bit in the size of the mantissa argument.
+   *     include the hidden bit, but this method expects the mantissa argument without the hidden
+   *     bit. Use {@link #getFloatingPointTypeFromSizesWithoutHiddenBit(int, int)} instead if you
+   *     want to construct a {@link FloatingPointType} with the constructing method treating the
+   *     mantissa argument without the hidden bit, and {@link
+   *     #getFloatingPointTypeFromSizesWithHiddenBit(int, int)} if you want it to include the hidden
+   *     bit in the size of the mantissa argument.
    * @param exponentSize size of the exponent for the base of the floating-point
-   * @param mantissaSizeWithoutSignBit size of the mantissa (also called a coefficient or
-   *     significant), excluding the sign bit.
+   * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
+   *     significant), excluding the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
   @Deprecated(since = "6.0", forRemoval = true)
   @InlineMe(
       replacement =
-          "FormulaType.getFloatingPointTypeFromSizesWithoutSignBit(exponentSize,"
-              + " mantissaSizeWithoutSignBit)",
+          "FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
+              + " mantissaSizeWithoutHiddenBit)",
       imports = "org.sosy_lab.java_smt.api.FormulaType")
   public static FloatingPointType getFloatingPointType(
-      int exponentSize, int mantissaSizeWithoutSignBit) {
-    return getFloatingPointTypeFromSizesWithoutSignBit(exponentSize, mantissaSizeWithoutSignBit);
+      int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    return getFloatingPointTypeFromSizesWithoutHiddenBit(
+        exponentSize, mantissaSizeWithoutHiddenBit);
   }
 
   /**
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
-   * The mantissa size is expected to not include the sign bit. The total size of the constructed
+   * The mantissa size is expected to not include the hidden bit. The total size of the constructed
    * type is equal to the addition of the two arguments plus one, as in: total size == exponentSize
-   * + mantissaSizeWithoutSignBit + 1.
+   * + mantissaSizeWithoutHiddenBit + 1.
    *
    * <p>Using the arguments e and m, calling this method with
-   * getFloatingPointTypeFromSizesWithoutSignBit (e, m) returns a type equal to a type constructed
-   * by {@link #getFloatingPointTypeFromSizesWithSignBit(int, int)} with the same arguments e and m
-   * as before, but m incremented by 1, as in getFloatingPointTypeFromSizesWithSignBit(e, m + 1).
+   * getFloatingPointTypeFromSizesWithoutHiddenBit (e, m) returns a type equal to a type constructed
+   * by {@link #getFloatingPointTypeFromSizesWithHiddenBit(int, int)} with the same arguments e and
+   * m as before, but m incremented by 1, as in getFloatingPointTypeFromSizesWithHiddenBit(e, m +
+   * 1).
    *
    * @param exponentSize size of the exponent for the base of the floating-point
-   * @param mantissaSizeWithoutSignBit size of the mantissa (also called a coefficient or
-   *     significant), excluding the sign bit.
+   * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
+   *     significant), excluding the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
-  public static FloatingPointType getFloatingPointTypeFromSizesWithoutSignBit(
-      int exponentSize, int mantissaSizeWithoutSignBit) {
-    return new FloatingPointType(exponentSize, mantissaSizeWithoutSignBit);
+  public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
+      int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    return new FloatingPointType(exponentSize, mantissaSizeWithoutHiddenBit);
   }
 
   /**
    * Constructs a new IEEE-754 {@link FloatingPointType} with the given exponent and mantissa sizes.
-   * The mantissa size is expected to include the sign bit. The total size of the constructed type
+   * The mantissa size is expected to include the hidden bit. The total size of the constructed type
    * is equal to the addition of the two arguments, as in: total size == exponentSize +
-   * mantissaSizeWithSignBit.
+   * mantissaSizeWithHiddenBit.
    *
    * <p>Using the arguments e and m, calling this method with
-   * getFloatingPointTypeFromSizesWithSignBit(e, m) returns a type equal to a type constructed by
-   * {@link #getFloatingPointTypeFromSizesWithoutSignBit(int, int)} with the same arguments e and m
-   * as before, but m decremented by 1, as in getFloatingPointTypeFromSizesWithoutSignBit(e, m - 1).
+   * getFloatingPointTypeFromSizesWithHiddenBit(e, m) returns a type equal to a type constructed by
+   * {@link #getFloatingPointTypeFromSizesWithoutHiddenBit(int, int)} with the same arguments e and
+   * m as before, but m decremented by 1, as in getFloatingPointTypeFromSizesWithoutHiddenBit(e, m -
+   * 1).
    *
    * @param exponentSize size of the exponent for the base of the floating-point
-   * @param mantissaSizeWithSignBit size of the mantissa (also called a coefficient or significant),
-   *     including the sign bit.
+   * @param mantissaSizeWithHiddenBit size of the mantissa (also called a coefficient or
+   *     significant), including the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
-  public static FloatingPointType getFloatingPointTypeFromSizesWithSignBit(
-      int exponentSize, int mantissaSizeWithSignBit) {
-    return getFloatingPointTypeFromSizesWithoutSignBit(exponentSize, mantissaSizeWithSignBit - 1);
+  public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
+      int exponentSize, int mantissaSizeWithHiddenBit) {
+    return getFloatingPointTypeFromSizesWithoutHiddenBit(
+        exponentSize, mantissaSizeWithHiddenBit - 1);
   }
 
   /**
    * @return single precision {@link FloatingPointType} with exponent sized 8, and mantissa sized 24
-   *     (including the sign bit).
+   *     (including the hidden bit).
    */
   public static FloatingPointType getSinglePrecisionFloatingPointType() {
     return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
@@ -284,7 +289,7 @@ public abstract class FormulaType<T extends Formula> {
 
   /**
    * @return double precision {@link FloatingPointType} with exponent sized 11, and mantissa sized
-   *     53 (including the sign bit).
+   *     53 (including the hidden bit).
    */
   public static FloatingPointType getDoublePrecisionFloatingPointType() {
     return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;
@@ -295,19 +300,19 @@ public abstract class FormulaType<T extends Formula> {
 
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
         new FloatingPointType(
-            SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
+            SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
     private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE =
         new FloatingPointType(
-            DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
+            DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
 
     private final int exponentSize;
-    // The SMTLib2 standard defines the mantissa size as including the sign bit. We do not include
+    // The SMTLib2 standard defines the mantissa size as including the hidden bit. We do not include
     // it here though.
-    private final int mantissaSizeWithoutSignBit;
+    private final int mantissaSizeWithoutHiddenBit;
 
-    private FloatingPointType(int pExponentSize, int pMantissaSizeWithoutSignBit) {
+    private FloatingPointType(int pExponentSize, int pMantissaSizeWithoutHiddenBit) {
       exponentSize = pExponentSize;
-      mantissaSizeWithoutSignBit = pMantissaSizeWithoutSignBit;
+      mantissaSizeWithoutHiddenBit = pMantissaSizeWithoutHiddenBit;
     }
 
     @Override
@@ -322,45 +327,45 @@ public abstract class FormulaType<T extends Formula> {
 
     /**
      * Returns the size of the mantissa (also called a coefficient or significant), excluding the
-     * sign bit.
+     * hidden bit.
      *
      * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
-     *     include the sign bit, but this does not. Use {@link #getMantissaSizeWithoutSignBit()}
-     *     instead if you want the mantissa without the sign bit, and {@link
-     *     #getMantissaSizeWithSignBit()} if you want it to include the sign bit.
+     *     include the hidden bit, but this does not. Use {@link #getMantissaSizeWithoutHiddenBit()}
+     *     instead if you want the mantissa without the hidden bit, and {@link
+     *     #getMantissaSizeWithHiddenBit()} if you want it to include the hidden bit.
      */
     @Deprecated(since = "6.0", forRemoval = true)
     public int getMantissaSize() {
-      return mantissaSizeWithoutSignBit;
+      return mantissaSizeWithoutHiddenBit;
     }
 
     /**
      * Returns the size of the mantissa (also called a coefficient or significant), excluding the
-     * sign bit.
+     * hidden bit.
      */
-    public int getMantissaSizeWithoutSignBit() {
-      return mantissaSizeWithoutSignBit;
+    public int getMantissaSizeWithoutHiddenBit() {
+      return mantissaSizeWithoutHiddenBit;
     }
 
     /**
      * Returns the size of the mantissa (also called a coefficient or significant), including the
-     * sign bit.
+     * hidden bit.
      */
-    public int getMantissaSizeWithSignBit() {
-      return mantissaSizeWithoutSignBit + 1;
+    public int getMantissaSizeWithHiddenBit() {
+      return mantissaSizeWithoutHiddenBit + 1;
     }
 
     /**
      * Return the total size of a value of this type in bits. Equal to exponent + mantissa
-     * (including the sign bit).
+     * (including the hidden bit).
      */
     public int getTotalSize() {
-      return exponentSize + getMantissaSizeWithSignBit();
+      return exponentSize + getMantissaSizeWithHiddenBit();
     }
 
     @Override
     public int hashCode() {
-      return (31 + exponentSize) * 31 + mantissaSizeWithoutSignBit;
+      return (31 + exponentSize) * 31 + mantissaSizeWithoutHiddenBit;
     }
 
     @Override
@@ -373,17 +378,17 @@ public abstract class FormulaType<T extends Formula> {
       }
       FloatingPointType other = (FloatingPointType) obj;
       return this.exponentSize == other.exponentSize
-          && this.mantissaSizeWithoutSignBit == other.mantissaSizeWithoutSignBit;
+          && this.mantissaSizeWithoutHiddenBit == other.mantissaSizeWithoutHiddenBit;
     }
 
     @Override
     public String toString() {
-      return "FloatingPoint<exp=" + exponentSize + ",mant=" + getMantissaSizeWithSignBit() + ">";
+      return "FloatingPoint<exp=" + exponentSize + ",mant=" + getMantissaSizeWithHiddenBit() + ">";
     }
 
     @Override
     public String toSMTLIBString() {
-      return "(_ FloatingPoint " + exponentSize + " " + getMantissaSizeWithSignBit() + ")";
+      return "(_ FloatingPoint " + exponentSize + " " + getMantissaSizeWithHiddenBit() + ")";
     }
   }
 
@@ -586,8 +591,8 @@ public abstract class FormulaType<T extends Formula> {
     } else if (t.startsWith("FloatingPoint<")) {
       // FloatingPoint<exp=11,mant=52>
       List<String> exman = Splitter.on(',').limit(2).splitToList(t.substring(14, t.length() - 1));
-      // SMTLIB2 standard expects the sign bit to be part of the mantissa
-      return FormulaType.getFloatingPointTypeFromSizesWithSignBit(
+      // SMTLIB2 standard expects the hidden bit to be part of the mantissa
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
           Integer.parseInt(exman.get(0).substring(4)), Integer.parseInt(exman.get(1).substring(5)));
     } else if (t.startsWith("Bitvector<")) {
       // Bitvector<32>

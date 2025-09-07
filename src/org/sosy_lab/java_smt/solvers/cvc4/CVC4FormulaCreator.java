@@ -114,7 +114,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Type getFloatingPointType(FloatingPointType pType) {
     return exprManager.mkFloatingPointType(
-        pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
+        pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -154,8 +154,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
-          FormulaType.getFloatingPointTypeFromSizesWithSignBit(
-              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with sign bit
+          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
@@ -181,8 +181,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointTypeFromSizesWithSignBit(
-          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with sign bit
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
     } else if (t.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
@@ -629,7 +629,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fp = fpExpr.getConstFloatingPoint();
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
-    // CVC4 returns the mantissa with the sign bit, hence - 1
+    // CVC4 returns the mantissa with the hidden bit, hence - 1
     final var mantWidthWithoutSignBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");

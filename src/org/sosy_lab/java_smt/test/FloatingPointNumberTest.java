@@ -11,9 +11,9 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT;
+import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 
 import com.google.common.base.Strings;
 import java.math.BigInteger;
@@ -52,7 +52,7 @@ public class FloatingPointNumberTest {
           FloatingPointNumber.of(
               bits,
               SINGLE_PRECISION_EXPONENT_SIZE,
-              SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
+              SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
       assertThat(fpNum.floatValue()).isEqualTo(f);
       assertThat(fpNum.doubleValue()).isEqualTo((double) f); // float is a strict subtype of double.
     }
@@ -87,7 +87,7 @@ public class FloatingPointNumberTest {
           FloatingPointNumber.of(
               bits,
               DOUBLE_PRECISION_EXPONENT_SIZE,
-              DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_SIGN_BIT);
+              DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
       assertThat(fpNum.doubleValue()).isEqualTo(d);
     }
   }

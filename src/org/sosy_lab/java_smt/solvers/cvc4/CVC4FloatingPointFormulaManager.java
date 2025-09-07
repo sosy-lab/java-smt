@@ -50,7 +50,7 @@ public class CVC4FloatingPointFormulaManager
   // TODO Is there a difference in `FloatingPointSize` and `FloatingPointType` in CVC4?
   // They are both just pairs of `exponent size` and `significant size`.
   private static FloatingPointSize getFPSize(FloatingPointType pType) {
-    return new FloatingPointSize(pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
+    return new FloatingPointSize(pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -86,11 +86,12 @@ public class CVC4FloatingPointFormulaManager
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     final String signStr = sign.isNegative() ? "1" : "0";
     final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
-    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSizeWithoutSignBit());
+    final String mantissaStr =
+        getBvRepresentation(mantissa, type.getMantissaSizeWithoutHiddenBit());
     final String bitvecStr = signStr + exponentStr + mantissaStr;
     final BitVector bitVector = new BitVector(bitvecStr, 2);
     final FloatingPoint fp =
-        new FloatingPoint(type.getExponentSize(), type.getMantissaSizeWithSignBit(), bitVector);
+        new FloatingPoint(type.getExponentSize(), type.getMantissaSizeWithHiddenBit(), bitVector);
     return exprManager.mkConst(fp);
   }
 
@@ -106,7 +107,7 @@ public class CVC4FloatingPointFormulaManager
 
     final Rational rat = toRational(pN);
     final BigInteger upperBound =
-        getBiggestNumberBeforeInf(pType.getMantissaSizeWithoutSignBit(), pType.getExponentSize());
+        getBiggestNumberBeforeInf(pType.getMantissaSizeWithoutHiddenBit(), pType.getExponentSize());
 
     if (rat.greater(Rational.fromDecimal(upperBound.negate().toString()))
         && rat.less(Rational.fromDecimal(upperBound.toString()))) {
@@ -123,10 +124,10 @@ public class CVC4FloatingPointFormulaManager
   }
 
   // TODO lookup why this number works: <code>2**(2**(exp-1)) - 2**(2**(exp-1)-2-mant)</code>
-  private static BigInteger getBiggestNumberBeforeInf(int mantissaWithoutSignBit, int exponent) {
+  private static BigInteger getBiggestNumberBeforeInf(int mantissaWithoutHiddenBit, int exponent) {
     int boundExponent = BigInteger.valueOf(2).pow(exponent - 1).intValueExact();
     BigInteger upperBoundExponent = BigInteger.valueOf(2).pow(boundExponent);
-    int mantissaExponent = boundExponent - 2 - mantissaWithoutSignBit;
+    int mantissaExponent = boundExponent - 2 - mantissaWithoutHiddenBit;
     if (mantissaExponent >= 0) { // ignore negative mantissaExponent
       upperBoundExponent = upperBoundExponent.subtract(BigInteger.valueOf(2).pow(mantissaExponent));
     }
@@ -215,7 +216,7 @@ public class CVC4FloatingPointFormulaManager
 
     } else if (formulaType.isBitvectorType()) {
       long pExponentSize = pTargetType.getExponentSize();
-      long pMantissaSize = pTargetType.getMantissaSizeWithSignBit();
+      long pMantissaSize = pTargetType.getMantissaSizeWithHiddenBit();
       FloatingPointSize fpSize = new FloatingPointSize(pExponentSize, pMantissaSize);
       FloatingPointConvertSort fpConvert = new FloatingPointConvertSort(fpSize);
       final Expr op;
@@ -355,16 +356,16 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr fromIeeeBitvectorImpl(Expr pBitvector, FloatingPointType pTargetType) {
-    int mantissaSizeWithoutSignBit = pTargetType.getMantissaSizeWithoutSignBit();
+    int mantissaSizeWithoutHiddenBit = pTargetType.getMantissaSizeWithoutHiddenBit();
     int size = pTargetType.getTotalSize();
-    // total size = mantissa without sign bit + sign bit + exponent
-    assert size == mantissaSizeWithoutSignBit + 1 + pTargetType.getExponentSize();
+    // total size = mantissa without hidden bit + hidden bit + exponent
+    assert size == mantissaSizeWithoutHiddenBit + 1 + pTargetType.getExponentSize();
 
     Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
     Expr exponentExtract =
-        exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSizeWithoutSignBit));
+        exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSizeWithoutHiddenBit));
     Expr mantissaExtract =
-        exprManager.mkConst(new BitVectorExtract(mantissaSizeWithoutSignBit - 1, 0));
+        exprManager.mkConst(new BitVectorExtract(mantissaSizeWithoutHiddenBit - 1, 0));
 
     Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, pBitvector);
     Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, pBitvector);
