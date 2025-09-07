@@ -1235,7 +1235,7 @@ public class FloatingPointFormulaManagerTest
   //  exponent equal the total size. This test checks this, + that it holds with to/from IEEE
   //  bitvector
   @Test
-  public void floatingPointMantissaSignBitWithBitvectorInterpretationSinglePrecision() {
+  public void bitvectorToFloatingPointMantissaSignBitInterpretationSinglePrecision() {
     int bvSize32 = singlePrecType.getTotalSize();
     BitvectorFormula bvNumber32 = bvmgr.makeBitvector(bvSize32, BigInteger.ZERO);
     // Sanity checks
@@ -1304,35 +1304,53 @@ public class FloatingPointFormulaManagerTest
     assertThat(
             ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getExponentSize())
         .isEqualTo(singlePrecType.getExponentSize());
+  }
 
-    if (solverSupportsNativeFPToBitvector()) {
-      BitvectorFormula bvToFpSinglePrecToBv = fpmgr.toIeeeBitvector(bvToFpSinglePrec);
-      assertThat(bvmgr.getLength(bvToFpSinglePrecToBv)).isEqualTo(bvSize32);
+  @Test
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationSinglePrecision() {
+    requireFPToBitvector();
 
-      BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
-      assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize32);
+    int bvSize32 = singlePrecType.getTotalSize();
+    BitvectorFormula bvNumber32 = bvmgr.makeBitvector(bvSize32, BigInteger.ZERO);
+    FloatingPointFormula bvToFpSinglePrec = fpmgr.fromIeeeBitvector(bvNumber32, singlePrecType);
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithSignBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithSignBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutSignBit(
+            singlePrecType.getExponentSize(), singlePrecType.getMantissaSizeWithoutSignBit());
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithSignBit);
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumber32, fpTypeWithoutSignBit);
 
-      BitvectorFormula bvToFpTypeWithoutSignBitToBv =
-          fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
-      assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize32);
+    // Check FP to BV conversion in regard to precision (all above is asserted in
+    //  bitvectorToFloatingPointMantissaSignBitInterpretationSinglePrecision())
+    BitvectorFormula bvToFpSinglePrecToBv = fpmgr.toIeeeBitvector(bvToFpSinglePrec);
+    assertThat(bvmgr.getLength(bvToFpSinglePrecToBv)).isEqualTo(bvSize32);
 
-      assume()
-          .withMessage(
-              "Bitwuzla equals on FPs/terms has a problem that needs to be addressed " + "first")
-          .that(solver)
-          .isNotEqualTo(Solvers.BITWUZLA);
+    BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize32);
 
-      assertThat(bvToFpSinglePrecToBv).isEqualTo(bvNumber32);
-      assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumber32);
-      assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumber32);
-    }
+    BitvectorFormula bvToFpTypeWithoutSignBitToBv =
+        fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize32);
+
+    assume()
+        .withMessage("Bitwuzla equals on FPs/terms has a problem that needs to be addressed first")
+        .that(solver)
+        .isNotEqualTo(Solvers.BITWUZLA);
+
+    assertThat(bvToFpSinglePrecToBv).isEqualTo(bvNumber32);
+    assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumber32);
+    assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumber32);
   }
 
   // The standard defines the mantissa such that it includes the sign bit, and mantissa +
-  //  exponent equal the total size. This test checks this, + that it holds with to/from IEEE
-  //  bitvector
+  //  exponent equal the total size. This test checks this, + that it holds with from
+  //  bitvector to IEEE FP
   @Test
-  public void floatingPointMantissaSignBitWithBitvectorInterpretationDoublePrecision() {
+  public void bitvectorToFloatingPointMantissaSignBitInterpretationDoublePrecision() {
     int bvSize64 = doublePrecType.getTotalSize();
     BitvectorFormula bvNumberSize64 = bvmgr.makeBitvector(bvSize64, BigInteger.ZERO);
     // Sanity checks
@@ -1401,28 +1419,47 @@ public class FloatingPointFormulaManagerTest
     assertThat(
             ((FloatingPointType) mgr.getFormulaType(bvToFpfpTypeWithoutSignBit)).getExponentSize())
         .isEqualTo(doublePrecType.getExponentSize());
+  }
 
-    if (solverSupportsNativeFPToBitvector()) {
-      BitvectorFormula bvToFpDoublePrecToBv = fpmgr.toIeeeBitvector(bvToFpDoublePrec);
-      assertThat(bvmgr.getLength(bvToFpDoublePrecToBv)).isEqualTo(bvSize64);
+  // Checks the correct precision/exponent/mantissa in FP to BV conversion
+  @Test
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationDoublePrecision() {
+    requireFPToBitvector();
 
-      BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
-      assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize64);
+    int bvSize64 = doublePrecType.getTotalSize();
+    BitvectorFormula bvNumberSize64 = bvmgr.makeBitvector(bvSize64, BigInteger.ZERO);
+    FloatingPointFormula bvToFpDoublePrec = fpmgr.fromIeeeBitvector(bvNumberSize64, doublePrecType);
+    FloatingPointType fpTypeWithSignBit =
+        getFloatingPointTypeFromSizesWithSignBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithSignBit());
+    FloatingPointType fpTypeWithoutSignBit =
+        getFloatingPointTypeFromSizesWithoutSignBit(
+            doublePrecType.getExponentSize(), doublePrecType.getMantissaSizeWithoutSignBit());
+    FloatingPointFormula bvToFpfpTypeWithSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithSignBit);
+    FloatingPointFormula bvToFpfpTypeWithoutSignBit =
+        fpmgr.fromIeeeBitvector(bvNumberSize64, fpTypeWithoutSignBit);
 
-      BitvectorFormula bvToFpTypeWithoutSignBitToBv =
-          fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
-      assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize64);
+    // Check FP to BV conversion in regard to precision (all above is asserted in
+    //  bitvectorToFloatingPointMantissaSignBitInterpretationDoublePrecision())
+    BitvectorFormula bvToFpDoublePrecToBv = fpmgr.toIeeeBitvector(bvToFpDoublePrec);
+    assertThat(bvmgr.getLength(bvToFpDoublePrecToBv)).isEqualTo(bvSize64);
 
-      assume()
-          .withMessage(
-              "Bitwuzla equals on FPs/terms has a problem that needs to be addressed " + "first")
-          .that(solver)
-          .isNotEqualTo(Solvers.BITWUZLA);
+    BitvectorFormula bvToFpTypeWithSignBitToBv = fpmgr.toIeeeBitvector(bvToFpfpTypeWithSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithSignBitToBv)).isEqualTo(bvSize64);
 
-      assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumberSize64);
-      assertThat(bvToFpDoublePrecToBv).isEqualTo(bvNumberSize64);
-      assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumberSize64);
-    }
+    BitvectorFormula bvToFpTypeWithoutSignBitToBv =
+        fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
+    assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize64);
+
+    assume()
+        .withMessage("Bitwuzla equals on FPs/terms has a problem that needs to be addressed first")
+        .that(solver)
+        .isNotEqualTo(Solvers.BITWUZLA);
+
+    assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumberSize64);
+    assertThat(bvToFpDoublePrecToBv).isEqualTo(bvNumberSize64);
+    assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumberSize64);
   }
 
   @Test
