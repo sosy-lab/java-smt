@@ -208,8 +208,8 @@ public interface BitvectorFormulaManager {
    * <p>We refer to the SMTLIB standard version 2.6 for the remainder operator in BV theory for
    * additional information.
    *
-   * @param dividend dividend of the operation. The hidden bit is carried over from this bitvector
-   *     for signed operations.
+   * @param dividend dividend of the operation. The sign bit is carried over from this bitvector for
+   *     signed operations.
    * @param divisor divisor of the operation.
    * @param signed whether to interpret all operands as signed or as unsigned numbers.
    */
@@ -407,7 +407,7 @@ public interface BitvectorFormulaManager {
    *
    * @param number The bitvector to extend.
    * @param extensionBits How many bits to add.
-   * @param signed Whether the extension should depend on the hidden bit.
+   * @param signed Whether the extension should depend on the sign bit.
    */
   BitvectorFormula extend(BitvectorFormula number, int extensionBits, boolean signed);
 
