@@ -296,8 +296,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : NAMES) {
       testName0(
           name,
@@ -335,8 +333,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       testName0(
           name,
@@ -401,10 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not (yet) return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
-              }
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -487,10 +480,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not return quantified variables.
                 assertThat(pBoundVariables).hasSize(1);
-              }
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -537,11 +527,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testBoolVariableDump() {
-    // FIXME: Broken on yices2
-    //  Yices does not quote symbols when dumping a formula, f.ex for the variable "(" we get
-    //    (declare-fun |(| () Bool)
-    //    (assert ()
-    //  which is not a valid SMTLIB script.
+    // FIXME: Broken on yices2, fixed in 2.7.0
     assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
@@ -610,8 +596,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBvArrayVariable() {
     requireArrays();
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
           v ->

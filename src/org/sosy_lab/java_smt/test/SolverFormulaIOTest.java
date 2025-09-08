@@ -363,7 +363,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
         .withMessage(
             "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.CVC5);
+        .isNotEqualTo(Solvers.YICES2);
 
     assume()
         .withMessage(

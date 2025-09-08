@@ -337,7 +337,6 @@ public abstract class SolverBasedTest0 {
   }
 
   protected void requireArrayModel() {
-    // INFO: OpenSmt does not support model generation for array
     assume()
         .withMessage("Solver %s does not support model generation for arrays", solverToUse())
         .that(solverToUse())
