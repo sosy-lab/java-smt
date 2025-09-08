@@ -110,7 +110,7 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression floor(IExpression number) {
-    throw new UnsupportedOperationException("floor is not supported in Princess");
+    return Rationals.ring2int((ITerm) number);
   }
 
   @Override

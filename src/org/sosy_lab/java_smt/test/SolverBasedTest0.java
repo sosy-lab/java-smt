@@ -27,7 +27,10 @@ import org.sosy_lab.common.ShutdownManager;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
+import org.sosy_lab.common.configuration.FileOption;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.configuration.converters.FileTypeConverter;
+import org.sosy_lab.common.io.PathTemplate;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -221,7 +224,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support floor for rationals", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.OPENSMT);
+        .isNotEqualTo(Solvers.OPENSMT);
   }
 
   /** Skip test if the solver does not support bitvectors. */

@@ -112,6 +112,10 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
+    assume()
+        .withMessage("Princees does not support universal quantification over rationals")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.PRINCESS);
 
     RationalFormula v = rmgr.makeVariable("v");
     // counterexample: all integers
@@ -122,6 +126,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void visitFloorTest() {
     requireRationals();
     requireRationalFloor();
+    // TODO Princess will rewrite floor. Add backtranslation in the visitor
+    assume()
+        .withMessage("We don't support \"floor\" in the Princess visitor")
+        .that(solverToUse())
+        .isEqualTo(Solvers.PRINCESS);
 
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
