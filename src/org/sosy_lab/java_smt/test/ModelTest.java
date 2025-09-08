@@ -1152,6 +1152,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
 
+    // FIXME Add support for multi-dimensional array to the Princess backend
+
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
         mgr.parse(
