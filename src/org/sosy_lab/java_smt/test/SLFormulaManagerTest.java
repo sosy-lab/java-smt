@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -34,21 +34,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
     return formulas.stream().reduce(slmgr::makeStar).orElse(bmgr.makeTrue());
   }
 
-  protected void requireSepNil() {
-    assume()
-        .withMessage("Java bindings for solver %s do not support SEP_NIL", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
-  }
-
-  protected void requireMultipleHeapSorts() {
-    assume()
-        .withMessage(
-            "Java bindings for solver %s do not support multiple heap sorts", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
-  }
-
   @Before
   public void setup() {
     requireSeparationLogic();
@@ -70,10 +55,9 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
   }
 
   @Test
-  public void testMakeEmptoP2() throws InterruptedException, SolverException {
-    requireMultipleHeapSorts();
+  public void testMakeEmpWithMultipleSorts() throws InterruptedException, SolverException {
     // Actually, no solver supports multiple heap sorts. However, our bindings for CVC5
-    // apply non-incremental mode for SL and use distinct solver instances for distinct queries.
+    // can not detect the heap sort for EMP, so we use a dummy sort (Int->Int) instead.
 
     BooleanFormula emptyHeapInt =
         slmgr.makeEmptyHeap(FormulaType.RationalType, FormulaType.BooleanType);
@@ -81,13 +65,42 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
         slmgr.makeEmptyHeap(FormulaType.IntegerType, FormulaType.IntegerType);
     BooleanFormula query = bmgr.and(emptyHeapInt, emptyHeapRat);
 
-    assertThatFormula(query).isSatisfiable(ProverOptions.ENABLE_SEPARATION_LOGIC);
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(ProverOptions.ENABLE_SEPARATION_LOGIC)) {
+      prover.push(query);
+      if (solverToUse() == Solvers.CVC5) {
+        assertThatEnvironment(prover).isSatisfiable();
+      } else {
+        assertThrows(Exception.class, () -> prover.isUnsat());
+      }
+      prover.pop();
+    }
+  }
+
+  @Test
+  public void testMakeEmpWithMultipleSortsInDistinctQueries()
+      throws InterruptedException, SolverException {
+    // Actually, no solver supports multiple heap sorts. However, our bindings for CVC5
+    // apply non-incremental mode for SL and use distinct solver instances for distinct queries.
+
+    BooleanFormula emptyHeapInt =
+        slmgr.makeEmptyHeap(FormulaType.RationalType, FormulaType.BooleanType);
+    BooleanFormula emptyHeapRat =
+        slmgr.makeEmptyHeap(FormulaType.IntegerType, FormulaType.IntegerType);
+
+    try (ProverEnvironment prover =
+        context.newProverEnvironment(ProverOptions.ENABLE_SEPARATION_LOGIC)) {
+      prover.push(emptyHeapInt);
+      assertThatEnvironment(prover).isSatisfiable();
+      prover.pop();
+      prover.push(emptyHeapRat);
+      assertThatEnvironment(prover).isSatisfiable();
+      prover.pop();
+    }
   }
 
   @Test
   public void testNotNilPtoNil() throws InterruptedException, SolverException {
-    requireSepNil();
-
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     BooleanFormula nilPtoNil = slmgr.makePointsTo(nil, nil);
 
@@ -96,8 +109,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testNilPtoValue() throws InterruptedException, SolverException {
-    requireSepNil();
-
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     IntegerFormula value = imgr.makeNumber(42);
     BooleanFormula nilPtoValue = slmgr.makePointsTo(nil, value);
@@ -107,8 +118,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testXPtoNil() throws InterruptedException, SolverException {
-    requireSepNil();
-
     IntegerFormula ptr = imgr.makeVariable("p");
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     BooleanFormula ptoNil = slmgr.makePointsTo(ptr, nil);
@@ -127,8 +136,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testPPtoNilThenPPtoNil() throws SolverException, InterruptedException {
-    requireSepNil();
-
     IntegerFormula ptr = imgr.makeVariable("p");
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     BooleanFormula ptoNil = slmgr.makePointsTo(ptr, nil);
@@ -141,14 +148,14 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
       prover.push(ptoNil);
       assertThatEnvironment(prover).isSatisfiable();
       assertThatEnvironment(prover).isSatisfiable();
+      assertThatEnvironment(prover).isSatisfiable();
+      assertThatEnvironment(prover).isSatisfiable();
       prover.pop();
     }
   }
 
   @Test
   public void testPtoNilThenPPto42() throws SolverException, InterruptedException {
-    requireSepNil();
-
     IntegerFormula ptr = imgr.makeVariable("p");
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     IntegerFormula value = imgr.makeNumber(42);
@@ -210,8 +217,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testSimpleTreeValid() throws InterruptedException, SolverException {
-    requireSepNil();
-
     // lets build a tree:
     // - each node consists of two integers: left and right
     // - each node pointer points to the left integer, the right integer is at pointer+1
@@ -250,8 +255,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testSimpleTreeInvalid() throws InterruptedException, SolverException {
-    requireSepNil();
-
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     IntegerFormula root = imgr.makeVariable("root");
     IntegerFormula left = imgr.makeVariable("left");
@@ -271,8 +274,6 @@ public class SLFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBa
 
   @Test
   public void testListValid() throws InterruptedException, SolverException {
-    requireSepNil();
-
     IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
     List<IntegerFormula> nodes = new ArrayList<>();
     for (int i = 0; i <= 10; i++) {
