@@ -126,11 +126,11 @@ public class RationalFormulaManagerTest extends SolverBasedTest0.ParameterizedSo
   public void visitFloorTest() {
     requireRationals();
     requireRationalFloor();
-    // TODO Princess will rewrite floor. Add backtranslation in the visitor
+    // TODO Princess will rewrite floor. Add back translation in the visitor
     assume()
         .withMessage("We don't support \"floor\" in the Princess visitor")
         .that(solverToUse())
-        .isEqualTo(Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula f = rmgr.floor(rmgr.makeVariable("v"));
     assertThat(mgr.extractVariables(f)).hasSize(1);
