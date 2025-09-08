@@ -73,7 +73,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   // TODO this method is highly recursive and should be rewritten with a proper visitor
   private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
-    if (expr.isConst() || expr.isNull()) {
+    if (expr.getKind() == Kind.SEP_NIL || expr.isConst() || expr.isNull()) {
       // We don't care about consts.
       return;
     } else if (expr.isVariable() && expr.getKind() == Kind.BOUND_VARIABLE) {
