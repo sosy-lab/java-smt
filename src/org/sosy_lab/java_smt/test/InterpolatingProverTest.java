@@ -199,11 +199,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
-
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
