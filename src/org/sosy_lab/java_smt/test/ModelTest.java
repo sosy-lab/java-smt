@@ -1729,7 +1729,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // supported yet
     // TODO: only filter out UF formulas here, not all
     if (solver != Solvers.BOOLECTOR) {
-      // CVC5 crashes here
       assertThatFormula(bmgr.and(pModelAssignments)).implies(constraint);
     }
   }
@@ -2401,8 +2400,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         false);
   }
 
-  @Test // (timeout = 10_000)
-  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  @Test(timeout = 10_000)
   public void testDeeplyNestedFormulaLIA() throws SolverException, InterruptedException {
     requireIntegers();
 
@@ -2412,8 +2410,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         var -> imgr.equal(var, imgr.makeNumber(1)));
   }
 
-  @Test // (timeout = 10_000)
-  // TODO CVC5 crashes on making the first boolean symbol when using timeout ???.
+  @Test(timeout = 10_000)
   public void testDeeplyNestedFormulaBV() throws SolverException, InterruptedException {
     requireBitvectors();
 
