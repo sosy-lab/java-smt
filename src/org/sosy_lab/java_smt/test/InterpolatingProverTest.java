@@ -262,11 +262,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
-
     int i = index.getFreshId();
 
     IntegerFormula zero = imgr.makeNumber(0);
