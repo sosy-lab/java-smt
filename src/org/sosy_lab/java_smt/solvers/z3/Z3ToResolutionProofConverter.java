@@ -481,10 +481,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     BooleanFormula t1 = (BooleanFormula) child.getFormula();
     BooleanFormula li = (BooleanFormula) node.getFormula();
 
-    BooleanFormula axiomFormula = bfm.or(bfm.not(T1), li);
+    BooleanFormula axiomFormula = bfm.or(bfm.not(t1), li);
     AxiomProof axiom = new AxiomProof(ResAxiom.AND_NEGATIVE, axiomFormula);
 
-    ResolutionProof res = new ResolutionProof(li, T1);
+    ResolutionProof res = new ResolutionProof(li, t1);
     res.addChild(axiom);
     res.addChild(child);
 
@@ -555,9 +555,12 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return iterativeResolution(node, ResAxiom.ASSUME);
   }
 
+  // Z3_OP_PR_PULL_QUANT: A proof for (iff (f (forall (x) q(x)) r) (forall (x) (f (q x) r))).
+  // This proof object has no antecedents.
   Proof handlePullQuant(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
+
 
   Proof handleElimUnusedVars(Z3Proof node) {
     throw new UnsupportedOperationException();
