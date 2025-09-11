@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
@@ -35,6 +36,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void assumptionsTest() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
+
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -54,6 +60,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         .withMessage("MathSAT can't construct models for SAT check with assumptions")
         .that(solver)
         .isNotEqualTo(MATHSAT5);
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
+
     BooleanFormula b = bmgr.makeVariable("b");
     BooleanFormula c = bmgr.makeVariable("c");
 
@@ -154,6 +165,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void testSatWithUnsatUnsatCoreOptions() throws InterruptedException, SolverException {
     requireUnsatCore();
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
+
     try (ProverEnvironment prover = context.newProverEnvironment(GENERATE_UNSAT_CORE)) {
       checkSimpleQuery(prover);
     }

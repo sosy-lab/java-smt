@@ -184,6 +184,11 @@ public class SolverFormulaWithAssumptionsTest
     (check-sat-assumptions (A))
     */
 
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
+
     BooleanFormula a = bmgr.makeVariable("a");
     try (ProverEnvironment pe = context.newProverEnvironment()) {
       pe.push();

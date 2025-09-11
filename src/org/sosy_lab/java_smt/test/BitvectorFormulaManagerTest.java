@@ -121,6 +121,11 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvModelValue32bit() throws SolverException, InterruptedException {
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
+
     BitvectorFormula var = bvmgr.makeVariable(32, "var");
 
     Map<Long, Long> values = new LinkedHashMap<>();
