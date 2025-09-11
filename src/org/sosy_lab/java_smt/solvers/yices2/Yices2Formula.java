@@ -82,6 +82,7 @@ abstract class Yices2Formula implements Formula {
     }
   }
 
+  @SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
   @Immutable
   static final class Yices2ArrayFormula<TI extends Formula, TE extends Formula>
       extends Yices2Formula implements ArrayFormula<TI, TE> {

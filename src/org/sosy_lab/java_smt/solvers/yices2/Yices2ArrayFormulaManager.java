@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractArrayFormulaManager;
 
+@SuppressWarnings({"ClassTypeParameterName", "MethodTypeParameterName"})
 public class Yices2ArrayFormulaManager
     extends AbstractArrayFormulaManager<Integer, Integer, Long, Integer> {
 
