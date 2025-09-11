@@ -610,8 +610,8 @@ public class Yices2NativeApiTest {
 
   @Test
   public void isThreadSafe() {
-    // TODO: this explains why our concurrency tests fail ;D FIX!
-    assertThat(yices_is_thread_safe()).isEqualTo(0);
+    // Check that we compiled with --thread-safety to make it reentrant
+    assertThat(yices_is_thread_safe()).isEqualTo(1);
   }
 
   @Test

@@ -146,14 +146,14 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support integers")
         .that(solver)
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.YICES2, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA);
   }
 
   private void requireBitvectors() {
     assume()
         .withMessage("Solver does not support bitvectors")
         .that(solver)
-        .isNoneOf(Solvers.SMTINTERPOL, Solvers.YICES2, Solvers.OPENSMT);
+        .isNoneOf(Solvers.SMTINTERPOL, Solvers.OPENSMT);
   }
 
   private void requireOptimization() {
@@ -298,7 +298,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS, Solvers.YICES2);
 
     ConcurrentLinkedQueue<ContextAndFormula> contextAndFormulaList = new ConcurrentLinkedQueue<>();
 
@@ -535,7 +535,7 @@ public class SolverConcurrencyTest {
     assume()
         .withMessage("Solver does not support translation of formulas")
         .that(solver)
-        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.PRINCESS);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5, Solvers.YICES2, Solvers.PRINCESS);
 
     // This is fine! We might access this more than once at a time,
     // but that gives only access to the bucket, which is threadsafe.
