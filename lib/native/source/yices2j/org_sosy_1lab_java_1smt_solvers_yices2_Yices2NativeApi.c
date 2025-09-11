@@ -1599,6 +1599,13 @@ CALL0(int, is_thread_safe)
 INT_RETURN
 
 /*
+ * Check if yices was compiled with MCSAT support
+ */
+DEFINE_FUNC(int, 1has_1mcsat) WITHOUT_ARGS
+CALL0(int, has_mcsat)
+INT_RETURN
+
+/*
  * The function first checks whether f is satisifiable or unsatisfiable.
  *
  */

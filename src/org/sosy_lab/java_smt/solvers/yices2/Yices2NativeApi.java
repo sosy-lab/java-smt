@@ -796,6 +796,11 @@ public final class Yices2NativeApi {
    */
   public static native int yices_is_thread_safe();
 
+  /**
+   * @return int 1 if the Yices2-lib is compiled with MCSAT support and 0 otherwise
+   */
+  public static native int yices_has_mcsat();
+
   /** The function first checks whether f is satisifiable or unsatisfiable. */
   public static native int yices_check_formula(int term, String logic, long model, String delegate);
 
