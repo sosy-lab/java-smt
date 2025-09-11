@@ -242,13 +242,13 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
         return handleUnitResolution(node);
 
       case IFF_TRUE:
-        return handleIffTrue(node);
+        handleIffTrue(node);
 
       case IFF_FALSE:
-        return handleIffFalse(node);
+        handleIffFalse(node);
 
       case COMMUTATIVITY:
-        return handleCommutativity(node);
+        handleCommutativity(node);
 
       case DEF_AXIOM:
         return handleDefAxiom(node);
@@ -617,28 +617,50 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return axiom;
   }
 
+  // Z3_OP_PR_LEMMA:
+  //
+  //          T1: false
+  //          [lemma T1]: (or (not l_1) ... (not l_n))
+  //
+  //      This proof object has one antecedent: a hypothetical proof for false.
+  //      It converts the proof in a proof for (or (not l_1) ... (not l_n)),
+  //      when T1 contains the open hypotheses: l_1, ..., l_n.
+  //      The hypotheses are closed after an application of a lemma.
+  //      Furthermore, there are no other open hypotheses in the subtree covered by
+  //      the lemma.
   Proof handleLemma(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
+  // Z3_OP_PR_UNIT_RESOLUTION:
+  //       \nicebox{
+  //          T1:      (or l_1 ... l_n l_1' ... l_m')
+  //          T2:      (not l_1)
+  //          ...
+  //          T(n+1):  (not l_n)
+  //          [unit-resolution T1 ... T(n+1)]: (or l_1' ... l_m')
+  //          }
+  // Resolve one by one, creating a resolution step for every Ti in the proof.
   Proof handleUnitResolution(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Proof handleIffTrue(Z3Proof node) {
-    throw new UnsupportedOperationException();
+  void handleIffTrue(Z3Proof node) {
+    //do nothing
   }
 
-  Proof handleIffFalse(Z3Proof node) {
-    throw new UnsupportedOperationException();
+  void handleIffFalse(Z3Proof node) {
+    //do nothing
   }
 
-  Proof handleCommutativity(Z3Proof node) {
-    throw new UnsupportedOperationException();
-  }
+  void handleCommutativity(Z3Proof node) {
+//do nothing
+}
 
   Proof handleDefAxiom(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
   Proof handleAssumptionAdd(Z3Proof node) {
