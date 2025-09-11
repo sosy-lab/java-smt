@@ -13,7 +13,6 @@ package org.sosy_lab.java_smt.solvers.z3;
 import static org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.MODUS_PONENS;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -379,7 +378,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   Proof handleTransitivityStar(Z3Proof node) {
     return iterativeResolution(node, ResAxiom.TRANSITIVITY);
   }
-  
+
   // There seems to be no equivalent singular axiom in RESOLUTE for the encoding of the
   // Z3_MONOTONICITY Proof Rule:
   // " Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
@@ -396,10 +395,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // oracle_(rule) proof rule, e.g.: oracle_Z3_monotonicity to be able to introduce the rule as a
   // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
   // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
- Proof handleMonotonicity(Z3Proof node) {
+  Proof handleMonotonicity(Z3Proof node) {
     return iterativeResolution(node, ResAxiom.ORACLE);
   }
-  
+
   // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
   // Z3_OP_PR_MONOTONICITY: Monotonicity proof object.
   //
@@ -414,7 +413,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-// From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+  // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
   // Z3_OP_PR_BIND: Given a proof p,
   // produces a proof of lambda x . p, where x are free variables in p.
   //
@@ -440,7 +439,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
-// From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
+  // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
   //  - Z3_OP_PR_DISTRIBUTIVITY: Distributivity proof object.
   //          Given that f (= or) distributes over g (= and), produces a proof for
   //          \nicebox{
@@ -491,13 +490,13 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
- // Z3_OP_PR_NOT_OR_ELIM: Given a proof for (not (or l_1 ... l_n)), produces a proof for (not l_i).
+  // Z3_OP_PR_NOT_OR_ELIM: Given a proof for (not (or l_1 ... l_n)), produces a proof for (not l_i).
   //
   //         T1: (not (or l_1 ... l_n))
   //         [not-or-elim T1]: (not l_i)
   // This is exactly the RESOLUTE axiom "or+": (+(or l_1 ... l_n) -(l_i))
   // Introduce node with said axiom and use the proof T1 to resolve the conjunction and prove not
-  // l_i through resolution  
+  // l_i through resolution
   Proof handleNotOrElim(Z3Proof node) {
 
     List<Proof> children = new ArrayList<>(node.getChildren());
@@ -518,8 +517,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resNode;
   }
 
-
- // Z3_OP_PR_REWRITE: A proof for a local rewriting step (= t s).
+  // Z3_OP_PR_REWRITE: A proof for a local rewriting step (= t s).
   //        The head function symbol of t is interpreted.
   //
   //        This proof object has no antecedents.
@@ -551,7 +549,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Since this is also a rewrite, use the assume axiom here for the clause NOT (AND p0 ... pn)
   // OR (= t s) where pi is an antecedent. This lets us resolve all the antecedents with this
   // clause and conclude (= t s)
-   Proof handleRewriteStar(Z3Proof node) {
+  Proof handleRewriteStar(Z3Proof node) {
     return iterativeResolution(node, ResAxiom.ASSUME);
   }
 
@@ -609,6 +607,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     AxiomProof axiomProof = new AxiomProof(ResAxiom.FORALL_NEGATIVE, formula);
     return axiomProof;
   }
+
   // Z3_OP_PR_HYPOTHESIS: Mark a hypothesis in a natural deduction style proof.
   // Assume the hypothesis
   Proof handleHypothesis(Z3Proof node) {
@@ -646,16 +645,16 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   void handleIffTrue(Z3Proof node) {
-    //do nothing
+    // do nothing
   }
 
   void handleIffFalse(Z3Proof node) {
-    //do nothing
+    // do nothing
   }
 
   void handleCommutativity(Z3Proof node) {
-//do nothing
-}
+    // do nothing
+  }
 
   Proof handleDefAxiom(Z3Proof node) {
     BooleanFormula conclusion = (BooleanFormula) node.getFormula();
@@ -723,7 +722,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
- //Creates a subtree of resolution rule applications
+  // Creates a subtree of resolution rule applications
   private ResolutionProof iterativeResolution(Z3Proof node, ResAxiom axiom) {
     List<Proof> children = new ArrayList<>(node.getChildren());
     int n = children.size();
@@ -757,7 +756,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
     return resNode;
   }
-  
+
   // This is for debugging purposes.
   void printProof(Proof node, int indentLevel) {
     String indent = "  ".repeat(indentLevel);
