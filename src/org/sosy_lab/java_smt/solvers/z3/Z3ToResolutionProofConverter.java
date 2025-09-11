@@ -587,9 +587,17 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-
+  // Z3_OP_PR_DER: A proof for destructive equality resolution:
+  //          (iff (forall (x) (or (not (= x t)) P[x])) P[t])
+  //          if x does not occur in t.
+  //
+  //          This proof object has no antecedents.
+  //
+  //          Several variables can be eliminated simultaneously.
+  // Analogous to the UNUSED_VARS rule.
   Proof handleDer(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    return new AxiomProof(ResAxiom.ASSUME, conclusion);
   }
 
   Proof handleQuantInst(Z3Proof node) {
