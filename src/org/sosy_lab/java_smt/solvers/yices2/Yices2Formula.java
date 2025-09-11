@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
 
 import com.google.errorprone.annotations.Immutable;
+import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 
@@ -76,6 +79,28 @@ abstract class Yices2Formula implements Formula {
   static final class Yices2BooleanFormula extends Yices2Formula implements BooleanFormula {
     Yices2BooleanFormula(int pTerm) {
       super(pTerm);
+    }
+  }
+
+  @Immutable
+  static final class Yices2ArrayFormula<TI extends Formula, TE extends Formula>
+      extends Yices2Formula implements ArrayFormula<TI, TE> {
+
+    private final FormulaType<TI> indexType;
+    private final FormulaType<TE> elementType;
+
+    Yices2ArrayFormula(Integer info, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
+      super(info);
+      this.indexType = checkNotNull(pIndexType);
+      this.elementType = checkNotNull(pElementType);
+    }
+
+    public FormulaType<TI> getIndexType() {
+      return indexType;
+    }
+
+    public FormulaType<TE> getElementType() {
+      return elementType;
     }
   }
 }

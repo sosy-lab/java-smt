@@ -279,7 +279,7 @@ public abstract class SolverBasedTest0 {
   }
 
   /** Skip test if the solver does not support arrays. */
-  protected /*final*/ void requireArrays() {
+  protected final void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
