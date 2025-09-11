@@ -402,7 +402,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       case YICES_APP_TERM:
         functionKind = FunctionDeclarationKind.UF;
         functionArgs = getArgs(pF);
-        functionName = yices_term_to_string(functionArgs.get(0));
+        functionName = yices_get_term_name(functionArgs.get(0));
         functionDeclaration = functionArgs.get(0);
         functionArgs.remove(0);
         break;
