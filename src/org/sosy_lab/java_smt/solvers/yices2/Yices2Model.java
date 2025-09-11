@@ -16,6 +16,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_SCALAR;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_TUPLE;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_UNKNOWN;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.tagForValKind;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
@@ -112,7 +113,8 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
     for (int i = 2; i < expandFun.length - 1; i += 2) {
       int[] expandMap;
       if (expandFun[i + 1] == YVAL_MAPPING) {
-        expandMap = yices_val_expand_mapping(model, expandFun[i], arity, expandFun[i + 1]);
+        expandMap =
+            yices_val_expand_mapping(model, expandFun[i], arity, tagForValKind(expandFun[i + 1]));
       } else {
         throw new IllegalArgumentException("Unexpected YVAL tag " + yval[1]);
       }

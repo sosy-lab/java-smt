@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ABS;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_AND;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_FF_CONSTANT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BIT_TERM;
@@ -160,6 +161,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
       ImmutableSet.of(
           YICES_BOOL_CONST,
           YICES_ARITH_CONST,
+          YICES_ARITH_FF_CONSTANT,
           YICES_BV_CONST,
           YICES_VARIABLE,
           YICES_UNINTERPRETED_TERM);
