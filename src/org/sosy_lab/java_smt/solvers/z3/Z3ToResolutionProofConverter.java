@@ -561,14 +561,32 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-
+  // Z3_OP_PR_ELIM_UNUSED_VARS:
+  //          A proof for (iff (forall (x_1 ... x_n y_1 ... y_m) p[x_1 ... x_n])
+  //                           (forall (x_1 ... x_n) p[x_1 ... x_n]))
+  //
+  //          It is used to justify the elimination of unused variables.
+  //          This proof object has no antecedents.
+  // Assume the equivalency. If this is used to substitute all occurrences of (forall (x_1 ...
+  // x_n y_1 ... y_m) p[x_1 ... x_n]) with (forall (x_1 ... x_n) p[x_1 ... x_n]) then a more
+  // complex process is needed.
   Proof handleElimUnusedVars(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    return new AxiomProof(ResAxiom.ASSUME, conclusion);
   }
 
+  // Z3_OP_PR_PUSH_QUANT: A proof for:
+  //       \nicebox{
+  //          (iff (forall (x_1 ... x_m) (and p_1[x_1 ... x_m] ... p_n[x_1 ... x_m]))
+  //               (and (forall (x_1 ... x_m) p_1[x_1 ... x_m])
+  //                 ...
+  //               (forall (x_1 ... x_m) p_n[x_1 ... x_m])))
+  //               }
+  //         This proof object has no antecedents.
   Proof handlePushQuant(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
+
 
   Proof handleDer(Z3Proof node) {
     throw new UnsupportedOperationException();
