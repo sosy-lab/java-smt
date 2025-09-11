@@ -484,11 +484,11 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     BooleanFormula axiomFormula = bfm.or(bfm.not(t1), li);
     AxiomProof axiom = new AxiomProof(ResAxiom.AND_NEGATIVE, axiomFormula);
 
-    ResolutionProof res = new ResolutionProof(li, t1);
-    res.addChild(axiom);
-    res.addChild(child);
+    ResolutionProof resNode = new ResolutionProof(li, t1);
+    resNode.addChild(axiom);
+    resNode.addChild(child);
 
-    return res;
+    return resNode;
   }
 
  // Z3_OP_PR_NOT_OR_ELIM: Given a proof for (not (or l_1 ... l_n)), produces a proof for (not l_i).
@@ -572,7 +572,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // complex process is needed.
   Proof handleElimUnusedVars(Z3Proof node) {
     BooleanFormula conclusion = (BooleanFormula) node.getFormula();
-    return new AxiomProof(ResAxiom.ASSUME, conclusion);
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
   // Z3_OP_PR_PUSH_QUANT: A proof for:
@@ -597,15 +598,23 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Analogous to the UNUSED_VARS rule.
   Proof handleDer(Z3Proof node) {
     BooleanFormula conclusion = (BooleanFormula) node.getFormula();
-    return new AxiomProof(ResAxiom.ASSUME, conclusion);
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
+  // Z3_OP_PR_QUANT_INST: A proof of (or (not (forall (x) (P x))) (P a))
+  // This is equivalent to the forall- axiom
   Proof handleQuantInst(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    AxiomProof axiomProof = new AxiomProof(ResAxiom.FORALL_NEGATIVE, formula);
+    return axiomProof;
   }
-
+  // Z3_OP_PR_HYPOTHESIS: Mark a hypothesis in a natural deduction style proof.
+  // Assume the hypothesis
   Proof handleHypothesis(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
   Proof handleLemma(Z3Proof node) {
