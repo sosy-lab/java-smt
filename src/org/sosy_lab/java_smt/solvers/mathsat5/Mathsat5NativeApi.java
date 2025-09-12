@@ -652,6 +652,14 @@ final class Mathsat5NativeApi {
 
   public static native boolean msat_term_is_bv_comp(long e, long t);
 
+  public static native boolean msat_term_is_fp_roundingmode_nearest_even(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_zero(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_plus_inf(long e, long t);
+
+  public static native boolean msat_term_is_fp_roundingmode_minus_inf(long e, long t);
+
   public static native boolean msat_term_is_quantifier(long e, long t);
 
   public static native boolean msat_term_is_forall(long e, long t);
