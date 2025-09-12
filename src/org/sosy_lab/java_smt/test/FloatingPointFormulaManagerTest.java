@@ -1309,7 +1309,8 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
-  public void floatingPointMantissaSignBitWithBitvectorInterpretationSinglePrecision() {
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationSinglePrecision()
+      throws SolverException, InterruptedException {
     requireFPToBitvector();
 
     int bvSize32 = singlePrecType.getTotalSize();
@@ -1338,21 +1339,9 @@ public class FloatingPointFormulaManagerTest
         fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
     assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize32);
 
-    assume()
-        .withMessage("Bitwuzla equals on FPs/terms has a problem that needs to be addressed first")
-        .that(solver)
-        .isNotEqualTo(Solvers.BITWUZLA);
-
-    // Z3 returns "(fp.to_ieee_bv ((_ to_fp 8 24) #x00000000))" for bvNumber32, which is valid,
-    //  but we should ask whether they can improve this
-    assume()
-        .withMessage("Z3 returns a formula consisting of the transformation")
-        .that(solver)
-        .isNotEqualTo(Z3);
-
-    assertThat(bvToFpSinglePrecToBv).isEqualTo(bvNumber32);
-    assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumber32);
-    assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumber32);
+    assertThatFormula(bvmgr.equal(bvToFpSinglePrecToBv, bvNumber32)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithSignBitToBv, bvNumber32)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithoutSignBitToBv, bvNumber32)).isTautological();
   }
 
   // The standard defines the mantissa such that it includes the hidden bit, and mantissa +
@@ -1433,7 +1422,8 @@ public class FloatingPointFormulaManagerTest
 
   // Checks the correct precision/exponent/mantissa in FP to BV conversion
   @Test
-  public void floatingPointMantissaSignBitWithBitvectorInterpretationDoublePrecision() {
+  public void floatingPointMantissaSignBitWithBitvectorInterpretationDoublePrecision()
+      throws SolverException, InterruptedException {
     requireFPToBitvector();
 
     int bvSize64 = doublePrecType.getTotalSize();
@@ -1462,19 +1452,9 @@ public class FloatingPointFormulaManagerTest
         fpmgr.toIeeeBitvector(bvToFpfpTypeWithoutSignBit);
     assertThat(bvmgr.getLength(bvToFpTypeWithoutSignBitToBv)).isEqualTo(bvSize64);
 
-    assume()
-        .withMessage("Bitwuzla equals on FPs/terms has a problem that needs to be addressed first")
-        .that(solver)
-        .isNotEqualTo(Solvers.BITWUZLA);
-
-    assume()
-        .withMessage("Z3 returns a formula consisting of the transformation")
-        .that(solver)
-        .isNotEqualTo(Z3);
-
-    assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumberSize64);
-    assertThat(bvToFpDoublePrecToBv).isEqualTo(bvNumberSize64);
-    assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumberSize64);
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithSignBitToBv, bvNumberSize64)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpDoublePrecToBv, bvNumberSize64)).isTautological();
+    assertThatFormula(bvmgr.equal(bvToFpTypeWithoutSignBitToBv, bvNumberSize64)).isTautological();
   }
 
   @Test
