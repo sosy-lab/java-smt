@@ -10,10 +10,6 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
-import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 import static org.sosy_lab.java_smt.api.FormulaType.getDoublePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
@@ -29,6 +25,11 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 public class FloatingPointNumberTest {
+
+  private static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
+  private static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 23;
+  private static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
+  private static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 52;
 
   @Test
   public void floatingPointNumberWithSinglePrecision() {
