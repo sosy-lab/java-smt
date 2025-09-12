@@ -15,11 +15,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -542,7 +542,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, Formula... args) {
-    return makeApplication(declaration, Arrays.asList(args));
+    return makeApplication(declaration, ImmutableList.copyOf(args));
   }
 
   @Override

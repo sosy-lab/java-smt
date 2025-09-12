@@ -58,7 +58,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -764,7 +763,7 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {
-    return toITermSeq(Arrays.asList(exprs));
+    return toITermSeq(ImmutableList.copyOf(exprs));
   }
 
   IExpression simplify(IExpression f) {
