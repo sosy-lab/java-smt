@@ -488,16 +488,13 @@ class PrincessFormulaCreator
       }
     }
 
-    ImmutableList.Builder<Formula> args = ImmutableList.builder();
-    ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-    int arity = input.length();
-    int arityStart = 0;
+    int numSortParameters = getNumSortParameters(kind);
+    int numIndices = FunctionDeclarationKind.getNumIndices(kind);
 
     PrincessFunctionDeclaration solverDeclaration;
-    if (isBitvectorOperationWithAdditionalArgument(kind)) {
+    if (numSortParameters > 0) {
       // the first argument is the bitsize, and it is not relevant for the user.
       // we do not want type/sort information as arguments.
-      arityStart = 1;
       if (input instanceof IAtom) {
         solverDeclaration = new PrincessBitvectorToBooleanDeclaration(((IAtom) input).pred());
       } else if (input instanceof IFunApp) {
@@ -518,7 +515,17 @@ class PrincessFormulaCreator
       solverDeclaration = new PrincessByExampleDeclaration(input);
     }
 
-    for (int i = arityStart; i < arity; i++) {
+    ImmutableList.Builder<Integer> indices = ImmutableList.builder();
+
+    for (int i = numSortParameters; i < numSortParameters + numIndices; i++) {
+      IExpression term = input.apply(i);
+      indices.add(((IIntLit) term).value().intValue());
+    }
+
+    ImmutableList.Builder<Formula> args = ImmutableList.builder();
+    ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
+
+    for (int i = numSortParameters + numIndices; i < input.length(); i++) {
       IExpression arg = input.apply(i);
       FormulaType<?> argumentType = getFormulaType(arg);
       args.add(encapsulate(argumentType, arg));
@@ -529,7 +536,12 @@ class PrincessFormulaCreator
         f,
         args.build(),
         FunctionDeclarationImpl.of(
-            getName(input), kind, argTypes.build(), getFormulaType(f), solverDeclaration));
+            getName(input),
+            kind,
+            indices.build(),
+            argTypes.build(),
+            getFormulaType(f),
+            solverDeclaration));
   }
 
   private <R> R visitQuantifier(FormulaVisitor<R> visitor, BooleanFormula f, IQuantified input) {
@@ -569,7 +581,8 @@ class PrincessFormulaCreator
         body, k -> "__JAVASMT__BOUND_VARIABLE_" + boundVariableNames.size());
   }
 
-  private boolean isBitvectorOperationWithAdditionalArgument(FunctionDeclarationKind kind) {
+  private int getNumSortParameters(FunctionDeclarationKind kind) {
+    // TODO Check that his is still right
     switch (kind) {
       case BV_NOT:
       case BV_NEG:
@@ -593,9 +606,14 @@ class PrincessFormulaCreator
       case BV_UGE:
       case BV_SGE:
       case BV_EQ:
-        return true;
+      case BV_LSHR:
+      case BV_ASHR:
+      case BV_SHL:
+        return 1;
+      case BV_CONCAT:
+        return 2;
       default:
-        return false;
+        return 0;
     }
   }
 
