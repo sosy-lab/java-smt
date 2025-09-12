@@ -130,11 +130,11 @@ public abstract class FloatingPointNumber {
   }
 
   /**
-   * Returns the size of the precision, i.e. the size of the exponent + the size of the mantissa
-   * including hidden bit.
+   * Returns the size of the precision, i.e. the single sign bit + the size of the exponent + the
+   * size of the mantissa (excluding the hidden bit).
    */
   public int getTotalSize() {
-    return getMantissaSizeWithHiddenBit() + getExponentSize();
+    return getMantissaSizeWithoutHiddenBit() + getExponentSize() + 1;
   }
 
   /**

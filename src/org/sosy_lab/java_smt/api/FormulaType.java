@@ -359,11 +359,11 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     /**
-     * Return the total size of a value of this type in bits. Equal to exponent + mantissa
-     * (including the hidden bit).
+     * Return the total size of a value of this type in bits. Equal to sign bit + size of the
+     * exponent + size of the mantissa (excluding the hidden bit).
      */
     public int getTotalSize() {
-      return exponentSize + getMantissaSizeWithHiddenBit();
+      return exponentSize + getMantissaSizeWithoutHiddenBit() + 1;
     }
 
     @Override
