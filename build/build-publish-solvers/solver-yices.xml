@@ -39,7 +39,7 @@ SPDX-License-Identifier: Apache-2.0
             <copy file="lib/native/source/yices2j/libyices2j.so" tofile="libyices2j-${yices2.version}.so"/>
 
             <ivy:resolve conf="solver-yices2" file="solvers_ivy_conf/ivy_yices2.xml" />
-            <publishToRepository solverName="Yices" solverVersion="${version}"/>
+            <publishToRepository solverName="Yices" solverVersion="${yices2.version}"/>
         </sequential>
     </target>
 

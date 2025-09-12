@@ -149,7 +149,7 @@ typedef void jvoid; // for symmetry to jint, jlong etc.
   if(arg##id < 0) { \
     throwException(jenv, "java/lang/IllegalArgumentException", "An yval_id cannot be negative."); \
   }\
-  if(arg##tag < 0 || arg##tag > 8) { \
+  if(arg##tag < 0 || arg##tag > 9) { \
     throwException(jenv, "java/lang/IllegalArgumentException", "Yval_tag is negative or not a valid yval_tag."); \
   } \
   m_arg##num->node_id = arg##id; \
