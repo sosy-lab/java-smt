@@ -23,11 +23,30 @@ import java.util.BitSet;
 @AutoValue
 public abstract class FloatingPointNumber {
 
-  // Mantissas do not include the hidden bit
+  // TODO: remove deprecated constants from public API after 6.0 release (and delete the unused).
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
-  public static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 23;
+
+  /**
+   * @deprecated this constant can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this constant does not.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
+  public static final int SINGLE_PRECISION_MANTISSA_SIZE = 23;
+
+  protected static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 23;
+
+  @Deprecated(since = "6.0", forRemoval = true)
   public static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
-  public static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 52;
+
+  /**
+   * @deprecated this constant can be confusing, as the SMTLIB2 standard expects the mantissa to
+   *     include the hidden bit, but this constant does not.
+   */
+  @Deprecated(since = "6.0", forRemoval = true)
+  public static final int DOUBLE_PRECISION_MANTISSA_SIZE = 52;
+
+  protected static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 52;
 
   public enum Sign {
     POSITIVE,

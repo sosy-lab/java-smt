@@ -298,9 +298,12 @@ public abstract class FormulaType<T extends Formula> {
   @Immutable
   public static final class FloatingPointType extends FormulaType<FloatingPointFormula> {
 
+    @SuppressWarnings("removal")
     private static final FloatingPointType SINGLE_PRECISION_FP_TYPE =
         new FloatingPointType(
             SINGLE_PRECISION_EXPONENT_SIZE, SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
+
+    @SuppressWarnings("removal")
     private static final FloatingPointType DOUBLE_PRECISION_FP_TYPE =
         new FloatingPointType(
             DOUBLE_PRECISION_EXPONENT_SIZE, DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
