@@ -264,7 +264,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
         return handleRedundantDel(node);
 
       case CLAUSE_TRAIL:
-        return handleClauseTrail(node);
+        handleClauseTrail(node);
 
       case DEF_INTRO:
         return handleDefIntro(node);
@@ -666,38 +666,107 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return currentRes;
   }
 
+  // Z3_OP_PR_IFF_TRUE:
+  //      \nicebox{
+  //       T1: p
+  //       [iff-true T1]: (iff p true)
+  //       }
+  // it proves the equivalence of p. Leaving as is will be tested otherwise using the
+  // BooleanFormulaManager.makeTrue() method should work.
   void handleIffTrue(Z3Proof node) {
     // do nothing
   }
 
+  // Z3_OP_PR_IFF_FALSE:
+  //      \nicebox{
+  //       T1: (not p)
+  //       [iff-false T1]: (iff p false)
+  //       }
+  // it proves the equivalence of p. Leaving as is will be tested otherwise using the
+  // BooleanFormulaManager.makeFalse() method should work.
   void handleIffFalse(Z3Proof node) {
     // do nothing
   }
-
+  // Z3_OP_PR_COMMUTATIVITY:
+  //
+  //          [comm]: (= (f a b) (f b a))
+  //
+  //          f is a commutative operator.
+  //
+  //          This proof object has no antecedents.
+  //          Remark: if f is bool, then = is iff.
+  // similar case to handleDistributivity
   void handleCommutativity(Z3Proof node) {
     // do nothing
   }
 
+  // Z3_OP_PR_DEF_AXIOM: Proof object used to justify Tseitin's like axioms:
+  //          \nicebox{
+  //          (or (not (and p q)) p)
+  //          (or (not (and p q)) q)
+  //          (or (not (and p q r)) p)
+  //          (or (not (and p q r)) q)
+  //          (or (not (and p q r)) r)
+  //          ...
+  //          (or (and p q) (not p) (not q))
+  //          (or (not (or p q)) p q)
+  //          (or (or p q) (not p))
+  //          (or (or p q) (not q))
+  //          (or (not (iff p q)) (not p) q)
+  //          (or (not (iff p q)) p (not q))
+  //          (or (iff p q) (not p) (not q))
+  //          (or (iff p q) p q)
+  //          (or (not (ite a b c)) (not a) b)
+  //          (or (not (ite a b c)) a c)
+  //          (or (ite a b c) (not a) (not b))
+  //          (or (ite a b c) a (not c))
+  //          (or (not (not a)) (not a))
+  //          (or (not a) a)
+  //          }
+  //          This proof object has no antecedents.
+  //          Note: all axioms are propositional tautologies.
+  //          Note also that 'and' and 'or' can take multiple arguments.
+  //          You can recover the propositional tautologies by
+  //          unfolding the Boolean connectives in the axioms a small
+  //          bounded number of steps (=3).
+  // Assume formula proven by this rule.
   Proof handleDefAxiom(Z3Proof node) {
     BooleanFormula conclusion = (BooleanFormula) node.getFormula();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
 
+  // Z3_OP_PR_ASSUMPTION_ADD
+  //     Clausal proof adding axiom
+  // assume formula
   Proof handleAssumptionAdd(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
+  // Z3_OP_PR_LEMMA_ADD
+  //     Clausal proof lemma addition
+  // assume formula
   Proof handleLemmaAdd(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
+    return axiom;
   }
 
+  // Z3_OP_PR_REDUNDANT_DEL
+  //     Clausal proof lemma deletion
+  // Possibility: delete whole subtree that was derived from using the redundant lemma. otherwise
+  // resolve it from clauses that may contain it.
   Proof handleRedundantDel(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
-  Proof handleClauseTrail(Z3Proof node) {
-    throw new UnsupportedOperationException();
+  // Z3_OP_PR_CLAUSE_TRAIL,
+  //     Clausal proof trail of additions and deletions
+  // this tracks the applications of additions and deletions.
+  void handleClauseTrail(Z3Proof node) {
+    //do nothing
   }
 
   Proof handleDefIntro(Z3Proof node) {
