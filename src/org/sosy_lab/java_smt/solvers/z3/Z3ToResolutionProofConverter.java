@@ -81,58 +81,60 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
   // This should help extract parts of a formula to better transform proof rules.
   private static final class ExtractorVisitor implements BooleanFormulaVisitor<TraversalProcess> {
-    private final List<BooleanFormula> equivalenceOperands = new ArrayList<>();
+    private final List<BooleanFormula> operands = new ArrayList<>();
 
-    public List<BooleanFormula> getEquivalenceOperands() {
-      return equivalenceOperands;
+    public List<BooleanFormula> getOperands() {
+      return operands;
     }
 
     @Override
     public TraversalProcess visitEquivalence(BooleanFormula left, BooleanFormula right) {
-      equivalenceOperands.add(left);
-      equivalenceOperands.add(right);
-      return TraversalProcess.CONTINUE;
+      operands.add(left);
+      operands.add(right);
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitImplication(BooleanFormula operand1, BooleanFormula operand2) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitConstant(boolean value) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitBoundVar(BooleanFormula var, int deBruijnIdx) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitNot(BooleanFormula operand) {
-      return TraversalProcess.CONTINUE;
+      operands.add(operand);
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitAnd(List<BooleanFormula> operands) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitOr(List<BooleanFormula> operands) {
-      return TraversalProcess.CONTINUE;
+      this.operands.addAll(operands);
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitXor(BooleanFormula operand1, BooleanFormula operand2) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitIfThenElse(
         BooleanFormula condition, BooleanFormula thenFormula, BooleanFormula elseFormula) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
@@ -141,20 +143,20 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
         BooleanFormula quantifiedAST,
         List<Formula> boundVars,
         BooleanFormula body) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
 
     @Override
     public TraversalProcess visitAtom(
         BooleanFormula atom, FunctionDeclaration<BooleanFormula> funcDecl) {
-      return TraversalProcess.CONTINUE;
+      return TraversalProcess.ABORT;
     }
   }
 
-  public List<BooleanFormula> extractEquivalenceOperands(BooleanFormula formula) {
+  public List<BooleanFormula> extractOperands(BooleanFormula formula) {
     ExtractorVisitor extractor = new ExtractorVisitor();
     bfm.visitRecursively(formula, extractor);
-    return extractor.getEquivalenceOperands();
+    return extractor.getOperands();
   }
 
   /**
@@ -346,8 +348,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula();
     BooleanFormula formula = (BooleanFormula) node.getFormula();
 
-    List<BooleanFormula> equivalenceOperands1 = extractEquivalenceOperands(t1);
-    List<BooleanFormula> equivalenceOperands2 = extractEquivalenceOperands(t2);
+    List<BooleanFormula> equivalenceOperands1 = extractOperands(t1);
+    List<BooleanFormula> equivalenceOperands2 = extractOperands(t2);
 
     assert equivalenceOperands1.get(1).equals(equivalenceOperands2.get(0));
 
@@ -376,7 +378,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // resolution proof. The resulting node has the same formula as the initial node from Z3 but also
   // includes the pivot used in the last resolution step.
   Proof handleTransitivityStar(Z3Proof node) {
-    return iterativeResolution(node, ResAxiom.TRANSITIVITY);
+    return iterativeResolutionWithAxiom(node, ResAxiom.TRANSITIVITY);
   }
 
   // There seems to be no equivalent singular axiom in RESOLUTE for the encoding of the
@@ -396,7 +398,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // clause: from ((R t_1 s_1) AND ... AND (R t_n s_n)) => (R (f t_1 ... t_n) (f s_1 ... s_n))
   // into (not (R t_1 s_1)) OR ... OR (not (R t_n s_n)) OR (R (f t_1 ... t_n) (f s_1 ... s_n))
   Proof handleMonotonicity(Z3Proof node) {
-    return iterativeResolution(node, ResAxiom.ORACLE);
+    return iterativeResolutionWithAxiom(node, ResAxiom.ORACLE);
   }
 
   // From https://github.com/Z3Prover/z3/blob/master/src/api/z3_api.h:
@@ -550,7 +552,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // OR (= t s) where pi is an antecedent. This lets us resolve all the antecedents with this
   // clause and conclude (= t s)
   Proof handleRewriteStar(Z3Proof node) {
-    return iterativeResolution(node, ResAxiom.ASSUME);
+    return iterativeResolutionWithAxiom(node, ResAxiom.ASSUME);
   }
 
   // Z3_OP_PR_PULL_QUANT: A proof for (iff (f (forall (x) q(x)) r) (forall (x) (f (q x) r))).
@@ -641,7 +643,27 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //          }
   // Resolve one by one, creating a resolution step for every Ti in the proof.
   Proof handleUnitResolution(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    List<Proof> children = new ArrayList<>(node.getChildren());
+    int n = children.size();
+
+    // First child is the large disjunction
+    Proof currentRes = children.get(0);
+
+    // Resolve iteratively with each subsequent "not l_i"
+    for (int i = 1; i < n; i++) {
+      Proof negChild = children.get(i);
+      BooleanFormula pivot = extractOperands((BooleanFormula) negChild.getFormula()).get(0);
+      List<BooleanFormula> operands =
+          extractOperands((BooleanFormula) currentRes.getFormula());
+      operands.remove(0);
+      BooleanFormula formula = bfm.or(operands);
+      ResolutionProof resNode = new ResolutionProof(formula, pivot);
+      resNode.addChild(currentRes);
+      resNode.addChild(negChild);
+      currentRes = resNode;
+    }
+
+    return currentRes;
   }
 
   void handleIffTrue(Z3Proof node) {
@@ -722,8 +744,11 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-  // Creates a subtree of resolution rule applications
-  private ResolutionProof iterativeResolution(Z3Proof node, ResAxiom axiom) {
+
+
+  // Creates a subtree of resolution rule applications after creating the axiom needed to then
+  // resolve each pivot.
+  private ResolutionProof iterativeResolutionWithAxiom(Z3Proof node, ResAxiom axiom) {
     List<Proof> children = new ArrayList<>(node.getChildren());
     int n = children.size();
     List<BooleanFormula> formulas = new ArrayList<>();
