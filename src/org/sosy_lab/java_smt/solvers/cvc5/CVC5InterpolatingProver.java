@@ -105,7 +105,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       Collection<Term> formulasA =
           FluentIterable.from(partitions.get(i - 1))
               .transform(assertedTerms.peek()::get)
-              .append(previousItp)
+              .append(new Term[] {previousItp}) // class Term is Iterable<Term>, be careful here
               .toSet();
       Collection<Term> formulasB =
           FluentIterable.concat(partitions.subList(i, n))
