@@ -91,7 +91,6 @@ public abstract class FloatingPointNumber {
    *     #getMantissaSizeWithHiddenBit()} if you want it to include the hidden bit.
    */
   @Deprecated(since = "6.0", forRemoval = true)
-  @InlineMe(replacement = "this.getMantissaSizeWithoutHiddenBit()")
   public final int getMantissaSize() {
     return getMantissaSizeWithoutHiddenBit();
   }
