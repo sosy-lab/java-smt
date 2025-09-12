@@ -653,8 +653,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     for (int i = 1; i < n; i++) {
       Proof negChild = children.get(i);
       BooleanFormula pivot = extractOperands((BooleanFormula) negChild.getFormula()).get(0);
-      List<BooleanFormula> operands =
-          extractOperands((BooleanFormula) currentRes.getFormula());
+      List<BooleanFormula> operands = extractOperands((BooleanFormula) currentRes.getFormula());
       operands.remove(0);
       BooleanFormula formula = bfm.or(operands);
       ResolutionProof resNode = new ResolutionProof(formula, pivot);
@@ -687,6 +686,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   void handleIffFalse(Z3Proof node) {
     // do nothing
   }
+
   // Z3_OP_PR_COMMUTATIVITY:
   //
   //          [comm]: (= (f a b) (f b a))
@@ -766,7 +766,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //     Clausal proof trail of additions and deletions
   // this tracks the applications of additions and deletions.
   void handleClauseTrail(Z3Proof node) {
-    //do nothing
+    // do nothing
   }
 
   Proof handleDefIntro(Z3Proof node) {
@@ -812,8 +812,6 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   Proof handleDefault(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
-
-
 
   // Creates a subtree of resolution rule applications after creating the axiom needed to then
   // resolve each pivot.
