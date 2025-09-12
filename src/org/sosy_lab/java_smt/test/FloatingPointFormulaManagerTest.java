@@ -12,6 +12,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -605,7 +606,7 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
+    if (!ImmutableSet.of(Z3, Solvers.CVC4).contains(solver)) {
       // check unequality for very large types
       FloatingPointType largeType = getFloatingPointTypeFromSizesWithoutHiddenBit(100, 100);
       FloatingPointFormula k1 =
@@ -1342,6 +1343,13 @@ public class FloatingPointFormulaManagerTest
         .that(solver)
         .isNotEqualTo(Solvers.BITWUZLA);
 
+    // Z3 returns "(fp.to_ieee_bv ((_ to_fp 8 24) #x00000000))" for bvNumber32, which is valid,
+    //  but we should ask whether they can improve this
+    assume()
+        .withMessage("Z3 returns a formula consisting of the transformation")
+        .that(solver)
+        .isNotEqualTo(Z3);
+
     assertThat(bvToFpSinglePrecToBv).isEqualTo(bvNumber32);
     assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumber32);
     assertThat(bvToFpTypeWithoutSignBitToBv).isEqualTo(bvNumber32);
@@ -1458,6 +1466,11 @@ public class FloatingPointFormulaManagerTest
         .withMessage("Bitwuzla equals on FPs/terms has a problem that needs to be addressed first")
         .that(solver)
         .isNotEqualTo(Solvers.BITWUZLA);
+
+    assume()
+        .withMessage("Z3 returns a formula consisting of the transformation")
+        .that(solver)
+        .isNotEqualTo(Z3);
 
     assertThat(bvToFpTypeWithSignBitToBv).isEqualTo(bvNumberSize64);
     assertThat(bvToFpDoublePrecToBv).isEqualTo(bvNumberSize64);
