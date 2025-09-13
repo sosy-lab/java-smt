@@ -61,14 +61,13 @@ public class Yices2ArrayFormulaManager
   protected <TI extends Formula, TE extends Formula> Integer internalMakeArray(
       FormulaType<TI> pIndexType, FormulaType<TE> pElementType, Integer defaultElement) {
     var arraySort = toSolverType(FormulaType.getArrayType(pIndexType, pElementType));
-    if (constCache.contains(arraySort, defaultElement)) {
-      return constCache.get(arraySort, defaultElement);
-    } else {
-      var constant =
+    var constantArray = constCache.get(arraySort, defaultElement);
+    if (constantArray == null) {
+      constantArray =
           yices_lambda(1, new int[] {yices_new_variable(toSolverType(pIndexType))}, defaultElement);
-      constCache.put(arraySort, defaultElement, constant);
-      return constant;
+      constCache.put(arraySort, defaultElement, constantArray);
     }
+    return constantArray;
   }
 
   @Override
