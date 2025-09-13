@@ -217,9 +217,9 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
       if (arity == 0) {
         if (app.equals(environment.getTheory().mTrue)) {
-          return visitor.visitConstant(f, Boolean.TRUE);
+          return visitor.visitConstant(f, true);
         } else if (app.equals(environment.getTheory().mFalse)) {
-          return visitor.visitConstant(f, Boolean.FALSE);
+          return visitor.visitConstant(f, false);
         } else if (func.getDefinition() == null) {
           return visitor.visitFreeVariable(f, dequote(input.toString()));
         } else {
