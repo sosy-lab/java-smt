@@ -716,6 +716,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
         // INFO: OpenSmt changes the order of the terms in the sum
         assertThat(_b_at_i_plus_1.toString()).isEqualTo("(select b (+ 1 i))");
         break;
+      case YICES2:
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(b (+ 1 i))");
+        break;
       default:
         assertThat(_b_at_i_plus_1.toString())
             .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
@@ -751,6 +754,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             .that(solver)
             .isNotEqualTo(Solvers.BOOLECTOR);
         break;
+      case YICES2:
+        assertThat(_b_at_i.toString()).isEqualTo("(b i)");
+        break;
       default:
         assertThat(_b_at_i.toString())
             .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
@@ -779,6 +785,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case PRINCESS:
         assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
         break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
+        break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
@@ -806,6 +815,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
         break;
       case PRINCESS:
         assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
+        break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -837,6 +849,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case MATHSAT5:
         assertThat(valueInMulti.toString())
             .isEqualTo("(`read_int_T(19)` (`read_int_T(20)` multi " + "i) i)");
+        break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
