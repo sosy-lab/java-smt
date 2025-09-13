@@ -532,7 +532,6 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     } catch (AssumptionViolatedException ave) {
       // ignore, i.e., do not report test-case as skipped.
     }
-    ;
   }
 
   private BooleanFormula genBoolExpr() {
