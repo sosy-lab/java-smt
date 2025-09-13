@@ -15,7 +15,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_APP_TER
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_GE_ATOM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARITH_SUM;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARRAY_EVAL;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_ARRAY_SELECT;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BIT_TERM;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BOOL_CONST;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YICES_BV_ARRAY;
@@ -477,7 +477,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           functionKind = FunctionDeclarationKind.SELECT;
           functionArgs = getArgs(pF);
           functionName = "select";
-          functionDeclaration = -YICES_ARRAY_EVAL;
+          functionDeclaration = -YICES_ARRAY_SELECT;
         }
         break;
       case YICES_UPDATE_TERM:
@@ -843,7 +843,7 @@ public class Yices2FormulaCreator extends FormulaCreator<Integer, Integer, Long,
           return yices_bvproduct(pArgs.size(), Ints.toArray(pArgs));
         case YICES_AND:
           return yices_and(pArgs.size(), Ints.toArray(pArgs));
-        case YICES_ARRAY_EVAL:
+        case YICES_ARRAY_SELECT:
           return yices_application(pArgs.get(0), 1, new int[] {pArgs.get(1)});
         case YICES_UPDATE_TERM:
           return yices_update(pArgs.get(0), 1, new int[] {pArgs.get(1)}, pArgs.get(2));
