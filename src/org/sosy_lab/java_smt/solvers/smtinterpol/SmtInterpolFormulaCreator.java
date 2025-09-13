@@ -179,15 +179,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     }
   }
 
-  /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
-  public static String dequote(String s) {
-    int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
-      return s.substring(1, l - 1);
-    }
-    return s;
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
     checkArgument(
