@@ -148,7 +148,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * extend the original model.
    */
   Collection<IFormula> getEvaluatedTerms() {
-    return Collections.unmodifiableCollection(evaluatedTerms);
+    return Collections.unmodifiableSet(evaluatedTerms);
   }
 
   /** Track an assignment `term == value` for an evaluated term and its value. */

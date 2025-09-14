@@ -1585,4 +1585,29 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     // check UF-equality. This check went wrong in CVC4 and was fixed.
     assertThat(usedDecls.get(1)).isEqualTo(usedDecls.get(3));
   }
+
+  @Test
+  public void testSl() throws SolverException, InterruptedException {
+    requireSeparationLogic();
+
+    // check constants
+    ConstantsVisitor visitor = new ConstantsVisitor(true);
+    mgr.visit(slmgr.makePointsTo(imgr.makeNumber(3), imgr.makeNumber(5)), visitor);
+    assertThat(visitor.found).containsExactly(BigInteger.valueOf(3), BigInteger.valueOf(5));
+
+    // check variables
+    ImmutableMap<String, Formula> vars =
+        mgr.extractVariables(
+            slmgr.makePointsTo(imgr.makeVariable("pointer"), imgr.makeVariable("value")));
+    assertThat(vars.keySet()).containsExactly("pointer", "value");
+
+    // check trasnformation
+    BooleanFormula f =
+        slmgr.makeStar(
+            slmgr.makePointsTo(imgr.makeNumber(3), imgr.makeNumber(5)),
+            slmgr.makePointsTo(imgr.makeVariable("pointer"), imgr.makeVariable("value")));
+    BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    assertThat(f2).isEqualTo(f);
+    assertThatFormula(f).isEquivalentTo(f2);
+  }
 }

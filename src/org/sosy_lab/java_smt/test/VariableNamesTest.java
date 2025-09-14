@@ -397,7 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-                assertThat(pBoundVariables).hasSize(1);
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -480,7 +480,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-                assertThat(pBoundVariables).hasSize(1);
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);

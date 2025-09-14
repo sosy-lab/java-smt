@@ -73,6 +73,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     requireIntegers();
     requireArrays();
 
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+
     x = imgr.makeVariable("x");
     a = amgr.makeArray("a", FormulaType.IntegerType, FormulaType.IntegerType);
 
@@ -85,7 +87,8 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void setUpBV() {
     requireBitvectors();
     requireArrays();
-    requireQuantifiers();
+
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
 
     xbv = bvmgr.makeVariable(bvWidth, "xbv");
     bvArray =
