@@ -19,7 +19,6 @@ import com.google.common.truth.SimpleSubjectBuilder;
 import com.google.common.truth.StandardSubjectBuilder;
 import com.google.common.truth.Subject;
 import com.google.common.truth.Truth;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -39,7 +38,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * {@link StandardSubjectBuilder#about(com.google.common.truth.Subject.Factory)} and set a solver
  * via the method {@link #booleanFormulasOf(SolverContext)}.
  */
-@SuppressFBWarnings("EQ_DOESNT_OVERRIDE_EQUALS")
 public final class BooleanFormulaSubject extends Subject {
 
   private final SolverContext context;
