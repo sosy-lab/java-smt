@@ -29,6 +29,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
@@ -53,7 +54,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * Values returned by {@link Model#evaluate(Formula)}.
    *
    * <p>We need to record these to make sure that the values returned by the evaluator are
-   * consistant. Calling {@link #isUnsat()} will reset this list as the underlying model has been
+   * consistent. Calling {@link #isUnsat()} will reset this list as the underlying model has been
    * updated.
    */
   protected final Set<IFormula> evaluatedTerms = new LinkedHashSet<>();
@@ -92,7 +93,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
       wasLastSatCheckSat = true;
-      evaluatedTerms.add(api.partialModelAsFormula());
+      if (this.generateModels || this.generateAllSat) {
+        // we only build the model if we have set the correct options
+        evaluatedTerms.add(callOrThrow(api::partialModelAsFormula));
+      }
       return false;
     } else if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Unsat())) {
       return true;
@@ -148,6 +152,9 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * extend the original model.
    */
   Collection<IFormula> getEvaluatedTerms() {
+    Preconditions.checkState(
+        this.generateModels || this.generateAllSat,
+        "Model generation was not enabled, no evaluated terms available.");
     return Collections.unmodifiableCollection(evaluatedTerms);
   }
 
@@ -168,22 +175,22 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @SuppressWarnings("resource")
   @Override
   protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
-    final PartialModel partialModel;
-    try {
-      partialModel = partialModel();
-    } catch (SimpleAPIException ex) {
-      throw new SolverException(ex.getMessage(), ex);
-    }
+    final PartialModel partialModel = callOrThrow(api::partialModel);
     return registerEvaluator(new PrincessModel(this, partialModel, creator, api));
   }
 
   /**
-   * This method only exists to allow catching the exception from Scala in Java.
+   * This method only exists to allow catching some exceptions from Scala in Java.
    *
-   * @throws SimpleAPIException if model can not be constructed.
+   * @throws SolverException if the callable throws an Exception (including {@link
+   *     SimpleAPIException})
    */
-  private PartialModel partialModel() throws SimpleAPIException {
-    return api.partialModel();
+  private <T> T callOrThrow(Callable<T> callable) throws SolverException {
+    try {
+      return callable.call();
+    } catch (Exception pException) { // mainly for catching SimpleAPIException
+      throw new SolverException(pException.getMessage(), pException);
+    }
   }
 
   @Override
