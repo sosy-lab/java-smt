@@ -155,7 +155,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     Preconditions.checkState(
         this.generateModels || this.generateAllSat,
         "Model generation was not enabled, no evaluated terms available.");
-    return Collections.unmodifiableCollection(evaluatedTerms);
+    return Collections.unmodifiableSet(evaluatedTerms);
   }
 
   /** Track an assignment `term == value` for an evaluated term and its value. */

@@ -1155,7 +1155,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("As of now, only Princess does not support multi-dimensional arrays")
         .that(solver)
-        .isNotSameInstanceAs(Solvers.PRINCESS);
+        .isNotEqualTo(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
@@ -1741,12 +1741,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void ufTest() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireBitvectors();
-    // only Z3 fulfills these requirements
-
-    assume()
-        .withMessage("solver does not implement optimisation")
-        .that(solverToUse())
-        .isEqualTo(Solvers.Z3);
+    requireOptimization();
 
     BitvectorType t32 = FormulaType.getBitvectorTypeWithSize(32);
     FunctionDeclaration<BitvectorFormula> si1 = fmgr.declareUF("*signed_int@1", t32, t32);

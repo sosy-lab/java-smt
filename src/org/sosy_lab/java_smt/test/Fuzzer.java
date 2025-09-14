@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -42,7 +41,6 @@ class Fuzzer {
     return recFuzz(formulaSize);
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private BooleanFormula recFuzz(int formulaSize) {
     if (formulaSize == 1) {
 
@@ -69,7 +67,6 @@ class Fuzzer {
     }
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private BooleanFormula getVar() {
     return vars[r.nextInt(vars.length)];
   }
