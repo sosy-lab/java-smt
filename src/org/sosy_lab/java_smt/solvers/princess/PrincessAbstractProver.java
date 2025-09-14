@@ -188,8 +188,8 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   private <T> T callOrThrow(Callable<T> callable) throws SolverException {
     try {
       return callable.call();
-    } catch (Exception pException) { // mainly for catching SimpleAPIException
-      throw new SolverException(pException.getMessage(), pException);
+    } catch (Exception ex) { // mainly for catching SimpleAPIException
+      throw new SolverException(ex.getMessage(), ex);
     }
   }
 
