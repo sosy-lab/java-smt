@@ -2229,11 +2229,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver runs out memory while generating the model")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula formula = context.getFormulaManager().parse(ARRAY_QUERY_BV);
     checkModelIteration(formula, false);
   }
