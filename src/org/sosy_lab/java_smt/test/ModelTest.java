@@ -81,7 +81,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(IntegerType, IntegerType);
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3);
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Before
   public void setup() {
@@ -1151,11 +1151,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireArrays();
     requireArrayModel();
-
-    assume()
-        .withMessage("As of now, only Princess does not support multi-dimensional arrays")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
