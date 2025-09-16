@@ -51,6 +51,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -117,7 +118,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public StringFormulaManager getStringFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceStringFormulaManager(delegate.getStringFormulaManager(), logger);
   }
 
   @Override
