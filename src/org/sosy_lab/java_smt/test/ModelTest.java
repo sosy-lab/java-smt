@@ -16,7 +16,9 @@ import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -42,6 +45,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -49,6 +53,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 /** Test that values from models are appropriately parsed. */
 public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -2252,6 +2257,380 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
                 Files.readString(Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
 
     checkModelIteration(formula, false);
+  }
+
+  /** Returns the arguments of an UF or array definition from the model. */
+  private Iterable<Formula> getFunctionArgs(Formula f) {
+    requireVisitor();
+    return mgr.visit(
+        f,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          protected Iterable<Formula> visitDefault(Formula f) {
+            throw new IllegalArgumentException();
+          }
+
+          @Override
+          public Iterable<Formula> visitFreeVariable(Formula f, String name) {
+            // Base case for array values
+            return ImmutableList.of();
+          }
+
+          @Override
+          public Iterable<Formula> visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
+              return FluentIterable.concat(
+                  getFunctionArgs(args.get(0)), ImmutableList.of(args.get(1)));
+            } else {
+              // Assume its an UF value
+              return args;
+            }
+          }
+        });
+  }
+
+  /** Evaluate the UF or array constraint and check that the model contains the expected values. */
+  private <T> void checkModelContains(
+      BooleanFormula pFormula, String pVar, Map<List<Formula>, Formula> expected) {
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.addConstraint(pFormula);
+      assertThat(prover.isUnsat()).isFalse();
+
+      ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
+      for (var assignment : prover.getModel().asList()) {
+        if (assignment.getName().equals(pVar)) {
+          builder.put(
+              ImmutableList.copyOf(getFunctionArgs(assignment.getKey())),
+              assignment.getValueAsFormula());
+        }
+      }
+      var model = builder.build();
+      assertThat(model).containsAtLeastEntriesIn(expected);
+
+    } catch (SolverException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
+  public void testArray1Bv() {
+    requireArrays();
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array = amgr.makeArray("array", bitvectorType, bitvectorType);
+
+    var idx = bvmgr.makeBitvector(8, 1);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(amgr.select(array, idx), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testArray2Bv() {
+    requireArrays();
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array = amgr.makeArray("array", bitvectorType, bitvectorType);
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(amgr.select(array, idxA), valA),
+            bvmgr.equal(amgr.select(array, idxB), valB)),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testArray1BvBV() {
+    requireArrays();
+    requireBitvectors();
+
+    // Boolector doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array =
+        amgr.makeArray(
+            "array", bitvectorType, FormulaType.getArrayType(bitvectorType, bitvectorType));
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var idxB = bvmgr.makeBitvector(8, 7);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(amgr.select(amgr.select(array, idxA), idxB), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testArray2BvBv() {
+    requireArrays();
+    requireBitvectors();
+
+    // Boolector doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array =
+        amgr.makeArray(
+            "array", bitvectorType, FormulaType.getArrayType(bitvectorType, bitvectorType));
+
+    var idxA1 = bvmgr.makeBitvector(8, 1);
+    var idxA2 = bvmgr.makeBitvector(8, 7);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB1 = bvmgr.makeBitvector(8, 3);
+    var idxB2 = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(amgr.select(amgr.select(array, idxA1), idxA2), valA),
+            bvmgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB)),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
+  }
+
+  @Test
+  public void testUf1Bv() {
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var uf = fmgr.declareUF("uf", bitvectorType, bitvectorType);
+
+    var idx = bvmgr.makeBitvector(8, 1);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(fmgr.callUF(uf, idx), val), "uf", ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testUf2Bv() {
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var uf = fmgr.declareUF("uf", bitvectorType, bitvectorType);
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(fmgr.callUF(uf, idxA), valA), bvmgr.equal(fmgr.callUF(uf, idxB), valB)),
+        "uf",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testUf1BvBV() {
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var uf = fmgr.declareUF("uf", bitvectorType, bitvectorType, bitvectorType);
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var idxB = bvmgr.makeBitvector(8, 7);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(fmgr.callUF(uf, idxA, idxB), val),
+        "uf",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testUf2BvBv() {
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var uf = fmgr.declareUF("uf", bitvectorType, bitvectorType, bitvectorType);
+
+    var idxA1 = bvmgr.makeBitvector(8, 1);
+    var idxA2 = bvmgr.makeBitvector(8, 7);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB1 = bvmgr.makeBitvector(8, 3);
+    var idxB2 = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(fmgr.callUF(uf, idxA1, idxA2), valA),
+            bvmgr.equal(fmgr.callUF(uf, idxB1, idxB2), valB)),
+        "uf",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
+  }
+
+  @Test
+  public void testArray1Int() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array = amgr.makeArray("array", IntegerType, IntegerType);
+
+    var idx = imgr.makeNumber(1);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(amgr.select(array, idx), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testArray2Int() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array = amgr.makeArray("array", IntegerType, IntegerType);
+
+    var idxA = imgr.makeNumber(1);
+    var valA = imgr.makeNumber(10);
+
+    var idxB = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(
+            imgr.equal(amgr.select(array, idxA), valA), imgr.equal(amgr.select(array, idxB), valB)),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testArray1IntInt() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array =
+        amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
+
+    var idxA = imgr.makeNumber(1);
+    var idxB = imgr.makeNumber(7);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(amgr.select(amgr.select(array, idxA), idxB), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testArray2IntInt() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array =
+        amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
+
+    var idxA1 = imgr.makeNumber(1);
+    var idxA2 = imgr.makeNumber(7);
+    var valA = imgr.makeNumber(10);
+
+    var idxB1 = imgr.makeNumber(3);
+    var idxB2 = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(
+            imgr.equal(amgr.select(amgr.select(array, idxA1), idxA2), valA),
+            imgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB)),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
+  }
+
+  @Test
+  public void testUf1Int() {
+    requireIntegers();
+
+    var uf = fmgr.declareUF("uf", IntegerType, IntegerType);
+
+    var idx = imgr.makeNumber(1);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(fmgr.callUF(uf, idx), val), "uf", ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testUf2Int() {
+    requireIntegers();
+
+    var uf = fmgr.declareUF("uf", IntegerType, IntegerType);
+
+    var idxA = imgr.makeNumber(1);
+    var valA = imgr.makeNumber(10);
+
+    var idxB = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(imgr.equal(fmgr.callUF(uf, idxA), valA), imgr.equal(fmgr.callUF(uf, idxB), valB)),
+        "uf",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testUf1IntInt() {
+    requireIntegers();
+
+    var uf = fmgr.declareUF("uf", IntegerType, IntegerType, IntegerType);
+
+    var idxA = imgr.makeNumber(1);
+    var idxB = imgr.makeNumber(7);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(fmgr.callUF(uf, idxA, idxB), val),
+        "uf",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testUf2IntInt() {
+    requireIntegers();
+
+    var uf = fmgr.declareUF("uf", IntegerType, IntegerType, IntegerType);
+
+    var idxA1 = imgr.makeNumber(1);
+    var idxA2 = imgr.makeNumber(7);
+    var valA = imgr.makeNumber(10);
+
+    var idxB1 = imgr.makeNumber(3);
+    var idxB2 = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(
+            imgr.equal(fmgr.callUF(uf, idxA1, idxA2), valA),
+            imgr.equal(fmgr.callUF(uf, idxB1, idxB2), valB)),
+        "uf",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
   }
 
   @Test
