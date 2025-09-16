@@ -78,10 +78,4 @@ public class TraceUFManager implements UFManager {
     }
     return callUF(declareUF(name, pReturnType, builder.build()), pArgs);
   }
-
-  @Override
-  public <T extends Formula> T declareAndCallUF(
-      String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
-  }
 }

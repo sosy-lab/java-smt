@@ -10,7 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -107,7 +107,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula and(BooleanFormula formula1, BooleanFormula formula2) {
-    return and(Arrays.asList(formula1, formula2));
+    return and(ImmutableList.of(formula1, formula2));
   }
 
   @Override
@@ -125,7 +125,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(BooleanFormula formula1, BooleanFormula formula2) {
-    return or(Arrays.asList(formula1, formula2));
+    return or(ImmutableList.of(formula1, formula2));
   }
 
   @Override
