@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -173,14 +172,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     Preconditions.checkState(!closed);
     Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
-    return new CachingModel(
-        registerEvaluator(
-            new BitwuzlaModel(
-                env,
-                this,
-                creator,
-                manager,
-                Collections2.transform(getAssertedFormulas(), creator::extractInfo))));
+    return new CachingModel(registerEvaluator(new BitwuzlaModel(env, this, creator, manager)));
   }
 
   private List<BooleanFormula> getUnsatCore0() {
@@ -239,13 +231,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @SuppressWarnings("resource")
   @Override
   protected BitwuzlaModel getEvaluatorWithoutChecks() {
-    return registerEvaluator(
-        new BitwuzlaModel(
-            env,
-            this,
-            creator,
-            manager,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+    return registerEvaluator(new BitwuzlaModel(env, this, creator, manager));
   }
 
   public boolean isClosed() {
