@@ -40,8 +40,9 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
       Bitwuzla bitwuzlaEnv,
       BitwuzlaTheoremProver prover,
       BitwuzlaFormulaCreator bitwuzlaCreator,
+      BitwuzlaFormulaManager bitwuzlaFormulaManager,
       Collection<Term> assertedTerms) {
-    super(prover, bitwuzlaCreator);
+    super(bitwuzlaFormulaManager, prover, bitwuzlaCreator);
     this.bitwuzlaEnv = bitwuzlaEnv;
     this.prover = prover;
     this.bitwuzlaCreator = bitwuzlaCreator;

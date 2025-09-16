@@ -156,6 +156,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     }
     return new CachingModel(
         new SmtInterpolModel(
+            mgr,
             this,
             model,
             creator,

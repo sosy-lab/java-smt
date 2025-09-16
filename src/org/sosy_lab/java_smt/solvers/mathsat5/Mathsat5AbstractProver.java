@@ -141,7 +141,8 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     checkGenerateModels();
-    return new CachingModel(new Mathsat5Model(getMsatModel(), creator, this));
+    return new CachingModel(
+        new Mathsat5Model(context.getFormulaManager(), getMsatModel(), creator, this));
   }
 
   /**

@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
@@ -31,11 +32,12 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   private final CVC4TheoremProver prover;
 
   CVC4Model(
+      FormulaManager pFormulaManager,
       CVC4TheoremProver pProver,
       CVC4FormulaCreator pCreator,
       SmtEngine pSmtEngine,
       Collection<Expr> pAssertedExpressions) {
-    super(pProver, pCreator);
+    super(pFormulaManager, pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
     assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);

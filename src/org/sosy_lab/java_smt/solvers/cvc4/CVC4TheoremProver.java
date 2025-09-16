@@ -27,8 +27,8 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -39,6 +39,7 @@ import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
+  private final FormulaManager manager;
   private final CVC4FormulaCreator creator;
   private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
@@ -60,13 +61,14 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   private final boolean incremental;
 
   protected CVC4TheoremProver(
+      FormulaManager pFormulaManager,
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
       int pRandomSeed,
-      Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+      Set<ProverOptions> pOptions) {
+    super(pOptions, pFormulaManager.getBooleanFormulaManager(), pShutdownNotifier);
 
+    manager = pFormulaManager;
     creator = pFormulaCreator;
     randomSeed = pRandomSeed;
     incremental = !enableSL;
@@ -157,6 +159,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
         new CVC4Model(
+            manager,
             this,
             creator,
             smtEngine,

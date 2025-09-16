@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 class BoolectorModel extends AbstractModel<Long, Long, Long> {
@@ -85,11 +86,12 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private final ImmutableList<Long> assertedTerms;
 
   BoolectorModel(
+      FormulaManager pFormulaManager,
       long btor,
       BoolectorFormulaCreator creator,
       BoolectorAbstractProver<?> pProver,
       Collection<Long> assertedTerms) {
-    super(pProver, creator);
+    super(pFormulaManager, pProver, creator);
     this.bfCreator = creator;
     this.btor = btor;
     this.prover = pProver;

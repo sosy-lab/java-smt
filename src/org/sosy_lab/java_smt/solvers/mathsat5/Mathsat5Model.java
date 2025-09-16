@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 class Mathsat5Model extends AbstractModel<Long, Long, Long> {
@@ -40,8 +41,12 @@ class Mathsat5Model extends AbstractModel<Long, Long, Long> {
   /** for detecting closed environments, Exception is better than SegFault. */
   private final Mathsat5AbstractProver<?> prover;
 
-  Mathsat5Model(long model, Mathsat5FormulaCreator creator, Mathsat5AbstractProver<?> pProver) {
-    super(pProver, creator);
+  Mathsat5Model(
+      FormulaManager pFormulaManager,
+      long model,
+      Mathsat5FormulaCreator creator,
+      Mathsat5AbstractProver<?> pProver) {
+    super(pFormulaManager, pProver, creator);
     this.model = model;
     formulaCreator = creator;
     prover = pProver;

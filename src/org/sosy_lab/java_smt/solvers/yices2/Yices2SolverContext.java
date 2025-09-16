@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -29,7 +28,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractSolverContext;
 public class Yices2SolverContext extends AbstractSolverContext {
 
   private final Yices2FormulaCreator creator;
-  private final BooleanFormulaManager bfmgr;
   private final ShutdownNotifier shutdownManager;
 
   private static int numLoadedInstances = 0;
@@ -38,11 +36,9 @@ public class Yices2SolverContext extends AbstractSolverContext {
   public Yices2SolverContext(
       FormulaManager pFmgr,
       Yices2FormulaCreator creator,
-      BooleanFormulaManager pBfmgr,
       ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     this.creator = creator;
-    bfmgr = pBfmgr;
     shutdownManager = pShutdownManager;
   }
 
@@ -84,7 +80,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             quantTheory,
             arrayTheory);
-    return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
+    return new Yices2SolverContext(manager, creator, pShutdownManager);
   }
 
   @Override
@@ -113,7 +109,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> pOptions) {
-    return new Yices2TheoremProver(creator, pOptions, bfmgr, shutdownManager);
+    return new Yices2TheoremProver(getFormulaManager(), creator, pOptions, shutdownManager);
   }
 
   @Override

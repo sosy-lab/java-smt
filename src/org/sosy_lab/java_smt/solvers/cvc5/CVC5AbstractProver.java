@@ -176,8 +176,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
         new CVC5Model(
-            this,
             mgr,
+            this,
             creator,
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }

@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.BooleanFormulaManager;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
@@ -59,7 +59,9 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   private static final int DEFAULT_PARAMS = 0; // use default setting in the solver
 
+  protected final FormulaManager manager;
   protected final Yices2FormulaCreator creator;
+
   protected final long curEnv;
   protected final long curCfg;
 
@@ -68,12 +70,13 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   private int stackSizeToUnsat = Integer.MAX_VALUE;
 
   protected Yices2TheoremProver(
+      FormulaManager pFormulaManager,
       Yices2FormulaCreator creator,
       Set<ProverOptions> pOptions,
-      BooleanFormulaManager pBmgr,
       ShutdownNotifier pShutdownNotifier) {
-    super(pOptions, pBmgr, pShutdownNotifier);
+    super(pOptions, pFormulaManager.getBooleanFormulaManager(), pShutdownNotifier);
     this.creator = creator;
+    this.manager = pFormulaManager;
     curCfg = yices_new_config();
     yices_set_config(curCfg, "solver-type", "dpllt");
     yices_set_config(curCfg, "mode", "push-pop");
@@ -160,7 +163,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   protected Yices2Model getEvaluatorWithoutChecks() {
-    return new Yices2Model(yices_get_model(curEnv, 1), this, creator);
+    return new Yices2Model(manager, yices_get_model(curEnv, 1), this, creator);
   }
 
   private List<BooleanFormula> encapsulate(int[] terms) {

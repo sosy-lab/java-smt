@@ -179,6 +179,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
                 env,
                 this,
                 creator,
+                manager,
                 Collections2.transform(getAssertedFormulas(), creator::extractInfo))));
   }
 
@@ -243,6 +244,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
             env,
             this,
             creator,
+            manager,
             Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 

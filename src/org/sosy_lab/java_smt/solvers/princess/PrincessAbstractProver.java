@@ -176,7 +176,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
     final PartialModel partialModel = callOrThrow(api::partialModel);
-    return registerEvaluator(new PrincessModel(this, partialModel, creator, api));
+    return registerEvaluator(new PrincessModel(mgr, this, partialModel, creator, api));
   }
 
   /**

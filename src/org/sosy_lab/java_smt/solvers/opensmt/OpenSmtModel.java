@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Logic;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Model;
@@ -36,10 +37,11 @@ public class OpenSmtModel extends AbstractModel<PTRef, SRef, Logic> {
   private final ImmutableList<ValueAssignment> model;
 
   OpenSmtModel(
+      FormulaManager pMgr,
       OpenSmtAbstractProver<?> pProver,
       OpenSmtFormulaCreator pCreator,
       Collection<PTRef> pAssertedTerms) {
-    super(pProver, pCreator);
+    super(pMgr, pProver, pCreator);
 
     osmtLogic = pCreator.getEnv();
     osmtModel = pProver.getOsmtSolver().getModel();

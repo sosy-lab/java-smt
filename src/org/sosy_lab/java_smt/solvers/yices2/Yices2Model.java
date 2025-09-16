@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
@@ -65,8 +66,12 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
 
-  Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
-    super(prover, pCreator);
+  Yices2Model(
+      FormulaManager pFormulaManager,
+      long model,
+      Yices2TheoremProver prover,
+      Yices2FormulaCreator pCreator) {
+    super(pFormulaManager, prover, pCreator);
     this.model = model;
     this.prover = prover;
     this.formulaCreator = Preconditions.checkNotNull(pCreator);

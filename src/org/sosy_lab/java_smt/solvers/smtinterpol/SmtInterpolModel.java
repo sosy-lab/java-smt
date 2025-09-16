@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
@@ -33,11 +34,12 @@ class SmtInterpolModel extends AbstractModel<Term, Sort, Script> {
   private final ImmutableList<Term> assertedTerms;
 
   SmtInterpolModel(
+      FormulaManager pFormulaManager,
       AbstractProver<?> pProver,
       Model pModel,
       FormulaCreator<Term, Sort, Script, ?> pCreator,
       Collection<Term> pAssertedTerms) {
-    super(pProver, pCreator);
+    super(pFormulaManager, pProver, pCreator);
     model = pModel;
     env = pCreator.getEnv();
     assertedTerms = ImmutableList.copyOf(pAssertedTerms);

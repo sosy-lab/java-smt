@@ -43,6 +43,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.sstat;
 
 public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
+  protected final FormulaManager mgr;
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
@@ -57,6 +58,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       Set<ProverOptions> pOptions) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
+    mgr = pMgr;
     creator = pFormulaCreator;
 
     // BUGFIX: We need to store the SMTConfig reference to make sure the underlying C++ object does
@@ -126,7 +128,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
     Model model =
         new OpenSmtModel(
-            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+            mgr,
+            this,
+            creator,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo));
     return registerEvaluator(model);
   }
 
