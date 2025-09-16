@@ -107,7 +107,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public SLFormulaManager getSLFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceSLFormulaManager(delegate.getSLFormulaManager(), logger);
   }
 
   @Override
