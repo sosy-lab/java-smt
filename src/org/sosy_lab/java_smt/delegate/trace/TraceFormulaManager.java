@@ -112,7 +112,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
-    throw new UnsupportedOperationException();
+    return new TraceQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), logger);
   }
 
   @Override
