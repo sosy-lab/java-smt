@@ -2260,10 +2260,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   /** Returns the arguments of an UF or array definition from the model. */
-  private Iterable<Formula> getFunctionArgs(Formula f) {
+  private Iterable<Formula> getFunctionArgs(Formula pValue) {
     requireVisitor();
     return mgr.visit(
-        f,
+        pValue,
         new DefaultFormulaVisitor<>() {
           @Override
           protected Iterable<Formula> visitDefault(Formula f) {
@@ -2291,18 +2291,20 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   /** Evaluate the UF or array constraint and check that the model contains the expected values. */
-  private <T> void checkModelContains(
+  private void checkModelContains(
       BooleanFormula pFormula, String pVar, Map<List<Formula>, Formula> expected) {
     try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(pFormula);
       assertThat(prover.isUnsat()).isFalse();
 
       ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
-      for (var assignment : prover.getModel().asList()) {
-        if (assignment.getName().equals(pVar)) {
-          builder.put(
-              ImmutableList.copyOf(getFunctionArgs(assignment.getKey())),
-              assignment.getValueAsFormula());
+      try (var model = prover.getModel()) {
+        for (var assignment : model.asList()) {
+          if (assignment.getName().equals(pVar)) {
+            builder.put(
+                ImmutableList.copyOf(getFunctionArgs(assignment.getKey())),
+                assignment.getValueAsFormula());
+          }
         }
       }
       var model = builder.build();
