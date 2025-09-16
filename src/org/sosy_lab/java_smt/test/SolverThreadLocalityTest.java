@@ -9,12 +9,9 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.truth.Truth;
-import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,9 +37,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
 
   private HardIntegerFormulaGenerator hardProblem;
   private static final int DEFAULT_PROBLEM_SIZE = 8;
-
-  private static final Collection<Solvers> SOLVERS_NOT_SUPPORTING_FORMULA_THREAD_SHARING =
-      ImmutableList.of(Solvers.CVC5);
 
   @Before
   public void makeThreads() {
@@ -78,7 +72,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalContextTest()
       throws ExecutionException, InterruptedException, SolverException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new context in another thread, i.e., non-locally
     Future<SolverContext> result = executor.submit(() -> factory.generateContext());
@@ -113,7 +106,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTest()
       throws InterruptedException, SolverException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     // generate a new formula in another thread, i.e., non-locally
     Future<BooleanFormula> result =
@@ -142,7 +134,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   @Test
   public void nonLocalProverTest() throws InterruptedException, ExecutionException {
     requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -171,53 +162,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             });
 
     assert task.get() == null;
-  }
-
-  @Test
-  public void nonLocalFormulaTranslationTest() throws Throwable {
-    // Test that even when using translation, the thread local problem persists for CVC5
-    requireIntegers();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
-
-    BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
-
-    // generate a new prover in another thread, i.e., non-locally
-    Future<?> task;
-    if (SOLVERS_NOT_SUPPORTING_FORMULA_THREAD_SHARING.contains(solverToUse())) {
-      task =
-          executor.submit(
-              () ->
-                  assertThrows(
-                      io.github.cvc5.CVC5ApiException.class,
-                      () -> {
-                        try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                          prover.push(
-                              context
-                                  .getFormulaManager()
-                                  .translateFrom(formula, context.getFormulaManager()));
-                          assertThat(prover).isUnsatisfiable();
-                        } catch (SolverException | InterruptedException exception) {
-                          throw new RuntimeException(exception);
-                        }
-                      }));
-      Truth.assertThat(task.get()).isInstanceOf(io.github.cvc5.CVC5ApiException.class);
-
-    } else {
-      task =
-          executor.submit(
-              () -> {
-                try (BasicProverEnvironment<?> prover = context.newProverEnvironment()) {
-                  prover.push(
-                      context
-                          .getFormulaManager()
-                          .translateFrom(formula, context.getFormulaManager()));
-                  assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException exception) {
-                  throw new RuntimeException(exception);
-                }
-              });
-      Truth.assertThat(task.get()).isNull();
-    }
   }
 
   @Override
@@ -264,7 +208,6 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public <T> void nonLocalInterpolationTest() throws InterruptedException, ExecutionException {
     requireIntegers();
     requireInterpolation();
-    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula f1 = imgr.lessThan(imgr.makeVariable("A"), imgr.makeVariable("B"));
     BooleanFormula f2 = imgr.lessThan(imgr.makeVariable("B"), imgr.makeVariable("A"));

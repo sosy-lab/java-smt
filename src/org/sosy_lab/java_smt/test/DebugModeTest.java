@@ -112,6 +112,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
             });
 
     // We expect debug mode to throw an exception only on CVC5
+    // TODO CVC5 supports this now. Update debug mode
     if (solverToUse() == Solvers.CVC5) {
       assertThrows(IllegalStateException.class, () -> checkForExceptions(result));
     } else {
@@ -179,7 +180,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
           newFmgr.declareUF(
               "id", FormulaType.IntegerType, ImmutableList.of(FormulaType.IntegerType));
 
-      // We expect debug mode to throw an exception for all solvers, except Princess, CVC4 and Yices
+      // We expect debug mode to throw an exception for all solvers, except Princess and Yices
       if (!List.of(Solvers.PRINCESS, Solvers.YICES2).contains(solverToUse())) {
         assertThrows(IllegalArgumentException.class, () -> checkDeclarationInDebugContext(id));
       } else {

@@ -285,6 +285,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     List<BooleanFormula> itps4 =
         stack.getSeqInterpolants(
             Lists.transform(ImmutableList.of(TA, TA, TA, TB, TC, TD, TD), ImmutableSet::of));
+
+    // FIXME With CVC5 the last interpolant returned by CVC5InterpolatingProver.getCVC5Interpolation
+    //  is "null". Replacing it with "false" fixes the test
+
     List<BooleanFormula> itps5 =
         stack.getSeqInterpolants(
             Lists.transform(ImmutableList.of(TA, TA, TB, TC, TD, TA, TD), ImmutableSet::of));
