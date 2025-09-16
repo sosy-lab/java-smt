@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -174,12 +173,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return registerEvaluator(
-        new CVC5Model(
-            mgr,
-            this,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+    return registerEvaluator(new CVC5Model(mgr, this, creator));
   }
 
   @Override
