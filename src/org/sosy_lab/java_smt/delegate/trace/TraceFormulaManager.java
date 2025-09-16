@@ -188,6 +188,13 @@ public class TraceFormulaManager implements FormulaManager {
                   String.format("makeNumber(%s)", value),
                   () -> delegate.getRationalFormulaManager().makeNumber((Rational) value));
           Preconditions.checkArgument(g.equals(f));
+        } else if (f instanceof StringFormula && value instanceof String) {
+          var g =
+              logger.logDef(
+                  "mgr.getStringFormulaManager()",
+                  String.format("makeString(%s)", value),
+                  () -> delegate.getStringFormulaManager().makeString((String) value));
+          Preconditions.checkArgument(g.equals(f));
         } else {
           throw new IllegalArgumentException(
               String.format(
@@ -304,6 +311,7 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_IS_NORMAL:
       case FP_AS_IEEEBV:
       case FP_FROM_IEEEBV:
+      case RE_COMPLEMENT:
         return 1;
 
       case SELECT:
@@ -341,6 +349,7 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_CASTTO_FP:
       case FP_CASTTO_SBV:
       case FP_CASTTO_UBV:
+      case STR_CONCAT:
         return 2;
 
       case ITE:
@@ -835,28 +844,65 @@ public class TraceFormulaManager implements FormulaManager {
               getFloatingPointFormulaManager()
                   .fromIeeeBitvector(
                       (BitvectorFormula) args.get(0), (FloatingPointType) declaration.getType());
-        // TODO
-        /*
         case STR_CONCAT:
-          break;
+          Preconditions.checkArgument(args.size() >= 2);
+          return (T) getStringFormulaManager().concat((List<StringFormula>) args);
         case STR_PREFIX:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .prefix((StringFormula) args.get(0), (StringFormula) args.get(1));
         case STR_SUFFIX:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .suffix((StringFormula) args.get(0), (StringFormula) args.get(1));
         case STR_CONTAINS:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .contains((StringFormula) args.get(0), (StringFormula) args.get(1));
         case STR_SUBSTRING:
-          break;
+          Preconditions.checkArgument(args.size() == 3);
+          return (T)
+              getStringFormulaManager()
+                  .substring(
+                      (StringFormula) args.get(0),
+                      (IntegerFormula) args.get(1),
+                      (IntegerFormula) args.get(2));
         case STR_REPLACE:
-          break;
+          Preconditions.checkArgument(args.size() == 3);
+          return (T)
+              getStringFormulaManager()
+                  .replace(
+                      (StringFormula) args.get(0),
+                      (StringFormula) args.get(1),
+                      (StringFormula) args.get(2));
         case STR_REPLACE_ALL:
-          break;
+          Preconditions.checkArgument(args.size() == 3);
+          return (T)
+              getStringFormulaManager()
+                  .replaceAll(
+                      (StringFormula) args.get(0),
+                      (StringFormula) args.get(1),
+                      (StringFormula) args.get(2));
         case STR_CHAR_AT:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .charAt((StringFormula) args.get(0), (IntegerFormula) args.get(1));
         case STR_LENGTH:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().length((StringFormula) args.get(0));
         case STR_INDEX_OF:
-          break;
+          Preconditions.checkArgument(args.size() == 3);
+          return (T)
+              getStringFormulaManager()
+                  .indexOf(
+                      (StringFormula) args.get(0),
+                      (StringFormula) args.get(1),
+                      (IntegerFormula) args.get(2));
+        /*
         case STR_TO_RE:
           break;
         case STR_IN_RE:

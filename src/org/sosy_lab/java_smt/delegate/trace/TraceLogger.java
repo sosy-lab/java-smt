@@ -231,6 +231,7 @@ class TraceLogger {
           fpType.getExponentSize(), fpType.getMantissaSize());
     }
     // FIXME Handle other cases
-    throw new IllegalArgumentException("Unsupported formula type: " + pType);
+    throw new IllegalArgumentException(
+        String.format("Unsupported formula type %s of class %s.", pType, pType.getClass()));
   }
 }
