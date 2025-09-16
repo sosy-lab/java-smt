@@ -126,7 +126,7 @@ public class TraceFormulaManager implements FormulaManager {
   }
 
   private class Rebuilder extends FormulaTransformationVisitor {
-    protected Rebuilder(FormulaManager fmgr) {
+    Rebuilder(FormulaManager fmgr) {
       super(fmgr);
     }
 
