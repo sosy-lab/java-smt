@@ -49,6 +49,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormula;
@@ -278,6 +279,7 @@ public class TraceFormulaManager implements FormulaManager {
       case BV_SUB:
       case BV_ADD:
       case BV_MUL:
+      case RE_CONCAT:
         return -1;
 
       case FP_ROUND_EVEN:
@@ -285,6 +287,7 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_ROUND_POSITIVE:
       case FP_ROUND_NEGATIVE:
       case FP_ROUND_ZERO:
+      case RE_NONE:
         return 0;
 
       case NOT:
@@ -311,6 +314,7 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_IS_NORMAL:
       case FP_AS_IEEEBV:
       case FP_FROM_IEEEBV:
+      case STR_LENGTH:
       case RE_COMPLEMENT:
         return 1;
 
@@ -350,6 +354,7 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_CASTTO_SBV:
       case FP_CASTTO_UBV:
       case STR_CONCAT:
+      case RE_RANGE:
         return 2;
 
       case ITE:
@@ -902,41 +907,73 @@ public class TraceFormulaManager implements FormulaManager {
                       (StringFormula) args.get(0),
                       (StringFormula) args.get(1),
                       (IntegerFormula) args.get(2));
-        /*
+        /* TODO
         case STR_TO_RE:
           break;
         case STR_IN_RE:
           break;
+        */
         case STR_TO_INT:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().toIntegerFormula((StringFormula) args.get(0));
         case INT_TO_STR:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().toStringFormula((IntegerFormula) args.get(0));
         case STR_FROM_CODE:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().fromCodePoint((IntegerFormula) args.get(0));
         case STR_TO_CODE:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().toCodePoint((StringFormula) args.get(0));
         case STR_LT:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .lessThan((StringFormula) args.get(0), (StringFormula) args.get(1));
         case STR_LE:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .lessOrEquals((StringFormula) args.get(0), (StringFormula) args.get(1));
+        case RE_NONE:
+          Preconditions.checkArgument(args.isEmpty());
+          return (T) getStringFormulaManager().none();
         case RE_PLUS:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().cross((RegexFormula) args.get(0));
         case RE_STAR:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().closure((RegexFormula) args.get(0));
         case RE_OPTIONAL:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().optional((RegexFormula) args.get(0));
         case RE_CONCAT:
-          break;
+          Preconditions.checkArgument(args.size() >= 2);
+          return (T) getStringFormulaManager().concatRegex((List<RegexFormula>) args);
         case RE_UNION:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .union((RegexFormula) args.get(0), (RegexFormula) args.get(1));
         case RE_RANGE:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .range((StringFormula) args.get(0), (StringFormula) args.get(1));
         case RE_INTERSECT:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .intersection((RegexFormula) args.get(0), (RegexFormula) args.get(1));
         case RE_COMPLEMENT:
-          break;
+          Preconditions.checkArgument(args.size() == 1);
+          return (T) getStringFormulaManager().complement((RegexFormula) args.get(0));
         case RE_DIFFERENCE:
-          break;
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager()
+                  .difference((RegexFormula) args.get(0), (RegexFormula) args.get(1));
+        /* TODO
         case OTHER:
           break;
           */

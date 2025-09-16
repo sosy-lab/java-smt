@@ -304,6 +304,8 @@ public enum FunctionDeclarationKind {
   STR_TO_CODE,
   STR_LT,
   STR_LE,
+
+  RE_NONE,
   RE_PLUS,
   RE_STAR,
   RE_OPTIONAL,

@@ -624,6 +624,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_NONE, FunctionDeclarationKind.RE_NONE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
           .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
           .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
