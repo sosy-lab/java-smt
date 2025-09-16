@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -20,7 +19,6 @@ import com.google.common.truth.Truth;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -184,7 +182,6 @@ public class UfEliminationTest extends SolverBasedTest0.ParameterizedSolverBased
   public void twoFormulasTest() throws SolverException, InterruptedException {
     // See FormulaManagerTest.testEmptySubstitution(), FormulaManagerTest.testNoSubstitution()
     requireIntegers();
-    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     // f := uf(v1, v3) XOR uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");

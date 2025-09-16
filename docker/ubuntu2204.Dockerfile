@@ -110,7 +110,7 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 ARG BUILD_DATE
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.title="JavaSMT solver development"
-LABEL org.opencontainers.image.description="Ubuntu 18.04-based image for JavaSMT solver development"
+LABEL org.opencontainers.image.description="Ubuntu 22.04-based image for JavaSMT solver development"
 LABEL org.opencontainers.image.source="https://github.com/sosy-lab/java-smt"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 

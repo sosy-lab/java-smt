@@ -11,8 +11,8 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.After;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class TranslateFormulaTest {
 
   @Parameters(name = "{index}: {0} --> {1}")
   public static List<Object[]> getSolverCombinations() {
-    List<Solvers> solvers = Arrays.asList(Solvers.values());
+    List<Solvers> solvers = ImmutableList.copyOf(Solvers.values());
     return Lists.transform(Lists.cartesianProduct(solvers, solvers), List::toArray);
   }
 

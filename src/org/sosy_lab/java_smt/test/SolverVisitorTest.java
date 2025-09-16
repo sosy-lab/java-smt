@@ -211,11 +211,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.greaterOrEquals(x, y, true),
               bvmgr.greaterOrEquals(x, y, false))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-        if (Solvers.PRINCESS != solver) {
-          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-        }
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
         assertThatFormula(f).isEquivalentTo(f2);
@@ -243,11 +239,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.rotateLeft(x, y),
               bvmgr.rotateRight(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-        if (Solvers.PRINCESS != solver) {
-          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-        }
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
         assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
@@ -261,12 +253,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BitvectorFormula n = bvmgr.makeBitvector(8, 13);
 
     for (BitvectorFormula f : new BitvectorFormula[] {n}) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      if (Solvers.PRINCESS != solver) {
-        // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-        // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-      }
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
@@ -281,7 +269,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
           0, 1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000,
           -255000,
         }) {
-      ConstantsVisitor visitor = new ConstantsVisitor();
+      SolverVisitorTest.ConstantsVisitor visitor = new ConstantsVisitor();
       mgr.visit(imgr.makeNumber(n), visitor);
       assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
     }
@@ -556,7 +544,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     checkKind(fpmgr.max(x, y), FunctionDeclarationKind.FP_MAX);
     checkKind(fpmgr.min(x, y), FunctionDeclarationKind.FP_MIN);
     checkKind(fpmgr.sqrt(x), FunctionDeclarationKind.FP_SQRT);
-    if (!List.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
+    if (!ImmutableList.of(Solvers.CVC4, Solvers.CVC5, Solvers.BITWUZLA)
         .contains(solverToUse())) { // CVC4/CVC5 and bitwuzla do not support this operation
       // On Bitwuzla we replaces "fp_to_bv(fpTerm)" with "newVar" and the adds the assertion
       // "fpTerm = bv_to_fp(newVar)" as a side condition. Unfortunately this workaround will not
@@ -589,7 +577,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
           }
         };
 
-    for (int num : List.of(0, 1, 4, 16, 256, 1024)) {
+    for (int num : ImmutableList.of(0, 1, 4, 16, 256, 1024)) {
       Formula bv2fp = fpmgr.fromIeeeBitvector(bvmgr.makeBitvector(16, num), fpType);
       mgr.visit(bv2fp, visitor);
       Formula fp2bv = fpmgr.toIeeeBitvector(fpmgr.makeNumber(num, fpType));
@@ -676,10 +664,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
                   break;
                 case BV_NOT:
                 case BV_NEG:
-                  // Yices is special in some cases
-                  if (Solvers.YICES2 != solverToUse()) {
-                    assertThat(pArgs).hasSize(1);
-                  }
+                  assertThat(pArgs).hasSize(1);
                   break;
                 case BV_ADD:
                   assertThat(pArgs).contains(x);
@@ -688,6 +673,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
                 case BV_MUL:
                   assertThat(pArgs).contains(y);
                   assertThat(pArgs).hasSize(2);
+                  // Yices is special in some cases
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).contains(x);
                   }
@@ -722,8 +708,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             smgr.prefix(x, y),
             smgr.suffix(x, y),
             smgr.in(x, r))) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(f).isEquivalentTo(f2);
@@ -747,7 +733,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.charAt(x, offset))
             .add(smgr.toStringFormula(offset))
             .add(smgr.concat(x, y, z));
-    if (solverToUse() != Solvers.PRINCESS) { // TODO Princess crashes with MatchError of IFunApp
+    if (solverToUse() != Solvers.PRINCESS) {
+      // TODO Princess crashes with MatchError of IFunApp, fixed in Ostrich 2.0
       formulas.add(smgr.fromCodePoint(cp));
     }
     if (solverToUse() != Solvers.Z3) {
@@ -782,13 +769,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.closure(r))
             .add(smgr.concat(r, r, r, s, s, s))
             .add(smgr.cross(r));
-    if (solverToUse() != Solvers.Z3) {
-      formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
-      // invalid function OTHER/INTERNAL in visitor, bug in Z3?
-    }
+    formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
     for (RegexFormula f : formulas.build()) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       RegexFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
     }
@@ -1159,8 +1143,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNestedIntegerFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
-    // Z3 returns UNKNOWN as its quantifiers can not handle this.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -1181,8 +1163,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNestedIntegerFormulaQuantifierRecursiveHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
-    // Z3 returns UNKNOWN as its quantifiers can not handle this.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -1604,5 +1584,30 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
 
     // check UF-equality. This check went wrong in CVC4 and was fixed.
     assertThat(usedDecls.get(1)).isEqualTo(usedDecls.get(3));
+  }
+
+  @Test
+  public void testSl() throws SolverException, InterruptedException {
+    requireSeparationLogic();
+
+    // check constants
+    ConstantsVisitor visitor = new ConstantsVisitor(true);
+    mgr.visit(slmgr.makePointsTo(imgr.makeNumber(3), imgr.makeNumber(5)), visitor);
+    assertThat(visitor.found).containsExactly(BigInteger.valueOf(3), BigInteger.valueOf(5));
+
+    // check variables
+    ImmutableMap<String, Formula> vars =
+        mgr.extractVariables(
+            slmgr.makePointsTo(imgr.makeVariable("pointer"), imgr.makeVariable("value")));
+    assertThat(vars.keySet()).containsExactly("pointer", "value");
+
+    // check trasnformation
+    BooleanFormula f =
+        slmgr.makeStar(
+            slmgr.makePointsTo(imgr.makeNumber(3), imgr.makeNumber(5)),
+            slmgr.makePointsTo(imgr.makeVariable("pointer"), imgr.makeVariable("value")));
+    BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
+    assertThat(f2).isEqualTo(f);
+    assertThatFormula(f).isEquivalentTo(f2);
   }
 }
