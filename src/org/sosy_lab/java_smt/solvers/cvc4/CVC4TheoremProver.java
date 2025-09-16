@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
@@ -157,13 +156,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     checkGenerateModels();
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
-    return registerEvaluator(
-        new CVC4Model(
-            manager,
-            this,
-            creator,
-            smtEngine,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+    return registerEvaluator(new CVC4Model(manager, this, creator, smtEngine));
   }
 
   @Override

@@ -328,22 +328,25 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
       } else if (type.isArray()) {
-        ArrayStoreAll storeAll = f.getConstArrayStoreAll();
-        Expr constant = storeAll.getExpr();
-        return visitor.visitFunction(
-            formula,
-            ImmutableList.of(encapsulate(constant)),
-            FunctionDeclarationImpl.of(
-                getName(f),
-                getDeclarationKind(f),
-                ImmutableList.of(getFormulaTypeFromTermType(constant.getType())),
-                getFormulaType(f),
-                f.getKind()));
+        if (f.getKind().equals(Kind.STORE_ALL)) {
+          ArrayStoreAll storeAll = f.getConstArrayStoreAll();
+          Expr constant = storeAll.getExpr();
+          return visitor.visitFunction(
+              formula,
+              ImmutableList.of(encapsulate(constant)),
+              FunctionDeclarationImpl.of(
+                  getName(f),
+                  getDeclarationKind(f),
+                  ImmutableList.of(getFormulaTypeFromTermType(constant.getType())),
+                  getFormulaType(f),
+                  f.getKind()));
+        }
       } else {
         throw new UnsupportedOperationException("Unhandled constant " + f + " with type " + type);
       }
+    }
 
-    } else if (f.getKind() == Kind.BOUND_VARIABLE) {
+    if (f.getKind() == Kind.BOUND_VARIABLE) {
       // BOUND vars are used for all vars that are bound to a quantifier in CVC4.
       // We resubstitute them back to the original free.
       // CVC4 doesn't give you the de-brujin index
