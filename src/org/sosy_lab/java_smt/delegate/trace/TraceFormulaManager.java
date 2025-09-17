@@ -317,7 +317,9 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_AS_IEEEBV:
       case FP_FROM_IEEEBV:
       case STR_LENGTH:
+      case STR_TO_RE:
       case RE_COMPLEMENT:
+      case SEP_NIL:
         return 1;
 
       case SELECT:
@@ -357,6 +359,10 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_CASTTO_UBV:
       case STR_CONCAT:
       case RE_RANGE:
+      case SEP_PTO:
+      case SEP_EMP:
+      case SEP_STAR:
+      case SEP_WAND:
         return 2;
 
       case ITE:
@@ -365,6 +371,8 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_ADD:
       case FP_DIV:
       case FP_MUL:
+      case STR_INDEX_OF:
+      case STR_SUBSTRING:
         return 3;
 
       default:
@@ -981,6 +989,31 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getStringFormulaManager()
                   .difference((RegexFormula) args.get(0), (RegexFormula) args.get(1));
+        case SEP_EMP:
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getSLFormulaManager()
+                  .makeEmptyHeap(
+                      (FormulaType<? extends Formula>) args.get(0),
+                      (FormulaType<? extends Formula>) args.get(1));
+        case SEP_NIL:
+          Preconditions.checkArgument(args.size() == 1);
+          return (T)
+              getSLFormulaManager().makeNilElement((FormulaType<? extends Formula>) args.get(0));
+        case SEP_PTO:
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getSLFormulaManager().makePointsTo((Formula) args.get(0), (Formula) args.get(1));
+        case SEP_STAR:
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getSLFormulaManager()
+                  .makeStar((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
+        case SEP_WAND:
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getSLFormulaManager()
+                  .makeMagicWand((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         /* TODO
         case OTHER:
           break;

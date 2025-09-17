@@ -322,6 +322,13 @@ public enum FunctionDeclarationKind {
   RE_COMPLEMENT,
   RE_DIFFERENCE,
 
+  // Separation logic
+  SEP_EMP,
+  SEP_NIL,
+  SEP_PTO,
+  SEP_STAR,
+  SEP_WAND,
+
   // default case
 
   /**
