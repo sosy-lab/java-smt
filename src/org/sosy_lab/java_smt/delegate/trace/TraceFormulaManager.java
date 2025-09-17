@@ -206,6 +206,7 @@ public class TraceFormulaManager implements FormulaManager {
       return f;
     }
 
+    @SuppressWarnings("CheckReturnValue")
     @Override
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
@@ -219,13 +220,26 @@ public class TraceFormulaManager implements FormulaManager {
       return f;
     }
 
+    @SuppressWarnings("CheckReturnValue")
     @Override
     public BooleanFormula visitQuantifier(
         BooleanFormula f,
         Quantifier quantifier,
         List<Formula> boundVariables,
         BooleanFormula body) {
-      throw new UnsupportedOperationException();
+      if (!logger.isTracked(f)) {
+        // final Formula g;
+        if (quantifier == Quantifier.EXISTS) {
+          // g =
+          getQuantifiedFormulaManager().exists(boundVariables, body);
+        } else {
+          // g =
+          getQuantifiedFormulaManager().forall(boundVariables, body);
+        }
+        // precondition is not helpful, as some solvers restructure their formulas.
+        // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+      }
+      return f;
     }
   }
 
@@ -997,9 +1011,10 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    logger.appendStmt(String.format("mgr.parse(\"%s\")", s));
+    String var = logger.newVariable();
+    logger.appendDef(var, String.format("mgr.parse(\"%s\")", s));
     BooleanFormula f = delegate.parse(s);
-    logger.undoLast();
+    logger.mapVariable(var, f);
     return rebuild(f);
   }
 
