@@ -467,6 +467,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_TO_NAT, FunctionDeclarationKind.UBV_TO_INT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           // Floating-point theory

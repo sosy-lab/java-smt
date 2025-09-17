@@ -205,6 +205,12 @@ public enum FunctionDeclarationKind {
   /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
 
+  /** Convert an unsigned bitvector to integer. The result is in [0, 2^size - 1]. */
+  UBV_TO_INT,
+
+  /** Convert a signed bitvector to integer. The result is in [-2^(size-1), 2^(size-1) - 1]. */
+  SBV_TO_INT,
+
   // Simple floating point operations
 
   /** Negation of a floating point. */

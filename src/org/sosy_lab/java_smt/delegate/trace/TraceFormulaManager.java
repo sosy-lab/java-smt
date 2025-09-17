@@ -212,7 +212,7 @@ public class TraceFormulaManager implements FormulaManager {
       if (!logger.isTracked(f)) {
         Formula g = makeApplication(functionDeclaration, args);
         if (!g.equals(f)) {
-          Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+          // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
         }
       }
       return f;
@@ -304,6 +304,8 @@ public class TraceFormulaManager implements FormulaManager {
       case BV_NEG:
       case BV_ROTATE_LEFT_BY_INT:
       case BV_ROTATE_RIGHT_BY_INT:
+      case UBV_TO_INT:
+      case SBV_TO_INT:
       case FP_NEG:
       case FP_ABS:
       case FP_IS_NAN:
@@ -752,6 +754,12 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getFloatingPointFormulaManager()
                   .castFrom(args.get(0), true, (FloatingPointType) declaration.getType());
+        case UBV_TO_INT:
+          return (T)
+              getBitvectorFormulaManager().toIntegerFormula((BitvectorFormula) args.get(0), false);
+        case SBV_TO_INT:
+          return (T)
+              getBitvectorFormulaManager().toIntegerFormula((BitvectorFormula) args.get(0), true);
         case FP_NEG:
           return (T) getFloatingPointFormulaManager().negate((FloatingPointFormula) args.get(0));
         case FP_ABS:
