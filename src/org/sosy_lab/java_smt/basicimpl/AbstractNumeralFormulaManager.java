@@ -211,7 +211,6 @@ public abstract class AbstractNumeralFormulaManager<
       return makeNumberImpl(0);
     } else {
       TFormulaInfo result = operands.get(0);
-      ;
       for (TFormulaInfo operand : operands.subList(1, operands.size())) {
         result = add(result, operand);
       }
