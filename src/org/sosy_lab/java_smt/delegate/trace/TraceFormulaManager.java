@@ -210,10 +210,11 @@ public class TraceFormulaManager implements FormulaManager {
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       if (!logger.isTracked(f)) {
-        Formula g = makeApplication(functionDeclaration, args);
-        if (!g.equals(f)) {
-          // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
-        }
+        // Formula g =
+        //noinspection ResultOfMethodCallIgnored
+        makeApplication(functionDeclaration, args);
+        // precondition is not helpful, as some solvers restructure their formulas.
+        // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
     }
@@ -411,30 +412,24 @@ public class TraceFormulaManager implements FormulaManager {
         case OR:
           return (T) getBooleanFormulaManager().or((List<BooleanFormula>) args);
         case IFF:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBooleanFormulaManager()
-                    .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBooleanFormulaManager()
+                  .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         case ITE:
           return getBooleanFormulaManager()
               .ifThenElse((BooleanFormula) args.get(0), (T) args.get(1), (T) args.get(2));
         case XOR:
-          {
-            Preconditions.checkArgument(args.size() == 2);
+          Preconditions.checkArgument(args.size() == 2);
 
-            return (T)
-                getBooleanFormulaManager()
-                    .xor((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-          }
+          return (T)
+              getBooleanFormulaManager()
+                  .xor((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         case IMPLIES:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBooleanFormulaManager()
-                    .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBooleanFormulaManager()
+                  .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         // TODO We only have 'distinct' for some theories
         /*
         case DISTINCT:
@@ -450,129 +445,108 @@ public class TraceFormulaManager implements FormulaManager {
               getArrayFormulaManager()
                   .makeArray((ArrayFormulaType) declaration.getType(), args.get(0));
         case UMINUS:
-          {
-            if (declaration.getType().isIntegerType()) {
-              return (T) getIntegerFormulaManager().negate((IntegerFormula) args.get(0));
-            } else {
-              return (T) getRationalFormulaManager().negate((NumeralFormula) args.get(0));
-            }
+          if (declaration.getType().isIntegerType()) {
+            return (T) getIntegerFormulaManager().negate((IntegerFormula) args.get(0));
+          } else {
+            return (T) getRationalFormulaManager().negate((NumeralFormula) args.get(0));
           }
         case SUB:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            if (declaration.getType().isIntegerType()) {
-              return (T)
-                  getIntegerFormulaManager()
-                      .subtract((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            } else {
-              return (T)
-                  getRationalFormulaManager()
-                      .subtract((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-            }
+          Preconditions.checkArgument(args.size() == 2);
+          if (declaration.getType().isIntegerType()) {
+            return (T)
+                getIntegerFormulaManager()
+                    .subtract((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .subtract((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case ADD:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            if (declaration.getType().isIntegerType()) {
-              return (T)
-                  getIntegerFormulaManager()
-                      .add((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            } else {
-              return (T)
-                  getRationalFormulaManager()
-                      .add((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-            }
+          Preconditions.checkArgument(args.size() == 2);
+          if (declaration.getType().isIntegerType()) {
+            return (T)
+                getIntegerFormulaManager()
+                    .add((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .add((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case DIV:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            if (declaration.getType().isIntegerType()) {
-              return (T)
-                  getIntegerFormulaManager()
-                      .divide((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            } else {
-              return (T)
-                  getRationalFormulaManager()
-                      .divide((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-            }
+          Preconditions.checkArgument(args.size() == 2);
+          if (declaration.getType().isIntegerType()) {
+            return (T)
+                getIntegerFormulaManager()
+                    .divide((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .divide((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case MUL:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            if (declaration.getType().isIntegerType()) {
-              return (T)
-                  getIntegerFormulaManager()
-                      .multiply((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-            } else {
-              return (T)
-                  getRationalFormulaManager()
-                      .multiply((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-            }
+          Preconditions.checkArgument(args.size() == 2);
+          if (declaration.getType().isIntegerType()) {
+            return (T)
+                getIntegerFormulaManager()
+                    .multiply((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .multiply((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case MODULO:
           return (T)
               getIntegerFormulaManager()
                   .modulo((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
         case LT:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getRationalFormulaManager()
-                    .lessThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getRationalFormulaManager()
+                  .lessThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case LTE:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getRationalFormulaManager()
-                    .lessOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getRationalFormulaManager()
+                  .lessOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case GT:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getRationalFormulaManager()
-                    .greaterThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getRationalFormulaManager()
+                  .greaterThan((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case GTE:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getRationalFormulaManager()
-                    .greaterOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getRationalFormulaManager()
+                  .greaterOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case EQ:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            if (declaration.getArgumentTypes().get(0).isBooleanType()) {
+          Preconditions.checkArgument(args.size() == 2);
+          if (declaration.getArgumentTypes().get(0).isBooleanType()) {
+            return (T)
+                getBooleanFormulaManager()
+                    .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
+          } else if (declaration.getArgumentTypes().get(1).isNumeralType()) {
+            if (declaration.getArgumentTypes().get(0).isRationalType()
+                || declaration.getArgumentTypes().get(1).isRationalType()) {
               return (T)
-                  getBooleanFormulaManager()
-                      .equivalence((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(1).isNumeralType()) {
-              if (declaration.getArgumentTypes().get(0).isRationalType()
-                  || declaration.getArgumentTypes().get(1).isRationalType()) {
-                return (T)
-                    getRationalFormulaManager()
-                        .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
-              } else {
-                return (T)
-                    getIntegerFormulaManager()
-                        .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
-              }
-            } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
-              return (T)
-                  getBitvectorFormulaManager()
-                      .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-            } else if (declaration.getArgumentTypes().get(0).isArrayType()) {
-              return (T)
-                  getArrayFormulaManager()
-                      .equivalence((ArrayFormula) args.get(0), (ArrayFormula) args.get(1));
+                  getRationalFormulaManager()
+                      .equal((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
             } else {
-              throw new UnsupportedOperationException(
-                  String.format(
-                      "EQ not supported for theory " + "%s",
-                      declaration.getArgumentTypes().get(0)));
+              return (T)
+                  getIntegerFormulaManager()
+                      .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
             }
+          } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
+            return (T)
+                getBitvectorFormulaManager()
+                    .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
+          } else if (declaration.getArgumentTypes().get(0).isArrayType()) {
+            return (T)
+                getArrayFormulaManager()
+                    .equivalence((ArrayFormula) args.get(0), (ArrayFormula) args.get(1));
+          } else {
+            throw new UnsupportedOperationException(
+                String.format(
+                    "EQ not supported for theory " + "%s", declaration.getArgumentTypes().get(0)));
           }
         // TODO
         /*
@@ -585,30 +559,24 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getRationalFormulaManager().sum(ImmutableList.of((NumeralFormula) args.get(0)));
         case FLOOR:
-          {
-            if (args.get(0) instanceof IntegerFormula) {
-              return (T) getIntegerFormulaManager().floor((IntegerFormula) args.get(0));
-            } else {
-              return (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
-            }
+          if (args.get(0) instanceof IntegerFormula) {
+            return (T) getIntegerFormulaManager().floor((IntegerFormula) args.get(0));
+          } else {
+            return (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
           }
         case BV_EXTRACT:
-          {
-            List<String> tokens = Splitter.on('_').splitToList(declaration.getName());
-            return (T)
-                getBitvectorFormulaManager()
-                    .extract(
-                        (BitvectorFormula) args.get(0),
-                        Integer.parseInt(tokens.get(1)),
-                        Integer.parseInt(tokens.get(2)));
-          }
+          List<String> tokens = Splitter.on('_').splitToList(declaration.getName());
+          return (T)
+              getBitvectorFormulaManager()
+                  .extract(
+                      (BitvectorFormula) args.get(0),
+                      Integer.parseInt(tokens.get(1)),
+                      Integer.parseInt(tokens.get(2)));
         case BV_CONCAT:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         // TODO
         /*case BV_SIGN_EXTENSION:
           break;
@@ -620,40 +588,30 @@ public class TraceFormulaManager implements FormulaManager {
         case BV_NEG:
           return (T) getBitvectorFormulaManager().negate((BitvectorFormula) args.get(0));
         case BV_OR:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .or((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .or((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_AND:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .and((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .and((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_XOR:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .xor((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .xor((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_SUB:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .subtract((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .subtract((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_ADD:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .add((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .add((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_SDIV:
           return (T)
               getBitvectorFormulaManager()
@@ -675,12 +633,10 @@ public class TraceFormulaManager implements FormulaManager {
               getBitvectorFormulaManager()
                   .smodulo((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_MUL:
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .multiply((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .multiply((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_ULT:
           return (T)
               getBitvectorFormulaManager()
@@ -720,12 +676,10 @@ public class TraceFormulaManager implements FormulaManager {
                   .greaterOrEquals(
                       (BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1), true);
         case BV_EQ: // FIXME Why is this a separate symbol?
-          {
-            Preconditions.checkArgument(args.size() == 2);
-            return (T)
-                getBitvectorFormulaManager()
-                    .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-          }
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getBitvectorFormulaManager()
+                  .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
         case BV_SHL:
           return (T)
               getBitvectorFormulaManager()
