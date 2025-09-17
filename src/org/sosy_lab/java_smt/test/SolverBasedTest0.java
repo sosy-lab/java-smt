@@ -131,24 +131,23 @@ public abstract class SolverBasedTest0 {
   }
 
   protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
-    String tracefile =
-        String.format(
-            "traces/%s/trace_%s_%s.java",
-            this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
-
     ConfigurationBuilder newConfig =
-        Configuration.builder()
-            .setOption("solver.solver", solverToUse().toString())
-            .setOption("solver.trace", "true")
-            .setOption("solver.tracefile", tracefile);
+        Configuration.builder().setOption("solver.solver", solverToUse().toString());
+
+    if (solverToUse() != Solvers.BOOLECTOR) { // Boolector has no formula visitation.
+      String tracefile =
+          String.format(
+              "traces/%s/trace_%s_%s.java",
+              this.getClass().getSimpleName(), testName.getMethodName(), System.nanoTime());
+      newConfig.setOption("solver.trace", "true").setOption("solver.tracefile", tracefile);
+      Configuration configForFiles = Configuration.builder().setOption("output.path", "./").build();
+      FileTypeConverter fileTypeConverter = FileTypeConverter.create(configForFiles);
+      Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
+      newConfig.addConverter(PathTemplate.class, fileTypeConverter);
+    }
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
-
-    Configuration configForFiles = Configuration.builder().setOption("output.path", "./").build();
-    FileTypeConverter fileTypeConverter = FileTypeConverter.create(configForFiles);
-    Configuration.getDefaultConverters().put(FileOption.class, fileTypeConverter);
-    newConfig.addConverter(PathTemplate.class, fileTypeConverter);
 
     return newConfig;
   }
