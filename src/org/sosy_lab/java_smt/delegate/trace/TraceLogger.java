@@ -230,6 +230,9 @@ class TraceLogger {
           "FormulaType.getFloatingPointType(%s, %s)",
           fpType.getExponentSize(), fpType.getMantissaSize());
     }
+    if (pType.isStringType()) {
+      return "FormulaType.StringType";
+    }
     // FIXME Handle other cases
     throw new IllegalArgumentException(
         String.format("Unsupported formula type %s of class %s.", pType, pType.getClass()));
