@@ -239,12 +239,13 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression formula) {
+    IExpression simplified = creator.getEnv().simplify(formula);
     if (formula instanceof ITerm) {
-      return model.evalToTerm((ITerm) formula).getOrElse(() -> null);
+      return model.evalToTerm((ITerm) simplified).getOrElse(() -> null);
     } else if (formula instanceof IFormula) {
-      return model.evalExpression(formula).getOrElse(() -> null);
+      return model.evalExpression(simplified).getOrElse(() -> null);
     } else {
-      throw new AssertionError("unexpected formula: " + formula);
+      throw new AssertionError(); // unreachable
     }
   }
 }
