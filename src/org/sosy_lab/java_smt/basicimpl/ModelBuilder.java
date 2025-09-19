@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +60,7 @@ public class ModelBuilder {
                 ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
                 builder.putAll(nextIndex);
                 builder.putAll(nextMatch);
-                return builder.build();
+                return builder.buildOrThrow();
               } else {
                 throw new IllegalArgumentException();
               }
@@ -127,25 +129,23 @@ public class ModelBuilder {
   public ImmutableList<ValueAssignment> buildArrayAssignments(
       ArrayFormula<?, ?> pVariable, Formula pValue) {
     var values = collectArrayIndices(ImmutableList.of(), pValue);
-    return FluentIterable.from(values.entrySet())
-        .transform(
-            entry -> {
-              var idx = entry.getKey();
-              var left = buildSelectTerm(pVariable, idx);
-              var right = entry.getValue();
+    return transformedImmutableListCopy(
+        values.entrySet(),
+        entry -> {
+          var idx = entry.getKey();
+          var left = buildSelectTerm(pVariable, idx);
+          var right = entry.getValue();
 
-              return new ValueAssignment(
-                  left,
-                  right,
-                  mgr.equal(left, right),
-                  getVariableName(pVariable),
-                  getConstantValue(right),
-                  FluentIterable.from(idx).transform(this::getConstantValue).toList());
-            })
-        .toList();
+          return new ValueAssignment(
+              left,
+              right,
+              mgr.equal(left, right),
+              getVariableName(pVariable),
+              getConstantValue(right),
+              FluentIterable.from(idx).transform(this::getConstantValue).toList());
+        });
   }
 
-  @SuppressWarnings("unused")
   private Map<Formula, Formula> collectUFTerms(
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class UFVisitor extends FormulaTransformationVisitor {
@@ -170,8 +170,7 @@ public class ModelBuilder {
           if (evaluated.size() == newArgs.size()) {
             ufTerms.put(
                 mgr.makeApplication(
-                    functionDeclaration,
-                    FluentIterable.from(newArgs).transform(pEval::apply).toList()),
+                    functionDeclaration, transformedImmutableListCopy(newArgs, pEval::apply)),
                 pEval.apply(f));
           }
         }
@@ -183,6 +182,7 @@ public class ModelBuilder {
       }
     }
     var ufTerms = new UFVisitor();
+    @SuppressWarnings("unused")
     var unused = mgr.transformRecursively(pAssertions, ufTerms);
     return ufTerms.getUfTerms();
   }
@@ -232,26 +232,26 @@ public class ModelBuilder {
   /**
    * Build assignments for all UFs in the asserted formulas.
    *
+   * @param pAssertions conjunction of all assertions on the stack
    * @param eval function to evaluate terms to values in the current model
    */
   public ImmutableList<ValueAssignment> buildUfAssignments(
       Formula pAssertions, Function<Formula, Formula> eval) {
     var ufTerms = collectUFTerms(pAssertions, eval);
-    return FluentIterable.from(ufTerms.entrySet())
-        .transform(
-            entry -> {
-              var left = entry.getKey();
-              var right = entry.getValue();
+    return transformedImmutableListCopy(
+        ufTerms.entrySet(),
+        entry -> {
+          var left = entry.getKey();
+          var right = entry.getValue();
 
-              return new ValueAssignment(
-                  left,
-                  right,
-                  mgr.equal(left, right),
-                  getUfName(left),
-                  getConstantValue(right),
-                  FluentIterable.from(getUfArgs(left)).transform(this::getConstantValue).toList());
-            })
-        .toList();
+          return new ValueAssignment(
+              left,
+              right,
+              mgr.equal(left, right),
+              getUfName(left),
+              getConstantValue(right),
+              FluentIterable.from(getUfArgs(left)).transform(this::getConstantValue).toList());
+        });
   }
 
   /** Create an assignment for a normal variable. */

@@ -9,8 +9,8 @@
 package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.SmtEngine;
@@ -52,6 +52,6 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    return ImmutableList.copyOf(FluentIterable.from(model).toSet());
+    return ImmutableList.copyOf(ImmutableSet.copyOf(model));
   }
 }

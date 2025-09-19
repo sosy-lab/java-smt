@@ -2307,7 +2307,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           }
         }
       }
-      var model = builder.build();
+      var model = builder.buildOrThrow();
       assertThat(model).containsAtLeastEntriesIn(expected);
 
     } catch (SolverException | InterruptedException e) {
