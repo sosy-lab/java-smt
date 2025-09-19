@@ -714,6 +714,9 @@ class PrincessFormulaCreator
       }
     }
 
+    if (isValue(input)) {
+      return visitor.visitConstant(encapsulateWithTypeOf(input), convertValue(input));
+    }
     if (input instanceof IQuantified) {
       // Is it a quantifier?
       return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
