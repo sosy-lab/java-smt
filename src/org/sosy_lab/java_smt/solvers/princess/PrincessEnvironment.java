@@ -12,6 +12,7 @@ import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.collectionAsScalaIterableConverter;
 
 import ap.api.SimpleAPI;
+import ap.basetypes.IdealInt;
 import ap.parameters.GlobalSettings;
 import ap.parser.BooleanCompactifier;
 import ap.parser.Environment.EnvironmentException;
@@ -22,6 +23,7 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
+import ap.parser.IIntLit;
 import ap.parser.IIntRelation;
 import ap.parser.IPlus;
 import ap.parser.ITerm;
@@ -590,6 +592,18 @@ class PrincessEnvironment {
       FormulaType<?> t1 = getFormulaType(plus.left());
       FormulaType<?> t2 = getFormulaType(plus.right());
       return mergeFormulaTypes(t1, t2);
+    } else if (pFormula instanceof IFunApp
+        && ((IFunApp) pFormula).fun().equals(ModuloArithmetic.bv_extract())) {
+      IIntLit upper = (IIntLit) pFormula.apply(0);
+      IIntLit lower = (IIntLit) pFormula.apply(1);
+      IdealInt bwResult = upper.value().$minus(lower.value());
+      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue());
+    } else if (pFormula instanceof IFunApp
+        && ((IFunApp) pFormula).fun().equals(ModuloArithmetic.bv_concat())) {
+      IIntLit upper = (IIntLit) pFormula.apply(0);
+      IIntLit lower = (IIntLit) pFormula.apply(1);
+      IdealInt bwResult = upper.value().$plus(lower.value());
+      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue());
     } else {
       final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
       try {
