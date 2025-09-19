@@ -89,6 +89,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessModularCongruenceDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessMultiplyDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalDivisionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalFloorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
 import scala.Enumeration;
 import scala.collection.JavaConverters;
@@ -626,6 +627,9 @@ class PrincessFormulaCreator
         buildPattern(
             PrincessRationalDivisionDeclaration.INSTANCE,
             ImmutableList.of(symbolReal1, symbolReal2)),
+
+        // Rational.floor
+        buildPattern(PrincessRationalFloorDeclaration.INSTANCE, ImmutableList.of(symbolReal1)),
 
         // Integer.divide
         buildPattern(

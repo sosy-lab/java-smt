@@ -467,6 +467,29 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
+  static class PrincessRationalFloorDeclaration extends PrincessFunctionDeclaration {
+    static final PrincessRationalFloorDeclaration INSTANCE =
+        new PrincessRationalFloorDeclaration() {};
+
+    private PrincessRationalFloorDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 1);
+      return Rationals.ring2int((ITerm) args.get(0));
+    }
+
+    @Override
+    public String getName() {
+      return "floor";
+    }
+
+    @Override
+    public FunctionDeclarationKind getKind() {
+      return FunctionDeclarationKind.FLOOR;
+    }
+  }
+
   static class PrincessIntegerDivisionDeclaration extends PrincessFunctionDeclaration {
     static final PrincessIntegerDivisionDeclaration INSTANCE =
         new PrincessIntegerDivisionDeclaration() {};

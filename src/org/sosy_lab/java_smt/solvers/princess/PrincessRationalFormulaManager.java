@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalDivisionDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalFloorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
 
 public class PrincessRationalFormulaManager
@@ -112,7 +113,8 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression floor(IExpression number) {
-    return Rationals.ring2int((ITerm) number);
+    return PrincessRationalFloorDeclaration.INSTANCE.makeApp(
+        getFormulaCreator().getEnv(), ImmutableList.of(number));
   }
 
   @Override
