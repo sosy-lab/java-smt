@@ -13,6 +13,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
+import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -120,6 +122,42 @@ public interface FormulaManager {
    * @return Constructed formula
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
+
+  /**
+   * Returns the formula <code>(= a b)</code> for two arguments <code>a</code> and <code>b</code>.
+   *
+   * <p>The types of the arguments need to be compatible. This generally means that they have to be
+   * the same, but {@link IntegerFormula} and {@link RationalFormula} can be mixed
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  default BooleanFormula equal(Formula arg1, Formula arg2) {
+    // TODO Add a version with a variable number of arguments?
+    // TODO Add `distinct`?
+    if (arg1 instanceof BooleanFormula) {
+      return getBooleanFormulaManager().equivalence((BooleanFormula) arg1, (BooleanFormula) arg2);
+    } else if (arg1 instanceof IntegerFormula && arg2 instanceof IntegerFormula) {
+      return getIntegerFormulaManager().equal((IntegerFormula) arg1, (IntegerFormula) arg2);
+    } else if (arg1 instanceof NumeralFormula) {
+      return getRationalFormulaManager().equal((NumeralFormula) arg1, (NumeralFormula) arg2);
+    } else if (arg1 instanceof BitvectorFormula) {
+      return getBitvectorFormulaManager().equal((BitvectorFormula) arg1, (BitvectorFormula) arg2);
+    } else if (arg1 instanceof FloatingPointFormula) {
+      return getFloatingPointFormulaManager()
+          .assignment((FloatingPointFormula) arg1, (FloatingPointFormula) arg2);
+    } else if (arg1 instanceof StringFormula) {
+      return getStringFormulaManager().equal((StringFormula) arg1, (StringFormula) arg2);
+    } else if (arg1 instanceof EnumerationFormula) {
+      return getEnumerationFormulaManager()
+          .equivalence((EnumerationFormula) arg1, (EnumerationFormula) arg2);
+    } else if (arg1 instanceof ArrayFormula) {
+      return getArrayFormulaManager().equivalence((ArrayFormula) arg1, (ArrayFormula) arg2);
+    } else {
+      throw new IllegalArgumentException(
+          String.format(
+              "Can't create equality for types %s and %s",
+              arg1.getClass().getSimpleName(), arg2.getClass().getSimpleName()));
+    }
+  }
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

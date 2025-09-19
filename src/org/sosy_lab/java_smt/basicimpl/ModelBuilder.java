@@ -18,18 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BitvectorFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.EnumerationFormula;
-import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
-import org.sosy_lab.java_smt.api.NumeralFormula;
-import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
-import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
@@ -130,37 +123,6 @@ public class ModelBuilder {
     }
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  private BooleanFormula makeEqual(Formula pLeft, Formula pRight) {
-    // TODO Move this method to FormulaManager?
-    if (pLeft instanceof BooleanFormula) {
-      return mgr.getBooleanFormulaManager()
-          .equivalence((BooleanFormula) pLeft, (BooleanFormula) pRight);
-    } else if (pLeft instanceof IntegerFormula && pRight instanceof IntegerFormula) {
-      return mgr.getIntegerFormulaManager().equal((IntegerFormula) pLeft, (IntegerFormula) pRight);
-    } else if (pLeft instanceof NumeralFormula) {
-      return mgr.getRationalFormulaManager().equal((NumeralFormula) pLeft, (NumeralFormula) pRight);
-    } else if (pLeft instanceof BitvectorFormula) {
-      return mgr.getBitvectorFormulaManager()
-          .equal((BitvectorFormula) pLeft, (BitvectorFormula) pRight);
-    } else if (pLeft instanceof FloatingPointFormula) {
-      return mgr.getFloatingPointFormulaManager()
-          .assignment((FloatingPointFormula) pLeft, (FloatingPointFormula) pRight);
-    } else if (pLeft instanceof StringFormula) {
-      return mgr.getStringFormulaManager().equal((StringFormula) pLeft, (StringFormula) pRight);
-    } else if (pLeft instanceof EnumerationFormula) {
-      return mgr.getEnumerationFormulaManager()
-          .equivalence((EnumerationFormula) pLeft, (EnumerationFormula) pRight);
-    } else if (pLeft instanceof ArrayFormula) {
-      return mgr.getArrayFormulaManager().equivalence((ArrayFormula) pLeft, (ArrayFormula) pRight);
-    } else {
-      throw new IllegalArgumentException(
-          String.format(
-              "Can't create equality for types %s and %s",
-              pLeft.getClass().getSimpleName(), pRight.getClass().getSimpleName()));
-    }
-  }
-
   /** Convert a "Store" term into a list of assignments. */
   public ImmutableList<ValueAssignment> buildArrayAssignments(
       ArrayFormula<?, ?> pVariable, Formula pValue) {
@@ -175,7 +137,7 @@ public class ModelBuilder {
               return new ValueAssignment(
                   left,
                   right,
-                  makeEqual(left, right),
+                  mgr.equal(left, right),
                   getVariableName(pVariable),
                   getConstantValue(right),
                   FluentIterable.from(idx).transform(this::getConstantValue).toList());
@@ -284,7 +246,7 @@ public class ModelBuilder {
               return new ValueAssignment(
                   left,
                   right,
-                  makeEqual(left, right),
+                  mgr.equal(left, right),
                   getUfName(left),
                   getConstantValue(right),
                   FluentIterable.from(getUfArgs(left)).transform(this::getConstantValue).toList());
@@ -297,7 +259,7 @@ public class ModelBuilder {
     return new ValueAssignment(
         pVariable,
         pValue,
-        makeEqual(pVariable, pValue),
+        mgr.equal(pVariable, pValue),
         getVariableName(pVariable),
         getConstantValue(pValue),
         ImmutableList.of());
