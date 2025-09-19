@@ -268,7 +268,7 @@ public class ModelBuilder {
   }
 
   /**
-   * Build assignments for alls UFs in the assertion term.
+   * Build assignments for all UFs in the asserted formulas.
    *
    * @param eval function to evaluate terms to values in the current model
    */
