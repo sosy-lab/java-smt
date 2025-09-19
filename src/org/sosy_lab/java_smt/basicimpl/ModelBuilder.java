@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.collect.FluentIterable;
@@ -32,7 +33,7 @@ public class ModelBuilder {
   private final FormulaManager mgr;
 
   public ModelBuilder(FormulaManager pFormulaManager) {
-    mgr = pFormulaManager;
+    mgr = checkNotNull(pFormulaManager);
   }
 
   private Map<List<Formula>, Formula> collectArrayIndices(List<Formula> pIndices, Formula pValue) {
@@ -237,7 +238,7 @@ public class ModelBuilder {
    */
   public ImmutableList<ValueAssignment> buildUfAssignments(
       Formula pAssertions, Function<Formula, Formula> eval) {
-    var ufTerms = collectUFTerms(pAssertions, eval);
+    var ufTerms = collectUFTerms(pAssertions, checkNotNull(eval));
     return transformedImmutableListCopy(
         ufTerms.entrySet(),
         entry -> {
