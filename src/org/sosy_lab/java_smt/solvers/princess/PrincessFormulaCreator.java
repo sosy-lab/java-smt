@@ -624,6 +624,7 @@ class PrincessFormulaCreator
         buildPattern(
             PrincessRationalDivisionDeclaration.INSTANCE,
             ImmutableList.of(symbolReal1, symbolReal2)),
+
         // Integer.divide
         buildPattern(
             PrincessIntegerDivisionDeclaration.INSTANCE,
@@ -643,6 +644,7 @@ class PrincessFormulaCreator
             PrincessIntegerDivisionDeclaration.INSTANCE,
             ImmutableList.of(symbolInt1, IExpression.i(3).unary_$minus()),
             true),
+
         // Integer.modulo
         buildPattern(
             PrincessIntegerModuloDeclaration.INSTANCE, ImmutableList.of(symbolInt1, symbolInt2)),
@@ -661,6 +663,7 @@ class PrincessFormulaCreator
             PrincessIntegerModuloDeclaration.INSTANCE,
             ImmutableList.of(symbolInt1, IExpression.i(3).unary_$minus()),
             true),
+
         // Integer.modularCongruence
         buildPattern(
             PrincessModularCongruenceDeclaration.INSTANCE,
