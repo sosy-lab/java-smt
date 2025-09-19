@@ -450,6 +450,9 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       checkArgument(args.size() == 2);
+      // SMT-LIB allows division by zero, so we use divWithSpecialZero here.
+      // If the divisor is zero, divWithSpecialZero will evaluate to a unary UF `ratDivZero`,
+      // otherwise it is the normal division
       return Rationals.divWithSpecialZero((ITerm) args.get(0), (ITerm) args.get(1));
     }
 
