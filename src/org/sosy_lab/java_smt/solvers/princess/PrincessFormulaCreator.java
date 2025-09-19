@@ -144,6 +144,8 @@ class PrincessFormulaCreator
     theoryPredKind.put(ModuloArithmetic.bv_ule(), FunctionDeclarationKind.BV_ULE);
     theoryPredKind.put(ModuloArithmetic.bv_slt(), FunctionDeclarationKind.BV_SLT);
     theoryPredKind.put(ModuloArithmetic.bv_sle(), FunctionDeclarationKind.BV_SLE);
+    theoryPredKind.put(Rationals.lessThan(), FunctionDeclarationKind.LT);
+    theoryPredKind.put(Rationals.lessThanOrEqual(), FunctionDeclarationKind.LTE);
 
     theoryFunctionKind.put(GroebnerMultiplication$.MODULE$.mul(), FunctionDeclarationKind.MUL);
 
