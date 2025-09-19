@@ -122,7 +122,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   }
 
   private void requireVariableStringLiterals() {
-    // FIXME: Remove once support for operations on non-singleton Strings has been added
+    // FIXME: Remove once we've updated to Ostrich 2.0
     // See https://github.com/uuverifiers/ostrich/issues/88
     assume()
         .withMessage(
@@ -162,7 +162,7 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
             .isEqualTo("\\u{39E}");
 
         // Test with a character that is not in the BMP
-        if (solver != Solvers.PRINCESS && solver != Solvers.CVC5) {
+        if (solver != Solvers.PRINCESS) {
           String str = Character.toString(0x200cb);
           assertThat(model.evaluate(smgr.makeString(str))).isEqualTo(str);
         }
@@ -186,8 +186,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testRegexAllChar() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
-
     RegexFormula regexAllChar = smgr.allChar();
 
     assertThatFormula(smgr.in(a, regexAllChar)).isSatisfiable();
@@ -204,8 +202,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testRegexAllCharUnicode() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
-
     RegexFormula regexAllChar = smgr.allChar();
 
     // special single characters.
@@ -217,8 +213,10 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
     assertThatFormula(smgr.in(makeStringEscaped("\\u{fa6a}"), regexAllChar)).isTautological();
     assertThatFormula(smgr.in(smgr.makeString("頻"), regexAllChar)).isTautological();
     // Xiangqi Black Horse from Supplementary Multilingual Plane
-    assertThatFormula(smgr.in(makeStringEscaped("\\u{1fa6a}"), regexAllChar)).isTautological();
-
+    if (solver != Solvers.PRINCESS) {
+      // Princess does not support codepoint > 0xffff
+      assertThatFormula(smgr.in(makeStringEscaped("\\u{1fa6a}"), regexAllChar)).isTautological();
+    }
     // Combining characters are not matched as one character.
     assertThatFormula(smgr.in(smgr.makeString("ab"), regexAllChar)).isUnsatisfiable();
     assertThatFormula(smgr.in(smgr.makeString("abcdefgh"), regexAllChar)).isUnsatisfiable();
@@ -244,8 +242,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringRegex2() throws SolverException, InterruptedException {
-    requireVariableStringLiterals();
-
     RegexFormula regex = smgr.concat(smgr.closure(a2z), smgr.makeRegex("ll"), smgr.closure(a2z));
     assertThatFormula(smgr.in(hello, regex)).isSatisfiable();
   }
@@ -381,9 +377,6 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringPrefixSuffixConcat() throws SolverException, InterruptedException {
-    // FIXME: Princess will timeout on this test
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
-
     // check whether "prefix + suffix == concat"
     StringFormula prefix = smgr.makeVariable("prefix");
     StringFormula suffix = smgr.makeVariable("suffix");
@@ -542,12 +535,12 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testStringCompare() throws SolverException, InterruptedException {
+    // TODO regression:
+    // - CVC5 was able to solve this in v1.0.2, but no longer in v1.0.5
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
         .isNotEqualTo(Solvers.CVC5);
-    // TODO regression:
-    // - CVC5 was able to solve this in v1.0.2, but no longer in v1.0.5
 
     requireVariableStringLiterals();
 

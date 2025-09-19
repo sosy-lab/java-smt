@@ -60,8 +60,8 @@ abstract class PrincessFunctionDeclaration {
 
   private abstract static class AbstractDeclaration<T> extends PrincessFunctionDeclaration {
 
-    /** some object representing the functon declaration. */
-    protected final T declarationItem;
+    /* some object representing the function declaration. */
+    final T declarationItem;
 
     AbstractDeclaration(T pDeclaration) {
       declarationItem = pDeclaration;
@@ -132,7 +132,7 @@ abstract class PrincessFunctionDeclaration {
       }
     }
 
-    /** Check if the expression returns a <code>Rational</code>. */
+    /* Check if the expression returns a "Rational". */
     private boolean exprIsRational(IExpression arg) {
       if (arg instanceof IFunApp) {
         IFunction fun = ((IFunApp) arg).fun();
@@ -152,7 +152,7 @@ abstract class PrincessFunctionDeclaration {
       return false;
     }
 
-    /** Checks if the k-th argument of the function is a <code>Rational</code>. */
+    /* Checks if the k-th argument of the function is a "Rational". */
     private boolean functionTakesRational(Integer index) {
       // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
       if (declarationItem instanceof MonoSortedIFunction) {

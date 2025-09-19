@@ -389,16 +389,32 @@ class PrincessFormulaCreator
   }
 
   /** Returns true if the expression is a constant value. */
-  private static boolean isValue(IFunApp pExpr) {
-    if (!pExpr.fun().equals(Rationals.frac()) && !pExpr.fun().equals(Rationals.fromRing())) {
-      return false;
-    }
-    for (IExpression sub : asJava(pExpr.args())) {
-      if (!(sub instanceof IIntLit)) {
-        return false;
+  private static boolean isValue(IExpression input) {
+    if (input instanceof IBoolLit || input instanceof IIntLit) {
+      // Boolean or integer literal
+      return true;
+    } else if (input instanceof IFunApp) {
+      IFunApp app = (IFunApp) input;
+      IFunction fun = app.fun();
+      if (fun.equals(Rationals.fromRing()) || fun.equals(Rationals.frac())) {
+        // Rational number literal
+        for (IExpression sub : asJava(app.args())) {
+          if (!(sub instanceof IIntLit)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      if (fun.equals(ModuloArithmetic.mod_cast()) && input.apply(2) instanceof IIntLit) {
+        // Bitvector literal
+        return true;
+      }
+      if (CONSTANT_UFS.contains(fun.name())) {
+        // Nil, Cons from String theory
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   /** Cast integer terms to rational, if needed. */
@@ -698,21 +714,7 @@ class PrincessFormulaCreator
       }
     }
 
-    if (input instanceof IFunApp && isValue((IFunApp) input)) {
-      // Is it a rational value?
-      return visitor.visitConstant(f, convertValue(input));
-
-    } else if (input instanceof IIntLit) {
-      // Is it an integer value?
-      IdealInt value = ((IIntLit) input).value();
-      return visitor.visitConstant(f, value.bigIntValue());
-
-    } else if (input instanceof IBoolLit) {
-      // Is it a boolean value?
-      IBoolLit literal = (IBoolLit) input;
-      return visitor.visitConstant(f, literal.value());
-
-    } else if (input instanceof IQuantified) {
+    if (input instanceof IQuantified) {
       // Is it a quantifier?
       return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
 
@@ -780,20 +782,6 @@ class PrincessFormulaCreator
       assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
       // this is really a Boolean formula, visit the lhs of the equation
       return visit(visitor, f, ((IIntFormula) input).t());
-    }
-
-    if (kind == FunctionDeclarationKind.OTHER && input instanceof IFunApp) {
-      if (ModuloArithmetic.mod_cast().equals(((IFunApp) input).fun())
-          && ((IFunApp) input).apply(2) instanceof IIntLit) {
-        // mod_cast(0, 256, 7) -> BV=7 with bitsize=8
-        return visitor.visitConstant(f, convertValue(input));
-      }
-    }
-
-    if (kind == FunctionDeclarationKind.UF && input instanceof IFunApp) {
-      if (CONSTANT_UFS.contains(((IFunApp) input).fun().name())) {
-        return visitor.visitConstant(f, convertValue(input));
-      }
     }
 
     ImmutableList.Builder<Formula> args = ImmutableList.builder();
