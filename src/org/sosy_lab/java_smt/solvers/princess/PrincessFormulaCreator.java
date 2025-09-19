@@ -431,11 +431,11 @@ class PrincessFormulaCreator
       b = pB;
     }
 
-    public A getA() {
+    A getA() {
       return a;
     }
 
-    public B getB() {
+    B getB() {
       return b;
     }
   }
