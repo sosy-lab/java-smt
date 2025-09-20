@@ -198,7 +198,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.1-gc1454189" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
 
         <!-- additional JavaSMT components with Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="4.1.1-734-g3732f7e08" conf="runtime-yices2->runtime; contrib->sources" />
+        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources" />
         <!-- <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.4-264-g553897f5" conf="runtime->solver-yices2" /> -->
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest, although they do not really need it.
