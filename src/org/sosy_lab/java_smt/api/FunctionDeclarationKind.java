@@ -205,6 +205,12 @@ public enum FunctionDeclarationKind {
   /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
 
+  /** Convert an unsigned bitvector to integer. The result is in [0, 2^size - 1]. */
+  UBV_TO_INT,
+
+  /** Convert a signed bitvector to integer. The result is in [-2^(size-1), 2^(size-1) - 1]. */
+  SBV_TO_INT,
+
   // Simple floating point operations
 
   /** Negation of a floating point. */
@@ -304,6 +310,8 @@ public enum FunctionDeclarationKind {
   STR_TO_CODE,
   STR_LT,
   STR_LE,
+
+  RE_NONE,
   RE_PLUS,
   RE_STAR,
   RE_OPTIONAL,
@@ -313,6 +321,13 @@ public enum FunctionDeclarationKind {
   RE_INTERSECT,
   RE_COMPLEMENT,
   RE_DIFFERENCE,
+
+  // Separation logic
+  SEP_EMP,
+  SEP_NIL,
+  SEP_PTO,
+  SEP_STAR,
+  SEP_WAND,
 
   // default case
 
