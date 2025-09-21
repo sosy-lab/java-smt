@@ -34,9 +34,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
   private boolean closed = false;
 
   public Yices2SolverContext(
-      FormulaManager pFmgr,
-      Yices2FormulaCreator creator,
-      ShutdownNotifier pShutdownManager) {
+      FormulaManager pFmgr, Yices2FormulaCreator creator, ShutdownNotifier pShutdownManager) {
     super(pFmgr);
     this.creator = creator;
     shutdownManager = pShutdownManager;
