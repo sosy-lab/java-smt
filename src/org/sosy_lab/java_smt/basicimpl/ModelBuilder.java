@@ -304,7 +304,6 @@ public class ModelBuilder {
         if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
           ImmutableList.Builder<Formula> builder = ImmutableList.builder();
           for (var arg : newArgs) {
-            System.out.println(pEval.apply(f));
             var value = pEval.apply(arg);
             if (value != null) {
               builder.add(value);
