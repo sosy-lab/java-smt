@@ -126,12 +126,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     checkGenerateModels();
 
-    Model model =
-        new OpenSmtModel(
-            mgr,
-            this,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+    Model model = new OpenSmtModel(mgr, this, creator);
     return registerEvaluator(model);
   }
 
