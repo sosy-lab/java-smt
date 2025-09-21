@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
-import ap.api.PartialModel;
 import ap.api.SimpleAPI;
 import ap.api.SimpleAPI.SimpleAPIException;
 import ap.parser.IFormula;
@@ -175,8 +174,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @SuppressWarnings("resource")
   @Override
   protected PrincessModel getEvaluatorWithoutChecks() throws SolverException {
-    final PartialModel partialModel = callOrThrow(api::partialModel);
-    return registerEvaluator(new PrincessModel(mgr, this, partialModel, creator, api));
+    return registerEvaluator(new PrincessModel(mgr, this, creator, api));
   }
 
   /**
