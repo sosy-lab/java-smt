@@ -147,7 +147,7 @@ public class ModelBuilder {
               mgr.equal(left, right),
               getVariableName(pVariable),
               getConstantValue(right),
-              FluentIterable.from(idx).transform(this::getConstantValue).toList());
+              transformedImmutableListCopy(idx, this::getConstantValue));
         });
   }
 
@@ -351,7 +351,7 @@ public class ModelBuilder {
       return ImmutableMap.of(indices, pValue);
     } else {
       ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
-      for (var entry : pArrayIndices.getOrDefault(pValue, Map.of()).entrySet()) {
+      for (var entry : pArrayIndices.getOrDefault(pValue, ImmutableMap.of()).entrySet()) {
         builder.putAll(
             buildArrayAssignments__(
                 pArrayIndices,
@@ -360,7 +360,7 @@ public class ModelBuilder {
                     .toList(),
                 entry.getValue()));
       }
-      return builder.build();
+      return builder.buildOrThrow();
     }
   }
 
