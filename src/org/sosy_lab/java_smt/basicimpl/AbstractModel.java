@@ -46,20 +46,28 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
     }
     var symbols = extractBuilder.build();
 
+    var arrayIndices =
+        modelBuilder.prepareArrayIndices(
+            creator.encapsulateBoolean(
+                creator.extractInfo(
+                    mgr.getBooleanFormulaManager().and(prover.getAssertedFormulas()))),
+            f -> eval(f));
+
     ImmutableList.Builder<ValueAssignment> builder = ImmutableList.builder();
     for (var variable : symbols) {
       if (creator.getFormulaType(variable).isArrayType()) {
         var value = evalImpl(variable);
         if (value != null) {
           builder.addAll(
-              modelBuilder.buildArrayAssignments(
+              modelBuilder.buildArrayAssignments_(
+                  arrayIndices,
                   (ArrayFormula<?, ?>) creator.encapsulateWithTypeOf(variable),
                   creator.encapsulateWithTypeOf(value)));
         }
       } else {
         var value = evalImpl(variable);
         if (value != null) {
-          builder.add(
+          builder.addAll(
               modelBuilder.buildVariableAssignment(
                   creator.encapsulateWithTypeOf(variable), creator.encapsulateWithTypeOf(value)));
         }

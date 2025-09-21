@@ -146,7 +146,6 @@ public final class Z3SolverContext extends AbstractSolverContext {
       Native.setParamValue(cfg, "PROOF", "true");
     }
     Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
-    Native.globalParamSet("model.compact", "false");
 
     final long context = Native.mkContextRc(cfg);
     Native.delConfig(cfg);
