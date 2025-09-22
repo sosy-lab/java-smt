@@ -18,6 +18,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,8 @@ public class ModelBuilder {
     }
   }
 
+  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
+  @SuppressWarnings("unused")
   private Map<Formula, Formula> collectUFTerms(
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class UFVisitor extends FormulaTransformationVisitor {
@@ -221,6 +224,8 @@ public class ModelBuilder {
     return assignmentBuilder.build();
   }
 
+  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
+  @SuppressWarnings("unused")
   public Map<Formula, Map<Formula, Formula>> collectArrayValues(
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class ArrayVisitor extends FormulaTransformationVisitor {
@@ -230,11 +235,11 @@ public class ModelBuilder {
         super(mgr);
       }
 
+      @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
       @Override
       public Formula visitFreeVariable(Formula f, String name) {
         var value = pEval.apply(f);
         if (!f.equals(value)) {
-          @SuppressWarnings("unused")
           var unused = mgr.transformRecursively(value, this);
         }
         return f;
@@ -278,7 +283,6 @@ public class ModelBuilder {
     }
     checkNotNull(pEval);
     var arrayTerms = new ArrayVisitor();
-    @SuppressWarnings("unused")
     var unused = mgr.transformRecursively(pAssertions, arrayTerms);
     return arrayTerms.getArrayTerms();
   }
