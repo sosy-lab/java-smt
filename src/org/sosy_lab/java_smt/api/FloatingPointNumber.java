@@ -200,7 +200,7 @@ public abstract class FloatingPointNumber {
   /**
    * Get a floating-point number encoded as bitvector as defined by IEEE 754.
    *
-   * @param bits the bit-representation of the floating-point number, consisting of hidden bit,
+   * @param bits the bit-representation of the floating-point number, consisting of sign bit,
    *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering
    * @param exponentSize the size of the exponent in bits
    * @param mantissaSizeWithoutHiddenBit the size of the mantissa in bits (excluding the hidden bit)
