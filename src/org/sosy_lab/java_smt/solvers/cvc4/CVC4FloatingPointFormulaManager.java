@@ -358,7 +358,7 @@ public class CVC4FloatingPointFormulaManager
   protected Expr fromIeeeBitvectorImpl(Expr pBitvector, FloatingPointType pTargetType) {
     int mantissaSizeWithoutHiddenBit = pTargetType.getMantissaSizeWithoutHiddenBit();
     int size = pTargetType.getTotalSize();
-    // total size = mantissa without hidden bit + hidden bit + exponent
+    // total size = mantissa without hidden bit + sign bit + exponent
     assert size == mantissaSizeWithoutHiddenBit + 1 + pTargetType.getExponentSize();
 
     Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
