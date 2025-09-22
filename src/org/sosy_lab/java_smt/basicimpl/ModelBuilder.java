@@ -134,6 +134,7 @@ public class ModelBuilder {
         return ufTerms;
       }
     }
+    checkNotNull(pEval);
     var ufTerms = new UFVisitor();
     @SuppressWarnings("unused")
     var unused = mgr.transformRecursively(pAssertions, ufTerms);
@@ -275,6 +276,7 @@ public class ModelBuilder {
         return arrayTerms.rowMap();
       }
     }
+    checkNotNull(pEval);
     var arrayTerms = new ArrayVisitor();
     @SuppressWarnings("unused")
     var unused = mgr.transformRecursively(pAssertions, arrayTerms);
@@ -315,6 +317,7 @@ public class ModelBuilder {
       Map<Formula, Map<Formula, Formula>> pArrayIndices,
       ArrayFormula<?, ?> pVariable,
       Formula pValue) {
+    checkNotNull(pArrayIndices);
     var values = buildArrayAssignments0(pArrayIndices, ImmutableList.of(), pValue);
 
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
