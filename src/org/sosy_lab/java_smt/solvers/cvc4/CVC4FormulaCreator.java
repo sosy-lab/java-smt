@@ -630,7 +630,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
     // CVC4 returns the mantissa with the hidden bit, hence - 1
-    final var mantWidthWithoutSignBit = Ints.checkedCast(fpType.significandWidth() - 1);
+    final var mantWidthWithoutHiddenBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");
     final var exp = matcher.group("exp");
@@ -638,13 +638,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
-    Preconditions.checkArgument(mant.length() == mantWidthWithoutSignBit);
+    Preconditions.checkArgument(mant.length() == mantWidthWithoutHiddenBit);
 
     return FloatingPointNumber.of(
         Sign.of(sign.charAt(0) == '1'),
         new BigInteger(exp, 2),
         new BigInteger(mant, 2),
         expWidth,
-        mantWidthWithoutSignBit);
+        mantWidthWithoutHiddenBit);
   }
 }
