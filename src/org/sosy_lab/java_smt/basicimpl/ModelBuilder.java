@@ -299,6 +299,16 @@ public class ModelBuilder {
       }
 
       @Override
+      public Formula visitFreeVariable(Formula f, String name) {
+        var value = pEval.apply(f);
+        if (!f.equals(value)) {
+          @SuppressWarnings("unused")
+          var unused = mgr.transformRecursively(value, this);
+        }
+        return f;
+      }
+
+      @Override
       public Formula visitFunction(
           Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
         if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
