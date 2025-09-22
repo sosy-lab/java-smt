@@ -381,6 +381,8 @@ public abstract class FormulaType<T extends Formula> {
 
     @Override
     public String toString() {
+      // We align what we do here with the SMTLIB2 standard, which expects the hidden bit to be part
+      // of the mantissa.
       return "FloatingPoint<exp=" + exponentSize + ",mant=" + getMantissaSizeWithHiddenBit() + ">";
     }
 
@@ -587,17 +589,18 @@ public abstract class FormulaType<T extends Formula> {
     } else if (FloatingPointRoundingModeType.toString().equals(t)) {
       return FloatingPointRoundingModeType;
     } else if (t.startsWith("FloatingPoint<")) {
-      // FloatingPoint<exp=11,mant=52>
+      // Example: FloatingPoint<exp=11,mant=52>
       List<String> exman = Splitter.on(',').limit(2).splitToList(t.substring(14, t.length() - 1));
-      // SMTLIB2 standard expects the hidden bit to be part of the mantissa
+      // We align what we do here with the SMTLIB2 standard, which expects the hidden bit to be part
+      // of the mantissa.
       return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
           Integer.parseInt(exman.get(0).substring(4)), Integer.parseInt(exman.get(1).substring(5)));
     } else if (t.startsWith("Bitvector<")) {
-      // Bitvector<32>
+      // Example: Bitvector<32>
       return FormulaType.getBitvectorTypeWithSize(
           Integer.parseInt(t.substring(10, t.length() - 1)));
     } else if (t.matches(".*\\(.*\\)")) {
-      // Color (Red, Green, Blue)
+      // Example: Color (Red, Green, Blue)
       String name = t.substring(0, t.indexOf("(") - 1);
       String elementsStr = t.substring(t.indexOf("(") + 1, t.length() - 1);
       Set<String> elements = ImmutableSet.copyOf(Splitter.on(", ").split(elementsStr));
