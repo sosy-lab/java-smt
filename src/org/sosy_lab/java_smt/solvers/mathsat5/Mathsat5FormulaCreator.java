@@ -581,13 +581,13 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
     // The term representation in MathSAT5 does not include the hidden bit
-    int mantWidthWithoutSignBit = Integer.parseInt(matcher.group(3));
+    int mantWidthWithoutHiddenBit = Integer.parseInt(matcher.group(3));
 
-    Sign sign = Sign.of(bits.testBit(expWidth + mantWidthWithoutSignBit));
-    BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutSignBit, expWidth);
-    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutSignBit);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidthWithoutHiddenBit));
+    BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutHiddenBit, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutHiddenBit);
 
-    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidthWithoutSignBit);
+    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidthWithoutHiddenBit);
   }
 
   /**
