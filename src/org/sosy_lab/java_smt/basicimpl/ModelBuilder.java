@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -38,42 +37,6 @@ public class ModelBuilder {
 
   public ModelBuilder(FormulaManager pFormulaManager) {
     mgr = checkNotNull(pFormulaManager);
-  }
-
-  private Map<List<Formula>, Formula> collectArrayIndices(List<Formula> pIndices, Formula pValue) {
-    if (pValue instanceof ArrayFormula) {
-      return mgr.visit(
-          pValue,
-          new DefaultFormulaVisitor<>() {
-            @Override
-            protected Map<List<Formula>, Formula> visitDefault(Formula f) {
-              throw new IllegalArgumentException();
-            }
-
-            @Override
-            public Map<List<Formula>, Formula> visitFunction(
-                Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
-              if (functionDeclaration.getKind().equals(FunctionDeclarationKind.CONST)) {
-                return ImmutableMap.of();
-              } else if (functionDeclaration.getKind().equals(FunctionDeclarationKind.STORE)) {
-                var nextIndex =
-                    collectArrayIndices(
-                        FluentIterable.concat(pIndices, ImmutableList.of(args.get(1))).toList(),
-                        args.get(2));
-                var nextMatch = collectArrayIndices(pIndices, args.get(0));
-
-                ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
-                builder.putAll(nextIndex);
-                builder.putAll(nextMatch);
-                return builder.buildOrThrow();
-              } else {
-                throw new IllegalArgumentException();
-              }
-            }
-          });
-    } else {
-      return ImmutableMap.of(pIndices, pValue);
-    }
   }
 
   private String getVariableName(Formula pVariable) {
@@ -119,36 +82,21 @@ public class ModelBuilder {
         });
   }
 
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  private Formula buildSelectTerm(Formula pArray, List<Formula> pIndices) {
-    if (pIndices.isEmpty()) {
-      return pArray;
-    } else {
-      return buildSelectTerm(
-          mgr.getArrayFormulaManager().select((ArrayFormula) pArray, pIndices.get(0)),
-          pIndices.subList(1, pIndices.size()));
-    }
-  }
-
-  /** Convert a "Store" term into a list of assignments. */
-  public ImmutableList<ValueAssignment> buildArrayAssignments(
-      ArrayFormula<?, ?> pVariable, Formula pValue) {
-    var values = collectArrayIndices(ImmutableList.of(), pValue);
-    return transformedImmutableListCopy(
-        values.entrySet(),
-        entry -> {
-          var idx = entry.getKey();
-          var left = buildSelectTerm(pVariable, idx);
-          var right = entry.getValue();
-
-          return new ValueAssignment(
-              left,
-              right,
-              mgr.equal(left, right),
+  /** Create an assignment for a normal variable. */
+  public List<ValueAssignment> buildVariableAssignment(Formula pVariable, Formula pValue) {
+    var evaluated = getConstantValue(pValue);
+    if (evaluated != null) {
+      return ImmutableList.of(
+          new ValueAssignment(
+              pVariable,
+              pValue,
+              mgr.equal(pVariable, pValue),
               getVariableName(pVariable),
-              getConstantValue(right),
-              transformedImmutableListCopy(idx, this::getConstantValue));
-        });
+              evaluated,
+              ImmutableList.of()));
+    } else {
+      return ImmutableList.of();
+    }
   }
 
   private Map<Formula, Formula> collectUFTerms(
@@ -272,24 +220,7 @@ public class ModelBuilder {
     return assignmentBuilder.build();
   }
 
-  /** Create an assignment for a normal variable. */
-  public List<ValueAssignment> buildVariableAssignment(Formula pVariable, Formula pValue) {
-    var evaluated = getConstantValue(pValue);
-    if (evaluated != null) {
-      return ImmutableList.of(
-          new ValueAssignment(
-              pVariable,
-              pValue,
-              mgr.equal(pVariable, pValue),
-              getVariableName(pVariable),
-              evaluated,
-              ImmutableList.of()));
-    } else {
-      return ImmutableList.of();
-    }
-  }
-
-  private Map<Formula, Map<Formula, Formula>> collectArrayTerms(
+  public Map<Formula, Map<Formula, Formula>> collectArrayValues(
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class ArrayVisitor extends FormulaTransformationVisitor {
       private final Table<Formula, Formula, Formula> arrayTerms = HashBasedTable.create();
@@ -344,18 +275,13 @@ public class ModelBuilder {
         return arrayTerms.rowMap();
       }
     }
-    var ufTerms = new ArrayVisitor();
+    var arrayTerms = new ArrayVisitor();
     @SuppressWarnings("unused")
-    var unused = mgr.transformRecursively(pAssertions, ufTerms);
-    return ufTerms.getArrayTerms();
+    var unused = mgr.transformRecursively(pAssertions, arrayTerms);
+    return arrayTerms.getArrayTerms();
   }
 
-  public Map<Formula, Map<Formula, Formula>> prepareArrayIndices(
-      BooleanFormula pAssertions, Function<Formula, Formula> eval) {
-    return collectArrayTerms(pAssertions, eval);
-  }
-
-  public Map<List<Formula>, Formula> buildArrayAssignments__(
+  private Map<List<Formula>, Formula> buildArrayAssignments0(
       Map<Formula, Map<Formula, Formula>> pArrayIndices, List<Formula> indices, Formula pValue) {
     if (!mgr.getFormulaType(pValue).isArrayType()) {
       return ImmutableMap.of(indices, pValue);
@@ -363,7 +289,7 @@ public class ModelBuilder {
       ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
       for (var entry : pArrayIndices.getOrDefault(pValue, ImmutableMap.of()).entrySet()) {
         builder.putAll(
-            buildArrayAssignments__(
+            buildArrayAssignments0(
                 pArrayIndices,
                 FluentIterable.concat(
                         FluentIterable.from(indices), ImmutableList.of(entry.getKey()))
@@ -374,11 +300,22 @@ public class ModelBuilder {
     }
   }
 
-  public ImmutableList<ValueAssignment> buildArrayAssignments_(
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  private Formula buildSelectTerm(Formula pArray, List<Formula> pIndices) {
+    if (pIndices.isEmpty()) {
+      return pArray;
+    } else {
+      return buildSelectTerm(
+          mgr.getArrayFormulaManager().select((ArrayFormula) pArray, pIndices.get(0)),
+          pIndices.subList(1, pIndices.size()));
+    }
+  }
+
+  public ImmutableList<ValueAssignment> buildArrayAssignments(
       Map<Formula, Map<Formula, Formula>> pArrayIndices,
       ArrayFormula<?, ?> pVariable,
       Formula pValue) {
-    var values = buildArrayAssignments__(pArrayIndices, ImmutableList.of(), pValue);
+    var values = buildArrayAssignments0(pArrayIndices, ImmutableList.of(), pValue);
 
     ImmutableList.Builder<ValueAssignment> assignmentBuilder = ImmutableList.builder();
     for (var entry : values.entrySet()) {
@@ -407,7 +344,6 @@ public class ModelBuilder {
                 newArgs));
       }
     }
-
     return assignmentBuilder.build();
   }
 }

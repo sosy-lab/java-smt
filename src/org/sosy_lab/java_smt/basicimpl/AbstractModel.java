@@ -47,7 +47,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
     var symbols = extractBuilder.build();
 
     var arrayIndices =
-        modelBuilder.prepareArrayIndices(
+        modelBuilder.collectArrayValues(
             creator.encapsulateBoolean(
                 creator.extractInfo(
                     mgr.getBooleanFormulaManager().and(prover.getAssertedFormulas()))),
@@ -59,7 +59,7 @@ public abstract class AbstractModel<TFormulaInfo, TType, TEnv>
         var value = evalImpl(variable);
         if (value != null) {
           builder.addAll(
-              modelBuilder.buildArrayAssignments_(
+              modelBuilder.buildArrayAssignments(
                   arrayIndices,
                   (ArrayFormula<?, ?>) creator.encapsulateWithTypeOf(variable),
                   creator.encapsulateWithTypeOf(value)));
