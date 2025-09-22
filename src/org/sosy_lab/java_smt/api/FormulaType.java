@@ -18,7 +18,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.Immutable;
-import com.google.errorprone.annotations.InlineMe;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -223,11 +222,7 @@ public abstract class FormulaType<T extends Formula> {
    * @return the newly constructed {@link FloatingPointType}.
    */
   @Deprecated(since = "6.0", forRemoval = true)
-  @InlineMe(
-      replacement =
-          "FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
-              + " mantissaSizeWithoutHiddenBit)",
-      imports = "org.sosy_lab.java_smt.api.FormulaType")
+  @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointType getFloatingPointType(
       int exponentSize, int mantissaSizeWithoutHiddenBit) {
     return getFloatingPointTypeFromSizesWithoutHiddenBit(
