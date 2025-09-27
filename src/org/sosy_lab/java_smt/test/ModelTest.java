@@ -594,33 +594,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(2));
 
     String func = "func";
-    IntegerFormula funcAtTwo = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(2));
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
-    ValueAssignment expectedValueAssignment =
-        new ValueAssignment(
-            funcAtTwo,
-            one,
-            imgr.equal(funcAtTwo, one),
-            func,
-            BigInteger.ONE,
-            ImmutableList.of(BigInteger.TWO));
-
-    // CVC4/5 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4 || solverToUse() == Solvers.CVC5) {
-      expectedValueAssignment =
-          new ValueAssignment(
-              funcAtBoundVar,
-              one,
-              imgr.equal(funcAtBoundVar, one),
-              func,
-              BigInteger.ONE,
-              ImmutableList.of("boundVar"));
-    }
+    ValueAssignment assignmentVar =
+        new ValueAssignment(var, one, varIsOne, "var", BigInteger.ONE, ImmutableList.of());
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
@@ -630,7 +611,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m).contains(expectedValueAssignment);
+        assertThat(m).containsExactly(assignmentVar);
       }
     }
   }
@@ -651,35 +632,19 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(0));
     BooleanFormula boundVarIsOne = imgr.equal(boundVar, imgr.makeNumber(1));
 
-    String func = "func";
-    IntegerFormula funcAtZero = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(0));
-    IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
+    IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF("func", IntegerType, boundVar);
 
     BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f =
         bmgr.and(varIsOne, boundVarIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
-    ValueAssignment expectedValueAssignment =
-        new ValueAssignment(
-            funcAtZero,
-            one,
-            imgr.equal(funcAtZero, one),
-            func,
-            BigInteger.ONE,
-            ImmutableList.of(BigInteger.ZERO));
+    ValueAssignment assignmentVar =
+        new ValueAssignment(var, one, varIsOne, "var", BigInteger.ONE, ImmutableList.of());
 
-    // CVC4/5 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4 || solverToUse() == Solvers.CVC5) {
-      expectedValueAssignment =
-          new ValueAssignment(
-              funcAtBoundVar,
-              one,
-              imgr.equal(funcAtBoundVar, one),
-              func,
-              BigInteger.ONE,
-              ImmutableList.of("boundVar"));
-    }
+    ValueAssignment assingmentBoundVar =
+        new ValueAssignment(
+            boundVar, one, boundVarIsOne, "boundVar", BigInteger.ONE, ImmutableList.of());
 
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
@@ -689,7 +654,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         for (@SuppressWarnings("unused") ValueAssignment assignment : m) {
           // Check that we can iterate through with no crashes.
         }
-        assertThat(m).contains(expectedValueAssignment);
+        assertThat(m).containsExactly(assignmentVar, assingmentBoundVar);
       }
     }
   }
