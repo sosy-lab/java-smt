@@ -119,7 +119,7 @@ public class ModelBuilder {
         for (var arg : args) {
           var evaluated = mgr.visit(arg, this);
           if (evaluated.isPresent()) {
-            argBuilder.add(evaluated.get());
+            argBuilder.add(evaluated.orElseThrow());
           }
         }
         var newArgs = argBuilder.build();
@@ -263,7 +263,7 @@ public class ModelBuilder {
         for (var arg : args) {
           var evaluated = mgr.visit(arg, this);
           if (evaluated.isPresent()) {
-            argBuilder.add(evaluated.get());
+            argBuilder.add(evaluated.orElseThrow());
           }
         }
         var newArgs = argBuilder.build();
