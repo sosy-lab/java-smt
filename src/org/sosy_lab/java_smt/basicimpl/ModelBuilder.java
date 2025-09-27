@@ -105,7 +105,7 @@ public class ModelBuilder {
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class UFVisitor extends DefaultFormulaVisitor<Optional<Formula>> {
       private final Map<Formula, Formula> ufTerms = new HashMap<>();
-      private final List<Formula> scope = new ArrayList<>();
+      private List<Formula> scope = new ArrayList<>();
 
       @Override
       protected Optional<Formula> visitDefault(Formula f) {
@@ -143,7 +143,7 @@ public class ModelBuilder {
         int last = scope.size();
         scope.addAll(boundVariables);
         var r = mgr.visit(body, this);
-        scope.subList(0, last);
+        scope = scope.subList(0, last);
         return r;
       }
 
@@ -233,7 +233,6 @@ public class ModelBuilder {
                 argBuilder.build()));
       }
     }
-
     return assignmentBuilder.build();
   }
 
@@ -241,7 +240,7 @@ public class ModelBuilder {
       Formula pAssertions, Function<Formula, Formula> pEval) {
     class ArrayVisitor extends DefaultFormulaVisitor<Optional<Formula>> {
       private final Table<Formula, Formula, Formula> arrayTerms = HashBasedTable.create();
-      private final List<Formula> scope = new ArrayList<>();
+      private List<Formula> scope = new ArrayList<>();
 
       @Override
       protected Optional<Formula> visitDefault(Formula f) {
@@ -291,7 +290,7 @@ public class ModelBuilder {
         int last = scope.size();
         scope.addAll(boundVariables);
         var r = mgr.visit(body, this);
-        scope.subList(0, last);
+        scope = scope.subList(0, last);
         return r;
       }
 
@@ -299,7 +298,9 @@ public class ModelBuilder {
         return arrayTerms.rowMap();
       }
     }
+
     checkNotNull(pEval);
+
     var arrayTerms = new ArrayVisitor();
     mgr.visit(pAssertions, arrayTerms);
     return arrayTerms.getArrayTerms();
