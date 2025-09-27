@@ -11,27 +11,28 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Table;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
-import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 public class ModelBuilder {
   private final FormulaManager mgr;
@@ -100,37 +101,50 @@ public class ModelBuilder {
     }
   }
 
-  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-  @SuppressWarnings("unused")
   private Map<Formula, Formula> collectUFTerms(
       Formula pAssertions, Function<Formula, Formula> pEval) {
-    class UFVisitor extends FormulaTransformationVisitor {
+    class UFVisitor extends DefaultFormulaVisitor<Optional<Formula>> {
       private final Map<Formula, Formula> ufTerms = new HashMap<>();
+      private final List<Formula> scope = new ArrayList<>();
 
-      UFVisitor() {
-        super(mgr);
+      @Override
+      protected Optional<Formula> visitDefault(Formula f) {
+        return !scope.contains(f) ? Optional.of(pEval.apply(f)) : Optional.empty();
       }
 
       @Override
-      public Formula visitFunction(
-          Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
-        if (functionDeclaration.getKind().equals(FunctionDeclarationKind.UF)) {
-          ImmutableList.Builder<Formula> builder = ImmutableList.builder();
-          for (var arg : newArgs) {
-            var value = pEval.apply(arg);
-            if (value != null) {
-              builder.add(value);
-            }
-          }
-          var evaluated = builder.build();
-          if (evaluated.size() == newArgs.size()) {
-            ufTerms.put(
-                mgr.makeApplication(
-                    functionDeclaration, transformedImmutableListCopy(newArgs, pEval::apply)),
-                pEval.apply(f));
+      public Optional<Formula> visitFunction(
+          Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+        ImmutableList.Builder<Formula> argBuilder = ImmutableList.builder();
+        for (var arg : args) {
+          var evaluated = mgr.visit(arg, this);
+          if (evaluated.isPresent()) {
+            argBuilder.add(evaluated.get());
           }
         }
-        return f;
+        var newArgs = argBuilder.build();
+        if (newArgs.size() == args.size()) {
+          var value = pEval.apply(f);
+          if (functionDeclaration.getKind().equals(FunctionDeclarationKind.UF)) {
+            ufTerms.put(mgr.makeApplication(functionDeclaration, newArgs), value);
+          }
+          return Optional.of(value);
+        } else {
+          return Optional.empty();
+        }
+      }
+
+      @Override
+      public Optional<Formula> visitQuantifier(
+          BooleanFormula f,
+          Quantifier quantifier,
+          List<Formula> boundVariables,
+          BooleanFormula body) {
+        int last = scope.size();
+        scope.addAll(boundVariables);
+        var r = mgr.visit(body, this);
+        scope.subList(0, last);
+        return r;
       }
 
       Map<Formula, Formula> getUfTerms() {
@@ -139,8 +153,7 @@ public class ModelBuilder {
     }
     checkNotNull(pEval);
     var ufTerms = new UFVisitor();
-    @SuppressWarnings("unused")
-    var unused = mgr.transformRecursively(pAssertions, ufTerms);
+    mgr.visit(pAssertions, ufTerms);
     return ufTerms.getUfTerms();
   }
 
@@ -224,57 +237,62 @@ public class ModelBuilder {
     return assignmentBuilder.build();
   }
 
-  @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-  @SuppressWarnings("unused")
   public Map<Formula, Map<Formula, Formula>> collectArrayValues(
       Formula pAssertions, Function<Formula, Formula> pEval) {
-    class ArrayVisitor extends FormulaTransformationVisitor {
+    class ArrayVisitor extends DefaultFormulaVisitor<Optional<Formula>> {
       private final Table<Formula, Formula, Formula> arrayTerms = HashBasedTable.create();
-
-      ArrayVisitor() {
-        super(mgr);
-      }
-
-      @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-      @Override
-      public Formula visitFreeVariable(Formula f, String name) {
-        var value = pEval.apply(f);
-        if (!f.equals(value)) {
-          var unused = mgr.transformRecursively(value, this);
-        }
-        return f;
-      }
+      private final List<Formula> scope = new ArrayList<>();
 
       @Override
-      public Formula visitFunction(
-          Formula f, List<Formula> newArgs, FunctionDeclaration<?> functionDeclaration) {
-        if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
-          ImmutableList.Builder<Formula> builder = ImmutableList.builder();
-          for (var arg : newArgs) {
-            var value = pEval.apply(arg);
-            if (value != null) {
-              builder.add(value);
-            }
-          }
-          var evaluated = builder.build();
-          if (evaluated.size() == newArgs.size()) {
-            arrayTerms.put(evaluated.get(0), evaluated.get(1), pEval.apply(f));
+      protected Optional<Formula> visitDefault(Formula f) {
+        if (scope.contains(f)) {
+          return Optional.empty();
+        } else {
+          var value = pEval.apply(f);
+          if (!f.equals(value)) {
+            return mgr.visit(value, this);
+          } else {
+            return Optional.of(f);
           }
         }
-        if (functionDeclaration.getKind().equals(FunctionDeclarationKind.STORE)) {
-          ImmutableList.Builder<Formula> builder = ImmutableList.builder();
-          for (var arg : newArgs) {
-            var value = pEval.apply(arg);
-            if (value != null) {
-              builder.add(value);
-            }
-          }
-          var evaluated = builder.build();
-          if (evaluated.size() == newArgs.size()) {
-            arrayTerms.put(pEval.apply(f), evaluated.get(1), evaluated.get(2));
+      }
+
+      @Override
+      public Optional<Formula> visitFunction(
+          Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+        ImmutableList.Builder<Formula> argBuilder = ImmutableList.builder();
+        for (var arg : args) {
+          var evaluated = mgr.visit(arg, this);
+          if (evaluated.isPresent()) {
+            argBuilder.add(evaluated.get());
           }
         }
-        return f;
+        var newArgs = argBuilder.build();
+        if (newArgs.size() == args.size()) {
+          var value = pEval.apply(f);
+          if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
+            arrayTerms.put(newArgs.get(0), newArgs.get(1), value);
+          }
+          if (functionDeclaration.getKind().equals(FunctionDeclarationKind.STORE)) {
+            arrayTerms.put(value, newArgs.get(1), newArgs.get(2));
+          }
+          return Optional.of(value);
+        } else {
+          return Optional.empty();
+        }
+      }
+
+      @Override
+      public Optional<Formula> visitQuantifier(
+          BooleanFormula f,
+          Quantifier quantifier,
+          List<Formula> boundVariables,
+          BooleanFormula body) {
+        int last = scope.size();
+        scope.addAll(boundVariables);
+        var r = mgr.visit(body, this);
+        scope.subList(0, last);
+        return r;
       }
 
       Map<Formula, Map<Formula, Formula>> getArrayTerms() {
@@ -283,7 +301,7 @@ public class ModelBuilder {
     }
     checkNotNull(pEval);
     var arrayTerms = new ArrayVisitor();
-    var unused = mgr.transformRecursively(pAssertions, arrayTerms);
+    mgr.visit(pAssertions, arrayTerms);
     return arrayTerms.getArrayTerms();
   }
 
