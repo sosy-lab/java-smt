@@ -71,7 +71,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     checkArgument(
-        Rational.ZERO.compareTo(pSolverOptions.interpolationLraFactor) >= 0
+        Rational.ZERO.compareTo(pSolverOptions.interpolationLraFactor) <= 0
             && pSolverOptions.interpolationLraFactor.compareTo(Rational.ONE) < 0,
         "LRA strength factor must be from the interval [0,1)");
 
