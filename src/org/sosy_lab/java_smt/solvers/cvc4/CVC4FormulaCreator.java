@@ -326,7 +326,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         // TODO is this correct?
         return visitor.visitConstant(formula, f.getConstRoundingMode());
       } else if (type.isString()) {
-        return visitor.visitConstant(formula, f.getConstString());
+        return visitor.visitConstant(formula, f.getConstString().toString());
       } else if (type.isArray()) {
         if (f.getKind().equals(Kind.STORE_ALL)) {
           ArrayStoreAll storeAll = f.getConstArrayStoreAll();
