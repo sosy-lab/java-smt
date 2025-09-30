@@ -372,6 +372,14 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       assert f.getKind() != Kind.BOUND_VARIABLE;
       return visitor.visitFreeVariable(formula, getName(f));
 
+    } else if (f.getKind().equals(Kind.SEP_NIL)) {
+      // Special case as f.getOperator will throw an exception
+      return visitor.visitFunction(
+          formula,
+          ImmutableList.of(),
+          FunctionDeclarationImpl.of(
+              "sep.nil", FunctionDeclarationKind.OTHER, ImmutableList.of(), getFormulaType(f), f));
+
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
       // These are all treated like operators, so we can get the declaration by f.getOperator()!
@@ -559,6 +567,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
+    if (pDeclaration.getKind().equals(Kind.SEP_NIL) && pArgs.isEmpty()) {
+      return pDeclaration;
+    }
     if (pArgs.isEmpty()) {
       return exprManager.mkExpr(pDeclaration);
     } else {

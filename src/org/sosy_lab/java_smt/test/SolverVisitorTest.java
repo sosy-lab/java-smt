@@ -1609,5 +1609,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
     assertThat(f2).isEqualTo(f);
     assertThatFormula(f).isEquivalentTo(f2);
+
+    // check that we can visit nil
+    IntegerFormula nil = slmgr.makeNilElement(FormulaType.IntegerType);
+    IntegerFormula copy = mgr.transformRecursively(nil, new FormulaTransformationVisitor(mgr) {});
+    assertThat(nil).isEqualTo(copy);
   }
 }
