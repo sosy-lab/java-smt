@@ -109,7 +109,8 @@ public class ModelBuilder {
 
       @Override
       protected Optional<Formula> visitDefault(Formula f) {
-        return !scope.contains(f) ? Optional.of(pEval.apply(f)) : Optional.empty();
+        var value = pEval.apply(f);
+        return !scope.contains(f) && value != null ? Optional.of(value) : Optional.empty();
       }
 
       @Override
@@ -123,8 +124,8 @@ public class ModelBuilder {
           }
         }
         var newArgs = argBuilder.build();
-        if (newArgs.size() == args.size()) {
-          var value = pEval.apply(f);
+        var value = pEval.apply(f);
+        if (newArgs.size() == args.size() && value != null) {
           if (functionDeclaration.getKind().equals(FunctionDeclarationKind.UF)) {
             ufTerms.put(mgr.makeApplication(functionDeclaration, newArgs), value);
           }
@@ -248,7 +249,7 @@ public class ModelBuilder {
           return Optional.empty();
         } else {
           var value = pEval.apply(f);
-          if (!f.equals(value)) {
+          if (!f.equals(value) && value != null) {
             return mgr.visit(value, this);
           } else {
             return Optional.of(f);
@@ -267,8 +268,8 @@ public class ModelBuilder {
           }
         }
         var newArgs = argBuilder.build();
-        if (newArgs.size() == args.size()) {
-          var value = pEval.apply(f);
+        var value = pEval.apply(f);
+        if (newArgs.size() == args.size() && value != null) {
           if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
             arrayTerms.put(newArgs.get(0), newArgs.get(1), value);
           }
