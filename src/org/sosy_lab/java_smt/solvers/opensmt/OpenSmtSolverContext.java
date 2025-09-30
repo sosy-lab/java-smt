@@ -18,6 +18,7 @@ import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.configuration.Option;
 import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
@@ -65,6 +66,12 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
         secure = true,
         description = "Algorithm for LRA interpolation")
     LA interpolationLraAlgorithm = LA.STRONG;
+
+    @Option(
+        name = "interpolation.lraFactor",
+        secure = true,
+        description = "Strength factor for LRA interpolation algorithm")
+    Rational interpolationLraFactor = Rational.of("1/2");
 
     /**
      * This option controls the level of simplification applied to interpolants.

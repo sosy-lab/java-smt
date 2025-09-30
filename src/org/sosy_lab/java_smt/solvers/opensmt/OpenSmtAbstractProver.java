@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
@@ -21,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -67,6 +70,11 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
+    checkArgument(
+        Rational.ZERO.compareTo(pSolverOptions.interpolationLraFactor) >= 0
+            && pSolverOptions.interpolationLraFactor.compareTo(Rational.ONE) < 0,
+        "LRA strength factor must be from the interval [0,1)");
+
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
     config.setOption(
@@ -88,6 +96,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       config.setOption(
           ":interpolation-lra-algorithm",
           new SMTOption(pSolverOptions.interpolationLraAlgorithm.getValue()));
+      config.setOption(
+          ":interpolation-lra-factor",
+          new SMTOption(pSolverOptions.interpolationLraFactor.toString()));
       config.setOption(
           ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }
