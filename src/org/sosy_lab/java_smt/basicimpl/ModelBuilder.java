@@ -223,15 +223,11 @@ public class ModelBuilder {
           argBuilder.add(value);
         }
       }
-      if (ufArgs.size() == argBuilder.build().size()) {
+      var value = getConstantValue(right);
+      if (ufArgs.size() == argBuilder.build().size() && value != null) {
         assignmentBuilder.add(
             new ValueAssignment(
-                left,
-                right,
-                mgr.equal(left, right),
-                getUfName(left),
-                getConstantValue(right),
-                argBuilder.build()));
+                left, right, mgr.equal(left, right), getUfName(left), value, argBuilder.build()));
       }
     }
     return assignmentBuilder.build();
