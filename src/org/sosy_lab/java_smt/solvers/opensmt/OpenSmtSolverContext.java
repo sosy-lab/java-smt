@@ -48,14 +48,23 @@ public final class OpenSmtSolverContext extends AbstractSolverContext {
     @Option(secure = true, description = "SMT-LIB2 name of the logic to be used by the solver.")
     Logics logic = Logics.QF_AUFLIRA;
 
-    @Option(secure = true, description = "Algorithm for boolean interpolation")
-    Core algBool = Core.MCMILLAN;
+    @Option(
+        name = "interpolation.booleanAlgorithm",
+        secure = true,
+        description = "Algorithm for boolean interpolation")
+    Core interpolationBooleanAlgorithm = Core.MCMILLAN;
 
-    @Option(secure = true, description = "Algorithm for UF interpolation")
-    UF algUf = UF.STRONG;
+    @Option(
+        name = "interpolation.eufAlgorithm",
+        secure = true,
+        description = "Algorithm for UF interpolation")
+    UF interpolationEufAlgorithm = UF.STRONG;
 
-    @Option(secure = true, description = "Algorithm for LRA interpolation")
-    LA algLra = LA.STRONG;
+    @Option(
+        name = "interpolation.lraAlgorithm",
+        secure = true,
+        description = "Algorithm for LRA interpolation")
+    LA interpolationLraAlgorithm = LA.STRONG;
 
     /**
      * This option controls the level of simplification applied to interpolants.
