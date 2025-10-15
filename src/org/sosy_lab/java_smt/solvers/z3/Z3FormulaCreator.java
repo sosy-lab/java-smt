@@ -588,8 +588,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int numBound = Native.getQuantifierNumBound(environment, pF);
     long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
-      long varName = Native.getQuantifierBoundName(environment, pF, i);
-      long varSort = Native.getQuantifierBoundSort(environment, pF, i);
+      // The indices are reversed according to
+      //  https://github.com/Z3Prover/z3/issues/7970#issuecomment-3407924907
+      int inverseIndex = numBound - 1 - i;
+      long varName = Native.getQuantifierBoundName(environment, pF, inverseIndex);
+      long varSort = Native.getQuantifierBoundSort(environment, pF, inverseIndex);
       long freeVar = Native.mkConst(environment, varName, varSort);
       Native.incRef(environment, freeVar);
       freeVars[i] = freeVar;
