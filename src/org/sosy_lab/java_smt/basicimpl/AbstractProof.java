@@ -74,6 +74,10 @@ public abstract class AbstractProof implements Proof {
     formula = pFormula;
   }
 
+  public void setRule(ProofRule pRule) {
+    rule = pRule;
+  }
+
   // use this for debugging
   public String proofAsString() {
     return proofAsString(0);
