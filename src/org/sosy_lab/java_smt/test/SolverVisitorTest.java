@@ -1661,7 +1661,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     requireVisitor();
 
     int bvLen = 32;
-    BitvectorType bvType = BitvectorType.getBitvectorTypeWithSize(bvLen);
+    BitvectorType bvType = FormulaType.getBitvectorTypeWithSize(bvLen);
 
     BitvectorFormula four = bvmgr.makeBitvector(bvLen, 4);
     BitvectorFormula var1 = bvmgr.makeVariable(bvType, "var1");
