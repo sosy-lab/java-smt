@@ -64,18 +64,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
    * @param z3ProofNodes the nodes to be converted.
    * @return {@link org.sosy_lab.java_smt.ResolutionProof}
    */
-  ResolutionProof convertToResolutionProofDag(Z3Proof[] z3ProofNodes) {
+  ResolutionProof convertToResolutionProofDag(Z3Proof z3ProofNodes) {
 
-    for (Z3Proof z3Node : z3ProofNodes) {
-      if (z3Node.getRule() == MODUS_PONENS) {
-        continue; // process mp continue here to avoid empty if block
-      } else {
-        Formula formula = z3Node.getFormula();
-        // ResAxiom resAxiom = mapRule(z3Node.getRule());
-        // SourceProofNode sourceNode = new SourceProofNode(resAxiom, formula);
-        // dag.addNode(sourceNode);
-      }
-    }
     throw new UnsupportedOperationException();
   }
 
@@ -769,16 +759,70 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     // do nothing
   }
 
+  // Z3_OP_PR_DEF_INTRO: Introduces a name for a formula/term.
+  //     Suppose e is an expression with free variables x, and def-intro
+  //     introduces the name n(x). The possible cases are:
+  //
+  //     When e is of Boolean type:
+  //     [def-intro]: (and (or n (not e)) (or (not n) e))
+  //
+  //     or:
+  //     [def-intro]: (or (not n) e)
+  //     when e only occurs positively.
+  //
+  //     When e is of the form (ite cond th el):
+  //     [def-intro]: (and (or (not cond) (= n th)) (or cond (= n el)))
+  //
+  //     Otherwise:
+  //     [def-intro]: (= n e)
+  //
+  // Check form of the formula proven.
+  //
+  //  When e is of Boolean type - ((not e ) or n) and ((not n) or e)) -:
+  //    ...
+  //
+  //  When e only occurs positively - (or (not n) e) -:
+  //    we use the axiom 'or+' which produces '(+ (or (not n) e) - e)' assuming e (the
+  //    expression) we can resolve e and get the original.
+  //
+  //  ...
+  //
+  // The way it is done in the second case could be expanded to the other cases. Otherwise, it is a
+  // possibility to implement the oracle rule with different inputs.
+  // It should be possible to introduce names with the 'let' operator, as well as the way it is
+  // done by Z3. So another option is to use said operator here.
   Proof handleDefIntro(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
+  // Z3_OP_PR_APPLY_DEF:
+  //
+  //        [apply-def T1]: F ~ n
+  //
+  //     F is 'equivalent' to n, given that T1 is a proof that
+  //     n is a name for F.
+  //
+  // This rule depends on the implementation of the DEF_INTRO rule. if using 'let' this step
+  // might not be needed, otherwise should be kept. According to the paper found here:
+  // https://www21.in.tum.de/~boehmes/proof-reconstruction.html
+  // Most instance of equisatisfiability -'~'- can be represented by equivalency in Isabelle/HOL.
+  // Therefore, it should be possible to also use equivalency in a RESOLUTE based format.
   Proof handleApplyDef(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
+  // Z3_OP_PR_IFF_OEQ:
+  //
+  //       T1: (iff p q)
+  //       [iff~ T1]: (~ p q)
+  //
+  // This rule does the opposite of what we are trying to do with the ~ operator. Skipping this
+  // rule applicaiton should work. However, every instance of ~ later on should be replaced with
+  // iff. In fact, replacing all ~ instances with iff might be desired.
   Proof handleIffOeq(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    Z3Proof child = (Z3Proof) node.getChildren().toArray()[0];
+    ResolutionProof resolutionProof = (ResolutionProof) handleNode(child);
+    return resolutionProof;
   }
 
   Proof handleNnfPos(Z3Proof node) {
