@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
-@SuppressWarnings({"resource", "LocalVariableName"})
+@SuppressWarnings({"resource", "LocalVariableName", "UnusedVariable"})
 public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF

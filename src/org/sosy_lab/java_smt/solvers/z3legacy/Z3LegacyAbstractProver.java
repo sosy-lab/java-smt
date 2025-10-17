@@ -159,6 +159,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.solverAssertAndTrack(z3context, z3solver, constraint, symbol);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected T addConstraintImpl(BooleanFormula f) throws InterruptedException {
     Preconditions.checkState(!closed);

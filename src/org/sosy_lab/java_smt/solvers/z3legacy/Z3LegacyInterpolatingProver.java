@@ -207,6 +207,7 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
    * it sometimes returns such invalid formulas as interpolants
    * (https://github.com/Z3Prover/z3/issues/665).
    */
+  @SuppressWarnings("deprecation")
   private void checkInterpolantsForUnboundVariables(List<BooleanFormula> itps)
       throws SolverException {
     List<Formula> unboundVariables = new ArrayList<>(1);
