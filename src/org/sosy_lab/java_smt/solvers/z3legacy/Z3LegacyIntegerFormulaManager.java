@@ -16,10 +16,12 @@ import java.math.BigInteger;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
-class Z3LegacyIntegerFormulaManager extends Z3LegacyNumeralFormulaManager<IntegerFormula, IntegerFormula>
+class Z3LegacyIntegerFormulaManager
+    extends Z3LegacyNumeralFormulaManager<IntegerFormula, IntegerFormula>
     implements IntegerFormulaManager {
 
-  Z3LegacyIntegerFormulaManager(Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+  Z3LegacyIntegerFormulaManager(
+      Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 

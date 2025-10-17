@@ -72,9 +72,8 @@ abstract class Z3LegacyFormula implements Formula {
   }
 
   @SuppressWarnings("ClassTypeParameterName")
-  static final class Z3ArrayLegacyFormula<TI extends Formula, TE extends Formula> extends
-                                                                                  Z3LegacyFormula
-      implements ArrayFormula<TI, TE> {
+  static final class Z3ArrayLegacyFormula<TI extends Formula, TE extends Formula>
+      extends Z3LegacyFormula implements ArrayFormula<TI, TE> {
 
     private final FormulaType<TI> indexType;
     private final FormulaType<TE> elementType;

@@ -25,7 +25,8 @@ abstract class Z3LegacyNumeralFormulaManager<
 
   protected final long z3context;
 
-  Z3LegacyNumeralFormulaManager(Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+  Z3LegacyNumeralFormulaManager(
+      Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
     this.z3context = pCreator.getEnv();
   }

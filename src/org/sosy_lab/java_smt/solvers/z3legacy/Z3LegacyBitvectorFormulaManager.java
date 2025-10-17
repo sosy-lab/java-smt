@@ -16,11 +16,13 @@ import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.basicimpl.AbstractBitvectorFormulaManager;
 
-class Z3LegacyBitvectorFormulaManager extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
+class Z3LegacyBitvectorFormulaManager
+    extends AbstractBitvectorFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
 
-  Z3LegacyBitvectorFormulaManager(Z3LegacyFormulaCreator creator, Z3LegacyBooleanFormulaManager pBmgr) {
+  Z3LegacyBitvectorFormulaManager(
+      Z3LegacyFormulaCreator creator, Z3LegacyBooleanFormulaManager pBmgr) {
     super(creator, pBmgr);
     this.z3context = creator.getEnv();
   }

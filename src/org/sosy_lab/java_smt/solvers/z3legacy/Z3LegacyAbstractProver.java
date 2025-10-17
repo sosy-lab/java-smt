@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -192,8 +191,6 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       storedConstraints.pop();
     }
   }
-
-
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
@@ -372,13 +369,13 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public void close() {
     if (!closed) {
-        Preconditions.checkArgument(
-            Native.solverGetNumScopes(z3context, z3solver) >= 0,
-            "a negative number of scopes is not allowed");
+      Preconditions.checkArgument(
+          Native.solverGetNumScopes(z3context, z3solver) >= 0,
+          "a negative number of scopes is not allowed");
 
-        Native.solverReset(z3context, z3solver); // remove all assertions from the solver
-        Native.solverDecRef(z3context, z3solver);
-        shutdownNotifier.unregister(interruptListener);
+      Native.solverReset(z3context, z3solver); // remove all assertions from the solver
+      Native.solverDecRef(z3context, z3solver);
+      shutdownNotifier.unregister(interruptListener);
       if (storedConstraints != null) {
         storedConstraints.clear();
       }

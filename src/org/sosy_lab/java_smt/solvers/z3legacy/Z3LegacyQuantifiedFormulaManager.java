@@ -18,7 +18,8 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractQuantifiedFormulaManager;
 
-class Z3LegacyQuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
+class Z3LegacyQuantifiedFormulaManager
+    extends AbstractQuantifiedFormulaManager<Long, Long, Long, Long> {
 
   private final long z3context;
   private final Z3LegacyFormulaCreator z3FormulaCreator;

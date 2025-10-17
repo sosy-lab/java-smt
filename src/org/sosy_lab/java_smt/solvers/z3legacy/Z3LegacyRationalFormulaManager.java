@@ -16,10 +16,12 @@ import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 
-class Z3LegacyRationalFormulaManager extends Z3LegacyNumeralFormulaManager<NumeralFormula, RationalFormula>
+class Z3LegacyRationalFormulaManager
+    extends Z3LegacyNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  Z3LegacyRationalFormulaManager(Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
+  Z3LegacyRationalFormulaManager(
+      Z3LegacyFormulaCreator pCreator, NonLinearArithmetic pNonLinearArithmetic) {
     super(pCreator, pNonLinearArithmetic);
   }
 

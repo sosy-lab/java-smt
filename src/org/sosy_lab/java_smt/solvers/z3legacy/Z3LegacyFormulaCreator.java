@@ -333,12 +333,14 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return (T) storePhantomReference(new Z3FloatingPointLegacyFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isFloatingPointRoundingModeType()) {
       return (T)
-          storePhantomReference(new Z3FloatingPointRoundingModeLegacyFormula(getEnv(), pTerm), pTerm);
+          storePhantomReference(
+              new Z3FloatingPointRoundingModeLegacyFormula(getEnv(), pTerm), pTerm);
     } else if (pType.isArrayType()) {
       ArrayFormulaType<?, ?> arrFt = (ArrayFormulaType<?, ?>) pType;
       return (T)
           storePhantomReference(
-              new Z3ArrayLegacyFormula<>(getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType()),
+              new Z3ArrayLegacyFormula<>(
+                  getEnv(), pTerm, arrFt.getIndexType(), arrFt.getElementType()),
               pTerm);
     } else if (pType.isEnumerationType()) {
       return (T) storePhantomReference(new Z3EnumerationLegacyFormula(getEnv(), pTerm), pTerm);
@@ -437,7 +439,8 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       this(null, null, 0);
     }
 
-    private Z3AstReference(Z3LegacyFormula referent, ReferenceQueue<? super Z3LegacyFormula> q, long z3Ast) {
+    private Z3AstReference(
+        Z3LegacyFormula referent, ReferenceQueue<? super Z3LegacyFormula> q, long z3Ast) {
       super(referent, q);
       this.z3Ast = z3Ast;
     }
@@ -940,28 +943,28 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           pType.getExponentSize(),
           pType.getMantissaSize());
 
-//    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
-//      // Floating Point Inf uses:
-//      //  - an sign for posiive/negative infinity,
-//      //  - "11..11" as exponent,
-//      //  - "00..00" as mantissa.
-//      String sign = getSign(pValue).isNegative() ? "1" : "0";
-//      return FloatingPointNumber.of(
-//          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
-//          pType.getExponentSize(),
-//          pType.getMantissaSize());
-//
-//    } else if (Native.fpaIsNumeralNan(environment, pValue)) {
-//      // TODO We are underspecified here and choose several bits on our own.
-//      //  This is not sound, if we combine FP anf BV theory.
-//      // Floating Point NaN uses:
-//      //  - an unspecified sign (we choose "0"),
-//      //  - "11..11" as exponent,
-//      //  - an unspecified mantissa (we choose all "1").
-//      return FloatingPointNumber.of(
-//          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
-//          pType.getExponentSize(),
-//          pType.getMantissaSize());
+      //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
+      //      // Floating Point Inf uses:
+      //      //  - an sign for posiive/negative infinity,
+      //      //  - "11..11" as exponent,
+      //      //  - "00..00" as mantissa.
+      //      String sign = getSign(pValue).isNegative() ? "1" : "0";
+      //      return FloatingPointNumber.of(
+      //          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
+      //          pType.getExponentSize(),
+      //          pType.getMantissaSize());
+      //
+      //    } else if (Native.fpaIsNumeralNan(environment, pValue)) {
+      //      // TODO We are underspecified here and choose several bits on our own.
+      //      //  This is not sound, if we combine FP anf BV theory.
+      //      // Floating Point NaN uses:
+      //      //  - an unspecified sign (we choose "0"),
+      //      //  - "11..11" as exponent,
+      //      //  - an unspecified mantissa (we choose all "1").
+      //      return FloatingPointNumber.of(
+      //          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
+      //          pType.getExponentSize(),
+      //          pType.getMantissaSize());
 
     } else {
       Sign sign = getSign(pValue);

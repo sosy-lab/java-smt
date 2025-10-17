@@ -11,7 +11,6 @@
 package org.sosy_lab.java_smt.solvers.z3legacy;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.enumerations.Z3_ast_print_mode;
@@ -111,11 +110,11 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
     // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
-//    loadLibrariesWithFallback(
-//        pLoader, ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
+    //    loadLibrariesWithFallback(
+    //        pLoader, ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
 
-//    // disable Z3's own loading mechanism, see com.microsoft.z3legacy.Native
-//    System.setProperty("z3.skipLibraryLoad", "true");
+    //    // disable Z3's own loading mechanism, see com.microsoft.z3legacy.Native
+    //    System.setProperty("z3.skipLibraryLoad", "true");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
@@ -133,8 +132,8 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
       Native.setParamValue(cfg, "PROOF", "true");
       GENERATE_PROOFS = true;
     }
-//    Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
-//    Native.globalParamSet("model.compact", "false");
+    //    Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
+    //    Native.globalParamSet("model.compact", "false");
 
     final long context = Native.mkContextRc(cfg);
     Native.delConfig(cfg);
@@ -176,8 +175,8 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
         new Z3LegacyBitvectorFormulaManager(creator, booleanTheory);
     Z3LegacyFloatingPointFormulaManager floatingPointTheory =
         new Z3LegacyFloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
-    Z3LegacyQuantifiedFormulaManager
-        quantifierManager = new Z3LegacyQuantifiedFormulaManager(creator);
+    Z3LegacyQuantifiedFormulaManager quantifierManager =
+        new Z3LegacyQuantifiedFormulaManager(creator);
     Z3LegacyArrayFormulaManager arrayManager = new Z3LegacyArrayFormulaManager(creator);
     Z3LegacyStringFormulaManager stringTheory = new Z3LegacyStringFormulaManager(creator);
     Z3LegacyEnumerationFormulaManager enumTheory = new Z3LegacyEnumerationFormulaManager(creator);

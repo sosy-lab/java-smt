@@ -36,7 +36,8 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
 
   private final Z3LegacyFormulaCreator z3creator;
 
-  Z3LegacyModel(AbstractProver<?> pProver, long z3context, long z3model, Z3LegacyFormulaCreator pCreator) {
+  Z3LegacyModel(
+      AbstractProver<?> pProver, long z3context, long z3model, Z3LegacyFormulaCreator pCreator) {
     super(pProver, pCreator);
     Native.modelIncRef(z3context, z3model);
     model = z3model;
