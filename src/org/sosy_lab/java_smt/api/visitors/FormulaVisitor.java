@@ -47,6 +47,7 @@ public interface FormulaVisitor<R> {
    * @param deBruijnIdx de-Bruijn index of the bound variable, which can be used to find the
    *     matching quantifier.
    */
+  @Deprecated(since = "2025.07, because bound variables are never created or used in the visitor")
   default R visitBoundVariable(Formula f, int deBruijnIdx) {
     throw new UnsupportedOperationException(
         "Bound variables are no longer explicitly visited in JavaSMT. "
