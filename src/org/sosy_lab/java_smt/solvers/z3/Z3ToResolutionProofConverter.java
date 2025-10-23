@@ -853,7 +853,29 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-
+ // Z3_OP_PR_NNF_NEG: Proof for a (negative) NNF step. Examples:
+ //
+ //          T1: (not s_1) ~ r_1
+ //          ...
+ //          Tn: (not s_n) ~ r_n
+ //          [nnf-neg T1 ... Tn]: (not (and s_1 ... s_n)) ~ (or r_1 ... r_n)
+ //
+ //          and
+ //
+ //          T1: (not s_1) ~ r_1
+ //          ...
+ //          Tn: (not s_n) ~ r_n
+ //          [nnf-neg T1 ... Tn]: (not (or s_1 ... s_n)) ~ (and r_1 ... r_n)
+ //
+ //          and
+ //
+ //          T1: (not s_1) ~ r_1
+ //          T2: (not s_2) ~ r_2
+ //          T3: s_1 ~ r_1'
+ //          T4: s_2 ~ r_2'
+ //          [nnf-neg T1 T2 T3 T4]: (~ (not (iff s_1 s_2))
+ //                                   (and (or r_1 r_2) (or r_1' r_2')))
+ // Same strategy as with NnfPos
   Proof handleNnfNeg(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
