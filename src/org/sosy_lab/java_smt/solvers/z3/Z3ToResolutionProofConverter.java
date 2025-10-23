@@ -825,9 +825,34 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return resolutionProof;
   }
 
+  // Z3_OP_PR_NNF_POS: Proof for a (positive) NNF step. Example:
+  //
+  //          T1: (not s_1) ~ r_1
+  //          T2: (not s_2) ~ r_2
+  //          T3: s_1 ~ r_1'
+  //          T4: s_2 ~ r_2'                                r_2 => r_1     r_1  => r_2
+  //          [nnf-pos T1 T2 T3 T4]: (~ (iff s_1 s_2) (and (or r_1 r_2') (or r_1' r_2)))
+  //                                                              NOT r_2   not r_1
+  //       The negation normal form steps NNF_POS and NNF_NEG are used in the following cases:
+  //       (a) When creating the NNF of a positive force quantifier.
+  //       The quantifier is retained (unless the bound variables are eliminated).
+  //       Example
+  //
+  //            T1: q ~ q_new
+  //            [nnf-pos T1]: (~ (forall (x T) q) (forall (x T) q_new))
+  //
+  //       (b) When recursively creating NNF over Boolean formulas, where the top-level
+  //       connective is changed during NNF conversion. The relevant Boolean connectives
+  //       for NNF_POS are 'implies', 'iff', 'xor', 'ite'.
+  //       NNF_NEG furthermore handles the case where negation is pushed
+  //       over Boolean connectives 'and' and 'or'.
+  //
+  // Possibly skip the rest of the tree and use oracle to introduce the equivalence this rule
+  // proves.
   Proof handleNnfPos(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
+
 
   Proof handleNnfNeg(Z3Proof node) {
     throw new UnsupportedOperationException();
