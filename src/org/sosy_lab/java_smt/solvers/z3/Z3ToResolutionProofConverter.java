@@ -849,6 +849,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //
   // Possibly skip the rest of the tree and use oracle to introduce the equivalence this rule
   // proves.
+  // Actually, this equivalence would require to have a system in place to record the
+  // susbtitution of the previous formula for the one in nnf so that it can then be used in place
+  // of the original one if this is indeed what happens during z3.
+  // use   =+2: (+ (= p0 p1) - p0 - p1)  to establish the required substitution.
   Proof handleNnfPos(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
@@ -879,6 +883,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   Proof handleNnfNeg(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
+
 
   Proof handleSkolemize(Z3Proof node) {
     throw new UnsupportedOperationException();
