@@ -122,6 +122,22 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    throw new UnsupportedOperationException();
+    // We don't log the call to allSat as it is hard to remove it later on. This is fine as long
+    // as the crash is not (immediately) caused by this call
+    // TODO Redesign the logger and add the call to the log
+    return delegate.allSat(
+        new AllSatCallback<R>() {
+          @Override
+          public void apply(List<BooleanFormula> model) {
+            var newModel = mgr.rebuildAll(model);
+            callback.apply(newModel);
+          }
+
+          @Override
+          public R getResult() throws InterruptedException {
+            return callback.getResult();
+          }
+        },
+        important);
   }
 }
