@@ -9,7 +9,6 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.microsoft.z3.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -621,7 +620,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
 
-    assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
+    assert arity >= 0
         : String.format(
             "Unexpected arity '%s' for formula '%s' for handling a function application.",
             arity, Native.astToString(environment, f));
@@ -763,6 +762,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_ROTATE_LEFT;
       case Z3_OP_EXT_ROTATE_RIGHT:
         return FunctionDeclarationKind.BV_ROTATE_RIGHT;
+      case Z3_OP_BV2INT:
+        return FunctionDeclarationKind.UBV_TO_INT;
+      case Z3_OP_SBV2INT:
+        return FunctionDeclarationKind.SBV_TO_INT;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
