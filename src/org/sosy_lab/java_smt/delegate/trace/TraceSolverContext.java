@@ -123,7 +123,16 @@ public class TraceSolverContext implements SolverContext {
   @Override
   public InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation(
       ProverOptions... options) {
-    throw new UnsupportedOperationException();
+    return logger.logDefKeep(
+        "context",
+        String.format(
+            "newProverEnvironmentWithInterpolation(%s)",
+            FluentIterable.from(options)
+                .transform(v -> "SolverContext.ProverOptions." + v.name())
+                .join(Joiner.on(", "))),
+        () ->
+            new TraceInterpolatingProverEnvironment<>(
+                delegate.newProverEnvironmentWithInterpolation(options), mgr, logger));
   }
 
   @SuppressWarnings("resource")
