@@ -857,29 +857,29 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
- // Z3_OP_PR_NNF_NEG: Proof for a (negative) NNF step. Examples:
- //
- //          T1: (not s_1) ~ r_1
- //          ...
- //          Tn: (not s_n) ~ r_n
- //          [nnf-neg T1 ... Tn]: (not (and s_1 ... s_n)) ~ (or r_1 ... r_n)
- //
- //          and
- //
- //          T1: (not s_1) ~ r_1
- //          ...
- //          Tn: (not s_n) ~ r_n
- //          [nnf-neg T1 ... Tn]: (not (or s_1 ... s_n)) ~ (and r_1 ... r_n)
- //
- //          and
- //
- //          T1: (not s_1) ~ r_1
- //          T2: (not s_2) ~ r_2
- //          T3: s_1 ~ r_1'
- //          T4: s_2 ~ r_2'
- //          [nnf-neg T1 T2 T3 T4]: (~ (not (iff s_1 s_2))
- //                                   (and (or r_1 r_2) (or r_1' r_2')))
- // Same strategy as with NnfPos
+  // Z3_OP_PR_NNF_NEG: Proof for a (negative) NNF step. Examples:
+  //
+  //          T1: (not s_1) ~ r_1
+  //          ...
+  //          Tn: (not s_n) ~ r_n
+  //          [nnf-neg T1 ... Tn]: (not (and s_1 ... s_n)) ~ (or r_1 ... r_n)
+  //
+  //          and
+  //
+  //          T1: (not s_1) ~ r_1
+  //          ...
+  //          Tn: (not s_n) ~ r_n
+  //          [nnf-neg T1 ... Tn]: (not (or s_1 ... s_n)) ~ (and r_1 ... r_n)
+  //
+  //          and
+  //
+  //          T1: (not s_1) ~ r_1
+  //          T2: (not s_2) ~ r_2
+  //          T3: s_1 ~ r_1'
+  //          T4: s_2 ~ r_2'
+  //          [nnf-neg T1 T2 T3 T4]: (~ (not (iff s_1 s_2))
+  //                                   (and (or r_1 r_2) (or r_1' r_2')))
+  // Same strategy as with NnfPos
   Proof handleNnfNeg(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
@@ -901,9 +901,15 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-  
+  // Z3_OP_PR_MODUS_PONENS_OEQ: Modus ponens style rule for equi-satisfiability.
+  //
+  //          T1: p
+  //          T2: (~ p q)
+  //          [mp~ T1 T2]: q
+  // Strategy: Introduce (not (T1 and T2)) or q as an axiom and proceed to resolve T1 and T2 to
+  // end up with q.
   Proof handleModusPonensOeq(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    return iterativeResolutionWithAxiom(node, ResAxiom.ORACLE);
   }
 
   Proof handleThLemma(Z3Proof node) {
@@ -930,9 +936,11 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     List<BooleanFormula> formulas = new ArrayList<>();
 
     for (int i = 0; i < n; i++) {
+      assert (formulaManager.getFormulaType(children.get(i).getFormula()).isBooleanType());
       formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
     }
 
+    assert (formulaManager.getFormulaType(node.getFormula()).isBooleanType());
     formulas.add((BooleanFormula) node.getFormula());
 
     BooleanFormula axiomFormula = bfm.or(formulas);
