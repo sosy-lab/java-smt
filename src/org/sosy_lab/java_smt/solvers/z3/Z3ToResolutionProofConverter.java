@@ -884,11 +884,24 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     throw new UnsupportedOperationException();
   }
 
-
+  // Z3_OP_PR_SKOLEMIZE: Proof for:
+  //
+  //          [sk]: (~ (not (forall x (p x y))) (not (p (sk y) y)))
+  //          [sk]: (~ (exists x (p x y)) (p (sk y) y))
+  //
+  //     This proof object has no antecedents.
+  // Strategies:
+  //  - use the exists- axiom to prove the formula without the quantifier.
+  //  - oracle axiom to prove the entire formula.
+  //  - use the define-fun axiom to defin the sk function to be used. This would imply tracking
+  //    the whole proof where the (p (sk y) y) formula is used.
+  //  - use a let or other mechanism for recording the equisatisfiability of the original formula
+  //    with the new one.
   Proof handleSkolemize(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
 
+  
   Proof handleModusPonensOeq(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
