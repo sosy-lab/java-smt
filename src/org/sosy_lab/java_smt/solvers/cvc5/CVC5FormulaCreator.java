@@ -76,8 +76,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
   // String representation is equal (and they are equal)
-  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
-  private final Map<String, Term> functionsCache = new HashMap<>();
+  protected final Table<String, String, Term> variablesCache = HashBasedTable.create();
+  protected final Map<String, Term> functionsCache = new HashMap<>();
   private final TermManager termManager;
   private final Solver solver;
 

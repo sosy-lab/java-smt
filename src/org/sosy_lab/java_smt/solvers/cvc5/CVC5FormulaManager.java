@@ -8,14 +8,22 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Command;
+import io.github.cvc5.InputParser;
 import io.github.cvc5.Kind;
+import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
+import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import io.github.cvc5.modes.InputLanguage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -66,7 +74,69 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+    TermManager env = creator.getEnv();
+    Solver parseSolver = new Solver(env);
+    SymbolManager sm = new SymbolManager(env);
+    if (!parseSolver.isLogicSet()) {
+      try {
+        parseSolver.setLogic("ALL");
+      } catch (CVC5ApiException e) {
+        throw new AssertionError("Unexpected exception", e);
+      }
+    }
+    String expectedSuccessMsg = "success\n";
+    parseSolver.setOption("print-success", "true");
+    InputParser parser = new InputParser(parseSolver, sm);
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
+
+    Command command = parser.nextCommand();
+    while (!command.isNull()) {
+      // This WILL read in asserts, and they are no longer available for getTerm(), but on the
+      // solver as assertions
+      // TODO: pushs and pops?
+      String invokeReturn = command.invoke(parseSolver, sm);
+      if (!invokeReturn.equals(expectedSuccessMsg)) {
+        throw new AssertionError("Unknown error when parsing using CVC5: " + invokeReturn);
+      }
+      command = parser.nextCommand();
+    }
+
+    parser.deletePointer();
+
+    // Register new terms in our caches
+    for (Term declaredTerm : sm.getDeclaredTerms()) {
+      Sort declaredSort = declaredTerm.getSort();
+      // TODO: is isFunction() correct?
+      if (!declaredSort.isFunction()) {
+        Term termCacheHit =
+            creator.variablesCache.get(declaredTerm.toString(), declaredSort.toString());
+        if (termCacheHit == null) {
+          checkState(!creator.variablesCache.containsRow(declaredTerm.toString()));
+          creator.variablesCache.put(
+              declaredTerm.toString(), declaredSort.toString(), declaredTerm);
+          continue;
+        } else {
+          continue;
+        }
+      }
+
+      Term funCacheHit = creator.functionsCache.get(declaredTerm.toString());
+      // TODO:
+      if (funCacheHit == null) {}
+    }
+
+    // Get the assertions out of the solver
+    if (parseSolver.getAssertions().length != 1) {
+      // If failing, conjugate the input and return
+      throw new AssertionError(
+          "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 " + "input");
+    }
+    Term parsedTerm = parseSolver.getAssertions()[0];
+
+    checkState(!checkNotNull(parsedTerm).isNull());
+    parseSolver.deletePointer();
+
+    return parsedTerm;
   }
 
   @Override
