@@ -45,6 +45,9 @@ public class Z3Proof extends AbstractProof {
     return super.proofAsString();
   }
 
+
+  //TODO: add a way of retrieving the optional extra information given as parameters of the proof
+  // rule. See rule TH_LEMMA
   /**
    * This transformation omits one level of the proofs from Z3, as the leaves in that case are the
    * operands of the boolean formulas used as the very first proof steps in the whole proof .E.g.,

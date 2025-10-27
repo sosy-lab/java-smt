@@ -912,8 +912,42 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return iterativeResolutionWithAxiom(node, ResAxiom.ORACLE);
   }
 
+  // Z3_OP_PR_TH_LEMMA: Generic proof for theory lemmas.
+  //     The theory lemma function comes with one or more parameters.
+  //     The first parameter indicates the name of the theory.
+  //     For the theory of arithmetic, additional parameters provide hints for
+  //     checking the theory lemma.
+  //     The hints for arithmetic are:
+  //
+  //         - farkas - followed by rational coefficients. Multiply the coefficients to the
+  //           inequalities in the lemma, add the (negated) inequalities and obtain a contradiction.
+  //
+  //         - triangle-eq - Indicates a lemma related to the equivalence:
+  //
+  //            (iff (= t1 t2) (and (<= t1 t2) (<= t2 t1)))
+  //
+  //         - gcd-test - Indicates an integer linear arithmetic lemma that uses a gcd test.
+  // This is an example for the parameters included with a TH_LEMMA proof:
+  //          Decl kind: Z3_OP_PR_TH_LEMMA (th-lemma)
+  //            Num parameters: 4
+  //            Param[0] kind: Z3_PARAMETER_SYMBOL
+  //              symbol: arith
+  //           Param[1] kind: Z3_PARAMETER_SYMBOL
+  //              symbol: farkas
+  //            Param[2] kind: Z3_PARAMETER_RATIONAL
+  //              value: 1
+  //            Param[3] kind: Z3_PARAMETER_RATIONAL
+  //              value: 1
+  //            child 0 of ast 125199987906936
+  //           Kind: Z3_APP_AST
+  //            Decl kind: Z3_OP_OR (or)
+  //            String: (or (>= (+ x (* (- 1.0) y)) (- 2.0)) (<= (+ x (* (- 1.0) y)) 2.0))
+  // This actually shows that some information is lost when transforming the proof form Z3 into
+  // the representation in the Proofs common API.
+  // Strategy: Use oracle. In the future this should be expanded to allow to include the hints of
+  // the theory, lemma and other parameters.
   Proof handleThLemma(Z3Proof node) {
-    throw new UnsupportedOperationException();
+    return new AxiomProof(ResAxiom.ORACLE, node.getFormula());
   }
 
   Proof handleHyperResolve(Z3Proof node) {
