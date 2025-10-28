@@ -9,21 +9,21 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
@@ -82,7 +82,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         variablesBuilder.add(getSimpleAssignment(term));
 
       } else if (sort.is_array() && term.is_const()) {
-        variablesBuilder.addAll(getArrayAssignment(term));
+        variablesBuilder.addAll(buildArrayAssignment(term, bitwuzlaEnv.get_value(term)));
 
       } else {
         for (Term child : children) {
@@ -108,94 +108,91 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         argumentInterpretation);
   }
 
-  private Collection<ValueAssignment> getArrayAssignment(Term pTerm) {
-    return getArrayAssignments(pTerm, ImmutableList.of());
+  /** Takes a (nested) select statement and returns its indices. */
+  private Iterable<Term> getArgs(Term array) {
+    if (array.kind().equals(Kind.ARRAY_SELECT)) {
+      return FluentIterable.concat(getArgs(array.get(0)), ImmutableList.of(array.get(1)));
+    } else {
+      return ImmutableList.of();
+    }
   }
 
-  // TODO: check this in detail. I think this might be incomplete.
-  // We should add more Model tests in general. As most are parsing and int based!
-  private Collection<ValueAssignment> getArrayAssignments(Term pTerm, List<Object> upperIndices) {
-    // Array children for store are structured in the following way:
-    // {starting array, index, value} in "we add value at index to array"
-    // Selections are structured: {starting array, index}
-    // Just declared (empty) arrays return an empty array
+  /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
+  private String getVar(Term array) {
+    if (array.kind().equals(Kind.ARRAY_SELECT)) {
+      return getVar(array.get(0));
+    } else {
+      return array.symbol();
+    }
+  }
 
-    // Example Formula: (SELECT ARRAY INDEX)
-    // new ValueAssignment((SELECT ARRAY INDEX), value formula of INDEX, (SELECT ARRAY INDEX) =
-    // value of index, name of INDEX, actual java value of index, {return java value of the
-    // formula})
+  /** Build assignment for an array value. */
+  private Iterable<ValueAssignment> buildArrayAssignment(Term expr, Term value) {
+    // Bitwuzla returns values such as "(Store (Store ... i1,1 e1,1) i1,0 e1,0)" where the i1,x
+    // match the first index of the array and the elements e1,Y can again be arrays (if there is
+    // more than one index). We need "pattern match" this values to extract assignments from it.
+    // Initially we have:
+    //  arr = (Store (Store ... i1,1 e1,1) i1,0 e1,0)
+    // where 'arr' is the name of the variable. By applying (Select i1,0 ...) to both side we get:
+    // (Select i1,0 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0))
+    // The right side simplifies to e1,0 as the index matches. We need to continue with this for
+    // all other matches to the first index, that is
+    //  (Select i1,1 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0))
+    //                    = (Select i1,0 (Store ... i1,1 e1,1))
+    //                    = e1,1
+    // until all matches are explored and the bottom of the Store chain is reached. If the array
+    // has more than one dimension we also have to descend into the elements to apply the next
+    // index there. For instance, let's consider a 2-dimensional array with type (Array Int ->
+    // (Array Int -> Int)). After matching the first index just as in the above example we might
+    // have:
+    //  (Select i1,0 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0)) = e1,0
+    // In this case e1,0 is again a Store chain, let's say e1,0 := (Store (Store ... i2,1 e2,1)
+    // i2,0 e2,0), and we now continue with the second index:
+    //  (Select i2,1 (Select i1,0 arr)) = (Select i2,1 (Store (Store ... i2,1 e2,1) i2,0 e2,0)) =
+    //                                  = e2,1
+    // This again has to be done for all possible matches.
+    // Once we've reached the last index, the successor element will be a non-array value. We
+    // then create the final assignments and return:
+    //  (Select iK,mK ... (Select i2,1 (Select i1,0 arr)) = eik,mK
+    if (value.kind().equals(Kind.ARRAY_STORE)) {
+      // This is a Store node for the current index. We need to follow the chain downwards to
+      // match this index, while also exploring the successor for the other indices
+      Term index = value.get(1);
+      Term element = value.get(2);
 
-    // TODO: Array equals value
-    Term array = pTerm;
-    Collection<ValueAssignment> assignments = new ArrayList<>();
-    Set<Term> indices = new HashSet<>();
-    while (array.sort().is_array()) {
-      // Here we either have STORE; SELECT or an empty Array
-      Vector_Term children = array.children();
-      List<Object> innerIndices = new ArrayList<>(upperIndices);
-      String name = getArrayName(array);
-      Preconditions.checkNotNull(name, "unexpected array %s without name", array);
-      if (children.isEmpty()) {
-        // Empty array
-        return assignments;
-      } else if (children.size() == 2) {
-        // SELECT expression
-        Term index = children.get(1);
-        if (!indices.add(index)) {
-          continue;
-        }
+      TermManager termManager = bitwuzlaCreator.getTermManager();
+      Term select = termManager.mk_term(Kind.ARRAY_SELECT, expr, index);
 
-        Term indexValue = bitwuzlaEnv.get_value(index);
-        innerIndices.add(evaluateImpl(indexValue));
-
-        // The value of an SELECT is equal to the content
-        Term valueTerm = bitwuzlaEnv.get_value(array);
-
-        assignments.add(
-            new ValueAssignment(
-                bitwuzlaCreator.encapsulateWithTypeOf(array),
-                bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-                creator.encapsulateBoolean(buildEqForTwoTerms(array, valueTerm)),
-                name,
-                evaluateImpl(valueTerm),
-                innerIndices));
-        array = children.get(0);
-
+      Iterable<ValueAssignment> current;
+      if (expr.sort().array_element().is_array()) {
+        current = buildArrayAssignment(select, element);
       } else {
-        // STORE expression
-        assert children.size() == 3;
-        Term index = children.get(1);
-        Term content = children.get(2);
+        Term equation = termManager.mk_term(Kind.EQUAL, select, element);
 
-        if (!indices.add(index)) {
-          continue;
-        }
-
-        Term indexValue = bitwuzlaEnv.get_value(index);
-        Term contentValue = bitwuzlaEnv.get_value(content);
-        innerIndices.add(evaluateImpl(indexValue));
-        assignments.add(
-            new ValueAssignment(
-                bitwuzlaCreator.encapsulateWithTypeOf(array),
-                bitwuzlaCreator.encapsulateWithTypeOf(content),
-                creator.encapsulateBoolean(buildEqForTwoTerms(array, contentValue)),
-                name,
-                evaluateImpl(contentValue),
-                innerIndices));
-
-        array = children.get(0);
-        assignments.addAll(getArrayAssignments(array, innerIndices));
+        current =
+            FluentIterable.of(
+                new ValueAssignment(
+                    creator.encapsulate(creator.getFormulaType(element), select),
+                    creator.encapsulate(creator.getFormulaType(element), element),
+                    creator.encapsulateBoolean(equation),
+                    getVar(expr),
+                    creator.convertValue(element, element),
+                    FluentIterable.from(getArgs(select))
+                        .transform(creator::convertValue)
+                        .toList()));
       }
-    }
-    return assignments;
-  }
+      return FluentIterable.concat(current, buildArrayAssignment(expr, value.get(0)));
 
-  private String getArrayName(Term array) {
-    String name = array.symbol();
-    if (name != null) {
-      return name;
+    } else if (value.kind().equals(Kind.CONST_ARRAY)) {
+      // We've reached the end of the Store chain
+      return ImmutableList.of();
+
+    } else {
+      // Should be unreachable
+      // We assume that array values are made up of "const" and "store" nodes with non-array
+      // constants as leaves
+      throw new AssertionError();
     }
-    return getArrayName(array.get(0));
   }
 
   private Term buildEqForTwoTerms(Term left, Term right) {
