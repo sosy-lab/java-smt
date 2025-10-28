@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
@@ -27,6 +28,9 @@ import io.github.cvc5.TermManager;
 import io.github.cvc5.modes.InputLanguage;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -89,7 +93,35 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     String expectedSuccessMsg = "success\n";
     parseSolver.setOption("print-success", "true");
     InputParser parser = new InputParser(parseSolver, sm);
-    parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
+
+    // Sanitize input String for CVC5 (it disallows . and @ without quotes)
+    String sanitizedInputFormula = formulaStr;
+    ImmutableBiMap<String, String> replacementMap = null;
+    if (sanitizedInputFormula.contains("define-fun .def_")) {
+      // MathSAT5 output, resubstitute
+      ImmutableBiMap.Builder<String, String> replacementMapBuilder = ImmutableBiMap.builder();
+      // Since no quotes are used, we can assume that there are no spaces in the defined name
+      String pattern = "(define-fun \\.)[^\\s]+";
+      Pattern r = Pattern.compile(pattern);
+      Matcher m = r.matcher(sanitizedInputFormula);
+
+      while (m.find()) {
+        String match = m.group();
+        String bare = match.replace("define-fun ", ""); // to replace
+        String replacement = "|" + bare.substring(1, bare.length()) + "|";
+        checkState(!sanitizedInputFormula.contains(replacement));
+        replacementMapBuilder.put(bare, replacement);
+      }
+
+      replacementMap = replacementMapBuilder.buildOrThrow();
+      for (Entry<String, String> replacementEntry : replacementMap.entrySet()) {
+        sanitizedInputFormula =
+            sanitizedInputFormula.replace(replacementEntry.getKey(), replacementEntry.getValue());
+      }
+      checkState(!sanitizedInputFormula.contains("define-fun ."));
+    }
+
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, sanitizedInputFormula, "");
 
     ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
     ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
@@ -99,7 +131,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       if (command.toString().contains("push") || command.toString().contains("pop")) {
         // TODO: push and pop?
         throw new IllegalArgumentException(
-            "Parsing SMTLIB2 with CVC5 in JavaSMT does not support" + " push or pop currently.");
+            "Parsing SMTLIB2 with CVC5 in JavaSMT does not support push or pop currently.");
       }
 
       // This WILL read in asserts, and they are no longer available for getTerm(), but on the
@@ -161,13 +193,35 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     checkState(sm.getNamedTerms().isEmpty());
 
     // Get the assertions out of the solver
-    if (parseSolver.getAssertions().length != 1) {
+    Term[] assertions = parseSolver.getAssertions();
+    checkState(assertions.length > 0);
+    Term parsedTerm = assertions[assertions.length - 1];
+    checkState(!checkNotNull(parsedTerm).isNull());
+    if (assertions.length > 1 && replacementMap != null) {
+      // re-substitute MathSAT5 input
+      try {
+        for (int i = assertions.length - 2; i >= 0; i--) {
+          Term equation = assertions[i];
+
+          if (equation.getKind() != Kind.EQUAL) {
+            // Original problem we try to solve
+            throw new IllegalArgumentException(
+                "Error when parsing using CVC5, no expressions may use a . or "
+                    + "@ as first character in a symbol.");
+          }
+
+          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
+        }
+      } catch (CVC5ApiException apiException) {
+        throw new IllegalArgumentException(
+            "Error parsing the following term in CVC5: " + parsedTerm, apiException);
+      }
+
+    } else if (assertions.length != 1) {
       // If failing, conjugate the input and return
       throw new IllegalArgumentException(
           "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 input");
     }
-    Term parsedTerm = parseSolver.getAssertions()[0];
-    checkState(!checkNotNull(parsedTerm).isNull());
 
     // If the symbols used in the term were already declared before parsing, the term uses new
     // ones with the same name, so we need to substitute them!
