@@ -114,14 +114,15 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Register new terms in our caches
     for (Term parsedTerm : sm.getDeclaredTerms()) {
+      Term termToRegister = parsedTerm;
       try {
-        Kind kind = parsedTerm.getKind();
+        Kind kind = termToRegister.getKind();
         if (kind == Kind.APPLY_UF) {
-          parsedTerm = parsedTerm.getChild(0);
+          termToRegister = termToRegister.getChild(0);
         }
 
-        String parsedTermString = parsedTerm.toString();
-        Sort parsedSort = parsedTerm.getSort();
+        String parsedTermString = termToRegister.toString();
+        Sort parsedSort = termToRegister.getSort();
         String parsedSortString = parsedSort.toString();
 
         if (parsedSort.isFunction()) {
@@ -129,10 +130,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
           Term funCacheHit = creator.functionsCache.get(parsedTermString);
           if (funCacheHit == null) {
             assert !creator.variablesCache.contains(parsedTermString, parsedSortString);
-            creator.functionsCache.put(parsedTermString, parsedTerm);
+            creator.functionsCache.put(parsedTermString, termToRegister);
 
           } else {
-            substituteFromBuilder.add(parsedTerm);
+            substituteFromBuilder.add(termToRegister);
             substituteToBuilder.add(funCacheHit);
           }
 
@@ -141,10 +142,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
           if (termCacheHit == null) {
             assert !creator.functionsCache.containsKey(parsedTermString);
             checkState(!creator.variablesCache.containsRow(parsedTermString));
-            creator.variablesCache.put(parsedTermString, parsedSortString, parsedTerm);
+            creator.variablesCache.put(parsedTermString, parsedSortString, termToRegister);
 
           } else {
-            substituteFromBuilder.add(parsedTerm);
+            substituteFromBuilder.add(termToRegister);
             substituteToBuilder.add(termCacheHit);
           }
         }
