@@ -417,7 +417,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = accessVariablesCache(formula.toString(), sort);
+        Term originalVar = getFreeVariableFromCache(formula.toString(), sort);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -427,7 +427,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
+          Term freeVar = getFreeVariableFromCache(name, boundVar.getSort());
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -845,14 +845,20 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
   }
 
-  private Term accessVariablesCache(String name, Sort sort) {
+  /**
+   * Returns the free variable for the given name and sort of a bound variable from the variables
+   * cache. Will throw a {@link NullPointerException} if no variable is known for the input!
+   */
+  private Term getFreeVariableFromCache(String name, Sort sort) {
     Term existingVar = variablesCache.get(name, sort.toString());
     Preconditions.checkNotNull(
         existingVar,
-        "Symbol %s requested with type %s, but already used with type %s",
+        "Symbol %s requested with type %s, but %s",
         name,
         sort,
-        variablesCache.row(name).keySet());
+        variablesCache.containsRow(name)
+            ? "the used symbol is already registered with type " + variablesCache.row(name).keySet()
+            : "the used symbol is unknown to the variables cache");
     return existingVar;
   }
 }
