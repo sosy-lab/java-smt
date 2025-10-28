@@ -9,9 +9,9 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
@@ -103,7 +103,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     if (existingVar != null) {
       return existingVar;
     }
-    Preconditions.checkArgument(
+    checkArgument(
         !variablesCache.containsRow(name),
         "Symbol %s requested with type %s, but already used with type %s",
         name,
@@ -439,7 +439,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitFreeVariable(formula, dequote(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
-        Preconditions.checkState(
+        checkState(
             f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
         return visitor.visitConstant(formula, f.getChild(0).getSymbol());
 
@@ -765,7 +765,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       functionsCache.put(pName, exp);
 
     } else {
-      Preconditions.checkArgument(
+      checkArgument(
           exp.getSort().equals(exp.getSort()),
           "Symbol %s already in use for different return type %s",
           exp,
@@ -773,7 +773,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       for (int i = 1; i < exp.getNumChildren(); i++) {
         // CVC5s first argument in a function/Uf is the declaration, we don't need that here
         try {
-          Preconditions.checkArgument(
+          checkArgument(
               pArgTypes.get(i).equals(exp.getChild(i).getSort()),
               "Argument %s with type %s does not match expected type %s",
               i - 1,
@@ -840,7 +840,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     final var expWidth = Ints.checkedCast(fpValue.first);
     final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without sign bit
     final var bvValue = fpValue.third;
-    Preconditions.checkState(bvValue.isBitVectorValue());
+    checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
   }
@@ -851,7 +851,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    */
   private Term getFreeVariableFromCache(String name, Sort sort) {
     Term existingVar = variablesCache.get(name, sort.toString());
-    Preconditions.checkNotNull(
+    checkNotNull(
         existingVar,
         "Symbol %s requested with type %s, but %s",
         name,
