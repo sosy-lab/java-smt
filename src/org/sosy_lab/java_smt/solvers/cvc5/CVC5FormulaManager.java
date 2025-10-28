@@ -82,6 +82,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       try {
         parseSolver.setLogic("ALL");
       } catch (CVC5ApiException e) {
+        // Should never happen in this configuration
         throw new AssertionError("Unexpected exception", e);
       }
     }
@@ -103,6 +104,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
       // This WILL read in asserts, and they are no longer available for getTerm(), but on the
       // solver as assertions
+      // invoke() throws CVC5ParserException for errors
       String invokeReturn = command.invoke(parseSolver, sm);
       if (!invokeReturn.equals(expectedSuccessMsg)) {
         throw new AssertionError("Unknown error when parsing using CVC5: " + invokeReturn);
@@ -151,21 +153,17 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         }
       } catch (CVC5ApiException apiException) {
         throw new IllegalArgumentException(
-            "You tried reading a bool variable potentially in a UF application that failed. Checked"
-                + " term: "
-                + parsedTerm
-                + ".",
-            apiException);
+            "Error parsing the following term in CVC5: " + parsedTerm, apiException);
       }
     }
 
-    // TODO: Which terms can end up here?
+    // TODO: Which terms can end up here? Seems like this is always empty
     checkState(sm.getNamedTerms().isEmpty());
 
     // Get the assertions out of the solver
     if (parseSolver.getAssertions().length != 1) {
       // If failing, conjugate the input and return
-      throw new AssertionError(
+      throw new IllegalArgumentException(
           "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 input");
     }
     Term parsedTerm = parseSolver.getAssertions()[0];
