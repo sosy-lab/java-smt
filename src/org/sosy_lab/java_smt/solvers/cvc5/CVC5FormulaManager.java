@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
@@ -89,11 +90,19 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     InputParser parser = new InputParser(parseSolver, sm);
     parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
 
+    ImmutableSet.Builder<Term> substituteFrom = ImmutableSet.builder();
+    ImmutableSet.Builder<Term> substituteTo = ImmutableSet.builder();
+
     Command command = parser.nextCommand();
     while (!command.isNull()) {
+      if (command.toString().contains("push") || command.toString().contains("pop")) {
+        // TODO: push and pop?
+        throw new IllegalArgumentException(
+            "Parsing SMTLIB2 with CVC5 in JavaSMT does not support" + " push or pop currently.");
+      }
+
       // This WILL read in asserts, and they are no longer available for getTerm(), but on the
       // solver as assertions
-      // TODO: pushs and pops?
       String invokeReturn = command.invoke(parseSolver, sm);
       if (!invokeReturn.equals(expectedSuccessMsg)) {
         throw new AssertionError("Unknown error when parsing using CVC5: " + invokeReturn);
@@ -114,24 +123,33 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
           checkState(!creator.variablesCache.containsRow(declaredTerm.toString()));
           creator.variablesCache.put(
               declaredTerm.toString(), declaredSort.toString(), declaredTerm);
-          continue;
-        } else {
-          continue;
-        }
-      }
 
-      Term funCacheHit = creator.functionsCache.get(declaredTerm.toString());
-      // TODO:
-      if (funCacheHit == null) {}
+        } else {
+          substituteFrom.add(declaredTerm);
+          substituteTo.add(termCacheHit);
+        }
+      } else {
+
+        Term funCacheHit = creator.functionsCache.get(declaredTerm.toString());
+        // TODO:
+        if (funCacheHit == null) {}
+        throw new IllegalArgumentException("implement me");
+      }
     }
 
     // Get the assertions out of the solver
     if (parseSolver.getAssertions().length != 1) {
       // If failing, conjugate the input and return
       throw new AssertionError(
-          "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 " + "input");
+          "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 input");
     }
     Term parsedTerm = parseSolver.getAssertions()[0];
+
+    // If the symbols used in the term were already declared before parsing, the term uses new
+    // ones with the same name, so we need to substitute them!
+    parsedTerm =
+        parsedTerm.substitute(
+            substituteFrom.build().toArray(new Term[0]), substituteTo.build().toArray(new Term[0]));
 
     checkState(!checkNotNull(parsedTerm).isNull());
     parseSolver.deletePointer();
