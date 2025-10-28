@@ -851,7 +851,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    */
   private Term getFreeVariableFromCache(String name, Sort sort) {
     Term existingVar = variablesCache.get(name, sort.toString());
-    checkNotNull(
+    return checkNotNull(
         existingVar,
         "Symbol %s requested with type %s, but %s",
         name,
@@ -859,6 +859,5 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         variablesCache.containsRow(name)
             ? "the used symbol is already registered with type " + variablesCache.row(name).keySet()
             : "the used symbol is unknown to the variables cache");
-    return existingVar;
   }
 }
