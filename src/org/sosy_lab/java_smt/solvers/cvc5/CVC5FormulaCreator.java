@@ -32,10 +32,14 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -48,11 +52,13 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
@@ -78,6 +84,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   // String representation is equal (and they are equal)
   protected final Table<String, String, Term> variablesCache = HashBasedTable.create();
   protected final Map<String, Term> functionsCache = new HashMap<>();
+  protected boolean registerUnknownBoundVariables = false;
   private final TermManager termManager;
   private final Solver solver;
 
@@ -417,7 +424,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = getFreeVariableFromCache(formula.toString(), sort);
+        Term originalVar = getFreeVariableFromCache(formula.toString(), sort, visitor);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -427,7 +434,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = getFreeVariableFromCache(name, boundVar.getSort());
+          Term freeVar = getFreeVariableFromCache(name, boundVar.getSort(), visitor);
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -849,7 +856,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
    * Returns the free variable for the given name and sort of a bound variable from the variables
    * cache. Will throw a {@link NullPointerException} if no variable is known for the input!
    */
-  private Term getFreeVariableFromCache(String name, Sort sort) {
+  private Term getFreeVariableFromCache(String name, Sort sort, FormulaVisitor<?> visitor) {
+    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor) {
+      ((BoundVariablesRegisteringRecursiveVisitor) visitor).registerBoundVariable(name, sort);
+    }
     Term existingVar = variablesCache.get(name, sort.toString());
     return checkNotNull(
         existingVar,
@@ -859,5 +869,89 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         variablesCache.containsRow(name)
             ? "the used symbol is already registered with type " + variablesCache.row(name).keySet()
             : "the used symbol is unknown to the variables cache");
+  }
+
+  /**
+   * Caches all bound variables nested in the boolean input term that are unknown to the variable
+   * cache with a free variable copy in it.
+   */
+  protected void registerBoundVariablesWithVisitor(Term input) {
+    checkArgument(
+        input.getSort().isBoolean(),
+        "Only boolean terms can be used to register " + "bound variables as free variables!");
+
+    BoundVariablesRegisteringRecursiveVisitor boundVariablesRegisteringRecursiveVisitor =
+        new BoundVariablesRegisteringRecursiveVisitor(this);
+
+    boundVariablesRegisteringRecursiveVisitor.addToQueue(encapsulateBoolean(input));
+    while (!boundVariablesRegisteringRecursiveVisitor.isQueueEmpty()) {
+      Formula tt = boundVariablesRegisteringRecursiveVisitor.pop();
+      TraversalProcess process = visit(tt, boundVariablesRegisteringRecursiveVisitor);
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
+  }
+
+  private static final class BoundVariablesRegisteringRecursiveVisitor
+      implements FormulaVisitor<TraversalProcess> {
+
+    private final Set<Formula> seen = new HashSet<>();
+    private final Deque<Formula> toVisit = new ArrayDeque<>();
+
+    private final CVC5FormulaCreator usedCreator;
+
+    BoundVariablesRegisteringRecursiveVisitor(CVC5FormulaCreator pCreator) {
+      usedCreator = checkNotNull(pCreator);
+    }
+
+    private void registerBoundVariable(String boundVariableName, Sort boundVarSort) {
+      String boundSort = boundVarSort.toString();
+      Term existingVar = usedCreator.variablesCache.get(boundVariableName, boundSort);
+      if (existingVar == null) {
+        existingVar = usedCreator.makeVariable(boundVarSort, boundVariableName);
+        usedCreator.variablesCache.put(boundVariableName, boundSort, existingVar);
+      }
+    }
+
+    void addToQueue(Formula f) {
+      if (seen.add(f)) {
+        toVisit.push(f);
+      }
+    }
+
+    boolean isQueueEmpty() {
+      return toVisit.isEmpty();
+    }
+
+    Formula pop() {
+      return toVisit.pop();
+    }
+
+    @Override
+    public TraversalProcess visitFreeVariable(Formula pF, String pName) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitConstant(Formula pF, Object pValue) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitFunction(
+        Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+      for (Formula f : pArgs) {
+        addToQueue(f);
+      }
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitQuantifier(
+        BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+      addToQueue(pBody);
+      return TraversalProcess.CONTINUE;
+    }
   }
 }

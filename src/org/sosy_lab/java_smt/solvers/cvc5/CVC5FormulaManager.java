@@ -110,7 +110,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       command = parser.nextCommand();
     }
 
-    parser.deletePointer();
+    parser.deletePointer(); // Clean up parser
 
     // Register new terms in our caches
     for (Term parsedTerm : sm.getDeclaredTerms()) {
@@ -168,6 +168,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
           "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 input");
     }
     Term parsedTerm = parseSolver.getAssertions()[0];
+    checkState(!checkNotNull(parsedTerm).isNull());
 
     // If the symbols used in the term were already declared before parsing, the term uses new
     // ones with the same name, so we need to substitute them!
@@ -183,11 +184,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Quantified formulas do not give us the bound variables in getDeclaredTerms() above.
     // Find them and register a free equivalent
-    // TODO:
-
-    checkState(!checkNotNull(parsedTerm).isNull());
-    parseSolver.deletePointer();
-
+    creator.registerBoundVariablesWithVisitor(parsedTerm);
+    parseSolver.deletePointer(); // Clean up parse solver
     return parsedTerm;
   }
 
