@@ -118,8 +118,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       Sort parsedSort = parsedTerm.getSort();
       String parsedSortString = parsedSort.toString();
 
-      // TODO: quantifiers and their bounds seems to be handled distinctly
-
       if (!parsedSort.isFunction()) {
         Term termCacheHit = creator.variablesCache.get(parsedTermString, parsedSortString);
         if (termCacheHit == null) {
@@ -146,6 +144,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       }
     }
 
+    // TODO: Which terms can end up here?
+    checkState(sm.getNamedTerms().isEmpty());
+
     // Get the assertions out of the solver
     if (parseSolver.getAssertions().length != 1) {
       // If failing, conjugate the input and return
@@ -165,6 +166,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     parsedTerm =
         parsedTerm.substitute(
             substituteFrom.toArray(new Term[0]), substituteTo.toArray(new Term[0]));
+
+    // Quantified formulas do not give us the bound variables in getDeclaredTerms() above.
+    // Find them and register a free equivalent
+    // TODO:
 
     checkState(!checkNotNull(parsedTerm).isNull());
     parseSolver.deletePointer();
