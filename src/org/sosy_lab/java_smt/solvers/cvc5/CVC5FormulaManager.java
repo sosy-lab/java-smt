@@ -90,8 +90,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     InputParser parser = new InputParser(parseSolver, sm);
     parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
 
-    ImmutableSet.Builder<Term> substituteFrom = ImmutableSet.builder();
-    ImmutableSet.Builder<Term> substituteTo = ImmutableSet.builder();
+    ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
+    ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
 
     Command command = parser.nextCommand();
     while (!command.isNull()) {
@@ -125,14 +125,19 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
               declaredTerm.toString(), declaredSort.toString(), declaredTerm);
 
         } else {
-          substituteFrom.add(declaredTerm);
-          substituteTo.add(termCacheHit);
+          substituteFromBuilder.add(declaredTerm);
+          substituteToBuilder.add(termCacheHit);
         }
       } else {
 
         Term funCacheHit = creator.functionsCache.get(declaredTerm.toString());
         // TODO:
-        if (funCacheHit == null) {}
+        if (funCacheHit == null) {
+
+        } else {
+          substituteFromBuilder.add(declaredTerm);
+          substituteToBuilder.add(funCacheHit);
+        }
         throw new IllegalArgumentException("implement me");
       }
     }
@@ -147,9 +152,15 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // If the symbols used in the term were already declared before parsing, the term uses new
     // ones with the same name, so we need to substitute them!
+    ImmutableSet<Term> substituteFrom = substituteFromBuilder.build();
+    ImmutableSet<Term> substituteTo = substituteToBuilder.build();
+    checkState(substituteFrom.size() == substituteTo.size());
+    assert substituteFrom.stream()
+        .map(Term::toString)
+        .allMatch(from -> substituteTo.stream().map(Term::toString).anyMatch(from::equals));
     parsedTerm =
         parsedTerm.substitute(
-            substituteFrom.build().toArray(new Term[0]), substituteTo.build().toArray(new Term[0]));
+            substituteFrom.toArray(new Term[0]), substituteTo.toArray(new Term[0]));
 
     checkState(!checkNotNull(parsedTerm).isNull());
     parseSolver.deletePointer();
