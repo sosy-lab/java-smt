@@ -114,33 +114,47 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Register new terms in our caches
     for (Term parsedTerm : sm.getDeclaredTerms()) {
-      String parsedTermString = parsedTerm.toString();
-      Sort parsedSort = parsedTerm.getSort();
-      String parsedSortString = parsedSort.toString();
-
-      if (!parsedSort.isFunction()) {
-        Term termCacheHit = creator.variablesCache.get(parsedTermString, parsedSortString);
-        if (termCacheHit == null) {
-          assert !creator.functionsCache.containsKey(parsedTermString);
-          checkState(!creator.variablesCache.containsRow(parsedTermString));
-          creator.variablesCache.put(parsedTermString, parsedSortString, parsedTerm);
-
-        } else {
-          substituteFromBuilder.add(parsedTerm);
-          substituteToBuilder.add(termCacheHit);
+      try {
+        Kind kind = parsedTerm.getKind();
+        if (kind == Kind.APPLY_UF) {
+          parsedTerm = parsedTerm.getChild(0);
         }
 
-      } else {
-        // UFs
-        Term funCacheHit = creator.functionsCache.get(parsedTermString);
-        if (funCacheHit == null) {
-          assert !creator.variablesCache.contains(parsedTermString, parsedSortString);
-          creator.functionsCache.put(parsedTermString, parsedTerm);
+        String parsedTermString = parsedTerm.toString();
+        Sort parsedSort = parsedTerm.getSort();
+        String parsedSortString = parsedSort.toString();
+
+        if (parsedSort.isFunction()) {
+          // UFs
+          Term funCacheHit = creator.functionsCache.get(parsedTermString);
+          if (funCacheHit == null) {
+            assert !creator.variablesCache.contains(parsedTermString, parsedSortString);
+            creator.functionsCache.put(parsedTermString, parsedTerm);
+
+          } else {
+            substituteFromBuilder.add(parsedTerm);
+            substituteToBuilder.add(funCacheHit);
+          }
 
         } else {
-          substituteFromBuilder.add(parsedTerm);
-          substituteToBuilder.add(funCacheHit);
+          Term termCacheHit = creator.variablesCache.get(parsedTermString, parsedSortString);
+          if (termCacheHit == null) {
+            assert !creator.functionsCache.containsKey(parsedTermString);
+            checkState(!creator.variablesCache.containsRow(parsedTermString));
+            creator.variablesCache.put(parsedTermString, parsedSortString, parsedTerm);
+
+          } else {
+            substituteFromBuilder.add(parsedTerm);
+            substituteToBuilder.add(termCacheHit);
+          }
         }
+      } catch (CVC5ApiException apiException) {
+        throw new IllegalArgumentException(
+            "You tried reading a bool variable potentially in a UF application that failed. Checked"
+                + " term: "
+                + parsedTerm
+                + ".",
+            apiException);
       }
     }
 
