@@ -66,6 +66,9 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_SBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_FP_TO_UBV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_IFF;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_FROM_SBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_FROM_UBV;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_INT_TO_BV;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ITE;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_LEQ;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_NOT;
@@ -411,6 +414,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.LTE;
       case MSAT_TAG_EQ:
         return FunctionDeclarationKind.EQ;
+      case MSAT_TAG_INT_TO_BV:
+        return FunctionDeclarationKind.INT_TO_BV;
       case MSAT_TAG_ARRAY_READ:
         return FunctionDeclarationKind.SELECT;
       case MSAT_TAG_ARRAY_WRITE:
@@ -468,6 +473,10 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT;
       case MSAT_TAG_BV_ROR:
         return FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT;
+      case MSAT_TAG_INT_FROM_UBV:
+        return FunctionDeclarationKind.UBV_TO_INT;
+      case MSAT_TAG_INT_FROM_SBV:
+        return FunctionDeclarationKind.SBV_TO_INT;
 
       case MSAT_TAG_FP_NEG:
         return FunctionDeclarationKind.FP_NEG;
