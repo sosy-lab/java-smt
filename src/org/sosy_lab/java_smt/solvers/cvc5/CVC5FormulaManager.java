@@ -113,32 +113,36 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     parser.deletePointer();
 
     // Register new terms in our caches
-    for (Term declaredTerm : sm.getDeclaredTerms()) {
-      Sort declaredSort = declaredTerm.getSort();
-      // TODO: is isFunction() correct?
-      if (!declaredSort.isFunction()) {
-        Term termCacheHit =
-            creator.variablesCache.get(declaredTerm.toString(), declaredSort.toString());
+    for (Term parsedTerm : sm.getDeclaredTerms()) {
+      String parsedTermString = parsedTerm.toString();
+      Sort parsedSort = parsedTerm.getSort();
+      String parsedSortString = parsedSort.toString();
+
+      // TODO: quantifiers and their bounds seems to be handled distinctly
+
+      if (!parsedSort.isFunction()) {
+        Term termCacheHit = creator.variablesCache.get(parsedTermString, parsedSortString);
         if (termCacheHit == null) {
-          checkState(!creator.variablesCache.containsRow(declaredTerm.toString()));
-          creator.variablesCache.put(
-              declaredTerm.toString(), declaredSort.toString(), declaredTerm);
+          assert !creator.functionsCache.containsKey(parsedTermString);
+          checkState(!creator.variablesCache.containsRow(parsedTermString));
+          creator.variablesCache.put(parsedTermString, parsedSortString, parsedTerm);
 
         } else {
-          substituteFromBuilder.add(declaredTerm);
+          substituteFromBuilder.add(parsedTerm);
           substituteToBuilder.add(termCacheHit);
         }
-      } else {
 
-        Term funCacheHit = creator.functionsCache.get(declaredTerm.toString());
-        // TODO:
+      } else {
+        // UFs
+        Term funCacheHit = creator.functionsCache.get(parsedTermString);
         if (funCacheHit == null) {
+          assert !creator.variablesCache.contains(parsedTermString, parsedSortString);
+          creator.functionsCache.put(parsedTermString, parsedTerm);
 
         } else {
-          substituteFromBuilder.add(declaredTerm);
+          substituteFromBuilder.add(parsedTerm);
           substituteToBuilder.add(funCacheHit);
         }
-        throw new IllegalArgumentException("implement me");
       }
     }
 
