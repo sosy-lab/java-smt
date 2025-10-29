@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
@@ -295,18 +296,26 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    StringBuilder out = new StringBuilder();
+    StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
+
+    // now add the final assert
+    variablesAndUFsAsSMTLIB2.append("(assert ").append(f).append(')');
+    return variablesAndUFsAsSMTLIB2.toString();
+  }
+
+  private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
+    StringBuilder variablesAndUFsAsSMTLIB2 = new StringBuilder();
     // get all symbols
-    final Map<String, Term> allVars = new LinkedHashMap<>();
-    creator.extractVariablesAndUFs(f, true, allVars::put);
+    ImmutableMap.Builder<String, Term> allKnownVarsAndUFsBuilder = ImmutableMap.builder();
+    creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
 
     // print all symbols
-    for (Map.Entry<String, Term> entry : allVars.entrySet()) {
+    for (Entry<String, Term> entry : allKnownVarsAndUFsBuilder.buildOrThrow().entrySet()) {
       String name = entry.getKey();
       Term var = entry.getValue();
 
       // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      variablesAndUFsAsSMTLIB2.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
       // add function parameters
       Iterable<Sort> childrenTypes;
@@ -319,15 +328,12 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       } catch (CVC5ApiException e) {
         childrenTypes = Iterables.transform(var, Term::getSort);
       }
-      out.append(Joiner.on(" ").join(childrenTypes));
+      variablesAndUFsAsSMTLIB2.append(Joiner.on(" ").join(childrenTypes));
 
       // and return type
-      out.append(") ").append(var.getSort().toString()).append(")\n");
+      variablesAndUFsAsSMTLIB2.append(") ").append(var.getSort().toString()).append(")\n");
     }
-
-    // now add the final assert
-    out.append("(assert ").append(f).append(')');
-    return out.toString();
+    return variablesAndUFsAsSMTLIB2;
   }
 
   @Override
