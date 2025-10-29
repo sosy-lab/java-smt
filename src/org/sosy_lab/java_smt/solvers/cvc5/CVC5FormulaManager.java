@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -104,42 +103,12 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Add all already known (cached) variables and UFs
     // (double parsing is a problem for UFs it seems, and the internal UFs cause problems)
-    Set<String> declarationsForAllVarsAndUfs =
-        getSMTLIB2DeclarationsFor(
-            ImmutableMap.<String, Term>builder()
-                .putAll(creator.getAllCachedVariablesAndUFs(true, true))
-                .buildOrThrow());
-    StringBuilder extraDefs = new StringBuilder();
-    for (String declaration : declarationsForAllVarsAndUfs) {
-      if (!formulaStr.contains(declaration.replace("\n", ""))) {
-        extraDefs.append(declaration);
-      }
-    }
-    String sanitizedInputFormula = extraDefs.append(formulaStr).toString();
-    ImmutableBiMap<String, String> replacementMap = null;
+    String sanitizedInputFormula = addCachedDeclarationsTo(formulaStr);
+    boolean mathsatReplacement = false;
     // Sanitize input String for CVC5 (it disallows . and @ without quotes)
     if (sanitizedInputFormula.contains("define-fun .def_")) {
-      // MathSAT5 output, resubstitute
-      ImmutableBiMap.Builder<String, String> replacementMapBuilder = ImmutableBiMap.builder();
-      // Since no quotes are used, we can assume that there are no spaces in the defined name
-      String pattern = "(define-fun \\.)[^\\s]+";
-      Pattern r = Pattern.compile(pattern);
-      Matcher m = r.matcher(sanitizedInputFormula);
-
-      while (m.find()) {
-        String match = m.group();
-        String bare = match.replace("define-fun ", ""); // to replace
-        String replacement = "|" + bare.substring(1) + "|";
-        checkState(!sanitizedInputFormula.contains(replacement));
-        replacementMapBuilder.put(bare, replacement);
-      }
-
-      replacementMap = replacementMapBuilder.buildOrThrow();
-      for (Entry<String, String> replacementEntry : replacementMap.entrySet()) {
-        sanitizedInputFormula =
-            sanitizedInputFormula.replace(replacementEntry.getKey(), replacementEntry.getValue());
-      }
-      checkState(!sanitizedInputFormula.contains("define-fun ."));
+      mathsatReplacement = true;
+      sanitizedInputFormula = sanitizeInputForMathsat(sanitizedInputFormula);
     }
 
     parser.setStringInput(InputLanguage.SMT_LIB_2_6, sanitizedInputFormula, "");
@@ -171,9 +140,79 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       command = getNextCommand(parser);
     }
 
-    parser.deletePointer(); // Clean up parser
+    // Register new terms in our caches or throw for errors
+    registerNewTermsInCache(sm, substituteFromBuilder, substituteToBuilder);
 
-    // Register new terms in our caches
+    // TODO: Which terms can end up here? Seems like this is always empty
+    checkState(sm.getNamedTerms().isEmpty());
+
+    // Get the assertions out of the solver and re-substitute additional definitions outside of
+    // assertions
+    Term parsedTerm = getAssertedTerm(parseSolver, numberOfAssertions, mathsatReplacement);
+
+    // If the symbols used in the term were already declared before parsing, the term uses new
+    // ones with the same name, so we need to substitute them!
+    parsedTerm =
+        resubstituteCachedVariables(
+            substituteFromBuilder.build(), substituteToBuilder.build(), parsedTerm);
+
+    // Quantified formulas do not give us the bound variables in getDeclaredTerms() above.
+    // Find them and register a free equivalent
+    creator.registerBoundVariablesWithVisitor(parsedTerm);
+
+    parser.deletePointer(); // Clean up parser
+    parseSolver.deletePointer(); // Clean up parse solver
+    return parsedTerm;
+  }
+
+  private String addCachedDeclarationsTo(String formulaStr) {
+    // Add all already known (cached) variables and UFs
+    // (double parsing is a problem for UFs it seems, and the internal UFs cause problems)
+    Set<String> declarationsForAllVarsAndUfs =
+        getSMTLIB2DeclarationsFor(
+            ImmutableMap.<String, Term>builder()
+                .putAll(creator.getAllCachedVariablesAndUFs(true, true))
+                .buildOrThrow());
+
+    StringBuilder extraDefs = new StringBuilder();
+    for (String declaration : declarationsForAllVarsAndUfs) {
+      if (!formulaStr.contains(declaration.replace("\n", ""))) {
+        extraDefs.append(declaration);
+      }
+    }
+    return extraDefs.append(formulaStr).toString();
+  }
+
+  private String sanitizeInputForMathsat(String inputString) {
+    // MathSAT5 output, resubstitute the illegal input.
+    // Since no quotes are used, we can assume that there are no spaces in the defined name.
+    ImmutableMap.Builder<String, String> replacementMapBuilder = ImmutableMap.builder();
+    String sanitizedInputFormula = inputString;
+    String pattern = "(define-fun \\.)[^\\s]+";
+    Pattern r = Pattern.compile(pattern);
+    Matcher m = r.matcher(sanitizedInputFormula);
+
+    while (m.find()) {
+      String match = m.group();
+      String bare = match.replace("define-fun ", ""); // to replace
+      String replacement = "|" + bare.substring(1) + "|";
+      checkState(!sanitizedInputFormula.contains(replacement));
+      replacementMapBuilder.put(bare, replacement);
+      // TODO: can we modify the string while we match?
+    }
+
+    for (Entry<String, String> replacementEntry : replacementMapBuilder.buildOrThrow().entrySet()) {
+      sanitizedInputFormula =
+          sanitizedInputFormula.replace(replacementEntry.getKey(), replacementEntry.getValue());
+    }
+    checkState(!sanitizedInputFormula.contains("define-fun ."));
+    return sanitizedInputFormula;
+  }
+
+  private void registerNewTermsInCache(
+      SymbolManager sm,
+      ImmutableSet.Builder<Term> substituteFromBuilder,
+      ImmutableSet.Builder<Term> substituteToBuilder) {
     for (Term parsedTerm : sm.getDeclaredTerms()) {
       Term termToRegister = parsedTerm;
       try {
@@ -232,82 +271,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
             "Error parsing the following term in CVC5: " + parsedTerm, apiException);
       }
     }
-
-    // TODO: Which terms can end up here? Seems like this is always empty
-    checkState(sm.getNamedTerms().isEmpty());
-
-    // Get the assertions out of the solver
-    Term[] assertions = parseSolver.getAssertions();
-    checkArgument(
-        numberOfAssertions > 0,
-        "Error when parsing using CVC5: at least one assert "
-            + "statement needs to be part of the input");
-
-    // If failing, conjugate the input and return
-    // (We disallow push and pop currently, so this is fine!)
-    // TODO: this can be improved, but we need to be able to discern the non-assertion terms to
-    //  re-substitute (we can just remember them before invoking the commands above)
-    checkArgument(
-        numberOfAssertions == 1,
-        "Error when parsing using CVC5: at most one assert "
-            + "statement is currently allowed to be part of the input");
-    checkArgument(assertions.length > 0, "Error when parsing using CVC5: no term found to return");
-    Term parsedTerm = assertions[assertions.length - 1];
-    checkState(!checkNotNull(parsedTerm).isNull());
-
-    try {
-      if (assertions.length > 1 && replacementMap != null) {
-        // re-substitute MathSAT5 input
-        for (int i = assertions.length - 2; i >= 0; i--) {
-          Term equation = assertions[i];
-
-          if (equation.getKind() != Kind.EQUAL) {
-            // Original problem we try to solve
-            throw new IllegalArgumentException(
-                "Error when parsing using CVC5, no expressions may use a . or "
-                    + "@ as first character in a symbol.");
-          }
-
-          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
-        }
-
-      } else if (assertions.length != 1) {
-        // Sometimes terms are added as assertions without them being sources by an assertion, but
-        // a fun-def. We re-substitute these!
-        for (int i = assertions.length - 2; i >= 0; i--) {
-          Term equation = assertions[i];
-
-          if (equation.getKind() != Kind.EQUAL) {
-            // Original problem description we try to solve
-            throw new IllegalArgumentException(
-                "Error when parsing using CVC5: re-substitution of function-definitions into "
-                    + "assertions failed");
-          }
-          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
-        }
-      }
-    } catch (CVC5ApiException apiException) {
-      throw new IllegalArgumentException(
-          "Error parsing the following term in CVC5: " + parsedTerm, apiException);
-    }
-
-    // If the symbols used in the term were already declared before parsing, the term uses new
-    // ones with the same name, so we need to substitute them!
-    ImmutableSet<Term> substituteFrom = substituteFromBuilder.build();
-    ImmutableSet<Term> substituteTo = substituteToBuilder.build();
-    checkState(substituteFrom.size() == substituteTo.size());
-    assert substituteFrom.stream()
-        .map(Term::toString)
-        .allMatch(from -> substituteTo.stream().map(Term::toString).anyMatch(from::equals));
-    parsedTerm =
-        parsedTerm.substitute(
-            substituteFrom.toArray(new Term[0]), substituteTo.toArray(new Term[0]));
-
-    // Quantified formulas do not give us the bound variables in getDeclaredTerms() above.
-    // Find them and register a free equivalent
-    creator.registerBoundVariablesWithVisitor(parsedTerm);
-    parseSolver.deletePointer(); // Clean up parse solver
-    return parsedTerm;
   }
 
   @Override
@@ -317,7 +280,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
 
-    // now add the final assert
+    // Add the final assert after the declarations
     variablesAndUFsAsSMTLIB2.append("(assert ").append(f).append(')');
     return variablesAndUFsAsSMTLIB2.toString();
   }
@@ -432,5 +395,68 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     }
     // Extend as needed
     return true;
+  }
+
+  private static Term resubstituteCachedVariables(
+      Set<Term> substituteFrom, Set<Term> substituteTo, Term parsedTerm) {
+    checkState(substituteFrom.size() == substituteTo.size());
+    assert substituteFrom.stream()
+        .map(Term::toString)
+        .allMatch(from -> substituteTo.stream().map(Term::toString).anyMatch(from::equals));
+    parsedTerm =
+        parsedTerm.substitute(
+            substituteFrom.toArray(new Term[0]), substituteTo.toArray(new Term[0]));
+    return parsedTerm;
+  }
+
+  private static Term getAssertedTerm(
+      Solver parseSolver, int numberOfAssertions, boolean mathsatReplacementUsed) {
+    Term[] assertions = parseSolver.getAssertions();
+    checkArgument(
+        numberOfAssertions > 0,
+        "Error when parsing using CVC5: at least one assert "
+            + "statement needs to be part of the input");
+
+    // If failing, conjugate the input and return
+    // (We disallow push and pop currently, so this is fine!)
+    // TODO: this can be improved, but we need to be able to discern the non-assertion terms to
+    //  re-substitute (we can just remember them before invoking the commands above)
+    checkArgument(
+        numberOfAssertions == 1,
+        "Error when parsing using CVC5: at most one assert "
+            + "statement is currently allowed to be part of the input");
+    checkArgument(assertions.length > 0, "Error when parsing using CVC5: no term found to return");
+    Term parsedTerm = assertions[assertions.length - 1];
+    checkState(!checkNotNull(parsedTerm).isNull());
+
+    if (assertions.length > 1) {
+      // Sometimes terms are added as assertions without them being sources by an assertion, but
+      // a fun-def. We re-substitute these! (E.g. MathSAT5 input)
+      for (int i = assertions.length - 2; i >= 0; i--) {
+        Term equation = assertions[i];
+
+        try {
+          if (equation.getKind() != Kind.EQUAL) {
+            // Original problem we try to solve
+            if (mathsatReplacementUsed) {
+              throw new IllegalArgumentException(
+                  "Error when parsing using CVC5, no expressions may use a . or "
+                      + "@ as first character in a symbol.");
+            } else {
+              throw new IllegalArgumentException(
+                  "Error when parsing using CVC5: re-substitution of function-definitions into "
+                      + "assertions failed");
+            }
+          }
+
+          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
+        } catch (CVC5ApiException apiException) {
+          // getKind() will not throw here, but getChild() might for unexpected input
+          throw new IllegalArgumentException(
+              "Error parsing in CVC5: " + apiException.getMessage(), apiException);
+        }
+      }
+    }
+    return parsedTerm;
   }
 }
