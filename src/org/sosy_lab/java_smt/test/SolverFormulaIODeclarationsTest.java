@@ -136,7 +136,7 @@ public class SolverFormulaIODeclarationsTest
     requireIntegers();
     IntegerFormula var = imgr.makeVariable("x");
     String query = "(declare-fun x () Int)(declare-fun x () Int)(assert (= 0 x))";
-    if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
     } else {
       // some solvers are more tolerant for identical symbols.
