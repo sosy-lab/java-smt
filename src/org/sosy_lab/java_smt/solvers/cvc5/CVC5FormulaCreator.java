@@ -975,10 +975,10 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       for (Entry<String, Term> fun : functionsCache.entrySet()) {
         if (excludeInternalArithmeticUFs) {
           if (!INTERNAL_UF_NAMES.contains(fun.getKey())) {
-            knownVariablesAndUFsMap.put(fun);
+            knownVariablesAndUFsMap.put(fun.getKey(), fun.getValue());
           }
         } else {
-          knownVariablesAndUFsMap.put(fun);
+          knownVariablesAndUFsMap.put(fun.getKey(), fun.getValue());
         }
       }
     }
