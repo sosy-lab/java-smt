@@ -126,7 +126,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
     ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
 
-    Command command = parser.nextCommand();
+    Command command = getNextCommand(parser);
     while (!command.isNull()) {
       if (command.toString().contains("push") || command.toString().contains("pop")) {
         // TODO: push and pop?
@@ -136,13 +136,13 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
       // This WILL read in asserts, and they are no longer available for getTerm(), but on the
       // solver as assertions
-      String invokeReturn = command.invoke(parseSolver, sm);
+      String invokeReturn = invokeCommand(command, parseSolver, sm);
+
       if (!invokeReturn.equals(expectedSuccessMsg)) {
-        throw new IllegalArgumentException(
-            "Unknown error when parsing using CVC5: " + invokeReturn);
+        throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
       }
-      // nextCommand() throws CVC5ParserException for errors
-      command = parser.nextCommand();
+
+      command = getNextCommand(parser);
     }
 
     parser.deletePointer(); // Clean up parser
@@ -297,5 +297,25 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     Term input = extractInfo(f);
     FormulaType<T> type = getFormulaType(f);
     return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
+  }
+
+  private Command getNextCommand(InputParser parser) {
+    try {
+      // throws CVC5ParserException for errors
+      return parser.nextCommand();
+    } catch (Exception parseException) {
+      throw new IllegalArgumentException(
+          "Error parsing with CVC5: " + parseException.getMessage(), parseException);
+    }
+  }
+
+  private String invokeCommand(Command command, Solver parseSolver, SymbolManager sm) {
+    try {
+      // throws CVC5ParserException for errors
+      return command.invoke(parseSolver, sm);
+    } catch (Exception parseException) {
+      throw new IllegalArgumentException(
+          "Error parsing with CVC5 " + parseException.getMessage(), parseException);
+    }
   }
 }
