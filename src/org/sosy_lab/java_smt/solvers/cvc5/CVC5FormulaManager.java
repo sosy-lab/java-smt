@@ -138,7 +138,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       // solver as assertions
       String invokeReturn = command.invoke(parseSolver, sm);
       if (!invokeReturn.equals(expectedSuccessMsg)) {
-        throw new AssertionError("Unknown error when parsing using CVC5: " + invokeReturn);
+        throw new IllegalArgumentException(
+            "Unknown error when parsing using CVC5: " + invokeReturn);
       }
       // nextCommand() throws CVC5ParserException for errors
       command = parser.nextCommand();
