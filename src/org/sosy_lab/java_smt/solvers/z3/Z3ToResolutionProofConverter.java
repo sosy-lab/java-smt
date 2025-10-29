@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.MODUS_PONENS;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,7 +156,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
    * @return the resulting {@link Proof}
    */
   Proof handleNode(Z3Proof node) {
-    Z3ProofRule rule = (Z3ProofRule) node.getRule();
+    Z3ProofRule.Rule rule = (Z3ProofRule.Rule) node.getRule();
 
     switch (rule) {
       case TRUE:
@@ -950,6 +949,45 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     return new AxiomProof(ResAxiom.ORACLE, node.getFormula());
   }
 
+  // Z3_OP_PR_HYPER_RESOLVE: Hyper-resolution rule.
+  //
+  //        The premises of the rules is a sequence of clauses.
+  //        The first clause argument is the main clause of the rule.
+  //        with a literal from the first (main) clause.
+  //
+  //        Premises of the rules are of the form
+  //        \nicebox{
+  //                (or l0 l1 l2 .. ln)
+  //        }
+  //        or
+  //        \nicebox{
+  //             (=> (and l1 l2 .. ln) l0)
+  //        }
+  //        or in the most general (ground) form:
+  //        \nicebox{
+  //             (=> (and ln+1 ln+2 .. ln+m) (or l0 l1 .. ln))
+  //        }
+  //        In other words we use the following (Prolog style) convention for Horn
+  //        implications:
+  //        The head of a Horn implication is position 0,
+  //        the first conjunct in the body of an implication is position 1
+  //        the second conjunct in the body of an implication is position 2
+  //
+  //        For general implications where the head is a disjunction, the
+  //        first n positions correspond to the n disjuncts in the head.
+  //        The next m positions correspond to the m conjuncts in the body.
+  //
+  //        The premises can be universally quantified so that the most
+  //        general non-ground form is:
+  //
+  //        \nicebox{
+  //             (forall (vars) (=> (and ln+1 ln+2 .. ln+m) (or l0 l1 .. ln)))
+  //        }
+  //
+  //        The hyper-resolution rule takes a sequence of parameters.
+  //        The parameters are substitutions of bound variables separated by pairs
+  //        of literal positions from the main clause and side clause.
+  //
   Proof handleHyperResolve(Z3Proof node) {
     throw new UnsupportedOperationException();
   }
