@@ -108,7 +108,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       while (m.find()) {
         String match = m.group();
         String bare = match.replace("define-fun ", ""); // to replace
-        String replacement = "|" + bare.substring(1, bare.length()) + "|";
+        String replacement = "|" + bare.substring(1) + "|";
         checkState(!sanitizedInputFormula.contains(replacement));
         replacementMapBuilder.put(bare, replacement);
       }
