@@ -2406,6 +2406,44 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
+  public void testArrayStore1BvBvBv() {
+    // Test for 3d bitvector arrays with exactly one element
+    // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireBitvectors();
+
+    // Boolector doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var scalarType = FormulaType.getBitvectorTypeWithSize(8);
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = bvmgr.makeBitvector(scalarType.getSize(), 1);
+    var idxB = bvmgr.makeBitvector(scalarType.getSize(), 7);
+    var idxC = bvmgr.makeBitvector(scalarType.getSize(), 2);
+    var val = bvmgr.makeBitvector(scalarType.getSize(), 10);
+
+    var scalarConst = bvmgr.makeBitvector(scalarType.getSize(), 0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    var array1Value = amgr.store(array1Const, idxC, val);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC), val));
+  }
+
+  @Test
   public void testUf1Bv() {
     requireBitvectors();
 
@@ -2535,6 +2573,41 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         imgr.equal(amgr.select(amgr.select(array, idxA), idxB), val),
         "array",
         ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testArrayStore1IntIntInt() {
+    // Test for 3d integer arrays with exactly one element
+    // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireIntegers();
+
+    var scalarType = FormulaType.IntegerType;
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = imgr.makeNumber(1);
+    var idxB = imgr.makeNumber(7);
+    var idxC = imgr.makeNumber(2);
+    var val = imgr.makeNumber(10);
+
+    var scalarConst = imgr.makeNumber(0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    var array1Value = amgr.store(array1Const, idxC, val);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC), val));
   }
 
   @Test
