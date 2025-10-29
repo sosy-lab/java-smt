@@ -80,7 +80,9 @@ public final class CVC4SolverContext extends AbstractSolverContext {
 
     CVC4FloatingPointFormulaManager fpTheory;
     if (Configuration.isBuiltWithSymFPU()) {
-      fpTheory = new CVC4FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
+      fpTheory =
+          new CVC4FloatingPointFormulaManager(
+              creator, pFloatingPointRoundingMode, bitvectorTheory, booleanTheory);
     } else {
       fpTheory = null;
       pLogger.log(Level.INFO, "CVC4 was built without support for FloatingPoint theory");
