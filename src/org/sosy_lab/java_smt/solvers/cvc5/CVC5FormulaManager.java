@@ -173,8 +173,15 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     StringBuilder extraDefs = new StringBuilder();
     for (String declaration : declarationsForAllVarsAndUfs) {
-      if (!formulaStr.contains(declaration.replace("\n", ""))) {
-        extraDefs.append(declaration);
+      String declWoNewline = declaration.replace("\n", "");
+      if (!formulaStr.contains(declWoNewline)) {
+        if (!declWoNewline.contains("()")) {
+          extraDefs.append(declaration);
+        } else if (!formulaStr.contains(
+            declWoNewline.replace("(declare-fun ", "(declare-const ").replace(" ()", ""))) {
+          // No "input" value; may be a variable, which can be defined using declare-const as well
+          extraDefs.append(declaration);
+        }
       }
     }
     return extraDefs.append(formulaStr).toString();
