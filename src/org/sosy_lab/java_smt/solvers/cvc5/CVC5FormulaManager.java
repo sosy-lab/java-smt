@@ -31,6 +31,7 @@ import io.github.cvc5.modes.InputLanguage;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.Formula;
@@ -102,13 +103,19 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     InputParser parser = new InputParser(parseSolver, sm);
 
     // Add all already known (cached) variables and UFs
-    // (double parsing is no problem and is ignored below, but the internal UFs cause problems)
-    StringBuilder knownVarsAndUfs =
-        getSMTLIB2For(
+    // (double parsing is a problem for UFs it seems, and the internal UFs cause problems)
+    Set<String> declarationsForAllVarsAndUfs =
+        getSMTLIB2DeclarationsFor(
             ImmutableMap.<String, Term>builder()
                 .putAll(creator.getAllCachedVariablesAndUFs(true, true))
                 .buildOrThrow());
-    String sanitizedInputFormula = knownVarsAndUfs.append(formulaStr).toString();
+    StringBuilder extraDefs = new StringBuilder();
+    for (String declaration : declarationsForAllVarsAndUfs) {
+      if (!formulaStr.contains(declaration.replace("\n", ""))) {
+        extraDefs.append(declaration);
+      }
+    }
+    String sanitizedInputFormula = extraDefs.append(formulaStr).toString();
     ImmutableBiMap<String, String> replacementMap = null;
     // Sanitize input String for CVC5 (it disallows . and @ without quotes)
     if (sanitizedInputFormula.contains("define-fun .def_")) {
@@ -321,20 +328,27 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
 
     // return all symbols relevant for the input term as SMTLIB2
-    return getSMTLIB2For(allKnownVarsAndUFsBuilder.buildOrThrow());
+    StringBuilder builder = new StringBuilder();
+    // buildKeepingLast due to UFs; 1 UF might be applied multiple times. But the names and the
+    // types are consistent.
+    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast()).stream()
+        .forEach(builder::append);
+    return builder;
   }
 
-  private static StringBuilder getSMTLIB2For(Map<String, Term> varsAndUFs) {
-    StringBuilder variablesAndUFsAsSMTLIB2 = new StringBuilder();
+  /**
+   * Returns the SMTLIB2 declarations for the input, line by line with one declaration per line,
+   * with a line-break at the end of all lines.
+   */
+  private static Set<String> getSMTLIB2DeclarationsFor(Map<String, Term> varsAndUFs) {
+    ImmutableSet.Builder<String> variablesAndUFsAsSMTLIB2 = ImmutableSet.builder();
     for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
       Term varOrUf = entry.getValue();
+      StringBuilder line = new StringBuilder();
 
       // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      variablesAndUFsAsSMTLIB2
-          .append("(declare-fun ")
-          .append(PrintTerm.quoteIdentifier(name))
-          .append(" (");
+      line.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
       // add function parameters
       Iterable<Sort> childrenTypes;
@@ -355,16 +369,17 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         childrenTypes = Iterables.transform(varOrUf, Term::getSort);
       }
 
-      variablesAndUFsAsSMTLIB2.append(Joiner.on(" ").join(childrenTypes));
+      line.append(Joiner.on(" ").join(childrenTypes));
 
       // Return type
       String returnTypeString = sort.toString();
       if (sort.isFunction()) {
         returnTypeString = sort.getFunctionCodomainSort().toString();
       }
-      variablesAndUFsAsSMTLIB2.append(") ").append(returnTypeString).append(")\n");
+      line.append(") ").append(returnTypeString).append(")\n");
+      variablesAndUFsAsSMTLIB2.add(line.toString());
     }
-    return variablesAndUFsAsSMTLIB2;
+    return variablesAndUFsAsSMTLIB2.build();
   }
 
   @Override
