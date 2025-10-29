@@ -28,7 +28,7 @@ import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import io.github.cvc5.modes.InputLanguage;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -40,6 +40,11 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager, Term> {
 
   private final CVC5FormulaCreator creator;
+
+  private static final String INVOKE_SUCCESS = "success\n";
+  private static final String INVOKE_MULTI_DEF_ERROR_PREFIX = "(error \"Cannot bind ";
+  private static final String INVOKE_MULTI_DEF_ERROR_SUFFIX =
+      ", maybe the symbol has already been defined?\")\n";
 
   @SuppressWarnings("checkstyle:parameternumber")
   CVC5FormulaManager(
@@ -92,13 +97,20 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         throw new AssertionError("Unexpected exception", e);
       }
     }
-    String expectedSuccessMsg = "success\n";
+    // Expected success string: "success\n"
     parseSolver.setOption("print-success", "true");
     InputParser parser = new InputParser(parseSolver, sm);
 
-    // Sanitize input String for CVC5 (it disallows . and @ without quotes)
-    String sanitizedInputFormula = formulaStr;
+    // Add all already known (cached) variables and UFs
+    // (double parsing is no problem and is ignored below, but the internal UFs cause problems)
+    StringBuilder knownVarsAndUfs =
+        getSMTLIB2For(
+            ImmutableMap.<String, Term>builder()
+                .putAll(creator.getAllCachedVariablesAndUFs(true, true))
+                .buildOrThrow());
+    String sanitizedInputFormula = knownVarsAndUfs.append(formulaStr).toString();
     ImmutableBiMap<String, String> replacementMap = null;
+    // Sanitize input String for CVC5 (it disallows . and @ without quotes)
     if (sanitizedInputFormula.contains("define-fun .def_")) {
       // MathSAT5 output, resubstitute
       ImmutableBiMap.Builder<String, String> replacementMapBuilder = ImmutableBiMap.builder();
@@ -145,7 +157,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       // solver as assertions
       String invokeReturn = invokeCommand(command, parseSolver, sm);
 
-      if (!invokeReturn.equals(expectedSuccessMsg)) {
+      if (isDisallowedInvokeError(invokeReturn)) {
         throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
       }
 
@@ -304,34 +316,53 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
-    StringBuilder variablesAndUFsAsSMTLIB2 = new StringBuilder();
     // get all symbols
     ImmutableMap.Builder<String, Term> allKnownVarsAndUFsBuilder = ImmutableMap.builder();
     creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
 
-    // print all symbols
-    for (Entry<String, Term> entry : allKnownVarsAndUFsBuilder.buildOrThrow().entrySet()) {
+    // return all symbols relevant for the input term as SMTLIB2
+    return getSMTLIB2For(allKnownVarsAndUFsBuilder.buildOrThrow());
+  }
+
+  private static StringBuilder getSMTLIB2For(Map<String, Term> varsAndUFs) {
+    StringBuilder variablesAndUFsAsSMTLIB2 = new StringBuilder();
+    for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
-      Term var = entry.getValue();
+      Term varOrUf = entry.getValue();
 
       // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      variablesAndUFsAsSMTLIB2.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      variablesAndUFsAsSMTLIB2
+          .append("(declare-fun ")
+          .append(PrintTerm.quoteIdentifier(name))
+          .append(" (");
 
       // add function parameters
       Iterable<Sort> childrenTypes;
       try {
-        if (var.getSort().isFunction() || var.getKind() == Kind.APPLY_UF) {
-          childrenTypes = Iterables.skip(Iterables.transform(var, Term::getSort), 1);
-        } else {
-          childrenTypes = Iterables.transform(var, Term::getSort);
+        if (varOrUf.getKind() == Kind.APPLY_UF) {
+          // Unpack the def of the UF to get to the declaration which has the types
+          varOrUf = varOrUf.getChild(0);
         }
-      } catch (CVC5ApiException e) {
-        childrenTypes = Iterables.transform(var, Term::getSort);
+      } catch (CVC5ApiException apiEx) {
+        // Does not happen anyway
+        throw new IllegalArgumentException("CVC5 internal error: " + apiEx.getMessage(), apiEx);
       }
+
+      Sort sort = varOrUf.getSort();
+      if (sort.isFunction()) {
+        childrenTypes = Arrays.asList(sort.getFunctionDomainSorts());
+      } else {
+        childrenTypes = Iterables.transform(varOrUf, Term::getSort);
+      }
+
       variablesAndUFsAsSMTLIB2.append(Joiner.on(" ").join(childrenTypes));
 
-      // and return type
-      variablesAndUFsAsSMTLIB2.append(") ").append(var.getSort().toString()).append(")\n");
+      // Return type
+      String returnTypeString = sort.toString();
+      if (sort.isFunction()) {
+        returnTypeString = sort.getFunctionCodomainSort().toString();
+      }
+      variablesAndUFsAsSMTLIB2.append(") ").append(returnTypeString).append(")\n");
     }
     return variablesAndUFsAsSMTLIB2;
   }
@@ -370,5 +401,21 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       throw new IllegalArgumentException(
           "Error parsing with CVC5 " + parseException.getMessage(), parseException);
     }
+  }
+
+  /**
+   * We allow invoke() to succeed with the expected string, but also to fail for multiple
+   * definitions of the same variable for example.
+   */
+  private boolean isDisallowedInvokeError(String pInvokeReturn) {
+    // We allow skipping of variables that are declared twice
+    if (pInvokeReturn.equals(INVOKE_SUCCESS)) {
+      return false;
+    } else if (pInvokeReturn.startsWith(INVOKE_MULTI_DEF_ERROR_PREFIX)
+        && pInvokeReturn.endsWith(INVOKE_MULTI_DEF_ERROR_SUFFIX)) {
+      return false;
+    }
+    // Extend as needed
+    return true;
   }
 }
