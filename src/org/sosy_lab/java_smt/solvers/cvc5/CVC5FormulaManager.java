@@ -42,9 +42,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   private final CVC5FormulaCreator creator;
 
   private static final String INVOKE_SUCCESS = "success\n";
-  private static final String INVOKE_MULTI_DEF_ERROR_PREFIX = "(error \"Cannot bind ";
-  private static final String INVOKE_MULTI_DEF_ERROR_SUFFIX =
-      ", maybe the symbol has already been defined?\")\n";
 
   @SuppressWarnings("checkstyle:parameternumber")
   CVC5FormulaManager(
@@ -133,7 +130,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       // solver as assertions
       String invokeReturn = invokeCommand(command, parseSolver, sm);
 
-      if (isDisallowedInvokeError(invokeReturn)) {
+      if (!invokeReturn.equals(INVOKE_SUCCESS)) {
         throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
       }
 
@@ -379,22 +376,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       throw new IllegalArgumentException(
           "Error parsing with CVC5 " + parseException.getMessage(), parseException);
     }
-  }
-
-  /**
-   * We allow invoke() to succeed with the expected string, but also to fail for multiple
-   * definitions of the same variable for example.
-   */
-  private boolean isDisallowedInvokeError(String pInvokeReturn) {
-    // We allow skipping of variables that are declared twice
-    if (pInvokeReturn.equals(INVOKE_SUCCESS)) {
-      return false;
-    } else if (pInvokeReturn.startsWith(INVOKE_MULTI_DEF_ERROR_PREFIX)
-        && pInvokeReturn.endsWith(INVOKE_MULTI_DEF_ERROR_SUFFIX)) {
-      return false;
-    }
-    // Extend as needed
-    return true;
   }
 
   private static Term resubstituteCachedVariables(
