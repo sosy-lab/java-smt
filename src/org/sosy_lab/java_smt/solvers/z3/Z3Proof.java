@@ -23,6 +23,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.Rule;
 
 public class Z3Proof extends AbstractProof {
   private static class Frame extends ProofFrame<Long> {
@@ -131,6 +132,6 @@ public class Z3Proof extends AbstractProof {
     String rawName = Z3_decl_kind.fromInt(declKind).name();
     String prName = rawName.replaceFirst("Z3_OP_PR_", "");
     // return ProofRule.fromName(Z3ProofRule.class, prName);
-    return Enum.valueOf(Z3ProofRule.class, prName);
+    return Enum.valueOf(Rule.class, prName);
   }
 }
