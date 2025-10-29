@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
+import com.google.common.collect.Table.Cell;
 import com.google.common.primitives.Ints;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -956,5 +958,29 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       addToQueue(pBody);
       return TraversalProcess.CONTINUE;
     }
+  }
+
+  private static final Set<String> INTERNAL_UF_NAMES =
+      ImmutableSet.of(
+          "Rational_*_", "Rational_/_", "Rational_%_", "Integer_*_", "Integer_/_", "Integer_%_");
+
+  protected Map<String, Term> getAllCachedVariablesAndUFs(
+      boolean includeUFs, boolean excludeInternalArithmeticUFs) {
+    ImmutableMap.Builder<String, Term> knownVariablesAndUFsMap = ImmutableMap.builder();
+    for (Cell<String, String, Term> cell : variablesCache.cellSet()) {
+      knownVariablesAndUFsMap.put(cell.getRowKey(), cell.getValue());
+    }
+    if (includeUFs) {
+      for (Entry<String, Term> fun : functionsCache.entrySet()) {
+        if (excludeInternalArithmeticUFs) {
+          if (!INTERNAL_UF_NAMES.contains(fun.getKey())) {
+            knownVariablesAndUFsMap.put(fun);
+          }
+        } else {
+          knownVariablesAndUFsMap.put(fun);
+        }
+      }
+    }
+    return knownVariablesAndUFsMap.buildOrThrow();
   }
 }
