@@ -298,8 +298,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     StringBuilder builder = new StringBuilder();
     // buildKeepingLast due to UFs; 1 UF might be applied multiple times. But the names and the
     // types are consistent.
-    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast()).stream()
-        .forEach(builder::append);
+    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast()).forEach(builder::append);
     return builder;
   }
 
