@@ -76,6 +76,11 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
 public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
+  // Used to determine the internal UFs not to use when parsing
+  private static final Set<String> INTERNAL_UF_NAMES =
+      ImmutableSet.of(
+          "Rational_*_", "Rational_/_", "Rational_%_", "Integer_*_", "Integer_/_", "Integer_%_");
+
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
 
@@ -959,10 +964,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       return TraversalProcess.CONTINUE;
     }
   }
-
-  private static final Set<String> INTERNAL_UF_NAMES =
-      ImmutableSet.of(
-          "Rational_*_", "Rational_/_", "Rational_%_", "Integer_*_", "Integer_/_", "Integer_%_");
 
   protected Map<String, Term> getAllCachedVariablesAndUFs(
       boolean includeUFs, boolean excludeInternalArithmeticUFs) {
