@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -126,12 +127,17 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
     ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
 
+    int numberOfAssertions = 0;
     Command command = getNextCommand(parser);
     while (!command.isNull()) {
       if (command.toString().contains("push") || command.toString().contains("pop")) {
         // TODO: push and pop?
         throw new IllegalArgumentException(
             "Parsing SMTLIB2 with CVC5 in JavaSMT does not support push or pop currently.");
+      }
+
+      if (command.toString().startsWith("(assert ")) {
+        numberOfAssertions++;
       }
 
       // This WILL read in asserts, and they are no longer available for getTerm(), but on the
@@ -212,12 +218,26 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     // Get the assertions out of the solver
     Term[] assertions = parseSolver.getAssertions();
-    checkState(assertions.length > 0);
+    checkArgument(
+        numberOfAssertions > 0,
+        "Error when parsing using CVC5: at least one assert "
+            + "statement needs to be part of the input");
+
+    // If failing, conjugate the input and return
+    // (We disallow push and pop currently, so this is fine!)
+    // TODO: this can be improved, but we need to be able to discern the non-assertion terms to
+    //  re-substitute (we can just remember them before invoking the commands above)
+    checkArgument(
+        numberOfAssertions == 1,
+        "Error when parsing using CVC5: at most one assert "
+            + "statement is currently allowed to be part of the input");
+    checkArgument(assertions.length > 0, "Error when parsing using CVC5: no term found to return");
     Term parsedTerm = assertions[assertions.length - 1];
     checkState(!checkNotNull(parsedTerm).isNull());
-    if (assertions.length > 1 && replacementMap != null) {
-      // re-substitute MathSAT5 input
-      try {
+
+    try {
+      if (assertions.length > 1 && replacementMap != null) {
+        // re-substitute MathSAT5 input
         for (int i = assertions.length - 2; i >= 0; i--) {
           Term equation = assertions[i];
 
@@ -230,15 +250,25 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
           parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
         }
-      } catch (CVC5ApiException apiException) {
-        throw new IllegalArgumentException(
-            "Error parsing the following term in CVC5: " + parsedTerm, apiException);
-      }
 
-    } else if (assertions.length != 1) {
-      // If failing, conjugate the input and return
+      } else if (assertions.length != 1) {
+        // Sometimes terms are added as assertions without them being sources by an assertion, but
+        // a fun-def. We re-substitute these!
+        for (int i = assertions.length - 2; i >= 0; i--) {
+          Term equation = assertions[i];
+
+          if (equation.getKind() != Kind.EQUAL) {
+            // Original problem description we try to solve
+            throw new IllegalArgumentException(
+                "Error when parsing using CVC5: re-substitution of function-definitions into "
+                    + "assertions failed");
+          }
+          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
+        }
+      }
+    } catch (CVC5ApiException apiException) {
       throw new IllegalArgumentException(
-          "Error when parsing using CVC5: more than 1 assertion in SMTLIB2 input");
+          "Error parsing the following term in CVC5: " + parsedTerm, apiException);
     }
 
     // If the symbols used in the term were already declared before parsing, the term uses new
