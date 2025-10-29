@@ -2293,6 +2293,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   /** Evaluate the UF or array constraint and check that the model contains the expected values. */
   private void checkModelContains(
       BooleanFormula pFormula, String pVar, Map<List<Formula>, Formula> expected) {
+    requireArrayModel();
+
     try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.addConstraint(pFormula);
       assertThat(prover.isUnsat()).isFalse();
