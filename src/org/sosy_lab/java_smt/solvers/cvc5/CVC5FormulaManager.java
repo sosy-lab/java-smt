@@ -160,11 +160,31 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         Sort parsedSort = termToRegister.getSort();
         String parsedSortString = parsedSort.toString();
 
+        Term funCacheHit = creator.functionsCache.get(parsedTermString);
+        Map<String, Term> termRowHit = creator.variablesCache.row(parsedTermString);
+        Term termCacheHit = termRowHit.get(parsedSortString);
+
+        if (funCacheHit != null && termCacheHit != null) {
+          throw new IllegalArgumentException(
+              "Error parsing with CVC5: the parsed term "
+                  + parsedTermString
+                  + " is parsed with the 2 distinct sorts "
+                  + parsedSortString
+                  + " and "
+                  + funCacheHit.getSort());
+        } else if (!termRowHit.isEmpty() && !termRowHit.containsKey(parsedSortString)) {
+          throw new IllegalArgumentException(
+              "Error parsing with CVC5: the parsed term "
+                  + parsedTermString
+                  + " is parsed with the 2 distinct sorts "
+                  + parsedSortString
+                  + " and "
+                  + termRowHit.keySet());
+        }
+
         if (parsedSort.isFunction()) {
           // UFs
-          Term funCacheHit = creator.functionsCache.get(parsedTermString);
           if (funCacheHit == null) {
-            assert !creator.variablesCache.contains(parsedTermString, parsedSortString);
             creator.functionsCache.put(parsedTermString, termToRegister);
 
           } else {
@@ -173,10 +193,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
           }
 
         } else {
-          Term termCacheHit = creator.variablesCache.get(parsedTermString, parsedSortString);
           if (termCacheHit == null) {
-            assert !creator.functionsCache.containsKey(parsedTermString);
-            checkState(!creator.variablesCache.containsRow(parsedTermString));
             creator.variablesCache.put(parsedTermString, parsedSortString, termToRegister);
 
           } else {
