@@ -152,7 +152,7 @@ public class SolverFormulaIODeclarationsTest
         fmgr.declareAndCallUF("foo", IntegerType, imgr.makeNumber(1), imgr.makeNumber(2));
     String query =
         "(declare-fun foo (Int Int) Int)(declare-fun foo (Int Int) Int)(assert (= 0 (foo 1 2)))";
-    if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3).contains(solverToUse())) {
+    if (EnumSet.of(Solvers.PRINCESS, Solvers.Z3, Solvers.CVC5).contains(solverToUse())) {
       assertThrows(IllegalArgumentException.class, () -> mgr.parse(query));
     } else {
       // some solvers are more tolerant for identical symbols.
