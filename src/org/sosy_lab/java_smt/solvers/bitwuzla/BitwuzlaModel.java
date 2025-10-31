@@ -191,7 +191,11 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
       // Should be unreachable
       // We assume that array values are made up of "const" and "store" nodes with non-array
       // constants as leaves
-      throw new AssertionError();
+      throw new AssertionError(
+          String.format(
+              "Can't process model value for variable '%s'. Please report this issue to the "
+                  + "JavaSMT developers",
+              getVar(expr)));
     }
   }
 
