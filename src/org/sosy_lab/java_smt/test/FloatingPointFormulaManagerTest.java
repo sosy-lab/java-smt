@@ -1086,14 +1086,11 @@ public class FloatingPointFormulaManagerTest
             Float.POSITIVE_INFINITY,
             Float.NEGATIVE_INFINITY,
             0.0f,
+            -0.0f,
             1f,
             -1f,
             2f,
             -2f);
-
-    if (solverToUse() != Solvers.MATHSAT5) {
-      flts.add(-0.0f); // MathSat5 fails for NEGATIVE_ZERO
-    }
 
     for (int i = 1; i < 10; i++) {
       for (int j = 1; j < 10; j++) {
@@ -1123,14 +1120,11 @@ public class FloatingPointFormulaManagerTest
             Double.POSITIVE_INFINITY,
             Double.NEGATIVE_INFINITY,
             0.0,
+            -0.0,
             1d,
             -1d,
             2d,
             -2d);
-
-    if (solverToUse() != Solvers.MATHSAT5) {
-      dbls.add(-0.0); // MathSat5 fails for NEGATIVE_ZERO
-    }
 
     for (int i = 1; i < 10; i++) {
       for (int j = 1; j < 10; j++) {

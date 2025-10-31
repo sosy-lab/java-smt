@@ -92,6 +92,9 @@ public enum FunctionDeclarationKind {
   /** Identity operation, converts from integers to rationals, also known as {@code to_real}. */
   TO_REAL,
 
+  /** Convert from integer to bitvector. */
+  INT_TO_BV,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */
@@ -204,6 +207,12 @@ public enum FunctionDeclarationKind {
 
   /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
+
+  /** Cast an unsigned bitvector to an integer number. */
+  UBV_TO_INT,
+
+  /** Cast a signed bitvector to an integer number. */
+  SBV_TO_INT,
 
   // Simple floating point operations
 

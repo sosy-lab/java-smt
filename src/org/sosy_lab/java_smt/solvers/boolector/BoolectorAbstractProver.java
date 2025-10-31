@@ -33,7 +33,8 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
+  protected final AtomicBoolean wasLastSatCheckSat =
+      new AtomicBoolean(false); // and stack is not changed
   private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
@@ -83,10 +84,10 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+    wasLastSatCheckSat.set(false);
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
-      wasLastSatCheckSat = true;
+      wasLastSatCheckSat.set(true);
       return false;
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
@@ -127,7 +128,7 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
+    Preconditions.checkState(wasLastSatCheckSat.get(), NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }

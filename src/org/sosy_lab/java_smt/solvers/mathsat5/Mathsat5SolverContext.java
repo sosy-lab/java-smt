@@ -60,6 +60,26 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
                 + "Format is 'key1=value1,key2=value2'")
     private String furtherOptions = "";
 
+    @Option(
+        secure = true,
+        description =
+            "If enabled, SMTLIB2 output of MathSAT5 will be generated using the extended dumping "
+                + "function msat_to_smtlib2_ext(), instead of the regular dumping "
+                + "function msat_to_smtlib2(). This extended dump might allow the exporting of "
+                + "features to SMTLIB2 that can't be solved using MathSAT5, e.g. quantified "
+                + "formulas. "
+                + "The output will contain define-fun based bindings instead of "
+                + "let-expressions per default. If you want to use let bindings, enable option "
+                + "solver.mathsat5.dumpSMTLIB2LetExpressions as well.")
+    private boolean useExtendedSMTLIB2Output = false;
+
+    @Option(
+        secure = true,
+        description =
+            "If used together with solver.mathsat5.useExtendedSMTLIB2Output, SMTLIB2 output will "
+                + "contain let-bindings instead of define-fun based bindings.")
+    private boolean dumpSMTLIB2LetExpressions = false;
+
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
     boolean loadOptimathsat5 = false;
 
@@ -206,7 +226,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             floatingPointTheory,
             arrayTheory,
-            enumerationTheory);
+            enumerationTheory,
+            settings.useExtendedSMTLIB2Output,
+            settings.dumpSMTLIB2LetExpressions);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }

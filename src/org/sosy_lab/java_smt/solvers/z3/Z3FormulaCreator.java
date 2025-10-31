@@ -589,8 +589,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int numBound = Native.getQuantifierNumBound(environment, pF);
     long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
-      long varName = Native.getQuantifierBoundName(environment, pF, i);
-      long varSort = Native.getQuantifierBoundSort(environment, pF, i);
+      // The indices are reversed according to
+      //  https://github.com/Z3Prover/z3/issues/7970#issuecomment-3407924907
+      int inverseIndex = numBound - 1 - i;
+      long varName = Native.getQuantifierBoundName(environment, pF, inverseIndex);
+      long varSort = Native.getQuantifierBoundSort(environment, pF, inverseIndex);
       long freeVar = Native.mkConst(environment, varName, varSort);
       Native.incRef(environment, freeVar);
       freeVars[i] = freeVar;
@@ -659,6 +662,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FLOOR;
       case Z3_OP_TO_REAL:
         return FunctionDeclarationKind.TO_REAL;
+      case Z3_OP_INT2BV:
+        return FunctionDeclarationKind.INT_TO_BV;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -764,6 +769,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_ROTATE_LEFT;
       case Z3_OP_EXT_ROTATE_RIGHT:
         return FunctionDeclarationKind.BV_ROTATE_RIGHT;
+      case Z3_OP_BV2INT:
+        return FunctionDeclarationKind.UBV_TO_INT;
+      case Z3_OP_SBV2INT:
+        return FunctionDeclarationKind.SBV_TO_INT;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;

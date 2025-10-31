@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 
 /** Manager for dealing with uninterpreted functions (UFs). */
@@ -20,7 +21,7 @@ public interface UFManager {
   /** Declare an uninterpreted function. */
   default <T extends Formula> FunctionDeclaration<T> declareUF(
       String name, FormulaType<T> returnType, FormulaType<?>... args) {
-    return declareUF(name, returnType, List.of(args));
+    return declareUF(name, returnType, ImmutableList.copyOf(args));
   }
 
   /**
@@ -38,7 +39,7 @@ public interface UFManager {
    * @see #callUF(FunctionDeclaration, List)
    */
   default <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return callUF(funcType, List.of(args));
+    return callUF(funcType, ImmutableList.copyOf(args));
   }
 
   /**
@@ -58,6 +59,6 @@ public interface UFManager {
    */
   default <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
-    return declareAndCallUF(name, pReturnType, List.of(pArgs));
+    return declareAndCallUF(name, pReturnType, ImmutableList.copyOf(pArgs));
   }
 }
