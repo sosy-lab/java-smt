@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_CONST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
@@ -76,6 +77,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_apply_substitution;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -139,6 +141,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
@@ -349,16 +352,32 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, msat_term_repr(f));
     } else if (msat_term_is_variable(environment, f)) {
       // Bound variable, get the free equivalent
-      long originalVar = makeVariable(msat_term_get_type(f), getName(f));
+      String boundName = getName(f);
+      // Bound names are equal to the original, but have a ' character in front of them
+      checkState(boundName.charAt(0) == '\'');
+      long originalVar = makeVariable(msat_term_get_type(f), boundName.substring(1));
       return visitor.visitBoundVariable(encapsulate(getFormulaType(originalVar), originalVar), 0);
     } else if (msat_term_is_forall(environment, f) || msat_term_is_exists(environment, f)) {
-      // Quantifier quantifier = msat_term_is_forall(environment, f) ? Quantifier.FORALL :
-      //                          Quantifier.EXISTS;
+      Quantifier quantifier =
+          msat_term_is_forall(environment, f) ? Quantifier.FORALL : Quantifier.EXISTS;
 
-      // TODO: find out how to disassemble quantifiers in mathsat
-      // return visitor.visitQuantifier((BooleanFormula) formula, quantifier, freeVars, body);
-      throw new UnsupportedOperationException(
-          "Visitation of quantified formulas is currently not " + "supported using MathSAT5");
+      // Note: quantifiers with multiple (bound) variables are nested with only 1 variable each.
+      checkState(arity == 2);
+
+      long boundVar = msat_term_get_arg(f, 0);
+      String boundName = getName(boundVar);
+      // Bound names are equal to the original, but have a ' character in front of them
+      checkState(boundName.charAt(0) == '\'');
+      long freeVar = makeVariable(msat_term_get_type(boundVar), boundName.substring(1));
+      List<Formula> freeVars = ImmutableList.of(encapsulate(getFormulaType(freeVar), freeVar));
+
+      long nativeBody = msat_term_get_arg(f, 1);
+      nativeBody =
+          msat_apply_substitution(
+              environment, nativeBody, 1, new long[] {boundVar}, new long[] {freeVar});
+      BooleanFormula body = encapsulateBoolean(nativeBody);
+
+      return visitor.visitQuantifier((BooleanFormula) formula, quantifier, freeVars, body);
 
     } else {
 
