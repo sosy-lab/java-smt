@@ -218,7 +218,7 @@ public abstract class FormulaType<T extends Formula> {
    *     bit in the size of the mantissa argument.
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
-   *     significant), excluding the hidden bit.
+   *     significand), excluding the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
   @Deprecated(since = "6.0", forRemoval = true)
@@ -243,7 +243,7 @@ public abstract class FormulaType<T extends Formula> {
    *
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithoutHiddenBit size of the mantissa (also called a coefficient or
-   *     significant), excluding the hidden bit.
+   *     significand), excluding the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
   public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
@@ -265,7 +265,7 @@ public abstract class FormulaType<T extends Formula> {
    *
    * @param exponentSize size of the exponent for the base of the floating-point
    * @param mantissaSizeWithHiddenBit size of the mantissa (also called a coefficient or
-   *     significant), including the hidden bit.
+   *     significand), including the hidden bit.
    * @return the newly constructed {@link FloatingPointType}.
    */
   public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
@@ -324,7 +324,7 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     /**
-     * Returns the size of the mantissa (also called a coefficient or significant), excluding the
+     * Returns the size of the mantissa (also called a coefficient or significand), excluding the
      * hidden bit.
      *
      * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
@@ -338,7 +338,7 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     /**
-     * Returns the size of the mantissa (also called a coefficient or significant), excluding the
+     * Returns the size of the mantissa (also called a coefficient or significand), excluding the
      * hidden bit.
      */
     public int getMantissaSizeWithoutHiddenBit() {
@@ -346,7 +346,7 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     /**
-     * Returns the size of the mantissa (also called a coefficient or significant), including the
+     * Returns the size of the mantissa (also called a coefficient or significand), including the
      * hidden bit.
      */
     public int getMantissaSizeWithHiddenBit() {
@@ -354,11 +354,11 @@ public abstract class FormulaType<T extends Formula> {
     }
 
     /**
-     * Return the total size of a value of this type in bits. Equal to sign bit + size of the
-     * exponent + size of the mantissa (excluding the hidden bit).
+     * Return the total bit size of a value of this type (i.e. the precision). Equal to sign bit +
+     * size of the exponent + size of the mantissa (excluding the hidden bit).
      */
     public int getTotalSize() {
-      return exponentSize + getMantissaSizeWithoutHiddenBit() + 1;
+      return 1 + exponentSize + getMantissaSizeWithoutHiddenBit();
     }
 
     @Override

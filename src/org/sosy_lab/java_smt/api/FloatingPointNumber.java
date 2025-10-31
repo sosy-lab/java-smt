@@ -101,7 +101,7 @@ public abstract class FloatingPointNumber {
   public abstract int getExponentSize();
 
   /**
-   * Returns the size of the mantissa (also called a coefficient or significant), excluding the sign
+   * Returns the size of the mantissa (also called a coefficient or significand), excluding the sign
    * bit.
    *
    * @deprecated this method can be confusing, as the SMTLIB2 standard expects the mantissa to
@@ -116,13 +116,13 @@ public abstract class FloatingPointNumber {
   }
 
   /**
-   * Returns the size of the mantissa (also called a coefficient or significant), excluding the
+   * Returns the size of the mantissa (also called a coefficient or significand), excluding the
    * hidden bit.
    */
   public abstract int getMantissaSizeWithoutHiddenBit();
 
   /**
-   * Returns the size of the mantissa (also called a coefficient or significant), including the
+   * Returns the size of the mantissa (also called a coefficient or significand), including the
    * hidden bit.
    */
   public int getMantissaSizeWithHiddenBit() {
@@ -130,11 +130,11 @@ public abstract class FloatingPointNumber {
   }
 
   /**
-   * Returns the size of the precision, i.e. the single sign bit + the size of the exponent + the
-   * size of the mantissa (excluding the hidden bit).
+   * Returns the size of the precision as defined by the SMTLIB2 standard, i.e. sign bit + the size
+   * of the exponent + the size of the mantissa (excluding the hidden bit).
    */
   public int getTotalSize() {
-    return getMantissaSizeWithoutHiddenBit() + getExponentSize() + 1;
+    return 1 + getMantissaSizeWithoutHiddenBit() + getExponentSize();
   }
 
   /**
