@@ -108,10 +108,13 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_decl;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_exists;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_forall;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_variable;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_repr;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
@@ -328,6 +331,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     return msat_get_array_type(getEnv(), pIndexType, pElementType);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Long f) {
     int arity = msat_term_arity(f);
@@ -343,6 +347,19 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert !msat_term_is_constant(environment, f) : "Enumeration constants are no variables";
       assert arity == 0 : "Enumeration constants have no parameters";
       return visitor.visitConstant(formula, msat_term_repr(f));
+    } else if (msat_term_is_variable(environment, f)) {
+      // Bound variable, get the free equivalent
+      long originalVar = makeVariable(msat_term_get_type(f), getName(f));
+      return visitor.visitBoundVariable(encapsulate(getFormulaType(originalVar), originalVar), 0);
+    } else if (msat_term_is_forall(environment, f) || msat_term_is_exists(environment, f)) {
+      // Quantifier quantifier = msat_term_is_forall(environment, f) ? Quantifier.FORALL :
+      //                          Quantifier.EXISTS;
+
+      // TODO: find out how to disassemble quantifiers in mathsat
+      // return visitor.visitQuantifier((BooleanFormula) formula, quantifier, freeVars, body);
+      throw new UnsupportedOperationException(
+          "Visitation of quantified formulas is currently not " + "supported using MathSAT5");
+
     } else {
 
       final long declaration = msat_term_get_decl(f);
