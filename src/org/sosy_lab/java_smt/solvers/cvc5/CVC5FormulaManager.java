@@ -116,11 +116,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     int numberOfAssertions = 0;
     Command command = getNextCommand(parser);
     while (!command.isNull()) {
-      if (command.toString().contains("push") || command.toString().contains("pop")) {
-        // TODO: push and pop?
-        throw new IllegalArgumentException(
-            "Parsing SMTLIB2 with CVC5 in JavaSMT does not support push or pop currently.");
-      }
+      // Note: push and pop are not handled as we disallow SMTLIB2 input including it!
 
       if (command.toString().startsWith("(assert ")) {
         numberOfAssertions++;
