@@ -56,6 +56,8 @@ public class Mathsat5QuantifiedFormulaManager
 
     long substBody = msat_apply_substitution(env, body, 1, freeVariables, boundVariables);
 
+    // TODO: in the past, dumping with the function for quantifiers with more than 1 variable
+    //  caused problems. Re-check from time to time with function: msat_existentially_quantify()
     if (quantifier == Quantifier.EXISTS) {
       for (int i = 0; i < variables.size(); i++) {
         quantifiedFormula = msat_make_exists(env, boundVariables[i], substBody);
