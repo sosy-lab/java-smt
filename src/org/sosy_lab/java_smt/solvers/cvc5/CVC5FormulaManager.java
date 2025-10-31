@@ -173,7 +173,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
     StringBuilder extraDefs = new StringBuilder();
     for (String declaration : declarationsForAllVarsAndUfs) {
-      String declWoNewline = declaration.replace("\n", "");
+      // Remove newline from the end
+      String declWoNewline = declaration.substring(0, declaration.length() - 1);
       if (!formulaStr.contains(declWoNewline)) {
         if (!declWoNewline.contains("()")) {
           extraDefs.append(declaration);
