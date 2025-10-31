@@ -13,6 +13,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_copy_from;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_simplify;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_to_smtlib2_ext;
 
 import com.google.common.collect.Collections2;
 import com.google.common.primitives.Longs;
@@ -26,6 +27,9 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
 final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Long, Long> {
 
+  private final boolean dumpExtendedOutput;
+  private final boolean dumpLetExpressions;
+
   @SuppressWarnings("checkstyle:parameternumber")
   Mathsat5FormulaManager(
       Mathsat5FormulaCreator creator,
@@ -36,7 +40,9 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
       Mathsat5BitvectorFormulaManager pBitpreciseManager,
       Mathsat5FloatingPointFormulaManager pFloatingPointManager,
       Mathsat5ArrayFormulaManager pArrayManager,
-      Mathsat5EnumerationFormulaManager pEnumerationManager) {
+      Mathsat5EnumerationFormulaManager pEnumerationManager,
+      boolean pDumpExtendedOutput,
+      boolean pDumpLetExpressions) {
     super(
         creator,
         pFunctionManager,
@@ -50,6 +56,8 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
         null,
         null,
         pEnumerationManager);
+    dumpLetExpressions = pDumpLetExpressions;
+    dumpExtendedOutput = pDumpExtendedOutput;
   }
 
   static long getMsatTerm(Formula pT) {
@@ -69,7 +77,16 @@ final class Mathsat5FormulaManager extends AbstractFormulaManager<Long, Long, Lo
   public String dumpFormulaImpl(final Long f) {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
-    return msat_to_smtlib2(getEnvironment(), f);
+
+    if (dumpExtendedOutput) {
+      // msat_to_smtlib2_ext() can export quantified formulas created in MathSAT5 (which it can't
+      // solve). Can generate let-expressions instead of define-fun bindings.
+      return msat_to_smtlib2_ext(getFormulaCreator().getEnv(), f, "", dumpLetExpressions ? 0 : 1);
+    } else {
+      // msat_to_smtlib2() generates `.def_...` expressions, which are disliked by some solvers
+      // (due to the . being a SMTLIB2 reserved symbol at the beginning of definitions)
+      return msat_to_smtlib2(getEnvironment(), f);
+    }
   }
 
   @Override
