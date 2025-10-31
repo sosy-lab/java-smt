@@ -140,7 +140,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     // Register new terms in our caches or throw for errors
     registerNewTermsInCache(sm, substituteFromBuilder, substituteToBuilder);
 
-    // TODO: Which terms can end up here? Seems like this is always empty
+    // For named definitions like (=> (! (> x y) : named p1) (! (= x z) : named p2))
+    // TODO: how to handle this in CVC5 in JavaSMT?
     checkState(sm.getNamedTerms().isEmpty());
 
     // Get the assertions out of the solver and re-substitute additional definitions outside of
