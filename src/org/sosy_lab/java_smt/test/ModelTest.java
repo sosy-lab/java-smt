@@ -14,6 +14,7 @@ import static com.google.common.truth.Truth.assert_;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
@@ -79,6 +80,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ArrayFormulaType<IntegerFormula, IntegerFormula> ARRAY_TYPE_INT_INT =
       FormulaType.getArrayType(IntegerType, IntegerType);
+  private static final ArrayFormulaType<BitvectorFormula, BitvectorFormula> ARRAY_TYPE_BV32_BV32 =
+      FormulaType.getArrayType(getBitvectorTypeWithSize(32), getBitvectorTypeWithSize(32));
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3);
@@ -1143,6 +1146,124 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
                 + "        (not (= (select *unsigned_int@1 |pi@2|) 50))))");
 
     testModelIterator(f);
+  }
+
+  @Test
+  public void testGetArrays3IntegerNoParsing() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArrays();
+    requireArrayModel();
+
+    assume()
+        .withMessage("Solvers have problems with multi-dimensional arrays")
+        .that(solverToUse())
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
+
+    // (= (select (select (select arr 5) 3) 1) x)
+    // (= x 123)"
+    ArrayFormulaType<IntegerFormula, IntegerFormula> innerType =
+        FormulaType.getArrayType(IntegerType, IntegerType);
+    ArrayFormulaType<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>> middleType =
+        FormulaType.getArrayType(IntegerType, innerType);
+    ArrayFormulaType<
+            IntegerFormula,
+            ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
+        type = FormulaType.getArrayType(IntegerType, middleType);
+
+    IntegerFormula num1 = imgr.makeNumber(1);
+    IntegerFormula num3 = imgr.makeNumber(3);
+    IntegerFormula num5 = imgr.makeNumber(5);
+    IntegerFormula num123 = imgr.makeNumber(123);
+    IntegerFormula x = imgr.makeVariable("x");
+    ArrayFormula<
+            IntegerFormula,
+            ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
+        arr = amgr.makeArray("arr", type);
+
+    BooleanFormula f =
+        bmgr.and(
+            imgr.equal(x, amgr.select(amgr.select(amgr.select(arr, num5), num3), num1)),
+            imgr.equal(x, num123));
+
+    testModelIterator(f);
+    testModelGetters(f, imgr.makeVariable("x"), BigInteger.valueOf(123), "x");
+    ArrayFormulaType<
+            IntegerFormula,
+            ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>>>
+        arrType =
+            FormulaType.getArrayType(
+                IntegerType, FormulaType.getArrayType(IntegerType, ARRAY_TYPE_INT_INT));
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.select(
+                amgr.select(amgr.makeArray("arr", arrType), imgr.makeNumber(5)),
+                imgr.makeNumber(3)),
+            imgr.makeNumber(1)),
+        BigInteger.valueOf(123),
+        "arr",
+        true,
+        ImmutableList.of(BigInteger.valueOf(5), BigInteger.valueOf(3), BigInteger.ONE));
+  }
+
+  @Test
+  public void testGetArrays3BitvectorNoParsing() throws SolverException, InterruptedException {
+    requireBitvectors();
+    requireArrays();
+    requireArrayModel();
+
+    assume()
+        .withMessage("Solvers have problems with multi-dimensional arrays")
+        .that(solverToUse())
+        .isNoneOf(
+            Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2, Solvers.BOOLECTOR, Solvers.BITWUZLA);
+
+    // (= (select (select (select arr 5) 3) 1) x)
+    // (= x 123)"
+    BitvectorType bvType = getBitvectorTypeWithSize(32);
+    ArrayFormulaType<BitvectorFormula, BitvectorFormula> innerType =
+        FormulaType.getArrayType(bvType, bvType);
+    ArrayFormulaType<BitvectorFormula, ArrayFormula<BitvectorFormula, BitvectorFormula>>
+        middleType = FormulaType.getArrayType(bvType, innerType);
+    ArrayFormulaType<
+            BitvectorFormula,
+            ArrayFormula<BitvectorFormula, ArrayFormula<BitvectorFormula, BitvectorFormula>>>
+        type = FormulaType.getArrayType(bvType, middleType);
+
+    BitvectorFormula num1 = bvmgr.makeBitvector(32, 1);
+    BitvectorFormula num3 = bvmgr.makeBitvector(32, 3);
+    BitvectorFormula num5 = bvmgr.makeBitvector(32, 5);
+    BitvectorFormula num123 = bvmgr.makeBitvector(32, 123);
+    BitvectorFormula x = bvmgr.makeVariable(32, "x");
+    ArrayFormula<
+            BitvectorFormula,
+            ArrayFormula<BitvectorFormula, ArrayFormula<BitvectorFormula, BitvectorFormula>>>
+        arr = amgr.makeArray("arr", type);
+
+    BooleanFormula f =
+        bmgr.and(
+            bvmgr.equal(x, amgr.select(amgr.select(amgr.select(arr, num5), num3), num1)),
+            bvmgr.equal(x, num123));
+
+    testModelIterator(f);
+    testModelGetters(f, bvmgr.makeVariable(32, "x"), BigInteger.valueOf(123), "x");
+    ArrayFormulaType<
+            BitvectorFormula,
+            ArrayFormula<BitvectorFormula, ArrayFormula<BitvectorFormula, BitvectorFormula>>>
+        arrType =
+            FormulaType.getArrayType(
+                bvType, FormulaType.getArrayType(bvType, ARRAY_TYPE_BV32_BV32));
+    testModelGetters(
+        f,
+        amgr.select(
+            amgr.select(
+                amgr.select(amgr.makeArray("arr", arrType), bvmgr.makeBitvector(32, 5)),
+                bvmgr.makeBitvector(32, 3)),
+            bvmgr.makeBitvector(32, 1)),
+        BigInteger.valueOf(123),
+        "arr",
+        true,
+        ImmutableList.of(BigInteger.valueOf(5), BigInteger.valueOf(3), BigInteger.ONE));
   }
 
   @Test
