@@ -88,6 +88,18 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     return parseCVC5(formulaStr);
   }
 
+  @Override
+  public String dumpFormulaImpl(Term f) {
+    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
+        : "Only BooleanFormulas may be dumped";
+
+    StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
+
+    // Add the final assert after the declarations
+    variablesAndUFsAsSMTLIB2.append("(assert ").append(f).append(')');
+    return variablesAndUFsAsSMTLIB2.toString();
+  }
+
   // Collect all actually parsed symbols as far as possible, then restart with cached
   // symbols included if needed (this way we can use the correct symbols from the input string
   // easily to not include them from the cache and reduce possible mistakes with symbols that
@@ -278,18 +290,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
             "Error parsing the following term in CVC5: " + parsedTerm, apiException);
       }
     }
-  }
-
-  @Override
-  public String dumpFormulaImpl(Term f) {
-    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
-        : "Only BooleanFormulas may be dumped";
-
-    StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
-
-    // Add the final assert after the declarations
-    variablesAndUFsAsSMTLIB2.append("(assert ").append(f).append(')');
-    return variablesAndUFsAsSMTLIB2.toString();
   }
 
   private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
