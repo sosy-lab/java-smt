@@ -10,7 +10,7 @@
 
 podman build \
     --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
-    -t registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu2204 - < ubuntu2404.Dockerfile
+    -t registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu2404 - < ubuntu2404.Dockerfile
 
 # For pushing to Gitlab registry, please create your personal access token:
 #   https://gitlab.com/-/user_settings/personal_access_tokens

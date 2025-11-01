@@ -38,9 +38,8 @@ RUN  apt-get update \
 # GMP >6.3.0 is automatically downloaded and build within Bitwuzla.
 RUN apt-get update \
  && apt-get install -y \
-        ninja-build python3-pip \
+        ninja-build python3-pip meson \
  && apt-get clean
-RUN pip3 install --upgrade meson
 
 # OpenSMT requires swig, gmp, flex and bison
 # - swig v4.1 or newer for unique_ptr support
