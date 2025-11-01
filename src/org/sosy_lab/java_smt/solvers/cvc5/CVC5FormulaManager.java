@@ -191,12 +191,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   private Term parseWithAddedSymbol(String formulaStr, String symbolNotDeclared, Term knownTerm) {
-    Set<String> declarationsForAllVarsAndUfs =
+    StringBuilder declaration =
         getSMTLIB2DeclarationsFor(ImmutableMap.of(symbolNotDeclared, knownTerm));
-    checkState(declarationsForAllVarsAndUfs.size() == 1);
     // TODO: insert after options if options present?
-    String inputWithAddedVariable = declarationsForAllVarsAndUfs.iterator().next() + formulaStr;
-    return parseCVC5(inputWithAddedVariable);
+    return parseCVC5(declaration.append(formulaStr).toString());
   }
 
   /**
@@ -293,27 +291,22 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
-    // get all symbols
     ImmutableMap.Builder<String, Term> allKnownVarsAndUFsBuilder = ImmutableMap.builder();
+    // Get all symbols relevant for the input term
     creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
 
-    // return all symbols relevant for the input term as SMTLIB2
-    StringBuilder builder = new StringBuilder();
     // buildKeepingLast due to UFs; 1 UF might be applied multiple times. But the names and the
     // types are consistent.
-    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast())
-        .forEach(builder::append);
-    return builder;
+    return getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast());
   }
 
   /**
-   * Returns the SMTLIB2 declarations for the input (Entry<Symbol, Term>) line by line with one
+   * Returns the SMTLIB2 declarations for the input Map<Symbol, Term> line by line with one
    * declaration per line, with a line-break at the end of all lines. The output order will match
    * the order of the input map.
    */
-  private static ImmutableSet<String> getSMTLIB2DeclarationsFor(
-      ImmutableMap<String, Term> varsAndUFs) {
-    ImmutableSet.Builder<String> variablesAndUFsAsSMTLIB2 = ImmutableSet.builder();
+  private static StringBuilder getSMTLIB2DeclarationsFor(ImmutableMap<String, Term> varsAndUFs) {
+    StringBuilder declarations = new StringBuilder();
     for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
       Term varOrUf = entry.getValue();
@@ -349,9 +342,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         returnTypeString = sort.getFunctionCodomainSort().toString();
       }
       line.append(") ").append(returnTypeString).append(")\n");
-      variablesAndUFsAsSMTLIB2.add(line.toString());
+      declarations.append(line);
     }
-    return variablesAndUFsAsSMTLIB2.build();
+    return declarations;
   }
 
   @Override
