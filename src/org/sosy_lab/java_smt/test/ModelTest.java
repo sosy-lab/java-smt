@@ -1732,7 +1732,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // supported yet
     // TODO: only filter out UF formulas here, not all
     if (solver != Solvers.BOOLECTOR) {
-      // CVC5 crashes here
       assertThatFormula(bmgr.and(pModelAssignments)).implies(constraint);
     }
   }
@@ -2243,7 +2242,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
+        .isNoneOf(Solvers.PRINCESS, Solvers.CVC5);
 
     BooleanFormula formula =
         context

@@ -285,12 +285,16 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
+    // MathSat prints reserved symbols starting with . or @ that CVC5 can't parse
+    assume().that(solver).isNotEqualTo(Solvers.CVC5);
     requireParser();
     compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException {
+    // MathSat prints reserved symbols starting with . or @ that CVC5 can't parse
+    assume().that(solver).isNotEqualTo(Solvers.CVC5);
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr, ABDE);
   }
@@ -321,6 +325,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
+    // MathSat prints reserved symbols starting with . or @ that CVC5 can't parse
+    assume().that(solver).isNotEqualTo(Solvers.CVC5);
     requireParser();
     requireIntegers();
     compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
@@ -328,6 +334,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
+    // MathSat prints reserved symbols starting with . or @ that CVC5 can't parse
+    assume().that(solver).isNotEqualTo(Solvers.CVC5);
     requireParser();
     compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
   }
@@ -360,6 +368,8 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
 
   @Test
   public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
+    // MathSat prints reserved symbols starting with . or @ that CVC5 can't parse
+    assume().that(solver).isNotEqualTo(Solvers.CVC5);
     requireParser();
     requireIntegers();
     compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen, ImmutableSet.of("fun_b"));
