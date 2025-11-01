@@ -965,7 +965,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     }
   }
 
-  protected Map<String, Term> getAllCachedVariablesAndUFs(
+  protected ImmutableMap<String, Term> getAllCachedVariablesAndUFs(
       boolean includeUFs, boolean excludeInternalArithmeticUFs) {
     ImmutableMap.Builder<String, Term> knownVariablesAndUFsMap = ImmutableMap.builder();
     for (Cell<String, String, Term> cell : variablesCache.cellSet()) {

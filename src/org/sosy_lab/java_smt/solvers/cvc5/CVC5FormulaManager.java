@@ -31,8 +31,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -42,6 +40,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   private final CVC5FormulaCreator creator;
 
   private static final String INVOKE_SUCCESS = "success\n";
+  public static final String PARSING_MISSING_SYMBOL_START = "Symbol ";
+  public static final String PARSING_MISSING_SYMBOL_END = " not declared as a variable";
+  private SymbolManager symbolManager;
 
   @SuppressWarnings("checkstyle:parameternumber")
   CVC5FormulaManager(
@@ -71,6 +72,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         pStrmgr,
         pEfmgr);
     creator = pFormulaCreator;
+    symbolManager = new SymbolManager(creator.getEnv());
   }
 
   static Term getCVC5Term(Formula pT) {
@@ -83,66 +85,83 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    TermManager env = creator.getEnv();
-    Solver parseSolver = new Solver(env);
-    SymbolManager sm = new SymbolManager(env);
-    if (!parseSolver.isLogicSet()) {
-      try {
-        parseSolver.setLogic("ALL");
-      } catch (CVC5ApiException e) {
-        // Should never happen in this configuration
-        throw new AssertionError("Unexpected exception", e);
-      }
-    }
-    // Expected success string: "success\n"
-    parseSolver.setOption("print-success", "true");
-    InputParser parser = new InputParser(parseSolver, sm);
+    return parseCVC5(formulaStr);
+  }
 
-    // Add all already known (cached) variables and UFs
-    // (double parsing is a problem for UFs it seems, and the internal UFs cause problems)
-    String sanitizedInputFormula = addCachedDeclarationsTo(formulaStr);
-    boolean mathsatReplacement = false;
-    // Sanitize input String for CVC5 (it disallows . and @ without quotes)
-    if (sanitizedInputFormula.contains("define-fun .def_")) {
-      mathsatReplacement = true;
-      sanitizedInputFormula = sanitizeInputForMathsat(sanitizedInputFormula);
-    }
+  // Collect all actually parsed symbols as far as possible, then restart with cached
+  // symbols included if needed (this way we can use the correct symbols from the input string
+  // easily to not include them from the cache and reduce possible mistakes with symbols that
+  // need to be included from the cache)
+  private Term parseCVC5(final String formulaStr) {
+    // checkState(definitionsInInput.isEmpty()); // TODO: remove or use
+    final Solver parseSolver = new Solver(creator.getEnv());
+    final InputParser parser = getParser(parseSolver);
 
-    parser.setStringInput(InputLanguage.SMT_LIB_2_6, sanitizedInputFormula, "");
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
 
     ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
     ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
 
-    int numberOfAssertions = 0;
-    Command command = getNextCommand(parser);
-    while (!command.isNull()) {
-      // Note: push and pop are not handled as we disallow SMTLIB2 input including it!
+    // "Commands" represent 1 definition or assertion from the input string
+    Command command;
+    try {
+      // throws CVC5ParserException for errors, which can only be caught with Exception
+      command = parser.nextCommand();
+      while (!command.isNull()) {
+        // Note: push and pop are not handled as we disallow SMTLIB2 input including it!
 
-      if (command.toString().startsWith("(assert ")) {
-        numberOfAssertions++;
+        // This WILL read in asserts, and they are no longer available for getTerm(), but on the
+        // solver as assertions
+        String invokeReturn = invokeCommand(command, parseSolver, symbolManager);
+
+        if (!invokeReturn.equals(INVOKE_SUCCESS)) {
+          throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
+        }
+
+        command = parser.nextCommand();
+      }
+    } catch (Exception parseException) {
+      // nextCommand(); throws CVC5ParserException for errors, which can only be caught with
+      // Exception
+      if (parseException instanceof IllegalArgumentException) {
+        throw (IllegalArgumentException) parseException;
       }
 
-      // This WILL read in asserts, and they are no longer available for getTerm(), but on the
-      // solver as assertions
-      String invokeReturn = invokeCommand(command, parseSolver, sm);
+      String message = parseException.getMessage();
+      if (message.startsWith(PARSING_MISSING_SYMBOL_START)
+          && message.endsWith(PARSING_MISSING_SYMBOL_END)) {
+        // This case seems to happen only very rarely (maybe just boolean variables or assertions
+        // with 1 symbol in them?)! CVC5 seems to recognize most declared symbols just fine.
 
-      if (!invokeReturn.equals(INVOKE_SUCCESS)) {
-        throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
+        // Strip the error message until only the symbol is left
+        String symbolNotDeclared = message.substring(8, message.length() - 28);
+
+        Term knownTerm = creator.functionsCache.get(symbolNotDeclared);
+        if (knownTerm == null) {
+          Map<String, Term> variableRow = creator.variablesCache.row(symbolNotDeclared);
+          if (variableRow.size() == 1) {
+            knownTerm = variableRow.values().iterator().next();
+            return parseWithAddedSymbol(formulaStr, symbolNotDeclared, knownTerm);
+          }
+        } else {
+          return parseWithAddedSymbol(formulaStr, symbolNotDeclared, knownTerm);
+        }
       }
 
-      command = getNextCommand(parser);
+      throw new IllegalArgumentException(
+          "Error parsing with CVC5: " + parseException.getMessage(), parseException);
     }
 
     // Register new terms in our caches or throw for errors
-    registerNewTermsInCache(sm, substituteFromBuilder, substituteToBuilder);
+    registerNewTermsInCache(symbolManager, substituteFromBuilder, substituteToBuilder);
 
     // For named definitions like (=> (! (> x y) : named p1) (! (= x z) : named p2))
     // TODO: how to handle this in CVC5 in JavaSMT?
-    checkState(sm.getNamedTerms().isEmpty());
+    checkState(symbolManager.getNamedTerms().isEmpty());
 
     // Get the assertions out of the solver and re-substitute additional definitions outside of
     // assertions
-    Term parsedTerm = getAssertedTerm(parseSolver, numberOfAssertions, mathsatReplacement);
+    Term parsedTerm = getAssertedTerm(parseSolver);
 
     // If the symbols used in the term were already declared before parsing, the term uses new
     // ones with the same name, so we need to substitute them!
@@ -159,56 +178,42 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     return parsedTerm;
   }
 
-  private String addCachedDeclarationsTo(String formulaStr) {
-    // Add all already known (cached) variables and UFs
-    // (double parsing is a problem for UFs it seems, and the internal UFs cause problems)
+  private Term parseWithAddedSymbol(String formulaStr, String symbolNotDeclared, Term knownTerm) {
     Set<String> declarationsForAllVarsAndUfs =
-        getSMTLIB2DeclarationsFor(
-            ImmutableMap.<String, Term>builder()
-                .putAll(creator.getAllCachedVariablesAndUFs(true, true))
-                .buildOrThrow());
-
-    StringBuilder extraDefs = new StringBuilder();
-    for (String declaration : declarationsForAllVarsAndUfs) {
-      // Remove newline from the end
-      String declWoNewline = declaration.substring(0, declaration.length() - 1);
-      if (!formulaStr.contains(declWoNewline)) {
-        if (!declWoNewline.contains("()")) {
-          extraDefs.append(declaration);
-        } else if (!formulaStr.contains(
-            declWoNewline.replace("(declare-fun ", "(declare-const ").replace(" ()", ""))) {
-          // No "input" value; may be a variable, which can be defined using declare-const as well
-          extraDefs.append(declaration);
-        }
-      }
-    }
-    return extraDefs.append(formulaStr).toString();
+        getSMTLIB2DeclarationsFor(ImmutableMap.of(symbolNotDeclared, knownTerm));
+    checkState(declarationsForAllVarsAndUfs.size() == 1);
+    // TODO: insert after options if options present?
+    String inputWithAddedVariable = declarationsForAllVarsAndUfs.iterator().next() + formulaStr;
+    return parseCVC5(inputWithAddedVariable);
   }
 
-  private String sanitizeInputForMathsat(String inputString) {
-    // MathSAT5 output, resubstitute the illegal input.
-    // Since no quotes are used, we can assume that there are no spaces in the defined name.
-    ImmutableMap.Builder<String, String> replacementMapBuilder = ImmutableMap.builder();
-    String sanitizedInputFormula = inputString;
-    String pattern = "(define-fun \\.)[^\\s]+";
-    Pattern r = Pattern.compile(pattern);
-    Matcher m = r.matcher(sanitizedInputFormula);
-
-    while (m.find()) {
-      String match = m.group();
-      String bare = match.replace("define-fun ", ""); // to replace
-      String replacement = "|" + bare.substring(1) + "|";
-      checkState(!sanitizedInputFormula.contains(replacement));
-      replacementMapBuilder.put(bare, replacement);
-      // TODO: can we modify the string while we match?
+  /**
+   * Builds the parser from the given {@link Solver} and the {@link SymbolManager}. The {@link
+   * SymbolManager} needs to be persistent to remember terms already parsed/created.
+   */
+  private InputParser getParser(Solver parseSolver) {
+    if (!parseSolver.isLogicSet()) {
+      try {
+        parseSolver.setLogic("ALL");
+      } catch (CVC5ApiException e) {
+        // Should never happen in this configuration
+        throw new AssertionError("Unexpected exception", e);
+      }
     }
+    // Expected success string due to option set: "success\n"
+    parseSolver.setOption("print-success", "true");
+    // more tolerant of non-conforming inputs, default: default
+    parseSolver.setOption("parsing-mode", "lenient");
+    // force all declarations and definitions to be global when parsing, default: false
+    parseSolver.setOption("global-declarations", "true");
+    // use API interface for fresh constants when parsing declarations and definitions, default:
+    // true
+    parseSolver.setOption("fresh-declarations", "false");
+    // allows overloading of terms and sorts if true, default: true
+    parseSolver.setOption("term-sort-overload", "false");
 
-    for (Entry<String, String> replacementEntry : replacementMapBuilder.buildOrThrow().entrySet()) {
-      sanitizedInputFormula =
-          sanitizedInputFormula.replace(replacementEntry.getKey(), replacementEntry.getValue());
-    }
-    checkState(!sanitizedInputFormula.contains("define-fun ."));
-    return sanitizedInputFormula;
+    InputParser parser = new InputParser(parseSolver, symbolManager);
+    return parser;
   }
 
   private void registerNewTermsInCache(
@@ -296,15 +301,18 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     StringBuilder builder = new StringBuilder();
     // buildKeepingLast due to UFs; 1 UF might be applied multiple times. But the names and the
     // types are consistent.
-    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast()).forEach(builder::append);
+    getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast())
+        .forEach(builder::append);
     return builder;
   }
 
   /**
-   * Returns the SMTLIB2 declarations for the input, line by line with one declaration per line,
-   * with a line-break at the end of all lines.
+   * Returns the SMTLIB2 declarations for the input (Entry<Symbol, Term>) line by line with one
+   * declaration per line, with a line-break at the end of all lines. The output order will match
+   * the order of the input map.
    */
-  private static Set<String> getSMTLIB2DeclarationsFor(Map<String, Term> varsAndUFs) {
+  private static ImmutableSet<String> getSMTLIB2DeclarationsFor(
+      ImmutableMap<String, Term> varsAndUFs) {
     ImmutableSet.Builder<String> variablesAndUFsAsSMTLIB2 = ImmutableSet.builder();
     for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
@@ -362,16 +370,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
   }
 
-  private Command getNextCommand(InputParser parser) {
-    try {
-      // throws CVC5ParserException for errors
-      return parser.nextCommand();
-    } catch (Exception parseException) {
-      throw new IllegalArgumentException(
-          "Error parsing with CVC5: " + parseException.getMessage(), parseException);
-    }
-  }
-
   private String invokeCommand(Command command, Solver parseSolver, SymbolManager sm) {
     try {
       // throws CVC5ParserException for errors
@@ -394,47 +392,38 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     return parsedTerm;
   }
 
-  private static Term getAssertedTerm(
-      Solver parseSolver, int numberOfAssertions, boolean mathsatReplacementUsed) {
+  // Assumes that there is only one assertion at index 0 in the parsers assertions array
+  // Additional definitions are ordered from index 1 to length - 1 REVERSED!
+  private static Term getAssertedTerm(Solver parseSolver) {
     Term[] assertions = parseSolver.getAssertions();
-    checkArgument(
-        numberOfAssertions > 0,
-        "Error when parsing using CVC5: at least one assert "
-            + "statement needs to be part of the input");
 
-    // If failing, conjugate the input and return
-    // (We disallow push and pop currently, so this is fine!)
-    // TODO: this can be improved, but we need to be able to discern the non-assertion terms to
-    //  re-substitute (we can just remember them before invoking the commands above)
     checkArgument(
-        numberOfAssertions == 1,
-        "Error when parsing using CVC5: at most one assert "
-            + "statement is currently allowed to be part of the input");
-    checkArgument(assertions.length > 0, "Error when parsing using CVC5: no term found to return");
-    Term parsedTerm = assertions[assertions.length - 1];
+        assertions.length > 0,
+        "Error when parsing using CVC5: no term found to return."
+            + " Did the input string contain assertions?");
+    Term parsedTerm = assertions[0];
     checkState(!checkNotNull(parsedTerm).isNull());
 
     if (assertions.length > 1) {
       // Sometimes terms are added as assertions without them being sources by an assertion, but
-      // a fun-def. We re-substitute these! (E.g. MathSAT5 input)
-      for (int i = assertions.length - 2; i >= 0; i--) {
-        Term equation = assertions[i];
+      // as function-def. We re-substitute these into the assertion.
+      for (int i = assertions.length - 1; i >= 1; i--) {
+        Term parsedDefinition = assertions[i];
 
         try {
-          if (equation.getKind() != Kind.EQUAL) {
-            // Original problem we try to solve
-            if (mathsatReplacementUsed) {
-              throw new IllegalArgumentException(
-                  "Error when parsing using CVC5, no expressions may use a . or "
-                      + "@ as first character in a symbol.");
-            } else {
-              throw new IllegalArgumentException(
-                  "Error when parsing using CVC5: re-substitution of function-definitions into "
-                      + "assertions failed");
-            }
+          Kind kind = parsedDefinition.getKind();
+          if (kind == Kind.EQUAL) {
+            parsedTerm =
+                parsedTerm.substitute(parsedDefinition.getChild(0), parsedDefinition.getChild(1));
+          } else {
+            throw new IllegalArgumentException(
+                "Error when parsing using CVC5: re-substitution of function-definitions into "
+                    + "assertions failed due to unexpected term "
+                    + parsedDefinition
+                    + " kind "
+                    + parsedDefinition.getKind());
           }
 
-          parsedTerm = parsedTerm.substitute(equation.getChild(0), equation.getChild(1));
         } catch (CVC5ApiException apiException) {
           // getKind() will not throw here, but getChild() might for unexpected input
           throw new IllegalArgumentException(
