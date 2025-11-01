@@ -301,9 +301,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   /**
-   * Returns the SMTLIB2 declarations for the input Map<Symbol, Term> line by line with one
-   * declaration per line, with a line-break at the end of all lines. The output order will match
-   * the order of the input map.
+   * Returns the SMTLIB2 declarations for the input Map with key=symbol for the value=term, line by
+   * line with one declaration per line, with a line-break at the end of all lines. The output order
+   * will match the order of the input map.
    */
   private static StringBuilder getSMTLIB2DeclarationsFor(ImmutableMap<String, Term> varsAndUFs) {
     StringBuilder declarations = new StringBuilder();
