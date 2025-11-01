@@ -238,7 +238,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support bitvectors for interpolation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3LEGACY);
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   protected final void requireBitvectorToInt() {
@@ -296,7 +296,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support floats for interpolation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3LEGACY);
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   /** Skip test if the solver does not support strings. */

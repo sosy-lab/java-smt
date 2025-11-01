@@ -249,7 +249,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3LEGACY);
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_4_5_0);
   }
 
   @Test
@@ -1149,7 +1149,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       case SMTINTERPOL:
         p3 = "some string";
         break;
-      case Z3LEGACY:
+      case Z3_4_5_0:
         p3 = 12350;
         break;
       default:
