@@ -286,8 +286,8 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
-   * sizes of the exponent and mantissa (including the hidden bit) of the input formula.
+   * bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting bitvector is
+   * equal to the total size of the {@link FloatingPointNumber}s precision.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
 

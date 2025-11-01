@@ -275,16 +275,18 @@ public abstract class FormulaType<T extends Formula> {
   }
 
   /**
-   * @return single precision {@link FloatingPointType} with exponent sized 8, and mantissa sized 24
-   *     (including the hidden bit).
+   * @return a single precision {@link FloatingPointType} with a total size of 32 bits, consisting
+   *     of the sign bit, an exponent sized 8 bits, and a mantissa sized 23 bits (excluding the
+   *     hidden bit).
    */
   public static FloatingPointType getSinglePrecisionFloatingPointType() {
     return FloatingPointType.SINGLE_PRECISION_FP_TYPE;
   }
 
   /**
-   * @return double precision {@link FloatingPointType} with exponent sized 11, and mantissa sized
-   *     53 (including the hidden bit).
+   * @return a double precision {@link FloatingPointType} with a total size of 64 bits, consisting
+   *     of the sign bit, an exponent sized 11 bits, and a mantissa sized 52 bits (excluding the
+   *     hidden bit).
    */
   public static FloatingPointType getDoublePrecisionFloatingPointType() {
     return FloatingPointType.DOUBLE_PRECISION_FP_TYPE;

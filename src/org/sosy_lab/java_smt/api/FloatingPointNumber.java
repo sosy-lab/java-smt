@@ -228,12 +228,12 @@ public abstract class FloatingPointNumber {
 
   /**
    * Returns true if this floating-point number is an IEEE-754-2008 single precision type with 32
-   * bits length consisting of an 8 bit exponent, a 24 bit mantissa (including the hidden bit).
+   * bits total length consisting of the sign bit, an 8 bit exponent, and a 23 bit mantissa
+   * (excluding the hidden bit).
    *
    * @return true for IEEE-754 single precision type, false otherwise.
    */
   public boolean isIEEE754SinglePrecision() {
-    // Mantissa does not include the hidden bit internally
     return getTotalSize()
             == SINGLE_PRECISION_EXPONENT_SIZE
                 + SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT
@@ -244,12 +244,12 @@ public abstract class FloatingPointNumber {
 
   /**
    * Returns true if this floating-point number is an IEEE-754-2008 double precision type with 64
-   * bits length consisting of an 11 bit exponent, a 53 bit mantissa (including the hidden bit).
+   * bits total length, consisting of the sign bit, an 11 bit exponent, and a 52 bit mantissa
+   * (excluding the hidden bit).
    *
    * @return true for IEEE-754 double precision type, false otherwise.
    */
   public boolean isIEEE754DoublePrecision() {
-    // Mantissa does not include the hidden bit internally
     return getTotalSize()
             == DOUBLE_PRECISION_EXPONENT_SIZE
                 + DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT
