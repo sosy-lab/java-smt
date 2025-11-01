@@ -4,7 +4,7 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
@@ -20,8 +20,9 @@
 # There are the following dependencies:
 # - MinGW (install Ubuntu package: `mingw-w64`)
 # - The MathSAT5 library for Windows64 as can be downloaded from http://mathsat.fbk.eu/download.html
-# - MathSAT5 is linked against MPIR which aims to be compatible to GMP.
-#   Since 2017, MPIR is no longer developed. We use the precompiled `mpir.dll` from the MathSAT5 archive.
+# - MathSAT5 is linked against GMP. We use the precompiled `gmp.dll` from the MathSAT5 archive.
+#   Previously, MathSAT5 used MPIR which aimed to be compatible to GMP.
+#   Since 2017, MPIR was no longer developed, and since 2022, MPIR officially dead.
 #   When compiling our bindings, we use the header files from GMP.
 #   We do not actually need to compile it. However, this is a nice test, whether our build system works as expected.
 #   To build GMP, download GMP 6.3.0 from http://gmplib.org/ and run
@@ -87,7 +88,7 @@ $CC -g -std=gnu99 -Wall -Wextra -Wpedantic -Wno-return-type -Wno-unused-paramete
     -o $OUT_FILE -shared -Wl,-soname,$OUT_FILE \
     -D_JNI_IMPLEMENTATION_ -Wl,--kill-at \
     $JNI_HEADERS -I$MSAT_SRC_DIR -I$GMP_DIR -L$MSAT_LIB_DIR $SRC_FILES \
-    -lmathsat $MSAT_BIN_DIR/mpir.dll -lstdc++ -lpsapi
+    -lmathsat $MSAT_BIN_DIR/gmp.dll -lstdc++ -lpsapi
 
 echo "Compilation Done"
 echo "Reducing file size by dropping unused symbols..."

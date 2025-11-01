@@ -162,7 +162,7 @@ public class SolverContextFactoryTest {
       case "opensmtj":
         return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
-        return new String[] {"GLIBC_2.33"};
+        return new String[] {"GLIBC_2.33", "GLIBC_2.38"};
       case "cvc5jni":
         return new String[] {"GLIBC_2.32"};
       default:

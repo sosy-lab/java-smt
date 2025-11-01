@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -236,7 +236,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
     loadLibrariesWithFallback(
-        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
+        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("gmp", "mathsat", "mathsat5j"));
   }
 
   long createEnvironment(long cfg) {

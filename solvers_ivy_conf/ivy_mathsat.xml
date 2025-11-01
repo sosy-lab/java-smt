@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -45,7 +45,7 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Windows x64 files -->
         <artifact name="mathsat5j" conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
         <artifact name="mathsat"   conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
-        <artifact name="mpir"      conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
+        <artifact name="gmp"       conf="solver-mathsat-windows-x64" e:arch="x64" type="dll" ext="dll"/>
     </publications>
     <dependencies></dependencies>
 

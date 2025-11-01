@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -73,7 +73,7 @@ SPDX-License-Identifier: Apache-2.0
         <copy file="lib/native/source/libmathsat5j/libmathsat5j-arm64.so" tofile="${mathsat.dist.dir}/arm64/libmathsat5j-${mathsat.version}.so"/>
         <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="${mathsat.dist.dir}/x64/mathsat5j-${mathsat.version}.dll"/>
         <copy file="${mathsat-windows-x64.path}/lib/mathsat.dll" tofile="${mathsat.dist.dir}/x64/mathsat-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows-x64.path}/bin/mpir.dll" tofile="${mathsat.dist.dir}/x64/mpir-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/bin/gmp.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
         <copy file="${gmp-windows-x64.path}/.libs/libgmp-10.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
 
         <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml"/>
