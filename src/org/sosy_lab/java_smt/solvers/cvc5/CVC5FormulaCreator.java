@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
-import com.google.common.collect.Table.Cell;
 import com.google.common.primitives.Ints;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Datatype;
@@ -40,7 +39,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
@@ -75,11 +73,6 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
 public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
-
-  // Used to determine the internal UFs not to use when parsing
-  private static final Set<String> INTERNAL_UF_NAMES =
-      ImmutableSet.of(
-          "Rational_*_", "Rational_/_", "Rational_%_", "Integer_*_", "Integer_/_", "Integer_%_");
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
@@ -963,25 +956,5 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       addToQueue(pBody);
       return TraversalProcess.CONTINUE;
     }
-  }
-
-  protected ImmutableMap<String, Term> getAllCachedVariablesAndUFs(
-      boolean includeUFs, boolean excludeInternalArithmeticUFs) {
-    ImmutableMap.Builder<String, Term> knownVariablesAndUFsMap = ImmutableMap.builder();
-    for (Cell<String, String, Term> cell : variablesCache.cellSet()) {
-      knownVariablesAndUFsMap.put(cell.getRowKey(), cell.getValue());
-    }
-    if (includeUFs) {
-      for (Entry<String, Term> fun : functionsCache.entrySet()) {
-        if (excludeInternalArithmeticUFs) {
-          if (!INTERNAL_UF_NAMES.contains(fun.getKey())) {
-            knownVariablesAndUFsMap.put(fun.getKey(), fun.getValue());
-          }
-        } else {
-          knownVariablesAndUFsMap.put(fun.getKey(), fun.getValue());
-        }
-      }
-    }
-    return knownVariablesAndUFsMap.buildOrThrow();
   }
 }
