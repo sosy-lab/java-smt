@@ -66,7 +66,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [Boolector](https://boolector.github.io/) | :heavy_check_mark: |  |  |  |  |  | a fast solver for bitvector logic, misses formula introspection, deprecated |
 | [CVC4](https://cvc4.github.io/) | :heavy_check_mark: |  |  |  |  |  |  |
 | [CVC5](https://cvc5.github.io/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  | :heavy_check_mark: | :heavy_check_mark: |  |
-| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/430)⁴ |  |  |
+| [MathSAT5](http://mathsat.fbk.eu/) | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/430)⁴ |  |  |
 | [OpenSMT](https://verify.inf.usi.ch/opensmt) | :heavy_check_mark:² | :heavy_check_mark:² |  |  |  |  |  |
 | [OptiMathSAT](http://optimathsat.disi.unitn.it/) | :heavy_check_mark: |  |  |  |  |  | based on MathSAT5, with support for optimization queries |
 | [Princess](http://www.philipp.ruemmer.org/princess.shtml) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
