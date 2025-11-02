@@ -198,8 +198,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   /**
-   * Builds the parser from the given {@link Solver} and the {@link SymbolManager}. The {@link
-   * SymbolManager} needs to be persistent to remember terms already parsed/created.
+   * Builds the parser from the given {@link Solver} and the {@link SymbolManager} of this class.
+   * The {@link SymbolManager} needs to be persistent to remember terms already parsed/created.
    */
   private InputParser getParser(Solver parseSolver) {
     if (!parseSolver.isLogicSet()) {
