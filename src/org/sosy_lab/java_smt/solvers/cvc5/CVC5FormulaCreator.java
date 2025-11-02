@@ -141,15 +141,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   @Override
   public Sort getFloatingPointType(FloatingPointType pType) {
     try {
-      // plus sign bit
-      return termManager.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      // plus hidden bit
+      return termManager.mkFloatingPointSort(
+          pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create floatingpoint sort with exponent size "
               + pType.getExponentSize()
               + " and mantissa "
-              + pType.getMantissaSize()
-              + " (plus sign bit).",
+              + pType.getMantissaSizeWithHiddenBit()
+              + " (including hidden bit).",
           e);
     }
   }
@@ -222,9 +223,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     } else if (sort.isBitVector()) {
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
-      // CVC5 wants the sign bit as part of the mantissa. We add that manually in creation.
-      return FormulaType.getFloatingPointType(
-          sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize() - 1);
+      // CVC5 wants the hidden bit as part of the mantissa. We add that manually in creation.
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize());
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (sort.isReal()) {
@@ -841,7 +842,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   private FloatingPointNumber convertFloatingPoint(Term value) throws CVC5ApiException {
     final var fpValue = value.getFloatingPointValue();
     final var expWidth = Ints.checkedCast(fpValue.first);
-    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without sign bit
+    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without hidden bit
     final var bvValue = fpValue.third;
     Preconditions.checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
