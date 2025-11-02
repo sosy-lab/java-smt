@@ -39,6 +39,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   private static final CharMatcher VALID_CHARS =
       LETTERS.or(DIGITS).or(ADDITIONAL_CHARS).precomputed();
 
+  @SuppressWarnings("checkstyle:parameternumber")
   Yices2FormulaManager(
       Yices2FormulaCreator pFormulaCreator,
       Yices2UFManager pFunctionManager,
@@ -46,7 +47,8 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
       Yices2IntegerFormulaManager pIntegerManager,
       Yices2RationalFormulaManager pRationalManager,
       Yices2BitvectorFormulaManager pBitvectorManager,
-      Yices2QuantifiedFormulaManager pQuantifiedFormulaManager) {
+      Yices2QuantifiedFormulaManager pQuantifiedFormulaManager,
+      Yices2ArrayFormulaManager pArrayFormulaManager) {
     super(
         pFormulaCreator,
         pFunctionManager,
@@ -56,7 +58,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
         pBitvectorManager,
         null,
         pQuantifiedFormulaManager,
-        null,
+        pArrayFormulaManager,
         null,
         null,
         null);

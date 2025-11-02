@@ -228,7 +228,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     boolean containsMoreAnd = false;
     boolean started = false;
 
-    protected CNFChecker(FormulaManager pFmgr) {
+    CNFChecker(FormulaManager pFmgr) {
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
@@ -237,7 +237,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       return bfmgr.visit(f, this);
     }
 
-    public boolean isInCNF() {
+    boolean isInCNF() {
       return (startsWithAnd && !containsMoreAnd) || (started && !startsWithAnd);
     }
 
@@ -334,7 +334,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     boolean wasLastVisitNot = false;
     boolean notOnlyAtAtoms = true;
 
-    protected NNFChecker(FormulaManager pFmgr) {
+    NNFChecker(FormulaManager pFmgr) {
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
@@ -343,7 +343,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       return bfmgr.visit(f, this);
     }
 
-    public boolean isInNNF() {
+    boolean isInNNF() {
       return notOnlyAtAtoms;
     }
 

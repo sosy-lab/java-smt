@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -117,11 +116,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
   }
 
-  @Override
-  public BooleanFormula and(BooleanFormula... pBits) {
-    return and(Arrays.asList(pBits));
-  }
-
   /**
    * Create an n-ary conjunction. The default implementation delegates to {@link #and(Object,
    * Object)} and assumes that all simplifications are done by that method. This method can be
@@ -152,11 +146,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param2 = extractInfo(pBits2);
 
     return wrap(or(param1, param2));
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... pBits) {
-    return or(Arrays.asList(pBits));
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);

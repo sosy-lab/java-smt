@@ -12,8 +12,8 @@ import static com.google.common.truth.Truth.assertThat;
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,12 +39,12 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
 
   @Test
   public void testEnumerationDeclaration() {
-    Set<String> colors = Sets.newHashSet("Blue", "White");
+    Set<String> colors = ImmutableSet.of("Blue", "White");
     EnumerationFormulaType colorType = emgr.declareEnumeration("Color", "Blue", "White");
     assertEquals("Color", colorType.getName());
     assertEquals(colors, colorType.getElements());
 
-    Set<String> shapes = Sets.newHashSet("Circle", "Square", "Triangle");
+    Set<String> shapes = ImmutableSet.of("Circle", "Square", "Triangle");
     EnumerationFormulaType shapeType = emgr.declareEnumeration("Shape", shapes);
     assertEquals("Shape", shapeType.getName());
     assertEquals(shapes, shapeType.getElements());
@@ -64,8 +64,8 @@ public class EnumerationFormulaManagerTest extends SolverBasedTest0.Parameterize
 
   @Test
   public void testRepeatedEnumerationDeclaration() {
-    Set<String> colors = Sets.newHashSet("Blue", "White");
-    Set<String> otherColors = Sets.newHashSet("Blue", "White", "Red");
+    Set<String> colors = ImmutableSet.of("Blue", "White");
+    Set<String> otherColors = ImmutableSet.of("Blue", "White", "Red");
     EnumerationFormulaType colorType = emgr.declareEnumeration("Color", colors);
 
     // same type again is allowed
