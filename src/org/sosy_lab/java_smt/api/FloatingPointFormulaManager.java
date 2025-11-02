@@ -302,12 +302,15 @@ public interface FloatingPointFormulaManager {
    * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
    * is not defined, and returned values are solver dependent. In case you want to define how to
    * handle those values, please use {@link #toIeeeBitvector(FloatingPointFormula, String, Map)}.
-   * This method is based on a suggestion in the SMTLib2 standard ( <a
+   * This method is based on a suggestion in the SMTLib2 standard (<a
    * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
    *
    * <p>(declare-fun b () (_ BitVec m))
    *
    * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above and
+   * no keyword variation for floating-point to bitvector conversion like 'fp.as_ieee_bv'.
    *
    * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
    * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
@@ -326,12 +329,15 @@ public interface FloatingPointFormulaManager {
    * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
    * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
    * can be defined using the specialFPConstantHandling parameter. This method is based on a
-   * suggestion in the SMTLib2 standard ( <a
+   * suggestion in the SMTLib2 standard (<a
    * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
    *
    * <p>(declare-fun b () (_ BitVec m))
    *
    * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above and
+   * no keyword variation for floating-point to bitvector conversion like 'fp.as_ieee_bv'.
    *
    * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
    * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.

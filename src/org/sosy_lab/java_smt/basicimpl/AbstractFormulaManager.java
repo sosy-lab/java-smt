@@ -327,7 +327,23 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula parse(String formulaStr) throws IllegalArgumentException {
-    return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+    try {
+      return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
+    } catch (IllegalArgumentException illegalArgumentException) {
+      if (illegalArgumentException.getMessage().contains("fp.as_ieee_bv")) {
+        String additionalMessage =
+            "; Note: operation 'fp.as_ieee_bv' is not supported in most SMT solvers. Instead, try"
+                + " utilizing the SMTLIB2 keyword 'to_fp' which is supported in most SMT solvers"
+                + " with Bitvector and Floating-Point support. In case the SMTLIB2 output has been"
+                + " created using JavaSMT, try replacing the FloatingPointFormulaManager method"
+                + " toIeeeBitvector(FloatingPointFormula), with either"
+                + " toIeeeBitvector(FloatingPointFormula, String) or"
+                + " toIeeeBitvector(FloatingPointFormula, String, Map).";
+        throw new IllegalArgumentException(
+            illegalArgumentException.getMessage() + additionalMessage, illegalArgumentException);
+      }
+      throw illegalArgumentException;
+    }
   }
 
   protected abstract String dumpFormulaImpl(TFormulaInfo t) throws IOException;
