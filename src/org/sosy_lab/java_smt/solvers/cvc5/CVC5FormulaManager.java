@@ -210,16 +210,26 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         throw new AssertionError("Unexpected exception", e);
       }
     }
-    // Expected success string due to option set: "success\n"
+    // Expected success string due to option set is "success\n" (as sanity check when invoking
+    // parsing commands, which might also return errors!)
     parseSolver.setOption("print-success", "true");
-    // more tolerant of non-conforming inputs, default: default
+
+    // More tolerant of non-conforming inputs, default: default
+    // Allows e.g. parsing of Mathsat output with . in front of the definition names.
     parseSolver.setOption("parsing-mode", "lenient");
-    // force all declarations and definitions to be global when parsing, default: false
+
+    // Force all declarations and definitions to be global when parsing, default: false
+    // I.e. remembers declarations and definitions and helps to re-use them when parsed before etc.
     parseSolver.setOption("global-declarations", "true");
-    // use API interface for fresh constants when parsing declarations and definitions, default:
+
+    // Use API interface for fresh constants when parsing declarations and definitions, default:
     // true
+    // Parser re-uses existing declarations and definitions.
     parseSolver.setOption("fresh-declarations", "false");
-    // allows overloading of terms and sorts if true, default: true
+
+    // Allows overloading of terms and sorts if true, default: true
+    // Technically we want this to happen. But disabling this allows us to do it with our cache
+    // safely and get better error messaged.
     parseSolver.setOption("term-sort-overload", "false");
 
     InputParser parser = new InputParser(parseSolver, symbolManager);
