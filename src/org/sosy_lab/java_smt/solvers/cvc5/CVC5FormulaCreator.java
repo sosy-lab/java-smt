@@ -142,14 +142,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   public Sort getFloatingPointType(FloatingPointType pType) {
     try {
       // plus sign bit
-      return termManager.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return termManager.mkFloatingPointSort(
+          pType.getExponentSize(), pType.getMantissaSizeWithSignBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create floatingpoint sort with exponent size "
               + pType.getExponentSize()
               + " and mantissa "
-              + pType.getMantissaSize()
-              + " (plus sign bit).",
+              + pType.getMantissaSizeWithSignBit()
+              + " (including sign bit).",
           e);
     }
   }
@@ -223,7 +224,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
       // CVC5 wants the sign bit as part of the mantissa. We add that manually in creation.
-      return FormulaType.getFloatingPointType(
+      return FormulaType.getFloatingPointTypeWithoutSignBit(
           sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize() - 1);
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;

@@ -20,14 +20,18 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 class Z3FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
 
-  private static final FloatingPointType highPrec = FormulaType.getFloatingPointType(15, 112);
+  private static final FloatingPointType highPrec =
+      FormulaType.getFloatingPointTypeWithoutSignBit(15, 112);
 
   private final long z3context;
   private final long roundingMode;
 
   Z3FloatingPointFormulaManager(
-      Z3FormulaCreator creator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(creator);
+      Z3FormulaCreator creator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Z3BitvectorFormulaManager pBvFormulaManager,
+      Z3BooleanFormulaManager pBoolFormulaManager) {
+    super(creator, pBvFormulaManager, pBoolFormulaManager);
     z3context = creator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -78,7 +82,8 @@ class Z3FloatingPointFormulaManager
 
     final long signSort = getFormulaCreator().getBitvectorType(1);
     final long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
-    final long mantSort = getFormulaCreator().getBitvectorType(type.getMantissaSize());
+    final long mantSort =
+        getFormulaCreator().getBitvectorType(type.getMantissaSizeWithoutSignBit());
 
     final long signBv = Native.mkNumeral(z3context, sign.isNegative() ? "1" : "0", signSort);
     Native.incRef(z3context, signBv);
@@ -99,7 +104,7 @@ class Z3FloatingPointFormulaManager
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
-        || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
+        || pType.getMantissaSizeWithSignBit() <= highPrec.getMantissaSizeWithSignBit()) {
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber =
@@ -313,5 +318,15 @@ class Z3FloatingPointFormulaManager
   @Override
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
     return Native.mkFpaRoundToIntegral(z3context, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Long f) {
+    return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Long f) {
+    return Native.fpaGetSbits(z3context, Native.getSort(z3context, f));
   }
 }

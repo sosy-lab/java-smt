@@ -8,13 +8,15 @@
 
 package org.sosy_lab.java_smt.api;
 
-import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeWithoutSignBit;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 /**
  * Floating point operations.
@@ -99,7 +101,8 @@ public interface FloatingPointFormulaManager {
         number.getExponent(),
         number.getMantissa(),
         number.getMathSign(),
-        getFloatingPointType(number.getExponentSize(), number.getMantissaSize()));
+        getFloatingPointTypeWithoutSignBit(
+            number.getExponentSize(), number.getMantissaSizeWithoutSignBit()));
   }
 
   /**
@@ -285,10 +288,75 @@ public interface FloatingPointFormulaManager {
 
   /**
    * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE format. The size of the resulting bitvector is the sum of the
-   * sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
+
+  /**
+   * Create a formula that produces a representation of the given floating-point value as a
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * This implementation can be used independently of {@link
+   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
+   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
+   * is not defined, and returned values are solver dependent. In case you want to define how to
+   * handle those values, please use {@link #toIeeeBitvector(FloatingPointFormula, String, Map)}.
+   * This method is based on a suggestion in the SMTLib2 standard (<a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
+   *
+   * <p>(declare-fun b () (_ BitVec m))
+   *
+   * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above and
+   * no keyword variation for floating-point to bitvector conversion like 'fp.as_ieee_bv'.
+   *
+   * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
+   * @return {@link BitvectorFormulaAndBooleanFormula} consisting of the transformed input
+   *     floating-point as a {@link BitvectorFormula} and the additional constraint as {@link
+   *     BooleanFormula}.
+   */
+  BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName);
+
+  /**
+   * Create a formula that produces a representation of the given floating-point value as a
+   * bitvector conforming to the IEEE 754-2008 format. The size of the resulting bitvector is the
+   * sum of the sizes of the exponent and mantissa of the input formula plus 1 (for the sign bit).
+   * This implementation can be used independently of {@link
+   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
+   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
+   * can be defined using the specialFPConstantHandling parameter. This method is based on a
+   * suggestion in the SMTLib2 standard (<a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">source</a>) implementation:
+   *
+   * <p>(declare-fun b () (_ BitVec m))
+   *
+   * <p>(assert (= ((_ to_fp eb sb) b) f))
+   *
+   * <p>Note: SMTLIB2 output of this method uses the SMTLIB2 keyword 'to_fp' as described above and
+   * no keyword variation for floating-point to bitvector conversion like 'fp.as_ieee_bv'.
+   *
+   * @param number the {@link FloatingPointFormula} to be converted into an IEEE bitvector.
+   * @param bitvectorConstantName the name of the returned {@link BitvectorFormula}.
+   * @param specialFPConstantHandling a {@link Map} defining the returned {@link BitvectorFormula}
+   *     for special {@link FloatingPointFormula} constant numbers. You are only allowed to specify
+   *     a mapping for special FP numbers with more than one well-defined bitvector representation,
+   *     i.e. NaN and +/- Infinity. The width of the mapped bitvector values has to match the
+   *     expected width of the bitvector return value. The {@link FloatingPointType}, i.e.
+   *     precision, of the key FP numbers has to match the {@link FloatingPointType} of the
+   *     parameter {@code number}. For an empty {@link Map}, or missing mappings, this method
+   *     behaves like {@link #toIeeeBitvector(FloatingPointFormula, String)}.
+   * @return {@link BitvectorFormulaAndBooleanFormula} consisting of the transformed input
+   *     floating-point as a {@link BitvectorFormula} and the additional constraint as {@link
+   *     BooleanFormula}.
+   */
+  BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling);
 
   FloatingPointFormula round(FloatingPointFormula formula, FloatingPointRoundingMode roundingMode);
 
@@ -467,4 +535,13 @@ public interface FloatingPointFormulaManager {
    * </ul>
    */
   BooleanFormula isNegative(FloatingPointFormula number);
+
+  /**
+   * Returns the size of the mantissa (also called a coefficient or significant), including the sign
+   * bit, for the given {@link FloatingPointFormula}.
+   */
+  int getMantissaSizeWithSignBit(FloatingPointFormula number);
+
+  /** Returns the size of the exponent for the given {@link FloatingPointFormula}. */
+  int getExponentSize(FloatingPointFormula number);
 }
