@@ -52,8 +52,9 @@ public class Z3Proof extends AbstractProof {
   /**
    * This transformation omits one level of the proofs from Z3, as the leaves in that case are the
    * operands of the boolean formulas used as the very first proof steps in the whole proof .E.g.,
-   * when asserting (or (not q2) q1) that produces a single {@link Z3Proof}, but the input for that
-   * is a whole subtree from Z3 composed of the asseertion, the OR operation and the operands.
+   * when asserting (or (not q2) q1), that produces a single {@link Z3Proof}, but the input for that
+   * is a whole subtree from Z3 composed of the assertion, the disjunction and the negation,
+   * which in turn has q2 as a child, as well as q1.
    *
    * @param rootProof The root of proof DAG to be converted
    * @param formulaCreator The {@link FormulaCreator} to be able to produce the {@link Formula}s
