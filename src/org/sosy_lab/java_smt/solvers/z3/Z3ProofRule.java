@@ -169,5 +169,6 @@ Z3ProofRule(Rule pRule, List<Parameter<?>> pParameters) {
   return rule.getFormula();
   }
 
+  public List<Parameter<?>> getParameters() {return List.copyOf(this.parameters);}
 
 }
