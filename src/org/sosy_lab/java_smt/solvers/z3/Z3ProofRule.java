@@ -142,7 +142,7 @@ class Z3ProofRule implements ProofRule {
     }
   }
 
-  class Parameter<T> {
+  static class Parameter<T> {
     private final T value;
 
     Parameter(T value) {
