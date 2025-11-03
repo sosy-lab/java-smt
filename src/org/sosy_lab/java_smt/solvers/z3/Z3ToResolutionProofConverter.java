@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
