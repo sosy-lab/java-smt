@@ -12,10 +12,13 @@ package org.sosy_lab.java_smt.solvers.z3;
 
 import com.microsoft.z3.Native;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
+import com.microsoft.z3.enumerations.Z3_parameter_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
@@ -23,6 +26,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
+import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.Parameter;
 import org.sosy_lab.java_smt.solvers.z3.Z3ProofRule.Rule;
 
 public class Z3Proof extends AbstractProof {
@@ -47,14 +51,12 @@ public class Z3Proof extends AbstractProof {
   }
 
 
-  //TODO: add a way of retrieving the optional extra information given as parameters of the proof
-  // rule. See rule TH_LEMMA
   /**
    * This transformation omits one level of the proofs from Z3, as the leaves in that case are the
    * operands of the boolean formulas used as the very first proof steps in the whole proof .E.g.,
    * when asserting (or (not q2) q1), that produces a single {@link Z3Proof}, but the input for that
-   * is a whole subtree from Z3 composed of the assertion, the disjunction and the negation,
-   * which in turn has q2 as a child, as well as q1.
+   * is a whole subtree from Z3 composed of the assertion, the disjunction and the negation, which
+   * in turn has q2 as a child, as well as q1.
    *
    * @param rootProof The root of proof DAG to be converted
    * @param formulaCreator The {@link FormulaCreator} to be able to produce the {@link Formula}s
@@ -65,7 +67,7 @@ public class Z3Proof extends AbstractProof {
     // proof ast to be processed wrapped inside a frame
     Deque<Frame> stack = new ArrayDeque<>();
 
-    // proof ast has been converted into ProofNode
+    // proof ast has been converted into Z3Proof
     Map<Long, Z3Proof> computed = new HashMap<>();
 
     stack.push(new Frame(rootProof));
@@ -111,9 +113,12 @@ public class Z3Proof extends AbstractProof {
           long z3expr = Native.getAppArg(z3context, frame.getProof(), numArgs - 1);
           formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(z3expr), z3expr);
         }
+
+        long decl = Native.getAppDecl(z3context, frame.getProof());
         int declKind =
             Native.getDeclKind(z3context, Native.getAppDecl(z3context, frame.getProof()));
-        ProofRule proofRule = getPRfromDK(declKind);
+
+        ProofRule proofRule = generateProofRule(z3context, decl, declKind);
         Z3Proof node = new Z3Proof(formula, proofRule);
 
         for (int i = 0; i < numArgs - 1; i++) {
@@ -129,10 +134,60 @@ public class Z3Proof extends AbstractProof {
     return computed.get(rootProof);
   }
 
-  private static ProofRule getPRfromDK(int declKind) {
+  private static Rule getPRfromDK(int declKind) {
     String rawName = Z3_decl_kind.fromInt(declKind).name();
     String prName = rawName.replaceFirst("Z3_OP_PR_", "");
     // return ProofRule.fromName(Z3ProofRule.class, prName);
     return Enum.valueOf(Rule.class, prName);
+  }
+
+  private static ProofRule generateProofRule(long z3context, long decl, int declKind) {
+    List<Parameter<?>> parameters = new ArrayList<>();
+    int numParams = Native.getDeclNumParameters(z3context, decl);
+    for (int i = 0; i < numParams; i++) {
+      int pk = Native.getDeclParameterKind(z3context, decl, i);
+      Z3_parameter_kind kind = Z3_parameter_kind.fromInt(pk);
+      switch (kind) {
+        case Z3_PARAMETER_AST:
+          long astRef = Native.getDeclAstParameter(z3context, decl, i);
+          parameters.add(new Z3ProofRule.Parameter<>(Native.astToString(z3context, astRef)));
+          break;
+
+        case Z3_PARAMETER_INT:
+          parameters.add(
+              new Z3ProofRule.Parameter<>(Native.getDeclIntParameter(z3context, decl, i)));
+          break;
+
+        case Z3_PARAMETER_RATIONAL:
+          parameters.add(
+              new Z3ProofRule.Parameter<>(Native.getDeclRationalParameter(z3context, decl, i)));
+          break;
+
+        case Z3_PARAMETER_SYMBOL:
+          long symRef = Native.getDeclSymbolParameter(z3context, decl, i);
+          parameters.add(new Z3ProofRule.Parameter<>(Native.getSymbolString(z3context, symRef)));
+          break;
+
+        case Z3_PARAMETER_DOUBLE:
+          parameters.add(
+              new Z3ProofRule.Parameter<>(Native.getDeclDoubleParameter(z3context, decl, i)));
+          break;
+
+        case Z3_PARAMETER_SORT:
+          long sortRef = Native.getDeclSortParameter(z3context, decl, i);
+          parameters.add(new Z3ProofRule.Parameter<>(Native.sortToString(z3context, sortRef)));
+          break;
+
+        case Z3_PARAMETER_FUNC_DECL:
+          long funcRef = Native.getDeclFuncDeclParameter(z3context, decl, i);
+          parameters.add(new Z3ProofRule.Parameter<>(Native.funcDeclToString(z3context, funcRef)));
+          break;
+
+        default:
+          throw new UnsupportedOperationException("Can not get parameter kind: " + kind);
+      }
+    }
+    Rule pr = getPRfromDK(declKind);
+    return new Z3ProofRule(pr, parameters);
   }
 }
