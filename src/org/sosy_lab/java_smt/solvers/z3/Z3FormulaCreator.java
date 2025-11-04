@@ -420,6 +420,32 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    checkArgument(
+        Native.getSortKind(environment, Native.getSort(environment, f))
+            == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt(),
+        "Expected a floating point rounding mode, but got %s",
+        Native.astToString(environment, f));
+
+    int roundingModeOp = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
+    switch (Z3_decl_kind.fromInt(roundingModeOp)) {
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
+        return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
+        return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
+        return FloatingPointRoundingMode.TOWARD_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
+        return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO:
+        return FloatingPointRoundingMode.TOWARD_ZERO;
+      default:
+        throw new IllegalArgumentException(
+            "Cannot get rounding mode for Z3 operator: " + roundingModeOp);
+    }
+  }
+
+  @Override
   public Long getBitvectorType(int pBitwidth) {
     checkArgument(pBitwidth > 0, "Cannot use bitvector type with size %s", pBitwidth);
     long bvSort = Native.mkBvSort(getEnv(), pBitwidth);
@@ -506,6 +532,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         if (arity == 0) {
           // constants
           Object value = Z3_CONSTANTS.get(declKind);
+          int sortKind = Native.getSortKind(environment, Native.getSort(environment, f));
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
@@ -513,15 +540,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Rounding mode
-          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
-              || Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
+          } else if (sortKind == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+            return visitor.visitConstant(formula, getRoundingMode(f));
 
             // string constant
           } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
-              && Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+              && sortKind == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Free variable

@@ -43,6 +43,13 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   }
 
   @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+  }
+
+  @Override
   public FloatingPointFormula makeNumber(double pN, FloatingPointType pType) {
     stats.fpOperations.getAndIncrement();
     return delegate.makeNumber(pN, pType);

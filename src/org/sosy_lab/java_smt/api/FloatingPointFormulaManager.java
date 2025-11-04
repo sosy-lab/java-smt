@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -36,6 +36,13 @@ public interface FloatingPointFormulaManager {
 
   /** Creates a formula for the given floating point rounding mode. */
   FloatingPointRoundingModeFormula makeRoundingMode(FloatingPointRoundingMode pRoundingMode);
+
+  /**
+   * Converts a rounding mode formula to the corresponding enum value. This method is the inverse of
+   * {@link #makeRoundingMode(FloatingPointRoundingMode)}.
+   */
+  FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula);
 
   /**
    * Creates a floating point formula representing the given double value with the specified type.

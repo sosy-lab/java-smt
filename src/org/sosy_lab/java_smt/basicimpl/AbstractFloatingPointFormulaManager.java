@@ -67,6 +67,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return getFormulaCreator().encapsulateRoundingMode(getRoundingMode(pRoundingMode));
   }
 
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return getFormulaCreator().getRoundingMode(extractInfo(pRoundingModeFormula));
+  }
+
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
   }

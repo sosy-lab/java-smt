@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -132,6 +133,15 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
       throw new UnsupportedOperationException("String theory is not supported by this solver.");
     }
     return regexType;
+  }
+
+  public FloatingPointRoundingMode getRoundingMode(FloatingPointRoundingModeFormula f) {
+    return getRoundingMode(extractInfo(f));
+  }
+
+  protected FloatingPointRoundingMode getRoundingMode(TFormulaInfo f) {
+    throw new UnsupportedOperationException(
+        "Floating point rounding modes are not supported by this solver.");
   }
 
   public abstract TFormulaInfo makeVariable(TType type, String varName);

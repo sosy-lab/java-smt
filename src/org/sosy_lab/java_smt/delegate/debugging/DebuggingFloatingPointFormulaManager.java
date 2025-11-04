@@ -42,6 +42,14 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
   }
 
   @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pRoundingModeFormula);
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+  }
+
+  @Override
   public FloatingPointFormula makeNumber(double n, FloatingPointType type) {
     debugging.assertThreadLocal();
     FloatingPointFormula result = delegate.makeNumber(n, type);

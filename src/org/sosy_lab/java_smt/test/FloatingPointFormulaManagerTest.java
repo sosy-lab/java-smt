@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -850,6 +851,17 @@ public class FloatingPointFormulaManagerTest
   private void assertEqualsAsFormula(FloatingPointFormula f1, FloatingPointFormula f2)
       throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.assignment(f1, f2)).isTautological();
+  }
+
+  @Test
+  public void roundingModeMapping() {
+    for (FloatingPointRoundingMode rm : FloatingPointRoundingMode.values()) {
+      if (solver == Solvers.MATHSAT5 && rm == FloatingPointRoundingMode.NEAREST_TIES_AWAY) {
+        // SKIP MathSAT does not support rounding mode "nearest-ties-away"
+        continue;
+      }
+      assertEquals(rm, fpmgr.fromRoundingModeFormula(fpmgr.makeRoundingMode(rm)));
+    }
   }
 
   @Test

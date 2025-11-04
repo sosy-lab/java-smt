@@ -335,7 +335,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isFloatingPoint()) {
         return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
-        return visitor.visitConstant(formula, convertRoundingMode(f));
+        return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
       } else if (type.isArray()) {
@@ -626,7 +626,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return convertFloatingPoint(value);
 
     } else if (valueType.isRoundingMode()) {
-      return convertRoundingMode(value);
+      return getRoundingMode(value);
 
     } else if (valueType.isString()) {
       return unescapeUnicodeForSmtlib(value.getConstString().toString());
@@ -664,7 +664,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         mantWidth);
   }
 
-  private FloatingPointRoundingMode convertRoundingMode(Expr pExpr) {
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Expr pExpr) {
+    checkArgument(
+        pExpr.isConst() && pExpr.getType().isRoundingMode(),
+        "Expected a constant rounding mode, but got: %s",
+        pExpr);
     RoundingMode rm = pExpr.getConstRoundingMode();
     if (rm.equals(RoundingMode.roundNearestTiesToAway)) {
       return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
@@ -677,7 +682,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (rm.equals(RoundingMode.roundTowardZero)) {
       return FloatingPointRoundingMode.TOWARD_ZERO;
     } else {
-      throw new IllegalArgumentException(String.format("Unknown rounding mode: %s", pExpr));
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", pExpr));
     }
   }
 }

@@ -27,7 +27,6 @@ import io.github.cvc5.DatatypeConstructor;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
 import io.github.cvc5.Pair;
-import io.github.cvc5.RoundingMode;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
@@ -411,7 +410,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitConstant(formula, convertFloatingPoint(f));
 
       } else if (f.isRoundingModeValue()) {
-        return visitor.visitConstant(formula, convertRoundingMode(f));
+        return visitor.visitConstant(formula, getRoundingMode(f));
 
       } else if (f.isConstArray()) {
         Term constant = f.getConstArrayBase();
@@ -832,7 +831,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return convertFloatingPoint(value);
 
       } else if (value.isRoundingModeValue()) {
-        return convertRoundingMode(value);
+        return getRoundingMode(value);
 
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
@@ -863,20 +862,28 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
   }
 
-  private FloatingPointRoundingMode convertRoundingMode(Term pTerm) throws CVC5ApiException {
-    RoundingMode rm = pTerm.getRoundingModeValue();
-    if (rm.equals(RoundingMode.ROUND_NEAREST_TIES_TO_AWAY)) {
-      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
-    } else if (rm.equals(RoundingMode.ROUND_NEAREST_TIES_TO_EVEN)) {
-      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
-    } else if (rm.equals(RoundingMode.ROUND_TOWARD_NEGATIVE)) {
-      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
-    } else if (rm.equals(RoundingMode.ROUND_TOWARD_POSITIVE)) {
-      return FloatingPointRoundingMode.TOWARD_POSITIVE;
-    } else if (rm.equals(RoundingMode.ROUND_TOWARD_ZERO)) {
-      return FloatingPointRoundingMode.TOWARD_ZERO;
-    } else {
-      throw new IllegalArgumentException(String.format("Unknown rounding mode: %s", pTerm));
+  @Override
+  public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
+    checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
+    try {
+      switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY:
+          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN:
+          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE:
+          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE:
+          return FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO:
+          return FloatingPointRoundingMode.TOWARD_ZERO;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      }
+    } catch (CVC5ApiException pE) {
+      throw new IllegalArgumentException(
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), pE);
     }
   }
 

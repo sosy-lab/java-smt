@@ -16,6 +16,10 @@ import com.google.errorprone.annotations.Immutable;
  * <p>Rounding mode formulas are used by floating-point formulas to select the rounding mode for the
  * operation. Use {@link FloatingPointFormulaManager#makeRoundingMode(FloatingPointRoundingMode)} to
  * wrap a {@link org.sosy_lab.java_smt.api.FloatingPointRoundingMode} value inside a new formula.
+ *
+ * <p>This class is rarely used in the API but necessary to support visitor traversal of formulas
+ * with certain floating-point operations, where JavaSMT provides the rounding mode as Formula-based
+ * argument.
  */
 @Immutable
 public interface FloatingPointRoundingModeFormula extends Formula {}

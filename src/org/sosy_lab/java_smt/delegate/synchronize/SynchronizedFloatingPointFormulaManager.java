@@ -45,6 +45,14 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    synchronized (sync) {
+      return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+    }
+  }
+
+  @Override
   public FloatingPointFormula makeNumber(double pN, FloatingPointType pType) {
     synchronized (sync) {
       return delegate.makeNumber(pN, pType);

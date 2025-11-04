@@ -594,19 +594,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_bool();
     }
     if (sort.is_rm()) {
-      if (term.is_rm_value_rna()) {
-        return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
-      } else if (term.is_rm_value_rne()) {
-        return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
-      } else if (term.is_rm_value_rtn()) {
-        return FloatingPointRoundingMode.TOWARD_NEGATIVE;
-      } else if (term.is_rm_value_rtp()) {
-        return FloatingPointRoundingMode.TOWARD_POSITIVE;
-      } else if (term.is_rm_value_rtz()) {
-        return FloatingPointRoundingMode.TOWARD_ZERO;
-      } else {
-        throw new IllegalArgumentException(String.format("Unknown rounding mode: %s", term));
-      }
+      return getRoundingMode(term);
     }
     if (sort.is_bv()) {
       return new BigInteger(term.to_bv(), 2);
@@ -648,5 +636,24 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     }
 
     return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Term term) {
+    checkArgument(term.sort().is_rm(), "Term '%s' is not of rounding mode sort.", term);
+    if (term.is_rm_value_rna()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (term.is_rm_value_rne()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (term.is_rm_value_rtn()) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (term.is_rm_value_rtp()) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (term.is_rm_value_rtz()) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", term));
+    }
   }
 }

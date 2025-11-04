@@ -349,18 +349,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_term_is_false(environment, f)) {
       return visitor.visitConstant(formula, false);
     } else if (msat_is_fp_roundingmode_type(environment, msat_term_get_type(f))) {
-      if (msat_term_is_fp_roundingmode_nearest_even(environment, f)) {
-        return visitor.visitConstant(formula, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
-      } else if (msat_term_is_fp_roundingmode_plus_inf(environment, f)) {
-        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_POSITIVE);
-      } else if (msat_term_is_fp_roundingmode_minus_inf(environment, f)) {
-        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_NEGATIVE);
-      } else if (msat_term_is_fp_roundingmode_zero(environment, f)) {
-        return visitor.visitConstant(formula, FloatingPointRoundingMode.TOWARD_ZERO);
-      } else {
-        throw new IllegalArgumentException(
-            "Unknown rounding mode " + msat_decl_get_name(msat_term_get_decl(f)));
-      }
+      return visitor.visitConstant(formula, getRoundingMode(f));
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
     } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
@@ -397,6 +386,22 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               argTypes.build(),
               getFormulaType(f),
               msat_term_get_decl(f)));
+    }
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    if (msat_term_is_fp_roundingmode_nearest_even(environment, f)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (msat_term_is_fp_roundingmode_plus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (msat_term_is_fp_roundingmode_minus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (msat_term_is_fp_roundingmode_zero(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", msat_term_repr(f)));
     }
   }
 
