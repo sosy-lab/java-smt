@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static org.sosy_lab.java_smt.api.FormulaManager.API_METHOD_NOT_IMPLEMENTED;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
 
 import java.math.BigDecimal;
@@ -41,8 +42,10 @@ public interface FloatingPointFormulaManager {
    * Converts a rounding mode formula to the corresponding enum value. This method is the inverse of
    * {@link #makeRoundingMode(FloatingPointRoundingMode)}.
    */
-  FloatingPointRoundingMode fromRoundingModeFormula(
-      FloatingPointRoundingModeFormula pRoundingModeFormula);
+  default FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    throw new UnsupportedOperationException(API_METHOD_NOT_IMPLEMENTED);
+  }
 
   /**
    * Creates a floating point formula representing the given double value with the specified type.
