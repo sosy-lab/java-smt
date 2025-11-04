@@ -98,12 +98,6 @@ class StatisticsBooleanFormulaManager implements BooleanFormulaManager {
   }
 
   @Override
-  public BooleanFormula and(BooleanFormula... pBits) {
-    stats.booleanOperations.getAndIncrement();
-    return delegate.and(pBits);
-  }
-
-  @Override
   public Collector<BooleanFormula, ?, BooleanFormula> toConjunction() {
     return Collectors.collectingAndThen(Collectors.toList(), this::and);
   }
@@ -116,12 +110,6 @@ class StatisticsBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public BooleanFormula or(Collection<BooleanFormula> pBits) {
-    stats.booleanOperations.getAndIncrement();
-    return delegate.or(pBits);
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... pBits) {
     stats.booleanOperations.getAndIncrement();
     return delegate.or(pBits);
   }

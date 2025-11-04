@@ -58,7 +58,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -370,7 +369,6 @@ class PrincessEnvironment {
    * Exception at run time.
    */
   @SuppressWarnings("unchecked")
-  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
   private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
     throw (E) e;
   }
@@ -764,7 +762,7 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {
-    return toITermSeq(Arrays.asList(exprs));
+    return toITermSeq(ImmutableList.copyOf(exprs));
   }
 
   IExpression simplify(IExpression f) {

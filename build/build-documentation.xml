@@ -37,7 +37,7 @@ SPDX-License-Identifier: Apache-2.0
 
             <classpath refid="classpath"/>
 
-            <!-- "-v" is an optional param for verbose output of OptionCollector -->
+            <!-- "-v" is a optional param for verbose output of OptionCollector -->
             <!-- <arg value="-v"/> -->
         </java>
         <echo message="Options collected." level="info"/>

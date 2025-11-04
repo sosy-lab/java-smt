@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
@@ -104,7 +104,7 @@ public interface StringFormulaManager {
   IntegerFormula length(StringFormula str);
 
   default StringFormula concat(StringFormula... parts) {
-    return concat(Arrays.asList(parts));
+    return concat(ImmutableList.copyOf(parts));
   }
 
   StringFormula concat(List<StringFormula> parts);
@@ -165,7 +165,7 @@ public interface StringFormulaManager {
    * @return formula denoting the concatenation
    */
   default RegexFormula concat(RegexFormula... parts) {
-    return concatRegex(Arrays.asList(parts));
+    return concatRegex(ImmutableList.copyOf(parts));
   }
 
   /**

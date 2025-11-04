@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.microsoft.z3.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -595,8 +596,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int numBound = Native.getQuantifierNumBound(environment, pF);
     long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
-      long varName = Native.getQuantifierBoundName(environment, pF, i);
-      long varSort = Native.getQuantifierBoundSort(environment, pF, i);
+      // The indices are reversed according to
+      //  https://github.com/Z3Prover/z3/issues/7970#issuecomment-3407924907
+      int inverseIndex = numBound - 1 - i;
+      long varName = Native.getQuantifierBoundName(environment, pF, inverseIndex);
+      long varSort = Native.getQuantifierBoundSort(environment, pF, inverseIndex);
       long freeVar = Native.mkConst(environment, varName, varSort);
       Native.incRef(environment, freeVar);
       freeVars[i] = freeVar;
@@ -621,16 +625,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
     final int arity = Native.getArity(environment, Native.getAppDecl(environment, f));
-    assert arity > 0
-        : String.format(
-            "Unexpected arity '%s' for formula '%s' for handling a function application.",
-            arity, Native.astToString(environment, f));
     if (getAppName(f).equals("div0")) {
       // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
       return FunctionDeclarationKind.OTHER;
     }
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
+
+    assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
+        : String.format(
+            "Unexpected arity '%s' for formula '%s' for handling a function application.",
+            arity, Native.astToString(environment, f));
+
     switch (decl) {
       case Z3_OP_AND:
         return FunctionDeclarationKind.AND;
@@ -663,6 +669,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FLOOR;
       case Z3_OP_TO_REAL:
         return FunctionDeclarationKind.TO_REAL;
+      case Z3_OP_INT2BV:
+        return FunctionDeclarationKind.INT_TO_BV;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -768,6 +776,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_ROTATE_LEFT;
       case Z3_OP_EXT_ROTATE_RIGHT:
         return FunctionDeclarationKind.BV_ROTATE_RIGHT;
+      case Z3_OP_BV2INT:
+        return FunctionDeclarationKind.UBV_TO_INT;
+      case Z3_OP_SBV2INT:
+        return FunctionDeclarationKind.SBV_TO_INT;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
