@@ -881,9 +881,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           throw new IllegalArgumentException(
               String.format("Unknown rounding mode in Term '%s'.", pTerm));
       }
-    } catch (CVC5ApiException pE) {
+    } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
-          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), pE);
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
     }
   }
 

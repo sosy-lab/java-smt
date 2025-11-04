@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -11,7 +11,6 @@ package org.sosy_lab.java_smt.test;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -860,7 +859,7 @@ public class FloatingPointFormulaManagerTest
         // SKIP MathSAT does not support rounding mode "nearest-ties-away"
         continue;
       }
-      assertEquals(rm, fpmgr.fromRoundingModeFormula(fpmgr.makeRoundingMode(rm)));
+      assertThat(fpmgr.fromRoundingModeFormula(fpmgr.makeRoundingMode(rm))).isEqualTo(rm);
     }
   }
 

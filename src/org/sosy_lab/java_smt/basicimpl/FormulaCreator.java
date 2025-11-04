@@ -139,6 +139,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return getRoundingMode(extractInfo(f));
   }
 
+  @SuppressWarnings("unused")
   protected FloatingPointRoundingMode getRoundingMode(TFormulaInfo f) {
     throw new UnsupportedOperationException(
         "Floating point rounding modes are not supported by this solver.");
