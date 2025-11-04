@@ -42,6 +42,7 @@ public interface FloatingPointFormulaManager {
    * Converts a rounding mode formula to the corresponding enum value. This method is the inverse of
    * {@link #makeRoundingMode(FloatingPointRoundingMode)}.
    */
+  @SuppressWarnings("unused")
   default FloatingPointRoundingMode fromRoundingModeFormula(
       FloatingPointRoundingModeFormula pRoundingModeFormula) {
     throw new UnsupportedOperationException(API_METHOD_NOT_IMPLEMENTED);
