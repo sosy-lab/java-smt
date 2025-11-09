@@ -29,7 +29,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   private final ImmutableList<ValueAssignment> model;
   private final TermManager termManager;
   private final Solver solver;
-  private final ImmutableList<Term> assertedExpressions;
 
   @SuppressWarnings("unused")
   private final FormulaManager mgr;
@@ -43,12 +42,11 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     termManager = pCreator.getEnv();
     solver = pProver.solver;
     mgr = pMgr;
-    assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
     // persistent reference to the model. If the SMT engine is used somewhere else, the values we
     // get out of it might change!
-    model = generateModel();
+    model = generateModel(pAssertedExpressions);
   }
 
   @Override
@@ -57,7 +55,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     return solver.getValue(f);
   }
 
-  private ImmutableList<ValueAssignment> generateModel() {
+  private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedExpressions) {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
     // translate all bound vars back to their free counterparts in the visitor!
