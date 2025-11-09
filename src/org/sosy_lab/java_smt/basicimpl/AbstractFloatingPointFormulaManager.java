@@ -266,9 +266,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
         MoreStrings.lazyString(
             () ->
                 String.format(
-                    "The total size of the used FloatingPointType %s has to match the size of "
-                        + "the bitvector argument %s",
-                    pTargetType.getTotalSize(), bvType.getSize())));
+                    "The total size %s of type %s has to match the size %s of type %s.",
+                    pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 
