@@ -1099,6 +1099,27 @@ public class FloatingPointFormulaManagerTest
   }
 
   @Test
+  public void checkErrorOnInvalidSize_IeeeBv2FpConversion() {
+    BitvectorFormula bv = bvmgr.makeBitvector(9, 123);
+
+    var exSingle =
+        assertThrows(
+            IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, singlePrecType));
+    assertThat(exSingle.getMessage())
+        .contains(
+            "The total size 32 of type FloatingPoint<exp=8,mant=23> "
+                + "has to match the size 9 of type Bitvector<9>.");
+
+    var exDouble =
+        assertThrows(
+            IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, doublePrecType));
+    assertThat(exDouble.getMessage())
+        .contains(
+            "The total size 64 of type FloatingPoint<exp=11,mant=52> "
+                + "has to match the size 9 of type Bitvector<9>.");
+  }
+
+  @Test
   public void checkIeeeBv2FpConversion32() throws SolverException, InterruptedException {
     proveForAll(
         // makeFP(value.float) == fromBV(makeBV(value.bits))
