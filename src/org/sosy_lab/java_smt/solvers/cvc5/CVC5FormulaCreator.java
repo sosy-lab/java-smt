@@ -44,6 +44,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -316,6 +318,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+    return new CVC5FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -399,7 +410,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitConstant(formula, convertFloatingPoint(f));
 
       } else if (f.isRoundingModeValue()) {
-        return visitor.visitConstant(formula, f.getRoundingModeValue());
+        return visitor.visitConstant(formula, getRoundingMode(f));
 
       } else if (f.isConstArray()) {
         Term constant = f.getConstArrayBase();
@@ -819,6 +830,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else if (value.isFloatingPointValue()) {
         return convertFloatingPoint(value);
 
+      } else if (value.isRoundingModeValue()) {
+        return getRoundingMode(value);
+
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -846,6 +860,31 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     Preconditions.checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
+  }
+
+  @Override
+  public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
+    checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
+    try {
+      switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY:
+          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN:
+          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE:
+          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE:
+          return FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO:
+          return FloatingPointRoundingMode.TOWARD_ZERO;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+    }
   }
 
   private Term accessVariablesCache(String name, Sort sort) {

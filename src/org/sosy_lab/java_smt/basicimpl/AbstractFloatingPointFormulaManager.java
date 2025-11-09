@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -58,6 +59,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    return getFormulaCreator().encapsulateRoundingMode(getRoundingMode(pRoundingMode));
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return getFormulaCreator().getRoundingMode(extractInfo(pRoundingModeFormula));
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
