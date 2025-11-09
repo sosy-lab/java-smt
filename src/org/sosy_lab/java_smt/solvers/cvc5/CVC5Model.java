@@ -61,85 +61,77 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     // translate all bound vars back to their free counterparts in the visitor!
     for (Term expr : assertedExpressions) {
       // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
-      recursiveAssignmentFinder(builder, expr);
+      try {
+        recursiveAssignmentFinder(builder, expr);
+      } catch (CVC5ApiException e) {
+        throw new IllegalArgumentException(
+            "Failure when retrieving assignments for term '" + expr + "'.", e);
+      }
     }
     return builder.build().asList();
   }
 
   // TODO this method is highly recursive and should be rewritten with a proper visitor
-  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr) {
-    try {
-      Sort sort = expr.getSort();
-      Kind kind = expr.getKind();
-      if (kind == Kind.VARIABLE || sort.isFunction()) {
-        // We don't care about functions, as that's just the function definition and the nested
-        // lambda term
-        // We don't care about bound vars (not in a UF), as they don't return a value.
-        return;
-      } else if (kind == Kind.CONSTANT) {
-        // Vars and UFs, as well as bound vars in UFs!
-        // In CVC5 consts are variables! Free variables (in CVC5s notation, we call them bound
-        // variables, created with mkVar() can never have a value!)
-        builder.addAll(getAssignment(expr));
-      } else if (kind == Kind.FORALL || kind == Kind.EXISTS) {
-        // Body of the quantifier, with bound vars!
-        Term body = expr.getChild(1);
-        recursiveAssignmentFinder(builder, body);
-      } else if (kind == Kind.CONST_STRING
-          || kind == Kind.CONST_ARRAY
-          || kind == Kind.CONST_BITVECTOR
-          || kind == Kind.CONST_BOOLEAN
-          || kind == Kind.CONST_FLOATINGPOINT
-          || kind == Kind.CONST_RATIONAL
-          || kind == Kind.CONST_ROUNDINGMODE
-          || kind == Kind.CONST_SEQUENCE) {
-        // Constants, do nothing
-      } else if (kind == Kind.APPLY_UF) {
-        builder.add(getAssignmentForUf(expr));
+  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Term expr)
+      throws CVC5ApiException {
+    Sort sort = expr.getSort();
+    Kind kind = expr.getKind();
+    if (kind == Kind.VARIABLE || sort.isFunction()) {
+      // We don't care about functions, as that's just the function definition and the nested
+      // lambda term
+      // We don't care about bound vars (not in a UF), as they don't return a value.
+      return;
+    } else if (kind == Kind.CONSTANT) {
+      // Vars and UFs, as well as bound vars in UFs!
+      // In CVC5 consts are variables! Free variables (in CVC5s notation, we call them bound
+      // variables, created with mkVar() can never have a value!)
+      builder.addAll(getAssignments(expr));
+    } else if (kind == Kind.FORALL || kind == Kind.EXISTS) {
+      // Body of the quantifier, with bound vars!
+      Term body = expr.getChild(1);
+      recursiveAssignmentFinder(builder, body);
+    } else if (kind == Kind.CONST_STRING
+        || kind == Kind.CONST_ARRAY
+        || kind == Kind.CONST_BITVECTOR
+        || kind == Kind.CONST_BOOLEAN
+        || kind == Kind.CONST_FLOATINGPOINT
+        || kind == Kind.CONST_RATIONAL
+        || kind == Kind.CONST_ROUNDINGMODE
+        || kind == Kind.CONST_SEQUENCE) {
+      // Constants, do nothing
+    } else if (kind == Kind.APPLY_UF) {
+      builder.add(getAssignmentForUf(expr));
 
-      } else {
-        // Only nested terms (AND, OR, ...) are left
-        for (Term child : expr) {
-          recursiveAssignmentFinder(builder, child);
-        }
+    } else {
+      // Only nested terms (AND, OR, ...) are left
+      for (Term child : expr) {
+        recursiveAssignmentFinder(builder, child);
       }
-    } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException("Failure visiting the Term '" + expr + "'.", e);
     }
   }
 
-  private ValueAssignment getAssignmentForUf(Term pKeyTerm) {
+  private ValueAssignment getAssignmentForUf(Term pKeyTerm) throws CVC5ApiException {
     // Ufs consist of arguments + 1 child, the first child is the function definition as a lambda
-    // and the result, while the remaining children are the arguments. Note: we can't evaluate bound
-    // variables!
+    // and the result, while the remaining children are the arguments.
+    // Note: we can't evaluate bound variables!
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     boolean boundFound = false;
     // We don't want the first argument of uf applications as it is the declaration
     for (int i = 1; i < pKeyTerm.getNumChildren(); i++) {
-      try {
-        Term child = pKeyTerm.getChild(i);
-        if (child.getKind().equals(Kind.VARIABLE)) {
-          // Remember if we encountered bound variables
-          boundFound = true;
-          // Bound vars are extremely volatile in CVC5. Nearly every call to them ends in an
-          // exception. Also, we don't want to substitute them with their non bound values.
-          argumentInterpretationBuilder.add(child.toString());
-        } else {
-          argumentInterpretationBuilder.add(evaluateImpl(child));
-        }
-      } catch (CVC5ApiException e) {
-        throw new IllegalArgumentException("Failure visiting the Term '" + pKeyTerm + "'.", e);
+      Term child = pKeyTerm.getChild(i);
+      if (child.getKind().equals(Kind.VARIABLE)) {
+        // Remember if we encountered bound variables
+        boundFound = true;
+        // Bound vars are extremely volatile in CVC5. Nearly every call to them ends in an
+        // exception. Also, we don't want to substitute them with their non bound values.
+        argumentInterpretationBuilder.add(child.toString());
+      } else {
+        argumentInterpretationBuilder.add(evaluateImpl(child));
       }
     }
 
-    // In applied UFs the child with the name is the 0th child (as it is the declaration)
-    String nameStr;
-    try {
-      nameStr = pKeyTerm.getChild(0).getSymbol();
-    } catch (CVC5ApiException e) {
-      nameStr = "UF";
-    }
-
+    // In applied UFs, the child with the name is the 0th child (as it is the declaration)
+    String nameStr = pKeyTerm.getChild(0).getSymbol();
     if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
       nameStr = nameStr.substring(1, nameStr.length() - 1);
     }
@@ -150,12 +142,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       valueTerm = solver.getValue(pKeyTerm);
     } else {
       // But you may be able to get one nested in the function itself for some reason
-      try {
-        valueTerm = solver.getValue(pKeyTerm.getChild(0)).getChild(1);
-      } catch (CVC5ApiException e) {
-        throw new IndexOutOfBoundsException(
-            "Accessed a non existing UF value while creating a CVC5 model.");
-      }
+      valueTerm = solver.getValue(pKeyTerm.getChild(0)).getChild(1);
     }
 
     Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
@@ -168,8 +155,10 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
   }
 
-  /** Takes a (nested) select statement and returns its indices.
-   * For example: From "(SELECT (SELECT( SELECT 3 arr) 2) 1)" we return "[1,2,3]" */
+  /**
+   * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
+   * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
+   */
   private Iterable<Term> getArgs(Term array) throws CVC5ApiException {
     ImmutableList.Builder<Term> indices = ImmutableList.builder();
     while (array.getKind().equals(Kind.SELECT)) {
@@ -189,7 +178,8 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   }
 
   /** Build assignment for an array value. */
-  private Iterable<ValueAssignment> buildArrayAssignment(Term expr, Term value) {
+  private Iterable<ValueAssignment> buildArrayAssignments(Term expr, Term value)
+      throws CVC5ApiException {
     // CVC5 returns values such as "(Store (Store ... i1,1 e1,1) i1,0 e1,0)" where the i1,x match
     // the first index of the array and the elements e1,Y can again be arrays (if there is more
     // than one index). We need "pattern match" this values to extract assignments from it.
@@ -216,57 +206,48 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     // Once we've reached the last index, the successor element will be a non-array value. We
     // then create the final assignments and return:
     //  (Select iK,mK ... (Select i2,1 (Select i1,0 arr)) = eik,mK
-    try {
-      if (value.getKind().equals(Kind.STORE)) {
-        // This is a Store node for the current index. We need to follow the chain downwards to
-        // match this index, while also exploring the successor for the other indices
-        Term index = value.getChild(1);
-        Term element = value.getChild(2);
+    if (value.getKind().equals(Kind.STORE)) {
+      // This is a Store node for the current index. We need to follow the chain downwards to
+      // match this index, while also exploring the successor for the other indices
+      Term index = value.getChild(1);
+      Term element = value.getChild(2);
 
-        Term select = creator.getEnv().mkTerm(Kind.SELECT, expr, index);
+      Term select = creator.getEnv().mkTerm(Kind.SELECT, expr, index);
 
-        Iterable<ValueAssignment> current;
-        if (expr.getSort().getArrayElementSort().isArray()) {
-          current = buildArrayAssignment(select, element);
-        } else {
-          Term equation = creator.getEnv().mkTerm(Kind.EQUAL, select, element);
-
-          current =
-              FluentIterable.of(
-                  new ValueAssignment(
-                      creator.encapsulate(creator.getFormulaType(element), select),
-                      creator.encapsulate(creator.getFormulaType(element), element),
-                      creator.encapsulateBoolean(equation),
-                      getVar(expr),
-                      creator.convertValue(element, element),
-                      FluentIterable.from(getArgs(select)).transform(this::evaluateImpl).toList()));
-        }
-        return FluentIterable.concat(current, buildArrayAssignment(expr, value.getChild(0)));
-
-      } else if (value.getKind().equals(Kind.CONST_ARRAY)) {
-        // We've reached the end of the Store chain
-        return ImmutableList.of();
-
+      Iterable<ValueAssignment> current;
+      if (expr.getSort().getArrayElementSort().isArray()) {
+        current = buildArrayAssignments(select, element);
       } else {
-        // Should be unreachable
-        // We assume that array values are made up of "const" and "store" nodes with non-array
-        // constants as leaves
-        throw new IllegalArgumentException();
+        Term equation = creator.getEnv().mkTerm(Kind.EQUAL, select, element);
+
+        current =
+            FluentIterable.of(
+                new ValueAssignment(
+                    creator.encapsulate(creator.getFormulaType(element), select),
+                    creator.encapsulate(creator.getFormulaType(element), element),
+                    creator.encapsulateBoolean(equation),
+                    getVar(expr),
+                    creator.convertValue(element, element),
+                    FluentIterable.from(getArgs(select)).transform(this::evaluateImpl).toList()));
       }
-    } catch (CVC5ApiException e) {
-      throw new RuntimeException(e);
+      return FluentIterable.concat(current, buildArrayAssignments(expr, value.getChild(0)));
+
+    } else if (value.getKind().equals(Kind.CONST_ARRAY)) {
+      // We've reached the end of the Store chain
+      return ImmutableList.of();
+
+    } else {
+      // Should be unreachable
+      // We assume that array values are made up of "const" and "store" nodes with non-array
+      // constants as leaves
+      throw new IllegalArgumentException();
     }
   }
 
-  private Iterable<ValueAssignment> getAssignment(Term pKeyTerm) {
+  private Iterable<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
-      try {
-        argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
-      } catch (CVC5ApiException e) {
-        throw new IndexOutOfBoundsException(
-            "Accessed a non existing UF value while creating a CVC5 model.");
-      }
+      argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
     }
 
     String nameStr;
@@ -283,7 +264,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
     Term valueTerm = solver.getValue(pKeyTerm);
     if (valueTerm.getSort().isArray()) {
-      return buildArrayAssignment(pKeyTerm, valueTerm);
+      return buildArrayAssignments(pKeyTerm, valueTerm);
     } else {
       Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
       Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
