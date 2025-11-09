@@ -168,13 +168,15 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
         keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
   }
 
-  /** Takes a (nested) select statement and returns its indices. */
+  /** Takes a (nested) select statement and returns its indices.
+   * For example: From "(SELECT (SELECT( SELECT 3 arr) 2) 1)" we return "[1,2,3]" */
   private Iterable<Term> getArgs(Term array) throws CVC5ApiException {
-    if (array.getKind().equals(Kind.SELECT)) {
-      return FluentIterable.concat(getArgs(array.getChild(0)), ImmutableList.of(array.getChild(1)));
-    } else {
-      return ImmutableList.of();
+    ImmutableList.Builder<Term> indices = ImmutableList.builder();
+    while (array.getKind().equals(Kind.SELECT)) {
+      indices.add(array.getChild(1));
+      array = array.getChild(0);
     }
+    return indices.build().reverse();
   }
 
   /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
