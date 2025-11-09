@@ -14,7 +14,6 @@ import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.truth.Truth;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
@@ -86,7 +85,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
  */
-@SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "test code")
 public abstract class SolverBasedTest0 {
 
   protected Configuration config;
@@ -228,7 +226,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support floor for rationals", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.OPENSMT);
+        .isNotEqualTo(Solvers.OPENSMT);
   }
 
   /** Skip test if the solver does not support bitvectors. */
@@ -279,7 +277,7 @@ public abstract class SolverBasedTest0 {
   }
 
   /** Skip test if the solver does not support arrays. */
-  protected /*final*/ void requireArrays() {
+  protected final void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
@@ -351,7 +349,6 @@ public abstract class SolverBasedTest0 {
   }
 
   protected void requireArrayModel() {
-    // INFO: OpenSmt does not support model generation for array
     assume()
         .withMessage("Solver %s does not support model generation for arrays", solverToUse())
         .that(solverToUse())

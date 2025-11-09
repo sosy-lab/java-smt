@@ -35,7 +35,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
-    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -56,7 +55,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testNoSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
-    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");

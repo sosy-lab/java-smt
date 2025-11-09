@@ -21,6 +21,16 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 public interface FormulaManager {
 
   /**
+   * Standardized message for not implemented API methods.
+   *
+   * <p>This constant can be used in {@link UnsupportedOperationException} to indicate that a
+   * certain method is not implemented by some subclass. We recommend using this constant in API
+   * extensions where the default implementation throws an exception.
+   */
+  String API_METHOD_NOT_IMPLEMENTED =
+      "The requested method is not implemented in the current implementation of this interface.";
+
+  /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
    * and Rational-Theory, the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.

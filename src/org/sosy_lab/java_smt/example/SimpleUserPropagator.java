@@ -193,11 +193,13 @@ public final class SimpleUserPropagator {
         if (getBackend().propagateNextDecision(disExpr, Optional.of(decisionValue))) {
           // The above call returns "true" if the provided literal is yet undecided, otherwise
           // false.
-          logger.log(
+          logger.logf(
               Level.INFO,
-              String.format(
-                  "User propagator overwrites decision from '%s = %s' to '%s = %s'",
-                  expr, value, disExpr, decisionValue));
+              "User propagator overwrites decision from '%s = %s' to '%s = %s'",
+              expr,
+              value,
+              disExpr,
+              decisionValue);
           break;
         }
       }

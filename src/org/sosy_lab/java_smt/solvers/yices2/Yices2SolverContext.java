@@ -73,6 +73,7 @@ public class Yices2SolverContext extends AbstractSolverContext {
     Yices2RationalFormulaManager rationalTheory =
         new Yices2RationalFormulaManager(creator, pNonLinearArithmetic);
     Yices2QuantifiedFormulaManager quantTheory = new Yices2QuantifiedFormulaManager(creator);
+    Yices2ArrayFormulaManager arrayTheory = new Yices2ArrayFormulaManager(creator);
     Yices2FormulaManager manager =
         new Yices2FormulaManager(
             creator,
@@ -81,7 +82,8 @@ public class Yices2SolverContext extends AbstractSolverContext {
             integerTheory,
             rationalTheory,
             bitvectorTheory,
-            quantTheory);
+            quantTheory,
+            arrayTheory);
     return new Yices2SolverContext(manager, creator, booleanTheory, pShutdownManager);
   }
 

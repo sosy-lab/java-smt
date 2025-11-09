@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final boolean generateModels;
-  private final boolean generateAllSat;
+  protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
