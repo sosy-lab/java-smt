@@ -19,6 +19,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.Collection;
+import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -178,7 +179,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   }
 
   /** Build assignment for an array value. */
-  private Iterable<ValueAssignment> buildArrayAssignments(Term expr, Term value)
+  private List<ValueAssignment> buildArrayAssignments(Term expr, Term value)
       throws CVC5ApiException {
     // CVC5 returns values such as "(Store (Store ... i1,1 e1,1) i1,0 e1,0)" where the i1,x match
     // the first index of the array and the elements e1,Y can again be arrays (if there is more
@@ -216,10 +217,11 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
       Iterable<ValueAssignment> current;
       if (expr.getSort().getArrayElementSort().isArray()) {
+        // nested array element
         current = buildArrayAssignments(select, element);
       } else {
+        // final element
         Term equation = creator.getEnv().mkTerm(Kind.EQUAL, select, element);
-
         current =
             FluentIterable.of(
                 new ValueAssignment(
@@ -230,7 +232,8 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
                     creator.convertValue(element, element),
                     FluentIterable.from(getArgs(select)).transform(this::evaluateImpl).toList()));
       }
-      return FluentIterable.concat(current, buildArrayAssignments(expr, value.getChild(0)));
+      // continue with the next Store in the chain
+      return FluentIterable.concat(current, buildArrayAssignments(expr, value.getChild(0))).toList();
 
     } else if (value.getKind().equals(Kind.CONST_ARRAY)) {
       // We've reached the end of the Store chain
@@ -244,7 +247,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     }
   }
 
-  private Iterable<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
+  private List<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
       argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
