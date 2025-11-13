@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -18,6 +18,7 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -160,7 +161,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
    * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
    * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
    */
-  private Iterable<Term> getArgs(Term array) throws CVC5ApiException {
+  private Iterable<Term> getArrayIndices(Term array) throws CVC5ApiException {
     ImmutableList.Builder<Term> indices = ImmutableList.builder();
     while (array.getKind().equals(Kind.SELECT)) {
       indices.add(array.getChild(1));
@@ -207,44 +208,43 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     // Once we've reached the last index, the successor element will be a non-array value. We
     // then create the final assignments and return:
     //  (Select iK,mK ... (Select i2,1 (Select i1,0 arr)) = eik,mK
-    if (value.getKind().equals(Kind.STORE)) {
-      // This is a Store node for the current index. We need to follow the chain downwards to
-      // match this index, while also exploring the successor for the other indices
+
+    // Iterate down the Store-chain: (Store tail index element)
+    List<ValueAssignment> result = new ArrayList<>();
+    while (value.getKind().equals(Kind.STORE)) {
       Term index = value.getChild(1);
       Term element = value.getChild(2);
-
       Term select = creator.getEnv().mkTerm(Kind.SELECT, expr, index);
 
-      Iterable<ValueAssignment> current;
+      // CASE 1: nested array dimension, let's recurse deeper
       if (expr.getSort().getArrayElementSort().isArray()) {
-        // nested array element
-        current = buildArrayAssignments(select, element);
+        result.addAll(buildArrayAssignments(select, element));
+
       } else {
-        // final element
+        // CASE 2: final element, let's get the assignment and proceed with its sibling
         Term equation = creator.getEnv().mkTerm(Kind.EQUAL, select, element);
-        current =
-            FluentIterable.of(
-                new ValueAssignment(
-                    creator.encapsulate(creator.getFormulaType(element), select),
-                    creator.encapsulate(creator.getFormulaType(element), element),
-                    creator.encapsulateBoolean(equation),
-                    getVar(expr),
-                    creator.convertValue(element, element),
-                    FluentIterable.from(getArgs(select)).transform(this::evaluateImpl).toList()));
+        result.add(
+            new ValueAssignment(
+                creator.encapsulate(creator.getFormulaType(element), select),
+                creator.encapsulate(creator.getFormulaType(element), element),
+                creator.encapsulateBoolean(equation),
+                getVar(expr),
+                creator.convertValue(element, element),
+                FluentIterable.from(getArrayIndices(select)).transform(this::evaluateImpl).toList()));
       }
-      // continue with the next Store in the chain
-      return FluentIterable.concat(current, buildArrayAssignments(expr, value.getChild(0))).toList();
 
-    } else if (value.getKind().equals(Kind.CONST_ARRAY)) {
-      // We've reached the end of the Store chain
-      return ImmutableList.of();
-
-    } else {
-      // Should be unreachable
-      // We assume that array values are made up of "const" and "store" nodes with non-array
-      // constants as leaves
-      throw new IllegalArgumentException();
+      // Move to the next Store in the chain
+      value = value.getChild(0);
     }
+
+    // End of chain must be CONST_ARRAY
+    if (value.getKind().equals(Kind.CONST_ARRAY)) {
+      return result;
+    }
+
+    // Should be unreachable, because we assume that
+    // array values are made up of "const" and "store" nodes with non-array constants as leaves.
+    throw new IllegalArgumentException("Unexpected array value structure");
   }
 
   private List<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
