@@ -1737,6 +1737,27 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
   }
 
+  @Test
+  public void testArrayWithManyValues() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArrays();
+    requireArrayModel();
+
+    // Let's store N values into an array and check that each one is in the model.
+    // The example array formula is: for x in [1...N]: arr = store(arr, i_x, x)
+    // as SMTLIB: arr = store(store(store(... store(array, 0, 0), 1, 1), ... , N-1, N-1)
+    ArrayFormula<IntegerFormula, IntegerFormula> array =
+        amgr.makeArray("array", IntegerType, IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> storedArray = array;
+    final int numValues = 100;
+    for (int i = 0; i < numValues; i++) {
+      storedArray = amgr.store(storedArray, imgr.makeNumber(i), imgr.makeNumber(i));
+    }
+    BooleanFormula query = amgr.equivalence(array, storedArray);
+
+    testModelIterator(query);
+  }
+
   private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
