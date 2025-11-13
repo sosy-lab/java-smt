@@ -8,8 +8,9 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
+import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import io.github.cvc5.CVC5ApiException;
@@ -53,7 +54,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   @Override
   public Term evalImpl(Term f) {
-    Preconditions.checkState(!isClosed());
+    checkState(!isClosed());
     return solver.getValue(f);
   }
 
@@ -161,7 +162,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
    * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
    * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
    */
-  private Iterable<Term> getArrayIndices(Term array) throws CVC5ApiException {
+  private ImmutableList<Term> getArrayIndices(Term array) throws CVC5ApiException {
     ImmutableList.Builder<Term> indices = ImmutableList.builder();
     while (array.getKind().equals(Kind.SELECT)) {
       indices.add(array.getChild(1));
@@ -179,7 +180,14 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     }
   }
 
-  /** Build assignment for an array value. */
+  /**
+   * Build assignment for an array value.
+   *
+   * @param expr The array term, e.g., a variable
+   * @param value The model value term returned by CVC5 for the array, e.g., a Store chain
+   * @return A list of value assignments for all elements in the array, including nested arrays
+   * @throws CVC5ApiException If CVC5 API calls fail
+   */
   private List<ValueAssignment> buildArrayAssignments(Term expr, Term value)
       throws CVC5ApiException {
     // CVC5 returns values such as "(Store (Store ... i1,1 e1,1) i1,0 e1,0)" where the i1,x match
@@ -230,21 +238,18 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
                 creator.encapsulateBoolean(equation),
                 getVar(expr),
                 creator.convertValue(element, element),
-                FluentIterable.from(getArrayIndices(select)).transform(this::evaluateImpl).toList()));
+                transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
       }
 
       // Move to the next Store in the chain
       value = value.getChild(0);
     }
 
-    // End of chain must be CONST_ARRAY
-    if (value.getKind().equals(Kind.CONST_ARRAY)) {
-      return result;
-    }
+    // End of chain must be CONST_ARRAY.
+    checkState(
+        value.getKind().equals(Kind.CONST_ARRAY), "Unexpected array value structure: %s", value);
 
-    // Should be unreachable, because we assume that
-    // array values are made up of "const" and "store" nodes with non-array constants as leaves.
-    throw new IllegalArgumentException("Unexpected array value structure");
+    return result;
   }
 
   private List<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
