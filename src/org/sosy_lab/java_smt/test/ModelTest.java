@@ -226,7 +226,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testGetBvUfs() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Some names are specificly chosen to test the Boolector model
+    // Some names are specifically chosen to test the Boolector model
     // Use 1 instead of 0 or max bv value, as solvers tend to use 0, min or max as default
     for (String ufName : VARIABLE_NAMES) {
       testModelGetters(
@@ -584,18 +584,18 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
 
-    // create query: "(var == 1) && exists bound : (bound == 0 && var == func(bound))"
-    // then check that the model contains an evaluation "func(0) := 1"
+    // create query: "(var == 1) && exists bound : (bound == 2 && var == func(bound))"
+    // then check that the model contains an evaluation "func(2) := 1"
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
     IntegerFormula boundVar = imgr.makeVariable("boundVar");
-    BooleanFormula boundVarIsZero = imgr.equal(boundVar, imgr.makeNumber(2));
+    BooleanFormula boundVarIsTwo = imgr.equal(boundVar, imgr.makeNumber(2));
 
     String func = "func";
     IntegerFormula funcAtTwo = fmgr.declareAndCallUF(func, IntegerType, imgr.makeNumber(2));
     IntegerFormula funcAtBoundVar = fmgr.declareAndCallUF(func, IntegerType, boundVar);
 
-    BooleanFormula body = bmgr.and(boundVarIsZero, imgr.equal(var, funcAtBoundVar));
+    BooleanFormula body = bmgr.and(boundVarIsTwo, imgr.equal(var, funcAtBoundVar));
     BooleanFormula f = bmgr.and(varIsOne, qmgr.exists(ImmutableList.of(boundVar), body));
     IntegerFormula one = imgr.makeNumber(1);
 
@@ -2584,7 +2584,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // A depth of 16 results in 65.536 paths and model generation requires about 10-20 seconds if
     // badly implemented.
     // We expect the following model-generation to be 'fast', e.g., the 17 variables should be
-    // evaluated in an instant. If the time consumption is high, there is a bug in JavaSMT.
+    // evaluated in an instant. If the time consumption is high, there is a bug or bad performing
+    // implementation in JavaSMT.
     evaluateInModel(f, bmgr.makeVariable("basis"), true);
   }
 
