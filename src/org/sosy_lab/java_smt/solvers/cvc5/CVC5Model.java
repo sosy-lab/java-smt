@@ -133,12 +133,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       }
     }
 
-    // In applied UFs, the child with the name is the 0th child (as it is the declaration)
-    String nameStr = pKeyTerm.getChild(0).getSymbol();
-    if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
-      nameStr = nameStr.substring(1, nameStr.length() - 1);
-    }
-
+    String nameStr = ((CVC5FormulaCreator) creator).getName(pKeyTerm);
     Term valueTerm;
     // You can't get a value if there is a bound variable present
     if (!boundFound) {
@@ -258,18 +253,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
     }
 
-    String nameStr;
-    if (pKeyTerm.hasSymbol()) {
-      nameStr = pKeyTerm.getSymbol();
-    } else {
-      // Default if there is no name
-      nameStr = "UNKNOWN_VARIABLE";
-    }
-
-    if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
-      nameStr = nameStr.substring(1, nameStr.length() - 1);
-    }
-
+    String nameStr = ((CVC5FormulaCreator) creator).getName(pKeyTerm);
     Term valueTerm = solver.getValue(pKeyTerm);
     if (valueTerm.getSort().isArray()) {
       return buildArrayAssignments(pKeyTerm, valueTerm);
