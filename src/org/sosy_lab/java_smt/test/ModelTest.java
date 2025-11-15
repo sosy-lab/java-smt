@@ -19,6 +19,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Range;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -1837,10 +1838,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     }
     BooleanFormula query = amgr.equivalence(array, storedArray);
 
-    testModelIterator(query);
+    List<ValueAssignment> assignments = testModelIterator(query);
+
+    // Check that we only provide relevant assignments and ignore solver-internal variables.
+    // Allow about 100 assignments plus small overhead, for arr[x] := x for 0 to 99.
+    // Some solvers return additional assignments for constant array assignments.
+    assertThat(assignments.size()).isIn(Range.closedOpen(99, 102));
   }
 
-  private void testModelIterator(BooleanFormula f) throws SolverException, InterruptedException {
+  private ImmutableList<ValueAssignment> testModelIterator(BooleanFormula f)
+      throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
 
@@ -1851,6 +1858,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
           // Check that we can iterate through with no crashes.
         }
         assertThat(prover.getModelAssignments()).containsExactlyElementsIn(m).inOrder();
+        return m.asList();
       }
     }
   }
