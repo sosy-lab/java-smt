@@ -20,6 +20,7 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Range;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -1846,6 +1847,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assertThat(assignments.size()).isIn(Range.closedOpen(99, 102));
   }
 
+  @CanIgnoreReturnValue
   private ImmutableList<ValueAssignment> testModelIterator(BooleanFormula f)
       throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
