@@ -88,7 +88,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
    * @throws CVC5ApiException if CVC5 API calls fail
    */
   private ValueAssignment getAssignmentForUfInstantiation(Term pKeyTerm) throws CVC5ApiException {
-    // An uninterpreted function "(UF_NAME ARGS...) consist of N+1 children,
+    // An uninterpreted function "(UF_NAME ARGS...)" consist of N+1 children,
     // the first child is the function definition as a lambda and the result,
     // while the remaining children are the arguments.
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
