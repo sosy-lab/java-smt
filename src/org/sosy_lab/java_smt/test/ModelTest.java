@@ -586,9 +586,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("CVC5 does not provide a direct model for UFs used in quantified context")
+        .withMessage(
+            "CVC4 and CVC5 do not provide a direct model for UFs used in quantified context")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     // create query: "(var == 1) && exists bound : (bound == 2 && var == func(bound))"
     // then check that the model contains an evaluation "func(2) := 1"
@@ -614,18 +615,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             BigInteger.ONE,
             ImmutableList.of(BigInteger.TWO));
 
-    // CVC4 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4) {
-      expectedValueAssignment =
-          new ValueAssignment(
-              funcAtBoundVar,
-              one,
-              imgr.equal(funcAtBoundVar, one),
-              func,
-              BigInteger.ONE,
-              ImmutableList.of("boundVar"));
-    }
-
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover).isSatisfiable();
@@ -649,9 +638,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("CVC5 does not provide a direct model for UFs used in quantified context")
+        .withMessage(
+            "CVC4 and CVC5 do not provide a direct model for UFs used in quantified context")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     IntegerFormula var = imgr.makeVariable("var");
     BooleanFormula varIsOne = imgr.equal(var, imgr.makeNumber(1));
@@ -677,18 +667,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
             BigInteger.ONE,
             ImmutableList.of(BigInteger.ZERO));
 
-    // CVC4 does not give back bound variable values. Not even in UFs.
-    if (solverToUse() == Solvers.CVC4) {
-      expectedValueAssignment =
-          new ValueAssignment(
-              funcAtBoundVar,
-              one,
-              imgr.equal(funcAtBoundVar, one),
-              func,
-              BigInteger.ONE,
-              ImmutableList.of("boundVar"));
-    }
-
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(f);
       assertThat(prover).isSatisfiable();
@@ -712,13 +690,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .that(solverToUse())
         .isNotEqualTo(Solvers.YICES2);
     assume()
-        .withMessage("CVC4 does not provide a direct model for UFs used in quantified context")
+        .withMessage(
+            "CVC4 and CVC5 do not provide a direct model for UFs used in quantified context")
         .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC4);
-    assume()
-        .withMessage("CVC5 does not provide a direct model for UFs used in quantified context")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
+        .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
     IntegerFormula num5 = imgr.makeNumber(5);
     IntegerFormula num6 = imgr.makeNumber(6);
@@ -2668,9 +2643,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // Warning: do never call "toString" on this formula!
     BooleanFormula f = bmgr.makeVariable("basis");
 
-    // JavaSMT's model code for CVC4 has performance problems with very deep formulas.
-    // Other solvers work fine. A max depth of 30 should be fine for all solvers.
-    int maxDepth = solverToUse() == Solvers.CVC4 ? 15 : 30;
+    int maxDepth = 30; // if every solver is fast enough, we could increase this number up to 100.
 
     for (int depth = 0; depth < maxDepth; depth++) {
       T var = makeVar.apply(depth);
