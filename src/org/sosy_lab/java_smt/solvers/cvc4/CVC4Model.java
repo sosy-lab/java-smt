@@ -23,8 +23,6 @@ import edu.stanford.CVC4.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
@@ -65,16 +63,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   private ImmutableList<ValueAssignment> generateModel(Collection<Expr> assertedExpressions) {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
     for (Expr expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(
-          expr,
-          true,
-          (name, f) -> {
-            if (f.getKind() == Kind.APPLY_UF) {
-              builder.add(getAssignmentForUfInstantiation(f));
-            } else {
-              builder.addAll(getAssignments(f));
-            }
-          });
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
     }
     return builder.build().asList();
   }
@@ -87,23 +76,21 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
    */
   private ValueAssignment getAssignmentForUfInstantiation(Expr pKeyExpr) {
     // An uninterpreted function "(UF_NAME ARGS...)" consist of N children,
-    // each child is one arguments, and the UF itself is the operator of the keyExpr.
+    // each child is one argument, and the UF itself is the operator of the keyExpr.
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyExpr.getNumChildren(); i++) {
       Expr child = pKeyExpr.getChild(i);
       argumentInterpretationBuilder.add(evaluateImpl(child));
     }
 
-    String nameStr = CVC4FormulaCreator.getName(pKeyExpr);
-    Expr valueExpr = getValue(pKeyExpr);
-    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyExpr);
-    Formula valueFormula = creator.encapsulateWithTypeOf(valueExpr);
-    BooleanFormula equation =
-        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr));
-    Object value = creator.convertValue(pKeyExpr, valueExpr);
-
+    final Expr valueExpr = getValue(pKeyExpr);
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
+        creator.encapsulateWithTypeOf(pKeyExpr),
+        creator.encapsulateWithTypeOf(valueExpr),
+        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
+        CVC4FormulaCreator.getName(pKeyExpr),
+        creator.convertValue(pKeyExpr, valueExpr),
+        argumentInterpretationBuilder.build());
   }
 
   /**
@@ -150,12 +137,11 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
       } else {
         // CASE 2: final element, let's get the assignment and proceed with its sibling
-        Expr equation = creator.getEnv().mkExpr(Kind.EQUAL, select, element);
         result.add(
             new ValueAssignment(
                 creator.encapsulate(creator.getFormulaType(element), select),
                 creator.encapsulate(creator.getFormulaType(element), element),
-                creator.encapsulateBoolean(equation),
+                creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, select, element)),
                 getVar(expr),
                 creator.convertValue(element, element),
                 transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
@@ -173,30 +159,30 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
   }
 
   private List<ValueAssignment> getAssignments(Expr pKeyExpr) {
+
+    // handle UF instantiations
+    if (pKeyExpr.getKind() == Kind.APPLY_UF) {
+      return ImmutableList.of(getAssignmentForUfInstantiation(pKeyExpr));
+    }
+    // handle array assignments
+    final Expr valueExpr = getValue(pKeyExpr);
+    if (valueExpr.getType().isArray()) {
+      return buildArrayAssignments(pKeyExpr, valueExpr);
+    }
+
+    // handle simple assignments
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyExpr.getNumChildren(); i++) {
       argumentInterpretationBuilder.add(evaluateImpl(pKeyExpr.getChild(i)));
     }
-
-    String nameStr = CVC4FormulaCreator.getName(pKeyExpr);
-    Expr valueExpr = getValue(pKeyExpr);
-    if (valueExpr.getType().isArray()) {
-      return buildArrayAssignments(pKeyExpr, valueExpr);
-    } else {
-      Formula keyFormula = creator.encapsulateWithTypeOf(pKeyExpr);
-      Formula valueFormula = creator.encapsulateWithTypeOf(valueExpr);
-      BooleanFormula equation =
-          creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr));
-      Object value = creator.convertValue(pKeyExpr, valueExpr);
-      return ImmutableList.of(
-          new ValueAssignment(
-              keyFormula,
-              valueFormula,
-              equation,
-              nameStr,
-              value,
-              argumentInterpretationBuilder.build()));
-    }
+    return ImmutableList.of(
+        new ValueAssignment(
+            creator.encapsulateWithTypeOf(pKeyExpr),
+            creator.encapsulateWithTypeOf(valueExpr),
+            creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
+            CVC4FormulaCreator.getName(pKeyExpr),
+            creator.convertValue(pKeyExpr, valueExpr),
+            argumentInterpretationBuilder.build()));
   }
 
   @Override
