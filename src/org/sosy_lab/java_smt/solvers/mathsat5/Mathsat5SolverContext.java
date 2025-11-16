@@ -200,7 +200,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       msatEnv = msat_create_env(msatConf);
     }
     // Create Mathsat5FormulaCreator
-    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
+    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv, settings.loadOptimathsat5);
 
     // Create managers
     Mathsat5UFManager functionTheory = new Mathsat5UFManager(creator);
@@ -214,8 +214,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
-    Mathsat5EnumerationFormulaManager enumerationTheory =
-        new Mathsat5EnumerationFormulaManager(creator);
+    Mathsat5EnumerationFormulaManager enumerationTheory = null;
+    if (!settings.loadOptimathsat5) {
+      // OptiMathSAT does not support enumerations
+      enumerationTheory = new Mathsat5EnumerationFormulaManager(creator);
+    }
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
