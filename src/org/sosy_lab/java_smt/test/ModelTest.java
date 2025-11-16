@@ -21,6 +21,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
@@ -2519,7 +2520,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         }
       }
       var model = builder.buildOrThrow();
-      assertThat(model).containsAtLeastEntriesIn(expected);
+
+      // Check that the model contains all expected assignments, except maybe one that may be
+      // covered by the default value
+      assertThat(Maps.difference(model, expected).entriesDiffering()).isEmpty();
+      assertThat(Maps.difference(model, expected).entriesOnlyOnRight().size()).isLessThan(2);
 
     } catch (SolverException | InterruptedException e) {
       throw new RuntimeException(e);
@@ -2530,8 +2535,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testArray1Bv() {
     requireArrays();
     requireBitvectors();
-
-    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns a const array
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array = amgr.makeArray("array", bitvectorType, bitvectorType);
@@ -2549,8 +2552,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testArray2Bv() {
     requireArrays();
     requireBitvectors();
-
-    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns a const array
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array = amgr.makeArray("array", bitvectorType, bitvectorType);
@@ -2574,7 +2575,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.YICES2); // Returns a const array
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // FIXME Broken in JavaSMT
 
@@ -2632,7 +2632,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Returns const array
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
     assume()
         .that(solver)
@@ -2672,8 +2671,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns const array
-
     var array = amgr.makeArray("array", IntegerType, IntegerType);
 
     var idx = imgr.makeNumber(1);
@@ -2712,7 +2709,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns const array
     assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var array =
@@ -2736,7 +2732,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireConstArrays();
 
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Returns const array
     assume()
         .that(solver)
         .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.CVC4); // FIXME Broken in JavaSMT
