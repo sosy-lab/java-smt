@@ -114,11 +114,10 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
   private String getVar(Term array) throws CVC5ApiException {
-    if (array.getKind().equals(Kind.SELECT)) {
-      return getVar(array.getChild(0));
-    } else {
-      return array.getSymbol();
+    while (array.getKind().equals(Kind.SELECT)) {
+      array = array.getChild(0);
     }
+    return array.getSymbol();
   }
 
   /**

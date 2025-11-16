@@ -51,7 +51,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
-  private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
   private final int randomSeed;
   private final ImmutableMap<String, String> furtherOptionsMap;
@@ -75,7 +74,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ImmutableMap<String, String> pFurtherOptionsMap) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
-    mgr = pMgr;
     creator = pFormulaCreator;
     furtherOptionsMap = pFurtherOptionsMap;
     randomSeed = pRandomSeed;
