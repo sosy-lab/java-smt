@@ -86,7 +86,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(getBitvectorTypeWithSize(32), getBitvectorTypeWithSize(32));
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3);
+      ImmutableList.of(Solvers.Z3, Solvers.PRINCESS);
 
   @Before
   public void setup() {
@@ -1327,15 +1327,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
+    // We're having some issues handling arrays with more than one index in our Princess backend
+    // TODO Enable this test once model generation is fixed
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
     requireParser();
     requireIntegers();
     requireArrays();
     requireArrayModel();
-
-    assume()
-        .withMessage("As of now, only Princess does not support multi-dimensional arrays")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
