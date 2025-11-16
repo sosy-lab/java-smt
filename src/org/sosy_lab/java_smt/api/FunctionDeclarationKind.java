@@ -262,21 +262,6 @@ public enum FunctionDeclarationKind {
   FP_EQ,
 
   /** Rounding over floating points. */
-  FP_ROUND_EVEN,
-
-  /** Rounding over floating points. */
-  FP_ROUND_AWAY,
-
-  /** Rounding over floating points. */
-  FP_ROUND_POSITIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_NEGATIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_ZERO,
-
-  /** Rounding over floating points. */
   FP_ROUND_TO_INTEGRAL,
 
   /** Further FP queries. */

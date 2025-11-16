@@ -10,13 +10,13 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
-import edu.stanford.CVC4.BitVectorExtract;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.FloatingPoint;
 import edu.stanford.CVC4.FloatingPointConvertSort;
 import edu.stanford.CVC4.FloatingPointSize;
 import edu.stanford.CVC4.FloatingPointToFPFloatingPoint;
+import edu.stanford.CVC4.FloatingPointToFPIEEEBitVector;
 import edu.stanford.CVC4.FloatingPointToFPSignedBitVector;
 import edu.stanford.CVC4.FloatingPointToFPUnsignedBitVector;
 import edu.stanford.CVC4.FloatingPointToSBV;
@@ -358,20 +358,10 @@ public class CVC4FloatingPointFormulaManager
 
   @Override
   protected Expr fromIeeeBitvectorImpl(Expr bitvector, FloatingPointType pTargetType) {
-    int mantissaSize = pTargetType.getMantissaSize();
-    int exponentSize = pTargetType.getExponentSize();
-    int size = pTargetType.getTotalSize();
-    assert size == mantissaSize + exponentSize + 1;
-
-    Expr signExtract = exprManager.mkConst(new BitVectorExtract(size - 1, size - 1));
-    Expr exponentExtract = exprManager.mkConst(new BitVectorExtract(size - 2, mantissaSize));
-    Expr mantissaExtract = exprManager.mkConst(new BitVectorExtract(mantissaSize - 1, 0));
-
-    Expr sign = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, signExtract, bitvector);
-    Expr exponent = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, exponentExtract, bitvector);
-    Expr mantissa = exprManager.mkExpr(Kind.BITVECTOR_EXTRACT, mantissaExtract, bitvector);
-
-    return exprManager.mkExpr(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
+    // This is just named weird, but the CVC4 doc say this is IEEE BV -> FP
+    FloatingPointConvertSort fpConvertSort = new FloatingPointConvertSort(getFPSize(pTargetType));
+    Expr op = exprManager.mkConst(new FloatingPointToFPIEEEBitVector(fpConvertSort));
+    return exprManager.mkExpr(op, bitvector);
   }
 
   @Override
