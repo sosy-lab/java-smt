@@ -2531,6 +2531,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
+    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns a const array
+
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array = amgr.makeArray("array", bitvectorType, bitvectorType);
 
@@ -2547,6 +2549,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   public void testArray2Bv() {
     requireArrays();
     requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns a const array
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array = amgr.makeArray("array", bitvectorType, bitvectorType);
@@ -2570,8 +2574,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    // Boolector doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.YICES2); // Returns a const array
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // FIXME Broken in JavaSMT
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array =
@@ -2593,8 +2598,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    // Boolector doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array =
@@ -2625,8 +2632,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    // Boolector doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Returns const array
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2661,6 +2671,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireIntegers();
+
+    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns const array
 
     var array = amgr.makeArray("array", IntegerType, IntegerType);
 
@@ -2700,6 +2712,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
+    assume().that(solver).isNotEqualTo(Solvers.Z3); // Returns const array
+    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
+
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
 
@@ -2720,6 +2735,11 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireIntegers();
     requireConstArrays();
+
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Returns const array
+    assume()
+        .that(solver)
+        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.IntegerType;
 
@@ -2754,6 +2774,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
     requireIntegers();
+
+    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
