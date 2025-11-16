@@ -2719,6 +2719,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
     requireArrays();
     requireIntegers();
+    requireConstArrays();
 
     var scalarType = FormulaType.IntegerType;
 
