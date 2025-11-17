@@ -85,6 +85,11 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
   protected void popImpl() {
     if (size() < stackSizeToUnsat) { // constraintStack and Yices stack have same level.
       yices_pop(curEnv);
@@ -119,6 +124,8 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
     boolean unsat;
     if (generateUnsatCores) { // unsat core does not work with incremental mode
       int[] allConstraints = getAllConstraints();
@@ -133,6 +140,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
         // set to current constraintStack size.
       }
     }
+    wasLastSatCheckSatisfiable = !unsat;
     return unsat;
   }
 
@@ -145,6 +153,7 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
     // TODO handle BooleanFormulaCollection / check for literals
     return !yices_check_sat_with_assumptions(
         curEnv, DEFAULT_PARAMS, pAssumptions.size(), uncapsulate(pAssumptions), shutdownNotifier);
@@ -153,7 +162,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
@@ -182,7 +190,6 @@ class Yices2TheoremProver extends AbstractProverWithAllSat<Void> implements Prov
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     return getUnsatCore0();
   }

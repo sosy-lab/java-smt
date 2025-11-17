@@ -74,6 +74,9 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   @Override
   public OptStatus check() throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+
     int status;
     try {
       status =
@@ -96,6 +99,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
           Native.optimizeGetReasonUnknown(z3context, z3optSolver));
       return OptStatus.UNDEF;
     } else {
+      wasLastSatCheckSatisfiable = true;
       return OptStatus.OPT;
     }
   }

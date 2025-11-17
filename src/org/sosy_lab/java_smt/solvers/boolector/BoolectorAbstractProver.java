@@ -33,8 +33,6 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final long btor;
   private final BoolectorFormulaManager manager;
   private final BoolectorFormulaCreator creator;
-  protected final AtomicBoolean wasLastSatCheckSat =
-      new AtomicBoolean(false); // and stack is not changed
   private final TerminationCallback terminationCallback;
   private final long terminationCallbackHelper;
 
@@ -64,6 +62,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
   public void close() {
     if (!closed) {
       // Free resources of callback
@@ -84,10 +87,11 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    wasLastSatCheckSat.set(false);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
-      wasLastSatCheckSat.set(true);
+      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;
@@ -127,16 +131,18 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat.get(), NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
 
   @Override
   protected BoolectorModel getEvaluatorWithoutChecks() {
-    return new BoolectorModel(
-        btor, creator, this, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
+    return registerEvaluator(
+        new BoolectorModel(
+            btor,
+            creator,
+            this,
+            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override

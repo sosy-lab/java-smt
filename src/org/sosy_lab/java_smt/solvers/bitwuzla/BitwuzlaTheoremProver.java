@@ -47,7 +47,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   private final BitwuzlaFormulaManager manager;
 
   private final BitwuzlaFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected BitwuzlaTheoremProver(
       BitwuzlaFormulaManager pManager,
@@ -81,6 +80,11 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     return new Bitwuzla(creator.getTermManager(), pSolverOptions);
   }
 
+  @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
   /**
    * Remove one backtracking point/level from the current stack. This removes the latest level
    * including all of its formulas, i.e., all formulas that were added for this backtracking point.
@@ -92,7 +96,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
 
   @Override
   public @Nullable Void addConstraintImpl(BooleanFormula constraint) throws InterruptedException {
-    wasLastSatCheckSat = false;
     Term formula = creator.extractInfo(constraint);
     env.assert_formula(formula);
     for (Term t : creator.getConstraintsForTerm(formula)) {
@@ -114,8 +117,10 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   }
 
   private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
     if (resultValue == Result.SAT) {
-      wasLastSatCheckSat = true;
+      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
@@ -130,7 +135,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
     final Result result = env.check_sat();
     return readSATResult(result);
   }
@@ -145,7 +149,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
 
     Collection<Term> newAssumptions = new LinkedHashSet<>();
     for (BooleanFormula formula : assumptions) {
@@ -170,8 +173,6 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(
         registerEvaluator(
@@ -196,9 +197,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
    */
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!wasLastSatCheckSat);
     return getUnsatCore0();
   }
 
@@ -215,8 +214,8 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
     Preconditions.checkState(!closed);
-    checkGenerateUnsatCores(); // FIXME: JavaDoc say ProverOptions.GENERATE_UNSAT_CORE is not needed
-    Preconditions.checkState(!wasLastSatCheckSat);
+    checkGenerateUnsatCoresOverAssumptions();
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }

@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
@@ -29,7 +28,6 @@ import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -42,7 +40,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   private final CVC4FormulaCreator creator;
   private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
-  private boolean changedSinceLastSatQuery = false;
 
   /**
    * The local exprManager allows to set options per Prover (and not globally). See <a
@@ -114,7 +111,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void pushImpl() throws InterruptedException {
-    setChanged();
     if (incremental) {
       smtEngine.push();
     }
@@ -122,7 +118,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   protected void popImpl() {
-    setChanged();
     if (incremental) {
       smtEngine.pop();
     }
@@ -131,7 +126,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
-    setChanged();
     if (incremental) {
       assertFormula(pF);
     }
@@ -150,8 +144,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @SuppressWarnings("resource")
   @Override
   public CVC4Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
     // special case for CVC4: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
@@ -165,7 +157,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -176,18 +167,9 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     return registerEvaluator(new CVC4Evaluator(this, creator, smtEngine));
   }
 
-  private void setChanged() {
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      closeAllEvaluators();
-    }
-  }
-
   @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
+  protected boolean hasPersistentModel() {
+    return false;
   }
 
   @Override
@@ -196,6 +178,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     Preconditions.checkState(!closed);
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+
     if (!incremental) {
       // in non-incremental mode, we need to create a new solver instance for each sat check
       createNewEngine();
@@ -223,6 +207,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       }
     }
     if (result.isSat() == Result.Sat.SAT) {
+      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (result.isSat() == Result.Sat.UNSAT) {
       return true;
@@ -233,9 +218,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Expr aCore : smtEngine.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(exportExpr(aCore)));

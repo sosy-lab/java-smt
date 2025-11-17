@@ -29,12 +29,17 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
+  // flags for option
   protected final boolean generateModels;
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
+
+  // flags for status
   protected boolean closed = false;
+  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  protected boolean changedSinceLastSatQuery = false; // assume not-changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -60,6 +65,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkGenerateModels() {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
+    Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
   }
 
   protected final void checkGenerateAllSat() {
@@ -68,6 +76,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkGenerateUnsatCores() {
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkGenerateUnsatCoresOverAssumptions() {
@@ -81,6 +92,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 
+  protected abstract boolean hasPersistentModel();
+
+  private void setChanged() {
+    if (!changedSinceLastSatQuery) {
+      changedSinceLastSatQuery = true;
+      if (!hasPersistentModel()) {
+        closeAllEvaluators();
+      }
+    }
+  }
+
   @Override
   public int size() {
     checkState(!closed);
@@ -91,6 +113,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final void push() throws InterruptedException {
     checkState(!closed);
     pushImpl();
+    setChanged();
+    wasLastSatCheckSatisfiable = false;
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
@@ -102,6 +126,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
+    setChanged();
+    wasLastSatCheckSatisfiable = false;
   }
 
   protected abstract void popImpl();
@@ -111,6 +137,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
     T t = addConstraintImpl(constraint);
+    setChanged();
+    wasLastSatCheckSatisfiable = false;
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;
   }

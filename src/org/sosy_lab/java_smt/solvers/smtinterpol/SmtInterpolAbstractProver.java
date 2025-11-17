@@ -76,6 +76,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
+  @Override
   protected void pushImpl() {
     annotatedTerms.add(annotatedTerms.peek());
     env.push(1);
@@ -104,6 +109,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public boolean isUnsat() throws InterruptedException {
     checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
 
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
@@ -114,6 +121,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     LBool result = env.checkSat();
     switch (result) {
       case SAT:
+        wasLastSatCheckSatisfiable = true;
         return false;
       case UNSAT:
         return true;
@@ -141,7 +149,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @SuppressWarnings("resource")
   @Override
   public org.sosy_lab.java_smt.api.Model getModel() {
-    checkState(!closed);
     checkGenerateModels();
     final Model model;
     try {
@@ -168,7 +175,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    checkState(!closed);
     checkGenerateUnsatCores();
     return getUnsatCore0(annotatedTerms.peek());
   }
