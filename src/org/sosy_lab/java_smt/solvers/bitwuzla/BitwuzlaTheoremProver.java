@@ -213,9 +213,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }

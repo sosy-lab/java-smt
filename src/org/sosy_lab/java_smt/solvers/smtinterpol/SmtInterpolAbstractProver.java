@@ -198,7 +198,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
@@ -238,7 +237,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!closed);
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];
