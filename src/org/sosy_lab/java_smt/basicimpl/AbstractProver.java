@@ -71,6 +71,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateAllSat() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
@@ -82,6 +83,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkGenerateUnsatCoresOverAssumptions() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
@@ -89,12 +91,14 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected final void checkEnableSeparationLogic() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
   }
 
   protected abstract boolean hasPersistentModel();
 
   private void setChanged() {
+    wasLastSatCheckSatisfiable = false;
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
       if (!hasPersistentModel()) {
@@ -114,7 +118,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(!closed);
     pushImpl();
     setChanged();
-    wasLastSatCheckSatisfiable = false;
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
@@ -127,7 +130,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
     setChanged();
-    wasLastSatCheckSatisfiable = false;
   }
 
   protected abstract void popImpl();
@@ -138,7 +140,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(!closed);
     T t = addConstraintImpl(constraint);
     setChanged();
-    wasLastSatCheckSatisfiable = false;
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;
   }
