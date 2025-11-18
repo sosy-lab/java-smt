@@ -24,7 +24,6 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
-import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Option;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
@@ -174,13 +173,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   @Override
   public Model getModel() throws SolverException {
     checkGenerateModels();
-    return new CachingModel(
-        registerEvaluator(
-            new BitwuzlaModel(
-                env,
-                this,
-                creator,
-                Collections2.transform(getAssertedFormulas(), creator::extractInfo))));
+    // special case for Bitwuzla: Models are not permanent and need to be closed
+    // before any change is applied to the prover stack. So, we register the Model as Evaluator.
+    return getEvaluatorWithoutChecks();
   }
 
   private List<BooleanFormula> getUnsatCore0() {

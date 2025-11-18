@@ -120,10 +120,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   public Model getModel() {
     checkGenerateModels();
-    Model model =
+    return registerEvaluator(
         new OpenSmtModel(
-            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
-    return registerEvaluator(model);
+            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
