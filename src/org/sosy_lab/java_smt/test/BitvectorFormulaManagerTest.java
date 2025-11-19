@@ -469,9 +469,6 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
       case PRINCESS:
         bitsizes = new int[] {2, 3}; // Princess is too slow for larger bitvectors
         break;
-      case Z3:
-        bitsizes = new int[] {2, 3, 4, 8}; // Z3 is too slow for larger bitvectors since v4.15.0
-        break;
       default:
         bitsizes = new int[] {2, 3, 4, 8, 13, 25, 31};
         break;

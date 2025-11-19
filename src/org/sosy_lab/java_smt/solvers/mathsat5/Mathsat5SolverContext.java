@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -59,6 +59,26 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             "Further options that will be passed to Mathsat in addition to the default options. "
                 + "Format is 'key1=value1,key2=value2'")
     private String furtherOptions = "";
+
+    @Option(
+        secure = true,
+        description =
+            "If enabled, SMTLIB2 output of MathSAT5 will be generated using the extended dumping "
+                + "function msat_to_smtlib2_ext(), instead of the regular dumping "
+                + "function msat_to_smtlib2(). This extended dump might allow the exporting of "
+                + "features to SMTLIB2 that can't be solved using MathSAT5, e.g. quantified "
+                + "formulas. "
+                + "The output will contain define-fun based bindings instead of "
+                + "let-expressions per default. If you want to use let bindings, enable option "
+                + "solver.mathsat5.dumpSMTLIB2LetExpressions as well.")
+    private boolean useExtendedSMTLIB2Output = false;
+
+    @Option(
+        secure = true,
+        description =
+            "If used together with solver.mathsat5.useExtendedSMTLIB2Output, SMTLIB2 output will "
+                + "contain let-bindings instead of define-fun based bindings.")
+    private boolean dumpSMTLIB2LetExpressions = false;
 
     @Option(secure = true, description = "Load less stable optimizing version of mathsat5 solver.")
     boolean loadOptimathsat5 = false;
@@ -180,7 +200,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       msatEnv = msat_create_env(msatConf);
     }
     // Create Mathsat5FormulaCreator
-    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
+    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv, settings.loadOptimathsat5);
 
     // Create managers
     Mathsat5UFManager functionTheory = new Mathsat5UFManager(creator);
@@ -194,8 +214,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
-    Mathsat5EnumerationFormulaManager enumerationTheory =
-        new Mathsat5EnumerationFormulaManager(creator);
+    Mathsat5EnumerationFormulaManager enumerationTheory = null;
+    if (!settings.loadOptimathsat5) {
+      // OptiMathSAT does not support enumerations
+      enumerationTheory = new Mathsat5EnumerationFormulaManager(creator);
+    }
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
@@ -206,7 +229,9 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
             bitvectorTheory,
             floatingPointTheory,
             arrayTheory,
-            enumerationTheory);
+            enumerationTheory,
+            settings.useExtendedSMTLIB2Output,
+            settings.dumpSMTLIB2LetExpressions);
     return new Mathsat5SolverContext(
         logger, msatConf, settings, randomSeed, pShutdownNotifier, manager, creator);
   }
@@ -214,7 +239,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
   @VisibleForTesting
   static void loadLibrary(Consumer<String> pLoader) {
     loadLibrariesWithFallback(
-        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("mpir", "mathsat", "mathsat5j"));
+        pLoader, ImmutableList.of("mathsat5j"), ImmutableList.of("gmp", "mathsat", "mathsat5j"));
   }
 
   long createEnvironment(long cfg) {

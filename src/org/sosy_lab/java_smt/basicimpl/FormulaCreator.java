@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -134,6 +135,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return regexType;
   }
 
+  public FloatingPointRoundingMode getRoundingMode(FloatingPointRoundingModeFormula f) {
+    return getRoundingMode(extractInfo(f));
+  }
+
+  @SuppressWarnings("unused")
+  protected FloatingPointRoundingMode getRoundingMode(TFormulaInfo f) {
+    throw new UnsupportedOperationException(
+        "Floating point rounding modes are not supported by this solver.");
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
@@ -158,6 +169,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         "Floatingpoint formula has unexpected type: %s",
         getFormulaType(pTerm));
     return new FloatingPointFormulaImpl<>(pTerm);
+  }
+
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(TFormulaInfo pTerm) {
+    checkArgument(
+        getFormulaType(pTerm).isFloatingPointRoundingModeType(),
+        "Floatingpoint rounding mode formula has unexpected type: %s",
+        getFormulaType(pTerm));
+    return new FloatingPointRoundingModeFormulaImpl<>(pTerm);
   }
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
