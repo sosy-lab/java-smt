@@ -141,7 +141,7 @@ class Z3OptimizationProver extends Z3AbstractProver implements OptimizationProve
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    return false;
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

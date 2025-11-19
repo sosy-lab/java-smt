@@ -225,7 +225,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

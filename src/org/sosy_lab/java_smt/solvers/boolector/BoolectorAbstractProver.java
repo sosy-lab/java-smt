@@ -142,14 +142,13 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    throw new UnsupportedOperationException("Unsat core is not supported by Boolector.");
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "Unsat core with assumptions is not supported by Boolector.");
+    throw new UnsupportedOperationException(UNSAT_CORE_NOT_SUPPORTED);
   }
 
   @Override

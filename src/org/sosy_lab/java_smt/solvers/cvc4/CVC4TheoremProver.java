@@ -225,13 +225,13 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

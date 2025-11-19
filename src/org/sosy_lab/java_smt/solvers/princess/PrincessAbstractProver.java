@@ -192,7 +192,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Solving with assumptions is not supported.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
@@ -209,8 +209,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(
-        "UNSAT cores over assumptions not supported by Princess");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

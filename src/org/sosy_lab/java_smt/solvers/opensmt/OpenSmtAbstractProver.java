@@ -252,13 +252,13 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

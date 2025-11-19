@@ -24,6 +24,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 public interface BasicProverEnvironment<T> extends AutoCloseable {
 
   String NO_MODEL_HELP = "Model computation failed. Are the pushed formulae satisfiable?";
+  String ASSUMPTION_SOLVING_NOT_SUPPORTED = "Solving with assumptions is not supported.";
+  String UNSAT_CORE_NOT_SUPPORTED = "Unsat core extraction is not supported.";
 
   /**
    * Push a backtracking point and add a formula to the current stack, asserting it. The return
