@@ -90,14 +90,10 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
    * SAT or UNSAT.
    */
   @Override
-  public boolean isUnsat() throws SolverException {
-    Preconditions.checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
+  protected boolean isUnsatImpl() throws SolverException {
     evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
-      wasLastSatCheckSatisfiable = true;
       if (this.generateModels || this.generateAllSat) {
         // we only build the model if we have set the correct options
         evaluatedTerms.add(callOrThrow(api::partialModelAsFormula));

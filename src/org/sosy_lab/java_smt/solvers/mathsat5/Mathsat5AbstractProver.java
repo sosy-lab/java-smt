@@ -97,15 +97,10 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
   protected abstract void createConfig(Map<String, String> pConfig);
 
   @Override
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {
       boolean isSat = msat_check_sat(curEnv);
-      wasLastSatCheckSatisfiable = isSat;
       return !isSat;
     } finally {
       msat_free_termination_callback(hook);
@@ -117,6 +112,7 @@ abstract class Mathsat5AbstractProver<T2> extends AbstractProver<T2> {
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkForLiterals(pAssumptions);
+    changedSinceLastSatQuery = false;
 
     final long hook = msat_set_termination_callback(curEnv, context.getTerminationTest());
     try {

@@ -84,13 +84,9 @@ abstract class BoolectorAbstractProver<T> extends AbstractProverWithAllSat<T> {
    * Boolector should throw its own exceptions that tell you what went wrong!
    */
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     final int result = BtorJNI.boolector_sat(btor);
     if (result == BtorJNI.BTOR_RESULT_SAT_get()) {
-      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (result == BtorJNI.BTOR_RESULT_UNSAT_get()) {
       return true;

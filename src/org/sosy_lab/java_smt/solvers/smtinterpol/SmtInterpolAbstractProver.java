@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
@@ -107,11 +106,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
-    checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
+  protected boolean isUnsatImpl() throws InterruptedException {
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
@@ -121,7 +116,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
     LBool result = env.checkSat();
     switch (result) {
       case SAT:
-        wasLastSatCheckSatisfiable = true;
         return false;
       case UNSAT:
         return true;

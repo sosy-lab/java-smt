@@ -25,7 +25,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -38,7 +41,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   // flags for status
   protected boolean closed = false;
-  protected boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
   protected boolean changedSinceLastSatQuery = false; // assume not-changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
@@ -147,6 +150,39 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException;
+
+  /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
+  public final boolean isUnsat() throws SolverException, InterruptedException {
+    checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+    final boolean isUnsat = isUnsatImpl();
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
+  }
+
+  protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
+
+  /** Override for OptimizationProver */
+  public final OptStatus check() throws InterruptedException, SolverException {
+    checkState(!closed);
+    wasLastSatCheckSatisfiable = false;
+    changedSinceLastSatQuery = false;
+    final OptStatus status = checkImpl();
+    if (status == OptStatus.OPT) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return status;
+  }
+
+  protected OptStatus checkImpl() throws InterruptedException, SolverException {
+    if (this instanceof OptimizationProverEnvironment) {
+      throw new UnsupportedOperationException("checkImpl() must be implemented in a subclass.");
+    }
+    throw new UnsupportedOperationException("check() is not supported by this prover.");
+  }
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();

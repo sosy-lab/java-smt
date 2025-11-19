@@ -188,12 +188,8 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
     if (!incremental) {
       // in non-incremental mode, we need to create a new solver instance for each sat check
       if (solver != null) {
@@ -218,9 +214,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       /* Shutdown currently not possible in CVC5. */
       shutdownNotifier.shutdownIfNecessary();
     }
-    boolean isUnsat = convertSatResult(result);
-    wasLastSatCheckSatisfiable = !isUnsat;
-    return isUnsat;
+    return convertSatResult(result);
   }
 
   private void declareHeap(ImmutableSet<BooleanFormula> pAssertedFormulas) throws SolverException {

@@ -174,11 +174,8 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
 
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
 
     if (!incremental) {
       // in non-incremental mode, we need to create a new solver instance for each sat check
@@ -207,7 +204,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
       }
     }
     if (result.isSat() == Result.Sat.SAT) {
-      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (result.isSat() == Result.Sat.UNSAT) {
       return true;

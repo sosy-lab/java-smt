@@ -116,10 +116,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   }
 
   private boolean readSATResult(Result resultValue) throws SolverException, InterruptedException {
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
     if (resultValue == Result.SAT) {
-      wasLastSatCheckSatisfiable = true;
       return false;
     } else if (resultValue == Result.UNSAT) {
       return true;
@@ -130,12 +127,9 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
     }
   }
 
-  /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    final Result result = env.check_sat();
-    return readSATResult(result);
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
+    return readSATResult(env.check_sat());
   }
 
   /**
@@ -209,6 +203,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     Preconditions.checkNotNull(assumptions);
     checkGenerateUnsatCoresOverAssumptions();
+    changedSinceLastSatQuery = false;
     boolean sat = !isUnsatWithAssumptions(assumptions);
     return sat ? Optional.empty() : Optional.of(getUnsatCore0());
   }

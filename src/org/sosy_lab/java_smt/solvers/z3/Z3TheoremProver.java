@@ -83,11 +83,7 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
+  protected boolean isUnsatImpl() throws SolverException, InterruptedException {
     logSolverStack();
     int result;
     try {
@@ -96,15 +92,14 @@ class Z3TheoremProver extends Z3AbstractProver implements ProverEnvironment {
       throw creator.handleZ3Exception(e);
     }
     undefinedStatusToException(result);
-    boolean isUnsat = result == Z3_lbool.Z3_L_FALSE.toInt();
-    wasLastSatCheckSatisfiable = !isUnsat;
-    return isUnsat;
+    return result == Z3_lbool.Z3_L_FALSE.toInt();
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
 
     int result;
     try {

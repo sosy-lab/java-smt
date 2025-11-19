@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
@@ -209,12 +208,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
-    wasLastSatCheckSatisfiable = false;
-
     sstat result;
     try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
       shutdownNotifier.shutdownIfNecessary();
@@ -244,9 +239,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     } else if (result.equals(sstat.Undef())) {
       throw new InterruptedException();
     } else {
-      boolean isUnsat = result.equals(sstat.False());
-      wasLastSatCheckSatisfiable = !isUnsat;
-      return isUnsat;
+      return result.equals(sstat.False());
     }
   }
 
