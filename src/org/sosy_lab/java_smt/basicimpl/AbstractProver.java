@@ -42,7 +42,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   // flags for status
   protected boolean closed = false;
   private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
-  protected boolean changedSinceLastSatQuery = false; // assume not-changed for an empty prover
+  protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 

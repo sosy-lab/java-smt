@@ -124,6 +124,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
+  public void testModelAccessWithoutSatCheck() throws SolverException, InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeTrue());
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeVariable("x"));
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+    }
+  }
+
+  @Test
   public void testOnlyTrue() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       prover.push(bmgr.makeTrue());
