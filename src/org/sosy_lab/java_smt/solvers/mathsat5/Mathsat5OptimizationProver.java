@@ -96,8 +96,7 @@ class Mathsat5OptimizationProver extends Mathsat5AbstractProver<Void>
   }
 
   @Override
-  public OptStatus check() throws InterruptedException, SolverException {
-    checkState(!closed);
+  protected OptStatus checkImpl() throws InterruptedException, SolverException {
     final boolean isSatisfiable = msat_check_sat(curEnv);
     if (isSatisfiable) {
       return OptStatus.OPT;

@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
@@ -286,6 +287,8 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
   @Override
   protected @Nullable IExpression evalImpl(IExpression expr) {
+    checkState(!isClosed());
+
     // The utility variable only appears temporarily on the solver's stack.
     // The user should never notice it.
     // We might not even need an index/counter for the variable.

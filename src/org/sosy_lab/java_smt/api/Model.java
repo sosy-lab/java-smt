@@ -23,11 +23,12 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
  * <p>This class is an extensions of {@link Evaluator} and provides more features:
  *
  * <ul>
- *   <li>a listing of model assignments, i.e., the user can iterate over all available symbols and
+ *   <li>a listing of model assignments, i.e., the user can iterate over most available symbols and
  *       their assignments,
- *   <li>a guaranteed availability even after applying any operation on the original prover stack, i
- *       .e., the model instance stays constant and remains valid for one given satisfiable prover
- *       environment.
+ *   <li>for several solvers, a guaranteed availability even after applying any operation on the
+ *       original prover stack, i.e., the model instance stays constant and remains valid for one
+ *       given satisfiable prover environment. Solvers without this guarantee (Princess, Boolector,
+ *       and Bitwuzla) are failing when accessing the corresponding methods.
  * </ul>
  */
 public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseable {

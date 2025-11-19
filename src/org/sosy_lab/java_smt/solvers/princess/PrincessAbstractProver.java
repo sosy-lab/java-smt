@@ -64,7 +64,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   protected final Deque<PersistentMap<Integer, BooleanFormula>> partitions = new ArrayDeque<>();
 
   private final PrincessFormulaCreator creator;
-  protected boolean wasLastSatCheckSat = false; // and stack is not changed
 
   protected PrincessAbstractProver(
       PrincessFormulaManager pMgr,
@@ -81,18 +80,20 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     partitions.push(PathCopyingPersistentTreeMap.of());
   }
 
+  @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
   /**
    * This function causes the SatSolver to check all the terms on the stack, if their conjunction is
    * SAT or UNSAT.
    */
   @Override
-  public boolean isUnsat() throws SolverException {
-    Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
+  protected boolean isUnsatImpl() throws SolverException {
     evaluatedTerms.clear();
     final Value result = api.checkSat(true);
     if (result.equals(SimpleAPI.ProverStatus$.MODULE$.Sat())) {
-      wasLastSatCheckSat = true;
       if (this.generateModels || this.generateAllSat) {
         // we only build the model if we have set the correct options
         evaluatedTerms.add(callOrThrow(api::partialModelAsFormula));
@@ -111,7 +112,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @CanIgnoreReturnValue
   protected int addConstraint0(BooleanFormula constraint) {
     Preconditions.checkState(!closed);
-    wasLastSatCheckSat = false;
 
     final int formulaId = idGenerator.getFreshId();
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
@@ -125,7 +125,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @Override
   protected final void pushImpl() {
-    wasLastSatCheckSat = false;
     api.push();
     trackingStack.push(new Level());
     partitions.push(partitions.peek());
@@ -133,7 +132,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
   @Override
   protected void popImpl() {
-    wasLastSatCheckSat = false;
     api.pop();
 
     // we have to recreate symbols on lower levels, because JavaSMT assumes "global" symbols.
@@ -166,8 +164,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(wasLastSatCheckSat, NO_MODEL_HELP);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
@@ -196,12 +192,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Solving with assumptions is not supported.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     final List<BooleanFormula> result = new ArrayList<>();
     final Set<Object> core = asJava(api.getUnsatCore());
@@ -214,8 +209,7 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) {
-    throw new UnsupportedOperationException(
-        "UNSAT cores over assumptions not supported by Princess");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
@@ -229,14 +223,6 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
       partitions.clear();
     }
     super.close();
-  }
-
-  @Override
-  public <T> T allSat(AllSatCallback<T> callback, List<BooleanFormula> important)
-      throws InterruptedException, SolverException {
-    T result = super.allSat(callback, important);
-    wasLastSatCheckSat = false; // we do not know about the current state, thus we reset the flag.
-    return result;
   }
 
   /** add external definition: boolean variable. */
