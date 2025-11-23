@@ -166,7 +166,20 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
 
-  /** Override for OptimizationProver */
+  /**
+   * Performs an optimization-aware check and returns the optimization status.
+   *
+   * <p>This method is the public entry point for optimization checks. It validates that the prover
+   * is open, resets internal change-tracking state, and delegates solver-specific work to {@link
+   * #checkImpl()}. Subclasses that implement optimization support must provide the actual checking
+   * logic in {@code checkImpl()}.
+   *
+   * <p>The signature of this method matches that of {@link OptimizationProverEnvironment#check()},
+   * to allow overrides in subclasses that implement both {@link BasicProverEnvironment} and {@link
+   * OptimizationProverEnvironment}.
+   *
+   * @return the optimization status; {@link OptStatus#OPT} indicates a satisfiable/optimal result
+   */
   public final OptStatus check() throws InterruptedException, SolverException {
     checkState(!closed);
     wasLastSatCheckSatisfiable = false;
@@ -178,6 +191,13 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     return status;
   }
 
+  /**
+   * Implementation of optimization-aware satisfiability-check.
+   *
+   * @throws InterruptedException if the thread is interrupted during the check
+   * @throws SolverException if the underlying solver reports an error
+   * @throws UnsupportedOperationException if optimization is not supported by this prover
+   */
   protected OptStatus checkImpl() throws InterruptedException, SolverException {
     if (this instanceof OptimizationProverEnvironment) {
       throw new UnsupportedOperationException("checkImpl() must be implemented in a subclass.");
