@@ -10,10 +10,11 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,17 +24,13 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
-import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-
   private final BitwuzlaTheoremProver prover;
-
-  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
@@ -44,7 +41,6 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     super(prover, bitwuzlaCreator);
     this.bitwuzlaEnv = bitwuzlaEnv;
     this.prover = prover;
-    this.bitwuzlaCreator = bitwuzlaCreator;
 
     // We need to generate and save this at construction time as Bitwuzla has no functionality to
     // give a persistent reference to the model. If the SMT engine is used somewhere else, the
@@ -92,14 +88,15 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
    * @return A list of value assignments for all elements in the array, including nested arrays
    */
   private List<ValueAssignment> buildArrayAssignments(Term expr, Term value) {
-    TermManager termManager = bitwuzlaCreator.getTermManager();
-
     // Iterate down the Store-chain: (Store tail index element)
     List<ValueAssignment> result = new ArrayList<>();
     while (value.kind().equals(Kind.ARRAY_STORE)) {
       Term index = value.get(1);
       Term element = value.get(2);
-      Term select = termManager.mk_term(Kind.ARRAY_SELECT, expr, index);
+      Term select =
+          ((BitwuzlaFormulaCreator) creator)
+              .getTermManager()
+              .mk_term(Kind.ARRAY_SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
       if (expr.sort().array_element().is_array()) {
@@ -111,12 +108,10 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
             new ValueAssignment(
                 creator.encapsulate(creator.getFormulaType(element), select),
                 creator.encapsulate(creator.getFormulaType(element), element),
-                creator.encapsulateBoolean(termManager.mk_term(Kind.EQUAL, select, element)),
+                creator.encapsulateBoolean(buildEqForTwoTerms(select, element)),
                 getVar(expr),
                 creator.convertValue(element, element),
-                FluentIterable.from(getArrayIndices(select))
-                    .transform(creator::convertValue)
-                    .toList()));
+                transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
       }
 
       // Move to the next Store in the chain
@@ -136,7 +131,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     if (left.sort().is_fp() || right.sort().is_fp()) {
       kind = Kind.FP_EQUAL;
     }
-    return bitwuzlaCreator.getTermManager().mk_term(kind, left, right);
+    return ((BitwuzlaFormulaCreator) creator).getTermManager().mk_term(kind, left, right);
   }
 
   private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {
@@ -147,18 +142,16 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     assert name != null;
 
     List<Object> argumentInterpretation = new ArrayList<>();
-    for (int i = 1; i < children.size(); i++) {
-      Term child = children.get(i);
-      Term childValue = bitwuzlaEnv.get_value(child);
-      argumentInterpretation.add(creator.convertValue(childValue));
+    for (Term child : Iterables.skip(children, 1)) {
+      argumentInterpretation.add(this.evaluateImpl(child));
     }
 
     return new ValueAssignment(
-        bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
-        bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-        bitwuzlaCreator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
+        creator.encapsulateWithTypeOf(pTerm),
+        creator.encapsulateWithTypeOf(valueTerm),
+        creator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
         name,
-        bitwuzlaCreator.convertValue(valueTerm),
+        creator.convertValue(valueTerm),
         argumentInterpretation);
   }
 
