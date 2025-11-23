@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -111,22 +111,25 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         argumentInterpretation);
   }
 
-  /** Takes a (nested) select statement and returns its indices. */
-  private Iterable<Term> getArgs(Term array) {
-    if (array.kind().equals(Kind.ARRAY_SELECT)) {
-      return FluentIterable.concat(getArgs(array.get(0)), ImmutableList.of(array.get(1)));
-    } else {
-      return ImmutableList.of();
+  /**
+   * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
+   * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
+   */
+  private ImmutableList<Term> getArrayIndices(Term array) {
+    ImmutableList.Builder<Term> indices = ImmutableList.builder();
+    while (array.kind().equals(Kind.ARRAY_SELECT)) {
+      indices.add(array.get(1));
+      array = array.get(0);
     }
+    return indices.build().reverse();
   }
 
   /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
   private String getVar(Term array) {
-    if (array.kind().equals(Kind.ARRAY_SELECT)) {
-      return getVar(array.get(0));
-    } else {
-      return array.symbol();
+    while (array.kind().equals(Kind.ARRAY_SELECT)) {
+      array = array.get(0);
     }
+    return array.symbol();
   }
 
   /** Build assignment for an array value. */
@@ -180,7 +183,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
                     creator.encapsulateBoolean(equation),
                     getVar(expr),
                     creator.convertValue(element, element),
-                    FluentIterable.from(getArgs(select))
+                    FluentIterable.from(getArrayIndices(select))
                         .transform(creator::convertValue)
                         .toList()));
       }
