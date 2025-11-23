@@ -152,6 +152,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       throws InterruptedException;
 
   /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
+  @Override
   public final boolean isUnsat() throws SolverException, InterruptedException {
     checkState(!closed);
     changedSinceLastSatQuery = false;
