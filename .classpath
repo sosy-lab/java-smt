@@ -21,13 +21,17 @@ SPDX-License-Identifier: Apache-2.0
 	<classpathentry kind="lib" path="lib/java/core/spotbugs-annotations.jar" sourcepath="lib/java-contrib/spotbugs-annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/jsr305.jar" sourcepath="lib/java-contrib/jsr305-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/build/auto-value-annotations.jar"/>
-	<classpathentry kind="lib" path="lib/java/core/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
+	<classpathentry kind="lib" path="lib/java/build/error_prone_annotations.jar" sourcepath="lib/java-contrib/error_prone_annotations-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/core/common.jar" sourcepath="lib/java-contrib/common-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-smtinterpol/smtinterpol.jar" sourcepath="lib/java-contrib/smtinterpol-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/princess_2.13.jar" sourcepath="lib/java-contrib/princess_2.13-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/scala-library.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/princess-smt-parser_2.13.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-princess/java-cup-runtime.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/automaton.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/org.sat4j.core.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/ostrich_2.13.jar"/>
+	<classpathentry kind="lib" path="lib/java/runtime-princess/ostrich-ecma2020-parser_2.13.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-z3/com.microsoft.z3.jar" sourcepath="lib/java-contrib/com.microsoft.z3-sources.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-cvc4/CVC4.jar"/>
 	<classpathentry kind="lib" path="lib/java/runtime-cvc5/cvc5.jar"/>

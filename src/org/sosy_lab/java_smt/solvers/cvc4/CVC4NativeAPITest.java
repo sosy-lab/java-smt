@@ -31,7 +31,6 @@ import edu.stanford.CVC4.UnsatCore;
 import edu.stanford.CVC4.vectorExpr;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import org.junit.After;
 import org.junit.AssumptionViolatedException;
 import org.junit.Before;
@@ -655,8 +654,8 @@ public class CVC4NativeAPITest {
                 // 1 is not enough!
                 Thread.sleep(10);
                 smtEngine.interrupt();
-              } catch (InterruptedException pE) {
-                throw new UnsupportedOperationException("Unexpected interrupt");
+              } catch (InterruptedException exception) {
+                throw new UnsupportedOperationException("Unexpected interrupt", exception);
               }
             });
 
@@ -766,7 +765,7 @@ public class CVC4NativeAPITest {
 
     // UnsatCores are iterable
     for (Expr e : unsatCore) {
-      assertThat(e.toString()).isIn(Arrays.asList("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 

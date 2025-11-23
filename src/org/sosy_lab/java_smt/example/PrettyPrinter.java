@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.utils.SolverUtils;
 
 /** This program parses user-given formulas and prints them in a pretty format. */
 @SuppressWarnings("unused")
-public class PrettyPrinter {
+public final class PrettyPrinter {
 
   /** Utility class without a public constructor. */
   private PrettyPrinter() {}
@@ -88,14 +88,12 @@ public class PrettyPrinter {
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
-        if (Iterables.any(
-            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
-          continue;
-        } else if (line.startsWith("(assert ")) {
+        if (line.startsWith("(assert ")) {
           BooleanFormula bf =
               context.getFormulaManager().parse(Joiner.on("").join(definitions) + line);
           formulas.add(bf);
-        } else {
+        } else if (!Iterables.any(
+            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
           // it is a definition
           definitions.add(line);
         }

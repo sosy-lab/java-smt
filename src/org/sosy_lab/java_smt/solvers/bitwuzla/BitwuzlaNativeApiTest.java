@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext.loadLibrary;
 
 import com.google.common.truth.Truth;
@@ -55,7 +56,6 @@ public class BitwuzlaNativeApiTest {
 
   private Options createOptions() {
     Options options = new Options();
-    options.set(Option.REWRITE_LEVEL, 0);
     options.set(Option.PRODUCE_MODELS, 2);
     return options;
   }
@@ -759,8 +759,7 @@ public class BitwuzlaNativeApiTest {
     assertThat(newDump).isEqualTo(dump);
   }
 
-  @SuppressWarnings("CheckReturnValue")
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void parserFailTest() {
     // valid
     String input = "(declare-const a Bool)(declare-const b Bool)(assert (or a b))";
@@ -768,6 +767,6 @@ public class BitwuzlaNativeApiTest {
     assertThat(assertions).isNotEmpty();
     // invalid/fails
     String badInput = "(declare-const a Bool)(assert (or a b))";
-    parse(badInput);
+    assertThrows(IllegalArgumentException.class, () -> parse(badInput));
   }
 }

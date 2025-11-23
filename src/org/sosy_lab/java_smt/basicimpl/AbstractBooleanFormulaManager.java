@@ -17,7 +17,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.util.ArrayDeque;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
@@ -117,11 +116,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
   }
 
-  @Override
-  public BooleanFormula and(BooleanFormula... pBits) {
-    return and(Arrays.asList(pBits));
-  }
-
   /**
    * Create an n-ary conjunction. The default implementation delegates to {@link #and(Object,
    * Object)} and assumes that all simplifications are done by that method. This method can be
@@ -152,11 +146,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     TFormulaInfo param2 = extractInfo(pBits2);
 
     return wrap(or(param1, param2));
-  }
-
-  @Override
-  public BooleanFormula or(BooleanFormula... pBits) {
-    return or(Arrays.asList(pBits));
   }
 
   protected abstract TFormulaInfo or(TFormulaInfo pParam1, TFormulaInfo pParam2);
@@ -320,14 +309,6 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
     }
 
     @Override
-    public R visitBoundVariable(Formula f, int deBruijnIdx) {
-
-      // Only boolean formulas can appear here.
-      assert f instanceof BooleanFormula;
-      return delegate.visitBoundVar((BooleanFormula) f, deBruijnIdx);
-    }
-
-    @Override
     public R visitConstant(Formula f, Object value) {
       checkState(value instanceof Boolean);
       return delegate.visitConstant((boolean) value);
@@ -345,8 +326,7 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       switch (functionDeclaration.getKind()) {
         case AND:
-          R out = delegate.visitAnd(getBoolArgs(args));
-          return out;
+          return delegate.visitAnd(getBoolArgs(args));
         case NOT:
           checkState(args.size() == 1);
           Formula arg = args.get(0);
@@ -354,15 +334,13 @@ public abstract class AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, T
           checkArgument(arg instanceof BooleanFormula);
           return delegate.visitNot((BooleanFormula) arg);
         case OR:
-          R out2 = delegate.visitOr(getBoolArgs(args));
-          return out2;
+          return delegate.visitOr(getBoolArgs(args));
         case IFF:
           checkState(args.size() == 2);
           Formula a = args.get(0);
           Formula b = args.get(1);
           checkState(a instanceof BooleanFormula && b instanceof BooleanFormula);
-          R out3 = delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
-          return out3;
+          return delegate.visitEquivalence((BooleanFormula) a, (BooleanFormula) b);
         case EQ:
           if (args.size() == 2
               && args.get(0) instanceof BooleanFormula

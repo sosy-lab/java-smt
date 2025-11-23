@@ -17,7 +17,9 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -31,6 +33,20 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
       FloatingPointFormulaManager pDelegate, SolverStatistics pStats) {
     delegate = checkNotNull(pDelegate);
     stats = checkNotNull(pStats);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.makeRoundingMode(pRoundingMode);
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
   }
 
   @Override
@@ -89,9 +105,9 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
 
   @Override
   public FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     stats.fpOperations.getAndIncrement();
-    return delegate.makeNumber(exponent, mantissa, signBit, type);
+    return delegate.makeNumber(exponent, mantissa, sign, type);
   }
 
   @Override

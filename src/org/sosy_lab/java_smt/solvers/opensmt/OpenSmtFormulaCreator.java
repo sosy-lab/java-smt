@@ -36,7 +36,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.VectorSRef;
 
-public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
+public final class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, SymRef> {
 
   private final Logics logicToUse;
 
@@ -108,7 +108,12 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
 
   @Override
   public SymRef declareUFImpl(String pName, SRef pReturnType, List<SRef> pArgTypes) {
-    return getEnv().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
+    try {
+      return getEnv().declareFun(pName, pReturnType, new VectorSRef(pArgTypes));
+    } catch (UnsupportedOperationException e) {
+      // can fail, if function is already declared with a different sort
+      throw new IllegalArgumentException("Cannot declare function '" + pName + "'", e);
+    }
   }
 
   @Override
@@ -327,10 +332,10 @@ public class OpenSmtFormulaCreator extends FormulaCreator<PTRef, SRef, Logic, Sy
   public Object convertValue(PTRef value) {
     Logic logic = getEnv();
     if (logic.isTrue(value)) {
-      return Boolean.TRUE;
+      return true;
     }
     if (logic.isFalse(value)) {
-      return Boolean.FALSE;
+      return false;
     }
     ArithLogic alogic = (ArithLogic) getEnv();
     if (alogic.isIntConst(value)) {

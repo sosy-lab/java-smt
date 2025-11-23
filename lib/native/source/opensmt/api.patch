@@ -1,23 +1,33 @@
 diff --git a/src/api/Interpret.cc b/src/api/Interpret.cc
-index 0c778b9f..418da7d8 100644
+index 3d3bad4c..daaf1ded 100644
 --- a/src/api/Interpret.cc
 +++ b/src/api/Interpret.cc
-@@ -43,6 +43,11 @@ Interpret::~Interpret() {
-     for (int i = 0; i < term_names.size(); ++i) {
-         free(term_names[i]);
-     }
-+
-+    // if the logic is given in the constructor and was not set via string-input, we cleanup the reference
+@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ #include "Interpret.h"
+ 
+ #include <api/smt2tokens.h>
++#include <common/ApiException.h>
+ #include <logics/ArithLogic.h>
+ #include <logics/LogicFactory.h>
+ #include <rewriters/Substitutor.h>
+@@ -42,7 +43,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ 
+ namespace opensmt {
+ 
+-Interpret::~Interpret() = default;
++Interpret::~Interpret() {
++    // If the logic was given in the constructor, and not set by the string-input, we have to clean up the reference
 +    if (!ownsLogic) {
 +        logic.release();
 +    }
- }
++}
  
  PTRef
-@@ -1067,11 +1072,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
+ Interpret::getParsedFormula()
+@@ -1044,11 +1050,13 @@ void Interpret::comment_formatted(const char* fmt_str, ...) const {
  
  
- void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) const {
 +    std::stringstream out;
 +
      va_list ap;
@@ -29,7 +39,7 @@ index 0c778b9f..418da7d8 100644
  
      va_start(ap, fmt_str);
      while (true) {
-@@ -1080,25 +1087,31 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) {
+@@ -1057,25 +1065,29 @@ void Interpret::notify_formatted(bool error, const char* fmt_str, ...) const {
              switch (*fmt_str++) {
              case 's':
                  t = va_arg(ap, char *);
@@ -53,7 +63,6 @@ index 0c778b9f..418da7d8 100644
          else break;
      }
      va_end(ap);
-+
      if (error)
 -        std::cout << "\")" << '\n';
 -    std::cout << std::endl;
@@ -61,25 +70,24 @@ index 0c778b9f..418da7d8 100644
 +    out << std::endl;
 +
 +    if (error)
-+      throw new OsmtApiException(out.str());
-+
++        throw ApiException(out.str());
 +    std::cout << out.str();
  }
  
- void Interpret::notify_success() {
+ void Interpret::notify_success() const {
 diff --git a/src/api/Interpret.h b/src/api/Interpret.h
-index e43b7691..a28a659d 100644
+index c0b42e2d..e86986cc 100644
 --- a/src/api/Interpret.h
 +++ b/src/api/Interpret.h
-@@ -135,6 +135,7 @@ class Interpret {
+@@ -138,6 +138,7 @@ class Interpret {
      std::unique_ptr<MainSolver> main_solver;
  
      bool            f_exit;
 +    bool            ownsLogic;
  
-     // Named terms for getting variable values
-     MapWithKeys<const char*,PTRef,StringHash,Equal<const char*>> nameToTerm;
-@@ -189,8 +190,20 @@ class Interpret {
+     vec<PTRef>      assertions;
+     vec<SymRef>     user_declarations;
+@@ -188,8 +189,19 @@ class Interpret {
      Interpret(SMTConfig & c)
          : config     (c)
          , f_exit     (false)
@@ -90,21 +98,33 @@ index e43b7691..a28a659d 100644
 +    Interpret(SMTConfig & c, Logic & l)
 +        : config     (c)
 +        , f_exit     (false)
-+        , ownsLogic  (false)
-+        {
-+          logic.reset(&l);
-+          main_solver = createMainSolver(l.getName().c_str());
-+          main_solver->initialize();
-+        }
++        , ownsLogic  (false) {
++        logic.reset(&l);
++        main_solver = createMainSolver(l.getName().c_str());
++        main_solver->initialize();
++    }
 +
      ~Interpret();
  
      int interpFile(FILE* in);
-diff --git a/src/common/FastRational.cc b/src/common/FastRational.cc
-index 8ccc5a51..2af7bfbf 100644
---- a/src/common/FastRational.cc
-+++ b/src/common/FastRational.cc
-@@ -11,18 +11,22 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+diff --git a/src/api/MainSolver.h b/src/api/MainSolver.h
+index 6ce4d184..30f879f5 100644
+--- a/src/api/MainSolver.h
++++ b/src/api/MainSolver.h
+@@ -112,7 +112,7 @@ public:
+     // I.e., *excluding* popped assertions
+     vec<PTRef> getCurrentAssertions() const;
+     // Returns just a view to the assertions
+-    auto getCurrentAssertionsView() const { return getCurrentAssertionsViewImpl(); }
++    vec<PTRef> getCurrentAssertionsView() const { return getCurrentAssertionsViewImpl(); }
+ 
+     vec<PTRef> const & getAssertionsAtCurrentLevel() const { return getAssertionsAtLevel(getAssertionLevel()); }
+     vec<PTRef> const & getAssertionsAtLevel(std::size_t) const;
+diff --git a/src/common/numbers/FastRational.cc b/src/common/numbers/FastRational.cc
+index 68566c05..563fe045 100644
+--- a/src/common/numbers/FastRational.cc
++++ b/src/common/numbers/FastRational.cc
+@@ -15,18 +15,22 @@ namespace opensmt {
  mpq_ptr FastRational::mpqPool::alloc()
  {
      mpq_ptr r;
@@ -127,19 +147,19 @@ index 8ccc5a51..2af7bfbf 100644
  }
  
  FastRational::FastRational( const char * s, const int base )
-diff --git a/src/common/FastRational.h b/src/common/FastRational.h
-index a3f4bb1c..9fc7ac3d 100644
---- a/src/common/FastRational.h
-+++ b/src/common/FastRational.h
-@@ -14,6 +14,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
- #include <stack>
- #include <vector>
- #include <optional>
+diff --git a/src/common/numbers/FastRational.h b/src/common/numbers/FastRational.h
+index 7948137b..b99e17ef 100644
+--- a/src/common/numbers/FastRational.h
++++ b/src/common/numbers/FastRational.h
+@@ -11,6 +11,7 @@ Copyright (c) 2008, 2009 Centre national de la recherche scientifique (CNRS)
+ #include <cassert>
+ #include <climits>
+ #include <cstdint>
 +#include <mutex>
- 
- typedef int32_t  word;
- typedef uint32_t uword;
-@@ -72,6 +73,7 @@ class FastRational
+ #include <optional>
+ #include <stack>
+ #include <string>
+@@ -75,6 +76,7 @@ class FastRational
  {
      class mpqPool
      {
@@ -148,18 +168,18 @@ index a3f4bb1c..9fc7ac3d 100644
          std::stack<mpq_ptr, std::vector<mpq_ptr>> pool;
      public:
 diff --git a/src/logics/Logic.cc b/src/logics/Logic.cc
-index b90430c2..c4b34fc4 100644
+index 7188ce65..16cee996 100644
 --- a/src/logics/Logic.cc
 +++ b/src/logics/Logic.cc
-@@ -15,6 +15,7 @@
- #include "Substitutor.h"
- #include "smt2tokens.h"
- #include "IteHandler.h"
-+#include "Interpret.h"
+@@ -9,6 +9,7 @@
+ #include "Logic.h"
+ #include "SubstLoopBreaker.h"
  
- #include <iostream>
- #include <map>
-@@ -724,6 +725,18 @@ PTRef Logic::mkBoolVar(const char* name)
++#include <api/Interpret.h>
+ #include <api/smt2tokens.h>
+ #include <common/ApiException.h>
+ #include <common/InternalException.h>
+@@ -679,6 +680,18 @@ PTRef Logic::mkBoolVar(char const * name) {
      return mkFun(sr, {});
  }
  
@@ -169,56 +189,53 @@ index b90430c2..c4b34fc4 100644
 +
 +    int rval = repl.interpFile(input.data());
 +    if (rval != 0) {
-+      throw OsmtApiException("Failed to parse input formula");
++        throw ApiException("Failed to parse input formula");
 +    }
 +
 +    return repl.getParsedFormula();
 +}
 +
- void Logic::instantiateFunctions(SRef sr)
- {
+ void Logic::instantiateFunctions(SRef sr) {
      // Equality
-@@ -807,12 +820,10 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef>&& terms)
+     SymRef tr = declareFun_Commutative_NoScoping_Chainable(tk_equals, sort_BOOL, {sr, sr});
+@@ -751,10 +764,8 @@ PTRef Logic::insertTerm(SymRef sym, vec<PTRef> && terms) {
          assert(terms.size() == 0);
          return mkFun(sym, std::move(terms));
      }
 -    if (hasArrays()) {
--        if (isArrayStore(sym))
--            return mkStore(std::move(terms));
--        if (isArraySelect(sym))
--            return mkSelect(std::move(terms));
+-        if (isArrayStore(sym)) return mkStore(std::move(terms));
+-        if (isArraySelect(sym)) return mkSelect(std::move(terms));
 -    }
-+    if (isArrayStore(sym))
-+      return mkStore(std::move(terms));
-+    if (isArraySelect(sym))
-+      return mkSelect(std::move(terms));
++    if (isArrayStore(sym)) return mkStore(std::move(terms));
++    if (isArraySelect(sym)) return mkSelect(std::move(terms));
      return mkUninterpFun(sym, std::move(terms));
  }
  
-@@ -1445,6 +1456,8 @@ Logic::collectStats(PTRef root, int& n_of_conn, int& n_of_eq, int& n_of_uf, int&
+@@ -1344,6 +1355,9 @@ void Logic::collectStats(PTRef root, int & n_of_conn, int & n_of_eq, int & n_of_
      }
  }
  
 +Sort const&       Logic::getSortDefinition (SRef s)     const { return sort_store[s]; }
 +SortSymbol const& Logic::getSortSymbol     (SSymRef ss) const { return sort_store[ss]; }
- 
++
  // Fetching sorts
- SRef        Logic::getSortRef    (const PTRef tr)        const { return getSortRef(getPterm(tr).symb()); }
+ SRef Logic::getSortRef(PTRef const tr) const {
+     return getSortRef(getPterm(tr).symb());
 diff --git a/src/logics/Logic.h b/src/logics/Logic.h
-index 73513cd1..888f970c 100644
+index 1eff071f..1bb2dbcc 100644
 --- a/src/logics/Logic.h
 +++ b/src/logics/Logic.h
-@@ -144,6 +144,9 @@ class Logic {
-     void        markConstant  (SymId sid);
+@@ -59,6 +59,9 @@ public:
+     bool hasIntegers() const { return QFLogicToProperties.at(logicType).arithProperty.hasInts; }
+     bool hasReals() const { return QFLogicToProperties.at(logicType).arithProperty.hasReals; }
  
-   public:
-+    const Sort&       getSortDefinition (SRef s)     const;
-+    const SortSymbol& getSortSymbol     (SSymRef ss) const;
++    const Sort& getSortDefinition (SRef s) const;
++    const SortSymbol& getSortSymbol (SSymRef ss) const;
 +
-     SRef                getSortRef (PTRef tr)  const;
-     SRef                getSortRef (SymRef sr) const;
-     std::string         printSort  (SRef s)    const;
-@@ -275,6 +278,8 @@ public:
+     SRef getSortRef(PTRef tr) const;
+     SRef getSortRef(SymRef sr) const;
+     std::string printSort(SRef s) const;
+@@ -222,6 +225,8 @@ public:
      void dumpWithLets(std::ostream & out, PTRef formula) const;
      std::string dumpWithLets(PTRef formula) const;
  
@@ -226,29 +243,27 @@ index 73513cd1..888f970c 100644
 +
      PTRef instantiateFunctionTemplate(TemplateFunction const & tmplt, vec<PTRef> const & args);
  
-     SSymRef       getSortSymIndexed()              const { return sym_IndexedSort; }
+     SSymRef getSortSymIndexed() const { return sym_IndexedSort; }
 diff --git a/src/symbols/SymStore.cc b/src/symbols/SymStore.cc
-index 9b2c3241..a2b06c2d 100644
+index 66cfa605..8573ac80 100644
 --- a/src/symbols/SymStore.cc
 +++ b/src/symbols/SymStore.cc
-@@ -27,6 +27,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- #include "string.h"
+@@ -26,6 +26,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  #include "SymStore.h"
  #include "Symbol.h"
-+#include "OsmtApiException.h"
  
- const char* SymStore::e_duplicate_symbol = "Symbol Store: symbol already exists";
- const int   SymStore::symstore_buf_offs_idx = 1;
-@@ -55,6 +56,11 @@ SymRef SymStore::newSymb(const char * fname, SRef rsort, vec<SRef> const & args,
-                 }
++#include <common/ApiException.h>
+ #include <cstring>
+ 
+ namespace opensmt {
+@@ -54,6 +55,10 @@ SymRef SymStore::newSymb(char const * fname, SRef rsort, vec<SRef> const & args,
              }
          }
-+        if (!symConfig.isInterpreted) {
-+          // Only builtin functions like "=" or "+" should be polymorphic
-+          throw OsmtApiException("Symbol `" + std::string(fname) + "` has conflicting definitions");
-+        }
      }
-+
++    if (symrefs != nullptr && !symConfig.isInterpreted) {
++        // Only builtin functions like "=" or "+" should be polymorphic
++        throw ApiException("Symbol `" + std::string(fname) + "` has conflicting definitions");
++    }
      bool newsym = (symrefs == nullptr);
      SymRef tr = ta.alloc(rsort, args, symConfig);
      SymId id = symbols.size();

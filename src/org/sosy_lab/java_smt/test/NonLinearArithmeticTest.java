@@ -14,7 +14,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
@@ -52,9 +51,9 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   @Parameters(name = "{0} {1} {2}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(Solvers.values()),
+            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
             ImmutableList.of(FormulaType.IntegerType, FormulaType.RationalType),
-            Arrays.asList(NonLinearArithmetic.values()))
+            ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());
@@ -134,7 +133,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
   }
 
   @Test
-  public void testLinearMultiplicationUnsatisfiable() throws SolverException, InterruptedException {
+  public void testLinearMultiplicationWithConstantUnsatisfiable()
+      throws SolverException, InterruptedException {
     T a = nmgr.makeVariable("a");
 
     BooleanFormula f =
@@ -200,7 +200,7 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
   @Test
   public void testDivisionByZero() throws SolverException, InterruptedException {
-    // INFO: OpenSmt does not allow division by zero
+    // OpenSmt and Yices do not allow division by zero and throw an exception.
     assume()
         .withMessage("Solver %s does not support division by zero", solverToUse())
         .that(solverToUse())
@@ -208,6 +208,8 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
 
     T a = nmgr.makeVariable("a");
     T b = nmgr.makeVariable("b");
+    T c = nmgr.makeVariable("c");
+
     T zero = nmgr.makeNumber(0);
 
     BooleanFormula f =
@@ -216,6 +218,15 @@ public class NonLinearArithmeticTest<T extends NumeralFormula> extends SolverBas
             nmgr.equal(nmgr.divide(b, zero), nmgr.makeNumber(4)));
 
     assertThatFormula(f).isSatisfiable();
+
+    // Division by zero is still a function. So, if (/0 a) = b and (/0 a) = c, then b=c must hold
+    BooleanFormula g =
+        bmgr.and(
+            nmgr.equal(nmgr.divide(a, zero), b),
+            nmgr.equal(nmgr.divide(a, zero), c),
+            bmgr.not(nmgr.equal(b, c)));
+
+    assertThatFormula(g).isUnsatisfiable();
   }
 
   @Test

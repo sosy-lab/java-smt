@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -15,69 +15,96 @@ SPDX-License-Identifier: Apache-2.0
 
     <import file="macros.xml"/>
 
-    <target name="compile-mathsat-bindings-linux">
-        <compile-mathsatlike-bindings-linux flag="mathsat"/>
+    <property name="mathsat.dist.dir" value="${ivy.solver.dist.dir}/mathsat5"/>
+
+    <target name="compile-mathsat-bindings-linux-x64">
+        <checkPathOption pathOption="mathsat-linux-x64.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 directory (Linux x64)"/>
+        <checkPathOption pathOption="gmp-linux-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
+        <exec executable="lib/native/source/libmathsat5j/compileForLinux.sh" failonerror="true">
+            <arg value="linux-x64"/>
+            <arg value="${mathsat-linux-x64.path}"/>
+            <arg value="${gmp-linux-x64.path}"/>
+        </exec>
     </target>
 
-    <target name="compile-mathsat-bindings-windows">
-        <compile-mathsatlike-bindings-windows flag="mathsat"/>
+    <target name="compile-mathsat-bindings-linux-arm64">
+        <checkPathOption pathOption="mathsat-linux-arm64.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 directory (Linux arm64)"/>
+        <checkPathOption pathOption="gmp-linux-arm64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux arm64)"/>
+        <checkPathOption pathOption="jdk-linux-arm64.path" defaultPath="/path/to/jdk" targetName="JDK directory (Linux arm64)"/>
+        <exec executable="lib/native/source/libmathsat5j/compileForLinux.sh" failonerror="true">
+            <arg value="linux-arm64"/>
+            <arg value="${mathsat-linux-arm64.path}"/>
+            <arg value="${gmp-linux-arm64.path}"/>
+            <arg value="${jdk-linux-arm64.path}"/>
+        </exec>
     </target>
 
-    <target name="compile-optimathsat-bindings">
-        <compile-mathsatlike-bindings-linux flag="optimathsat"/>
+    <target name="compile-mathsat-bindings-windows-x64">
+        <checkPathOption pathOption="mathsat-windows-x64.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 directory (Windows x64)"/>
+        <checkPathOption pathOption="gmp-windows-x64.path" defaultPath="/path/to/gmp" targetName="GMP directory (Windows x64)"/>
+        <checkPathOption pathOption="jdk-windows-x64.path" defaultPath="/path/to/jdk" targetName="JDK directory (Windows x64)"/>
+        <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh"
+              failonerror="true">
+            <arg value="${mathsat-windows-x64.path}"/>
+            <arg value="${gmp-windows-x64.path}"/>
+            <arg value="${jdk-windows-x64.path}"/>
+        </exec>
     </target>
 
-    <macrodef name="compile-mathsatlike-bindings-linux">
-        <attribute name="flag" default="mathsat"/>
-        <sequential>
-            <checkPathOption pathOption="mathsat.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Linux version)"/>
-            <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP source folder (Linux version)"/>
-            <exec executable="lib/native/source/libmathsat5j/compile.sh" failonerror="true">
-                <arg value="${mathsat.path}" />
-                <arg value="${gmp.path}" />
-                <arg value="-@{flag}" />
-            </exec>
-        </sequential>
-    </macrodef>
+    <target name="compile-optimathsat-bindings-linux-x64">
+        <checkPathOption pathOption="mathsat.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 directory (Linux x64)"/>
+        <checkPathOption pathOption="gmp.path" defaultPath="/path/to/gmp" targetName="GMP directory (Linux x64)"/>
+        <exec executable="lib/native/source/libmathsat5j/compile.sh" failonerror="true">
+            <arg value="${mathsat.path}"/>
+            <arg value="${gmp.path}"/>
+            <arg value="-optimathsat"/>
+        </exec>
+    </target>
 
-    <macrodef name="compile-mathsatlike-bindings-windows">
-        <attribute name="flag" default="mathsat"/> <!-- unused, OptiMathSAT not yet build for Windows -->
-        <sequential>
-            <checkPathOption pathOption="mathsat-windows.path" defaultPath="/path/to/mathsat" targetName="Mathsat5 source folder (Windows version)"/>
-            <checkPathOption pathOption="mpir-windows.path" defaultPath="/path/to/mpir" targetName="MPIR source folder (Windows version)"/>
-            <checkPathOption pathOption="jdk-windows.path" defaultPath="/path/to/jdk" targetName="JDK source folder (Windows version)"/>
-            <exec executable="lib/native/source/libmathsat5j/compileForWindows.sh" failonerror="true">
-                <arg value="${mathsat-windows.path}" />
-                <arg value="${mpir-windows.path}" />
-                <arg value="${jdk-windows.path}" />
-            </exec>
-        </sequential>
-    </macrodef>
-
-    <target name="publish-mathsat" depends="compile-mathsat-bindings-linux, compile-mathsat-bindings-windows, load-ivy"
+    <target name="publish-mathsat" depends="compile-mathsat-bindings-linux-x64, compile-mathsat-bindings-linux-arm64, compile-mathsat-bindings-windows-x64, load-ivy"
         description="Publish MathSAT binaries to Ivy repo.">
         <fail unless="mathsat.version">
             Please specify the MathSAT5 version with the flag -Dmathsat.version=... .
         </fail>
 
-        <copy file="lib/native/source/libmathsat5j/libmathsat5j.so" tofile="libmathsat5j-${mathsat.version}.so"/>
-        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="mathsat5j-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows.path}/lib/mathsat.dll" tofile="mathsat-${mathsat.version}.dll"/>
-        <copy file="${mathsat-windows.path}/bin/mpir.dll" tofile="mpir-${mathsat.version}.dll"/>
+        <mkdir dir="${mathsat.dist.dir}/x64"/>
+        <mkdir dir="${mathsat.dist.dir}/arm64"/>
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j-x64.so" tofile="${mathsat.dist.dir}/x64/libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/libmathsat5j-arm64.so" tofile="${mathsat.dist.dir}/arm64/libmathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/mathsat5j.dll" tofile="${mathsat.dist.dir}/x64/mathsat5j-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/lib/mathsat.dll" tofile="${mathsat.dist.dir}/x64/mathsat-${mathsat.version}.dll"/>
+        <copy file="${mathsat-windows-x64.path}/bin/gmp.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
+        <copy file="${gmp-windows-x64.path}/.libs/libgmp-10.dll" tofile="${mathsat.dist.dir}/x64/gmp-${mathsat.version}.dll"/>
 
-        <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml" />
-        <publishToRepository solverName="MathSAT" solverVersion="${mathsat.version}"/>
+        <ivy:resolve conf="solver-mathsat" file="solvers_ivy_conf/ivy_mathsat.xml"/>
+        <publishToRepository solverName="MathSAT" solverVersion="${mathsat.version}" distDir="${mathsat.dist.dir}"/>
+
+        <!--
+            We additionally provide x64-files without arch-attribute for backwards compatibility,
+            such that applications can load dependencies without changing their Ivy configuration.
+            Those files are not part of any direct configuration, but will be resolved if the
+            arch-attribute is not used.
+        -->
+        <echo>
+            Lets copy the files for architecture x64 into main directory, for backwards compatibility.
+            Afterward, please execute the SVN command from above.
+        </echo>
+        <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
+            <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                <include name="*-${mathsat.version}.*"/>
+            </fileset>
+        </copy>
     </target>
 
-    <target name="publish-optimathsat" depends="compile-optimathsat-bindings, load-ivy"
+    <target name="publish-optimathsat" depends="compile-optimathsat-bindings-linux-x64, load-ivy"
         description="Publish OptiMathSAT binaries to Ivy repo.">
         <fail unless="mathsat.version">
             Please specify the @{flag} version with the flag -Dmathsat.version=... .
         </fail>
 
-        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="liboptimathsat5j-${mathsat.version}.so"/>
+        <copy file="lib/native/source/libmathsat5j/liboptimathsat5j.so" tofile="${mathsat.dist.dir}/liboptimathsat5j-${mathsat.version}.so"/>
 
-        <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml" />
-        <publishToRepository solverName="OptiMathSAT" solverVersion="${mathsat.version}"/>
+        <ivy:resolve conf="solver-optimathsat" file="solvers_ivy_conf/ivy_optimathsat.xml"/>
+        <publishToRepository solverName="OptiMathSAT" solverVersion="${mathsat.version}" distDir="${mathsat.dist.dir}"/>
     </target>
 </project>

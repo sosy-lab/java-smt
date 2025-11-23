@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -34,7 +35,7 @@ public interface BitvectorFormulaManager {
    * Convert/Cast/Interpret a numeral formula into a bitvector with given size.
    *
    * <p>If the numeral formula is too large for the given length, we cut off the largest bits and
-   * only use the lest significant bits.
+   * only use the least significant bits.
    */
   BitvectorFormula makeBitvector(int length, IntegerFormula pI);
 
@@ -117,8 +118,8 @@ public interface BitvectorFormulaManager {
    *       dividend is negative.
    * </ul>
    *
-   * <p>We refer to the SMTLIB standard version 2.6 for the division and remainder operators in BV
-   * theory.
+   * <p>We refer to the SMTLIB standard version 2.6 for the division operator in BV theory for
+   * additional information.
    *
    * @param dividend dividend of the operation.
    * @param divisor divisor of the operation.
@@ -137,28 +138,31 @@ public interface BitvectorFormulaManager {
    * signed remainder() it follows the dividend). Unsigned remainder() is equivalent to unsigned
    * modulo().
    */
-  @Deprecated(forRemoval = true)
+  @Deprecated(
+      forRemoval = true,
+      since = "2024.08, because of inconsistent behavior at modulo and remainder operations")
   default BitvectorFormula modulo(
       BitvectorFormula dividend, BitvectorFormula divisor, boolean signed) {
     return remainder(dividend, divisor, signed);
   }
 
   /**
-   * This method returns the two complement signed remainder for the Euclidean division (modulo) of
-   * two bitvector formulas.
+   * This method returns the two complement signed remainder (smodulo(dividend, divisor) ==
+   * remainder) for the Euclidean division (dividend = quotient * divisor + remainder) of two
+   * bitvector formulas, with the sign of the remainder following the sign of the divisor.
    *
-   * <p>The sign of the result follows the sign of the divisor, i.e. the quotient calculated in the
+   * <p>The sign of the result follows the sign of the divisor; i.e. the quotient calculated in the
    * modulo operation is rounded in such a way that the result of the smodulo operation follows the
-   * sign of the divisor, e.g., a user can assume the following equations, with bitvectors
-   * interpreted as signed decimal numbers and % representing signed modulo, to hold:
+   * sign of the divisor. A user can assume the following example equations, with bitvectors
+   * interpreted as signed decimal numbers, to hold:
    *
    * <ul>
-   *   <li>10 % 5 == 0
-   *   <li>10 % 3 == 1
-   *   <li>10 % (-3) == -2
-   *   <li>-10 % 5 == 0
-   *   <li>-10 % 3 == 2
-   *   <li>-10 % (-3) == -1
+   *   <li>smodulo(10, 5) == 0
+   *   <li>smodulo(10, 3) == 1
+   *   <li>smodulo(10, -3) == -2
+   *   <li>smodulo(-10, 5) == 0
+   *   <li>smodulo(-10, 3) == 2
+   *   <li>smodulo(-10, -3) == -1
    * </ul>
    *
    * <p>If the divisor evaluates to zero (modulo-by-zero), either directly as value or indirectly
@@ -166,7 +170,11 @@ public interface BitvectorFormulaManager {
    * dividend itself. We refer to the SMTLIB standard version 2.6 for the division and remainder
    * operators in BV theory.
    *
-   * <p>For unsigned modulo, we refer to the unsigned remainder method.
+   * <p>For unsigned modulo, we refer to the unsigned remainder method {@link
+   * #remainder(BitvectorFormula, BitvectorFormula, boolean)}.
+   *
+   * <p>We refer to the SMTLIB standard version 2.6 for the smodulo operator in BV theory for
+   * additional information.
    *
    * @param dividend dividend of the operation.
    * @param divisor divisor of the operation.
@@ -174,30 +182,32 @@ public interface BitvectorFormulaManager {
   BitvectorFormula smodulo(BitvectorFormula dividend, BitvectorFormula divisor);
 
   /**
-   * This method returns the remainder for two bitvector formulas using the {@link
-   * #divide(BitvectorFormula, BitvectorFormula, boolean)} operation.
+   * This method returns the remainder (remainder(dividend, divisor) == remainder) for the Euclidean
+   * division (dividend = quotient * divisor + remainder) of two bitvector formulas.
    *
    * <p>For unsigned bitvectors, this returns the remainder of unsigned bitvector division.
    *
    * <p>For signed bitvectors, the sign of the result follows the sign of the dividend, i.e. the
    * quotient of the division is rounded in such a way that the sign of the result of the remainder
-   * operation follows the sign of the dividend, e.g., a user can assume the following equations,
-   * with bitvectors interpreted as signed decimal numbers and % representing signed remainder
-   * (similar to the C programming language), to hold:
+   * operation follows the sign of the dividend. A user can assume the following example equations,
+   * with bitvectors interpreted as signed decimal numbers, to hold:
    *
    * <ul>
-   *   <li>10 % 5 == 0
-   *   <li>10 % 3 == 1
-   *   <li>10 % (-3) == 1
-   *   <li>-10 % 5 == 0
-   *   <li>-10 % 3 == -1
-   *   <li>-10 % (-3) == -1
+   *   <li>remainder(10, 5, true) == 0
+   *   <li>remainder(10, 3, true) == 1
+   *   <li>remainder(10, -3, true) == 1
+   *   <li>remainder(-10, 5, true) == 0
+   *   <li>remainder(-10, 3, true) == -1
+   *   <li>remainder(-10, -3, true) == -1
    * </ul>
    *
    * <p>If the divisor evaluates to zero (modulo-by-zero), either directly as value or indirectly
    * via an additional constraint, then the result of the modulo operation is defined as the
    * dividend itself. We refer to the SMTLIB standard version 2.6 for the division and remainder
    * operators in BV theory.
+   *
+   * <p>We refer to the SMTLIB standard version 2.6 for the remainder operator in BV theory for
+   * additional information.
    *
    * @param dividend dividend of the operation. The sign bit is carried over from this bitvector for
    *     signed operations.
@@ -372,6 +382,23 @@ public interface BitvectorFormulaManager {
    * @param number from where the bits are extracted.
    * @param msb Upper index for the most significant bit. Must be in interval from lsb to bitsize-1.
    * @param lsb Lower index for the least significant bit. Must be in interval from 0 to msb.
+   * @param signed unused and will be removed in the future.
+   */
+  @Deprecated(forRemoval = true, since = "2022.04, because of unused flag for sign")
+  default BitvectorFormula extract(BitvectorFormula number, int msb, int lsb, boolean signed) {
+    return extract(number, msb, lsb);
+  }
+
+  /**
+   * Extract a range of bits from a bitvector. We require {@code 0 <= lsb <= msb < bitsize}.
+   *
+   * <p>If msb equals lsb, then a single bit will be returned, i.e., the bit from the given
+   * position. If lsb equals 0 and msb equals bitsize-1, then the complete bitvector will be
+   * returned.
+   *
+   * @param number from where the bits are extracted.
+   * @param msb Upper index for the most significant bit. Must be in interval from lsb to bitsize-1.
+   * @param lsb Lower index for the least significant bit. Must be in interval from 0 to msb.
    */
   BitvectorFormula extract(BitvectorFormula number, int msb, int lsb);
 
@@ -387,4 +414,8 @@ public interface BitvectorFormulaManager {
 
   /** All given bitvectors are pairwise unequal. */
   BooleanFormula distinct(List<BitvectorFormula> pBits);
+
+  default BooleanFormula distinct(BitvectorFormula... pBits) {
+    return distinct(ImmutableList.copyOf(pBits));
+  }
 }

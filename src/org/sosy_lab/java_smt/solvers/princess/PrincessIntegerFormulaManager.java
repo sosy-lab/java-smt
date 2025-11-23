@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
+import ap.parser.IFormula;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.theories.nia.GroebnerMultiplication;
@@ -99,5 +100,45 @@ class PrincessIntegerFormulaManager
   @Override
   protected boolean isNumeral(IExpression val) {
     return val instanceof IIntLit;
+  }
+
+  @Override
+  protected IExpression floor(IExpression pNumber) {
+    return pNumber; // identity for integers
+  }
+
+  @Override
+  protected ITerm negate(IExpression pNumber) {
+    return ((ITerm) pNumber).unary_$minus();
+  }
+
+  @Override
+  protected ITerm add(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$plus((ITerm) pNumber2);
+  }
+
+  @Override
+  protected ITerm subtract(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$minus((ITerm) pNumber2);
+  }
+
+  @Override
+  protected IFormula greaterThan(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$greater((ITerm) pNumber2);
+  }
+
+  @Override
+  protected IFormula greaterOrEquals(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$greater$eq((ITerm) pNumber2);
+  }
+
+  @Override
+  protected IFormula lessThan(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$less((ITerm) pNumber2);
+  }
+
+  @Override
+  protected IFormula lessOrEquals(IExpression pNumber1, IExpression pNumber2) {
+    return ((ITerm) pNumber1).$less$eq((ITerm) pNumber2);
   }
 }

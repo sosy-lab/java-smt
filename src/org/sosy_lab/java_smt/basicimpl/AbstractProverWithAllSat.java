@@ -12,6 +12,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -67,6 +68,7 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
   private <R> void iterateOverAllModels(
       AllSatCallback<R> callback, List<BooleanFormula> importantPredicates)
       throws SolverException, InterruptedException {
+    final Set<ImmutableList<BooleanFormula>> modelEvaluations = new LinkedHashSet<>();
     while (!isUnsat()) {
       shutdownNotifier.shutdownIfNecessary();
 
@@ -87,6 +89,11 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
       }
 
       final ImmutableList<BooleanFormula> values = valuesOfModel.build();
+      // avoid endless loops in case of repeated models.
+      Preconditions.checkState(
+          modelEvaluations.add(values),
+          "The model evaluation %s was found before. ALLSAT computation did not make progress.",
+          values);
       callback.apply(values);
       shutdownNotifier.shutdownIfNecessary();
 
@@ -154,5 +161,6 @@ public abstract class AbstractProverWithAllSat<T> extends AbstractProver<T> {
    *
    * @throws SolverException if model can not be constructed.
    */
-  protected abstract Evaluator getEvaluatorWithoutChecks() throws SolverException;
+  protected abstract Evaluator getEvaluatorWithoutChecks()
+      throws SolverException, InterruptedException;
 }

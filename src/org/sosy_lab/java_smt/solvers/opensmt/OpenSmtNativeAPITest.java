@@ -37,8 +37,7 @@ public class OpenSmtNativeAPITest {
   @BeforeClass
   public static void load() {
     try {
-      NativeLibraries.loadLibrary("opensmt");
-      NativeLibraries.loadLibrary("opensmtjava");
+      NativeLibraries.loadLibrary("opensmtj");
     } catch (UnsatisfiedLinkError e) {
       throw new AssumptionViolatedException("OpenSMT is not available", e);
     }
@@ -52,9 +51,9 @@ public class OpenSmtNativeAPITest {
       return vars;
     } else {
       VectorPTRef vars = new VectorPTRef();
-      for (PTRef sub : logic.getPterm(term).getArgs()) {
-        VectorPTRef res = variables(logic, sub);
-        vars.addAll(res);
+      for (int i = 0; i < logic.getPterm(term).size(); i++) {
+        PTRef sub = logic.getPterm(term).at(i);
+        vars.addAll(variables(logic, sub));
       }
       return vars;
     }
@@ -435,6 +434,7 @@ public class OpenSmtNativeAPITest {
 
     SMTConfig config = new SMTConfig();
     config.setOption(":produce-unsat-cores", new SMTOption(true));
+    config.setOption(":print-cores-full", new SMTOption(true));
 
     MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
 
@@ -447,5 +447,44 @@ public class OpenSmtNativeAPITest {
 
     VectorPTRef core = mainSolver.getUnsatCore();
     assertThat(core).containsExactly(b1, nb1);
+  }
+
+  @Test
+  public void proofTest() {
+    Logic logic = LogicFactory.getInstance(Logic_t.QF_UF);
+
+    PTRef q1 = logic.mkBoolVar("q1");
+    PTRef q2 = logic.mkBoolVar("q2");
+    PTRef nq1 = logic.mkNot(q1);
+    PTRef nq2 = logic.mkNot(q2);
+
+    SMTConfig config = new SMTConfig();
+    config.setOption(":produce-proofs", new SMTOption(true));
+
+    MainSolver mainSolver = new MainSolver(logic, config, "opensmt-test");
+
+    mainSolver.insertFormula(logic.mkOr(nq1, q2));
+    mainSolver.insertFormula(q1);
+    mainSolver.insertFormula(nq2);
+
+    sstat r = mainSolver.check();
+    assertThat(r).isEqualTo(sstat.False());
+
+    String expected =
+        "(proof \n"
+            + "(let (cls_13 q1 )\n"
+            + "(let (cls_9 (or q2 (not q1) ))\n"
+            + "; q2 \n"
+            + "(let (cls_16 (res cls_9 cls_13 q1))\n"
+            + "(let (cls_19 (not q2) )\n"
+            + "; -\n"
+            + "(let (cls_4294967295 (res cls_19 cls_16 q2))\n"
+            + "cls_0\n"
+            + ")))))\n"
+            + ":core\n"
+            + "( cls_9 cls_13 cls_19 )\n"
+            + ")\n";
+
+    assertThat(mainSolver.printResolutionProofSMT2()).isEqualTo(expected);
   }
 }

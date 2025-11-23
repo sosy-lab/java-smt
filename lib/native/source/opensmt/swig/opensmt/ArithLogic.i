@@ -6,6 +6,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
 %ignore LessThan_deepPTRef;
 %ignore LANonLinearException;
 %ignore ArithDivisionByZeroException;
@@ -32,7 +33,7 @@
 %ignore ArithLogic::s_framev_prefix;
 %ignore ArithLogic::s_abstract_value_prefix;
 
-%ignore ArithLogic::ArithLogic (opensmt::Logic_t type);
+%ignore ArithLogic::ArithLogic (Logic_t type);
 %ignore ArithLogic::isBuiltinFunction (SymRef sr) const override;
 %ignore ArithLogic::isIntMinusOne (PTRef tr) const;
 %ignore ArithLogic::isMinusOne (PTRef tr) const;
@@ -40,14 +41,14 @@
 %ignore ArithLogic::insertTerm (SymRef sym, vec< PTRef > &&terms) override;
 %ignore ArithLogic::mkConst (const char *name) override;
 %ignore ArithLogic::mkConst (SRef s, const std::string &name);
-%ignore ArithLogic::mkConst (SRef s, opensmt::Number const &c);
-%ignore ArithLogic::mkIntConst (opensmt::Number const &c);
+%ignore ArithLogic::mkConst (SRef s, Number const &c);
+%ignore ArithLogic::mkIntConst (Number const &c);
 %extend ArithLogic {
   PTRef mkIntConst(const std::string& c) {
     return $self->mkIntConst(FastRational(c.c_str()));
   }
  }
-%ignore ArithLogic::mkRealConst (opensmt::Number const &c);
+%ignore ArithLogic::mkRealConst (Number const &c);
 %extend ArithLogic {
   PTRef mkRealConst(const std::string& c) {
     return $self->mkRealConst(FastRational(c.c_str()));
@@ -191,10 +192,10 @@
 %ignore ArithLogic::isIntOne (SymRef sr) const;
 %ignore ArithLogic::isRealOne (SymRef sr) const;
 %ignore ArithLogic::isNumTerm (PTRef tr) const;
-%ignore ArithLogic::checkSortInt (PTRef tr);
-%ignore ArithLogic::checkSortReal (PTRef tr);
-%ignore ArithLogic::checkSortInt (vec< PTRef > const &args);
-%ignore ArithLogic::checkSortReal (vec< PTRef > const &args);
+%ignore ArithLogic::checkSortInt (PTRef tr) const;
+%ignore ArithLogic::checkSortReal (PTRef tr) const;
+%ignore ArithLogic::checkSortInt (vec< PTRef > const &args) const;
+%ignore ArithLogic::checkSortReal (vec< PTRef > const &args) const;
 %ignore ArithLogic::getPlusForSort (SRef sort) const;
 %ignore ArithLogic::getTimesForSort (SRef sort) const;
 %ignore ArithLogic::getMinusForSort (SRef sort) const;
@@ -230,9 +231,10 @@
 %ignore ArithLogic::termSort (vec< PTRef > &v) const override;
 %ignore ArithLogic::removeAuxVars (PTRef) override;
 %ignore ArithLogic::printTerm_ (PTRef tr, bool ext, bool s) const override;
-%ignore ArithLogic::getConstantFromLeq (PTRef);
-%ignore ArithLogic::getTermFromLeq (PTRef);
-%ignore ArithLogic::leqToConstantAndTerm (PTRef);
+%ignore ArithLogic::getConstantFromLeq (PTRef) const;
+%ignore ArithLogic::getTermFromLeq (PTRef) const;
+%ignore ArithLogic::leqToConstantAndTerm (PTRef) const;
 %ignore ArithLogic::getNestedBoolRoots (PTRef) const override;
+}
 
-%include "include/opensmt/ArithLogic.h"
+%include "include/opensmt/logics/ArithLogic.h"

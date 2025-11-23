@@ -3,7 +3,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -36,6 +36,7 @@ SPDX-License-Identifier: Apache-2.0
     "/>
     <property name="ivy.configuration.main" value="core"/>
     <property name="ivy.configurations" value="build, ${ivy.configuration.main}, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
+    <property name="ivy.solver.dist.dir" value="dist"/> <!-- removable directory for publishing solver libraries -->
     <property name="package" value="java_smt"/>
     <property name="jar.excludes" value="**/*Test.class **/*Test$*.class ${yices2Classes} **/*smt2"/>
     <property name="jar.sources.excludes" value="**/*Test.java ${yices2Sources}"/>
@@ -79,12 +80,14 @@ SPDX-License-Identifier: Apache-2.0
     <!-- Main targets -->
 
     <target name="clean" description="Clean">
-        <property name="bitwuzla.path" value="${user.dir}/lib/native/source/libbitwuzla"/>
+        <property name="jarFiles" value="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.jar"/>
+        <property name="libraryFiles" value="*.so *.dll *.dylib dist/"/>
+
         <delete includeEmptyDirs="true">
-            <fileset dir="." includes="${class.dir}/** ${ivy.module}-*.jar ivy-*.xml *.so *.dll *.dylib *.jar"/>
+            <fileset dir="." includes="${libraryFiles} ${jarFiles} Javadoc-z3/"/>
             <fileset dir="lib/native/source/libmathsat5j" includes="*.so *.dll *.o"/>
-            <fileset dir="${bitwuzla.path}" includes="include/"/>
-            <fileset dir="${bitwuzla.path}" includes="bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/libbitwuzla" includes="install-linux/ install-linux-x64/ install-linux-arm64/ install-windows/ install-windows-x64/ build/ doc/ *.so *.dll bitwuzla_wrap.o"/>
+            <fileset dir="lib/native/source/opensmt" includes="build/ doc/ install-linux-x64/ install-linux-arm64/ *.o *.so version.h"/>
         </delete>
     </target>
 

@@ -13,14 +13,17 @@ import com.google.common.base.VerifyException;
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Native.LongPtr;
+import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
+import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.basicimpl.AbstractProver;
 
@@ -45,23 +48,27 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
     Preconditions.checkState(!isClosed());
     ImmutableList.Builder<ValueAssignment> out = ImmutableList.builder();
 
-    // Iterate through constants.
-    for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
-      long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
-      Native.incRef(z3context, keyDecl);
-      out.addAll(getConstAssignments(keyDecl));
-      Native.decRef(z3context, keyDecl);
-    }
-
-    // Iterate through function applications.
-    for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
-      long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
-      Native.incRef(z3context, funcDecl);
-      if (!isInternalSymbol(funcDecl)) {
-        String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
-        out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+    try {
+      // Iterate through constants.
+      for (int constIdx = 0; constIdx < Native.modelGetNumConsts(z3context, model); constIdx++) {
+        long keyDecl = Native.modelGetConstDecl(z3context, model, constIdx);
+        Native.incRef(z3context, keyDecl);
+        out.addAll(getConstAssignments(keyDecl));
+        Native.decRef(z3context, keyDecl);
       }
-      Native.decRef(z3context, funcDecl);
+
+      // Iterate through function applications.
+      for (int funcIdx = 0; funcIdx < Native.modelGetNumFuncs(z3context, model); funcIdx++) {
+        long funcDecl = Native.modelGetFuncDecl(z3context, model, funcIdx);
+        Native.incRef(z3context, funcDecl);
+        if (!isInternalSymbol(funcDecl)) {
+          String functionName = z3creator.symbolToString(Native.getDeclName(z3context, funcDecl));
+          out.addAll(getFunctionAssignments(funcDecl, funcDecl, functionName));
+        }
+        Native.decRef(z3context, funcDecl);
+      }
+    } catch (Z3Exception e) {
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e);
     }
 
     return out.build();
@@ -77,8 +84,13 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
       case Z3_OP_ARRAY_EXT:
         return true;
       default:
+        long declName = Native.getDeclName(z3context, funcDecl);
+        Z3_symbol_kind kind = Z3_symbol_kind.fromInt(Native.getSymbolKind(z3context, declName));
+        if (kind == Z3_symbol_kind.Z3_INT_SYMBOL) { // bound variables
+          return true;
+        }
         return Z3_IRRELEVANT_MODEL_TERM_PATTERN
-            .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
+            .matcher(z3creator.symbolToString(declName))
             .matches();
     }
   }
@@ -375,9 +387,15 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
   }
 
   @Override
+  @Nullable
   protected Long evalImpl(Long formula) {
     LongPtr resultPtr = new LongPtr();
-    boolean satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    boolean satisfiableModel;
+    try {
+      satisfiableModel = Native.modelEval(z3context, model, formula, false, resultPtr);
+    } catch (Z3Exception e) {
+      throw z3creator.handleZ3ExceptionAsRuntimeException(e);
+    }
     Preconditions.checkState(satisfiableModel);
     if (resultPtr.value == 0) {
       // unknown evaluation

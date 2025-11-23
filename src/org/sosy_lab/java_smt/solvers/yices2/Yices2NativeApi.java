@@ -13,7 +13,7 @@ import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
-public class Yices2NativeApi {
+public final class Yices2NativeApi {
   private Yices2NativeApi() {}
 
   // Yices2 status codes
@@ -89,6 +89,7 @@ public class Yices2NativeApi {
   // MAX_INT avoids collisions with existing constants
   public static final int YICES_AND = Integer.MAX_VALUE - 1;
   public static final int YICES_BV_MUL = Integer.MAX_VALUE - 2;
+  public static final int YICES_ARRAY_SELECT = Integer.MAX_VALUE - 3;
 
   /*
    * Yices model tags
@@ -610,7 +611,15 @@ public class Yices2NativeApi {
   public static native int[] yices_bvsum_component(int t, int i, int bitsize);
 
   // TODO can return up to UINT32_MAX ?
-  /** Returns an array in the form [term,power]. */
+  //  Daniel: we cast the uint return of exp to signed int (jint), this is obviously wrong!
+  /**
+   * Returns an array of size 2 in the form [term,exp] for the term and exponent at index i and
+   * checks automatically for errors (original function return) and throws IllegalArgumentException
+   * for return value -1. Original API: int32_t yices_product_component(term_t t, int32_t i, term_t
+   * *term, uint32_t *exp) Component of a power product. A product t is of the form t0^d0 × … ×
+   * tn^dn. This function stores the term ti into *term and the exponent di into *exp. The function
+   * returns -1 if t is not a product or if the index i is too large. It returns 0 otherwise.
+   */
   public static native int[] yices_product_component(int t, int i);
 
   /*
@@ -782,25 +791,6 @@ public class Yices2NativeApi {
   public static native int yices_parse_term(String t);
 
   public static native int yices_subst_term(int size, int[] from, int[] to, int t);
-
-  public static int yices_named_variable(int type, String name) {
-    int termFromName = yices_get_term_by_name(name);
-    if (termFromName != -1) {
-      int termFromNameType = yices_type_of_term(termFromName);
-      if (type == termFromNameType) {
-        return termFromName;
-      } else {
-        throw new IllegalArgumentException(
-            String.format(
-                "Can't create variable with name '%s' and type '%s' "
-                    + "as it would omit a variable with type '%s'",
-                name, yices_type_to_string(type), yices_type_to_string(termFromNameType)));
-      }
-    }
-    int var = yices_new_uninterpreted_term(type);
-    yices_set_term_name(var, name);
-    return var;
-  }
 
   /**
    * @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise

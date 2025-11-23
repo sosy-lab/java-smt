@@ -21,6 +21,16 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 public interface FormulaManager {
 
   /**
+   * Standardized message for not implemented API methods.
+   *
+   * <p>This constant can be used in {@link UnsupportedOperationException} to indicate that a
+   * certain method is not implemented by some subclass. We recommend using this constant in API
+   * extensions where the default implementation throws an exception.
+   */
+  String API_METHOD_NOT_IMPLEMENTED =
+      "The requested method is not implemented in the current implementation of this interface.";
+
+  /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
    * and Rational-Theory, the Integer- and the RationalFormulaManager both return the same Formulas
    * for numeric operations like ADD, SUBTRACT, TIMES, LESSTHAN, EQUAL and others.
@@ -140,7 +150,7 @@ public interface FormulaManager {
    * <code>set-info</code>. Most solvers just ignore those commands.
    *
    * <p>Variables that are defined, but not used in the assertion, might be ignored by the SMT
-   * solver and they might not be available for later usage.
+   * solver, and they might not be available for later usage.
    *
    * @return A single formula from the assertion in the internal representation.
    * @throws IllegalArgumentException If the string cannot be parsed.
@@ -161,23 +171,31 @@ public interface FormulaManager {
   /**
    * Apply a tactic which performs formula transformation. The available tactics depend on the used
    * solver.
+   *
+   * @throws InterruptedException If the solver is interrupted.
+   * @throws SolverException If the solver fails to apply the tactic.
    */
-  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic) throws InterruptedException;
+  BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
+      throws InterruptedException, SolverException;
 
   /**
    * Simplify an input formula, while ensuring equivalence.
    *
    * <p>For solvers that do not provide a simplification API, an original formula is returned.
    *
+   * <p>If the solver throws an error, we ignore the specific exception (except interrupts) and also
+   * return the original formula.
+   *
    * @param input The input formula
    * @return Simplified version of the formula
+   * @throws InterruptedException If the solver is interrupted.
    */
   <T extends Formula> T simplify(T input) throws InterruptedException;
 
   /**
    * Visit the formula with a given visitor.
    *
-   * <p>This method does <b>not recursively visit</b> sub-components of a formula its own, so the
+   * <p>This method does <b>not recursively visit</b> subcomponents of a formula its own, so the
    * given {@link FormulaVisitor} needs to call such visitation on its own.
    *
    * <p>Please be aware that calling this method might cause extensive stack usage depending on the
@@ -193,7 +211,7 @@ public interface FormulaManager {
 
   /**
    * Visit the formula recursively with a given {@link FormulaVisitor}. This method traverses
-   * sub-components of a formula automatically, depending on the return value of the {@link
+   * subcomponents of a formula automatically, depending on the return value of the {@link
    * TraversalProcess} in the given {@link FormulaVisitor}.
    *
    * <p>This method guarantees that the traversal is done iteratively, without using Java recursion,

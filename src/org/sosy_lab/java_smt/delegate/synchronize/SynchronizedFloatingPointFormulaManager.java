@@ -17,7 +17,9 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -32,6 +34,22 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
       FloatingPointFormulaManager pDelegate, SolverContext pSync) {
     delegate = checkNotNull(pDelegate);
     sync = checkNotNull(pSync);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    synchronized (sync) {
+      return delegate.makeRoundingMode(pRoundingMode);
+    }
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    synchronized (sync) {
+      return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+    }
   }
 
   @Override
@@ -98,9 +116,9 @@ class SynchronizedFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     synchronized (sync) {
-      return delegate.makeNumber(exponent, mantissa, signBit, type);
+      return delegate.makeNumber(exponent, mantissa, sign, type);
     }
   }
 

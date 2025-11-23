@@ -44,6 +44,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     return fmgr;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public final ProverEnvironment newProverEnvironment(ProverOptions... options) {
     ProverEnvironment out = newProverEnvironment0(toSet(options));

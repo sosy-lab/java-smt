@@ -101,7 +101,12 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     FunctionSymbol fsym = environment.getTheory().getFunction(fun, paramSorts);
 
     if (fsym == null) {
-      environment.declareFun(fun, paramSorts, resultSort);
+      try {
+        environment.declareFun(fun, paramSorts, resultSort);
+      } catch (SMTLIBException e) {
+        // can fail, if function is already declared with a different sort
+        throw new IllegalArgumentException("Cannot declare function '" + fun + "'", e);
+      }
       return environment.getTheory().getFunction(fun, paramSorts);
     } else {
       if (!fsym.getReturnSort().equals(resultSort)) {
@@ -174,15 +179,6 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
     }
   }
 
-  /** ApplicationTerms can be wrapped with "|". This function removes those chars. */
-  public static String dequote(String s) {
-    int l = s.length();
-    if (s.charAt(0) == '|' && s.charAt(l - 1) == '|') {
-      return s.substring(1, l - 1);
-    }
-    return s;
-  }
-
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula f, final Term input) {
     checkArgument(
@@ -212,9 +208,9 @@ class SmtInterpolFormulaCreator extends FormulaCreator<Term, Sort, Script, Funct
 
       if (arity == 0) {
         if (app.equals(environment.getTheory().mTrue)) {
-          return visitor.visitConstant(f, Boolean.TRUE);
+          return visitor.visitConstant(f, true);
         } else if (app.equals(environment.getTheory().mFalse)) {
-          return visitor.visitConstant(f, Boolean.FALSE);
+          return visitor.visitConstant(f, false);
         } else if (func.getDefinition() == null) {
           return visitor.visitFreeVariable(f, dequote(input.toString()));
         } else {

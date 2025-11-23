@@ -15,14 +15,18 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -33,9 +37,9 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
  *
  * <p>For {@link #multiply(FloatingPointFormula, FloatingPointFormula)}, and {@link
  * #divide(FloatingPointFormula, FloatingPointFormula)} this class even offers an implementation
- * based on UFs. Sub-classes are supposed to override them if they can implement these operations
+ * based on UFs. Subclasses are supposed to override them if they can implement these operations
  * more precisely (for example multiplication with constants should be supported by all solvers and
- * implemented by all sub-classes).
+ * implemented by all subclasses).
  */
 @SuppressWarnings("ClassTypeParameterName")
 public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
@@ -57,6 +61,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    return getFormulaCreator().encapsulateRoundingMode(getRoundingMode(pRoundingMode));
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return getFormulaCreator().getRoundingMode(extractInfo(pRoundingModeFormula));
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
@@ -136,18 +152,24 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   @Override
   public FloatingPointFormula makeNumber(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type) {
-    return wrap(makeNumberImpl(exponent, mantissa, signBit, type));
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
+    return wrap(makeNumberImpl(exponent, mantissa, sign, type));
   }
 
   protected abstract TFormulaInfo makeNumberImpl(
-      BigInteger exponent, BigInteger mantissa, boolean signBit, FloatingPointType type);
+      BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   protected static boolean isNegativeZero(Double pN) {
     Preconditions.checkNotNull(pN);
     return Double.valueOf("-0.0").equals(pN);
   }
 
+  /**
+   * Parses the provided string and converts it into a floating-point formula.
+   *
+   * <p>The input string must represent a valid finite floating-point number. Values such as NaN,
+   * Infinity, or -Infinity are not allowed and should be handled before calling this method.
+   */
   protected abstract TFormulaInfo makeNumberAndRound(
       String pN, FloatingPointType pType, TFormulaInfo pFloatingPointRoundingMode);
 
@@ -238,6 +260,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
+    Preconditions.checkArgument(
+        bvType.getSize() == pTargetType.getTotalSize(),
+        MoreStrings.lazyString(
+            () ->
+                String.format(
+                    "The total size %s of type %s has to match the size %s of type %s.",
+                    pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -64,7 +65,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
   }
 
-  protected static SMTConfig getConfigInstance(
+  static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
@@ -73,14 +74,19 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
         new SMTOption(
             pOptions.contains(ProverOptions.GENERATE_MODELS)
                 || pOptions.contains(ProverOptions.GENERATE_ALL_SAT)));
-    config.setOption(
-        ":produce-unsat-cores",
-        new SMTOption(pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)));
+    SMTOption optUnsatCore = new SMTOption(pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE));
+    config.setOption(":produce-unsat-cores", optUnsatCore);
+    config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
     if (interpolation) {
-      config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
-      config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
-      config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
+      config.setOption(
+          ":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool.getValue()));
+      config.setOption(
+          ":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf.getValue()));
+      config.setOption(
+          ":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra.getValue()));
+      config.setOption(
+          ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }
     return config;
   }
@@ -216,7 +222,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       return "Unknown reason.";
     } else {
       return String.format(
-          "Assertions use features %s that are not supported " + "by the specified logic %s.",
+          "Assertions use features %s that are not supported by the specified logic %s.",
           errors, creator.getLogic());
     }
   }
@@ -266,12 +272,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
     Preconditions.checkState(!changedSinceLastSatQuery);
-
-    ImmutableList.Builder<BooleanFormula> result = ImmutableList.builder();
-    for (PTRef r : osmtSolver.getUnsatCore()) {
-      result.add(creator.encapsulateBoolean(r));
-    }
-    return result.build();
+    return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 
   @Override

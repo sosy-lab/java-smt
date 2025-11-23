@@ -8,22 +8,32 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.base.Preconditions;
-import java.util.Arrays;
+import com.google.common.collect.ImmutableList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager;
 
 /**
- * Manager for dealing with string formulas. Functions come from
- * http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml.
+ * Manager for dealing with string formulas. Functions come from <a
+ * href="http://smtlib.cs.uiowa.edu/theories-UnicodeStrings.shtml">String theory in SMTLIB</a>.
  */
 public interface StringFormulaManager {
 
   /**
-   * Returns a {@link StringFormula} representing the given constant.
+   * Creates a {@link StringFormula} representing the given constant String.
    *
-   * @param value the string value the returned <code>Formula</code> should represent
-   * @return a Formula representing the given value
+   * <p>The String argument is expected to be a regular Java String and may contain Unicode
+   * characters from the first 3 planes (codepoints 0x00000-0x2FFFFF). Higher codepoints are not
+   * allowed due to limitations in SMTLIB. We do not support SMTLIB escape sequences in this method,
+   * and String like <code>"\\u{abc}"</code> are read verbatim and are not substituted with their
+   * Unicode character. If you still want to use SMTLIB Strings with this method, the function
+   * {@link AbstractStringFormulaManager#unescapeUnicodeForSmtlib(String)} can be used to handle the
+   * conversion before calling this method. Note that you may then also have to use {@link
+   * AbstractStringFormulaManager#escapeUnicodeForSmtlib(String)} to convert Strings from the model
+   * back to a format that is compatible with other SMTLIB based solvers.
+   *
+   * @param value the string value the returned {@link StringFormula} should represent
+   * @return a {@link StringFormula} representing the given value
    */
   StringFormula makeString(String value);
 
@@ -71,9 +81,8 @@ public interface StringFormulaManager {
   IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex);
 
   /**
-   * Get a substring of length 1 from the given String.
-   *
-   * <p>The result is underspecified, if the index is out of bounds for the given String.
+   * Get a substring of length 1 from the given String if the given index is within bounds.
+   * Otherwise, returns an empty string.
    */
   StringFormula charAt(StringFormula str, IntegerFormula index);
 
@@ -95,7 +104,7 @@ public interface StringFormulaManager {
   IntegerFormula length(StringFormula str);
 
   default StringFormula concat(StringFormula... parts) {
-    return concat(Arrays.asList(parts));
+    return concat(ImmutableList.copyOf(parts));
   }
 
   StringFormula concat(List<StringFormula> parts);
@@ -149,13 +158,6 @@ public interface StringFormulaManager {
    * @see #range(StringFormula, StringFormula)
    */
   default RegexFormula range(char start, char end) {
-    Preconditions.checkArgument(
-        start <= end,
-        "Range from start '%s' (%s) to end '%s' (%s) is empty.",
-        start,
-        (int) start,
-        end,
-        (int) end);
     return range(makeString(String.valueOf(start)), makeString(String.valueOf(end)));
   }
 
@@ -163,7 +165,7 @@ public interface StringFormulaManager {
    * @return formula denoting the concatenation
    */
   default RegexFormula concat(RegexFormula... parts) {
-    return concatRegex(Arrays.asList(parts));
+    return concatRegex(ImmutableList.copyOf(parts));
   }
 
   /**
@@ -231,4 +233,17 @@ public interface StringFormulaManager {
    * It returns the empty string <code>""</code> for negative numbers.
    */
   StringFormula toStringFormula(IntegerFormula number);
+
+  /**
+   * Returns an Integer formula representing the code point of the only character of the given
+   * String formula, if it represents a single character. Otherwise, returns -1.
+   */
+  IntegerFormula toCodePoint(StringFormula str);
+
+  /**
+   * Returns a String formula representing the single character with the given code point, if it is
+   * a valid Unicode code point within the Basic Multilingual Plane (BMP) or planes 1 and 2
+   * (codepoints in range [0x00000, 0x2FFFF]). Otherwise, returns the empty string.
+   */
+  StringFormula fromCodePoint(IntegerFormula codePoint);
 }

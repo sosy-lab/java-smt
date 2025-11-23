@@ -8,19 +8,21 @@
 
 package org.sosy_lab.java_smt.test;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.getLast;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 
 import com.google.common.base.Splitter;
-import com.google.common.collect.HashMultiset;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Multiset;
+import com.google.common.collect.Multimap;
 import com.google.common.truth.TruthJUnit;
-import java.util.List;
+import java.util.Collection;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import org.junit.AssumptionViolatedException;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -29,9 +31,19 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 
 @SuppressWarnings("checkstyle:linelength")
 public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  private static final String BOOL_CHECK =
+      "(declare-fun x () Bool)(declare-fun y () Bool)(assert (= y x))";
+
+  private static final String BOOL_VARS_W_LOGIC = "(set-logic ALL)" + BOOL_CHECK;
+
+  private static final String BOOL_VARS_W_LOGIC_AND_COMMENT =
+      "; Some comment in SMTLIB2\n" + BOOL_VARS_W_LOGIC;
+
   private static final String MATHSAT_DUMP1 =
       "(set-info :source |printed by MathSAT|)\n"
           + "(declare-fun a () Bool)\n"
@@ -96,6 +108,44 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
           + "(declare-fun u () Bool)\n"
           + "(assert  (let (($x35 (and (xor q (= (+ a b) c)) (>= a b)))) (let (($x9 (= a b))) (and"
           + " (and (or $x35 u) q) (and $x9 $x35)))))";
+
+  private static final Collection<String> ABDE = ImmutableSet.of("a", "b", "d", "e");
+  private static final Collection<String> AQBCU = ImmutableSet.of("a", "q", "b", "c", "u");
+  private static final Collection<String> QBCU = ImmutableSet.of("q", "b", "c", "u");
+
+  @Test
+  public void logicsParseTest() throws SolverException, InterruptedException {
+    requireParser();
+    // Some solvers have problems with (set-logic xxx) in the beginning
+
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula expr = bmgr.equivalence(y, x);
+
+    // actual test
+    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC);
+    assertThatFormula(parsedForm).isEquivalentTo(expr);
+  }
+
+  @Test
+  public void commentsParseTest() throws SolverException, InterruptedException {
+    requireParser();
+    // Some solvers have problems with comments in the beginning
+
+    // Boolector will fail this anyway since bools are bitvecs for btor
+    TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    BooleanFormula x = bmgr.makeVariable("x");
+    BooleanFormula y = bmgr.makeVariable("y");
+    BooleanFormula expr = bmgr.equivalence(y, x);
+
+    // actual test
+    BooleanFormula parsedForm = mgr.parse(BOOL_VARS_W_LOGIC_AND_COMMENT);
+    assertThatFormula(parsedForm).isEquivalentTo(expr);
+  }
 
   @Test
   public void varDumpTest() {
@@ -236,83 +286,83 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
   @Test
   public void parseMathSatTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr);
+    compareParseWithOrgParseFirst(MATHSAT_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseMathSatTestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr);
+    compareParseWithOrgExprFirst(MATHSAT_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseSmtinterpolTestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
+    compareParseWithOrgParseFirst(SMTINTERPOL_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseSmtinterpolTestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr);
+    compareParseWithOrgExprFirst(SMTINTERPOL_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseZ3TestParseFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr);
+    compareParseWithOrgParseFirst(Z3_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseZ3TestExprFirst1() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr);
+    compareParseWithOrgExprFirst(Z3_DUMP1, this::genBoolExpr, ABDE);
   }
 
   @Test
   public void parseMathSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     requireIntegers();
-    compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgParseFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
   @Test
   public void parseMathSatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgExprFirst(MATHSAT_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
   @Test
   public void parseSmtinterpolSatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     requireIntegers();
-    compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgParseFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen, QBCU);
   }
 
   @Test
   public void parseSmtinterpolSatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgExprFirst(SMTINTERPOL_DUMP2, this::redundancyExprGen, QBCU);
   }
 
   @Test
   public void parseZ3SatTestParseFirst2() throws SolverException, InterruptedException {
     requireParser();
     requireIntegers();
-    compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgParseFirst(Z3_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
   @Test
   public void parseZ3SatTestExprFirst2() throws SolverException, InterruptedException {
     requireParser();
-    compareParseWithOrgExprFirst(Z3_DUMP2, this::redundancyExprGen);
+    compareParseWithOrgExprFirst(Z3_DUMP2, this::redundancyExprGen, AQBCU);
   }
 
   @Test
   public void parseMathSatTestExprFirst3() throws SolverException, InterruptedException {
     requireParser();
     requireIntegers();
-    compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen);
+    compareParseWithOrgExprFirst(MATHSAT_DUMP3, this::functionExprGen, ImmutableSet.of("fun_b"));
   }
 
   @Test
@@ -321,7 +371,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
         .withMessage(
             "Solver %s does not remove redundant sub formulae from formula dump.", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.YICES2, Solvers.CVC5);
+        .isNotEqualTo(Solvers.YICES2);
 
     assume()
         .withMessage(
@@ -357,7 +407,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     String formDump = mgr.dumpFormula(imgr.equal(calc, int1)).toString();
 
     // check if dumped formula fits our specification
-    checkThatFunOnlyDeclaredOnce(formDump);
+    checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("fun_a", "fun_b"));
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
@@ -377,17 +427,41 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     String formDump = mgr.dumpFormula(imgr.equal(calc, int1)).toString();
 
     // check if dumped formula fits our specification
-    checkThatFunOnlyDeclaredOnce(formDump);
+    checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("fun_a"));
     checkThatAssertIsInLastLine(formDump);
     checkThatDumpIsParseable(formDump);
   }
 
-  private void compareParseWithOrgExprFirst(String textToParse, Supplier<BooleanFormula> fun)
+  @Test
+  public void funDeclareWithArrayTest() {
+    requireIntegers();
+    requireArrays();
+
+    IntegerFormula idx = imgr.makeVariable("idx");
+    IntegerFormula int1 = imgr.makeNumber(1);
+    IntegerFormula int2 = imgr.makeNumber(2);
+
+    // assert (((select (store arr idx 2) 1) 2)
+    var arr = amgr.makeArray("arr", FormulaType.IntegerType, FormulaType.IntegerType);
+    var store = amgr.store(arr, idx, int2);
+    var select = amgr.select(store, int1);
+    var query = imgr.equal(int2, select);
+
+    String formDump = mgr.dumpFormula(query).toString();
+
+    // check if dumped formula fits our specification
+    checkThatFunOnlyDeclaredOnce(formDump, ImmutableSet.of("idx", "arr"));
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
+  }
+
+  private void compareParseWithOrgExprFirst(
+      String textToParse, Supplier<BooleanFormula> fun, Collection<String> expectedDeclarations)
       throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
-    checkThatFunOnlyDeclaredOnce(textToParse);
+    checkThatFunOnlyDeclaredOnce(textToParse, expectedDeclarations);
     checkThatAssertIsInLastLine(textToParse);
 
     // actual test
@@ -396,12 +470,13 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     assertThatFormula(parsedForm).isEquivalentTo(expr);
   }
 
-  private void compareParseWithOrgParseFirst(String textToParse, Supplier<BooleanFormula> fun)
+  private void compareParseWithOrgParseFirst(
+      String textToParse, Supplier<BooleanFormula> fun, Collection<String> expectedDeclarations)
       throws SolverException, InterruptedException {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
     // check if input is correct
-    checkThatFunOnlyDeclaredOnce(textToParse);
+    checkThatFunOnlyDeclaredOnce(textToParse, expectedDeclarations);
     checkThatAssertIsInLastLine(textToParse);
 
     // actual test
@@ -410,19 +485,25 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     assertThatFormula(parsedForm).isEquivalentTo(expr);
   }
 
-  private void checkThatFunOnlyDeclaredOnce(String formDump) {
+  private void checkThatFunOnlyDeclaredOnce(
+      String formDump, Collection<String> expectedDeclarations) {
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-    Multiset<String> funDeclares = HashMultiset.create();
+    Multimap<String, String> funDeclares = HashMultimap.create();
 
+    final Pattern declareFunRegex = Pattern.compile("\\(declare-fun\\s+(?<name>\\S+)\\s*");
     for (String line : Splitter.on('\n').split(formDump)) {
       if (line.startsWith("(declare-fun ")) {
-        funDeclares.add(line.replaceAll("\\s+", ""));
+        var matcher = declareFunRegex.matcher(line);
+        var name = matcher.find() ? matcher.group(1) : line.replaceAll("\\s+", "");
+        funDeclares.put(name, line.replaceAll("\\s+", ""));
       }
     }
 
+    assertThat(funDeclares.keySet()).containsExactlyElementsIn(expectedDeclarations);
+
     // remove non-duplicates
-    funDeclares.entrySet().removeIf(pStringEntry -> pStringEntry.getCount() <= 1);
+    funDeclares.keySet().removeIf(pStringEntry -> funDeclares.get(pStringEntry).size() <= 1);
     assertWithMessage("duplicate function declarations").that(funDeclares).isEmpty();
   }
 
@@ -438,25 +519,19 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     // Boolector will fail this anyway since bools are bitvecs for btor
     TruthJUnit.assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
 
-    List<String> lines = Splitter.on('\n').splitToList(dump.trim());
-    String lineUnderTest = getLast(lines);
-
-    if (solver == Solvers.OPENSMT) {
-      // OpenSMT prints assertions over several lines, so lets find the last SMT-LIB command by
-      // heuristic: the last line starting with a plain bracket.
-      lineUnderTest = getLast(filter(lines, line -> line.startsWith("(")));
-    }
-
-    assertWithMessage("last line(s) of <\n" + dump + ">")
-        .that(lineUnderTest)
-        .startsWith("(assert ");
-    assertWithMessage("last line(s) of <\n" + dump + ">").that(getLast(lines)).endsWith(")");
+    String lastCommand = getLast(Tokenizer.tokenize(dump));
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).startsWith("(assert ");
+    assertWithMessage("last line(s) of <\n" + dump + ">").that(lastCommand).endsWith(")");
   }
 
   @SuppressWarnings("CheckReturnValue")
   private void checkThatDumpIsParseable(String dump) {
-    requireParser();
-    mgr.parse(dump);
+    try {
+      requireParser();
+      mgr.parse(dump);
+    } catch (AssumptionViolatedException ave) {
+      // ignore, i.e., do not report test-case as skipped.
+    }
   }
 
   private BooleanFormula genBoolExpr() {

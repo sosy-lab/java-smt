@@ -8,12 +8,12 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# specific for my system:
-# JavaSMT and all solver files are located in the directory "workspace".
-WORKSPACE=$HOME/workspace
+# JavaSMT and all solver files are located in the directory WORKSPACE.
+# Derive WORKSPACE from the script's location (two directories up from current)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE="$(realpath "${SCRIPT_DIR}/../..")"
 
-docker run -it \
+podman run -it \
     --mount type=bind,source=${WORKSPACE},target=/workspace \
     --workdir /workspace/java-smt \
-    --user $(id -u ${USER}):$(id -g ${USER}) \
     registry.gitlab.com/sosy-lab/software/java-smt/develop:ubuntu1804

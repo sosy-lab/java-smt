@@ -84,6 +84,10 @@ public class Bitwuzla {
     return new Vector_Term(BitwuzlaNativeJNI.Bitwuzla_get_unsat_core(swigCPtr, this), true);
   }
 
+  public Term simplify(Term term) {
+    return new Term(BitwuzlaNativeJNI.Bitwuzla_simplify(swigCPtr, this, Term.getCPtr(term), term), true);
+  }
+
   public Result check_sat(Vector_Term assumptions) {
     return Result.swigToEnum(BitwuzlaNativeJNI.Bitwuzla_check_sat__SWIG_0(swigCPtr, this, Vector_Term.getCPtr(assumptions), assumptions));
   }

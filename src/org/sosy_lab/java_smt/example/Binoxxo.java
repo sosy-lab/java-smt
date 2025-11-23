@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.example;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
@@ -41,7 +42,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  *
  * <ul>
  *   <li>In each column or row there are as many 'X's as 'O's.
- *   <li>Three aligned cells must not contains an identical value.
+ *   <li>Three aligned cells must not contain an identical value.
  * </ul>
  *
  * <p>The Binoxxo is read from StdIn and should be formatted as the following example:
@@ -59,7 +60,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * X..X..O..O
  * </pre>
  *
- * <p>A empty newline will terminate the input and start the solving process.
+ * <p>An empty newline will terminate the input and start the solving process.
  *
  * <p>The solution will then be printed on StdOut, just like the following solution:
  *
@@ -77,7 +78,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * </pre>
  */
 @SuppressWarnings("unused")
-public class Binoxxo {
+public final class Binoxxo {
 
   private static final char[][] UNSOLVABLE_BINOXXO = null;
 
@@ -95,7 +96,7 @@ public class Binoxxo {
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
         for (BinoxxoSolver<?> binoxxo :
-            List.of(
+            ImmutableList.of(
                 new IntegerBasedBinoxxoSolver(context), new BooleanBasedBinoxxoSolver(context))) {
           long start = System.currentTimeMillis();
 
@@ -193,7 +194,8 @@ public class Binoxxo {
     /** convert one user-given value at given coordinate into a constraint for the solver. */
     abstract BooleanFormula getAssignment(S symbols, int row, int col, char value);
 
-    abstract char getValue(S symbols, Model model, int row, int col);
+    abstract char getValue(S symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException;
 
     /**
      * Solves a Binoxxo using the given grid values and returns a possible solution. Return <code>
@@ -299,7 +301,7 @@ public class Binoxxo {
       for (int row = 0; row < size; row++) {
         for (int col = 0; col < size - 2; col++) {
           List<IntegerFormula> lst =
-              List.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
+              ImmutableList.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
           IntegerFormula sum = imgr.sum(lst);
           rules.add(bmgr.or(imgr.equal(one, sum), imgr.equal(two, sum)));
         }
@@ -309,7 +311,7 @@ public class Binoxxo {
       for (int col = 0; col < size; col++) {
         for (int row = 0; row < size - 2; row++) {
           List<IntegerFormula> lst =
-              List.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
+              ImmutableList.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
           IntegerFormula sum = imgr.sum(lst);
           rules.add(bmgr.or(imgr.equal(one, sum), imgr.equal(two, sum)));
         }
@@ -324,7 +326,8 @@ public class Binoxxo {
     }
 
     @Override
-    char getValue(IntegerFormula[][] symbols, Model model, int row, int col) {
+    char getValue(IntegerFormula[][] symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException {
       @Nullable BigInteger value = model.evaluate(symbols[row][col]);
       return value == null ? '.' : value.intValue() == 0 ? 'O' : 'X';
     }
@@ -396,7 +399,7 @@ public class Binoxxo {
       for (int row = 0; row < size; row++) {
         for (int col = 0; col < size - 2; col++) {
           List<BooleanFormula> lst =
-              List.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
+              ImmutableList.of(symbols[row][col], symbols[row][col + 1], symbols[row][col + 2]);
           rules.add(bmgr.not(bmgr.and(lst)));
           rules.add(bmgr.or(lst));
         }
@@ -406,7 +409,7 @@ public class Binoxxo {
       for (int col = 0; col < size; col++) {
         for (int row = 0; row < size - 2; row++) {
           List<BooleanFormula> lst =
-              List.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
+              ImmutableList.of(symbols[row][col], symbols[row + 1][col], symbols[row + 2][col]);
           rules.add(bmgr.not(bmgr.and(lst)));
           rules.add(bmgr.or(lst));
         }
@@ -421,7 +424,8 @@ public class Binoxxo {
     }
 
     @Override
-    char getValue(BooleanFormula[][] symbols, Model model, int row, int col) {
+    char getValue(BooleanFormula[][] symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException {
       @Nullable Boolean value = model.evaluate(symbols[row][col]);
       return value == null ? '.' : value ? 'X' : 'O';
     }

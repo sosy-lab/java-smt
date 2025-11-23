@@ -35,7 +35,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testEmptySubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
-    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -56,7 +55,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testNoSubstitution() throws SolverException, InterruptedException {
     requireSubstitution();
     requireIntegers();
-    assume().withMessage("Princess fails").that(solver).isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -221,7 +219,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
 
   @Test
   public void bitvectorFormulaEqualsAndHashCode() {
-    // Boolector does not support integers and it is easier to make a new test with bvs
+    // Boolector does not support integers, and it is easier to make a new test with bvs
     requireBitvectors();
     FunctionDeclaration<BitvectorFormula> fb =
         fmgr.declareUF(
@@ -352,6 +350,24 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             imgr.equal(x, num1),
             imgr.equal(y, imgr.add(x, num2)),
             imgr.equal(z, imgr.add(y, num3)));
+    assertThatFormula(mgr.simplify(f)).isEquisatisfiableTo(f);
+  }
+
+  @Test
+  public void simplifyBVTest() throws SolverException, InterruptedException {
+    requireBitvectors();
+    // x=1 && y=x+2 && z=y+3 --> simplified: x=1 && y=3 && z=6
+    BitvectorFormula num1 = bvmgr.makeBitvector(4, 1);
+    BitvectorFormula num2 = bvmgr.makeBitvector(4, 2);
+    BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
+    BitvectorFormula x = bvmgr.makeVariable(4, "x");
+    BitvectorFormula y = bvmgr.makeVariable(4, "y");
+    BitvectorFormula z = bvmgr.makeVariable(4, "z");
+    BooleanFormula f =
+        bmgr.and(
+            bvmgr.equal(x, num1),
+            bvmgr.equal(y, bvmgr.add(x, num2)),
+            bvmgr.equal(z, bvmgr.add(y, num3)));
     assertThatFormula(mgr.simplify(f)).isEquisatisfiableTo(f);
   }
 

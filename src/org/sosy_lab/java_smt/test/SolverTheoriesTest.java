@@ -257,23 +257,17 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     assertDivision(a, num3, numNeg4, aEqNeg10);
     assertDivision(a, numNeg3, num4, aEqNeg10);
 
-    switch (solverToUse()) {
-      case MATHSAT5: // modulo not supported
-        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
-        break;
-      default:
-        assertModulo(num10, num5, num0);
-        assertModulo(num10, num3, num1, aEq10);
-        assertModulo(numNeg10, num5, num0);
-        assertModulo(numNeg10, num3, num2);
-        assertModulo(numNeg10, numNeg3, num2);
+    assertModulo(num10, num5, num0);
+    assertModulo(num10, num3, num1, aEq10);
+    assertModulo(numNeg10, num5, num0);
+    assertModulo(numNeg10, num3, num2);
+    assertModulo(numNeg10, numNeg3, num2);
 
-        assertModulo(a, num5, num0, aEq10);
-        assertModulo(a, num3, num1, aEq10);
-        assertModulo(a, num5, num0, aEqNeg10);
-        assertModulo(a, num3, num2, aEqNeg10);
-        assertModulo(a, numNeg3, num2, aEqNeg10);
-    }
+    assertModulo(a, num5, num0, aEq10);
+    assertModulo(a, num3, num1, aEq10);
+    assertModulo(a, num5, num0, aEqNeg10);
+    assertModulo(a, num3, num2, aEqNeg10);
+    assertModulo(a, numNeg3, num2, aEqNeg10);
   }
 
   @Test
@@ -319,8 +313,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             IllegalArgumentException.class,
             () -> assertThatFormula(buildModulo(num10, num0, num10)).isSatisfiable());
         break;
-      case OPENSMT: // INFO
-      case MATHSAT5: // modulo not supported
+      case OPENSMT: // INFO: OpenSMT does not allow division by zero
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num0, num10));
         break;
       default:
@@ -364,11 +357,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
       case YICES2:
         assertThrows(UnsupportedOperationException.class, () -> buildDivision(a, b, num5));
         assertThrows(UnsupportedOperationException.class, () -> buildModulo(a, b, num0));
-        break;
-      case MATHSAT5: // modulo not supported
-        assertDivision(a, b, num5, aEq10, bEq2);
-        assertDivision(a, b, num5, aEqNeg10, bEqNeg2);
-        assertThrows(UnsupportedOperationException.class, () -> buildModulo(num10, num5, num0));
         break;
       default:
         assertDivision(a, b, num5, aEq10, bEq2);
@@ -635,6 +623,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void quantifierEliminationTest1() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
 
     IntegerFormula var_B = imgr.makeVariable("b");
     IntegerFormula var_C = imgr.makeVariable("c");
@@ -659,6 +648,7 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void quantifierEliminationTest2() throws SolverException, InterruptedException {
     requireQuantifiers();
     requireIntegers();
+    requireQuantifierElimination();
 
     IntegerFormula i1 = imgr.makeVariable("i@1");
     IntegerFormula j1 = imgr.makeVariable("j@1");
@@ -726,6 +716,9 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
         // INFO: OpenSmt changes the order of the terms in the sum
         assertThat(_b_at_i_plus_1.toString()).isEqualTo("(select b (+ 1 i))");
         break;
+      case YICES2:
+        assertThat(_b_at_i_plus_1.toString()).isEqualTo("(b (+ 1 i))");
+        break;
       default:
         assertThat(_b_at_i_plus_1.toString())
             .isEqualTo("(select b (+ i 1))"); // Compatibility to all solvers not guaranteed
@@ -736,11 +729,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   public void testMakeBitVectorArray() {
     requireArrays();
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver does not support bit-vector arrays.")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     BitvectorFormula _i = mgr.getBitvectorFormulaManager().makeVariable(64, "i");
     ArrayFormula<BitvectorFormula, BitvectorFormula> _b =
@@ -753,7 +741,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solver) {
       case MATHSAT5:
         // Mathsat5 has a different internal representation of the formula
-        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(18)_T(20)` b i)");
+        assertThat(_b_at_i.toString()).isEqualTo("(`read_T(19)_T(21)` b i)");
+        break;
+      case PRINCESS:
+        assertThat(_b_at_i.toString()).isEqualTo("select(b, i)");
         break;
       case BOOLECTOR:
         assume()
@@ -761,9 +752,42 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
             .that(solver)
             .isNotEqualTo(Solvers.BOOLECTOR);
         break;
+      case YICES2:
+        assertThat(_b_at_i.toString()).isEqualTo("(b i)");
+        break;
       default:
         assertThat(_b_at_i.toString())
             .isEqualTo("(select b i)"); // Compatibility to all solvers not guaranteed
+    }
+  }
+
+  @Test
+  public void testNestedIntegerArray() {
+    requireArrays();
+    requireIntegers();
+
+    IntegerFormula _i = imgr.makeVariable("i");
+    ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, IntegerFormula>> multi =
+        amgr.makeArray(
+            "multi",
+            FormulaType.IntegerType,
+            FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType));
+
+    IntegerFormula valueInMulti = amgr.select(amgr.select(multi, _i), _i);
+
+    switch (solver) {
+      case MATHSAT5:
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_int` (`read_int_T(18)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
+        break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
+        break;
+      default:
+        assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
     }
   }
 
@@ -785,7 +809,13 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     switch (solver) {
       case MATHSAT5:
         assertThat(valueInMulti.toString())
-            .isEqualTo("(`read_int_rat` (`read_int_T(17)` multi i) i)");
+            .isEqualTo("(`read_int_rat` (`read_int_T(18)` multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
+        break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -797,11 +827,6 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     requireArrays();
     requireBitvectors();
     requireIntegers();
-
-    assume()
-        .withMessage("Solver does not support bit-vector arrays.")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     IntegerFormula _i = imgr.makeVariable("i");
     ArrayFormula<IntegerFormula, ArrayFormula<IntegerFormula, BitvectorFormula>> multi =
@@ -815,8 +840,14 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
 
     switch (solver) {
       case MATHSAT5:
-        String readWrite = "(`read_int_T(18)` (`read_int_T(19)` multi i) i)";
-        assertThat(valueInMulti.toString()).isEqualTo(readWrite);
+        assertThat(valueInMulti.toString())
+            .isEqualTo("(`read_int_T(19)` (`read_int_T(20)` multi " + "i) i)");
+        break;
+      case YICES2:
+        assertThat(valueInMulti.toString()).isEqualTo("((multi i) i)");
+        break;
+      case PRINCESS:
+        assertThat(valueInMulti.toString()).isEqualTo("select(select(multi, i), i)");
         break;
       default:
         assertThat(valueInMulti.toString()).isEqualTo("(select (select multi i) i)");
@@ -1102,15 +1133,15 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     }
   }
 
-  @Test(expected = Exception.class) // complement of above test case
+  @Test // complement of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_TRACKING_SOLVERS);
     bmgr.makeVariable("x");
     if (imgr != null) {
-      imgr.makeVariable("x");
+      assertThrows(IllegalArgumentException.class, () -> imgr.makeVariable("x"));
     } else if (bvmgr != null) {
-      bvmgr.makeVariable(8, "x");
+      assertThrows(IllegalArgumentException.class, () -> bvmgr.makeVariable(8, "x"));
     }
   }
 
@@ -1122,20 +1153,28 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
     fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
   }
 
-  @Test(expected = Exception.class) // complement of above test case
+  @Test // complement of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnVariableAndUFWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
     bmgr.makeVariable("y");
-    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType));
   }
 
-  @Test(expected = Exception.class) // different ordering of above test case
+  @Test // different ordering of above test case
   @SuppressWarnings("CheckReturnValue")
   public void testFailOnUFAndVariableWithDifferentSort() {
     assume().that(solverToUse()).isIn(VAR_AND_UF_TRACKING_SOLVERS);
-    fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
-    bmgr.makeVariable("y");
+    if (solverToUse() == Solvers.MATHSAT5) {
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType));
+    } else {
+      fmgr.declareUF("y", FormulaType.BooleanType, FormulaType.BooleanType);
+      assertThrows(IllegalArgumentException.class, () -> bmgr.makeVariable("y"));
+    }
   }
 
   @Test

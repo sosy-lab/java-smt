@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.sosy_lab.common.Appender;
-import org.sosy_lab.common.Appenders;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -67,56 +64,52 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public BooleanFormula parse(String pS) throws IllegalArgumentException {
+  public Expr parseImpl(String formulaStr) throws IllegalArgumentException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Appender dumpFormula(Expr f) {
+  public String dumpFormulaImpl(Expr f) throws IOException {
     assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
         : "Only BooleanFormulas may be dumped";
 
-    return new Appenders.AbstractAppender() {
+    StringBuilder out = new StringBuilder();
 
-      @Override
-      public void appendTo(Appendable out) throws IOException {
+    // get all symbols
+    final Map<String, Expr> allVars = new LinkedHashMap<>();
+    creator.extractVariablesAndUFs(f, true, allVars::put);
 
-        // get all symbols
-        final Map<String, Expr> allVars = new LinkedHashMap<>();
-        creator.extractVariablesAndUFs(f, true, allVars::put);
+    // print all symbols
+    for (Map.Entry<String, Expr> entry : allVars.entrySet()) {
+      String name = entry.getKey();
+      Expr var = entry.getValue();
 
-        // print all symbols
-        for (Map.Entry<String, Expr> entry : allVars.entrySet()) {
-          String name = entry.getKey();
-          Expr var = entry.getValue();
+      // escaping is stolen from SMTInterpol, lets hope this remains consistent
+      out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
-          // escaping is stolen from SMTInterpol, lets hope this remains consistent
-          out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      // add function parameters
+      Iterable<Type> childrenTypes = Iterables.transform(var, Expr::getType);
+      out.append(Joiner.on(" ").join(childrenTypes));
 
-          // add function parameters
-          Iterable<Type> childrenTypes = Iterables.transform(var, Expr::getType);
-          out.append(Joiner.on(" ").join(childrenTypes));
+      // and return type
+      out.append(") ").append(var.getType().toString()).append(")\n");
+    }
 
-          // and return type
-          out.append(") ").append(var.getType().toString()).append(")\n");
-        }
+    // now add the final assert
+    out.append("(assert ");
+    // f.toString() does expand all nested sub-expressions and causes exponential overhead.
+    // f.toStream() uses LET-expressions and is exactly what we want.
+    try (OutputStream stream =
+        new OutputStream() {
 
-        // now add the final assert
-        out.append("(assert ");
-        // f.toString() does expand all nested sub-expressions and causes exponential overhead.
-        // f.toStream() uses LET-expressions and is exactly what we want.
-        try (OutputStream stream =
-            new OutputStream() {
-
-              @Override
-              public void write(int chr) throws IOException {
-                out.append((char) chr);
-              }
-            }) {
-          f.toStream(stream);
-        }
-        out.append(')');
-      }
-    };
+          @Override
+          public void write(int chr) throws IOException {
+            out.append((char) chr);
+          }
+        }) {
+      f.toStream(stream);
+    }
+    out.append(')');
+    return out.toString();
   }
 }

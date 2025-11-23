@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
+import edu.stanford.CVC4.Exception;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.ExprManagerMapCollection;
@@ -39,6 +40,7 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     implements ProverEnvironment, BasicProverEnvironment<Void> {
 
   private final CVC4FormulaCreator creator;
+  private final int randomSeed;
   SmtEngine smtEngine; // final except for SL theory
   private boolean changedSinceLastSatQuery = false;
 
@@ -49,10 +51,10 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
    * <p>TODO If the overhead of importing/exporting the expressions is too expensive, we can disable
    * this behavior. This change would cost us the flexibility of setting options per Prover.
    */
-  private final ExprManager exprManager = new ExprManager();
+  private ExprManager exprManager; // final except for SL theory
 
   /** We copy expression between different ExprManagers. The map serves as cache. */
-  private final ExprManagerMapCollection exportMapping = new ExprManagerMapCollection();
+  private ExprManagerMapCollection exportMapping; // final except for SL theory
 
   // CVC4 does not support separation logic in incremental mode.
   private final boolean incremental;
@@ -60,26 +62,34 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   protected CVC4TheoremProver(
       CVC4FormulaCreator pFormulaCreator,
       ShutdownNotifier pShutdownNotifier,
-      int randomSeed,
+      int pRandomSeed,
       Set<ProverOptions> pOptions,
       BooleanFormulaManager pBmgr) {
     super(pOptions, pBmgr, pShutdownNotifier);
 
     creator = pFormulaCreator;
-    smtEngine = new SmtEngine(exprManager);
+    randomSeed = pRandomSeed;
     incremental = !enableSL;
 
-    setOptions(randomSeed, pOptions);
+    createNewEngine();
   }
 
-  private void setOptions(int randomSeed, Set<ProverOptions> pOptions) {
+  private void createNewEngine() {
+    if (smtEngine != null) {
+      smtEngine.delete(); // cleanup
+    }
+    if (exportMapping != null) {
+      exportMapping.delete();
+    }
+    if (exprManager != null) {
+      exprManager.delete(); // cleanup
+    }
+    exprManager = new ExprManager();
+    smtEngine = new SmtEngine(exprManager);
+    exportMapping = new ExprManagerMapCollection();
     smtEngine.setOption("incremental", new SExpr(incremental));
-    if (pOptions.contains(ProverOptions.GENERATE_MODELS)) {
-      smtEngine.setOption("produce-models", new SExpr(true));
-    }
-    if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      smtEngine.setOption("produce-unsat-cores", new SExpr(true));
-    }
+    smtEngine.setOption("produce-models", new SExpr(generateModels));
+    smtEngine.setOption("produce-unsat-cores", new SExpr(generateUnsatCores));
     smtEngine.setOption("produce-assertions", new SExpr(true));
     smtEngine.setOption("dump-models", new SExpr(true));
     // smtEngine.setOption("produce-unsat-cores", new SExpr(true));
@@ -90,10 +100,6 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     // Enable more complete quantifier solving (for more information see
     // CVC4QuantifiedFormulaManager)
     smtEngine.setOption("full-saturate-quant", new SExpr(true));
-  }
-
-  protected void setOptionForIncremental() {
-    smtEngine.setOption("incremental", new SExpr(true));
   }
 
   /** import an expression from global context into this prover's context. */
@@ -126,16 +132,24 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   protected @Nullable Void addConstraintImpl(BooleanFormula pF) throws InterruptedException {
     Preconditions.checkState(!closed);
     setChanged();
-    Expr exp = creator.extractInfo(pF);
     if (incremental) {
-      smtEngine.assertFormula(importExpr(exp));
+      assertFormula(pF);
     }
     return null;
   }
 
+  private void assertFormula(BooleanFormula pF) {
+    try {
+      smtEngine.assertFormula(importExpr(creator.extractInfo(pF)));
+    } catch (Exception cvc4Exception) {
+      throw new AssertionError(
+          String.format("CVC4 crashed while adding the constraint '%s'", pF), cvc4Exception);
+    }
+  }
+
   @SuppressWarnings("resource")
   @Override
-  public CVC4Model getModel() {
+  public CVC4Model getModel() throws SolverException {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
@@ -163,13 +177,9 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
   }
 
   private void setChanged() {
-    closeAllEvaluators();
     if (!changedSinceLastSatQuery) {
       changedSinceLastSatQuery = true;
-      if (!incremental) {
-        // create a new clean smtEngine
-        smtEngine = new SmtEngine(exprManager);
-      }
+      closeAllEvaluators();
     }
   }
 
@@ -187,15 +197,20 @@ class CVC4TheoremProver extends AbstractProverWithAllSat<Void>
     closeAllEvaluators();
     changedSinceLastSatQuery = false;
     if (!incremental) {
-      getAssertedFormulas().forEach(f -> smtEngine.assertFormula(creator.extractInfo(f)));
+      // in non-incremental mode, we need to create a new solver instance for each sat check
+      createNewEngine();
+      getAssertedFormulas().forEach(this::assertFormula);
     }
 
     Result result;
     try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, smtEngine::interrupt)) {
       shutdownNotifier.shutdownIfNecessary();
       result = smtEngine.checkSat();
+    } catch (Exception e) {
+      throw new SolverException("CVC4 failed during satisfiability check", e);
+    } finally {
+      shutdownNotifier.shutdownIfNecessary();
     }
-    shutdownNotifier.shutdownIfNecessary();
     return convertSatResult(result);
   }
 

@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -134,46 +135,80 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return regexType;
   }
 
+  public FloatingPointRoundingMode getRoundingMode(FloatingPointRoundingModeFormula f) {
+    return getRoundingMode(extractInfo(f));
+  }
+
+  @SuppressWarnings("unused")
+  protected FloatingPointRoundingMode getRoundingMode(TFormulaInfo f) {
+    throw new UnsupportedOperationException(
+        "Floating point rounding modes are not supported by this solver.");
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isBooleanType();
+    checkArgument(
+        getFormulaType(pTerm).isBooleanType(),
+        "Boolean formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new BooleanFormulaImpl<>(pTerm);
   }
 
   protected BitvectorFormula encapsulateBitvector(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isBitvectorType();
+    checkArgument(
+        getFormulaType(pTerm).isBitvectorType(),
+        "Bitvector formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new BitvectorFormulaImpl<>(pTerm);
   }
 
   protected FloatingPointFormula encapsulateFloatingPoint(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType();
+    checkArgument(
+        getFormulaType(pTerm).isFloatingPointType(),
+        "Floatingpoint formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new FloatingPointFormulaImpl<>(pTerm);
+  }
+
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(TFormulaInfo pTerm) {
+    checkArgument(
+        getFormulaType(pTerm).isFloatingPointRoundingModeType(),
+        "Floatingpoint rounding mode formula has unexpected type: %s",
+        getFormulaType(pTerm));
+    return new FloatingPointRoundingModeFormulaImpl<>(pTerm);
   }
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       TFormulaInfo pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
-    assert getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType))
-        : "Expected: "
-            + getFormulaType(pTerm)
-            + " but found: "
-            + FormulaType.getArrayType(pIndexType, pElementType);
-
+    checkArgument(
+        getFormulaType(pTerm).equals(FormulaType.getArrayType(pIndexType, pElementType)),
+        "Array formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new ArrayFormulaImpl<>(pTerm, pIndexType, pElementType);
   }
 
   protected StringFormula encapsulateString(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isStringType();
+    checkArgument(
+        getFormulaType(pTerm).isStringType(),
+        "String formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new StringFormulaImpl<>(pTerm);
   }
 
   protected RegexFormula encapsulateRegex(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isRegexType();
+    checkArgument(
+        getFormulaType(pTerm).isRegexType(),
+        "Regex formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new RegexFormulaImpl<>(pTerm);
   }
 
   protected EnumerationFormula encapsulateEnumeration(TFormulaInfo pTerm) {
-    assert getFormulaType(pTerm).isEnumerationType();
+    checkArgument(
+        getFormulaType(pTerm).isEnumerationType(),
+        "Enumeration formula has unexpected type: %s",
+        getFormulaType(pTerm));
     return new EnumerationFormulaImpl<>(pTerm);
   }
 
@@ -183,10 +218,12 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
 
   @SuppressWarnings("unchecked")
   public <T extends Formula> T encapsulate(FormulaType<T> pType, TFormulaInfo pTerm) {
-    assert pType.equals(getFormulaType(pTerm))
-        : String.format(
-            "Trying to encapsulate formula %s of type %s as %s",
-            pTerm, getFormulaType(pTerm), pType);
+    checkArgument(
+        pType.equals(getFormulaType(pTerm)),
+        "Trying to encapsulate formula %s of type %s as %s",
+        pTerm,
+        getFormulaType(pTerm),
+        pType);
     if (pType.isBooleanType()) {
       return (T) new BooleanFormulaImpl<>(pTerm);
     } else if (pType.isIntegerType()) {
@@ -453,7 +490,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
               alreadyVisited),
           body);
 
-      // Afterwards, we skip the already finished body-formula.
+      // Afterward, we skip the already finished body-formula.
       return TraversalProcess.SKIP;
     }
   }

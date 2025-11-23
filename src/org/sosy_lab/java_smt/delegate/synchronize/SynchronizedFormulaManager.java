@@ -31,6 +31,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
@@ -180,7 +181,7 @@ class SynchronizedFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula applyTactic(BooleanFormula pInput, Tactic pTactic)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     synchronized (sync) {
       return delegate.applyTactic(pInput, pTactic);
     }

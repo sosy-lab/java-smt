@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <jni.h>
 #include "mathsat.h"
-#ifdef INCLUDE_OPTIMATHSAT5_HEADER
+#ifdef BUILD_FOR_OPTIMATHSAT5
     #include "optimathsat.h"
 #endif
 #include <gmp.h>
@@ -309,6 +309,16 @@ typedef jlong jjenv;
 #define ENV_ARG(num) STRUCT_ARG(msat_env, num)
 #define ENV_ARG_VOID(num) STRUCT_ARG_VOID(msat_env, num)
 #define ENV_RETURN STRUCT_RETURN
+
+typedef jlong jjproofmgr;
+#define PROOF_MGR_ARG(num) STRUCT_ARG(msat_proof_manager, num)
+#define PROOF_MGR_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof_manager, num)
+#define PROOF_MGR_RETURN STRUCT_RETURN
+
+typedef jlong jjproof;
+#define PROOF_ARG(num) STRUCT_ARG(msat_proof, num)
+#define PROOF_ARG_VOID(num) STRUCT_ARG_VOID(msat_proof, num)
+#define PROOF_RETURN STRUCT_RETURN
 
 typedef jlong jjconf;
 #define CONF_ARG(num) STRUCT_ARG(msat_config, num)

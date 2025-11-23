@@ -14,6 +14,7 @@ import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.Interpola
 import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
 import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
 import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.NATIVE;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -58,6 +59,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
+import org.sosy_lab.java_smt.api.SLFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -96,7 +98,6 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  * <p>Test that rely on a theory that not all solvers support should call one of the {@code require}
  * methods at the beginning.
  */
-@SuppressFBWarnings(value = "URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD", justification = "test code")
 public abstract class SolverBasedTest0 {
 
   protected Configuration config;
@@ -115,6 +116,7 @@ public abstract class SolverBasedTest0 {
   protected @Nullable FloatingPointFormulaManager fpmgr;
   protected @Nullable StringFormulaManager smgr;
   protected @Nullable EnumerationFormulaManager emgr;
+  protected @Nullable SLFormulaManager slmgr;
   protected ShutdownManager shutdownManager = ShutdownManager.create();
 
   protected ShutdownNotifier shutdownNotifierToUse() {
@@ -203,6 +205,11 @@ public abstract class SolverBasedTest0 {
     } catch (UnsupportedOperationException e) {
       emgr = null;
     }
+    try {
+      slmgr = mgr.getSLFormulaManager();
+    } catch (UnsupportedOperationException e) {
+      slmgr = null;
+    }
   }
 
   @After
@@ -228,6 +235,13 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  protected final void requireRationalFloor() {
+    assume()
+        .withMessage("Solver %s does not support floor for rationals", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
   /** Skip test if the solver does not support bitvectors. */
   protected final void requireBitvectors() {
     assume()
@@ -245,6 +259,19 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.YICES2);
   }
 
+  @SuppressWarnings("CheckReturnValue")
+  protected final void requireFPToBitvector() {
+    requireFloats();
+    try {
+      fpmgr.toIeeeBitvector(fpmgr.makeNumber(0, getSinglePrecisionFloatingPointType()));
+    } catch (UnsupportedOperationException e) {
+      assume()
+          .withMessage("Solver %s does not yet support FP-to-BV conversion", solverToUse())
+          .that(solverToUse())
+          .isNull();
+    }
+  }
+
   /** Skip test if the solver does not support quantifiers. */
   protected final void requireQuantifiers() {
     assume()
@@ -253,8 +280,17 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  @SuppressWarnings("unused")
+  protected final void requireQuantifierElimination() {
+    requireQuantifiers();
+    assume()
+        .withMessage("Solver %s does not support quantifier elimination", solverToUse())
+        .that(solverToUse())
+        .isNoneOf(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA);
+  }
+
   /** Skip test if the solver does not support arrays. */
-  protected /*final*/ void requireArrays() {
+  protected final void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
         .that(amgr)
@@ -285,6 +321,13 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
         .that(emgr)
+        .isNotNull();
+  }
+
+  protected final void requireSeparationLogic() {
+    assume()
+        .withMessage("Solver %s does not support the theory of separation logic", solverToUse())
+        .that(slmgr)
         .isNotNull();
   }
 
@@ -334,7 +377,6 @@ public abstract class SolverBasedTest0 {
   }
 
   protected void requireArrayModel() {
-    // INFO: OpenSmt does not support model generation for array
     assume()
         .withMessage("Solver %s does not support model generation for arrays", solverToUse())
         .that(solverToUse())
@@ -501,7 +543,7 @@ public abstract class SolverBasedTest0 {
   public abstract static class ParameterizedSolverBasedTest0 extends SolverBasedTest0 {
 
     @Parameters(name = "{0}")
-    public static Object[] getAllSolvers() {
+    public static Solvers[] getAllSolvers() {
       return Solvers.values();
     }
 

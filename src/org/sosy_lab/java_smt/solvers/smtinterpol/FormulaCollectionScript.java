@@ -38,11 +38,11 @@ import java.util.Map;
  * de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment} and allows declaring
  * and define terms (by forwarding such calls to a real {@link Script} implementation), but does not
  * allow any other actions. All formulas that are asserted (regardless of pop and push commands) are
- * collected and can be retrieved afterwards.
+ * collected and can be retrieved afterward.
  *
  * <p>The environment represented by the given {@link Script} that this class delegates to is
  * changed only by declaring and defining terms, sorts etc., so these terms can be used in that
- * environment afterwards.
+ * environment afterward.
  */
 class FormulaCollectionScript implements Script {
 
@@ -147,7 +147,7 @@ class FormulaCollectionScript implements Script {
         if (func.getParameterSorts().length == 0) {
           result = func.getDefinition();
         } else {
-          // If we would accept this here,
+          // If we accept this here,
           // we would need to handle the definition of a term
           // when accessing its parameters with SmtInterpolUtil.getArg()
           throw new SMTLIBException("Terms with definitions are not supported currently.");

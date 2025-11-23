@@ -22,7 +22,7 @@ SPDX-License-Identifier: Apache-2.0
     -->
 
     <!-- These properties can be overridden from including file. -->
-    <property name="ivy.target_version" value="2.5.1"/> <!-- Change version number here to use a newer version of Ivy. -->
+    <property name="ivy.target_version" value="2.5.2"/> <!-- Change version number here to use a newer version of Ivy. -->
     <!-- <property name="ivy.disable" value=""/> --> <!-- Disable ivy completely. -->
     <property name="ivy.repo.url" value="https://www.sosy-lab.org/ivy"/>
     <property name="ivy.lib.dir" value="lib/java"/>
@@ -66,7 +66,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="resolve-dependencies" depends="load-ivy, update-contrib" unless="ivy.disable">
         <echo message="Downloading and installing dependencies with Ivy..."/>
         <ivy:resolve conf="${ivy.configurations}" log="download-only"/>
-        <ivy:retrieve sync="true" overwriteMode="different" pattern="${ivy.lib.dir}/[conf]/[artifact](-[classifier]).[ext]"/>
+        <ivy:retrieve sync="true" overwriteMode="different" pattern="${ivy.lib.dir}/[conf]/([arch]/)[artifact](-[classifier]).[ext]"/>
     </target>
 
     <target name="report-dependencies" depends="resolve-dependencies" description="Generate dependencies report">
@@ -80,7 +80,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <target name="install-contrib" depends="load-ivy" unless="ivy.disable" description="Retrieve sources and docs for external libraries">
         <ivy:resolve conf="contrib" log="download-only"/>
-        <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/[artifact](-[classifier]).[ext]"/>
+        <ivy:retrieve sync="true" pattern="${ivy.lib.dir}-contrib/([arch]/)[artifact](-[classifier]).[ext]"/>
     </target>
 
     <target name="update-lib" depends="load-ivy" description="Update the version of a library to the latest one">

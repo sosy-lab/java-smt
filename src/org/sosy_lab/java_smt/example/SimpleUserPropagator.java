@@ -30,7 +30,7 @@ import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractUserPropagator;
 
 /** Example of a simple user propagator that prohibits variables/expressions to be set to true. */
-public class SimpleUserPropagator {
+public final class SimpleUserPropagator {
 
   private SimpleUserPropagator() {}
 
@@ -193,11 +193,13 @@ public class SimpleUserPropagator {
         if (getBackend().propagateNextDecision(disExpr, Optional.of(decisionValue))) {
           // The above call returns "true" if the provided literal is yet undecided, otherwise
           // false.
-          logger.log(
+          logger.logf(
               Level.INFO,
-              String.format(
-                  "User propagator overwrites decision from '%s = %s' to '%s = %s'",
-                  expr, value, disExpr, decisionValue));
+              "User propagator overwrites decision from '%s = %s' to '%s = %s'",
+              expr,
+              value,
+              disExpr,
+              decisionValue);
           break;
         }
       }

@@ -10,9 +10,9 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
@@ -34,7 +34,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(Solvers.values()), Arrays.asList(NonLinearArithmetic.values()))
+            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());
@@ -109,7 +110,12 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 handleExpectedException(() -> imgr.modulo(a, imgr.makeNumber(3)))));
 
     // INFO: OpenSMT does support modulo with constants
-    if (ImmutableSet.of(Solvers.SMTINTERPOL, Solvers.CVC4, Solvers.YICES2, Solvers.OPENSMT)
+    if (ImmutableSet.of(
+                Solvers.SMTINTERPOL,
+                Solvers.CVC4,
+                Solvers.YICES2,
+                Solvers.OPENSMT,
+                Solvers.MATHSAT5)
             .contains(solver)
         && nonLinearArithmetic == NonLinearArithmetic.APPROXIMATE_FALLBACK) {
       // some solvers support modulo with constants
@@ -147,7 +153,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
                 imgr.makeNumber(1),
                 handleExpectedException(() -> imgr.modulo(imgr.makeNumber(5), a))));
 
-    if (Solvers.CVC4 == solver && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
+    if (ImmutableSet.of(Solvers.CVC4, Solvers.MATHSAT5).contains(solver)
+        && nonLinearArithmetic != NonLinearArithmetic.APPROXIMATE_ALWAYS) {
       // some solvers support non-linear multiplication (partially)
       assertThatFormula(f).isUnsatisfiable();
 

@@ -15,7 +15,6 @@ import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -166,8 +165,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                 //   at ..
                 prover.push(formula);
                 assertThat(prover).isUnsatisfiable();
-              } catch (SolverException | InterruptedException pE) {
-                throw new RuntimeException(pE);
+              } catch (SolverException | InterruptedException exception) {
+                throw new RuntimeException(exception);
               }
             });
 
@@ -178,6 +177,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
   public void nonLocalFormulaTranslationTest() throws Throwable {
     // Test that even when using translation, the thread local problem persists for CVC5
     requireIntegers();
+    assume().that(solverToUse()).isNotEqualTo(Solvers.CVC5);
 
     BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
@@ -196,8 +196,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                                   .getFormulaManager()
                                   .translateFrom(formula, context.getFormulaManager()));
                           assertThat(prover).isUnsatisfiable();
-                        } catch (SolverException | InterruptedException pE) {
-                          throw new RuntimeException(pE);
+                        } catch (SolverException | InterruptedException exception) {
+                          throw new RuntimeException(exception);
                         }
                       }));
       Truth.assertThat(task.get()).isInstanceOf(io.github.cvc5.CVC5ApiException.class);
@@ -212,8 +212,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                           .getFormulaManager()
                           .translateFrom(formula, context.getFormulaManager()));
                   assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
       Truth.assertThat(task.get()).isNull();
@@ -289,8 +289,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   prover.push(f2);
                   assertThat(prover).isUnsatisfiable();
 
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
 
@@ -306,8 +306,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                         () -> {
                           try {
                             checkInterpolant(f1, f2, interpol);
-                          } catch (SolverException | InterruptedException pE) {
-                            throw new RuntimeException(pE);
+                          } catch (SolverException | InterruptedException exception) {
+                            throw new RuntimeException(exception);
                           }
                         });
                 assert task3.get() == null;
@@ -328,8 +328,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
                   prover.push(f2);
 
                   assertThat(prover).isUnsatisfiable();
-                } catch (SolverException | InterruptedException pE) {
-                  throw new RuntimeException(pE);
+                } catch (SolverException | InterruptedException exception) {
+                  throw new RuntimeException(exception);
                 }
               });
 
@@ -349,7 +349,8 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
             Solvers.Z3,
             Solvers.PRINCESS,
             Solvers.BOOLECTOR,
-            Solvers.BITWUZLA);
+            Solvers.BITWUZLA,
+            Solvers.CVC5);
 
     // FIXME: This test tries to use a formula that was created in a different context. We expect
     //  this test to fail for most solvers, but there should be a unique error message.
@@ -383,7 +384,7 @@ public class SolverThreadLocalityTest extends SolverBasedTest0.ParameterizedSolv
     // Boolector and Bitwuzla do not support integers, so we have to use two different versions
     // for this test.
     BooleanFormula formula =
-        List.of(Solvers.BOOLECTOR, Solvers.BITWUZLA).contains(solverToUse())
+        ImmutableList.of(Solvers.BOOLECTOR, Solvers.BITWUZLA).contains(solverToUse())
             ? bmgr.makeFalse()
             : hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 

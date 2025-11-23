@@ -30,7 +30,7 @@ import io.github.cvc5.Pair;
 import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
-import java.lang.reflect.Array;
+import io.github.cvc5.TermManager;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +44,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -66,7 +68,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RationalFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5RegexFormula;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5StringFormula;
 
-public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term> {
+public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, Term> {
 
   /** CVC5 does not allow using some key-functions from SMTLIB2 as identifiers. */
   private static final ImmutableSet<String> UNSUPPORTED_IDENTIFIERS = ImmutableSet.of("let");
@@ -78,17 +80,23 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   // String representation is equal (and they are equal)
   private final Table<String, String, Term> variablesCache = HashBasedTable.create();
   private final Map<String, Term> functionsCache = new HashMap<>();
+  private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5FormulaCreator(Solver pSolver) {
+  protected CVC5FormulaCreator(TermManager pTermManager, Solver pSolver) {
     super(
-        pSolver,
-        pSolver.getBooleanSort(),
-        pSolver.getIntegerSort(),
-        pSolver.getRealSort(),
-        pSolver.getStringSort(),
-        pSolver.getRegExpSort());
+        pTermManager,
+        pTermManager.getBooleanSort(),
+        pTermManager.getIntegerSort(),
+        pTermManager.getRealSort(),
+        pTermManager.getStringSort(),
+        pTermManager.getRegExpSort());
+    termManager = pTermManager;
     solver = pSolver;
+  }
+
+  public Solver getSolver() {
+    return solver;
   }
 
   @Override
@@ -97,26 +105,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     if (existingVar != null) {
       return existingVar;
     }
-    if (variablesCache.containsRow(name)) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type "
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
-    Term newVar = solver.mkConst(sort, name);
+    Preconditions.checkArgument(
+        !variablesCache.containsRow(name),
+        "Symbol %s requested with type %s, but already used with type %s",
+        name,
+        sort,
+        variablesCache.row(name).keySet());
+    Term newVar = termManager.mkConst(sort, name);
     variablesCache.put(name, sort.toString(), newVar);
     return newVar;
   }
@@ -131,14 +126,14 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   public Term makeBoundCopy(Term var) {
     Sort sort = var.getSort();
     String name = getName(var);
-    Term boundCopy = solver.mkVar(sort, name);
+    Term boundCopy = termManager.mkVar(sort, name);
     return boundCopy;
   }
 
   @Override
   public Sort getBitvectorType(int pBitwidth) {
     try {
-      return solver.mkBitVectorSort(pBitwidth);
+      return termManager.mkBitVectorSort(pBitwidth);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create bitvector sort with size " + pBitwidth + ".", e);
@@ -149,7 +144,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   public Sort getFloatingPointType(FloatingPointType pType) {
     try {
       // plus sign bit
-      return solver.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      return termManager.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create floatingpoint sort with exponent size "
@@ -163,7 +158,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   @Override
   public Sort getArrayType(Sort pIndexType, Sort pElementType) {
-    return solver.mkArraySort(pIndexType, pElementType);
+    return termManager.mkArraySort(pIndexType, pElementType);
   }
 
   @Override
@@ -257,8 +252,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       try {
         throw new AssertionError(
             String.format("Encountered unhandled Type '%s' %s.", sort, sort.getKind()));
-      } catch (CVC5ApiException pE) {
-        throw new AssertionError("Unexpected error when accessing sort.", pE);
+      } catch (CVC5ApiException exception) {
+        throw new AssertionError("Unexpected error when accessing sort.", exception);
       }
     }
   }
@@ -323,6 +318,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+    return new CVC5FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -352,7 +356,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return new CVC5EnumerationFormula(pTerm);
   }
 
-  private String getName(Term e) {
+  String getName(Term e) {
     checkState(!e.isNull());
     String repr = e.toString();
     try {
@@ -368,7 +372,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
-      // TODO what happens for function names containing whitepsace?
+      // TODO what happens for function names containing whitespace?
       String dequoted = dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
@@ -376,6 +380,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     }
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Term f) {
     checkState(!f.isNull());
@@ -405,7 +410,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
         return visitor.visitConstant(formula, convertFloatingPoint(f));
 
       } else if (f.isRoundingModeValue()) {
-        return visitor.visitConstant(formula, f.getRoundingModeValue());
+        return visitor.visitConstant(formula, getRoundingMode(f));
 
       } else if (f.isConstArray()) {
         Term constant = f.getConstArrayBase();
@@ -549,6 +554,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.INT_TO_BITVECTOR, FunctionDeclarationKind.INT_TO_BV)
           // Bitvector theory
           .put(Kind.BITVECTOR_ADD, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
@@ -578,9 +584,13 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
-          // Floating-point theory
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
+          .put(Kind.BITVECTOR_SBV_TO_INT, FunctionDeclarationKind.SBV_TO_INT)
+          .put(Kind.BITVECTOR_UBV_TO_INT, FunctionDeclarationKind.UBV_TO_INT)
+          // Floating-point theory
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
           .put(Kind.FLOATINGPOINT_TO_FP_FROM_FP, FunctionDeclarationKind.FP_CASTTO_FP)
@@ -600,6 +610,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.FLOATINGPOINT_ADD, FunctionDeclarationKind.FP_ADD)
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
+          .put(Kind.FLOATINGPOINT_REM, FunctionDeclarationKind.FP_REM)
           .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
           .put(Kind.FLOATINGPOINT_NEG, FunctionDeclarationKind.FP_NEG)
           .put(Kind.FLOATINGPOINT_LT, FunctionDeclarationKind.FP_LT)
@@ -623,6 +634,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
           .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
           .put(Kind.STRING_FROM_INT, FunctionDeclarationKind.INT_TO_STR)
           .put(Kind.STRING_TO_INT, FunctionDeclarationKind.STR_TO_INT)
+          .put(Kind.STRING_TO_CODE, FunctionDeclarationKind.STR_TO_CODE)
+          .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
@@ -687,7 +700,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       if (pDeclaration.hasOp()) {
         Op op = pDeclaration.getOp();
-        return solver.mkTerm(op, pArgs.toArray(new Term[] {}));
+        return termManager.mkTerm(op, pArgs.toArray(new Term[] {}));
       } else {
         try {
           Sort[] paramSorts = pDeclaration.getSort().getFunctionDomainSorts();
@@ -698,7 +711,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
             kind = Kind.APPLY_UF;
             args.add(0, pDeclaration);
           }
-          return solver.mkTerm(kind, args.toArray(new Term[] {}));
+          return termManager.mkTerm(kind, args.toArray(new Term[] {}));
         } catch (CVC5ApiException e) {
           throw new IllegalArgumentException(
               "Failure when building the UF '"
@@ -732,7 +745,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
   private Term castToParamTypeIfRequired(Term input, @Nullable Sort targetSort) {
     if (input.getSort().isInteger() && targetSort.isReal()) {
-      return solver.mkTerm(Kind.TO_REAL, input);
+      return termManager.mkTerm(Kind.TO_REAL, input);
     }
     return input;
   }
@@ -761,8 +774,8 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
       Sort sort =
           pArgTypes.isEmpty()
               ? pReturnType
-              : solver.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
-      exp = solver.mkConst(sort, pName);
+              : termManager.mkFunctionSort(pArgTypes.toArray(new Sort[0]), pReturnType);
+      exp = termManager.mkConst(sort, pName);
       functionsCache.put(pName, exp);
 
     } else {
@@ -794,7 +807,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     final Sort type = expForType.getSort();
     final Sort valueType = value.getSort();
 
-    // Variables are Kind.CONSTANT and can't be check with isIntegerValue() or getIntegerValue()
+    // Variables are Kind.CONSTANT and can't be checked with isIntegerValue() or getIntegerValue()
     // etc. but only with solver.getValue() and its String serialization
     try {
       if (value.getKind() == Kind.VARIABLE) {
@@ -816,6 +829,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
 
       } else if (value.isFloatingPointValue()) {
         return convertFloatingPoint(value);
+
+      } else if (value.isRoundingModeValue()) {
+        return getRoundingMode(value);
 
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
@@ -846,27 +862,39 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, Solver, Term>
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
   }
 
+  @Override
+  public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
+    checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
+    try {
+      switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY:
+          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN:
+          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE:
+          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE:
+          return FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO:
+          return FloatingPointRoundingMode.TOWARD_ZERO;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+    }
+  }
+
   private Term accessVariablesCache(String name, Sort sort) {
     Term existingVar = variablesCache.get(name, sort.toString());
-    if (existingVar == null) {
-      throw new IllegalArgumentException(
-          "Symbol "
-              + name
-              + " requested with type "
-              + sort
-              + ", but "
-              + "already "
-              + "used "
-              + "with "
-              + "type"
-              + variablesCache
-                  .rowMap()
-                  .get(name)
-                  .entrySet()
-                  .toArray((java.util.Map.Entry[]) Array.newInstance(java.util.Map.Entry.class, 0))[
-                  0]
-                  .getKey());
-    }
+    Preconditions.checkNotNull(
+        existingVar,
+        "Symbol %s requested with type %s, but already used with type %s",
+        name,
+        sort,
+        variablesCache.row(name).keySet());
     return existingVar;
   }
 }

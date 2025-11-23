@@ -92,6 +92,9 @@ public enum FunctionDeclarationKind {
   /** Identity operation, converts from integers to rationals, also known as {@code to_real}. */
   TO_REAL,
 
+  /** Convert from integer to bitvector. */
+  INT_TO_BV,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */
@@ -181,11 +184,35 @@ public enum FunctionDeclarationKind {
   /** Arithmetic right-shift over bitvectors (fill from left with value of first bit). */
   BV_ASHR,
 
+  /** Performs a circular left rotation on the bitvector. */
+  BV_ROTATE_LEFT,
+
+  /** Performs a circular right rotation on the bitvector. */
+  BV_ROTATE_RIGHT,
+
+  /**
+   * Performs a circular left rotation on the bitvector by a specified number of positions,
+   * determined by an integer value.
+   */
+  BV_ROTATE_LEFT_BY_INT,
+
+  /**
+   * Performs a circular right rotation on the bitvector by a specified number of positions,
+   * determined by an integer value.
+   */
+  BV_ROTATE_RIGHT_BY_INT,
+
   /** Cast an unsigned bitvector to a floating-point number. */
   BV_UCASTTO_FP,
 
   /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
+
+  /** Cast an unsigned bitvector to an integer number. */
+  UBV_TO_INT,
+
+  /** Cast a signed bitvector to an integer number. */
+  SBV_TO_INT,
 
   // Simple floating point operations
 
@@ -213,6 +240,9 @@ public enum FunctionDeclarationKind {
   /** Division over floating points. */
   FP_DIV,
 
+  /** Remainder of the floating point division. */
+  FP_REM,
+
   /** Multiplication over floating points. */
   FP_MUL,
 
@@ -230,21 +260,6 @@ public enum FunctionDeclarationKind {
 
   /** Equal over floating points. */
   FP_EQ,
-
-  /** Rounding over floating points. */
-  FP_ROUND_EVEN,
-
-  /** Rounding over floating points. */
-  FP_ROUND_AWAY,
-
-  /** Rounding over floating points. */
-  FP_ROUND_POSITIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_NEGATIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_ZERO,
 
   /** Rounding over floating points. */
   FP_ROUND_TO_INTEGRAL,
@@ -279,6 +294,8 @@ public enum FunctionDeclarationKind {
   STR_IN_RE,
   STR_TO_INT,
   INT_TO_STR,
+  STR_FROM_CODE,
+  STR_TO_CODE,
   STR_LT,
   STR_LE,
   RE_PLUS,

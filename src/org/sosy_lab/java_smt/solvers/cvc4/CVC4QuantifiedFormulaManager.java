@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
@@ -72,23 +74,22 @@ public class CVC4QuantifiedFormulaManager
    */
   @Override
   public Expr mkQuantifier(Quantifier pQ, List<Expr> pVars, Expr pBody) {
-    if (pVars.isEmpty()) {
-      throw new IllegalArgumentException("Empty variable list for quantifier.");
-    } else {
-      // CVC4 uses its own lists for quantifier that may only have bound vars
-      vectorExpr vec = new vectorExpr();
-      Expr substBody = pBody;
-      // every free needs a bound copy. As the internal Id is different for every variable, even
-      // with the same name, this is fine.
-      for (Expr var : pVars) {
-        Expr boundCopy = ((CVC4FormulaCreator) formulaCreator).makeBoundCopy(var);
-        vec.add(boundCopy);
-        substBody = substBody.substitute(var, boundCopy);
-      }
-      Expr quantifiedVars = exprManager.mkExpr(Kind.BOUND_VAR_LIST, vec);
+    checkArgument(
+        !pVars.isEmpty(), "Missing variables for quantifier '%s' and body '%s'.", pQ, pBody);
 
-      Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
-      return exprManager.mkExpr(quant, quantifiedVars, substBody);
+    // CVC4 uses its own lists for quantifier that may only have bound vars
+    vectorExpr vec = new vectorExpr();
+    Expr substBody = pBody;
+    // every free needs a bound copy. As the internal Id is different for every variable, even
+    // with the same name, this is fine.
+    for (Expr var : pVars) {
+      Expr boundCopy = ((CVC4FormulaCreator) formulaCreator).makeBoundCopy(var);
+      vec.add(boundCopy);
+      substBody = substBody.substitute(var, boundCopy);
     }
+    Expr quantifiedVars = exprManager.mkExpr(Kind.BOUND_VAR_LIST, vec);
+
+    Kind quant = pQ == Quantifier.EXISTS ? Kind.EXISTS : Kind.FORALL;
+    return exprManager.mkExpr(quant, quantifiedVars, substBody);
   }
 }

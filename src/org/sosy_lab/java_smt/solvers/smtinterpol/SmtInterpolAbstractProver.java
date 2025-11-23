@@ -191,7 +191,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
-      Collection<BooleanFormula> assumptions) throws InterruptedException {
+      Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
     checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
@@ -217,7 +217,8 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   public void close() {
     if (!closed) {
       annotatedTerms.clear();
-      env.pop(size());
+      env.resetAssertions();
+      env.exit();
     }
     super.close();
   }

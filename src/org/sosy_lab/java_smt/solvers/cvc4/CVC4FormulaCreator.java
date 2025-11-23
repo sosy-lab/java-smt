@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -25,6 +26,7 @@ import edu.stanford.CVC4.FunctionType;
 import edu.stanford.CVC4.Integer;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.RoundingMode;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import edu.stanford.CVC4.vectorType;
@@ -39,6 +41,9 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -263,6 +268,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Expr pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getType(), getFormulaType(pTerm));
+    return new CVC4FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -286,7 +300,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4RegexFormula(pTerm);
   }
 
-  private static String getName(Expr e) {
+  static String getName(Expr e) {
     checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
@@ -294,6 +308,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return dequote(e.toString());
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, Formula formula, final Expr f) {
     checkState(!f.isNull());
@@ -320,8 +335,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isFloatingPoint()) {
         return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstRoundingMode());
+        return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
       } else if (type.isArray()) {
@@ -365,6 +379,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (f.isVariable()) {
       assert f.getKind() != Kind.BOUND_VARIABLE;
       return visitor.visitFreeVariable(formula, getName(f));
+
+    } else if (f.getKind() == Kind.SEP_NIL) {
+      return visitor.visitConstant(formula, null);
 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
@@ -435,6 +452,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.INT_TO_BITVECTOR, FunctionDeclarationKind.INT_TO_BV)
           // Bitvector theory
           .put(Kind.BITVECTOR_PLUS, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
@@ -458,6 +476,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_SHL, FunctionDeclarationKind.BV_SHL)
           .put(Kind.BITVECTOR_ASHR, FunctionDeclarationKind.BV_ASHR)
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
+          .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
+          .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
           .put(Kind.BITVECTOR_NOT, FunctionDeclarationKind.BV_NOT)
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
@@ -487,6 +507,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.FLOATINGPOINT_SUB, FunctionDeclarationKind.FP_SUB)
           .put(Kind.FLOATINGPOINT_MULT, FunctionDeclarationKind.FP_MUL)
           .put(Kind.FLOATINGPOINT_DIV, FunctionDeclarationKind.FP_DIV)
+          .put(Kind.FLOATINGPOINT_REM, FunctionDeclarationKind.FP_REM)
           .put(Kind.FLOATINGPOINT_LT, FunctionDeclarationKind.FP_LT)
           .put(Kind.FLOATINGPOINT_LEQ, FunctionDeclarationKind.FP_LE)
           .put(Kind.FLOATINGPOINT_GT, FunctionDeclarationKind.FP_GT)
@@ -508,6 +529,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.STRING_IN_REGEXP, FunctionDeclarationKind.STR_IN_RE)
           .put(Kind.STRING_STOI, FunctionDeclarationKind.STR_TO_INT)
           .put(Kind.STRING_ITOS, FunctionDeclarationKind.INT_TO_STR)
+          .put(Kind.STRING_TO_CODE, FunctionDeclarationKind.STR_TO_CODE)
+          .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
@@ -605,8 +628,11 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (valueType.isFloatingPoint()) {
       return convertFloatingPoint(value);
 
+    } else if (valueType.isRoundingMode()) {
+      return getRoundingMode(value);
+
     } else if (valueType.isString()) {
-      return value.getConstString().toString();
+      return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
     } else {
       // String serialization for unknown terms.
@@ -629,11 +655,38 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var exp = matcher.group("exp");
     final var mant = matcher.group("mant");
 
-    Preconditions.checkArgument(sign.length() == 1 && "01".contains(sign));
+    Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
     Preconditions.checkArgument(mant.length() == mantWidth);
 
     return FloatingPointNumber.of(
-        sign.equals("1"), new BigInteger(exp, 2), new BigInteger(mant, 2), expWidth, mantWidth);
+        Sign.of(sign.charAt(0) == '1'),
+        new BigInteger(exp, 2),
+        new BigInteger(mant, 2),
+        expWidth,
+        mantWidth);
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Expr pExpr) {
+    checkArgument(
+        pExpr.isConst() && pExpr.getType().isRoundingMode(),
+        "Expected a constant rounding mode, but got: %s",
+        pExpr);
+    RoundingMode rm = pExpr.getConstRoundingMode();
+    if (rm.equals(RoundingMode.roundNearestTiesToAway)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (rm.equals(RoundingMode.roundNearestTiesToEven)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (rm.equals(RoundingMode.roundTowardNegative)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (rm.equals(RoundingMode.roundTowardPositive)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (rm.equals(RoundingMode.roundTowardZero)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", pExpr));
+    }
   }
 }

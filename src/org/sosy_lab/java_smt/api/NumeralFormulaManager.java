@@ -20,6 +20,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
  * @param <ParamFormulaType> formulaType of the parameters
  * @param <ResultFormulaType> formulaType of arithmetic results
  */
+@SuppressWarnings("InterfaceTypeParameterName")
 public interface NumeralFormulaManager<
     ParamFormulaType extends NumeralFormula, ResultFormulaType extends NumeralFormula> {
 
@@ -68,12 +69,13 @@ public interface NumeralFormulaManager<
 
   /**
    * Create a formula representing the division of two operands according to Boute's Euclidean
-   * definition.
+   * definition (DOI: 10.1145/128861.128862).
    *
    * <p>If the denominator evaluates to zero (division-by-zero), either directly as value or
    * indirectly via an additional constraint, then the solver is allowed to choose an arbitrary
-   * value for the result of the division (cf. SMTLIB standard for the division operator in Ints or
-   * Reals theory).
+   * value for the result of the division (cf. SMTLib standard version 2.6 for the division operator
+   * in Int or Real theory). The details of this are implementation specific and may change solver
+   * by solver.
    *
    * <p>Note: Some solvers, e.g., Yices2, abort with an exception when exploring a division-by-zero
    * during the SAT-check. This is not compliant to the SMTLIB standard, but sadly happens.

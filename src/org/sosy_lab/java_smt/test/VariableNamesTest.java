@@ -23,10 +23,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
-import org.junit.runners.Parameterized.Parameters;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
@@ -40,9 +36,8 @@ import org.sosy_lab.java_smt.api.visitors.DefaultBooleanFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 
-@RunWith(Parameterized.class)
 @SuppressFBWarnings(value = "DLS_DEAD_LOCAL_STORE")
-public class VariableNamesTest extends SolverBasedTest0 {
+public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<String> NAMES =
       ImmutableList.of(
@@ -175,19 +170,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
         .build();
   }
 
-  @Parameters(name = "{0}")
-  public static Object[] getAllSolvers() {
-    return Solvers.values();
-  }
-
-  @Parameter(0)
-  public Solvers solver;
-
-  @Override
-  protected Solvers solverToUse() {
-    return solver;
-  }
-
   boolean allowInvalidNames() {
     return true;
   }
@@ -314,8 +296,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : NAMES) {
       testName0(
           name,
@@ -353,8 +333,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
   @Test
   public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       testName0(
           name,
@@ -419,10 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not (yet) return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -505,10 +480,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -555,6 +527,8 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testBoolVariableDump() {
+    // FIXME: Broken on yices2, fixed in 2.7.0
+    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -566,6 +540,7 @@ public class VariableNamesTest extends SolverBasedTest0 {
 
   @Test
   public void testEqBoolVariableDump() {
+    // FIXME: Rewrite test? Most solvers will simplify the formula to `true`.
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {
@@ -621,8 +596,6 @@ public class VariableNamesTest extends SolverBasedTest0 {
   public void testBvArrayVariable() {
     requireArrays();
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
           v ->

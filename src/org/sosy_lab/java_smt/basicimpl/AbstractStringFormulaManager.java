@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -27,22 +30,87 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
     extends AbstractBaseFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl>
     implements StringFormulaManager {
 
+  private static final Pattern UNICODE_ESCAPE_PATTERN =
+      Pattern.compile(
+          // start with "\\u"
+          "\\\\u"
+              // either a plain Unicode letter like "\\u0061"
+              + "((?<codePoint>[0-9a-fA-F]{4})"
+              + "|"
+              // or curly brackets like "\\u{61}"
+              + "(\\{(?<codePointInBrackets>[0-9a-fA-F]{1,5})\\}))");
+
   protected AbstractStringFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
     super(pCreator);
   }
 
-  private StringFormula wrapString(TFormulaInfo formulaInfo) {
+  protected StringFormula wrapString(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateString(formulaInfo);
   }
 
-  private RegexFormula wrapRegex(TFormulaInfo formulaInfo) {
+  protected RegexFormula wrapRegex(TFormulaInfo formulaInfo) {
     return getFormulaCreator().encapsulateRegex(formulaInfo);
+  }
+
+  protected IntegerFormula wrapInteger(TFormulaInfo formulaInfo) {
+    return getFormulaCreator().encapsulate(FormulaType.IntegerType, formulaInfo);
   }
 
   @Override
   public StringFormula makeString(String value) {
+    checkArgument(
+        areAllCodePointsInRange(value, 0, 0x2FFFF),
+        "String constants may only contain Unicode characters from the first three planes "
+            + "(codepoints 0x00000 to 0x2FFFF).");
     return wrapString(makeStringImpl(value));
+  }
+
+  /** Check if the codepoints of all characters in the String are in range. */
+  private static boolean areAllCodePointsInRange(String str, int lower, int upper) {
+    return str.codePoints().allMatch(codePoint -> lower <= codePoint && codePoint <= upper);
+  }
+
+  /** Replace Unicode letters in UTF16 representation with their escape sequences. */
+  public static String escapeUnicodeForSmtlib(String input) {
+    StringBuilder sb = new StringBuilder();
+    for (int codePoint : input.codePoints().toArray()) {
+      if (codePoint == 0x5c) { // 0x5c is s single backslash, as char: '\\'
+        // Backslashes must be escaped, otherwise they may get substituted when reading back
+        // the results from the model
+        sb.append("\\u{5c}");
+      } else if (0x20 <= codePoint && codePoint <= 0x7E) {
+        sb.appendCodePoint(codePoint); // normal printable chars
+      } else {
+        sb.append("\\u{").append(Integer.toHexString(codePoint)).append("}");
+      }
+    }
+    return sb.toString();
+  }
+
+  /** Replace escaped Unicode letters in SMTLIB representation with their UTF16 pendant. */
+  public static String unescapeUnicodeForSmtlib(String input) {
+    Matcher matcher = UNICODE_ESCAPE_PATTERN.matcher(input);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String hexCodePoint = matcher.group("codePoint");
+      if (hexCodePoint == null) {
+        hexCodePoint = matcher.group("codePointInBrackets");
+      }
+      int codePoint = Integer.parseInt(hexCodePoint, 16);
+      checkArgument(
+          0 <= codePoint && codePoint <= 0x2FFFF,
+          "SMTLIB does only specify Unicode letters from Planes 0-2");
+      String replacement = Character.toString(codePoint);
+      if (replacement.equals("\\")) {
+        // Matcher.appendReplacement considers '\' as special character.
+        // Substitute with '\\' instead
+        replacement = "\\\\";
+      }
+      matcher.appendReplacement(sb, replacement);
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   protected abstract TFormulaInfo makeStringImpl(String value);
@@ -141,10 +209,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula indexOf(StringFormula str, StringFormula part, IntegerFormula startIndex) {
-    return getFormulaCreator()
-        .encapsulate(
-            FormulaType.IntegerType,
-            indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
+    return wrapInteger(indexOf(extractInfo(str), extractInfo(part), extractInfo(startIndex)));
   }
 
   protected abstract TFormulaInfo indexOf(
@@ -287,8 +352,7 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
 
   @Override
   public IntegerFormula toIntegerFormula(StringFormula str) {
-    return getFormulaCreator()
-        .encapsulate(FormulaType.IntegerType, toIntegerFormula(extractInfo(str)));
+    return wrapInteger(toIntegerFormula(extractInfo(str)));
   }
 
   protected abstract TFormulaInfo toIntegerFormula(TFormulaInfo pParam);
@@ -299,4 +363,18 @@ public abstract class AbstractStringFormulaManager<TFormulaInfo, TType, TEnv, TF
   }
 
   protected abstract TFormulaInfo toStringFormula(TFormulaInfo pParam);
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula number) {
+    return wrapInteger(toCodePoint(extractInfo(number)));
+  }
+
+  protected abstract TFormulaInfo toCodePoint(TFormulaInfo pParam);
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula number) {
+    return wrapString(fromCodePoint(extractInfo(number)));
+  }
+
+  protected abstract TFormulaInfo fromCodePoint(TFormulaInfo pParam);
 }

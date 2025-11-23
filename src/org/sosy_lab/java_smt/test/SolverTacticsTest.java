@@ -9,7 +9,7 @@
 package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
@@ -199,9 +199,10 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
-  public void ufEliminationNesteQuantifierTest() throws InterruptedException {
+  public void ufEliminationNestedQuantifierTest() {
     requireIntegers();
     requireQuantifiers();
+
     // f := exists v1,v2v,v3,v4 : uf(v1, v3) == uf(v2, v4)
     IntegerFormula variable1 = imgr.makeVariable("variable1");
     IntegerFormula variable2 = imgr.makeVariable("variable2");
@@ -216,11 +217,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
         qmgr.exists(
             ImmutableList.of(variable1, variable2, variable3, variable4), bmgr.equivalence(f1, f2));
 
-    try {
-      mgr.applyTactic(f, Tactic.ACKERMANNIZATION);
-      assert_().fail();
-    } catch (IllegalArgumentException expected) {
-    }
+    assertThrows(IllegalArgumentException.class, () -> mgr.applyTactic(f, Tactic.ACKERMANNIZATION));
   }
 
   private static class CNFChecker implements BooleanFormulaVisitor<Void> {
@@ -231,7 +228,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     boolean containsMoreAnd = false;
     boolean started = false;
 
-    protected CNFChecker(FormulaManager pFmgr) {
+    CNFChecker(FormulaManager pFmgr) {
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
@@ -240,18 +237,12 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       return bfmgr.visit(f, this);
     }
 
-    public boolean isInCNF() {
+    boolean isInCNF() {
       return (startsWithAnd && !containsMoreAnd) || (started && !startsWithAnd);
     }
 
     @Override
     public Void visitConstant(boolean value) {
-      started = true;
-      return null;
-    }
-
-    @Override
-    public Void visitBoundVar(BooleanFormula f, int deBruijnIdx) {
       started = true;
       return null;
     }
@@ -343,7 +334,7 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
     boolean wasLastVisitNot = false;
     boolean notOnlyAtAtoms = true;
 
-    protected NNFChecker(FormulaManager pFmgr) {
+    NNFChecker(FormulaManager pFmgr) {
       bfmgr = pFmgr.getBooleanFormulaManager();
     }
 
@@ -352,18 +343,12 @@ public class SolverTacticsTest extends SolverBasedTest0.ParameterizedSolverBased
       return bfmgr.visit(f, this);
     }
 
-    public boolean isInNNF() {
+    boolean isInNNF() {
       return notOnlyAtAtoms;
     }
 
     @Override
     public Void visitConstant(boolean value) {
-      wasLastVisitNot = false;
-      return null;
-    }
-
-    @Override
-    public Void visitBoundVar(BooleanFormula var, int deBruijnIdx) {
       wasLastVisitNot = false;
       return null;
     }

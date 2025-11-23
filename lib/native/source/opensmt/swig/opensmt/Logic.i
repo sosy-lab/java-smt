@@ -6,10 +6,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
+namespace opensmt {
+
 // Override the exception handler for Logic.parse()
 // Any error thrown here should be recast as an IllegalArgumentException
-
-
 %exception Logic::parseFormula {
   try { $action }
   catch(std::exception& e) {
@@ -28,6 +28,8 @@
     return $null;
   }
 }
+
+%ignore Logic::TermMarks;
 
 %ignore Logic::propFormulasAppearingInUF;
 %ignore Logic::tk_val_uf_default;
@@ -164,7 +166,7 @@
 %ignore Logic::declareFun_Pairwise (std::string const &s, SRef rsort, vec< SRef > const &args);
 %ignore Logic::instantiateFunctions (SRef);
 %ignore Logic::instantiateArrayFunctions (SRef);
-%ignore Logic::hasSortSymbol (SortSymbol const &);
+%ignore Logic::hasSortSymbol (SortSymbol const &) const;
 %ignore Logic::peekSortSymbol (SortSymbol const &, SSymRef &) const;
 %ignore Logic::declareSortSymbol (SortSymbol symbol);
 %ignore Logic::getSort (SSymRef, vec< SRef > &&args);
@@ -250,7 +252,7 @@
 %ignore Logic::getNewFacts (PTRef root, MapWithKeys< PTRef, lbool, PTRefHash > &facts);
 %ignore Logic::retrieveSubstitutions (const vec< PtAsgn > &units);
 %ignore Logic::substitutionsTransitiveClosure (SubstMap &substs);
-%ignore Logic::contains (PTRef x, PTRef y);
+%ignore Logic::contains (PTRef x, PTRef y) const;
 %ignore Logic::learnEqTransitivity (PTRef);
 %ignore Logic::removeAuxVars (PTRef tr);
 %ignore Logic::hasQuotableChars (std::string const &name) const;
@@ -262,10 +264,12 @@
 %ignore Logic::printTerm (PTRef tr) const;
 %ignore Logic::printTerm (PTRef tr, bool l, bool s) const;
 %ignore Logic::printSym (SymRef sr) const;
+%ignore Logic::getSortSize(SRef s) const;
 %ignore Logic::termSort (vec< PTRef > &v) const;
 %ignore Logic::purify (PTRef r, PTRef &p, lbool &sgn) const;
 %ignore Logic::collectStats (PTRef, int &n_of_conn, int &n_of_eq, int &n_of_uf, int &n_of_if);
 %ignore Logic::typeCheck (SymRef sym, vec< PTRef > const &args, std::string &why) const;
 %ignore Logic::verbose () const;
+}
 
-%include "include/opensmt/Logic.h"
+%include "include/opensmt/logics/Logic.h"

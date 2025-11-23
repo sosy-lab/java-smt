@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -41,12 +41,17 @@ public class CVC5RationalFormulaManager
   }
 
   @Override
+  protected Term toType(Term pNumber) {
+    return pNumber.getSort().isInteger() ? termManager.mkTerm(Kind.TO_REAL, pNumber) : pNumber;
+  }
+
+  @Override
   public Term divide(Term pParam1, Term pParam2) {
-    return solver.mkTerm(Kind.DIVISION, pParam1, pParam2);
+    return termManager.mkTerm(Kind.DIVISION, pParam1, pParam2);
   }
 
   @Override
   protected Term floor(Term pNumber) {
-    return solver.mkTerm(Kind.TO_INTEGER, pNumber);
+    return termManager.mkTerm(Kind.TO_INTEGER, pNumber);
   }
 }

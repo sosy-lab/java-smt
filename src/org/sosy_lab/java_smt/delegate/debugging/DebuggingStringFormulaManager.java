@@ -21,8 +21,7 @@ public class DebuggingStringFormulaManager implements StringFormulaManager {
   private final StringFormulaManager delegate;
   private final DebuggingAssertions debugging;
 
-  public DebuggingStringFormulaManager(
-      StringFormulaManager pDelegate, DebuggingAssertions pDebugging) {
+  DebuggingStringFormulaManager(StringFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = checkNotNull(pDelegate);
     debugging = pDebugging;
   }
@@ -351,6 +350,24 @@ public class DebuggingStringFormulaManager implements StringFormulaManager {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(number);
     StringFormula result = delegate.toStringFormula(number);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public IntegerFormula toCodePoint(StringFormula str) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(str);
+    IntegerFormula result = delegate.toCodePoint(str);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public StringFormula fromCodePoint(IntegerFormula codepoint) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(codepoint);
+    StringFormula result = delegate.fromCodePoint(codepoint);
     debugging.addFormulaTerm(result);
     return result;
   }

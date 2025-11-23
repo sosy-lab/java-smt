@@ -51,14 +51,6 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
         .isNotEqualTo(Solvers.BOOLECTOR);
   }
 
-  protected final void requireUfValuesInModel() {
-    assume()
-        .withMessage(
-            "Integration of solver does not support retrieving values for UFs from a model")
-        .that(solver)
-        .isNotEqualTo(Solvers.Z3);
-  }
-
   @Test
   public void simpleStackTestBool() throws SolverException, InterruptedException {
     BasicProverEnvironment<?> stack = newEnvironmentForTest(context);
@@ -507,8 +499,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
     }
   }
 
-  @Test(expected = IllegalStateException.class)
-  @SuppressWarnings("CheckReturnValue")
+  @Test
   public void avoidDualStacksIfNotSupported() throws InterruptedException {
     assume()
         .withMessage("Solver does not support multiple stacks yet")
@@ -519,7 +510,7 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
     stack1.push(bmgr.makeTrue());
 
     // creating a new environment is not allowed with non-empty stack -> fail
-    newEnvironmentForTest(context);
+    assertThrows(IllegalStateException.class, () -> newEnvironmentForTest(context));
   }
 
   /**
@@ -631,8 +622,6 @@ public abstract class SolverStackTest0 extends SolverBasedTest0.ParameterizedSol
       // actual type of object is not defined, thus do string matching:
       assertThat(model.evaluate(varA)).isEqualTo(BigInteger.ZERO);
       assertThat(model.evaluate(varB)).isEqualTo(BigInteger.ZERO);
-
-      requireUfValuesInModel();
 
       assertThat(model.evaluate(fmgr.callUF(uf, imgr.makeNumber(BigDecimal.ZERO))))
           .isEqualTo(BigInteger.ZERO);

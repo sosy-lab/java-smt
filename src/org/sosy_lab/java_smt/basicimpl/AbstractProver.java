@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
@@ -30,8 +31,8 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
-  private final boolean generateModels;
-  private final boolean generateAllSat;
+  protected final boolean generateModels;
+  protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
@@ -171,7 +172,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   protected void closeAllEvaluators() {
-    evaluators.forEach(Evaluator::close);
+    ImmutableList.copyOf(evaluators).forEach(Evaluator::close);
     evaluators.clear();
   }
 

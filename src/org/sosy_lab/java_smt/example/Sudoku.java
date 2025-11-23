@@ -88,7 +88,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  * </pre>
  */
 @SuppressWarnings("unused")
-public class Sudoku {
+public final class Sudoku {
 
   public static final int SIZE = 9;
   private static final int BLOCKSIZE = 3;
@@ -108,7 +108,7 @@ public class Sudoku {
           SolverContextFactory.createSolverContext(config, logger, notifier, solver)) {
 
         for (SudokuSolver<?> sudoku :
-            List.of(
+            ImmutableList.of(
                 new IntegerBasedSudokuSolver(context),
                 new EnumerationBasedSudokuSolver(context),
                 new BooleanBasedSudokuSolver(context))) {
@@ -195,7 +195,8 @@ public class Sudoku {
     /** convert one user-given value at given coordinate into a constraint for the solver. */
     abstract BooleanFormula getAssignment(S symbols, int row, int col, Integer value);
 
-    abstract Integer getValue(S symbols, Model model, int row, int col);
+    abstract Integer getValue(S symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException;
 
     /**
      * Solves a sudoku using the given grid values and returns a possible solution. Return <code>
@@ -314,7 +315,8 @@ public class Sudoku {
     }
 
     @Override
-    Integer getValue(IntegerFormula[][] symbols, Model model, int row, int col) {
+    Integer getValue(IntegerFormula[][] symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException {
       return model.evaluate(symbols[row][col]).intValue();
     }
   }
@@ -413,7 +415,8 @@ public class Sudoku {
     }
 
     @Override
-    Integer getValue(BooleanFormula[][][] symbols, Model model, int row, int col) {
+    Integer getValue(BooleanFormula[][][] symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException {
       for (int value = 0; value < SIZE; value++) {
         if (model.evaluate(symbols[row][col][value])) {
           return value + 1; // off-by-one!
@@ -516,7 +519,8 @@ public class Sudoku {
     }
 
     @Override
-    Integer getValue(EnumerationFormula[][] symbols, Model model, int row, int col) {
+    Integer getValue(EnumerationFormula[][] symbols, Model model, int row, int col)
+        throws InterruptedException, SolverException {
       String value = model.evaluate(symbols[row][col]);
       for (int i = 0; i < VALUES.length; i++) {
         if (VALUES[i].equals(value)) {

@@ -3,12 +3,12 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# How to install a SMT solver library for Windows (64-bit) for developers of JavaSMT
+# How to install an SMT solver library for Windows (64-bit) for developers of JavaSMT
 
 ## Note:
 
@@ -25,40 +25,49 @@ which are either to create symlinks or to copy the library files.
 Symbolic links allow for an automatic update as soon as a dependency is changed via Ant/Ivy.
 Windows does not allow user-space symlinks, but requires administrator rights to create them.
 Thus, we cannot check them into the repository. Please execute the following as administrator
-in the current directory `lib/native/x86_64-windows`:
+in the current directory `lib\native\x86_64-windows`:
 
 For Z3:
-- mklink libz3.dll ..\..\java\runtime-z3\libz3.dll
-- mklink libz3java.dll ..\..\java\runtime-z3\libz3java.dll
+- `mklink libz3.dll ..\..\java\runtime-z3\x64\libz3.dll`
+- `mklink libz3java.dll ..\..\java\runtime-z3\x64\libz3java.dll`
 
 For MathSAT5:
-- mklink mpir.dll ..\..\java\runtime-mathsat\mpir.dll
-- mklink mathsat.dll ..\..\java\runtime-mathsat\mathsat.dll
-- mklink mathsat5j.dll ..\..\java\runtime-mathsat\mathsat5j.dll
+- `mklink gmp.dll ..\..\java\runtime-mathsat\x64\gmp.dll`
+- `mklink mathsat.dll ..\..\java\runtime-mathsat\x64\mathsat.dll`
+- `mklink mathsat5j.dll ..\..\java\runtime-mathsat\x64\mathsat5j.dll`
 
 For Bitwuzla:
-- mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll
+- `mklink libbitwuzlaj.dll ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll`
+
+For CVC5:
+
+- `mlink libcvc5jni.dll ..\..\java\runtime-cvc5\x64\libcvcjni.so`
 
 ### With a direct copy of the library:
 
 An alternative simple solution (without the need of administrator rights) is to copy over
-those files from the `lib\java\runtime-*\` directory into the current directory `lib/native/x86_64-windows`:
+those files from the `lib\java\runtime-*\` directory into the current directory `lib\native\x86_64-windows`:
 Please note that this copy process needs to be repeated after each update of a solver library via Ant/Ivy dependencies.
 
 For Z3:
-- copy ..\..\java\runtime-z3\libz3.dll libz3.dll
-- copy ..\..\java\runtime-z3\libz3java.dll libz3java.dll
+- `copy ..\..\java\runtime-z3\x64\libz3.dll libz3.dll`
+- `copy ..\..\java\runtime-z3\x64\libz3java.dll libz3java.dll`
 
 For MathSAT5:
-- copy ..\..\java\runtime-mathsat\mpir.dll mpir.dll
-- copy ..\..\java\runtime-mathsat\mathsat.dll mathsat.dll
-- copy ..\..\java\runtime-mathsat\mathsat5j.dll mathsat5j.dll
+- `copy ..\..\java\runtime-mathsat\x64\gmp.dll gmp.dll`
+- `copy ..\..\java\runtime-mathsat\x64\mathsat.dll mathsat.dll`
+- `copy ..\..\java\runtime-mathsat\x64\mathsat5j.dll mathsat5j.dll`
 
 For Bitwuzla:
-- copy ..\..\java\runtime-bitwuzla\libbitwuzlaj.dll libbitwuzlaj.dll
+- `copy ..\..\java\runtime-bitwuzla\x64\libbitwuzlaj.dll libbitwuzlaj.dll`
+
+For CVC5:
+
+- `copy ..\..\java\runtime-cvc5\x64\libcvc5jni.dll libcvc5jni.dll`
 
 Or simply use a wildcard:
-- copy ..\..\java\runtime-*\*dll .\
+- `copy ..\..\java\runtime-*\*dll .\`
+- `copy ..\..\java\runtime-*\x64\*dll .\`
 
 ## Additional dependencies:
 

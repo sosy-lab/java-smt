@@ -100,7 +100,7 @@ public class BinoxxoTest {
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
     try (SolverContext context =
-        SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.Z3)) {
+        SolverContextFactory.createSolverContext(config, logger, notifier, Solvers.SMTINTERPOL)) {
       BinoxxoSolver<?> binoxxo = new BooleanBasedBinoxxoSolver(context);
       assertThat(binoxxo.solve(fromString(input))).isEqualTo(fromString(expected));
     }
