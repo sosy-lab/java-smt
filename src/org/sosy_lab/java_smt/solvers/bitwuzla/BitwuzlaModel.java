@@ -8,15 +8,14 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
@@ -57,59 +56,11 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
   private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedTerms) {
     checkState(!isClosed());
     checkState(!prover.isClosed(), "Cannot use model after prover is closed");
-    ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
-    Deque<Term> queue = new ArrayDeque<>(assertedTerms);
-    while (!queue.isEmpty()) {
-      Term term = queue.removeFirst();
-      Sort sort = term.sort();
-      Vector_Term children = term.children();
-      // The term might be a value (variable or const, w only variable having a symbol)
-      // an array, an UF, or an FP or a function.
-      // Functions are just split into their children and those are traversed
-      if (sort.is_rm()) {
-        // Do nothing
-      } else if (term.kind() == Kind.APPLY) {
-        variablesBuilder.add(getUFAssignment(term));
-        for (int i = 1; i < children.size(); i++) {
-          queue.addLast(children.get(i));
-        }
-
-      } else if (sort.is_bv() && term.is_const()) {
-        variablesBuilder.add(getSimpleAssignment(term));
-
-      } else if (sort.is_bool() && term.is_const()) {
-        variablesBuilder.add(getSimpleAssignment(term));
-
-      } else if (sort.is_fp() && term.is_const()) {
-        // We can't eval FP properly at the moment, we just return whatever the solver gives us
-        // (BV representation of the FP)
-        variablesBuilder.add(getSimpleAssignment(term));
-
-      } else if (sort.is_array() && term.is_const()) {
-        variablesBuilder.addAll(buildArrayAssignments(term, bitwuzlaEnv.get_value(term)));
-
-      } else {
-        for (Term child : children) {
-          queue.addLast(child);
-        }
-      }
+    ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
+    for (Term expr : assertedTerms) {
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
     }
-
-    return variablesBuilder.build().asList();
-  }
-
-  private ValueAssignment getSimpleAssignment(Term pTerm) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    Term valueTerm = bitwuzlaEnv.get_value(pTerm);
-    String name = pTerm.symbol();
-    assert name != null;
-    return new ValueAssignment(
-        bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
-        bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-        bitwuzlaCreator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
-        name,
-        bitwuzlaCreator.convertValue(valueTerm),
-        argumentInterpretation);
+    return builder.build().asList();
   }
 
   /**
@@ -188,7 +139,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     return bitwuzlaCreator.getTermManager().mk_term(kind, left, right);
   }
 
-  private ValueAssignment getUFAssignment(Term pTerm) {
+  private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {
     Term valueTerm = bitwuzlaEnv.get_value(pTerm);
     // The first child is the decl, the others are args
     Vector_Term children = pTerm.children();
@@ -209,6 +160,34 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         name,
         bitwuzlaCreator.convertValue(valueTerm),
         argumentInterpretation);
+  }
+
+  private List<ValueAssignment> getAssignments(Term pKeyTerm) {
+
+    // handle UF instantiations
+    if (pKeyTerm.kind() == Kind.APPLY) {
+      return ImmutableList.of(getAssignmentForUfInstantiation(pKeyTerm));
+    }
+
+    // handle array assignments
+    final Term valueTerm = bitwuzlaEnv.get_value(pKeyTerm);
+    if (pKeyTerm.sort().is_array()) {
+      return buildArrayAssignments(pKeyTerm, valueTerm);
+    }
+
+    // handle simple assignments
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    for (Term child : pKeyTerm.children()) {
+      argumentInterpretationBuilder.add(evaluateImpl(child));
+    }
+    return ImmutableList.of(
+        new ValueAssignment(
+            creator.encapsulateWithTypeOf(pKeyTerm),
+            creator.encapsulateWithTypeOf(valueTerm),
+            creator.encapsulateBoolean(buildEqForTwoTerms(pKeyTerm, valueTerm)),
+            checkNotNull(pKeyTerm.symbol()),
+            creator.convertValue(pKeyTerm, valueTerm),
+            argumentInterpretationBuilder.build()));
   }
 
   @Override
