@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -42,7 +41,6 @@ import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
@@ -51,12 +49,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
 
-  private final FormulaManager mgr;
   protected final CVC5FormulaCreator creator;
   private final int randomSeed;
   private final ImmutableMap<String, String> furtherOptionsMap;
   protected Solver solver; // final in incremental mode, non-final in non-incremental mode
-  private boolean changedSinceLastSatQuery = false;
   protected final Deque<PersistentMap<String, Term>> assertedTerms = new ArrayDeque<>();
 
   // TODO: does CVC5 support separation logic in incremental mode?
@@ -75,7 +71,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
       ImmutableMap<String, String> pFurtherOptionsMap) {
     super(pOptions, pMgr.getBooleanFormulaManager(), pShutdownNotifier);
 
-    mgr = pMgr;
     creator = pFormulaCreator;
     furtherOptionsMap = pFurtherOptionsMap;
     randomSeed = pRandomSeed;
@@ -126,8 +121,12 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
   protected void pushImpl() throws InterruptedException {
-    setChanged();
     assertedTerms.push(assertedTerms.peek()); // add copy of top-level
     if (incremental) {
       try {
@@ -141,7 +140,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   protected void popImpl() {
-    setChanged();
     if (incremental) {
       try {
         solver.pop();
@@ -156,7 +154,6 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @CanIgnoreReturnValue
   protected String addConstraint0(BooleanFormula pF) {
     checkState(!closed);
-    setChanged();
     Term exp = creator.extractInfo(pF);
     if (incremental) {
       solver.assertFormula(exp);
@@ -169,22 +166,16 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @SuppressWarnings("resource")
   @Override
   public CVC5Model getModel() throws SolverException {
-    checkState(!closed);
-    checkState(!changedSinceLastSatQuery);
     checkGenerateModels();
     // special case for CVC5: Models are not permanent and need to be closed
     // before any change is applied to the prover stack. So, we register the Model as Evaluator.
     return registerEvaluator(
         new CVC5Model(
-            this,
-            mgr,
-            creator,
-            Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
+            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
   public Evaluator getEvaluator() {
-    checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -195,26 +186,10 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     return registerEvaluator(new CVC5Evaluator(this, creator));
   }
 
-  protected void setChanged() {
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      closeAllEvaluators();
-    }
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    checkState(!closed);
-    checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
-  }
-
   @Override
   @SuppressWarnings("try")
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
     if (!incremental) {
       // in non-incremental mode, we need to create a new solver instance for each sat check
       if (solver != null) {
@@ -322,9 +297,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    checkState(!closed);
     checkGenerateUnsatCores();
-    checkState(!changedSinceLastSatQuery);
     List<BooleanFormula> converted = new ArrayList<>();
     for (Term aCore : solver.getUnsatCore()) {
       converted.add(creator.encapsulateBoolean(aCore));
@@ -335,13 +308,13 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

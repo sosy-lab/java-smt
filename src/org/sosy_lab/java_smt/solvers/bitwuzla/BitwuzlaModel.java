@@ -34,7 +34,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
   private final BitwuzlaTheoremProver prover;
 
   private final BitwuzlaFormulaCreator bitwuzlaCreator;
-  private final ImmutableList<Term> assertedTerms;
+  private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
@@ -45,12 +45,15 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     this.bitwuzlaEnv = bitwuzlaEnv;
     this.prover = prover;
     this.bitwuzlaCreator = bitwuzlaCreator;
-    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
+
+    // We need to generate and save this at construction time as Bitwuzla has no functionality to
+    // give a persistent reference to the model. If the SMT engine is used somewhere else, the
+    // values we get out of it might change!
+    model = generateModel(assertedTerms);
   }
 
   /** Build a list of assignments that stays valid after closing the model. */
-  @Override
-  public ImmutableList<ValueAssignment> asList() {
+  private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedTerms) {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
@@ -235,5 +238,10 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
   protected @Nullable Term evalImpl(Term formula) {
     Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     return bitwuzlaEnv.get_value(formula);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> asList() {
+    return model;
   }
 }

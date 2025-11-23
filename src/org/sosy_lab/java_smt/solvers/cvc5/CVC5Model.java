@@ -22,9 +22,6 @@ import io.github.cvc5.TermManager;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
@@ -33,18 +30,13 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   private final TermManager termManager;
   private final Solver solver;
 
-  @SuppressWarnings("unused")
-  private final FormulaManager mgr;
-
   CVC5Model(
       CVC5AbstractProver<?> pProver,
-      FormulaManager pMgr,
       CVC5FormulaCreator pCreator,
       Collection<Term> pAssertedExpressions) {
     super(pProver, pCreator);
     termManager = pCreator.getEnv();
     solver = pProver.solver;
-    mgr = pMgr;
 
     // We need to generate and save this at construction time as CVC5 has no functionality to give a
     // persistent reference to the model. If the SMT engine is used somewhere else, the values we
@@ -66,11 +58,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
           true,
           (name, f) -> {
             try {
-              if (f.getKind() == Kind.APPLY_UF) {
-                builder.add(getAssignmentForUfInstantiation(f));
-              } else {
-                builder.addAll(getAssignments(f));
-              }
+              builder.addAll(getAssignments(f));
             } catch (CVC5ApiException e) {
               throw new IllegalArgumentException(
                   "Failure when retrieving assignments for term '" + f + "'.", e);
@@ -101,16 +89,14 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
       argumentInterpretationBuilder.add(evaluateImpl(child));
     }
 
-    String nameStr = ((CVC5FormulaCreator) creator).getName(pKeyTerm);
-    Term valueTerm = solver.getValue(pKeyTerm);
-    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
-    Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
-    BooleanFormula equation =
-        creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
-    Object value = creator.convertValue(pKeyTerm, valueTerm);
-
+    final Term valueTerm = solver.getValue(pKeyTerm);
     return new ValueAssignment(
-        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretationBuilder.build());
+        creator.encapsulateWithTypeOf(pKeyTerm),
+        creator.encapsulateWithTypeOf(valueTerm),
+        creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm)),
+        ((CVC5FormulaCreator) creator).getName(pKeyTerm),
+        creator.convertValue(pKeyTerm, valueTerm),
+        argumentInterpretationBuilder.build());
   }
 
   /**
@@ -128,11 +114,10 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
   /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
   private String getVar(Term array) throws CVC5ApiException {
-    if (array.getKind().equals(Kind.SELECT)) {
-      return getVar(array.getChild(0));
-    } else {
-      return array.getSymbol();
+    while (array.getKind().equals(Kind.SELECT)) {
+      array = array.getChild(0);
     }
+    return array.getSymbol();
   }
 
   /**
@@ -185,12 +170,11 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
 
       } else {
         // CASE 2: final element, let's get the assignment and proceed with its sibling
-        Term equation = creator.getEnv().mkTerm(Kind.EQUAL, select, element);
         result.add(
             new ValueAssignment(
                 creator.encapsulate(creator.getFormulaType(element), select),
                 creator.encapsulate(creator.getFormulaType(element), element),
-                creator.encapsulateBoolean(equation),
+                creator.encapsulateBoolean(creator.getEnv().mkTerm(Kind.EQUAL, select, element)),
                 getVar(expr),
                 creator.convertValue(element, element),
                 transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
@@ -208,30 +192,31 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
   }
 
   private List<ValueAssignment> getAssignments(Term pKeyTerm) throws CVC5ApiException {
+
+    // handle UF instantiations
+    if (pKeyTerm.getKind() == Kind.APPLY_UF) {
+      return ImmutableList.of(getAssignmentForUfInstantiation(pKeyTerm));
+    }
+
+    // handle array assignments
+    final Term valueTerm = solver.getValue(pKeyTerm);
+    if (pKeyTerm.getSort().isArray()) {
+      return buildArrayAssignments(pKeyTerm, valueTerm);
+    }
+
+    // handle simple assignments
     ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
     for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
       argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
     }
-
-    String nameStr = ((CVC5FormulaCreator) creator).getName(pKeyTerm);
-    Term valueTerm = solver.getValue(pKeyTerm);
-    if (valueTerm.getSort().isArray()) {
-      return buildArrayAssignments(pKeyTerm, valueTerm);
-    } else {
-      Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
-      Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
-      BooleanFormula equation =
-          creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm));
-      Object value = creator.convertValue(pKeyTerm, valueTerm);
-      return ImmutableList.of(
-          new ValueAssignment(
-              keyFormula,
-              valueFormula,
-              equation,
-              nameStr,
-              value,
-              argumentInterpretationBuilder.build()));
-    }
+    return ImmutableList.of(
+        new ValueAssignment(
+            creator.encapsulateWithTypeOf(pKeyTerm),
+            creator.encapsulateWithTypeOf(valueTerm),
+            creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm)),
+            ((CVC5FormulaCreator) creator).getName(pKeyTerm),
+            creator.convertValue(pKeyTerm, valueTerm),
+            argumentInterpretationBuilder.build()));
   }
 
   @Override

@@ -158,7 +158,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
-  Mathsat5FormulaCreator(final Long msatEnv) {
+  private final boolean usingOptiMathSAT;
+
+  Mathsat5FormulaCreator(final Long msatEnv, boolean pUsingOptiMathSAT5) {
     super(
         msatEnv,
         msat_get_bool_type(msatEnv),
@@ -166,6 +168,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         msat_get_rational_type(msatEnv),
         null,
         null);
+    usingOptiMathSAT = pUsingOptiMathSAT5;
   }
 
   @Override
@@ -352,7 +355,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, getRoundingMode(f));
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
-    } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
+    } else if (!usingOptiMathSAT // OptiMathSAT does not support enumerations
+        && msat_is_enum_type(environment, msat_term_get_type(f))) {
       assert !msat_term_is_constant(environment, f) : "Enumeration constants are no variables";
       assert arity == 0 : "Enumeration constants have no parameters";
       return visitor.visitConstant(formula, msat_term_repr(f));

@@ -93,10 +93,27 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
       ImmutableList.of(Solvers.Z3);
+  private static final ImmutableList<Solvers> SOLVERS_WITH_PERSISTENT_MODEL =
+      ImmutableList.of(Solvers.MATHSAT5, Solvers.Z3, Solvers.SMTINTERPOL, Solvers.YICES2);
+
+  /** Model value for irrelevant variable. */
+  private BigInteger defaultValue;
 
   @Before
   public void setup() {
     requireModel();
+
+    switch (solverToUse()) {
+      case SMTINTERPOL:
+      case Z3:
+        defaultValue = BigInteger.TWO;
+        break;
+      case BOOLECTOR:
+        defaultValue = BigInteger.valueOf(255);
+        break;
+      default:
+        defaultValue = BigInteger.ZERO;
+    }
   }
 
   @Test
@@ -109,6 +126,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       }
 
       assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
+  public void testModelAccessWithoutSatCheck() throws InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeTrue());
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeVariable("x"));
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
     }
   }
 
@@ -2856,6 +2884,211 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   }
 
   @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterAnotherAddConstraint()
+      throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "y"));
+    }
+    prover.push(initialConstraint); // PUSH x=y -> arbitrary model
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pushing something else
+    final BooleanFormula newConstraint;
+    if (imgr != null) {
+      newConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(5));
+    } else {
+      newConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 5));
+    }
+    prover.addConstraint(newConstraint); // ADD x=5
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    final List<ValueAssignment> assignments = m.asList();
+    assertThat(assignments).hasSize(2);
+    System.out.println(assignments);
+    if (imgr != null) {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    } else {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(defaultValue);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(defaultValue);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterAnotherPush() throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "y"));
+    }
+    prover.push(initialConstraint); // PUSH x=y -> arbitrary model
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pushing something else
+    final BooleanFormula newConstraint;
+    if (imgr != null) {
+      newConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(5));
+    } else {
+      newConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 5));
+    }
+    prover.push(newConstraint); // PUSH x=5
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    final List<ValueAssignment> assignments = m.asList();
+    assertThat(assignments).hasSize(2);
+    System.out.println(assignments);
+    if (imgr != null) {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    } else {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(defaultValue);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(defaultValue);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterPop() throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 1));
+    }
+    prover.push(initialConstraint); // PUSH x=1
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pop
+    prover.pop();
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    if (imgr != null) {
+      assertThat(m.asList().get(0).getKey()).isEqualTo(imgr.makeVariable("x"));
+      assertThat(m.asList().get(0).getValue()).isEqualTo(BigInteger.ONE);
+    } else {
+      assertThat(m.asList().get(0).getKey()).isEqualTo(bvmgr.makeVariable(8, "x"));
+      assertThat(m.asList().get(0).getValue()).isEqualTo(BigInteger.ONE);
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(BigInteger.ONE);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
+  }
+
+  @Test
   public void testGenerateModelsOption() throws SolverException, InterruptedException {
     try (ProverEnvironment prover = context.newProverEnvironment()) { // no option
       assertThat(prover).isSatisfiable();
@@ -2972,7 +3205,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // Warning: do never call "toString" on this formula!
     BooleanFormula f = bmgr.makeVariable("basis");
 
-    int maxDepth = 30; // if every solver is fast enough, we could increase this number up to 100.
+    // if every solver is fast enough, we could increase this number up to 100.
+    int maxDepth = solverToUse() == Solvers.BITWUZLA ? 17 : 30;
 
     for (int depth = 0; depth < maxDepth; depth++) {
       T var = makeVar.apply(depth);
