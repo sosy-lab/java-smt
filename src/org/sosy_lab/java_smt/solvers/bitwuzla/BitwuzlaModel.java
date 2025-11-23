@@ -8,7 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -54,8 +55,8 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   /** Build a list of assignments that stays valid after closing the model. */
   private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedTerms) {
-    Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
+    checkState(!isClosed());
+    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
     Deque<Term> queue = new ArrayDeque<>(assertedTerms);
     while (!queue.isEmpty()) {
@@ -85,7 +86,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
         variablesBuilder.add(getSimpleAssignment(term));
 
       } else if (sort.is_array() && term.is_const()) {
-        variablesBuilder.addAll(buildArrayAssignment(term, bitwuzlaEnv.get_value(term)));
+        variablesBuilder.addAll(buildArrayAssignments(term, bitwuzlaEnv.get_value(term)));
 
       } else {
         for (Term child : children) {
@@ -132,77 +133,50 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     return array.symbol();
   }
 
-  /** Build assignment for an array value. */
-  private Iterable<ValueAssignment> buildArrayAssignment(Term expr, Term value) {
-    // Bitwuzla returns values such as "(Store (Store ... i1,1 e1,1) i1,0 e1,0)" where the i1,x
-    // match the first index of the array and the elements e1,Y can again be arrays (if there is
-    // more than one index). We need "pattern match" this values to extract assignments from it.
-    // Initially we have:
-    //  arr = (Store (Store ... i1,1 e1,1) i1,0 e1,0)
-    // where 'arr' is the name of the variable. By applying (Select i1,0 ...) to both side we get:
-    // (Select i1,0 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0))
-    // The right side simplifies to e1,0 as the index matches. We need to continue with this for
-    // all other matches to the first index, that is
-    //  (Select i1,1 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0))
-    //                    = (Select i1,0 (Store ... i1,1 e1,1))
-    //                    = e1,1
-    // until all matches are explored and the bottom of the Store chain is reached. If the array
-    // has more than one dimension we also have to descend into the elements to apply the next
-    // index there. For instance, let's consider a 2-dimensional array with type (Array Int ->
-    // (Array Int -> Int)). After matching the first index just as in the above example we might
-    // have:
-    //  (Select i1,0 arr) = (Select i1,0 (Store (Store ... i1,1 e1,1) i1,0 e1,0)) = e1,0
-    // In this case e1,0 is again a Store chain, let's say e1,0 := (Store (Store ... i2,1 e2,1)
-    // i2,0 e2,0), and we now continue with the second index:
-    //  (Select i2,1 (Select i1,0 arr)) = (Select i2,1 (Store (Store ... i2,1 e2,1) i2,0 e2,0)) =
-    //                                  = e2,1
-    // This again has to be done for all possible matches.
-    // Once we've reached the last index, the successor element will be a non-array value. We
-    // then create the final assignments and return:
-    //  (Select iK,mK ... (Select i2,1 (Select i1,0 arr)) = eik,mK
-    if (value.kind().equals(Kind.ARRAY_STORE)) {
-      // This is a Store node for the current index. We need to follow the chain downwards to
-      // match this index, while also exploring the successor for the other indices
+  /**
+   * Build assignment for an array value.
+   *
+   * @param expr The array term, e.g., a variable
+   * @param value The model value term returned by Bitwuzla for the array, e.g., a Store chain
+   * @return A list of value assignments for all elements in the array, including nested arrays
+   */
+  private List<ValueAssignment> buildArrayAssignments(Term expr, Term value) {
+    TermManager termManager = bitwuzlaCreator.getTermManager();
+
+    // Iterate down the Store-chain: (Store tail index element)
+    List<ValueAssignment> result = new ArrayList<>();
+    while (value.kind().equals(Kind.ARRAY_STORE)) {
       Term index = value.get(1);
       Term element = value.get(2);
-
-      TermManager termManager = bitwuzlaCreator.getTermManager();
       Term select = termManager.mk_term(Kind.ARRAY_SELECT, expr, index);
 
-      Iterable<ValueAssignment> current;
+      // CASE 1: nested array dimension, let's recurse deeper
       if (expr.sort().array_element().is_array()) {
-        current = buildArrayAssignment(select, element);
+        result.addAll(buildArrayAssignments(select, element));
+
       } else {
-        Term equation = termManager.mk_term(Kind.EQUAL, select, element);
-
-        current =
-            FluentIterable.of(
-                new ValueAssignment(
-                    creator.encapsulate(creator.getFormulaType(element), select),
-                    creator.encapsulate(creator.getFormulaType(element), element),
-                    creator.encapsulateBoolean(equation),
-                    getVar(expr),
-                    creator.convertValue(element, element),
-                    FluentIterable.from(getArrayIndices(select))
-                        .transform(creator::convertValue)
-                        .toList()));
+        // CASE 2: final element, let's get the assignment and proceed with its sibling
+        result.add(
+            new ValueAssignment(
+                creator.encapsulate(creator.getFormulaType(element), select),
+                creator.encapsulate(creator.getFormulaType(element), element),
+                creator.encapsulateBoolean(termManager.mk_term(Kind.EQUAL, select, element)),
+                getVar(expr),
+                creator.convertValue(element, element),
+                FluentIterable.from(getArrayIndices(select))
+                    .transform(creator::convertValue)
+                    .toList()));
       }
-      return FluentIterable.concat(current, buildArrayAssignment(expr, value.get(0)));
 
-    } else if (value.kind().equals(Kind.CONST_ARRAY)) {
-      // We've reached the end of the Store chain
-      return ImmutableList.of();
-
-    } else {
-      // Should be unreachable
-      // We assume that array values are made up of "const" and "store" nodes with non-array
-      // constants as leaves
-      throw new AssertionError(
-          String.format(
-              "Can't process model value for variable '%s'. Please report this issue to the "
-                  + "JavaSMT developers",
-              getVar(expr)));
+      // Move to the next Store in the chain
+      value = value.get(0);
     }
+
+    // End of chain must be CONST_ARRAY.
+    checkState(
+        value.kind().equals(Kind.CONST_ARRAY), "Unexpected array value structure: %s", value);
+
+    return result;
   }
 
   private Term buildEqForTwoTerms(Term left, Term right) {
@@ -239,7 +213,8 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   @Override
   protected @Nullable Term evalImpl(Term formula) {
-    Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
+    checkState(!isClosed());
+    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     return bitwuzlaEnv.get_value(formula);
   }
 
