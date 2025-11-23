@@ -32,7 +32,8 @@ SPDX-License-Identifier: Apache-2.0
         runtime-princess,
         runtime-smtinterpol,
         runtime-yices2,
-        runtime-z3
+        runtime-z3,
+        runtime-z3-legacy
     "/>
     <property name="ivy.configuration.main" value="core"/>
     <property name="ivy.configurations" value="build, ${ivy.configuration.main}, ${ivy.solver.configurations}, test, format-source, checkstyle, spotbugs"/>
