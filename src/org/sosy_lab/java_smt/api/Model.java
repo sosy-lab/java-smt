@@ -25,10 +25,12 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
  * <ul>
  *   <li>a listing of model assignments, i.e., the user can iterate over most available symbols and
  *       their assignments,
- *   <li>for several solvers, a guaranteed availability even after applying any operation on the
- *       original prover stack, i.e., the model instance stays constant and remains valid for one
- *       given satisfiable prover environment. Solvers without this guarantee (Princess, Boolector,
- *       and Bitwuzla) are failing when accessing the corresponding methods.
+ *   <li>for several solvers (such as MATHSAT5, SMTInterpol, Z3), a guaranteed availability even
+ *       after applying any operation on the original prover stack, i.e., the model instance stays
+ *       constant and remains valid for one given satisfiable prover environment. Solvers without
+ *       this guarantee (CVC4, CVC5, Princess, Boolector, and Bitwuzla) are failing when accessing
+ *       the corresponding methods (we call {@link Model#close()} as soon as the guarantee is
+ *       violated).
  * </ul>
  */
 public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseable {
@@ -56,13 +58,26 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
     return asList().iterator();
   }
 
-  /** Build a list of assignments that stays valid after closing the model. */
+  /**
+   * Returns a list of model assignments that remains valid after the model is closed (via {@link
+   * Model#close()}).
+   *
+   * <p>The returned {@link ImmutableList} contains the same {@link ValueAssignment} elements that
+   * {@link #iterator()} would provide, but it is a materialized copy such that the list and its
+   * elements can still be accessed safely after the model has been closed. Methods that rely on
+   * live solver state such as {@link #iterator()} or {@link #evaluate(Formula)} should not be used
+   * after {@link #close()}, whereas the returned list can always be used, until the underlying
+   * solver context is closed ({@link SolverContext#close()}).
+   *
+   * <p>This representation is primarily intended for model inspection and debugging. For precise
+   * evaluation of individual formulas prefer targeted calls to {@link #evaluate(Formula)}.
+   */
   ImmutableList<ValueAssignment> asList();
 
   /**
    * Pretty-printing of the model values.
    *
-   * <p>Please only use this method for debugging and not for retrieving relevant information about
+   * <p>Please use this method only for debugging and not for retrieving relevant information about
    * the model. The returned model representation is not intended for further usage like parsing,
    * because we do not guarantee any specific format, e.g., for arrays and uninterpreted functions,
    * and we allow the SMT solver to include arbitrary additional information about the current
@@ -75,6 +90,11 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
   /**
    * Free resources associated with this model (existing {@link ValueAssignment} instances stay
    * valid, but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
+   *
+   * <p>For several solvers (such as MATHSAT5, SMTInterpol, Z3) the model remains valid even after
+   * changes to the prover environment from which it was obtained. For other solvers (CVC4, CVC5,
+   * Princess, Boolector, Bitwuzla) the model becomes invalid after any change to the prover
+   * environment.
    */
   @Override
   void close();
