@@ -15,10 +15,10 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class PrincessProofRule implements ProofRule {
 
-  //In the princess API, its proof calculus is implemented in such a way that the proof rules may
+  // In the princess API, its proof calculus is implemented in such a way that the proof rules may
   // show up as certificates or inferences.
 
-  enum Certificate implements ProofRule{
+  enum Certificate implements ProofRule {
     BETA_CERTIFICATE,
     BINARY_CERTIFICATE,
     BRANCH_INFERENCE_CERTIFICATE,
@@ -35,7 +35,7 @@ public class PrincessProofRule implements ProofRule {
     }
   }
 
-  enum Inference implements ProofRule{
+  enum Inference implements ProofRule {
     ALPHA_INFERENCE,
     ANTI_SYMMETRY_INFERENCE,
     BRANCH_INFERENCE,
@@ -96,7 +96,7 @@ public class PrincessProofRule implements ProofRule {
   }
 
   ProofRule rule;
-  //The different inference and certificate instances have different fields, this allows to store
+  // The different inference and certificate instances have different fields, this allows to store
   // all of them independently of type
   HashMap<Field<?>, Value<?>> fields = new HashMap<>();
 

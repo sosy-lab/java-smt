@@ -11,8 +11,9 @@
 package org.sosy_lab.java_smt.basicimpl;
 
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import javax.annotation.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -33,17 +34,16 @@ public abstract class AbstractProof implements Proof {
 
   private final Set<Proof> children = new LinkedHashSet<>();
   private ProofRule rule;
-  @Nullable protected Formula formula;
+  protected Optional<Formula> formula = Optional.empty();
 
-  protected AbstractProof(ProofRule rule, Formula formula) {
+  protected AbstractProof(ProofRule rule, @Nullable Formula formula) {
     this.rule = rule;
-    this.formula = formula;
+    this.formula = Optional.ofNullable(formula);
   }
 
   // TODO: Use Optional instead of nullable
-  @Nullable
   @Override
-  public Formula getFormula() {
+  public Optional<Formula> getFormula() {
     return this.formula;
   }
 
@@ -70,8 +70,8 @@ public abstract class AbstractProof implements Proof {
   //  this.rule = rule;
   // }
 
-  public void setFormula(Formula pFormula) {
-    formula = pFormula;
+  public void setFormula(@Nullable Formula pFormula) {
+    formula = Optional.of(pFormula);
   }
 
   public void setRule(ProofRule pRule) {
@@ -87,13 +87,7 @@ public abstract class AbstractProof implements Proof {
     StringBuilder sb = new StringBuilder();
     String indent = "  ".repeat(indentLevel);
 
-    Formula f = getFormula();
-    String sFormula;
-    if (f != null) {
-      sFormula = f.toString();
-    } else {
-      sFormula = "null";
-    }
+    String sFormula = getFormula().map(Object::toString).orElse("null");
 
     sb.append(indent).append("Formula: ").append(sFormula).append("\n");
     sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");

@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
+import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
@@ -30,7 +31,7 @@ public interface Proof {
    *
    * @return The formula of the proof node.
    */
-  Formula getFormula();
+  Optional<Formula> getFormula();
 
   ProofRule getRule();
 }
