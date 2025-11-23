@@ -50,7 +50,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
 
   private static boolean GENERATE_PROOFS = false;
 
-  @Options(prefix = "solver.z3")
+  @Options(prefix = "solver.z3.legacy")
   private static class ExtraOptions {
 
     @Option(
