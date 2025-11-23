@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0"
+    xmlns:e="http://ant.apache.org/ivy/extra"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="org.sosy_lab" module="javasmt-solver-z3-legacy">
+        <license name="MIT License" url="https://opensource.org/licenses/MIT"/>
+        <description>
+            Z3 solver and JavaSMT JNI wrapper for legacy version 4.5.0.
+            Z3 is provided under the MIT License.
+        </description>
+    </info>
+
+    <configurations>
+        <!-- default config, provides only x64 for backwards-compatibility -->
+        <conf name="solver-z3-legacy" extends="solver-z3-legacy-x64"/>
+
+        <!-- main configurations -->
+        <conf name="solver-z3-legacy-x64" extends="solver-z3-legacy-linux-x64"/>
+
+        <!-- basic configurations -->
+        <conf name="solver-z3-legacy-linux-x64" extends="solver-z3-legacy-common"/>
+
+        <conf name="solver-z3-legacy-common" visibility="private"/>
+    </configurations>
+
+    <publications defaultconf="solver-z3-legacy">
+        <!-- Linux files -->
+        <artifact name="libz3legacy" conf="solver-z3-legacy-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <artifact name="libz3javalegacy" conf="solver-z3-legacy-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+
+        <!-- common Java file, Java is platform independent -->
+        <artifact name="com.microsoft.z3legacy" conf="solver-z3-legacy-common" ext="jar"/>
+    </publications>
+
+    <dependencies></dependencies>
+
+</ivy-module>
