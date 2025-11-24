@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 import com.microsoft.z3legacy.Native;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -35,9 +36,13 @@ class Z3LegacyIntegerFormulaManager
     return makeNumberImpl((long) pNumber);
   }
 
+  /**
+   * Creates an integer formula from a BigDecimal value. This method converts BigDecimal values to
+   * BigInteger by using {@link RoundingMode#FLOOR}.
+   */
   @Override
   protected Long makeNumberImpl(BigDecimal pNumber) {
-    return decimalAsInteger(pNumber);
+    return makeNumberImpl(pNumber.setScale(0, RoundingMode.FLOOR).toBigInteger());
   }
 
   @Override

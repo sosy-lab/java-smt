@@ -41,6 +41,17 @@ class Z3LegacyRationalFormulaManager
   }
 
   @Override
+  protected Long toType(Long pNumber) {
+    if (Native.getSort(z3context, pNumber) == formulaCreator.getIntegerType()) {
+      long castedNumber = Native.mkInt2real(z3context, pNumber);
+      Native.incRef(z3context, castedNumber);
+      return castedNumber;
+    } else {
+      return pNumber;
+    }
+  }
+
+  @Override
   protected Long floor(Long pNumber) {
     return Native.mkReal2int(z3context, pNumber);
   }

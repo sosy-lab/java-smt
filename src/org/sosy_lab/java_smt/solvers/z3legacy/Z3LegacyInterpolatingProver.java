@@ -243,7 +243,7 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
     }
   }
 
-  private static class Z3TreeInterpolant {
+  private static final class Z3TreeInterpolant {
     private final int rootOfSubTree;
     private final long interpolationPoint;
 

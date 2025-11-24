@@ -32,7 +32,12 @@ class Z3LegacyQuantifiedFormulaManager
 
   @Override
   public Long mkQuantifier(Quantifier q, List<Long> pVariables, Long pBody) {
-    checkArgument(!pVariables.isEmpty(), "List of quantified variables can not be empty");
+    checkArgument(
+        !pVariables.isEmpty(),
+        "Missing variables for quantifier '%s' and body '%s'.",
+        q,
+        Native.astToString(z3context, pBody));
+
     return Native.mkQuantifierConst(
         z3context,
         q == Quantifier.FORALL,

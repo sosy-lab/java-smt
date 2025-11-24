@@ -72,9 +72,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
       storedConstraints = Optional.of(new ArrayDeque<>());
-      storedConstraints.get().push(PathCopyingPersistentTreeMap.of());
+      storedConstraints.orElseThrow().push(PathCopyingPersistentTreeMap.of());
     } else {
-      storedConstraints = Optional.empty();
+      storedConstraints = Optional.empty(); // we use EMPTY as flag for "no unsat-core"
     }
 
     logfile = Optional.ofNullable(pLogfile);
@@ -105,7 +105,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     if (logfile.isPresent()) { // if logging is not disabled
       try {
         // write stack content to logfile
-        Path filename = logfile.get().getFreshPath();
+        Path filename = logfile.orElseThrow().getFreshPath();
         MoreFiles.createParentDirectories(filename);
         Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
@@ -169,7 +169,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
         String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
         assertContraintAndTrack(e, creator.extractInfo(t));
-        storedConstraints.get().push(storedConstraints.get().pop().putAndCopy(varName, f));
+        storedConstraints
+            .orElseThrow()
+            .push(storedConstraints.orElseThrow().pop().putAndCopy(varName, f));
       } else {
         assertContraint(e);
       }
@@ -291,7 +293,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Native.incRef(z3context, ast);
       String varName = Native.astToString(z3context, ast);
       Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.get().peek().get(varName));
+      constraints.add(storedConstraints.orElseThrow().peek().get(varName));
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
@@ -356,10 +358,6 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       key = originalKey + " (" + index + ")";
     } while (!seenKeys.add(key));
     return key;
-  }
-
-  protected Deque<PersistentMap<String, BooleanFormula>> getStoredConstraints() {
-    return storedConstraints.orElseThrow();
   }
 
   @Override

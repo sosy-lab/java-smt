@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -46,9 +47,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
   private final ExtraOptions extraOptions;
   private final Z3LegacyFormulaCreator creator;
   private final Z3LegacyFormulaManager manager;
-  private boolean closed = false;
-
-  private static boolean GENERATE_PROOFS = false;
+  private final AtomicBoolean closed = new AtomicBoolean(false);
 
   @Options(prefix = "solver.z3.legacy")
   private static class ExtraOptions {
@@ -130,7 +129,6 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
     long cfg = Native.mkConfig();
     if (extraOptions.requireProofs) {
       Native.setParamValue(cfg, "PROOF", "true");
-      GENERATE_PROOFS = true;
     }
     //    Native.globalParamSet("smt.random_seed", String.valueOf(randomSeed));
     //    Native.globalParamSet("model.compact", "false");
@@ -204,7 +202,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
 
   @Override
   protected ProverEnvironment newProverEnvironment0(Set<ProverOptions> options) {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkState(!closed.get(), "solver context is already closed");
     final ImmutableMap<String, Object> solverOptions =
         ImmutableMap.<String, Object>builder()
             .put(":random-seed", extraOptions.randomSeed)
@@ -224,7 +222,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
   @Override
   protected InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation0(
       Set<ProverOptions> options) {
-    Preconditions.checkState(!closed, "solver context is already closed");
+    Preconditions.checkState(!closed.get(), "solver context is already closed");
     long z3context = creator.getEnv();
     long z3params = Native.mkParams(z3context);
     Native.paramsIncRef(z3context, z3params);
@@ -259,19 +257,13 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
 
   @Override
   public void close() {
-    if (!closed) {
-      closed = true;
+    if (!closed.getAndSet(true)) {
       long context = creator.getEnv();
       creator.forceClose();
       shutdownNotifier.unregister(interruptListener);
       Native.closeLog();
       Native.delContext(context);
     }
-  }
-
-  // Method exlcusively used for testing
-  boolean getGenerateProofs() {
-    return GENERATE_PROOFS;
   }
 
   @Override
