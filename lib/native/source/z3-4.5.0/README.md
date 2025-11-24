@@ -1,3 +1,13 @@
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0 or MIT
+-->
+
 # README — Patch: build Z3 4.5.0 with `legacy` in package names
 
 This README explains how to apply a patchfile to the Z3 `d57a2a6` (4.5.0) tree and build it so that package names include the string `legacy`.
