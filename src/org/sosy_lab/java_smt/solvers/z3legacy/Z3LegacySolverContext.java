@@ -11,6 +11,7 @@
 package org.sosy_lab.java_smt.solvers.z3legacy;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.enumerations.Z3_ast_print_mode;
@@ -106,14 +107,17 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
       throws InvalidConfigurationException {
     ExtraOptions extraOptions = new ExtraOptions(config, solverLogfile, (int) randomSeed);
 
-    // We need to load z3 in addition to z3java, because Z3's own class only loads the latter,
+    // We need to load z3legacy in addition to z3javalegacy,
+    // because Z3's own class only loads the latter,
     // but it will fail to find the former if not loaded previously.
     // We load both libraries here to have all the loading in one place.
-    //    loadLibrariesWithFallback(
-    //        pLoader, ImmutableList.of("z3", "z3java"), ImmutableList.of("libz3", "libz3java"));
+    loadLibrariesWithFallback(
+        pLoader,
+        ImmutableList.of("z3legacy", "z3javalegacy"),
+        ImmutableList.of("libz3legacy", "libz3javalegacy"));
 
-    //    // disable Z3's own loading mechanism, see com.microsoft.z3legacy.Native
-    //    System.setProperty("z3.skipLibraryLoad", "true");
+    // disable Z3's own loading mechanism, see com.microsoft.z3legacy.Native
+    System.setProperty("z3.skipLibraryLoad", "true");
 
     if (extraOptions.log != null) {
       Path absolutePath = extraOptions.log.toAbsolutePath();
