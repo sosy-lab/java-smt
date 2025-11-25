@@ -33,7 +33,7 @@ import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
-@SuppressWarnings({"resource", "LocalVariableName", "UnusedVariable"})
+@SuppressWarnings({"resource", "LocalVariableName"})
 public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
@@ -1179,7 +1179,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       var eqT = prover.addConstraint(eq);
       var ltT1 = prover.addConstraint(lt1);
       var ltT2 = prover.addConstraint(lt2);
-      //      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
       assertThat(prover.isUnsat()).isTrue();
 
       var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT1));
@@ -1205,7 +1205,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       var eqT = prover.addConstraint(eq);
       var ltT1 = prover.addConstraint(lt1);
       var ltT2 = prover.addConstraint(lt2);
-      //      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
       assertThat(prover.isUnsat()).isTrue();
 
       var itps = prover.getSeqInterpolants0(ImmutableList.of(eqT, ltT2));
@@ -1231,7 +1231,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       var eqT = prover.addConstraint(eq);
       var ltT1 = prover.addConstraint(lt1);
       var ltT2 = prover.addConstraint(lt2);
-      //      assertThat(ltT1).isNotEqualTo(ltT2);
+      assertThat(ltT1).isNotEqualTo(ltT2);
       assertThat(prover.isUnsat()).isTrue();
 
       var itps = prover.getInterpolant(ImmutableList.of(eqT));
