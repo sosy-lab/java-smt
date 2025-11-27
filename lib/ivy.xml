@@ -188,7 +188,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.12" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.14" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
         <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.15.4" conf="runtime-z3-x64->solver-z3-x64; runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.9.0-gef441e1c" conf="runtime-opensmt-x64->solver-opensmt-x64; runtime-opensmt-arm64->solver-opensmt-arm64; contrib->sources,javadoc"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.3-sosy1" conf="runtime-optimathsat->solver-optimathsat" />
