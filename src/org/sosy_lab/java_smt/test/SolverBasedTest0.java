@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -345,7 +346,11 @@ public abstract class SolverBasedTest0 {
 
   protected final void requireInterpolation(ProverOptions... options) {
     try {
-      context.newProverEnvironmentWithInterpolation(options).close();
+      if (Arrays.stream(options).anyMatch(p -> p == null)) {
+        context.newProverEnvironmentWithInterpolation().close();
+      } else {
+        context.newProverEnvironmentWithInterpolation(options).close();
+      }
     } catch (UnsupportedOperationException e) {
       assume()
           .withMessage("Solver %s does not support interpolation", solverToUse())
@@ -561,27 +566,35 @@ public abstract class SolverBasedTest0 {
       extends ParameterizedSolverBasedTest0 {
 
     // GENERATE_MODELS as stand-in for native
-    private static final Set<InterpolationOption> ALL_INTERPOLATION_STRATEGIES =
+    private static final Set<ProverOptions> ALL_INTERPOLATION_STRATEGIES =
         ImmutableSet.of(
-            NATIVE,
-            GENERATE_PROJECTION_BASED_INTERPOLANTS,
-            GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-            GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+            ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
 
     @Parameters(name = "solver {0} with interpolation strategy {1}")
     public static List<Object[]> getAllSolversAndItpStrategies() {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
         // No arg for no option (== solver native interpolation)
-        for (InterpolationOption itpStrat : ALL_INTERPOLATION_STRATEGIES) {
+        lst.add(new Object[] {solver, null});
+        for (ProverOptions itpStrat : ALL_INTERPOLATION_STRATEGIES) {
           lst.add(new Object[] {solver, itpStrat});
         }
       }
       return lst;
     }
 
+    @Parameter(0)
+    public Solvers solver;
+
     @Parameter(1)
     public ProverOptions interpolationStrategy;
+
+    @Override
+    protected Solvers solverToUse() {
+      return solver;
+    }
 
     protected ProverOptions itpStrategyToUse() {
       return interpolationStrategy;

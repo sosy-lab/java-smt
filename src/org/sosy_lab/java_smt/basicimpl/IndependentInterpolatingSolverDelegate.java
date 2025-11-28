@@ -18,6 +18,7 @@ import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,6 +51,8 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
   private final InterpolatingProverEnvironment<T> delegate;
 
+  private final @Nullable ProverOptions interpolationStrategy;
+
   private final FormulaManager mgr;
   private final BooleanFormulaManager bmgr;
   private final UFManager ufmgr;
@@ -67,6 +70,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     super(checkNotNull(pOptions));
     solverContext = checkNotNull(pSourceContext);
     delegate = checkNotNull(pDelegate);
+    interpolationStrategy = pSourceContext.getIndependentInterpolationStrategy(pOptions);
     mgr = pSourceContext.getFormulaManager();
     bmgr = mgr.getBooleanFormulaManager();
     ufmgr = mgr.getUFManager();
@@ -78,7 +82,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
   }
 
   @Override
-  public BooleanFormula getInterpolant(Collection<T> identifiersForA, InterpolationOption option)
+  public BooleanFormula getInterpolant(Collection<T> identifiersForA)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
     checkArgument(
@@ -107,53 +111,115 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     List<Formula> exclusiveVariablesInB = removeVariablesFrom(variablesInB, sharedVariables);
 
     BooleanFormula interpolant;
-    switch (checkNotNull(option)) {
-      case NATIVE:
-        interpolant = getInterpolant(identifiersForA);
-        break;
-      case GENERATE_PROJECTION_BASED_INTERPOLANTS:
-        // Will generate CHC based constraints that are very hard to solve without a CHC solver
-        if (sharedVariables.isEmpty()) {
-          return bmgr.makeFalse();
-        }
-        interpolant =
-            getModelBasedProjectionInterpolant(
-                conjugatedFormulasOfA,
-                conjugatedFormulasOfB,
-                variablesInA,
-                variablesInB,
-                sharedVariables);
-        break;
-      case GENERATE_UNIFORM_FORWARD_INTERPOLANTS:
-        // Will generate interpolants based on quantifier elimination
-        if (exclusiveVariablesInA.isEmpty()) {
-          return bmgr.makeFalse();
-        }
-        interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
-        break;
-      case GENERATE_UNIFORM_BACKWARD_INTERPOLANTS:
-        // Will generate interpolants based on quantifier elimination
-        if (exclusiveVariablesInB.isEmpty()) {
-          return bmgr.makeFalse();
-        }
-        // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
-        interpolant =
-            getUniformBackwardInterpolant(bmgr.not(conjugatedFormulasOfB), exclusiveVariablesInB);
-        break;
-      default:
-        throw new AssertionError("Unknown interpolation strategy " + option);
+    if (interpolationStrategy == null) {
+      interpolant = delegate.getInterpolant(identifiersForA);
+    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
+      if (sharedVariables.isEmpty()) {
+        return bmgr.makeFalse();
+      }
+      interpolant =
+          getModelBasedProjectionInterpolant(
+              conjugatedFormulasOfA,
+              conjugatedFormulasOfB,
+              variablesInA,
+              variablesInB,
+              sharedVariables);
+    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
+      // Will generate interpolants based on quantifier elimination
+      if (exclusiveVariablesInA.isEmpty()) {
+        return bmgr.makeFalse();
+      }
+      interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
+    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
+      if (exclusiveVariablesInB.isEmpty()) {
+        return bmgr.makeFalse();
+      }
+      // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
+      interpolant =
+          getUniformBackwardInterpolant(conjugatedFormulasOfB, exclusiveVariablesInB);
+    } else {
+      throw new AssertionError("Unknown interpolation strategy.");
     }
 
     assert satisfiesInterpolationCriteria(
         interpolant, conjugatedFormulasOfA, conjugatedFormulasOfB);
 
     return interpolant;
+
+//    switch (checkNotNull(option)) {
+//      case NATIVE:
+//        interpolant = getInterpolant(identifiersForA);
+//        break;
+//      case GENERATE_PROJECTION_BASED_INTERPOLANTS:
+//        // Will generate CHC based constraints that are very hard to solve without a CHC solver
+//        if (sharedVariables.isEmpty()) {
+//          return bmgr.makeFalse();
+//        }
+//        interpolant =
+//            getModelBasedProjectionInterpolant(
+//                conjugatedFormulasOfA,
+//                conjugatedFormulasOfB,
+//                variablesInA,
+//                variablesInB,
+//                sharedVariables);
+//        break;
+//      case GENERATE_UNIFORM_FORWARD_INTERPOLANTS:
+//        // Will generate interpolants based on quantifier elimination
+//        if (exclusiveVariablesInA.isEmpty()) {
+//          return bmgr.makeFalse();
+//        }
+//        interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
+//        break;
+//      case GENERATE_UNIFORM_BACKWARD_INTERPOLANTS:
+//        // Will generate interpolants based on quantifier elimination
+//        if (exclusiveVariablesInB.isEmpty()) {
+//          return bmgr.makeFalse();
+//        }
+//        // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
+//        interpolant =
+//            getUniformBackwardInterpolant(bmgr.not(conjugatedFormulasOfB), exclusiveVariablesInB);
+//        break;
+//      default:
+//        throw new AssertionError("Unknown interpolation strategy " + option);
+//    }
+//
+//    assert satisfiesInterpolationCriteria(
+//        interpolant, conjugatedFormulasOfA, conjugatedFormulasOfB);
+//
+//    return interpolant;
   }
 
+//  @Override
+//  public BooleanFormula getInterpolant(Collection<T> formulasOfA)
+//      throws SolverException, InterruptedException {
+//    return delegate.getInterpolant(formulasOfA);
+//  }
+
+
   @Override
-  public BooleanFormula getInterpolant(Collection<T> formulasOfA)
+  public List<BooleanFormula> getTreeInterpolants(
+      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    return delegate.getInterpolant(formulasOfA);
+    if (interpolationStrategy == null) {
+      // Use native solver interpolation
+      return ((InterpolatingProverEnvironment<T>) delegate)
+          .getTreeInterpolants(partitionedFormulas, startOfSubTree);
+    }
+    throw new UnsupportedOperationException(
+        "Tree interpolants are not supported for independent interpolation currently.");
+  }
+
+
+  @Override
+  public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> pPartitionedFormulas)
+      throws SolverException, InterruptedException {
+    if (interpolationStrategy == null) {
+      // Use native solver interpolation
+      return ((InterpolatingProverEnvironment<T>) delegate)
+          .getSeqInterpolants(pPartitionedFormulas);
+    }
+    throw new UnsupportedOperationException(
+        "Sequential interpolants are not supported for independent interpolation currently.");
   }
 
   /**
@@ -217,7 +283,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     BooleanFormula itpBackwardQuantified = qfmgr.forall(exclusiveVariables, bmgr.not(formulasOfB));
     BooleanFormula itpBackward = qfmgr.eliminateQuantifiers(itpBackwardQuantified);
     // Check that the top-level quantifier has been eliminated
-    if (isQuantifiedFormula(itpBackwardQuantified)) {
+    if (isQuantifiedFormula(itpBackward)) {
       throw new SolverException(
           "Error when calculating uniform interpolant, quantifier elimination failed.");
     }
@@ -340,14 +406,6 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
       }
     }
     return builder.build();
-  }
-
-  @Override
-  public List<BooleanFormula> getTreeInterpolants(
-      List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
-      throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException(
-        "Tree interpolants are currently not supported using " + "independent interpolation");
   }
 
   @Override

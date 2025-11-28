@@ -119,11 +119,11 @@ public abstract class AbstractSolverContext implements SolverContext {
    */
   protected abstract boolean supportsAssumptionSolving();
 
-  private static final Set<InterpolationOption> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
+  private static final Set<ProverOptions> ALL_INDEPENDENT_INTERPOLATION_STRATEGIES =
       ImmutableSet.of(
-          GENERATE_PROJECTION_BASED_INTERPOLANTS,
-          GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-          GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+          ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+          ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
 
   protected boolean useNativeInterpolation(Set<ProverOptions> options) {
     return getIndependentInterpolationStrategy(options) == null;

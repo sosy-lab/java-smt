@@ -53,7 +53,10 @@ public interface SolverContext extends AutoCloseable {
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
     /** Whether the solver should enable support for formulae build in SL theory. */
-    ENABLE_SEPARATION_LOGIC
+    ENABLE_SEPARATION_LOGIC,
+    GENERATE_PROJECTION_BASED_INTERPOLANTS,
+    GENERATE_UNIFORM_FORWARD_INTERPOLANTS,
+    GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
   }
 
   /**
@@ -68,7 +71,6 @@ public interface SolverContext extends AutoCloseable {
   /**
    * Create a fresh new {@link InterpolatingProverEnvironment} which encapsulates an assertion stack
    * and allows generating and retrieve interpolants for unsatisfiable formulas. If the SMT solver
-   * is able to handle satisfiability tests with assumptions please consider implementing the {@link
    * InterpolatingProverEnvironment} interface, and return an Object of this type here.
    *
    * @param options Options specified for the prover environment. All the options specified in

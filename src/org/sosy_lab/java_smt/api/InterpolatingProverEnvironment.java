@@ -84,13 +84,13 @@ public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironmen
   BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException;
 
-  default BooleanFormula getInterpolant(Collection<T> formulasOfA, InterpolationOption option)
-      throws SolverException, InterruptedException {
-    if (option == InterpolationOption.NATIVE) {
-      return getInterpolant(formulasOfA);
-    }
-    throw new UnsupportedOperationException("Interpolation option " + option + " not supported");
-  }
+//  default BooleanFormula getInterpolant(Collection<T> formulasOfA, InterpolationOption option)
+//      throws SolverException, InterruptedException {
+//    if (option == InterpolationOption.NATIVE) {
+//      return getInterpolant(formulasOfA);
+//    }
+//    throw new UnsupportedOperationException("Interpolation option " + option + " not supported");
+//  }
 
   /**
    * This method returns interpolants of an 'inductive sequence'. This property must be supported by

@@ -28,13 +28,14 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5BooleanFormulaManager;
 import org.sosy_lab.java_smt.solvers.opensmt.Logics;
 
 /** This class contains some simple Junit-tests to check the interpolation-API of our solvers. */
 @SuppressWarnings({"resource", "LocalVariableName"})
-public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInterpolatingSolverBasedTest0 {
 
   // INFO: OpenSmt only support interpolation for QF_LIA, QF_LRA and QF_UF
   @Override
@@ -46,7 +47,12 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
     requireInterpolation();
-    return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    ProverOptions itpStrat = itpStrategyToUse();
+    if (itpStrat == null) {
+      return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
+    } else {
+      return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation(itpStrat);
+    }
   }
 
   private static final UniqueIdGenerator index = new UniqueIdGenerator(); // to get different names
