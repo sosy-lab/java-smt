@@ -50,9 +50,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   private final ShutdownRequestListener interruptListener;
 
   private final UniqueIdGenerator trackId = new UniqueIdGenerator();
-  private final Optional<Deque<PersistentMap<String, BooleanFormula>>> storedConstraints;
+  @Nullable private final Deque<PersistentMap<String, BooleanFormula>> storedConstraints;
 
-  private final Optional<PathCounterTemplate> logfile;
+  private final @Nullable PathCounterTemplate logfile;
 
   Z3LegacyAbstractProver(
       Z3LegacyFormulaCreator pCreator,
@@ -71,13 +71,13 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     shutdownNotifier.register(interruptListener);
 
     if (pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE)) {
-      storedConstraints = Optional.of(new ArrayDeque<>());
-      storedConstraints.orElseThrow().push(PathCopyingPersistentTreeMap.of());
+      storedConstraints = new ArrayDeque<>();
+      storedConstraints.push(PathCopyingPersistentTreeMap.of());
     } else {
-      storedConstraints = Optional.empty(); // we use EMPTY as flag for "no unsat-core"
+      storedConstraints = null; // we use NULL as flag for "no unsat-core"
     }
 
-    logfile = Optional.ofNullable(pLogfile);
+    logfile = pLogfile;
     mgr = pMgr;
   }
 
@@ -102,10 +102,10 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   /** dump the current solver stack into a new SMTLIB file. */
   protected void logSolverStack() throws SolverException {
-    if (logfile.isPresent()) { // if logging is not disabled
+    if (logfile != null) { // if logging is not disabled
       try {
         // write stack content to logfile
-        Path filename = logfile.orElseThrow().getFreshPath();
+        Path filename = logfile.getFreshPath();
         MoreFiles.createParentDirectories(filename);
         Files.writeString(filename, this + "(check-sat)\n");
       } catch (IOException e) {
@@ -165,13 +165,11 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Preconditions.checkState(!closed);
     long e = creator.extractInfo(f);
     try {
-      if (storedConstraints.isPresent()) { // Unsat core generation is on.
+      if (storedConstraints != null) { // Unsat core generation is on.
         String varName = String.format("Z3_UNSAT_CORE_%d", trackId.getFreshId());
         BooleanFormula t = mgr.getBooleanFormulaManager().makeVariable(varName);
         assertContraintAndTrack(e, creator.extractInfo(t));
-        storedConstraints
-            .orElseThrow()
-            .push(storedConstraints.orElseThrow().pop().putAndCopy(varName, f));
+        storedConstraints.push(storedConstraints.pop().putAndCopy(varName, f));
       } else {
         assertContraint(e);
       }
@@ -183,12 +181,16 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
 
   protected void push0() {
     Preconditions.checkState(!closed);
-    storedConstraints.ifPresent(pPersistentMaps -> pPersistentMaps.push(pPersistentMaps.peek()));
+    if (storedConstraints != null) {
+      storedConstraints.push(storedConstraints.peek());
+    }
   }
 
   protected void pop0() {
     Preconditions.checkState(!closed);
-    storedConstraints.ifPresent(Deque::pop);
+    if (storedConstraints != null) {
+      storedConstraints.pop();
+    }
   }
 
   @Override
@@ -280,7 +282,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public List<BooleanFormula> getUnsatCore() {
     Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    if (storedConstraints.isEmpty()) {
+    if (storedConstraints == null) {
       throw new UnsupportedOperationException(
           "Option to generate the UNSAT core wasn't enabled when creating the prover environment.");
     }
@@ -293,7 +295,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Native.incRef(z3context, ast);
       String varName = Native.astToString(z3context, ast);
       Native.decRef(z3context, ast);
-      constraints.add(storedConstraints.orElseThrow().peek().get(varName));
+      constraints.add(storedConstraints.peek().get(varName));
     }
     Native.astVectorDecRef(z3context, unsatCore);
     return constraints;
@@ -370,7 +372,9 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
       Native.solverReset(z3context, z3solver); // remove all assertions from the solver
       Native.solverDecRef(z3context, z3solver);
       shutdownNotifier.unregister(interruptListener);
-      storedConstraints.ifPresent(Collection::clear);
+      if (storedConstraints != null) {
+        storedConstraints.clear();
+      }
     }
     super.close();
   }
