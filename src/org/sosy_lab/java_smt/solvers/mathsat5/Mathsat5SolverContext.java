@@ -200,7 +200,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
       msatEnv = msat_create_env(msatConf);
     }
     // Create Mathsat5FormulaCreator
-    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv);
+    Mathsat5FormulaCreator creator = new Mathsat5FormulaCreator(msatEnv, settings.loadOptimathsat5);
 
     // Create managers
     Mathsat5UFManager functionTheory = new Mathsat5UFManager(creator);
@@ -214,8 +214,11 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(creator, pFloatingPointRoundingMode);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
-    Mathsat5EnumerationFormulaManager enumerationTheory =
-        new Mathsat5EnumerationFormulaManager(creator);
+    Mathsat5EnumerationFormulaManager enumerationTheory = null;
+    if (!settings.loadOptimathsat5) {
+      // OptiMathSAT does not support enumerations
+      enumerationTheory = new Mathsat5EnumerationFormulaManager(creator);
+    }
     Mathsat5FormulaManager manager =
         new Mathsat5FormulaManager(
             creator,
@@ -303,7 +306,22 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
 
   @Override
   public String getVersion() {
-    return msat_get_version();
+    String version = msat_get_version();
+
+    // sometimes, MathSAT developers forget to provide a nice version number. Let's insert one.
+    final ImmutableMap<String, String> versionHashes =
+        ImmutableMap.<String, String>builder()
+            .put("031d838a61a5", "5.6.12")
+            .put("9f6eb52a7aea", "5.6.13")
+            .put("4b32db6b0e84", "5.6.14")
+            .buildOrThrow();
+    for (Map.Entry<String, String> entry : versionHashes.entrySet()) {
+      String versionHash = String.format(" version %s ", entry.getKey());
+      String replacement = String.format(" version %s (%s) ", entry.getValue(), entry.getKey());
+      version = version.replace(versionHash, replacement);
+    }
+
+    return version;
   }
 
   @Override

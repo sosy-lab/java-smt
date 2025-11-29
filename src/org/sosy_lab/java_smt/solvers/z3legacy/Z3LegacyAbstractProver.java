@@ -114,10 +114,14 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     }
   }
 
+  @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return new CachingModel(getEvaluatorWithoutChecks());
   }
@@ -194,8 +198,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+  public boolean isUnsatImpl() throws SolverException, InterruptedException {
     logSolverStack();
     int result;
     try {
@@ -211,6 +214,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
     Preconditions.checkState(!closed);
+    changedSinceLastSatQuery = false;
 
     int result;
     try {

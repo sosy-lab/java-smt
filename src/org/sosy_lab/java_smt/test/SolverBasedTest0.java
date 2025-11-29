@@ -288,6 +288,15 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support constant arrays. */
+  protected final void requireConstArrays() {
+    assume()
+        .withMessage("Solver %s does not support constant arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
+  /** Skip test if the solver does not support floats. */
   protected final void requireFloats() {
     assume()
         .withMessage("Solver %s does not support the theory of floats", solverToUse())

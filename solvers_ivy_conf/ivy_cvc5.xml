@@ -28,7 +28,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- main configurations -->
         <conf name="solver-cvc5-x64" extends="solver-cvc5-linux-x64, solver-cvc5-macos-x64, solver-cvc5-windows-x64"/>
-        <conf name="solver-cvc5-arm64" extends="solver-cvc5-linux-arm64, solver-cvc5-macos-arm64"/>
+        <conf name="solver-cvc5-arm64" extends="solver-cvc5-linux-arm64, solver-cvc5-macos-arm64, solver-cvc5-windows-arm64"/>
 
         <!-- basic configurations -->
         <conf name="solver-cvc5-linux-x64" extends="solver-cvc5-common"/>
@@ -36,6 +36,7 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="solver-cvc5-macos-x64" extends="solver-cvc5-common"/>
         <conf name="solver-cvc5-macos-arm64" extends="solver-cvc5-common"/>
         <conf name="solver-cvc5-windows-x64" extends="solver-cvc5-common"/>
+        <conf name="solver-cvc5-windows-arm64" extends="solver-cvc5-common"/>
 
         <conf name="solver-cvc5-common" visibility="private"/>
     </configurations>
@@ -46,6 +47,7 @@ SPDX-License-Identifier: Apache-2.0
         <artifact name="libcvc5jni" conf="solver-cvc5-macos-x64" e:arch="x64" type="shared-object" ext="dylib"/>
         <artifact name="libcvc5jni" conf="solver-cvc5-macos-arm64" e:arch="arm64" type="shared-object" ext="dylib"/>
         <artifact name="libcvc5jni" conf="solver-cvc5-windows-x64" e:arch="x64" type="shared-object" ext="dll"/>
+        <artifact name="libcvc5jni" conf="solver-cvc5-windows-arm64" e:arch="arm64" type="shared-object" ext="dll"/>
         <!-- Java code -->
         <artifact name="cvc5" conf="solver-cvc5-common" ext="jar"/>
     </publications>

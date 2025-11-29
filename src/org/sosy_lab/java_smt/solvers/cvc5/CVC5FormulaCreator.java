@@ -356,7 +356,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return new CVC5EnumerationFormula(pTerm);
   }
 
-  private String getName(Term e) {
+  String getName(Term e) {
     checkState(!e.isNull());
     String repr = e.toString();
     try {
@@ -372,7 +372,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
-      // TODO what happens for function names containing whitepsace?
+      // TODO what happens for function names containing whitespace?
       String dequoted = dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {

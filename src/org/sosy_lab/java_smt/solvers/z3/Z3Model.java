@@ -16,6 +16,7 @@ import com.microsoft.z3.Native.LongPtr;
 import com.microsoft.z3.Z3Exception;
 import com.microsoft.z3.enumerations.Z3_decl_kind;
 import com.microsoft.z3.enumerations.Z3_sort_kind;
+import com.microsoft.z3.enumerations.Z3_symbol_kind;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -83,8 +84,13 @@ final class Z3Model extends AbstractModel<Long, Long, Long> {
       case Z3_OP_ARRAY_EXT:
         return true;
       default:
+        long declName = Native.getDeclName(z3context, funcDecl);
+        Z3_symbol_kind kind = Z3_symbol_kind.fromInt(Native.getSymbolKind(z3context, declName));
+        if (kind == Z3_symbol_kind.Z3_INT_SYMBOL) { // bound variables
+          return true;
+        }
         return Z3_IRRELEVANT_MODEL_TERM_PATTERN
-            .matcher(z3creator.symbolToString(Native.getDeclName(z3context, funcDecl)))
+            .matcher(z3creator.symbolToString(declName))
             .matches();
     }
   }
