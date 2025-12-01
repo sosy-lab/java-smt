@@ -20,11 +20,13 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.*;
 import ap.api.SimpleAPI;
 import ap.basetypes.IdealInt;
 import ap.parser.IExpression;
+import ap.parser.IFormula;
 import ap.proof.certificates.AlphaInference;
 import ap.proof.certificates.AntiSymmetryInference;
 import ap.proof.certificates.BetaCertificate;
 import ap.proof.certificates.BranchInference;
 import ap.proof.certificates.BranchInferenceCertificate;
+import ap.proof.certificates.CertEquation;
 import ap.proof.certificates.CertFormula;
 import ap.proof.certificates.Certificate;
 import ap.proof.certificates.CloseCertificate;
@@ -62,6 +64,7 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
+import scala.Tuple2;
 import scala.collection.immutable.Seq;
 import scala.jdk.javaapi.CollectionConverters;
 
@@ -131,12 +134,7 @@ public final class PrincessProof extends AbstractProof {
     return rule;
   }
 
-  /**
-   * Helper function to store fields common to most Certificate nodes.
-   *
-   * @param api The SimpleAPI instance, used for converting internal conjunctions to IFormula.
-   * @param creator The formula creator, used for final encapsulation.
-   */
+  // Helper function to store fields common to most Certificate nodes.
   private static void storeCommonFields(
       Certificate cert, PrincessCertificate rule, SimpleAPI api, PrincessFormulaCreator creator) {
     // 1) Closing constraint
@@ -173,6 +171,24 @@ public final class PrincessProof extends AbstractProof {
         convertCertFormulaSet(CollectionConverters.asJava(cert.theoryAxioms()), api, creator));
   }
 
+  private static void storeCommonInferenceFields(
+      BranchInference inf, PrincessInference rule, SimpleAPI api, PrincessFormulaCreator creator) {
+
+    Set<CertFormula> assumedFormulas = CollectionConverters.asJava(inf.assumedFormulas());
+    rule.specificFields.put(ASSUMED_FORMULAS, convertCertFormulaSet(assumedFormulas, api, creator));
+
+    Set<CertFormula> providedFormulas = CollectionConverters.asJava(inf.providedFormulas());
+    rule.specificFields.put(
+        PROVIDED_FORMULAS, convertCertFormulaSet(providedFormulas, api, creator));
+
+    Set<ConstantTerm> localBoundConstants = CollectionConverters.asJava(inf.localBoundConstants());
+    rule.specificFields.put(
+        LOCAL_BOUND_CONSTANTS, convertConstantTermSet(localBoundConstants, creator));
+
+    Set<ConstantTerm> constants = CollectionConverters.asJava(inf.constants());
+    rule.specificFields.put(CONSTANTS, convertConstantTermSet(constants, creator));
+  }
+
   /**
    * Converts a Set of Princess's internal CertFormula objects into a Set of JavaSMT Formula
    * objects.
@@ -198,7 +214,6 @@ public final class PrincessProof extends AbstractProof {
    * @param creator The PrincessFormulaCreator, used to encapsulate the final IFormula.
    * @return A List of JavaSMT Formula objects.
    */
-  @SuppressWarnings("unchecked")
   private static List<Formula> convertCertFormulaList(
       List<? extends CertFormula> certFormulas, SimpleAPI api, PrincessFormulaCreator creator) {
     return certFormulas.stream()
@@ -217,6 +232,27 @@ public final class PrincessProof extends AbstractProof {
         .collect(Collectors.toSet());
   }
 
+  // Converts a Scala Seq of (IdealInt, CertEquation) tuples into a Java List of Lists.
+  // Each inner list contains [BigInteger, Formula], representing the pair (coefficient, equation).
+  private static List<List<Object>> convertEquations(
+      Seq<Tuple2<IdealInt, CertEquation>> scalaEquations,
+      SimpleAPI api,
+      PrincessFormulaCreator creator) {
+    return CollectionConverters.asJava(scalaEquations).stream()
+        .map(
+            tuple -> {
+              // Convert IdealInt to BigInteger
+              BigInteger coeff = tuple._1().bigIntValue();
+
+              // Convert CertEquation to Formula
+              Formula equation = creator.encapsulateWithTypeOf(api.asIFormula(tuple._2().toConj()));
+
+              // Return as a List [Coeff, Equation]
+              return List.of(coeff, equation);
+            })
+        .collect(Collectors.toList());
+  }
+
   public static PrincessProof handleProofCase(
       Certificate cert, PrincessFormulaCreator creator, SimpleAPI api) {
     PrincessCertificate rule;
@@ -224,9 +260,11 @@ public final class PrincessProof extends AbstractProof {
     // BETA_CERTIFICATE
     if (cert instanceof BetaCertificate) {
       BetaCertificate betaCert = (BetaCertificate) cert;
+      IFormula rightFormula = api.asIFormula(betaCert.rightFormula().toConj());
+      IFormula leftFormula = api.asIFormula(betaCert.leftFormula().toConj());
       rule = new PrincessCertificate(BETA_CERTIFICATE);
-      rule.specificFields.put(LEFT_FORMULA, api.asIFormula(betaCert.leftFormula().toConj()));
-      rule.specificFields.put(RIGHT_FORMULA, api.asIFormula(betaCert.rightFormula().toConj()));
+      rule.specificFields.put(LEFT_FORMULA, creator.encapsulateWithTypeOf(leftFormula));
+      rule.specificFields.put(RIGHT_FORMULA, creator.encapsulateWithTypeOf(rightFormula));
       rule.specificFields.put(LEMMA_FORMULA, betaCert.lemma());
     }
 
@@ -246,10 +284,9 @@ public final class PrincessProof extends AbstractProof {
     // CUT_CERTIFICATE
     else if (cert instanceof CutCertificate) {
       CutCertificate cutCert = (CutCertificate) cert;
+      IFormula cutFormula = api.asIFormula(cutCert.cutFormula().toConj());
       rule = new PrincessCertificate(CUT_CERTIFICATE);
-      Formula cutFormula =
-          creator.encapsulateWithTypeOf(api.asIFormula(cutCert.cutFormula().toConj()));
-      rule.specificFields.put(CUT_FORMULA, cutFormula);
+      rule.specificFields.put(CUT_FORMULA, creator.encapsulateWithTypeOf(cutFormula));
 
     }
     // OMEGA_CERTIFICATE
@@ -274,19 +311,20 @@ public final class PrincessProof extends AbstractProof {
     // SPLIT_EQ_CERTIFICATE
     else if (cert instanceof SplitEqCertificate) {
       SplitEqCertificate seqCert = (SplitEqCertificate) cert;
+      IFormula leftInEq = api.asIFormula(seqCert.leftInEq().toConj());
+      IFormula rightInEq = api.asIFormula(seqCert.rightInEq().toConj());
       rule = new PrincessCertificate(SPLIT_EQ_CERTIFICATE);
-      rule.specificFields.put(LEFT_INEQUALITY, seqCert.leftInEq());
-      rule.specificFields.put(RIGHT_INEQUALITY, seqCert.rightInEq());
-
+      rule.specificFields.put(LEFT_INEQUALITY, creator.encapsulateWithTypeOf(leftInEq));
+      rule.specificFields.put(RIGHT_INEQUALITY, creator.encapsulateWithTypeOf(rightInEq));
     }
 
     // STRENGTHEN_CERTIFICATE
     else if (cert instanceof StrengthenCertificate) {
       StrengthenCertificate strCert = (StrengthenCertificate) cert;
+      IFormula weakInEq = api.asIFormula(strCert.weakInEq().toConj());
       rule = new PrincessCertificate(PrincessCertificate.Certificate.STRENGTHEN_CERTIFICATE);
-      rule.specificFields.put(WEAK_INEQUALITY, strCert.weakInEq());
-      // rule.specificFields.put(EQ_CASES, CollectionConverters.asJava(strCert.eqCases()));
-
+      rule.specificFields.put(WEAK_INEQUALITY, creator.encapsulateWithTypeOf(weakInEq));
+      rule.specificFields.put(EQ_CASES, strCert.eqCases().bigIntValue());
     }
 
     // PARTIAL_CERTIFICATE
@@ -300,9 +338,8 @@ public final class PrincessProof extends AbstractProof {
           "Unknown proof certificate: " + cert.getClass().getSimpleName());
     }
 
-    // storeCommonFields(cert, rule);
-    // return new PrincessProof(rule, formula);
-    throw new UnsupportedOperationException("Not yet implemented");
+    storeCommonFields(cert, rule, api, creator);
+    return new PrincessProof(rule, null);
   }
 
   @SuppressWarnings("unchecked")
@@ -321,7 +358,9 @@ public final class PrincessProof extends AbstractProof {
       if (inf instanceof AlphaInference) {
         infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.ALPHA_INFERENCE);
         AlphaInference ai = (AlphaInference) inf;
-        infRule.specificFields.put(SPLIT_FORMULA, ai.splitFormula());
+        Formula ecnapsulatedSplitFormula =
+            creator.encapsulateWithTypeOf(api.asIFormula(ai.splitFormula().toConj()));
+        infRule.specificFields.put(SPLIT_FORMULA, ecnapsulatedSplitFormula);
 
       }
 
@@ -331,9 +370,15 @@ public final class PrincessProof extends AbstractProof {
             new PrincessInference(
                 PrincessBranchCertificate.BranchInference.ANTI_SYMMETRY_INFERENCE);
         AntiSymmetryInference asi = (AntiSymmetryInference) inf;
-        infRule.specificFields.put(LEFT_INEQUALITY, asi.leftInEq());
-        infRule.specificFields.put(RIGHT_INEQUALITY, asi.rightInEq());
-        infRule.specificFields.put(RESULT_LITERAL, asi.result());
+        Formula encapsulatedLeftInEq =
+            creator.encapsulateWithTypeOf(api.asIFormula(asi.leftInEq().toConj()));
+        Formula encapsulatedRightInEq =
+            creator.encapsulateWithTypeOf(api.asIFormula(asi.rightInEq().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(asi.result().toConj()));
+        infRule.specificFields.put(LEFT_INEQUALITY, encapsulatedLeftInEq);
+        infRule.specificFields.put(RIGHT_INEQUALITY, encapsulatedRightInEq);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -343,6 +388,12 @@ public final class PrincessProof extends AbstractProof {
             new PrincessInference(
                 PrincessBranchCertificate.BranchInference.COLUMN_REDUCE_INFERENCE);
         ColumnReduceInference cri = (ColumnReduceInference) inf;
+        Formula encapsulatedOldSymbol =
+            creator.encapsulateWithTypeOf(IExpression.ConstantTerm2ITerm(cri.oldSymbol()));
+        Formula encapsulatedNewSymbol =
+            creator.encapsulateWithTypeOf(IExpression.ConstantTerm2ITerm(cri.newSymbol()));
+        Formula encapsulatedDefiningEquation =
+            creator.encapsulateWithTypeOf(api.asIFormula(cri.definingEquation().toConj()));
         infRule.specificFields.put(OLD_SYMBOL, cri.oldSymbol());
         infRule.specificFields.put(NEW_SYMBOL, cri.newSymbol());
         infRule.specificFields.put(DEFINING_EQUATION, cri.definingEquation());
@@ -356,9 +407,11 @@ public final class PrincessProof extends AbstractProof {
             new PrincessInference(
                 PrincessBranchCertificate.BranchInference.COMBINE_EQUATIONS_INFERENCE);
         CombineEquationsInference cei = (CombineEquationsInference) inf;
-        infRule.specificFields.put(EQUATIONS, CollectionConverters.asJava(cei.equations()));
-        infRule.specificFields.put(RESULT_LITERAL, cei.result());
-
+        List<List<Object>> convertedEquations = convertEquations(cei.equations(), api, creator);
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(cei.result().toConj()));
+        infRule.specificFields.put(EQUATIONS, convertedEquations);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
       }
 
       // COMBINE_INEQUALITIES_INFERENCE
@@ -367,11 +420,17 @@ public final class PrincessProof extends AbstractProof {
             new PrincessInference(
                 PrincessBranchCertificate.BranchInference.COMBINE_INEQUALITIES_INFERENCE);
         CombineInequalitiesInference cii = (CombineInequalitiesInference) inf;
-        infRule.specificFields.put(LEFT_COEFFICIENT, cii.leftCoeff());
-        infRule.specificFields.put(LEFT_INEQUALITY, cii.leftInEq());
-        infRule.specificFields.put(RIGHT_COEFFICIENT, cii.rightCoeff());
-        infRule.specificFields.put(RIGHT_INEQUALITY, cii.rightInEq());
-        infRule.specificFields.put(RESULT_LITERAL, cii.result());
+        Formula encapsulatedLeftInEq =
+            creator.encapsulateWithTypeOf(api.asIFormula(cii.leftInEq().toConj()));
+        Formula encapsulatedRightInEq =
+            creator.encapsulateWithTypeOf(api.asIFormula(cii.rightInEq().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(cii.result().toConj()));
+        infRule.specificFields.put(LEFT_COEFFICIENT, cii.leftCoeff().bigIntValue());
+        infRule.specificFields.put(LEFT_INEQUALITY, encapsulatedLeftInEq);
+        infRule.specificFields.put(RIGHT_COEFFICIENT, cii.rightCoeff().bigIntValue());
+        infRule.specificFields.put(RIGHT_INEQUALITY, encapsulatedRightInEq);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -381,9 +440,15 @@ public final class PrincessProof extends AbstractProof {
             new PrincessInference(
                 PrincessBranchCertificate.BranchInference.DIRECT_STRENGTHEN_INFERENCE);
         DirectStrengthenInference dsi = (DirectStrengthenInference) inf;
-        infRule.specificFields.put(INEQUALITY, dsi.inequality());
-        infRule.specificFields.put(EQUATION, dsi.equation());
-        infRule.specificFields.put(RESULT_LITERAL, dsi.result());
+        Formula encapsulatedInequality =
+            creator.encapsulateWithTypeOf(api.asIFormula(dsi.inequality().toConj()));
+        Formula encapsulatedEquation =
+            creator.encapsulateWithTypeOf(api.asIFormula(dsi.equation().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(dsi.result().toConj()));
+        infRule.specificFields.put(INEQUALITY, encapsulatedInequality);
+        infRule.specificFields.put(EQUATION, encapsulatedEquation);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -392,8 +457,12 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.DIV_RIGHT_INFERENCE);
         DivRightInference dri = (DivRightInference) inf;
+        Formula encapsulatedDivisibility =
+            creator.encapsulateWithTypeOf(api.asIFormula(dri.divisibility().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(dri.result().toConj()));
         infRule.specificFields.put(DIVISIBILITY, dri.divisibility());
-        infRule.specificFields.put(RESULT_LITERAL, dri.result());
+        infRule.specificFields.put(RESULT, dri.result());
 
       }
 
@@ -402,13 +471,19 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.GROUND_INST_INFERENCE);
         GroundInstInference gi = (GroundInstInference) inf;
-        infRule.specificFields.put(QUANTIFIED_FORMULA, gi.quantifiedFormula());
+        Formula encapsulatedQuantifiedFormula =
+            creator.encapsulateWithTypeOf(api.asIFormula(gi.quantifiedFormula().toConj()));
+        Formula encapsulatedInstanceFormula =
+            creator.encapsulateWithTypeOf(api.asIFormula(gi.instance().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(gi.result().toConj()));
+        infRule.specificFields.put(QUANTIFIED_FORMULA, encapsulatedQuantifiedFormula);
+        // TODO: Transform LinearCombination objects into JavaSMT objects
         infRule.specificFields.put(INSTANCE_TERMS, CollectionConverters.asJava(gi.instanceTerms()));
-        infRule.specificFields.put(INSTANCE_FORMULA, gi.instance());
+        infRule.specificFields.put(INSTANCE_FORMULA, encapsulatedInstanceFormula);
         infRule.specificFields.put(
             DISCHARGED_ATOMS, CollectionConverters.asJava(gi.dischargedAtoms()));
-        infRule.specificFields.put(RESULT_LITERAL, gi.result());
-
+        infRule.specificFields.put(RESULT, encapsulatedResult);
       }
 
       // MACRO_INFERENCE
@@ -433,7 +508,7 @@ public final class PrincessProof extends AbstractProof {
         PredUnifyInference pu = (PredUnifyInference) inf;
         infRule.specificFields.put(LEFT_ATOM, pu.leftAtom());
         infRule.specificFields.put(RIGHT_ATOM, pu.rightAtom());
-        infRule.specificFields.put(RESULT_LITERAL, pu.result());
+        infRule.specificFields.put(RESULT, pu.result());
         infRule.specificFields.put(
             PROVIDED_FORMULAS, CollectionConverters.asJava(pu.providedFormulas()));
 
@@ -446,7 +521,7 @@ public final class PrincessProof extends AbstractProof {
         QuantifierInference qi = (QuantifierInference) inf;
         infRule.specificFields.put(QUANTIFIED_FORMULA, qi.quantifiedFormula());
         infRule.specificFields.put(NEW_CONSTANTS, CollectionConverters.asJava(qi.newConstants()));
-        infRule.specificFields.put(RESULT_LITERAL, qi.result());
+        infRule.specificFields.put(RESULT, qi.result());
 
       }
 
@@ -456,7 +531,7 @@ public final class PrincessProof extends AbstractProof {
         ReduceInference ri = (ReduceInference) inf;
         infRule.specificFields.put(EQUATIONS, CollectionConverters.asJava(ri.equations()));
         infRule.specificFields.put(TARGET_LITERAL, ri.targetLit());
-        infRule.specificFields.put(RESULT_LITERAL, ri.result());
+        infRule.specificFields.put(RESULT, ri.result());
 
       }
 
@@ -467,7 +542,7 @@ public final class PrincessProof extends AbstractProof {
         ReducePredInference rpi = (ReducePredInference) inf;
         infRule.specificFields.put(EQUATIONS, CollectionConverters.asJava(rpi.equations()));
         infRule.specificFields.put(TARGET_LITERAL, rpi.targetLit());
-        infRule.specificFields.put(RESULT_LITERAL, rpi.result());
+        infRule.specificFields.put(RESULT, rpi.result());
 
       }
 
@@ -476,7 +551,7 @@ public final class PrincessProof extends AbstractProof {
         infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.SIMP_INFERENCE);
         SimpInference si = (SimpInference) inf;
         infRule.specificFields.put(TARGET_LITERAL, si.targetLit());
-        infRule.specificFields.put(RESULT_LITERAL, si.result());
+        infRule.specificFields.put(RESULT, si.result());
 
       }
 

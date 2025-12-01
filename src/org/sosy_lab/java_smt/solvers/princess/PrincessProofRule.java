@@ -90,32 +90,39 @@ final class PrincessProofFields {
   public static final ProofFieldKey<Formula> RIGHT_FORMULA =
       createKey(Formula.class, "rightFormula");
   public static final ProofFieldKey<Boolean> LEMMA_FORMULA = createKey(Boolean.class, "lemma");
-  public static final ProofFieldKey<Object> WEAK_INEQUALITY = createKey(Object.class, "weakInEq");
-  public static final ProofFieldKey<List<Object>> EQ_CASES = createKey(List.class, "eqCases");
-  public static final ProofFieldKey<Object> ELIM_CONSTANT = createKey(Object.class, "elimConst");
-  public static final ProofFieldKey<List<Object>> OMEGA_BOUNDS_A = createKey(List.class, "boundsA");
-  public static final ProofFieldKey<List<Object>> OMEGA_BOUNDS_B = createKey(List.class, "boundsB");
+  public static final ProofFieldKey<Formula> WEAK_INEQUALITY = createKey(Formula.class, "weakInEq");
+  public static final ProofFieldKey<BigInteger> EQ_CASES = createKey(BigInteger.class, "eqCases");
+  public static final ProofFieldKey<Formula> ELIM_CONSTANT = createKey(Formula.class, "elimConst");
+  public static final ProofFieldKey<List<Formula>> OMEGA_BOUNDS_A =
+      createKey(List.class, "boundsA");
+  public static final ProofFieldKey<List<Formula>> OMEGA_BOUNDS_B =
+      createKey(List.class, "boundsB");
   public static final ProofFieldKey<List<BigInteger>> OMEGA_STRENGTHEN_CASES =
       createKey(List.class, "strengthenCases");
-  public static final ProofFieldKey<Object> LEFT_INEQUALITY = createKey(Object.class, "leftInEq");
-  public static final ProofFieldKey<Object> RIGHT_INEQUALITY = createKey(Object.class, "rightInEq");
+  public static final ProofFieldKey<Formula> LEFT_INEQUALITY = createKey(Formula.class, "leftInEq");
+  public static final ProofFieldKey<Formula> RIGHT_INEQUALITY =
+      createKey(Formula.class, "rightInEq");
 
   // Specialized Inference Fields (PrincessInference)
-
-  public static final ProofFieldKey<Object> SPLIT_FORMULA = createKey(Object.class, "splitFormula");
-  public static final ProofFieldKey<Object> RESULT_LITERAL = createKey(Object.class, "result");
-  public static final ProofFieldKey<Object> OLD_SYMBOL = createKey(Object.class, "oldSymbol");
-  public static final ProofFieldKey<Object> NEW_SYMBOL = createKey(Object.class, "newSymbol");
-  public static final ProofFieldKey<Object> DEFINING_EQUATION =
+  // LEFT_INEQUALITY and RIGHT_INEQUALITY are reused from above
+  public static final ProofFieldKey<Formula> SPLIT_FORMULA =
+      createKey(Formula.class, "splitFormula");
+  public static final ProofFieldKey<Formula> RESULT = createKey(Formula.class, "result");
+  public static final ProofFieldKey<Formula> OLD_SYMBOL = createKey(Formula.class, "oldSymbol");
+  public static final ProofFieldKey<Formula> NEW_SYMBOL = createKey(Formula.class, "newSymbol");
+  public static final ProofFieldKey<Formula> DEFINING_EQUATION =
       createKey(Object.class, "definingEquation");
-  public static final ProofFieldKey<Object> SUBST = createKey(Object.class, "subst");
-  public static final ProofFieldKey<List<Object>> EQUATIONS = createKey(List.class, "equations");
-  public static final ProofFieldKey<Object> LEFT_COEFFICIENT = createKey(Object.class, "leftCoeff");
-  public static final ProofFieldKey<Object> RIGHT_COEFFICIENT =
-      createKey(Object.class, "rightCoeff");
-  public static final ProofFieldKey<Object> INEQUALITY = createKey(Object.class, "inequality");
-  public static final ProofFieldKey<Object> EQUATION = createKey(Object.class, "equation");
-  public static final ProofFieldKey<Object> DIVISIBILITY = createKey(Object.class, "divisibility");
+  public static final ProofFieldKey<Boolean> SUBST = createKey(Boolean.class, "subst");
+  public static final ProofFieldKey<List<List<Object>>> EQUATIONS =
+      createKey(List.class, "equations");
+  public static final ProofFieldKey<BigInteger> LEFT_COEFFICIENT =
+      createKey(BigInteger.class, "leftCoeff");
+  public static final ProofFieldKey<BigInteger> RIGHT_COEFFICIENT =
+      createKey(BigInteger.class, "rightCoeff");
+  public static final ProofFieldKey<Formula> INEQUALITY = createKey(Formula.class, "inequality");
+  public static final ProofFieldKey<Formula> EQUATION = createKey(Formula.class, "equation");
+  public static final ProofFieldKey<Formula> DIVISIBILITY =
+      createKey(Formula.class, "divisibility");
   public static final ProofFieldKey<Object> QUANTIFIED_FORMULA =
       createKey(Object.class, "quantifiedFormula");
   public static final ProofFieldKey<List<Object>> INSTANCE_TERMS =
