@@ -82,6 +82,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
   @Before
   public void setup() {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
+
     a = smgr.makeString("a");
     b = smgr.makeString("b");
     ab = smgr.makeString("ab");

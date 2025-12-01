@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3legacy;
 
+import com.google.common.collect.Lists;
 import com.google.common.primitives.Longs;
 import com.microsoft.z3legacy.Native;
 import java.math.BigInteger;
@@ -104,6 +105,10 @@ abstract class Z3LegacyNumeralFormulaManager<
 
   @Override
   protected Long distinctImpl(List<Long> pNumbers) {
+    if (pNumbers.isEmpty()) {
+      return Native.mkTrue(z3context);
+    }
+    pNumbers = Lists.transform(pNumbers, this::toType);
     return Native.mkDistinct(z3context, pNumbers.size(), Longs.toArray(pNumbers));
   }
 

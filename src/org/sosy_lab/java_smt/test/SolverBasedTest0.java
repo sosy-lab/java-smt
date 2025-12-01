@@ -467,6 +467,7 @@ public abstract class SolverBasedTest0 {
         if (eval != null) {
           switch (solverToUse()) {
             case Z3:
+            case Z3_4_5_0:
               // ignore, Z3 provides arbitrary values
               break;
             case BOOLECTOR:

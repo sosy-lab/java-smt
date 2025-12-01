@@ -227,9 +227,12 @@ public class SolverContextFactoryTest {
     String solverName = solverToUse().toString();
     if (solverToUse() == Solvers.YICES2) {
       solverName = "YICES"; // remove the number "2" from the name
+    } else if (solverToUse() == Solvers.Z3_4_5_0) {
+      solverName = "Z3";
     }
     String optionalSuffix = "([A-Za-z0-9.,:_+\\-\\s()@]+)?"; // any string
-    String versionNumberRegex = "(version\\s)?\\d+\\.\\d+(\\.\\d+)?"; // 2-3 numbers with dots
+    String versionNumberRegex =
+        "(version\\s)?\\d+\\.\\d+(\\.\\d+)?(\\.\\d+)?"; // 2-4 numbers with dots
     if (solverToUse() == Solvers.PRINCESS) {
       versionNumberRegex = "\\d+-\\d+-\\d+"; // Princess uses date instead of version
     }
