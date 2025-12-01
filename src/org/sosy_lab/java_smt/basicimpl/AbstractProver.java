@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
@@ -20,6 +21,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -219,6 +222,23 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       builder.addAll(level.values());
     }
     return builder.build();
+  }
+
+  /**
+   * Flatten and inverse the prover-stack and return all asserted constraints.
+   *
+   * <p>Each formula can be asserted several times. However, each assertion has a unique id. This
+   * implies that the inverted mapping is a plain {@link Map}, not a {@link Multimap}.
+   */
+  protected ImmutableMap<T, BooleanFormula> getAssertedFormulasById() {
+    ImmutableMap.Builder<T, BooleanFormula> builder = ImmutableMap.builder();
+    for (Multimap<BooleanFormula, T> level : assertedFormulas) {
+      for (Entry<BooleanFormula, T> entry : level.entries()) {
+        // the id (entry.value) is unique across all levels.
+        builder.put(entry.getValue(), entry.getKey());
+      }
+    }
+    return builder.buildOrThrow();
   }
 
   /**

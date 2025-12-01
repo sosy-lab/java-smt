@@ -13,10 +13,13 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Longs;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.Z3Exception;
 import java.util.ArrayDeque;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -40,6 +44,10 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
     implements InterpolatingProverEnvironment<Long> {
 
+  // The id is provided for the user, and must be globally unique for each formula used for
+  // interpolation.
+  private static final UniqueIdGenerator ID_GENERATOR = new UniqueIdGenerator();
+
   Z3LegacyInterpolatingProver(
       Z3LegacyFormulaCreator pCreator,
       Z3LegacyFormulaManager pMgr,
@@ -49,20 +57,28 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
     super(pCreator, pMgr, pOptions, pLogfile, pShutdownNotifier);
   }
 
+  @CanIgnoreReturnValue
+  @Override
+  protected Long addConstraintImpl(BooleanFormula f) throws InterruptedException {
+    super.addConstraintImpl(f);
+    return (long) ID_GENERATOR.getFreshId();
+  }
+
   @Override
   @SuppressWarnings({"unchecked", "varargs"})
   public BooleanFormula getInterpolant(final Collection<Long> pFormulasOfA)
       throws InterruptedException, SolverException {
     Preconditions.checkState(!closed);
+    final Set<Long> assertedConstraints = getAssertedConstraintIds();
     checkArgument(
-        getAssertedConstraintIds().containsAll(pFormulasOfA),
+        assertedConstraints.containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
 
     Set<Long> formulasOfA = ImmutableSet.copyOf(pFormulasOfA);
 
     // calc difference: formulasOfB := assertedFormulas - formulasOfA
     Set<Long> formulasOfB =
-        getAssertedConstraintIds().stream()
+        assertedConstraints.stream()
             .filter(f -> !formulasOfA.contains(f))
             .collect(ImmutableSet.toImmutableSet());
 
@@ -114,13 +130,15 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
 
   /** build a conjunction of each partition. */
   private long[] buildConjunctions(List<? extends Collection<Long>> partitionedFormulas) {
+    final ImmutableMap<Long, BooleanFormula> assertedConstraints = getAssertedFormulasById();
     final long[] conjunctionFormulas = new long[partitionedFormulas.size()];
     for (int i = 0; i < partitionedFormulas.size(); i++) {
-      long conjunction =
-          Native.mkAnd(
-              z3context,
-              partitionedFormulas.get(i).size(),
-              Longs.toArray(partitionedFormulas.get(i)));
+      List<Long> formulas =
+          FluentIterable.from(partitionedFormulas.get(i))
+              .transform(assertedConstraints::get)
+              .transform(creator::extractInfo)
+              .toList();
+      long conjunction = Native.mkAnd(z3context, formulas.size(), Longs.toArray(formulas));
       Native.incRef(z3context, conjunction);
       conjunctionFormulas[i] = conjunction;
     }

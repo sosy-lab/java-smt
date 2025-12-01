@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.solvers.z3legacy;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.MoreFiles;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.microsoft.z3legacy.Native;
 import com.microsoft.z3legacy.Z3Exception;
 import com.microsoft.z3legacy.enumerations.Z3_lbool;
@@ -163,6 +164,7 @@ abstract class Z3LegacyAbstractProver<T> extends AbstractProverWithAllSat<T> {
     Native.solverAssertAndTrack(z3context, z3solver, constraint, symbol);
   }
 
+  @CanIgnoreReturnValue
   @SuppressWarnings("unchecked")
   @Override
   protected T addConstraintImpl(BooleanFormula f) throws InterruptedException {
