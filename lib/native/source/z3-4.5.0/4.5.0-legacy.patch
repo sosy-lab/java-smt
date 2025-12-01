@@ -69,20 +69,46 @@ index cf06a10a7..f26c64a7f 100644
              for jfile in get_java_files(self.src_dir):
                  deps += ('%s ' % os.path.join(self.to_src_dir, jfile))
 diff --git a/scripts/update_api.py b/scripts/update_api.py
-index 04378b371..2e6a7d68f 100755
+index 04378b371..49afbfdc1 100755
 --- a/scripts/update_api.py
 +++ b/scripts/update_api.py
-@@ -494,8 +494,8 @@ def mk_java(java_dir, package_name):
+@@ -365,7 +365,7 @@ def mk_dotnet(dotnet):
+     dotnet.write('        public delegate void Z3_error_handler(Z3_context c, Z3_error_code e);\n\n')
+     dotnet.write('        public class LIB\n')
+     dotnet.write('        {\n')
+-    dotnet.write('            const string Z3_DLL_NAME = \"libz3.dll\";\n'
++    dotnet.write('            const string Z3_DLL_NAME = \"libz3legacy.dll\";\n'
+                  '            \n')
+     dotnet.write('            [DllImport(Z3_DLL_NAME, CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]\n')
+     dotnet.write('            public extern static void Z3_set_error_handler(Z3_context a0, Z3_error_handler a1);\n\n')
+@@ -494,8 +494,13 @@ def mk_java(java_dir, package_name):
      java_native.write('  public static native void setInternalErrorHandler(long ctx);\n\n')
  
      java_native.write('  static {\n')
 -    java_native.write('    try { System.loadLibrary("z3java"); }\n')
 -    java_native.write('    catch (UnsatisfiedLinkError ex) { System.loadLibrary("libz3java"); }\n')
-+    java_native.write('    try { System.loadLibrary("z3javalegacy"); }\n')
-+    java_native.write('    catch (UnsatisfiedLinkError ex) { System.loadLibrary("libz3javalegacy"); }\n')
++    java_native.write('    if (!Boolean.parseBoolean(System.getProperty("z3.skipLibraryLoad"))) {\n')
++    java_native.write('      try {\n')
++    java_native.write('        System.loadLibrary("z3legacyjava");\n')
++    java_native.write('      } catch (UnsatisfiedLinkError ex) {\n')
++    java_native.write('        System.loadLibrary("libz3legacyjava");\n')
++    java_native.write('      }\n')
++    java_native.write('    }\n')
      java_native.write('  }\n')
  
      java_native.write('\n')
+@@ -1644,9 +1649,9 @@ def init(PATH):
+   if PATH:
+     PATH = os.path.realpath(PATH)
+     if os.path.isdir(PATH):
+-      PATH = os.path.join(PATH, 'libz3.%s' % _ext)
++      PATH = os.path.join(PATH, 'libz3legacy.%s' % _ext)
+   else:
+-    PATH = 'libz3.%s' % _ext
++    PATH = 'libz3legacy.%s' % _ext
+ 
+   global _lib
+   _lib = ctypes.CDLL(PATH)
 diff --git a/src/api/java/AST.java b/src/api/java/AST.java
 index e1cde837f..d242bdcab 100644
 --- a/src/api/java/AST.java
@@ -1314,7 +1340,7 @@ index 7c5f606d9..349dd4305 100644
  /**
   * Internal base class for interfacing with native Z3 objects. Should not be
 diff --git a/src/util/hwf.cpp b/src/util/hwf.cpp
-index bd8d4958d..d6c0c72b9 100644
+index bd8d4958d..5ddae2b21 100644
 --- a/src/util/hwf.cpp
 +++ b/src/util/hwf.cpp
 @@ -21,20 +21,22 @@ Revision History:

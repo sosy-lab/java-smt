@@ -12,6 +12,9 @@ SPDX-License-Identifier: Apache-2.0 or MIT
 
 This README explains how to apply a patchfile to the Z3 `d57a2a6` (4.5.0) tree and build it so that package names include the string `legacy`.
 
+We use the Docker file for Ubuntu 18.04 as starting point (see [runUbuntu1804.sh](../../../../docker/runUbuntu1804.sh)
+and apply all commands within its context.
+
 ```bash
 # 1) clone and checkout the exact commit
 git clone https://github.com/Z3Prover/z3.git
@@ -27,6 +30,16 @@ git apply 4.5.0-legacy.patch
 
 # 4) build (the classic 4.5.0 build workflow using mk_make.py)
 mkdir release
-python2.7 scripts/mk_make.py --prefix="$PWD/release" --java
+python3 scripts/mk_make.py --prefix="$PWD/release" --java
 cd build && make -j "$(nproc)" && make install
+```
+
+Afterward, publish the build Z3 with the following command:
+```bash
+ant publish-z3-legacy -Dz3.path=<Z3_PATH> -Dz3.legacy.version=<VERSION>
+```
+
+Example:
+```bash
+ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.legacy.version=4.5.0-dev.1
 ```
