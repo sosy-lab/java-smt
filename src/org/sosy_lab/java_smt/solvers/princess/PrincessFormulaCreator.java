@@ -396,6 +396,44 @@ class PrincessFormulaCreator
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
     if (isValue(input)) {
       return visitor.visitConstant(f, convertValue(input));
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_extract())) {
+      var kind = FunctionDeclarationKind.BV_EXTRACT;
+      var upper = ((IIntLit) input.apply(0)).value().intValue();
+      var lower = ((IIntLit) input.apply(1)).value().intValue();
+      var arg = input.apply(2);
+      var argType = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg);
+
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(upper, lower),
+              ImmutableList.of(argType),
+              FormulaType.getBitvectorTypeWithSize(upper - lower),
+              new PrincessFunctionDeclaration.PrincessBitvectorExtractDeclaration(upper, lower)));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_concat())) {
+      var kind = FunctionDeclarationKind.BV_CONCAT;
+      var size1 = ((IIntLit) input.apply(0)).value().intValue();
+      var size2 = ((IIntLit) input.apply(1)).value().intValue();
+      var arg1 = input.apply(2);
+      var arg2 = input.apply(3);
+      var arg1Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg1);
+      var arg2Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg2);
+
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg1), encapsulateWithTypeOf(arg2)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(arg1Type, arg2Type),
+              FormulaType.getBitvectorTypeWithSize(size1 + size2),
+              new PrincessFunctionDeclaration.PrincessBitvectorConcatDeclaration()));
 
     } else if (input instanceof IQuantified) {
       return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
