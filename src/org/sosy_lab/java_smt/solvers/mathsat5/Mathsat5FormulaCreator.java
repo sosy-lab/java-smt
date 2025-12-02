@@ -119,6 +119,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_type_repr;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Longs;
@@ -369,6 +370,18 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return visitor.visitFreeVariable(formula, name);
       }
 
+      // Collect indices: We need to extract them from the term name in MathSAT
+      FunctionDeclarationKind kind = getDeclarationKind(f);
+      List<String> tokens =
+          Splitter.on('_')
+              .splitToList(name.startsWith("`") ? name.substring(1, name.length() - 1) : name);
+
+      ImmutableList.Builder<Integer> indices = ImmutableList.builder();
+      for (int p = 1; p <= FunctionDeclarationKind.getNumIndices(kind); p++) {
+        indices.add(Integer.valueOf(tokens.get(p)));
+      }
+
+      // Now collect the arguments
       ImmutableList.Builder<Formula> args = ImmutableList.builder();
       ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
       for (int i = 0; i < arity; i++) {
@@ -386,7 +399,8 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           args.build(),
           FunctionDeclarationImpl.of(
               name,
-              getDeclarationKind(f),
+              kind,
+              indices.build(),
               argTypes.build(),
               getFormulaType(f),
               msat_term_get_decl(f)));

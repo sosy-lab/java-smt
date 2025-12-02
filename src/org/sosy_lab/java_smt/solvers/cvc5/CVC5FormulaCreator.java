@@ -449,6 +449,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else if (f.getKind() == Kind.CONSTANT) {
         return visitor.visitFreeVariable(formula, dequote(f.toString()));
 
+      } else if (f.getKind() == Kind.SEP_NIL) {
+        return visitor.visitConstant(formula, null);
+
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         Preconditions.checkState(
             f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
@@ -463,7 +466,17 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
         List<FormulaType<?>> argsTypes = new ArrayList<>();
 
-        // Term operator = normalize(f.getSort());
+        // Collect indices
+        Op operator = f.getOp();
+        ImmutableList.Builder<Integer> indexBuilder = ImmutableList.builder();
+        for (int p = 0; p < operator.getNumIndices(); p++) {
+          Term index = operator.get(p);
+          if (index.isIntegerValue()) {
+            indexBuilder.add(index.getIntegerValue().intValueExact());
+          }
+        }
+
+        // Collect arguments
         Kind kind = f.getKind();
         if (sort.isFunction() || kind == Kind.APPLY_UF) {
           // The arguments are all children except the first one
@@ -479,10 +492,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           }
         }
 
-        // TODO some operations (BV_SIGN_EXTEND, BV_ZERO_EXTEND, maybe more) encode information as
-        // part of the operator itself, thus the arity is one too small and there might be no
-        // possibility to access the information from user side. Should we encode such information
-        // as additional parameters? We do so for some methods of Princess.
         if (sort.isFunction()) {
           return visitor.visitFunction(
               formula,
@@ -505,7 +514,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
               formula,
               argsBuilder.build(),
               FunctionDeclarationImpl.of(
-                  getName(f), getDeclarationKind(f), argsTypes, getFormulaType(f), normalize(f)));
+                  getName(f),
+                  getDeclarationKind(f),
+                  indexBuilder.build(),
+                  argsTypes,
+                  getFormulaType(f),
+                  normalize(f)));
         }
       }
     } catch (CVC5ApiException e) {
