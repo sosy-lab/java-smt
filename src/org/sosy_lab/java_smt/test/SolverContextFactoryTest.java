@@ -14,6 +14,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.StandardSystemProperty;
 import java.util.Locale;
+import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -162,7 +163,7 @@ public class SolverContextFactoryTest {
       case "opensmtj":
         return new String[] {"GLIBC_2.33", "GLIBCXX_3.4.26", "GLIBCXX_3.4.29"};
       case "mathsat5j":
-        return new String[] {"GLIBC_2.33"};
+        return new String[] {"GLIBC_2.33", "GLIBC_2.38"};
       case "cvc5jni":
         return new String[] {"GLIBC_2.32"};
       default:
@@ -184,6 +185,7 @@ public class SolverContextFactoryTest {
     try (SolverContext context = factory.generateContext()) {
       @SuppressWarnings("unused")
       FormulaManager mgr = context.getFormulaManager();
+      checkVersion(context);
     }
   }
 
@@ -214,7 +216,27 @@ public class SolverContextFactoryTest {
     try (SolverContext context = factory.generateContext()) {
       @SuppressWarnings("unused")
       FormulaManager mgr = context.getFormulaManager();
+      checkVersion(context);
     }
+  }
+
+  /** Check whether each solver reports a nice and readable version string. */
+  private void checkVersion(SolverContext pContext) {
+    String solverName = solverToUse().toString();
+    if (solverToUse() == Solvers.YICES2) {
+      solverName = "YICES"; // remove the number "2" from the name
+    }
+    String optionalSuffix = "([A-Za-z0-9.,:_+\\-\\s()@]+)?"; // any string
+    String versionNumberRegex = "(version\\s)?\\d+\\.\\d+(\\.\\d+)?"; // 2-3 numbers with dots
+    if (solverToUse() == Solvers.PRINCESS) {
+      versionNumberRegex = "\\d+-\\d+-\\d+"; // Princess uses date instead of version
+    }
+    String versionRegex = solverName + "\\s+" + versionNumberRegex + optionalSuffix;
+    Pattern versionPattern = Pattern.compile(versionRegex, Pattern.CASE_INSENSITIVE);
+    assert_()
+        .withMessage("Solver did not report a nice readable version number.")
+        .that(pContext.getVersion())
+        .matches(versionPattern);
   }
 
   /** Negative test for failing to load native library. */

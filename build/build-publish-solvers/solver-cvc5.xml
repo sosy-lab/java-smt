@@ -63,6 +63,12 @@ SPDX-License-Identifier: Apache-2.0
             <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
         </unzip>
 
+        <get src="${cvc5.url}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.downloads}" verbose="true"/>
+        <unzip src="${cvc5.downloads}/cvc5-Win64-arm64-static-${cvc5.version}.zip" dest="${cvc5.distDir}/arm64">
+            <patternset><include name="cvc5-Win64-arm64-static/bin/cvc5jni.dll"/></patternset>
+            <mapper type="merge" to="libcvc5jni-${cvc5.version}.dll"/>
+        </unzip>
+
         <!-- Download the Java bindings -->
         <get src="${cvc5.url}/cvc5-Linux-arm64-java-api-${cvc5.version}.jar" dest="${cvc5.distDir}/cvc5-${cvc5.version}.jar" verbose="true"/>
     </target>

@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -25,16 +25,24 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
+import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.api.SolverException;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
+  // flags for option
   protected final boolean generateModels;
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
   protected final boolean enableSL;
+
+  // flags for status
   protected boolean closed = false;
+  private boolean wasLastSatCheckSatisfiable = true; // assume SAT for an empty prover
+  protected boolean changedSinceLastSatQuery = true; // assume changed for an empty prover
 
   private final Set<Evaluator> evaluators = new LinkedHashSet<>();
 
@@ -60,25 +68,47 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
   protected final void checkGenerateModels() {
     Preconditions.checkState(generateModels, TEMPLATE, ProverOptions.GENERATE_MODELS);
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
+    Preconditions.checkState(wasLastSatCheckSatisfiable, NO_MODEL_HELP);
   }
 
   protected final void checkGenerateAllSat() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(generateAllSat, TEMPLATE, ProverOptions.GENERATE_ALL_SAT);
   }
 
   protected final void checkGenerateUnsatCores() {
     Preconditions.checkState(generateUnsatCores, TEMPLATE, ProverOptions.GENERATE_UNSAT_CORE);
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkGenerateUnsatCoresOverAssumptions() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
   protected final void checkEnableSeparationLogic() {
+    Preconditions.checkState(!closed);
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
+  }
+
+  protected abstract boolean hasPersistentModel();
+
+  private void setChanged() {
+    wasLastSatCheckSatisfiable = false;
+    if (!changedSinceLastSatQuery) {
+      changedSinceLastSatQuery = true;
+      if (!hasPersistentModel()) {
+        closeAllEvaluators();
+      }
+    }
   }
 
   @Override
@@ -91,6 +121,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final void push() throws InterruptedException {
     checkState(!closed);
     pushImpl();
+    setChanged();
     assertedFormulas.add(LinkedHashMultimap.create());
   }
 
@@ -102,6 +133,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     checkState(assertedFormulas.size() > 1, "initial level must remain until close");
     assertedFormulas.remove(assertedFormulas.size() - 1); // remove last
     popImpl();
+    setChanged();
   }
 
   protected abstract void popImpl();
@@ -111,12 +143,67 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   public final @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
     checkState(!closed);
     T t = addConstraintImpl(constraint);
+    setChanged();
     Iterables.getLast(assertedFormulas).put(constraint, t);
     return t;
   }
 
   protected abstract @Nullable T addConstraintImpl(BooleanFormula constraint)
       throws InterruptedException;
+
+  /** Check whether the conjunction of all formulas on the stack is unsatisfiable. */
+  @Override
+  public final boolean isUnsat() throws SolverException, InterruptedException {
+    checkState(!closed);
+    changedSinceLastSatQuery = false;
+    wasLastSatCheckSatisfiable = false;
+    final boolean isUnsat = isUnsatImpl();
+    if (!isUnsat) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return isUnsat;
+  }
+
+  protected abstract boolean isUnsatImpl() throws SolverException, InterruptedException;
+
+  /**
+   * Performs an optimization-aware check and returns the optimization status.
+   *
+   * <p>This method is the public entry point for optimization checks. It validates that the prover
+   * is open, resets internal change-tracking state, and delegates solver-specific work to {@link
+   * #checkImpl()}. Subclasses that implement optimization support must provide the actual checking
+   * logic in {@code checkImpl()}.
+   *
+   * <p>The signature of this method matches that of {@link OptimizationProverEnvironment#check()},
+   * to allow overrides in subclasses that implement both {@link BasicProverEnvironment} and {@link
+   * OptimizationProverEnvironment}.
+   *
+   * @return the optimization status; {@link OptStatus#OPT} indicates a satisfiable/optimal result
+   */
+  public final OptStatus check() throws InterruptedException, SolverException {
+    checkState(!closed);
+    wasLastSatCheckSatisfiable = false;
+    changedSinceLastSatQuery = false;
+    final OptStatus status = checkImpl();
+    if (status == OptStatus.OPT) {
+      wasLastSatCheckSatisfiable = true;
+    }
+    return status;
+  }
+
+  /**
+   * Implementation of optimization-aware satisfiability-check.
+   *
+   * @throws InterruptedException if the thread is interrupted during the check
+   * @throws SolverException if the underlying solver reports an error
+   * @throws UnsupportedOperationException if optimization is not supported by this prover
+   */
+  protected OptStatus checkImpl() throws InterruptedException, SolverException {
+    if (this instanceof OptimizationProverEnvironment) {
+      throw new UnsupportedOperationException("checkImpl() must be implemented in a subclass.");
+    }
+    throw new UnsupportedOperationException("check() is not supported by this prover.");
+  }
 
   protected ImmutableSet<BooleanFormula> getAssertedFormulas() {
     ImmutableSet.Builder<BooleanFormula> builder = ImmutableSet.builder();

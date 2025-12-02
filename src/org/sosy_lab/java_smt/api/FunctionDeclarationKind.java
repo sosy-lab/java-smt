@@ -92,6 +92,9 @@ public enum FunctionDeclarationKind {
   /** Identity operation, converts from integers to rationals, also known as {@code to_real}. */
   TO_REAL,
 
+  /** Convert from integer to bitvector. */
+  INT_TO_BV,
+
   // Simple bitvector operations
 
   /** Extraction over bitvectors. */
@@ -205,10 +208,10 @@ public enum FunctionDeclarationKind {
   /** Cast a signed bitvector to a floating-point number. */
   BV_SCASTTO_FP,
 
-  /** Convert an unsigned bitvector to integer. The result is in [0, 2^size - 1]. */
+  /** Cast an unsigned bitvector to an integer number. */
   UBV_TO_INT,
 
-  /** Convert a signed bitvector to integer. The result is in [-2^(size-1), 2^(size-1) - 1]. */
+  /** Cast a signed bitvector to an integer number. */
   SBV_TO_INT,
 
   // Simple floating point operations
@@ -257,21 +260,6 @@ public enum FunctionDeclarationKind {
 
   /** Equal over floating points. */
   FP_EQ,
-
-  /** Rounding over floating points. */
-  FP_ROUND_EVEN,
-
-  /** Rounding over floating points. */
-  FP_ROUND_AWAY,
-
-  /** Rounding over floating points. */
-  FP_ROUND_POSITIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_NEGATIVE,
-
-  /** Rounding over floating points. */
-  FP_ROUND_ZERO,
 
   /** Rounding over floating points. */
   FP_ROUND_TO_INTEGRAL,

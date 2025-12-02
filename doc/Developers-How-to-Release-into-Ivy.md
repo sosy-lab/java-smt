@@ -271,8 +271,9 @@ but in the normal system environment, where some testing can be applied by the d
 We publish MathSAT for Linux (x64 and arm64) and Windows (x64) systems at once.
 The build process can fully be done on a Linux system, 
 and requires several dependencies, such as gcc, x86_64-w64-mingw32-gcc, and aarch64-linux-gnu-gcc.
-We prefer to use the Docker container based on Ubuntu 22.04 (better use Ubuntu 18.04 for older GLIBC!)
+We prefer to use the Docker container based on Ubuntu 24.04
 for compiling the dependencies and assembling the libraries.
+Since MathSAT5 5.6.12, using Ubuntu 18.04 or 22.04 with older GLIBC no longer works!
 
 First, [download the (reentrant!) Linux and Windows64 binary release](http://mathsat.fbk.eu/download.html) in the same version, unpack them.
 Then provide the necessary dependencies (GMP/JDK for Linux (x64 and arm64) and GMP/JDK for Windows (x64))
@@ -295,15 +296,15 @@ ant publish-mathsat \
 Example:
 ```
 ant publish-mathsat \
-     -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-x86_64-reentrant \
+     -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.12-linux-x86_64 \
      -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
-     -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.11-win64-msvc \
+     -Dmathsat-windows-x64.path=/workspace/solvers/mathsat/mathsat-5.6.12-win64 \
      -Djdk-windows-x64.path=/workspace/solvers/jdk/openjdk-17.0.2_windows-x64_bin/jdk-17.0.2 \
      -Dgmp-windows-x64.path=/workspace/solvers/gmp/gmp-6.3.0-win-x64 \
-     -Dmathsat-linux-arm64.path=/workspace/solvers/mathsat/mathsat-5.6.11-linux-aarch64-reentrant \
+     -Dmathsat-linux-arm64.path=/workspace/solvers/mathsat/mathsat-5.6.12-linux-aarch64 \
      -Dgmp-linux-arm64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-arm64 \
      -Djdk-linux-arm64.path=/workspace/solvers/jdk/openjdk-17.0.2_linux-aarch64_bin/jdk-17.0.2 \
-     -Dmathsat.version=5.6.11
+     -Dmathsat.version=5.6.12
 ```
 Finally, follow the instructions shown in the message at the end.
 

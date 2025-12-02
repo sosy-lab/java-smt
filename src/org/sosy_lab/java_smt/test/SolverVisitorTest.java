@@ -299,6 +299,57 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   }
 
   @Test
+  public void integerDivisionVisit() {
+    requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // Princess will rewrite the term
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula c = imgr.makeNumber(7);
+
+    if (solver.equals(Solvers.MATHSAT5)) {
+      // MathSAT will rewrite if we don't use a variable in the denominator
+      checkKind(imgr.divide(x, y), FunctionDeclarationKind.DIV);
+    } else {
+      // Otherwise, just use a constant to support solvers that don't have non-linear arithmetics
+      checkKind(imgr.divide(x, c), FunctionDeclarationKind.DIV);
+    }
+  }
+
+  @Test
+  public void integerToBitvectorConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    // TODO Find out if mod_cast/int_cast could be mapped to (S)BV_TO_INT and INT_TO_BV
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    checkKind(bvmgr.makeBitvector(8, x), FunctionDeclarationKind.INT_TO_BV);
+  }
+
+  @Test
+  public void bitvectorToIntegerConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // CVC4, CVC5 and Z3 will rewrite SBV_TO_INT to a term that only uses unsigned integers
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.CVC5);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    BitvectorFormula y = bvmgr.makeVariable(8, "y");
+
+    checkKind(bvmgr.toIntegerFormula(y, true), FunctionDeclarationKind.SBV_TO_INT);
+    checkKind(bvmgr.toIntegerFormula(y, false), FunctionDeclarationKind.UBV_TO_INT);
+  }
+
+  @Test
   public void arrayVisit() {
     requireArrays();
     requireIntegers();
@@ -1609,5 +1660,92 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
     assertThat(f2).isEqualTo(f);
     assertThatFormula(f).isEquivalentTo(f2);
+  }
+
+  @Test
+  public void testQuantifierAndBoundVariablesWithIntegers() {
+    requireQuantifiers();
+    requireArrays();
+    requireIntegers();
+    requireVisitor();
+
+    IntegerFormula four = imgr.makeNumber(4);
+    IntegerFormula var1 = imgr.makeVariable("var1");
+    IntegerFormula var2 = imgr.makeVariable("var2");
+    IntegerFormula var3 = imgr.makeVariable("var3");
+
+    ArrayFormula<IntegerFormula, IntegerFormula> array1 =
+        amgr.makeArray("array1", FormulaType.IntegerType, FormulaType.IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> array2 =
+        amgr.makeArray("array2", FormulaType.IntegerType, FormulaType.IntegerType);
+
+    IntegerFormula bvIndex = imgr.add(var2, imgr.multiply(four, var1));
+    BooleanFormula body = amgr.equivalence(array2, amgr.store(array1, bvIndex, var3));
+
+    List<? extends Formula> freeVars = ImmutableList.of(var2, var3, array2);
+    List<? extends Formula> boundVars = ImmutableList.of(var1, array1);
+    List<? extends Formula> allVars = ImmutableList.of(var1, var2, var3, array1, array2);
+    Map<String, Formula> variablesInBody = mgr.extractVariables(body);
+    assertThat(variablesInBody.values()).containsExactlyElementsIn(allVars);
+
+    for (Quantifier quantifier : Quantifier.values()) {
+      BooleanFormula quantifiedFormula = qmgr.mkQuantifier(quantifier, boundVars, body);
+
+      Map<String, Formula> variablesInQuantifiedFormula = mgr.extractVariables(quantifiedFormula);
+      Map<String, Formula> variablesAndUFsInQuantifiedFormula =
+          mgr.extractVariablesAndUFs(quantifiedFormula);
+
+      assertThat(variablesAndUFsInQuantifiedFormula).isEqualTo(variablesInQuantifiedFormula);
+      assertThat(variablesInQuantifiedFormula.values()).containsExactlyElementsIn(freeVars);
+      assertThat(variablesInQuantifiedFormula.values()).containsNoneIn(boundVars);
+
+      // TODO: add collection of bound variables through new visitor implementation and test
+      //  failure of the old
+    }
+  }
+
+  @Test
+  public void testQuantifierAndBoundVariablesWithBitvectors() {
+    requireQuantifiers();
+    requireArrays();
+    requireBitvectors();
+    requireVisitor();
+
+    int bvLen = 32;
+    BitvectorType bvType = FormulaType.getBitvectorTypeWithSize(bvLen);
+
+    BitvectorFormula four = bvmgr.makeBitvector(bvLen, 4);
+    BitvectorFormula var1 = bvmgr.makeVariable(bvType, "var1");
+    BitvectorFormula var2 = bvmgr.makeVariable(bvType, "var2");
+    BitvectorFormula var3 = bvmgr.makeVariable(bvType, "var3");
+
+    ArrayFormula<BitvectorFormula, BitvectorFormula> array1 =
+        amgr.makeArray("array1", bvType, bvType);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> array2 =
+        amgr.makeArray("array2", bvType, bvType);
+
+    BitvectorFormula bvIndex = bvmgr.add(var2, bvmgr.multiply(four, var1));
+    BooleanFormula body = amgr.equivalence(array2, amgr.store(array1, bvIndex, var3));
+
+    List<? extends Formula> freeVars = ImmutableList.of(var2, var3, array2);
+    List<? extends Formula> boundVars = ImmutableList.of(var1, array1);
+    List<? extends Formula> allVars = ImmutableList.of(var1, var2, var3, array1, array2);
+    Map<String, Formula> variablesInBody = mgr.extractVariables(body);
+    assertThat(variablesInBody.values()).containsExactlyElementsIn(allVars);
+
+    for (Quantifier quantifier : Quantifier.values()) {
+      BooleanFormula quantifiedFormula = qmgr.mkQuantifier(quantifier, boundVars, body);
+
+      Map<String, Formula> variablesInQuantifiedFormula = mgr.extractVariables(quantifiedFormula);
+      Map<String, Formula> variablesAndUFsInQuantifiedFormula =
+          mgr.extractVariablesAndUFs(quantifiedFormula);
+
+      assertThat(variablesAndUFsInQuantifiedFormula).isEqualTo(variablesInQuantifiedFormula);
+      assertThat(variablesInQuantifiedFormula.values()).containsExactlyElementsIn(freeVars);
+      assertThat(variablesInQuantifiedFormula.values()).containsNoneIn(boundVars);
+
+      // TODO: add collection of bound variables through new visitor implementation and test
+      //  failure of the old
+    }
   }
 }
