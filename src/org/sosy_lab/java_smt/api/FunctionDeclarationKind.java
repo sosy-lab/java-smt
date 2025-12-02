@@ -343,13 +343,6 @@ public enum FunctionDeclarationKind {
       case BV_MUL:
         return -1;
 
-      case FP_ROUND_EVEN:
-      case FP_ROUND_AWAY:
-      case FP_ROUND_POSITIVE:
-      case FP_ROUND_NEGATIVE:
-      case FP_ROUND_ZERO:
-        return 0;
-
       case NOT:
       case UMINUS:
       case EQ_ZERO:
