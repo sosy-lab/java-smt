@@ -449,6 +449,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else if (f.getKind() == Kind.CONSTANT) {
         return visitor.visitFreeVariable(formula, dequote(f.toString()));
 
+      } else if (f.getKind() == Kind.SEP_NIL) {
+        return visitor.visitConstant(formula, null);
+
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
         Preconditions.checkState(
             f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
