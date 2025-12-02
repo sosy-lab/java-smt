@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -47,6 +48,15 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
     } else {
       return Double.toString(number);
     }
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    return logger.logDef(
+        "mgr.getFloatingPointFormulaManager()",
+        String.format("makeRoundingMode(%s)", "FloatingPointRoundingMode." + pRoundingMode.name()),
+        () -> delegate.makeRoundingMode(pRoundingMode));
   }
 
   @Override

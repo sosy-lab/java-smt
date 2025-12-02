@@ -15,7 +15,6 @@ import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCo
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -297,11 +296,6 @@ public class TraceFormulaManager implements FormulaManager {
       case RE_CONCAT:
         return -1;
 
-      case FP_ROUND_EVEN:
-      case FP_ROUND_AWAY:
-      case FP_ROUND_POSITIVE:
-      case FP_ROUND_NEGATIVE:
-      case FP_ROUND_ZERO:
       case RE_NONE:
         return 0;
 
@@ -445,10 +439,7 @@ public class TraceFormulaManager implements FormulaManager {
               getBooleanFormulaManager()
                   .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
         // TODO We only have 'distinct' for some theories
-        /*
-        case DISTINCT:
-          break;
-        */
+        // case DISTINCT:
         case STORE:
           return (T)
               getArrayFormulaManager().store((ArrayFormula) args.get(0), args.get(1), args.get(2));
@@ -563,12 +554,8 @@ public class TraceFormulaManager implements FormulaManager {
                     "EQ not supported for theory " + "%s", declaration.getArgumentTypes().get(0)));
           }
         // TODO
-        /*
-        case EQ_ZERO:
-          break;
-        case GTE_ZERO:
-          break;
-        */
+        // case EQ_ZERO:
+        // case GTE_ZERO:
         case TO_REAL:
           return (T)
               getRationalFormulaManager().sum(ImmutableList.of((NumeralFormula) args.get(0)));
@@ -578,25 +565,17 @@ public class TraceFormulaManager implements FormulaManager {
           } else {
             return (T) getRationalFormulaManager().floor((NumeralFormula) args.get(0));
           }
-        case BV_EXTRACT:
-          List<String> tokens = Splitter.on('_').splitToList(declaration.getName());
-          return (T)
-              getBitvectorFormulaManager()
-                  .extract(
-                      (BitvectorFormula) args.get(0),
-                      Integer.parseInt(tokens.get(1)),
-                      Integer.parseInt(tokens.get(2)));
+        // FIXME Requires indexed functions
+        // case INT_TO_BV:
+        // case BV_EXTRACT:
         case BV_CONCAT:
           Preconditions.checkArgument(args.size() == 2);
           return (T)
               getBitvectorFormulaManager()
                   .concat((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        // TODO
-        /*case BV_SIGN_EXTENSION:
-          break;
-        case BV_ZERO_EXTENSION:
-          break;
-        */
+        // FIXME Requires indexed functions
+        // case BV_SIGN_EXTENSION:
+        // case BV_ZERO_EXTENSION:
         case BV_NOT:
           return (T) getBitvectorFormulaManager().not((BitvectorFormula) args.get(0));
         case BV_NEG:
@@ -715,13 +694,9 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getBitvectorFormulaManager()
                   .rotateRight((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
-        // TODO
-        /*
-        case BV_ROTATE_LEFT_BY_INT:
-          break;
-        case BV_ROTATE_RIGHT_BY_INT:
-          break;
-        */
+        // FIXME Requires indexed functions
+        // case BV_ROTATE_LEFT_BY_INT:
+        // case BV_ROTATE_RIGHT_BY_INT:
         case BV_UCASTTO_FP:
           return (T)
               getFloatingPointFormulaManager()
@@ -891,12 +866,9 @@ public class TraceFormulaManager implements FormulaManager {
                       (StringFormula) args.get(0),
                       (StringFormula) args.get(1),
                       (IntegerFormula) args.get(2));
-        /* TODO
-        case STR_TO_RE:
-          break;
-        case STR_IN_RE:
-          break;
-        */
+        // TODO
+        // case STR_TO_RE:
+        // case STR_IN_RE:
         case STR_TO_INT:
           Preconditions.checkArgument(args.size() == 1);
           return (T) getStringFormulaManager().toIntegerFormula((StringFormula) args.get(0));
@@ -982,10 +954,8 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getSLFormulaManager()
                   .makeMagicWand((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-        /* TODO
-        case OTHER:
-          break;
-          */
+        // TODO
+        // case OTHER:
         default:
           throw new UnsupportedOperationException(
               String.format(
