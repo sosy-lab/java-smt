@@ -1,0 +1,389 @@
+#!/usr/bin/env python3
+
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+import sys
+
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional
+
+from parsy import regex, string, whitespace, eof, generate
+
+# TODO Simplify grammar and make sure it matches the parser rules
+"""
+Grammar:
+
+program ::= line+
+line ::= ws* (definition | statement) ";\n"
+definition ::= "var" ws* variable ws* "=" ws* statement
+statement ::= variable ("." variable "(" ws* args ws* ")")+
+args ::= arg ws* ("," ws* arg)*
+arg ::= variable | boolean | integer | float | string
+
+boolean ::= "true" | "false"
+integer ::= -?[0-9]+L? | "new" ws* "BigInteger(\"" -?[0-9]+ "\")"
+float ::= ...
+string ::= "\"" .* "\""
+"""
+
+litInt = (regex(r"-?[0-9]+").map(int) << string("L").optional() |
+          string("new") >> whitespace >> string("BigInteger(") >> whitespace.optional() >>
+          regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
+          << whitespace.optional() << string(")"))
+
+
+def test_integer():
+    assert litInt.parse('123') == 123
+    assert litInt.parse('-123') == -123
+    assert litInt.parse('123L') == 123
+    assert litInt.parse('new BigInteger("123")') == 123
+
+
+litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
+
+
+def test_bool():
+    assert litBool.parse('true') == True
+    assert litBool.parse('false') == False
+
+
+litString = string('"') >> regex(r'[^"]*') << string('"')
+
+
+def test_string():
+    assert litString.parse('"str"') == "str"
+
+
+variable = regex(r"[A-Za-z][A-Za-z0-9]*")
+
+
+def test_variable():
+    assert variable.parse("var1") == "var1"
+    assert variable.parse("mgr") == "mgr"
+
+
+@dataclass
+class Call:
+    fn: str
+    args: Optional[List] = None
+
+
+argument = litBool | litInt | litString | variable
+
+
+@generate
+def call():
+    yield string(".")
+    fn = yield variable
+    yield string("(")
+    yield whitespace.optional()
+    arg0 = yield argument.optional().map(lambda p: [p] if p is not None else [])
+    args = []
+    if (arg0 is not []):
+        args = yield (whitespace.optional() >> string(",") >> whitespace.optional() >> argument).many()
+    yield whitespace.optional()
+    yield string(")")
+    return Call(fn, arg0 + args)
+
+
+@generate
+def stmt():
+    call0 = yield variable.map(lambda str: Call(str))
+    calls = yield call.many()
+    return [call0] + calls
+
+
+def test_stmt():
+    assert stmt.parse("var1.method(123, false)") == [Call("var1"), Call("method", [123, False])]
+    assert (stmt.parse('mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"))')
+            == [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])])
+
+
+@dataclass
+class Definition:
+    variable: Optional[str]
+    value: List[Call]
+
+    def getCalls(self):
+        "Project the call chain on the right to just the method names"
+        return [call.fn for call in self.value]
+
+
+@generate
+def definition():
+    yield string("var")
+    yield whitespace.optional()
+    var = yield variable
+    yield whitespace.optional()
+    yield string("=")
+    yield whitespace.optional()
+    value = yield stmt
+    return Definition(var, value)
+
+
+line = whitespace.optional() >> (definition | stmt.map(lambda p: Definition(None, p))) << string(";\n")
+
+
+def test_line():
+    assert (line.parse(
+        'var var5 = mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"));\n')
+            == Definition("var5",
+                          [Call(
+                              "mgr"),
+                              Call(
+                                  "getBitvectorFormulaManager",
+                                  []),
+                              Call(
+                                  "makeBitvector",
+                                  [8,
+                                   0])]))
+
+
+program = line.many() << whitespace.optional() << eof
+
+
+def test_program():
+    assert (program.parse(
+        """
+        var var5 = mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"));
+        var var6 = mgr.getBitvectorFormulaManager().extend(var5, 24, false);
+        var var8 = mgr.getBitvectorFormulaManager().equal(var6, var6);
+        var var9 = mgr.getBitvectorFormulaManager().makeBitvector(32, 1L);
+        var2.push();
+        var var21 = var2.addConstraint(var8);
+        var var22 = var2.isUnsat();
+        var var23 = var2.getModel();
+        var23.close();
+        """)
+            == [Definition("var5",
+                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])]),
+                Definition("var6",
+                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("extend", ["var5", 24, False])]),
+                Definition("var8",
+                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("equal", ["var6", "var6"])]),
+                Definition("var9",
+                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [32, 1])]),
+                Definition(None, [Call("var2"), Call("push", [])]),
+                Definition("var21", [Call("var2"), Call("addConstraint", ["var8"])]),
+                Definition("var22", [Call("var2"), Call("isUnsat", [])]),
+                Definition("var23", [Call("var2"), Call("getModel", [])]),
+                Definition(None, [Call("var23"), Call("close", [])])])
+
+
+@dataclass
+class Type:
+    def toSmtlib(self):
+        "Print type in SMTLIB format"
+        raise NotImplementedError()
+
+
+@dataclass
+class BooleanType(Type):
+    def toSmtlib(self):
+        return "Bool"
+
+
+@dataclass
+class IntegerType(Type):
+    def toSmtlib(self):
+        return "Integer"
+
+
+@dataclass
+class BitvectorType(Type):
+    width: int
+
+    def toSmtlib(self):
+        return f"(_ BitVec {self.width})"
+
+
+@dataclass
+class FloatType(Type):
+    exponent: int
+    significand: int
+
+    def toSmtlib(self):
+        return f"(_ FloatingPoint {self.exponent} {self.significand})"
+
+
+@dataclass
+class ArrayType(Type):
+    index: Type
+    element: Type
+
+    def toSmtlib(self):
+        return f"(Array {self.index.toSmtlib()} {self.element.toSmtlib()})"
+
+
+def test_toSmtlib():
+    assert (ArrayType(IntegerType(), ArrayType(BitvectorType(32), FloatType(8, 24))).toSmtlib()
+            == "(Array Integer (Array (_ BitVec 32) (_ FloatingPoint 8 24)))")
+
+
+def printBitvector(width, value):
+    "Print a bitvector literal in SMTLIB format"
+    if value < 0:
+        raise Exception("Negative value")  # TODO Rewrite as 2s complement
+    return '#b' + format(int(value), f'0{width}b')
+
+
+def test_printBitvector():
+    assert printBitvector(8, 5) == "#b00000101"
+    # assert printBitvector(8, -5) == "#b11111011" # FIXME
+
+
+def translate(prog: List[Definition]):
+    "Convert a JavaSMT trace to a SMTLIB2 script"
+    sortMap = {}
+    output = []
+    for stmt in prog:
+        if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
+            if stmt.getCalls()[-1] == "and":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (bvand {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "equal":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "extend":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = BitvectorType(sortMap[arg1].width + arg2)
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {"sign_extend" if arg3 else "zero_extend"} {arg2}) {arg1}))')
+
+            elif stmt.getCalls()[-1] == "makeBitvector":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BitvectorType(arg1)
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {printBitvector(arg1, arg2)})')
+
+            elif stmt.getCalls()[-1] == "makeVariable":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+                sortMap[stmt.variable] = BitvectorType(arg1)
+                output.append(f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
+            elif stmt.getCalls()[-1] == "not":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (bvnot {arg1}))')
+
+            elif stmt.getCalls()[-1] == "or":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (bvor {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "shiftLeft":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (bvshl {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "shiftRight":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({"bvashr" if arg3 else "bvlshr"} {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "xor":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (bvxor {arg1} {arg2}))')
+
+            else:
+                raise Exception()
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getBooleanFormulaManager"]:
+            if stmt.getCalls()[-1] == "ifThenElse":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg2]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (ite {arg1} {arg2} {arg3}))')
+
+            elif stmt.getCalls()[-1] == "not":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (not {arg1}))')
+
+            else:
+                raise Exception()
+
+        elif stmt.getCalls()[-1] == "addConstraint":
+            arg1 = stmt.value[-1].args[0]
+            output.append(f'(assert {arg1})')
+
+        elif stmt.getCalls()[-1] == "asList":
+            pass
+
+        elif stmt.getCalls()[-1] == "close":
+            pass
+
+        elif stmt.getCalls()[-1] == "getModel":
+            output.append(f'(get-model)')
+
+        elif stmt.getCalls()[-1] == "isUnsat":
+            output.append(f'(check-sat)')
+
+        elif stmt.getCalls()[-1] == "pop":
+            output.append(f'(pop 1)')
+
+        elif stmt.getCalls()[-1] == "push":
+            output.append(f'(push 1)')
+
+        else:
+            raise Exception()
+
+    return '\n'.join(output)
+
+
+"""
+def collect(prog: List[Definition]):
+    "List JavaSMT functions that were used in the trace"
+    known = set()
+    for decl in prog:
+        if decl.value[0].fn == "mgr":
+            known.add((decl.value[-2].fn, decl.value[-1].fn))
+        else:
+            known.add(("-", decl.value[-1].fn))
+    for p in sorted(known):
+        print(p)
+"""
+
+if __name__ == '__main__':
+    arg = sys.argv
+    if not len(sys.argv) == 2:
+        print('Expecting a path to a JavaSMT trace as argument')
+        exit(-1)
+
+    path = Path(sys.argv[1])
+    if not (path.is_file()):
+        print(f'Could not find file "{path}"')
+        exit(-1)
+
+    # Translate the trace
+    print(translate(program.parse(open(path).read())))
