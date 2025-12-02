@@ -10,8 +10,8 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -50,18 +50,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   }
 
   @Override
-  public <T extends Formula> FunctionDeclaration<T> declareUF(
-      String pName, FormulaType<T> pReturnType, FormulaType<?>... pArgs) {
-    checkVariableName(pName);
-    return declareUF(pName, pReturnType, Arrays.asList(pArgs));
-  }
-
-  @Override
-  public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
-    return formulaCreator.callFunction(funcType, Arrays.asList(args));
-  }
-
-  @Override
   public final <T extends Formula> T callUF(
       FunctionDeclaration<T> pFunc, List<? extends Formula> pArgs) {
     return formulaCreator.callFunction(pFunc, pArgs);
@@ -80,6 +68,6 @@ public abstract class AbstractUFManager<TFormulaInfo, TFunctionDecl, TType, TEnv
   public <T extends Formula> T declareAndCallUF(
       String name, FormulaType<T> pReturnType, Formula... pArgs) {
     checkVariableName(name);
-    return declareAndCallUF(name, pReturnType, Arrays.asList(pArgs));
+    return declareAndCallUF(name, pReturnType, ImmutableList.copyOf(pArgs));
   }
 }

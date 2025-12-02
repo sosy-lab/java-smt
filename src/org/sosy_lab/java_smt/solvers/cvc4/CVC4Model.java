@@ -2,15 +2,19 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import edu.stanford.CVC4.ArrayType;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
@@ -19,15 +23,12 @@ import edu.stanford.CVC4.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
 
   private final ImmutableList<ValueAssignment> model;
   private final SmtEngine smtEngine;
-  private final ImmutableList<Expr> assertedExpressions;
   private final CVC4TheoremProver prover;
 
   CVC4Model(
@@ -38,12 +39,11 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     super(pProver, pCreator);
     smtEngine = pSmtEngine;
     prover = pProver;
-    assertedExpressions = ImmutableList.copyOf(pAssertedExpressions);
 
     // We need to generate and save this at construction time as CVC4 has no functionality to give a
     // persistent reference to the model. If the SMT engine is used somewhere else, the values we
     // get out of it might change!
-    model = generateModel();
+    model = generateModel(pAssertedExpressions);
   }
 
   @Override
@@ -60,59 +60,128 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
   }
 
-  private ImmutableList<ValueAssignment> generateModel() {
+  private ImmutableList<ValueAssignment> generateModel(Collection<Expr> assertedExpressions) {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    // Using creator.extractVariablesAndUFs we wouldn't get accurate information anymore as we
-    // translate all bound vars back to their free counterparts in the visitor!
     for (Expr expr : assertedExpressions) {
-      // creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.add(getAssignment(f)));
-      recursiveAssignmentFinder(builder, expr);
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
     }
     return builder.build().asList();
   }
 
-  // TODO this method is highly recursive and should be rewritten with a proper visitor
-  private void recursiveAssignmentFinder(ImmutableSet.Builder<ValueAssignment> builder, Expr expr) {
-    if (expr.isConst() || expr.isNull()) {
-      // We don't care about consts.
-      return;
-    } else if (expr.isVariable() && expr.getKind() == Kind.BOUND_VARIABLE) {
-      // We don't care about bound vars (not in a UF), as they don't return a value.
-      return;
-    } else if (expr.isVariable() || expr.getOperator().getType().isFunction()) {
-      // This includes free vars and UFs, as well as bound vars in UFs !
-      builder.add(getAssignment(expr));
-    } else if (expr.getKind() == Kind.FORALL || expr.getKind() == Kind.EXISTS) {
-      // Body of the quantifier, with bound vars!
-      Expr body = expr.getChildren().get(1);
-
-      recursiveAssignmentFinder(builder, body);
-    } else {
-      // Only nested terms (AND, OR, ...) are left
-      for (Expr child : expr) {
-        recursiveAssignmentFinder(builder, child);
-      }
+  /**
+   * Get a single value assignment from an instantiation of the given uninterpreted function.
+   *
+   * @param pKeyExpr the UF instantiation as "(UF_NAME ARGS...)"
+   * @return the value assignment as "(UF_NAME ARGS...) := VALUE"
+   */
+  private ValueAssignment getAssignmentForUfInstantiation(Expr pKeyExpr) {
+    // An uninterpreted function "(UF_NAME ARGS...)" consist of N children,
+    // each child is one argument, and the UF itself is the operator of the keyExpr.
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    for (int i = 0; i < pKeyExpr.getNumChildren(); i++) {
+      Expr child = pKeyExpr.getChild(i);
+      argumentInterpretationBuilder.add(evaluateImpl(child));
     }
+
+    final Expr valueExpr = getValue(pKeyExpr);
+    return new ValueAssignment(
+        creator.encapsulateWithTypeOf(pKeyExpr),
+        creator.encapsulateWithTypeOf(valueExpr),
+        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
+        CVC4FormulaCreator.getName(pKeyExpr),
+        creator.convertValue(pKeyExpr, valueExpr),
+        argumentInterpretationBuilder.build());
   }
 
-  private ValueAssignment getAssignment(Expr pKeyTerm) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    for (Expr param : pKeyTerm) {
-      argumentInterpretation.add(evaluateImpl(param));
+  /**
+   * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
+   * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
+   */
+  private ImmutableList<Expr> getArrayIndices(Expr array) {
+    ImmutableList.Builder<Expr> indices = ImmutableList.builder();
+    while (array.getKind().equals(Kind.SELECT)) {
+      indices.add(array.getChild(1));
+      array = array.getChild(0);
     }
-    Expr name = pKeyTerm.hasOperator() ? pKeyTerm.getOperator() : pKeyTerm; // extract UF name
-    String nameStr = name.toString();
-    if (nameStr.startsWith("|") && nameStr.endsWith("|")) {
-      nameStr = nameStr.substring(1, nameStr.length() - 1);
+    return indices.build().reverse();
+  }
+
+  /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
+  private String getVar(Expr array) {
+    while (array.getKind().equals(Kind.SELECT)) {
+      array = array.getChild(0);
     }
-    Expr valueTerm = getValue(pKeyTerm);
-    Formula keyFormula = creator.encapsulateWithTypeOf(pKeyTerm);
-    Formula valueFormula = creator.encapsulateWithTypeOf(valueTerm);
-    BooleanFormula equation =
-        creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyTerm, valueTerm));
-    Object value = creator.convertValue(pKeyTerm, valueTerm);
-    return new ValueAssignment(
-        keyFormula, valueFormula, equation, nameStr, value, argumentInterpretation);
+    return array.toString();
+  }
+
+  /**
+   * Build assignment for an array value.
+   *
+   * @param expr The array term, e.g., a variable
+   * @param value The model value term returned by CVC4 for the array, e.g., a Store chain
+   * @return A list of value assignments for all elements in the array, including nested arrays
+   */
+  private List<ValueAssignment> buildArrayAssignments(Expr expr, Expr value) {
+
+    // Iterate down the Store-chain: (Store tail index element)
+    List<ValueAssignment> result = new ArrayList<>();
+    while (value.getKind().equals(Kind.STORE)) {
+      Expr index = value.getChild(1);
+      Expr element = value.getChild(2);
+      Expr select = creator.getEnv().mkExpr(Kind.SELECT, expr, index);
+
+      // CASE 1: nested array dimension, let's recurse deeper
+      if (new ArrayType(expr.getType()).getConstituentType().isArray()) {
+        result.addAll(buildArrayAssignments(select, element));
+
+      } else {
+        // CASE 2: final element, let's get the assignment and proceed with its sibling
+        result.add(
+            new ValueAssignment(
+                creator.encapsulate(creator.getFormulaType(element), select),
+                creator.encapsulate(creator.getFormulaType(element), element),
+                creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, select, element)),
+                getVar(expr),
+                creator.convertValue(element, element),
+                transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
+      }
+
+      // Move to the next Store in the chain
+      value = value.getChild(0);
+    }
+
+    // End of chain must be CONST_ARRAY.
+    checkState(
+        value.getKind().equals(Kind.STORE_ALL), "Unexpected array value structure: %s", value);
+
+    return result;
+  }
+
+  private List<ValueAssignment> getAssignments(Expr pKeyExpr) {
+
+    // handle UF instantiations
+    if (pKeyExpr.getKind() == Kind.APPLY_UF) {
+      return ImmutableList.of(getAssignmentForUfInstantiation(pKeyExpr));
+    }
+    // handle array assignments
+    final Expr valueExpr = getValue(pKeyExpr);
+    if (valueExpr.getType().isArray()) {
+      return buildArrayAssignments(pKeyExpr, valueExpr);
+    }
+
+    // handle simple assignments
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    for (int i = 0; i < pKeyExpr.getNumChildren(); i++) {
+      argumentInterpretationBuilder.add(evaluateImpl(pKeyExpr.getChild(i)));
+    }
+    return ImmutableList.of(
+        new ValueAssignment(
+            creator.encapsulateWithTypeOf(pKeyExpr),
+            creator.encapsulateWithTypeOf(valueExpr),
+            creator.encapsulateBoolean(creator.getEnv().mkExpr(Kind.EQUAL, pKeyExpr, valueExpr)),
+            CVC4FormulaCreator.getName(pKeyExpr),
+            creator.convertValue(pKeyExpr, valueExpr),
+            argumentInterpretationBuilder.build()));
   }
 
   @Override

@@ -57,7 +57,7 @@ build-dependencies:
 build:jdk-11: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-11" }
 build:jdk-17: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-17" }
 build:jdk-21: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-21" }
-build:jdk-23: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-23" }
+build:jdk-24: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-24" }
 
 # For checks that need the binaries
 .binary_check:
@@ -78,14 +78,16 @@ build:jdk-23: { extends: .build, image: "${CI_REGISTRY_IMAGE}/test:jdk-23" }
 
 build-project-ecj:jdk-17: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-17" }
 build-project-ecj:jdk-21: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-21" }
-build-project-ecj:jdk-23: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-23" }
+build-project-ecj:jdk-24: {extends: .build-project-ecj, image: "${CI_REGISTRY_IMAGE}/test:jdk-24" }
 
 check-format:
   extends: .source_check
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
   script: "ant $ANT_PROPS_CHECKS format-source && git diff -s --exit-code"
 
 checkstyle:
   extends: .source_check
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
   script:
     - "ant $ANT_PROPS_CHECKS checkstyle"
     - "ant $ANT_PROPS_CHECKS run-checkstyle -Dcheckstyle.output=plain && cat Checkstyle*.xml && test $(cat Checkstyle*xml | grep -vic audit) -eq 0"
@@ -154,10 +156,10 @@ unit-tests:x86_64:jdk-21:
   extends: .unit-tests
   needs: [ build-dependencies, build:jdk-21 ]
   image: "${CI_REGISTRY_IMAGE}/test:jdk-21"
-unit-tests:x86_64:jdk-23:
+unit-tests:x86_64:jdk-24:
   extends: .unit-tests
-  needs: [ build-dependencies, build:jdk-23 ]
-  image: "${CI_REGISTRY_IMAGE}/test:jdk-23"
+  needs: [ build-dependencies, build:jdk-24 ]
+  image: "${CI_REGISTRY_IMAGE}/test:jdk-24"
 
 unit-tests:arm64:jdk-11:
   extends: .unit-tests-quick
@@ -171,14 +173,14 @@ unit-tests:arm64:jdk-21:
   extends: .unit-tests-quick
   needs: [ build-dependencies, build:jdk-21 ]
   image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-21-arm64", docker: { platform: linux/arm64 } }
-unit-tests:arm64:jdk-23:
+unit-tests:arm64:jdk-24:
   extends: .unit-tests-quick
-  needs: [ build-dependencies, build:jdk-23 ]
-  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-23-arm64", docker: { platform: linux/arm64 } }
+  needs: [ build-dependencies, build:jdk-24 ]
+  image: { name: "${CI_REGISTRY_IMAGE}/test:jdk-24-arm64", docker: { platform: linux/arm64 } }
 
 refaster:
   extends: .source_check
-  image: ${CI_REGISTRY_IMAGE}/test:jdk-11
+  image: ${CI_REGISTRY_IMAGE}/test:jdk-17
   before_script:
     - 'test -d refaster || git clone https://gitlab.com/sosy-lab/software/refaster.git'
     - 'cd refaster'
@@ -199,10 +201,8 @@ refaster:
       - "error-prone.patch"
       - "rule.refaster"
     when: on_failure
-  except:
-    variables:
-      - $REFASTER_REPO_REVISION == null # required for job
-      - $REFASTER_VERSION == null # required for job
+  rules:
+    - if: $REFASTER_REPO_REVISION != null && $REFASTER_VERSION != null  # required for job
 
 
 # check license declarations etc.
@@ -223,13 +223,15 @@ deploy-gh-pages:
     - build:jdk-11
     - javadoc
   environment: deploy/gh-pages
-  only:
-    variables:
-      - $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH # only on default branch
-      - $CI_PROJECT_PATH == $PROJECT_PATH # not on forks
-  except:
-    variables:
-      - $GH_TOKEN == null # required for job
+  rules:
+    # run only if:
+    # - on default branch
+    # - not on a fork,
+    # - GH_TOKEN is present (required for job)
+    - if: >
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+        && $CI_PROJECT_PATH == $PROJECT_PATH
+        && $GH_TOKEN != null
 
 
 # Build container images
@@ -247,9 +249,9 @@ deploy-gh-pages:
     - mkdir -p /root/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --dockerfile $CI_PROJECT_DIR/$DOCKERFILE --destination $CI_REGISTRY_IMAGE/$IMAGE $EXTRA_ARGS
-  only:
-    - schedules
-    - web
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+    - if: $CI_PIPELINE_SOURCE == "web"
 
 .build-docker:arm64:
   extends: .build-docker
@@ -262,9 +264,9 @@ deploy-gh-pages:
 build-docker:x86_64:jdk-11: { extends: .build-docker, variables: { JDK_VERSION: jdk-11 } }
 build-docker:x86_64:jdk-17: { extends: .build-docker, variables: { JDK_VERSION: jdk-17 } }
 build-docker:x86_64:jdk-21: { extends: .build-docker, variables: { JDK_VERSION: jdk-21 } }
-build-docker:x86_64:jdk-23: { extends: .build-docker, variables: { JDK_VERSION: jdk-23 } }
+build-docker:x86_64:jdk-24: { extends: .build-docker, variables: { JDK_VERSION: jdk-24 } }
 
 build-docker:arm64:jdk-11: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-11 } }
 build-docker:arm64:jdk-17: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-17 } }
 build-docker:arm64:jdk-21: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-21 } }
-build-docker:arm64:jdk-23: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-23 } }
+build-docker:arm64:jdk-24: { extends: .build-docker:arm64, variables: { JDK_VERSION: jdk-24 } }

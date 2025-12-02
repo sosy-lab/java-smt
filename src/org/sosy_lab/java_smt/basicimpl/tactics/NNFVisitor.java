@@ -80,7 +80,7 @@ public class NNFVisitor extends BooleanFormulaTransformationVisitor {
 
   private class NNFInsideNotVisitor extends BooleanFormulaTransformationVisitor {
 
-    protected NNFInsideNotVisitor(FormulaManager pFmgr) {
+    NNFInsideNotVisitor(FormulaManager pFmgr) {
       super(pFmgr);
     }
 

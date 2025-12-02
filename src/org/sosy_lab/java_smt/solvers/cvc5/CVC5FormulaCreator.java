@@ -44,6 +44,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -316,6 +318,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+    return new CVC5FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -345,7 +356,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return new CVC5EnumerationFormula(pTerm);
   }
 
-  private String getName(Term e) {
+  String getName(Term e) {
     checkState(!e.isNull());
     String repr = e.toString();
     try {
@@ -361,7 +372,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
-      // TODO what happens for function names containing whitepsace?
+      // TODO what happens for function names containing whitespace?
       String dequoted = dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
@@ -399,7 +410,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitConstant(formula, convertFloatingPoint(f));
 
       } else if (f.isRoundingModeValue()) {
-        return visitor.visitConstant(formula, f.getRoundingModeValue());
+        return visitor.visitConstant(formula, getRoundingMode(f));
 
       } else if (f.isConstArray()) {
         Term constant = f.getConstArrayBase();
@@ -554,6 +565,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.INT_TO_BITVECTOR, FunctionDeclarationKind.INT_TO_BV)
           // Bitvector theory
           .put(Kind.BITVECTOR_ADD, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
@@ -585,9 +597,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
           .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
           .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
-          // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
+          .put(Kind.BITVECTOR_SBV_TO_INT, FunctionDeclarationKind.SBV_TO_INT)
+          .put(Kind.BITVECTOR_UBV_TO_INT, FunctionDeclarationKind.UBV_TO_INT)
+          // Floating-point theory
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
           .put(Kind.FLOATINGPOINT_TO_FP_FROM_FP, FunctionDeclarationKind.FP_CASTTO_FP)
@@ -827,6 +841,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else if (value.isFloatingPointValue()) {
         return convertFloatingPoint(value);
 
+      } else if (value.isRoundingModeValue()) {
+        return getRoundingMode(value);
+
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -854,6 +871,31 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     Preconditions.checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
     return FloatingPointNumber.of(bits, expWidth, mantWidth);
+  }
+
+  @Override
+  public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
+    checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
+    try {
+      switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY:
+          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN:
+          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE:
+          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE:
+          return FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO:
+          return FloatingPointRoundingMode.TOWARD_ZERO;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+    }
   }
 
   private Term accessVariablesCache(String name, Sort sort) {

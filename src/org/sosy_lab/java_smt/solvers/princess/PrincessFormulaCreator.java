@@ -15,7 +15,6 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asJavaCollection;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
@@ -42,8 +41,7 @@ import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
 import ap.theories.nia.GroebnerMultiplication$;
-import ap.theories.rationals.Fractions;
-import ap.theories.rationals.Rationals$;
+import ap.theories.rationals.Rationals;
 import ap.types.Sort;
 import ap.types.Sort$;
 import com.google.common.base.Preconditions;
@@ -51,7 +49,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Table;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -107,6 +104,13 @@ class PrincessFormulaCreator
     theoryFunctionKind.put(ModuloArithmetic.bv_xor(), FunctionDeclarationKind.BV_XOR);
     // modmod.bv_xnor()?
     // modmod.bv_comp()?
+
+    theoryFunctionKind.put(Rationals.addition(), FunctionDeclarationKind.ADD);
+    theoryFunctionKind.put(Rationals.multiplication(), FunctionDeclarationKind.MUL);
+    theoryFunctionKind.put(Rationals.multWithFraction(), FunctionDeclarationKind.MUL);
+    theoryFunctionKind.put(Rationals.multWithRing(), FunctionDeclarationKind.MUL);
+    theoryFunctionKind.put(Rationals.division(), FunctionDeclarationKind.DIV);
+    theoryFunctionKind.put(Rationals.RatDivZero(), FunctionDeclarationKind.OTHER);
 
     // casts to integer, sign/zero-extension?
 
@@ -207,30 +211,28 @@ class PrincessFormulaCreator
       return ((IIntLit) value).value().bigIntValue();
     }
     if (value instanceof IFunApp) {
-      IFunApp fun = (IFunApp) value;
-      switch (fun.fun().name()) {
+      IFunApp app = (IFunApp) value;
+      switch (app.fun().name()) {
         case "true":
-          Preconditions.checkArgument(fun.fun().arity() == 0);
+          Preconditions.checkArgument(app.fun().arity() == 0);
           return true;
         case "false":
-          Preconditions.checkArgument(fun.fun().arity() == 0);
+          Preconditions.checkArgument(app.fun().arity() == 0);
           return false;
         case "mod_cast":
           // we found a bitvector BV(lower, upper, ctxt), lets extract the last parameter
-          return ((IIntLit) fun.apply(2)).value().bigIntValue();
-        case "_int":
-        case "Rat_int":
-          Preconditions.checkArgument(fun.fun().arity() == 1);
-          ITerm term = fun.apply(0);
+          return ((IIntLit) app.apply(2)).value().bigIntValue();
+        case "Rat_fromRing":
+          Preconditions.checkArgument(app.fun().arity() == 1);
+          ITerm term = app.apply(0);
           if (term instanceof IIntLit) {
             return ((IIntLit) term).value().bigIntValue();
           }
           break;
-        case "_frac":
         case "Rat_frac":
-          Preconditions.checkArgument(fun.fun().arity() == 2);
-          ITerm term1 = fun.apply(0);
-          ITerm term2 = fun.apply(1);
+          Preconditions.checkArgument(app.fun().arity() == 2);
+          ITerm term1 = app.apply(0);
+          ITerm term2 = app.apply(1);
           if (term1 instanceof IIntLit && term2 instanceof IIntLit) {
             Rational ratValue =
                 Rational.of(
@@ -241,7 +243,7 @@ class PrincessFormulaCreator
           break;
         case "str_empty":
         case "str_cons":
-          return strToString(fun);
+          return strToString(app);
         default:
       }
     }
@@ -360,46 +362,39 @@ class PrincessFormulaCreator
     }
   }
 
-  /** Returns true if the expression is a constant number. */
-  private static boolean isConstant(IFunApp pExpr) {
-    for (IExpression sub : asJava(pExpr.args())) {
-      if (!(sub instanceof IIntLit)) {
-        return false;
+  /** Returns true if the expression is a constant value. */
+  private static boolean isValue(IExpression input) {
+    if (input instanceof IBoolLit || input instanceof IIntLit) {
+      // Boolean or integer literal
+      return true;
+    } else if (input instanceof IFunApp) {
+      IFunApp app = (IFunApp) input;
+      IFunction fun = app.fun();
+      if (fun.equals(Rationals.fromRing()) || fun.equals(Rationals.frac())) {
+        // Rational number literal
+        for (IExpression sub : asJava(app.args())) {
+          if (!(sub instanceof IIntLit)) {
+            return false;
+          }
+        }
+        return true;
+      }
+      if (fun.equals(ModuloArithmetic.mod_cast()) && input.apply(2) instanceof IIntLit) {
+        // Bitvector literal
+        return true;
+      }
+      if (CONSTANT_UFS.contains(fun.name())) {
+        // Nil, Cons from String theory
+        return true;
       }
     }
-    return true;
-  }
-
-  /** Returns true if the expression is an integer literal. */
-  private static boolean isRatInt(IFunApp pExpr) {
-    // We need to use reflection to get Rationals.int() as `int` can't be a method name in Java
-    final IFunction ratInt;
-    try {
-      ratInt = (IFunction) Fractions.class.getMethod("int").invoke(Rationals$.MODULE$);
-    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException ex) {
-      throw new RuntimeException(ex);
-    }
-    return isConstant(pExpr) && pExpr.fun().equals(ratInt);
-  }
-
-  /** Returns true if the expression is a faction literal. */
-  private static boolean isRatFrac(IFunApp pExpr) {
-    return isConstant(pExpr) && pExpr.fun().equals(Rationals$.MODULE$.frac());
+    return false;
   }
 
   @SuppressWarnings("deprecation")
   @Override
   public <R> R visit(FormulaVisitor<R> visitor, final Formula f, final IExpression input) {
-    if (input instanceof IIntLit) {
-      IdealInt value = ((IIntLit) input).value();
-      return visitor.visitConstant(f, value.bigIntValue());
-
-    } else if (input instanceof IBoolLit) {
-      IBoolLit literal = (IBoolLit) input;
-      return visitor.visitConstant(f, literal.value());
-
-    } else if (input instanceof IFunApp
-        && (isRatInt((IFunApp) input) || isRatFrac((IFunApp) input))) {
+    if (isValue(input)) {
       return visitor.visitConstant(f, convertValue(input));
 
     } else if (input instanceof IQuantified) {
@@ -472,20 +467,6 @@ class PrincessFormulaCreator
       assert ((IIntFormula) input).rel().equals(IIntRelation.EqZero());
       // this is really a Boolean formula, visit the lhs of the equation
       return visit(visitor, f, ((IIntFormula) input).t());
-    }
-
-    if (kind == FunctionDeclarationKind.OTHER && input instanceof IFunApp) {
-      if (ModuloArithmetic.mod_cast().equals(((IFunApp) input).fun())
-          && ((IFunApp) input).apply(2) instanceof IIntLit) {
-        // mod_cast(0, 256, 7) -> BV=7 with bitsize=8
-        return visitor.visitConstant(f, convertValue(input));
-      }
-    }
-
-    if (kind == FunctionDeclarationKind.UF && input instanceof IFunApp) {
-      if (CONSTANT_UFS.contains(((IFunApp) input).fun().name())) {
-        return visitor.visitConstant(f, convertValue(input));
-      }
     }
 
     int numSortParameters = getNumSortParameters(kind);

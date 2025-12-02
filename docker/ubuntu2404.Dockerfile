@@ -2,11 +2,11 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # set default locale
 RUN apt-get update \
@@ -38,32 +38,20 @@ RUN  apt-get update \
 # GMP >6.3.0 is automatically downloaded and build within Bitwuzla.
 RUN apt-get update \
  && apt-get install -y \
-        ninja-build python3-pip \
+        ninja-build python3-pip meson \
  && apt-get clean
-RUN pip3 install --upgrade meson
 
 # OpenSMT requires swig, gmp, flex and bison
-# - swig needs to built manually to get version 4.1 for unique_ptr support
+# - swig v4.1 or newer for unique_ptr support
 # - libpcre2-dev is a dependency of swig
 # - gmp needs to be recompiled to generate PIC code (see below)
 # - lzip is required to unpack the gmp tar ball
 RUN apt-get update \
  && apt-get install -y \
-        cmake flex bison libpcre2-dev lzip \
+        cmake flex bison libpcre2-dev lzip swig \
  && apt-get clean
 
 WORKDIR /dependencies
-
-# Install SWIG in a recent enough version
-RUN wget http://prdownloads.sourceforge.net/swig/swig-4.1.1.tar.gz \
- && tar xf swig-4.1.1.tar.gz \
- && rm swig-4.1.1.tar.gz \
- && cd swig-4.1.1 \
- && ./configure \
- && make -j4 \
- && make install \
- && cd .. \
- && rm -rf swig-4.1.1
 
 # Install GMP for linux on x64 and arm64
 # We could add another build for windows when needed
@@ -110,9 +98,10 @@ ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64/
 ARG BUILD_DATE
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.title="JavaSMT solver development"
-LABEL org.opencontainers.image.description="Ubuntu 22.04-based image for JavaSMT solver development"
+LABEL org.opencontainers.image.description="Ubuntu 24.04-based image for JavaSMT solver development"
 LABEL org.opencontainers.image.source="https://github.com/sosy-lab/java-smt"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 # Podman-Specific Label for Auto-Update
 LABEL io.containers.autoupdate=registry
+

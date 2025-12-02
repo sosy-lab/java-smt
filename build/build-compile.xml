@@ -36,9 +36,10 @@ SPDX-License-Identifier: Apache-2.0
         <exclude name="**/*.java" />
     </patternset>
 
-    <!-- error-prone config from https://errorprone.info/docs/installation#jdk-16 -->
+    <!-- error-prone config from https://errorprone.info/docs/installation#ant -->
     <property name="errorprone.options.required" value="
         -XDcompilePolicy=simple
+        --should-stop=ifError=FLOW
         -J--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED
         -J--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED
         -J--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED
@@ -53,6 +54,11 @@ SPDX-License-Identifier: Apache-2.0
 
     <condition property="java21">
       <javaversion atleast="21"/>
+    </condition>
+
+    <!-- Current versions of Error Prone do not support running on Java 11 anymore. -->
+    <condition property="errorprone.disable">
+      <javaversion exactly="11"/>
     </condition>
 
     <!-- We use error-prone as the compiler, cf. http://errorprone.info/ -->
@@ -74,7 +80,7 @@ SPDX-License-Identifier: Apache-2.0
             <src path="${source.dir}"/>
             <classpath refid="classpath"/>
             <compilerarg value="-Xlint"/>
-            <compilerarg value="-Xlint:-fallthrough"/> <!-- checked by error-prone, too, and javac does not recognize $FALL-THROUGH$ -->
+            <compilerarg value="-Xlint:-fallthrough"/> <!-- checked by error-prone, too, and javac does not recognized $FALL-THROUGH$ -->
             <compilerarg value="-Xlint:-processing"/>
             <compilerarg value="-Xlint:-options"/> <!-- suppress warning about bootclasspath on newer JDK -->
             <compilerarg value="-Xlint:-this-escape" if:set="java21"/> <!-- false alarm for every use of configuration injection -->
@@ -130,10 +136,13 @@ SPDX-License-Identifier: Apache-2.0
         <mkdir dir="${source.generated.dir}"/>
 
         <copy file=".settings/org.eclipse.jdt.core.prefs" tofile="${ivy.lib.dir}/build/org.eclipse.jdt.core.prefs">
-            <!-- Convert all compiler warnings to errors. -->
+            <!-- Convert all compiler warnings to errors and ignore info messages to not clutter the output. -->
             <filterchain>
                 <replacetokens begintoken="=" endtoken="g">
                     <token key="warnin" value="=error"/>
+                </replacetokens>
+                <replacetokens begintoken="=" endtoken="o">
+                    <token key="inf" value="=ignore"/>
                 </replacetokens>
             </filterchain>
         </copy>

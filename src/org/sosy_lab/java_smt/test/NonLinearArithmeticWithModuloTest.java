@@ -10,9 +10,9 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import org.junit.AssumptionViolatedException;
@@ -34,8 +34,8 @@ public class NonLinearArithmeticWithModuloTest extends SolverBasedTest0 {
   @Parameters(name = "{0} {1}")
   public static Iterable<Object[]> getAllSolversAndTheories() {
     return Lists.cartesianProduct(
-            Arrays.asList(ParameterizedSolverBasedTest0.getAllSolvers()),
-            Arrays.asList(NonLinearArithmetic.values()))
+            ImmutableList.copyOf(ParameterizedSolverBasedTest0.getAllSolvers()),
+            ImmutableList.copyOf(NonLinearArithmetic.values()))
         .stream()
         .map(List::toArray)
         .collect(toImmutableList());
