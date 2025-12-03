@@ -589,6 +589,122 @@ def translate(prog: List[Definition]):
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
+        elif stmt.getCalls()[:-1] == ["mgr", "getIntegerFormulaManager"]:
+            if stmt.getCalls()[-1] == "add":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "distinct":
+                # FIXME Requires list arguments
+                raise Exception("distinct not supported")
+
+            elif stmt.getCalls()[-1] == "divide":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (div {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "equal":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "floor":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+
+            elif stmt.getCalls()[-1] == "greaterOrEquals":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (>= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "greaterThan":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (> {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "lessOrEquals":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (<= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "lessThan":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (< {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "makeNumber":
+                arg1 = stmt.value[-1].args[0]
+                if not isinstance(arg1, int):
+                    raise Exception("makeNumber is only supported for constant integer arguments")
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+
+            elif stmt.getCalls()[-1] == "makeVariable":
+                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
+            elif stmt.getCalls()[-1] == "modularCongruence":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= (mod (- {arg1} {arg2}) {arg3}) 0))')
+
+            elif stmt.getCalls()[-1] == "modulo":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (mod {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "multiply":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (* {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "negate":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1}))')
+
+            elif stmt.getCalls()[-1] == "subtract":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "sum":
+                # FIXME Requires list arguments
+                raise Exception("sum not supported")
+
+            else:
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
+
         elif stmt.getCalls()[-1] == "addConstraint":
             arg1 = stmt.value[-1].args[0]
             output.append(f'(assert {arg1})')
