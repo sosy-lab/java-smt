@@ -521,7 +521,21 @@ def translate(prog: List[Definition]):
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[:-1] == ["mgr", "getBooleanFormulaManager"]:
-            if stmt.getCalls()[-1] == "ifThenElse":
+            if stmt.getCalls()[-1] == "and":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (and {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "equivalence":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "ifThenElse":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
@@ -529,13 +543,51 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (ite {arg1} {arg2} {arg3}))')
 
+            elif stmt.getCalls()[-1] == "implication":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (=> {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "makeFalse":
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} false)')
+
+            elif stmt.getCalls()[-1] == "makeTrue":
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} true)')
+
+            elif stmt.getCalls()[-1] == "makeVariable":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
             elif stmt.getCalls()[-1] == "not":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (not {arg1}))')
 
+            elif stmt.getCalls()[-1] == "or":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (or {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "xor":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (xor {arg1} {arg2}))')
+
             else:
-                raise Exception()
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[-1] == "addConstraint":
             arg1 = stmt.value[-1].args[0]
