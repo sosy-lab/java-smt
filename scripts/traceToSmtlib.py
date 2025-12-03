@@ -14,7 +14,65 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
-from parsy import regex, string, whitespace, eof, generate
+from parsy import regex, string, whitespace, eof, generate, alt, forward_declaration
+
+
+@dataclass
+class Type:
+    def toSmtlib(self):
+        "Print type in SMTLIB format"
+        raise NotImplementedError()
+
+
+@dataclass
+class BooleanType(Type):
+    def toSmtlib(self):
+        return "Bool"
+
+
+@dataclass
+class IntegerType(Type):
+    def toSmtlib(self):
+        return "Integer"
+
+
+@dataclass
+class RationalType(Type):
+    def toSmtlib(self):
+        return "Real"
+
+
+@dataclass
+class StringType(Type):
+    def toSmtlib(self):
+        return "String"
+
+
+@dataclass
+class BitvectorType(Type):
+    width: int
+
+    def toSmtlib(self):
+        return f"(_ BitVec {self.width})"
+
+
+@dataclass
+class FloatType(Type):
+    exponent: int
+    significand: int
+
+    def toSmtlib(self):
+        return f"(_ FloatingPoint {self.exponent} {self.significand})"
+
+
+@dataclass
+class ArrayType(Type):
+    index: Type
+    element: Type
+
+    def toSmtlib(self):
+        return f"(Array {self.index.toSmtlib()} {self.element.toSmtlib()})"
+
 
 # TODO Simplify grammar and make sure it matches the parser rules
 """
@@ -61,6 +119,55 @@ def test_string():
     assert litString.parse('"str"') == "str"
 
 
+litType = forward_declaration()
+
+litBoolType = string("FormulaType.BooleanType").map(lambda str: IntegerType())
+litIntegerType = string("FormulaType.IntegerType").map(lambda str: IntegerType())
+litRationalType = string("FormulaType.RationalType").map(lambda str: RationalType())
+litStringType = string("FormulaType.StringType").map(lambda str: StringType())
+
+
+@generate
+def litBitvectorType():
+    yield string("FormulaType.getBitvectorTypeWithSize(") >> whitespace.optional()
+    width = yield regex(r'[0-9]+').map(int)
+    yield whitespace.optional() << string(")")
+    return BitvectorType(width)
+
+
+@generate
+def litFloatType():
+    yield string("FormulaType.getBitvectorTypeWithSize(") >> whitespace.optional()
+    exponent = yield regex(r'[0-9]+').map(int)
+    yield whitespace.optional() << string(",") << whitespace.optional()
+    significand = yield regex(r'[0-9]+').map(int)
+    yield whitespace.optional() << string(")")
+    return FloatType(exponent, significand)
+
+
+@generate
+def litArrayType():
+    yield string("FormulaType.getArrayType(")
+    yield whitespace.optional()
+    index = yield litType
+    yield whitespace.optional() >> string(",") >> whitespace.optional()
+    elements = yield litType
+    yield whitespace.optional() >> string(")")
+    return ArrayType(index, elements)
+
+
+litType.become(
+    alt(litBoolType, litIntegerType, litRationalType, litStringType, litBitvectorType, litFloatType, litArrayType))
+
+
+def test_sort():
+    assert litType.parse("FormulaType.BooleanType") == IntegerType()
+    assert litType.parse("FormulaType.IntegerType") == IntegerType()
+    assert litType.parse("FormulaType.getBitvectorTypeWithSize(8)") == BitvectorType(8)
+    assert (litType.parse("FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType)")
+            == ArrayType(IntegerType(), IntegerType()))
+
+
 variable = regex(r"[A-Za-z][A-Za-z0-9]*")
 
 
@@ -69,13 +176,13 @@ def test_variable():
     assert variable.parse("mgr") == "mgr"
 
 
+argument = litBool | litInt | litString | litType | variable
+
+
 @dataclass
 class Call:
     fn: str
     args: Optional[List] = None
-
-
-argument = litBool | litInt | litString | variable
 
 
 @generate
@@ -175,51 +282,6 @@ def test_program():
                 Definition("var22", [Call("var2"), Call("isUnsat", [])]),
                 Definition("var23", [Call("var2"), Call("getModel", [])]),
                 Definition(None, [Call("var23"), Call("close", [])])])
-
-
-@dataclass
-class Type:
-    def toSmtlib(self):
-        "Print type in SMTLIB format"
-        raise NotImplementedError()
-
-
-@dataclass
-class BooleanType(Type):
-    def toSmtlib(self):
-        return "Bool"
-
-
-@dataclass
-class IntegerType(Type):
-    def toSmtlib(self):
-        return "Integer"
-
-
-@dataclass
-class BitvectorType(Type):
-    width: int
-
-    def toSmtlib(self):
-        return f"(_ BitVec {self.width})"
-
-
-@dataclass
-class FloatType(Type):
-    exponent: int
-    significand: int
-
-    def toSmtlib(self):
-        return f"(_ FloatingPoint {self.exponent} {self.significand})"
-
-
-@dataclass
-class ArrayType(Type):
-    index: Type
-    element: Type
-
-    def toSmtlib(self):
-        return f"(Array {self.index.toSmtlib()} {self.element.toSmtlib()})"
 
 
 def test_toSmtlib():
