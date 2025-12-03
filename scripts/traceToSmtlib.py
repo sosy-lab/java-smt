@@ -75,6 +75,15 @@ class ArrayType(Type):
         return f"(Array {self.index.toSmtlib()} {self.element.toSmtlib()})"
 
 
+@dataclass
+class FunctionType(Type):
+    arguments: List[Type]
+    value: Type
+
+    def toSmtlib(self):
+        return f"({' '.join([arg.toSmtlib() for arg in self.arguments])}) {self.value.toSmtlib()}"
+
+
 # TODO Simplify grammar and make sure it matches the parser rules
 """
 Grammar:
@@ -701,6 +710,25 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "sum":
                 # FIXME Requires list arguments
                 raise Exception("sum not supported")
+
+            else:
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getUFManager"]:
+            if stmt.getCalls()[-1] == "callUF":
+                arg0 = stmt.value[-1].args[0]
+                args = stmt.value[-1].args[1:]
+                sortMap[stmt.variable] = sortMap[arg0].value
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({arg0} {' '.join(args)}))')
+
+            elif stmt.getCalls()[-1] == "declareUF":
+                arg0 = stmt.value[-1].args[0]
+                arg1 = stmt.value[-1].args[1]
+                args = stmt.value[-1].args[2:]
+                sortMap[arg0] = FunctionType(args, arg1)
+                output.append(
+                    f'(declare-fun {arg0} {sortMap[arg0].toSmtlib()})')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
