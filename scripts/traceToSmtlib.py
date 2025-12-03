@@ -11,10 +11,11 @@
 import sys
 
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import List, Optional
 
-from parsy import regex, string, whitespace, eof, generate, alt, forward_declaration
+from parsy import regex, string, whitespace, eof, generate, alt, forward_declaration, from_enum
 
 
 @dataclass
@@ -168,6 +169,21 @@ def test_sort():
             == ArrayType(IntegerType(), IntegerType()))
 
 
+class ProverOptions(Enum):
+    GENERATE_MODELS = "SolverContext.ProverOptions.GENERATE_MODELS"
+    GENERATE_ALL_SAT = "SolverContext.ProverOptions.GENERATE_ALL_SAT"
+    GENERATE_UNSAT_CORE = "SolverContext.ProverOptions.GENERATE_UNSAT_CORE"
+    GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS = "SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS"
+    ENABLE_SEPARATION_LOGIC = "SolverContext.ProverOptions.ENABLE_SEPARATION_LOGIC"
+
+
+litProverOptions = from_enum(ProverOptions)
+
+
+def test_proverOptions():
+    assert litProverOptions.parse("SolverContext.ProverOptions.GENERATE_MODELS") == ProverOptions.GENERATE_MODELS
+
+
 variable = regex(r"[A-Za-z][A-Za-z0-9]*")
 
 
@@ -176,7 +192,7 @@ def test_variable():
     assert variable.parse("mgr") == "mgr"
 
 
-argument = litBool | litInt | litString | litType | variable
+argument = litBool | litInt | litString | litType | litProverOptions | variable
 
 
 @dataclass
