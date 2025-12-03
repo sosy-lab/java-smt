@@ -714,6 +714,47 @@ def translate(prog: List[Definition]):
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
+        elif stmt.getCalls()[:-1] == ["mgr", "getArrayFormulaManager"]:
+            if stmt.getCalls()[-1] == "equivalence":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "makeArray":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                if arg1 is Type and arg2 is Type:
+                    # Build a const array
+                    sortMap[stmt.variable] = ArrayType(arg1, arg2)
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((as const {sortMap[stmt.variable].toSmtlib()}) {arg3}))')
+                else:
+                    # Declare a new variable
+                    sortMap[stmt.variable] = ArrayType(arg2, arg3)
+                    output.append(
+                        f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
+            elif stmt.getCalls()[-1] == "select":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1].element
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (select {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "store":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (store {arg1} {arg2} {arg3}))')
+
+            else:
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
+
         elif stmt.getCalls()[:-1] == ["mgr", "getUFManager"]:
             if stmt.getCalls()[-1] == "callUF":
                 arg0 = stmt.value[-1].args[0]
@@ -756,7 +797,7 @@ def translate(prog: List[Definition]):
             output.append(f'(push 1)')
 
         else:
-            raise Exception()
+            raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
     return '\n'.join(output)
 
