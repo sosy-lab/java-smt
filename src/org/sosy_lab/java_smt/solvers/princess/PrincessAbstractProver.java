@@ -15,9 +15,12 @@ import static scala.collection.JavaConverters.asScala;
 import ap.api.PartialModel;
 import ap.api.SimpleAPI;
 import ap.api.SimpleAPI.SimpleAPIException;
+import ap.parameters.Param.InputFormat$;
 import ap.parser.IFormula;
 import ap.parser.IFunction;
 import ap.parser.ITerm;
+import ap.proof.certificates.Certificate;
+import ap.proof.certificates.DagCertificateConverter;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
@@ -38,9 +41,12 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
+import scala.collection.immutable.HashMap;
+import scala.collection.immutable.Seq;
 
 @SuppressWarnings("ClassTypeParameterName")
 abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
@@ -279,13 +285,26 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     }
   }
 
-  // @Override
-  // public ProofNode getProof() {
-  //  api.getCertificate();
-  //  return null;
-  // }
+  @Override
+  public Proof getProof() {
+    Preconditions.checkState(!closed);
+    checkGenerateProofs();
+    if (wasLastSatCheckSat) {;
+      throw new IllegalStateException("Proofs can only be generated for UNSAT results.");
+    }
+  return PrincessProof.buildProofDAG(api.getCertificate(), creator, api);
+  }
 
-  // protected Certificate getCertificate() {
-  //   return api.getCertificate();
-  // }
+  protected Certificate getCertificate() {
+    return api.getCertificate();
+  }
+
+  protected String certificateAsString() {
+    return api.certificateAsString(new HashMap<>(), InputFormat$.MODULE$.SMTLIB());
+  }
+
+  protected void certificateAsDag() {
+    DagCertificateConverter converter = new DagCertificateConverter();
+    Seq<Certificate> certs = converter.apply(getCertificate());
+  }
 }
