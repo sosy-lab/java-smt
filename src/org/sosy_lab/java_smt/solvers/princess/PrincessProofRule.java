@@ -142,7 +142,7 @@ final class PrincessProofFields {
   public static final ProofFieldKey<Formula> TARGET_LITERAL = createKey(Formula.class, "targetLit");
   public static final ProofFieldKey<Object> THEORY = createKey(Object.class, "theory");
   public static final ProofFieldKey<Formula> AXIOM = createKey(Formula.class, "axiom");
-  public static final ProofFieldKey<Boolean> EXPANDED_INFERENCES = createKey(List.class, "expand");
+  public static final ProofFieldKey<List> EXPANDED_INFERENCES = createKey(List.class, "expand");
   public static final ProofFieldKey<BigInteger> CONSTANT_DIFF =
       createKey(BigInteger.class, "constantDiff");
   public static final ProofFieldKey<BigInteger> FACTOR = createKey(BigInteger.class, "factor");
