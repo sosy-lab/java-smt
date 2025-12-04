@@ -13,6 +13,7 @@ package org.sosy_lab.java_smt.delegate.trace;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormulaManager;
@@ -30,18 +31,22 @@ public abstract class TraceNumeralFormulaManager<
     logger = pLogger;
   }
 
+  private String getPrefix() {
+    return getFormulaType().equals(FormulaType.IntegerType)
+        ? "mgr.getIntegerFormulaManager()"
+        : "mgr.getRationalFormulaManager";
+  }
+
   @Override
   public ResultFormulaType makeNumber(long number) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
-        String.format("makeNumber(%s)", number),
-        () -> delegate.makeNumber(number));
+        getPrefix(), String.format("makeNumber(%s)", number), () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(BigInteger number) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("makeNumber(new BigInteger(\"%s\"))", number),
         () -> delegate.makeNumber(number));
   }
@@ -49,7 +54,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType makeVariable(String pVar) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("makeVariable(\"%s\")", pVar),
         () -> delegate.makeVariable(pVar));
   }
@@ -57,7 +62,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType negate(ParamFormulaType number) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("negate(%s)", logger.toVariable(number)),
         () -> delegate.negate(number));
   }
@@ -65,7 +70,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType add(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("add(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.add(number1, number2));
   }
@@ -73,7 +78,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType sum(List<ParamFormulaType> operands) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("sum(%s)", logger.toVariables(operands)),
         () -> delegate.sum(operands));
   }
@@ -81,7 +86,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType subtract(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("subtract(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.subtract(number1, number2));
   }
@@ -89,7 +94,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType divide(ParamFormulaType numerator, ParamFormulaType denominator) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format(
             "divide(%s, %s)", logger.toVariable(numerator), logger.toVariable(denominator)),
         () -> delegate.divide(numerator, denominator));
@@ -98,7 +103,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public ResultFormulaType multiply(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("multiply(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.multiply(number1, number2));
   }
@@ -106,7 +111,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula equal(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("equal(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.equal(number1, number2));
   }
@@ -114,7 +119,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula distinct(List<ParamFormulaType> pNumbers) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("distinct(%s)", logger.toVariables(pNumbers)),
         () -> delegate.distinct(pNumbers));
   }
@@ -122,7 +127,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula greaterThan(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format(
             "greaterThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterThan(number1, number2));
@@ -131,7 +136,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula greaterOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format(
             "greaterOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.greaterOrEquals(number1, number2));
@@ -140,7 +145,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula lessThan(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("lessThan(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessThan(number1, number2));
   }
@@ -148,7 +153,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public BooleanFormula lessOrEquals(ParamFormulaType number1, ParamFormulaType number2) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format(
             "lessOrEquals(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
         () -> delegate.lessOrEquals(number1, number2));
@@ -157,7 +162,7 @@ public abstract class TraceNumeralFormulaManager<
   @Override
   public IntegerFormula floor(ParamFormulaType formula) {
     return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
+        getPrefix(),
         String.format("floor(%s)", logger.toVariable(formula)),
         () -> delegate.floor(formula));
   }
