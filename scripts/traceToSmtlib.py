@@ -541,11 +541,10 @@ def translate(prog: List[Definition]):
 
         elif stmt.getCalls()[:-1] == ["mgr", "getBooleanFormulaManager"]:
             if stmt.getCalls()[-1] == "and":
-                arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]
+                args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (and {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (and {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "equivalence":
                 arg1 = stmt.value[-1].args[0]
@@ -591,11 +590,10 @@ def translate(prog: List[Definition]):
                 output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (not {arg1}))')
 
             elif stmt.getCalls()[-1] == "or":
-                arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]
+                args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (or {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (or {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "xor":
                 arg1 = stmt.value[-1].args[0]
