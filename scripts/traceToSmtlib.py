@@ -326,14 +326,33 @@ def test_printBitvector():
     # assert printBitvector(8, -5) == "#b11111011" # FIXME
 
 
-def filterProverEnvironments(prog: List[Definition]):
-    "Remove all provers, except the last, from the trace"
-    env = [stmt.variable for stmt in prog
-           if stmt.getCalls()[-1] == "newProverEnvironment"
-           or stmt.getCalls()[-1] == "newProverEnvironmentWithInterpolation"]
-    env = env[:-1]
-    return [stmt for stmt in prog
-            if not (stmt.getCalls()[0] in env or stmt.variable in env)]
+def flattenProvers(prog: List[Definition]):
+    "Push all assertions onto the same global prover"
+    # We assume that the provers are not used "in parallel"
+    # FIXME Reorder the instructions to avoid overlapping prover instances
+    active = ""
+    levels = 0
+    trace = []
+    for stmt in prog:
+        if (stmt.getCalls()[-1] == "newProverEnvironment"
+                or stmt.getCalls()[-1] == "newProverEnvironmentWithInterpolation"):
+            if levels > 0:
+                raise Exception("Can't open new prover before closing the last instance")
+            active = stmt.variable
+            levels = 1
+            trace.append(Definition(None, [Call(active), Call("push", [])]))
+        elif stmt.getCalls()[-1] == "push":
+            levels += 1
+            trace.append(stmt)
+        elif stmt.getCalls()[-1] == "pop":
+            levels -= 1
+            trace.append(stmt)
+        elif stmt.getCalls() == [active, "close"]:
+            trace.extend([Definition(None, [Call(active), Call("pop", [])])] * levels)
+            levels = 0
+        else:
+            trace.append(stmt)
+    return trace
 
 
 def translate(prog: List[Definition]):
@@ -842,4 +861,4 @@ if __name__ == '__main__':
         exit(-1)
 
     # Translate the trace
-    print(translate(filterProverEnvironments(program.parse(open(path).read()))))
+    print(translate(flattenProvers(program.parse(open(path).read()))))
