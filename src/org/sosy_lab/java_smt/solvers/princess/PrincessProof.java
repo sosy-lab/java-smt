@@ -342,18 +342,22 @@ public final class PrincessProof extends AbstractProof {
     return new PrincessProof(rule, null);
   }
 
-  @SuppressWarnings("unchecked")
-  public static PrincessProof handleBranchInferenceCertificate(
-      BranchInferenceCertificate bic, PrincessFormulaCreator creator, SimpleAPI api) {
-
-    // 1. Convert nested inferences into PrincessProofRule objects
-    List<? extends BranchInference> externalInferences =
-        CollectionConverters.asJava(bic.inferences());
+  /**
+   * Recursively wraps a sequence of BranchInference objects (which includes MacroInference).
+   *
+   * @param inferences The sequence of Princess BranchInference objects to process.
+   * @param api The SimpleAPI instance.
+   * @param creator The formula creator.
+   * @return A list of wrapped JavaSMT PrincessProofRule objects.
+   */
+  private static List<PrincessProofRule> getWrappedInferences(
+      Seq<BranchInference> inferences, SimpleAPI api, PrincessFormulaCreator creator) {
 
     List<PrincessProofRule> wrappedInferences = new ArrayList<>();
 
-    for (BranchInference inf : externalInferences) {
+    for (BranchInference inf : CollectionConverters.asJava(inferences)) {
       PrincessInference infRule = null;
+
       // ALPHA_INFERENCE
       if (inf instanceof AlphaInference) {
         infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.ALPHA_INFERENCE);
@@ -389,14 +393,16 @@ public final class PrincessProof extends AbstractProof {
                 PrincessBranchCertificate.BranchInference.COLUMN_REDUCE_INFERENCE);
         ColumnReduceInference cri = (ColumnReduceInference) inf;
         Formula encapsulatedOldSymbol =
-            creator.encapsulateWithTypeOf(IExpression.ConstantTerm2ITerm(cri.oldSymbol()));
+            creator.encapsulateWithTypeOf(
+                ap.parser.IExpression.ConstantTerm2ITerm(cri.oldSymbol()));
         Formula encapsulatedNewSymbol =
-            creator.encapsulateWithTypeOf(IExpression.ConstantTerm2ITerm(cri.newSymbol()));
+            creator.encapsulateWithTypeOf(
+                ap.parser.IExpression.ConstantTerm2ITerm(cri.newSymbol()));
         Formula encapsulatedDefiningEquation =
             creator.encapsulateWithTypeOf(api.asIFormula(cri.definingEquation().toConj()));
-        infRule.specificFields.put(OLD_SYMBOL, cri.oldSymbol());
-        infRule.specificFields.put(NEW_SYMBOL, cri.newSymbol());
-        infRule.specificFields.put(DEFINING_EQUATION, cri.definingEquation());
+        infRule.specificFields.put(OLD_SYMBOL, encapsulatedOldSymbol);
+        infRule.specificFields.put(NEW_SYMBOL, encapsulatedNewSymbol);
+        infRule.specificFields.put(DEFINING_EQUATION, encapsulatedDefiningEquation);
         infRule.specificFields.put(SUBST, cri.subst());
 
       }
@@ -461,8 +467,8 @@ public final class PrincessProof extends AbstractProof {
             creator.encapsulateWithTypeOf(api.asIFormula(dri.divisibility().toConj()));
         Formula encapsulatedResult =
             creator.encapsulateWithTypeOf(api.asIFormula(dri.result().toConj()));
-        infRule.specificFields.put(DIVISIBILITY, dri.divisibility());
-        infRule.specificFields.put(RESULT, dri.result());
+        infRule.specificFields.put(DIVISIBILITY, encapsulatedDivisibility);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -477,28 +483,38 @@ public final class PrincessProof extends AbstractProof {
             creator.encapsulateWithTypeOf(api.asIFormula(gi.instance().toConj()));
         Formula encapsulatedResult =
             creator.encapsulateWithTypeOf(api.asIFormula(gi.result().toConj()));
+        List<Formula> encapsulatedDischargedAtoms =
+            convertCertFormulaList(CollectionConverters.asJava(gi.dischargedAtoms()), api, creator);
         infRule.specificFields.put(QUANTIFIED_FORMULA, encapsulatedQuantifiedFormula);
         // TODO: Transform LinearCombination objects into JavaSMT objects
         infRule.specificFields.put(INSTANCE_TERMS, CollectionConverters.asJava(gi.instanceTerms()));
         infRule.specificFields.put(INSTANCE_FORMULA, encapsulatedInstanceFormula);
-        infRule.specificFields.put(
-            DISCHARGED_ATOMS, CollectionConverters.asJava(gi.dischargedAtoms()));
+        infRule.specificFields.put(DISCHARGED_ATOMS, encapsulatedDischargedAtoms);
         infRule.specificFields.put(RESULT, encapsulatedResult);
       }
 
       // MACRO_INFERENCE
       else if (inf instanceof MacroInference) {
-        // No fields to store
+        infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.MACRO_INFERENCE);
+        MacroInference macro = (MacroInference) inf;
+
+        // 1. Recursively process inferences
+        List<PrincessProofRule> expandedInferences =
+            getWrappedInferences(macro.expand().toSeq(), api, creator);
+
+        // 2. Store the list of wrapped children in the MacroInference wrapper
+        infRule.specificFields.put(EXPANDED_INFERENCES, expandedInferences);
       }
 
       // PARTIAL_CERTIFICATE_INFERENCE
       else if (inf instanceof PartialCertificateInference) {
-        infRule =
-            new PrincessInference(
-                PrincessBranchCertificate.BranchInference.PARTIAL_CERTIFICATE_INFERENCE);
-        PartialCertificateInference pci = (PartialCertificateInference) inf;
-        infRule.specificFields.put(PARTIAL_CERTIFICATE, pci.pCert());
-
+        // infRule =
+        //   new PrincessInference(
+        //       PrincessBranchCertificate.BranchInference.PARTIAL_CERTIFICATE_INFERENCE);
+        // PartialCertificateInference pci = (PartialCertificateInference) inf;
+        // infRule.specificFields.put(PARTIAL_CERTIFICATE, pci.pCert());
+        // One can access the partial certificate, but it appears to be the case that all relevant
+        // info may be accessed through the common fields
       }
 
       // PRED_UNIFY_INFERENCE
@@ -506,12 +522,12 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.PRED_UNIFY_INFERENCE);
         PredUnifyInference pu = (PredUnifyInference) inf;
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(pu.result().toConj()));
+        // TODO: Transform Atom into JavaSMT objects
         infRule.specificFields.put(LEFT_ATOM, pu.leftAtom());
         infRule.specificFields.put(RIGHT_ATOM, pu.rightAtom());
         infRule.specificFields.put(RESULT, pu.result());
-        infRule.specificFields.put(
-            PROVIDED_FORMULAS, CollectionConverters.asJava(pu.providedFormulas()));
-
       }
 
       // QUANTIFIER_INFERENCE
@@ -519,9 +535,18 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.QUANTIFIER_INFERENCE);
         QuantifierInference qi = (QuantifierInference) inf;
-        infRule.specificFields.put(QUANTIFIED_FORMULA, qi.quantifiedFormula());
-        infRule.specificFields.put(NEW_CONSTANTS, CollectionConverters.asJava(qi.newConstants()));
-        infRule.specificFields.put(RESULT, qi.result());
+        Formula encapsulatedQuantifiedFormula =
+            creator.encapsulateWithTypeOf(api.asIFormula(qi.quantifiedFormula().toConj()));
+        List<ConstantTerm> constantTerms = CollectionConverters.asJava(qi.newConstants());
+        List<Formula> encapsulatedNewConstants =
+            constantTerms.stream()
+                .map(c -> creator.encapsulateWithTypeOf(IExpression.ConstantTerm2ITerm(c)))
+                .collect(Collectors.toList());
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(qi.result().toConj()));
+        infRule.specificFields.put(QUANTIFIED_FORMULA, encapsulatedQuantifiedFormula);
+        infRule.specificFields.put(NEW_CONSTANTS, encapsulatedNewConstants);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -529,9 +554,13 @@ public final class PrincessProof extends AbstractProof {
       else if (inf instanceof ReduceInference) {
         infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.REDUCE_INFERENCE);
         ReduceInference ri = (ReduceInference) inf;
-        infRule.specificFields.put(EQUATIONS, CollectionConverters.asJava(ri.equations()));
-        infRule.specificFields.put(TARGET_LITERAL, ri.targetLit());
-        infRule.specificFields.put(RESULT, ri.result());
+        Formula encapsulatedTargetLiteral =
+            creator.encapsulateWithTypeOf(api.asIFormula(ri.targetLit().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(ri.result().toConj()));
+        infRule.specificFields.put(EQUATIONS, convertEquations(ri.equations(), api, creator));
+        infRule.specificFields.put(TARGET_LITERAL, encapsulatedTargetLiteral);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
 
       }
 
@@ -540,19 +569,31 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.REDUCE_PRED_INFERENCE);
         ReducePredInference rpi = (ReducePredInference) inf;
-        infRule.specificFields.put(EQUATIONS, CollectionConverters.asJava(rpi.equations()));
-        infRule.specificFields.put(TARGET_LITERAL, rpi.targetLit());
-        infRule.specificFields.put(RESULT, rpi.result());
-
+        List<List<List<Object>>> convertedEquations =
+            CollectionConverters.asJava(rpi.equations()).stream()
+                .map(seq -> convertEquations(seq, api, creator))
+                .collect(Collectors.toList());
+        Formula encapsulatedTargetLiteral =
+            creator.encapsulateWithTypeOf(api.asIFormula(rpi.targetLit().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(rpi.result().toConj()));
+        infRule.specificFields.put(EQUATIONS, convertedEquations);
+        infRule.specificFields.put(TARGET_LITERAL, encapsulatedTargetLiteral);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
       }
 
       // SIMP_INFERENCE
       else if (inf instanceof SimpInference) {
         infRule = new PrincessInference(PrincessBranchCertificate.BranchInference.SIMP_INFERENCE);
         SimpInference si = (SimpInference) inf;
-        infRule.specificFields.put(TARGET_LITERAL, si.targetLit());
-        infRule.specificFields.put(RESULT, si.result());
-
+        Formula encapsulatedTargetLiteral =
+            creator.encapsulateWithTypeOf(api.asIFormula(si.targetLit().toConj()));
+        Formula encapsulatedResult =
+            creator.encapsulateWithTypeOf(api.asIFormula(si.result().toConj()));
+        infRule.specificFields.put(TARGET_LITERAL, encapsulatedTargetLiteral);
+        infRule.specificFields.put(RESULT, encapsulatedResult);
+        infRule.specificFields.put(CONSTANT_DIFF, si.constantDiff().bigIntValue());
+        infRule.specificFields.put(FACTOR, si.factor().bigIntValue());
       }
 
       // THEORY_AXIOM_INFERENCE
@@ -560,8 +601,11 @@ public final class PrincessProof extends AbstractProof {
         infRule =
             new PrincessInference(PrincessBranchCertificate.BranchInference.THEORY_AXIOM_INFERENCE);
         TheoryAxiomInference tai = (TheoryAxiomInference) inf;
+        Formula encapsulatedAxiom =
+            creator.encapsulateWithTypeOf(api.asIFormula(tai.axiom().toConj()));
+        // TODO: Transform Theory into JavaSMT object
         infRule.specificFields.put(THEORY, tai.theory());
-        infRule.specificFields.put(AXIOM, tai.axiom());
+        infRule.specificFields.put(AXIOM, encapsulatedAxiom);
 
       } else {
         throw new IllegalArgumentException(
@@ -569,8 +613,21 @@ public final class PrincessProof extends AbstractProof {
                 Locale.ROOT, "Unknown branch inference: %s", inf.getClass().getSimpleName()));
       }
 
+      assert infRule != null;
+      storeCommonInferenceFields(inf, infRule, api, creator);
       wrappedInferences.add(infRule);
     }
+
+    return wrappedInferences;
+  }
+
+  private static PrincessProof handleBranchInferenceCertificate(
+      BranchInferenceCertificate bic, PrincessFormulaCreator creator, SimpleAPI api) {
+
+    // 1. Convert nested inferences into PrincessProofRule objects recursively.
+    // This handles MacroInference expansion and wraps all atomic inferences.
+    List<PrincessProofRule> wrappedInferences =
+        getWrappedInferences(bic.inferences(), api, creator);
 
     // 2. Create the container rule
     PrincessBranchCertificate containerRule = new PrincessBranchCertificate(wrappedInferences);

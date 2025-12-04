@@ -111,7 +111,7 @@ final class PrincessProofFields {
   public static final ProofFieldKey<Formula> OLD_SYMBOL = createKey(Formula.class, "oldSymbol");
   public static final ProofFieldKey<Formula> NEW_SYMBOL = createKey(Formula.class, "newSymbol");
   public static final ProofFieldKey<Formula> DEFINING_EQUATION =
-      createKey(Object.class, "definingEquation");
+      createKey(Formula.class, "definingEquation");
   public static final ProofFieldKey<Boolean> SUBST = createKey(Boolean.class, "subst");
   public static final ProofFieldKey<List<List<Object>>> EQUATIONS =
       createKey(List.class, "equations");
@@ -123,24 +123,29 @@ final class PrincessProofFields {
   public static final ProofFieldKey<Formula> EQUATION = createKey(Formula.class, "equation");
   public static final ProofFieldKey<Formula> DIVISIBILITY =
       createKey(Formula.class, "divisibility");
-  public static final ProofFieldKey<Object> QUANTIFIED_FORMULA =
-      createKey(Object.class, "quantifiedFormula");
+  public static final ProofFieldKey<Formula> QUANTIFIED_FORMULA =
+      createKey(Formula.class, "quantifiedFormula");
   public static final ProofFieldKey<List<Object>> INSTANCE_TERMS =
       createKey(List.class, "instanceTerms");
-  public static final ProofFieldKey<Object> INSTANCE_FORMULA = createKey(Object.class, "instance");
-  public static final ProofFieldKey<Set<Object>> DISCHARGED_ATOMS =
-      createKey(Set.class, "dischargedAtoms");
+  public static final ProofFieldKey<Formula> INSTANCE_FORMULA =
+      createKey(Formula.class, "instance");
+  public static final ProofFieldKey<List<Formula>> DISCHARGED_ATOMS =
+      createKey(List.class, "dischargedAtoms");
   public static final ProofFieldKey<Certificate> PARTIAL_CERTIFICATE =
       createKey(Certificate.class, "pCert");
   public static final ProofFieldKey<Object> LEFT_ATOM = createKey(Object.class, "leftAtom");
   public static final ProofFieldKey<Object> RIGHT_ATOM = createKey(Object.class, "rightAtom");
-  public static final ProofFieldKey<Set<Object>> PROVIDED_FORMULAS =
+  public static final ProofFieldKey<Set<Formula>> PROVIDED_FORMULAS =
       createKey(Set.class, "providedFormulas");
   public static final ProofFieldKey<List<Object>> NEW_CONSTANTS =
       createKey(List.class, "newConstants");
-  public static final ProofFieldKey<Object> TARGET_LITERAL = createKey(Object.class, "targetLit");
+  public static final ProofFieldKey<Formula> TARGET_LITERAL = createKey(Formula.class, "targetLit");
   public static final ProofFieldKey<Object> THEORY = createKey(Object.class, "theory");
-  public static final ProofFieldKey<Object> AXIOM = createKey(Object.class, "axiom");
+  public static final ProofFieldKey<Formula> AXIOM = createKey(Formula.class, "axiom");
+  public static final ProofFieldKey<Boolean> EXPANDED_INFERENCES = createKey(List.class, "expand");
+  public static final ProofFieldKey<BigInteger> CONSTANT_DIFF =
+      createKey(BigInteger.class, "constantDiff");
+  public static final ProofFieldKey<BigInteger> FACTOR = createKey(BigInteger.class, "factor");
 }
 
 // Base class for all concrete proof rules (certificates and inferences).
