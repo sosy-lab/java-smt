@@ -570,8 +570,7 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} true)')
 
             elif stmt.getCalls()[-1] == "makeVariable":
-                arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
