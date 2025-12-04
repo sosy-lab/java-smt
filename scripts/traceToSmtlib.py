@@ -326,6 +326,16 @@ def test_printBitvector():
     # assert printBitvector(8, -5) == "#b11111011" # FIXME
 
 
+def filterProverEnvironments(prog: List[Definition]):
+    "Remove all provers, except the last, from the trace"
+    env = [stmt.variable for stmt in prog
+           if stmt.getCalls()[-1] == "newProverEnvironment"
+           or stmt.getCalls()[-1] == "newProverEnvironmentWithInterpolation"]
+    env = env[:-1]
+    return [stmt for stmt in prog
+            if not (stmt.getCalls()[0] in env or stmt.variable in env)]
+
+
 def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
@@ -789,6 +799,14 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls()[-1] == "isUnsat":
             output.append(f'(check-sat)')
 
+        elif stmt.getCalls()[-1] == "newProverEnvironment":
+            # TODO Apply options at the top of the file
+            pass
+
+        elif stmt.getCalls()[-1] == "newProverEnvironmentWithInterpolation":
+            # TODO Apply options at the top of the file
+            pass
+
         elif stmt.getCalls()[-1] == "pop":
             output.append(f'(pop 1)')
 
@@ -826,4 +844,4 @@ if __name__ == '__main__':
         exit(-1)
 
     # Translate the trace
-    print(translate(program.parse(open(path).read())))
+    print(translate(filterProverEnvironments(program.parse(open(path).read()))))
