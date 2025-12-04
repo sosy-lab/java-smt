@@ -334,7 +334,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
     BooleanFormula t1 =
         (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula().get();
-    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula().get();
+    BooleanFormula t2 =
+        (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula().get();
     BooleanFormula formula = (BooleanFormula) node.getFormula().get();
 
     List<BooleanFormula> equivalenceOperands1 = extractOperands(t1);
@@ -641,8 +642,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     // Resolve iteratively with each subsequent "not l_i"
     for (int i = 1; i < n; i++) {
       Proof negChild = children.get(i);
-      BooleanFormula pivot = extractOperands((BooleanFormula) negChild.getFormula().orElseThrow()).get(0);
-      List<BooleanFormula> operands = extractOperands((BooleanFormula) currentRes.getFormula().orElseThrow());
+      BooleanFormula pivot =
+          extractOperands((BooleanFormula) negChild.getFormula().orElseThrow()).get(0);
+      List<BooleanFormula> operands =
+          extractOperands((BooleanFormula) currentRes.getFormula().orElseThrow());
       operands.remove(0);
       BooleanFormula formula = bfm.or(operands);
       ResolutionProof resNode = new ResolutionProof(formula, pivot);
@@ -1008,7 +1011,9 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     List<BooleanFormula> formulas = new ArrayList<>();
 
     for (int i = 0; i < n; i++) {
-      assert (formulaManager.getFormulaType(children.get(i).getFormula().orElseThrow()).isBooleanType());
+      assert (formulaManager
+          .getFormulaType(children.get(i).getFormula().orElseThrow())
+          .isBooleanType());
       formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula().orElseThrow()));
     }
 

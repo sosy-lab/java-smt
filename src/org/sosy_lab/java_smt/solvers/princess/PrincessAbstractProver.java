@@ -289,10 +289,11 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
   public Proof getProof() {
     Preconditions.checkState(!closed);
     checkGenerateProofs();
-    if (wasLastSatCheckSat) {;
+    if (wasLastSatCheckSat) {
+      ;
       throw new IllegalStateException("Proofs can only be generated for UNSAT results.");
     }
-  return PrincessProof.buildProofDAG(api.getCertificate(), creator, api);
+    return PrincessProof.buildProofDAG(api.getCertificate(), creator, api);
   }
 
   protected Certificate getCertificate() {

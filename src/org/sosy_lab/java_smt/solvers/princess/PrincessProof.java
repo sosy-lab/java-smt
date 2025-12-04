@@ -124,8 +124,7 @@ public final class PrincessProof extends AbstractProof {
       }
     }
 
-    // return computed.get(root);
-    throw new UnsupportedOperationException("Not yet implemented");
+    return computed.get(root);
   }
 
   private static PrincessProof generateProof(
