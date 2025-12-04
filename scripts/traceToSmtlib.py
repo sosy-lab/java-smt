@@ -34,7 +34,7 @@ class BooleanType(Type):
 @dataclass
 class IntegerType(Type):
     def toSmtlib(self):
-        return "Integer"
+        return "Int"
 
 
 @dataclass
