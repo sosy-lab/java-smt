@@ -290,21 +290,21 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   Proof handleTrue(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
     AxiomProof pn = new AxiomProof(ResAxiom.TRUE_POSITIVE, formula);
     return pn;
   }
 
   Proof handleAsserted(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
     AxiomProof pn = new AxiomProof(ResAxiom.ASSUME, formula);
     return pn;
   }
 
   Proof handleModusPonens(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
     BooleanFormula pivot =
-        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
+        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula().get();
     ResolutionProof pn = new ResolutionProof(formula, pivot);
     Proof c1 = handleNode((Z3Proof) node.getChildren().stream().findFirst().get());
     Proof c2 = handleNode((Z3Proof) new ArrayList<>(node.getChildren()).get(1));
@@ -312,15 +312,15 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   }
 
   Proof handleReflexivity(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
     AxiomProof pn = new AxiomProof(ResAxiom.REFLEXIVITY, formula);
     return pn;
   }
 
   Proof handleSymmetry(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
     BooleanFormula pivot =
-        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
+        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula().get();
     BooleanFormula snFormula = bfm.or(bfm.not(pivot), formula);
 
     ResolutionProof pn = new ResolutionProof(formula, pivot);
@@ -332,9 +332,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
   Proof handleTransitivity(Z3Proof node) {
 
-    BooleanFormula t1 = (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula();
-    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula();
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula t1 =
+        (BooleanFormula) node.getChildren().stream().findFirst().get().getFormula().get();
+    BooleanFormula t2 = (BooleanFormula) new ArrayList<>(node.getChildren()).get(1).getFormula().get();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().get();
 
     List<BooleanFormula> equivalenceOperands1 = extractOperands(t1);
     List<BooleanFormula> equivalenceOperands2 = extractOperands(t2);
@@ -415,9 +416,9 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   Proof handleBind(Z3Proof node) {
     List<Proof> children = new ArrayList<>(node.getChildren());
     Proof child = children.get(0);
-    BooleanFormula f = (BooleanFormula) child.getFormula();
+    BooleanFormula f = (BooleanFormula) child.getFormula().orElseThrow();
 
-    BooleanFormula forallF = (BooleanFormula) node.getFormula();
+    BooleanFormula forallF = (BooleanFormula) node.getFormula().orElseThrow();
 
     BooleanFormula axiomFormula = bfm.or(bfm.not(f), forallF);
     AxiomProof axiom = new AxiomProof(ResAxiom.ORACLE, axiomFormula);
@@ -467,8 +468,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     List<Proof> children = new ArrayList<>(node.getChildren());
     Proof child = children.get(0);
 
-    BooleanFormula t1 = (BooleanFormula) child.getFormula();
-    BooleanFormula li = (BooleanFormula) node.getFormula();
+    BooleanFormula t1 = (BooleanFormula) child.getFormula().orElseThrow();
+    BooleanFormula li = (BooleanFormula) node.getFormula().orElseThrow();
 
     BooleanFormula axiomFormula = bfm.or(bfm.not(t1), li);
     AxiomProof axiom = new AxiomProof(ResAxiom.AND_NEGATIVE, axiomFormula);
@@ -491,9 +492,9 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
     List<Proof> children = new ArrayList<>(node.getChildren());
     Proof child = children.get(0);
-    BooleanFormula t1 = (BooleanFormula) child.getFormula();
+    BooleanFormula t1 = (BooleanFormula) child.getFormula().orElseThrow();
 
-    BooleanFormula notLi = (BooleanFormula) node.getFormula();
+    BooleanFormula notLi = (BooleanFormula) node.getFormula().orElseThrow();
 
     BooleanFormula orFormula = bfm.not(t1);
 
@@ -523,7 +524,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // the assume axiom should produce a proof that is semantically equivalent
   Proof handleRewrite(Z3Proof node) {
 
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
 
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
 
@@ -559,7 +560,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // x_n y_1 ... y_m) p[x_1 ... x_n]) with (forall (x_1 ... x_n) p[x_1 ... x_n]) then a more
   // complex process is needed.
   Proof handleElimUnusedVars(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -585,7 +586,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //          Several variables can be eliminated simultaneously.
   // Analogous to the UNUSED_VARS rule.
   Proof handleDer(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -593,7 +594,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Z3_OP_PR_QUANT_INST: A proof of (or (not (forall (x) (P x))) (P a))
   // This is equivalent to the forall- axiom
   Proof handleQuantInst(Z3Proof node) {
-    BooleanFormula formula = (BooleanFormula) node.getFormula();
+    BooleanFormula formula = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiomProof = new AxiomProof(ResAxiom.FORALL_NEGATIVE, formula);
     return axiomProof;
   }
@@ -601,7 +602,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Z3_OP_PR_HYPOTHESIS: Mark a hypothesis in a natural deduction style proof.
   // Assume the hypothesis
   Proof handleHypothesis(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -640,8 +641,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     // Resolve iteratively with each subsequent "not l_i"
     for (int i = 1; i < n; i++) {
       Proof negChild = children.get(i);
-      BooleanFormula pivot = extractOperands((BooleanFormula) negChild.getFormula()).get(0);
-      List<BooleanFormula> operands = extractOperands((BooleanFormula) currentRes.getFormula());
+      BooleanFormula pivot = extractOperands((BooleanFormula) negChild.getFormula().orElseThrow()).get(0);
+      List<BooleanFormula> operands = extractOperands((BooleanFormula) currentRes.getFormula().orElseThrow());
       operands.remove(0);
       BooleanFormula formula = bfm.or(operands);
       ResolutionProof resNode = new ResolutionProof(formula, pivot);
@@ -719,7 +720,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //          bounded number of steps (=3).
   // Assume formula proven by this rule.
   Proof handleDefAxiom(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -728,7 +729,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //     Clausal proof adding axiom
   // assume formula
   Proof handleAssumptionAdd(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -737,7 +738,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   //     Clausal proof lemma addition
   // assume formula
   Proof handleLemmaAdd(Z3Proof node) {
-    BooleanFormula conclusion = (BooleanFormula) node.getFormula();
+    BooleanFormula conclusion = (BooleanFormula) node.getFormula().orElseThrow();
     AxiomProof axiom = new AxiomProof(ResAxiom.ASSUME, conclusion);
     return axiom;
   }
@@ -945,7 +946,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
   // Strategy: Use oracle. In the future this should be expanded to allow to include the hints of
   // the theory, lemma and other parameters.
   Proof handleThLemma(Z3Proof node) {
-    return new AxiomProof(ResAxiom.ORACLE, node.getFormula());
+    return new AxiomProof(ResAxiom.ORACLE, node.getFormula().orElseThrow());
   }
 
   // Z3_OP_PR_HYPER_RESOLVE: Hyper-resolution rule.
@@ -1007,22 +1008,22 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     List<BooleanFormula> formulas = new ArrayList<>();
 
     for (int i = 0; i < n; i++) {
-      assert (formulaManager.getFormulaType(children.get(i).getFormula()).isBooleanType());
-      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula()));
+      assert (formulaManager.getFormulaType(children.get(i).getFormula().orElseThrow()).isBooleanType());
+      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula().orElseThrow()));
     }
 
-    assert (formulaManager.getFormulaType(node.getFormula()).isBooleanType());
-    formulas.add((BooleanFormula) node.getFormula());
+    assert (formulaManager.getFormulaType(node.getFormula().orElseThrow()).isBooleanType());
+    formulas.add((BooleanFormula) node.getFormula().orElseThrow());
 
     BooleanFormula axiomFormula = bfm.or(formulas);
     AxiomProof ax = new AxiomProof(axiom, axiomFormula);
 
-    Formula resPivot = children.get(n - 1).getFormula();
-    ResolutionProof resNode = new ResolutionProof(node.getFormula(), resPivot);
+    Formula resPivot = children.get(n - 1).getFormula().orElseThrow();
+    ResolutionProof resNode = new ResolutionProof(node.getFormula().orElseThrow(), resPivot);
 
     Proof childNode = ax;
     for (int i = 0; i < n - 1; i++) {
-      resPivot = children.get(i).getFormula();
+      resPivot = children.get(i).getFormula().orElseThrow();
       assert formulas.get(0).equals(bfm.not((BooleanFormula) resPivot));
       formulas.remove(0);
       ResolutionProof rp = new ResolutionProof(bfm.or(formulas), resPivot);

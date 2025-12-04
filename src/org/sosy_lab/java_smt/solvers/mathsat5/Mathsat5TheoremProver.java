@@ -139,12 +139,12 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       }
 
       // Begin resolution chain: start with the first clause
-      BooleanFormula current = (BooleanFormula) children.get(0).getFormula();
+      BooleanFormula current = (BooleanFormula) children.get(0).getFormula().orElseThrow();
 
       // Apply resolution iteratively using pivot, clause pairs
       for (int i = 1; i < children.size() - 1; i += 2) {
-        BooleanFormula pivot = (BooleanFormula) children.get(i).getFormula();
-        BooleanFormula nextClause = (BooleanFormula) children.get(i + 1).getFormula();
+        BooleanFormula pivot = (BooleanFormula) children.get(i).getFormula().orElseThrow();
+        BooleanFormula nextClause = (BooleanFormula) children.get(i + 1).getFormula().orElseThrow();
         current = resolve(current, nextClause, pivot, bfmgr); // Perform resolution step
       }
 
