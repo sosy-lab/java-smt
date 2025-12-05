@@ -178,6 +178,22 @@ def test_sort():
             == ArrayType(IntegerType(), IntegerType()))
 
 
+class Solvers(Enum):
+    OPENSMT = "SolverContextFactory.Solvers.OPENSMT"
+    MATHSAT5 = "SolverContextFactory.Solvers.MATHSAT5"
+    SMTINTERPOL = "SolverContextFactory.Solvers.SMTINTERPOL"
+    Z3 = "SolverContextFactory.Solvers.Z3"
+    PRINCESS = "SolverContextFactory.Solvers.PRINCESS"
+    BOOLECTOR = "SolverContextFactory.Solvers.BOOLECTOR"
+    CVC4 = "SolverContextFactory.Solvers.CVC4"
+    CVC5 = "SolverContextFactory.Solvers.CVC5"
+    YICES2 = "SolverContextFactory.Solvers.OPENSMT"
+    BITWUZLA = "SolverContextFactory.Solvers.OPENSMT"
+
+
+litSolvers = from_enum(Solvers)
+
+
 class ProverOptions(Enum):
     GENERATE_MODELS = "SolverContext.ProverOptions.GENERATE_MODELS"
     GENERATE_ALL_SAT = "SolverContext.ProverOptions.GENERATE_ALL_SAT"
@@ -201,7 +217,7 @@ def test_variable():
     assert variable.parse("mgr") == "mgr"
 
 
-argument = litBool | litInt | litString | litType | litProverOptions | variable
+argument = litBool | litInt | litString | litType | litSolvers | litProverOptions | variable
 
 
 @dataclass
