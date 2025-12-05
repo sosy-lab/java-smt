@@ -109,7 +109,21 @@ class TraceLogger {
   public void undoLast() {
     Preconditions.checkArgument(!lastLines.isEmpty(), "Cannot undo last trace");
     try {
-      output.setLength(lastLines.pop());
+      var start = lastLines.pop();
+      output.seek(start);
+      var line = output.readLine();
+      if (start + line.length() + 1 == output.length()) {
+        // We need to remove the last line of the trace
+        // Just truncate the file
+        output.setLength(start);
+      } else {
+        // We need to remove a line somewhere in the middle
+        // Just overwrite it with whitespace to avoid having to move rest of the file around
+        output.seek(start);
+        output.write(
+            String.format("%s%n", " ".repeat(line.length())).getBytes(StandardCharsets.UTF_8));
+        output.seek(output.length());
+      }
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -126,6 +140,7 @@ class TraceLogger {
         return f;
       } else {
         mapVariable(var, f);
+        lastLines.pop();
         return mgr.rebuild(f);
       }
     } catch (Exception e) {
