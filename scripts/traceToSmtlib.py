@@ -640,7 +640,7 @@ def translate(prog: List[Definition]):
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
-        elif stmt.getCalls()[:-1] == ["mgr", "getIntegerFormulaManager"]:
+        elif stmt.getCalls()[1] == "getIntegerFormulaManager" or stmt.getCalls()[1] == "getRationalFormulaManager":
             if stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
@@ -652,12 +652,19 @@ def translate(prog: List[Definition]):
                 # FIXME Requires list arguments
                 raise Exception("distinct not supported")
 
-            elif stmt.getCalls()[-1] == "divide":
+            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "divide"]:
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = IntegerType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (div {arg1} {arg2}))')
+
+            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "divide"]:
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = RationalType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (/ {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "equal":
                 arg1 = stmt.value[-1].args[0]
@@ -666,11 +673,17 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
 
-            elif stmt.getCalls()[-1] == "floor":
+            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "floor"]:
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = IntegerType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+
+            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "floor"]:
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (to_int {arg1}))')
 
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
@@ -700,11 +713,20 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (< {arg1} {arg2}))')
 
-            elif stmt.getCalls()[-1] == "makeNumber":
+            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
                 if not isinstance(arg1, int):
                     raise Exception("makeNumber is only supported for constant integer arguments")
                 sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+
+            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "makeNumber"]:
+                arg1 = stmt.value[-1].args[0]
+                if not isinstance(arg1, int):
+                    # TODO Allow rational values
+                    raise Exception("makeNumber is only supported for constant integer arguments")
+                sortMap[stmt.variable] = RationalType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
 
@@ -714,7 +736,7 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
 
-            elif stmt.getCalls()[-1] == "modularCongruence":
+            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "modularCongruence"]:
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
@@ -722,7 +744,7 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= (mod (- {arg1} {arg2}) {arg3}) 0))')
 
-            elif stmt.getCalls()[-1] == "modulo":
+            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "modulo"]:
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = IntegerType()
