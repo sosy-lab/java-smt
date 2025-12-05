@@ -375,7 +375,7 @@ def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
     output = []
-    for stmt in prog:
+    for stmt in prog[5:]:
         if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
             if stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
