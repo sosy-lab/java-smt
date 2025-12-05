@@ -526,7 +526,7 @@ public final class PrincessProof extends AbstractProof {
         // TODO: Transform Atom into JavaSMT objects
         infRule.specificFields.put(LEFT_ATOM, pu.leftAtom());
         infRule.specificFields.put(RIGHT_ATOM, pu.rightAtom());
-        infRule.specificFields.put(RESULT, pu.result());
+        infRule.specificFields.put(RESULT, encapsulatedResult);
       }
 
       // QUANTIFIER_INFERENCE
