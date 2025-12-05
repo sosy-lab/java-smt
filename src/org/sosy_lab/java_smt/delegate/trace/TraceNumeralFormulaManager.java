@@ -34,7 +34,7 @@ public abstract class TraceNumeralFormulaManager<
   private String getPrefix() {
     return getFormulaType().equals(FormulaType.IntegerType)
         ? "mgr.getIntegerFormulaManager()"
-        : "mgr.getRationalFormulaManager";
+        : "mgr.getRationalFormulaManager()";
   }
 
   @Override
