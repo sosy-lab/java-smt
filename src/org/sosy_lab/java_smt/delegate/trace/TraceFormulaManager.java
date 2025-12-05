@@ -1020,7 +1020,7 @@ public class TraceFormulaManager implements FormulaManager {
     String var = logger.newVariable();
     logger.appendDef(var, String.format("mgr.parse(\"%s\")", s));
     BooleanFormula f = delegate.parse(s);
-    logger.mapVariable(var, f);
+    logger.undoLast();
     return rebuild(f);
   }
 
