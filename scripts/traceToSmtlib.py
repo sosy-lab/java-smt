@@ -332,14 +332,17 @@ def test_toSmtlib():
 
 def printBitvector(width, value):
     "Print a bitvector literal in SMTLIB format"
+    digits = format(value, f'0{width}b')
     if value < 0:
-        raise Exception("Negative value")  # TODO Rewrite as 2s complement
-    return '#b' + format(int(value), f'0{width}b')
+        # Convert to 2s complement
+        digits = ''.join(['0' if l == '1' else '1' for l in digits])
+        digits = format(int(digits, 2) + 1, f'0{width}b')
+    return '#b' + digits
 
 
 def test_printBitvector():
     assert printBitvector(8, 5) == "#b00000101"
-    # assert printBitvector(8, -5) == "#b11111011" # FIXME
+    assert printBitvector(8, -5) == "#b11111011"
 
 
 def flattenProvers(prog: List[Definition]):
