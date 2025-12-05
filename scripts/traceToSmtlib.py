@@ -374,7 +374,8 @@ def flattenProvers(prog: List[Definition]):
 def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
-    output = []
+    output = ["(set-option :produce-models true)",
+              "(set-option :global-declarations true)"]
     for stmt in prog[5:]:
         if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
             if stmt.getCalls()[-1] == "add":
