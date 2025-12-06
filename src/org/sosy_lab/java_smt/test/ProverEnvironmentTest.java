@@ -23,16 +23,61 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.ASSUMED_FORMULAS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.AXIOM;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CLOSING_CONSTRAINT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CONSTANTS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CONSTANT_DIFF;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CUT_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DEFINING_EQUATION;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DISCHARGED_ATOMS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DIVISIBILITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.ELIM_CONSTANT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQUATION;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQUATIONS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQ_CASES;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EXPANDED_INFERENCES;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.FACTOR;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INEQUALITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_TERMS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_COEFFICIENT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_INEQUALITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_ASSUMED_FORMULAS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_BOUND_CONSTANTS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_PROVIDED_FORMULAS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.NEW_CONSTANTS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.NEW_SYMBOL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OLD_SYMBOL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_BOUNDS_A;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_BOUNDS_B;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_STRENGTHEN_CASES;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.PROVIDED_FORMULAS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.QUANTIFIED_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RESULT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_COEFFICIENT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_INEQUALITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.SPLIT_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.TARGET_LITERAL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.THEORY_AXIOMS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.WEAK_INEQUALITY;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
+import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
@@ -49,7 +94,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
 import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
-import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
+import org.sosy_lab.java_smt.solvers.princess.PrincessProofRule;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -231,13 +276,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
 
       // Test getFormula()
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
+      if (solverToUse().equals(SMTINTERPOL) || solverToUse().equals(PRINCESS)) {
+
       } else {
-        assertThat(proof.getFormula()).isNotNull();
+        assertThat(proof.getFormula().isPresent()).isTrue();
       }
 
-      // Test getArguments()
+      // Test getChilderen()
       assertThat(proof.getChildren()).isNotNull();
       assertThat(proof.getChildren()).isNotEmpty();
 
@@ -254,7 +299,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
@@ -353,7 +397,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
@@ -382,7 +425,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -415,7 +457,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -475,8 +516,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              // || contextClass.equals(OpenSmtSolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -566,7 +606,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
@@ -668,7 +707,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
               || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
@@ -819,5 +857,175 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       return pn;
     }
     return findanyProofLeaf(pn.getChildren().stream().findFirst().get());
+  }
+
+  // Traverses a proof and asserts that certain values are not null, instances, etc.
+  private void checkProof(Proof root) {
+    assertThat(root).isNotNull();
+
+    Deque<Proof> stack = new ArrayDeque<>();
+    stack.push(root);
+
+    while (!stack.isEmpty()) {
+      Proof proof = stack.pop();
+      ProofRule rule = proof.getRule();
+      Optional<Formula> formula = proof.getFormula();
+
+      assertThat(rule).isNotNull();
+      assertThat(rule).isInstanceOf(ProofRule.class);
+      assertThat(proof.getChildren()).isNotNull();
+      if (solverToUse().equals(SMTINTERPOL)) {
+
+      } else if (solverToUse().equals(PRINCESS)) {
+        assertThat(formula.isEmpty()).isTrue();
+      } else {
+        assertThat(formula.isPresent()).isTrue();
+      }
+
+      if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
+        checkPrincessSpecificFields((PrincessProofRule) rule);
+      }
+
+      for (Proof child : proof.getChildren()) {
+        assertThat(child).isNotNull();
+        stack.push(child);
+      }
+    }
+  }
+
+  // Performs all necessary feature checks for Princess rules, validating type and existence of
+  // fields retrieved via getSpecificFields.
+  @SuppressWarnings("unchecked")
+  private void checkPrincessSpecificFields(PrincessProofRule rule) {
+
+    String ruleName = rule.getName();
+    try {
+      // Common fields
+      if (ruleName.contains("CERTIFICATE")) {
+        assertThat(rule.getSpecificField(CLOSING_CONSTRAINT)).isInstanceOf(Formula.class);
+        assertThat(rule.getSpecificField(LOCAL_ASSUMED_FORMULAS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(ASSUMED_FORMULAS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(LOCAL_PROVIDED_FORMULAS)).isInstanceOf(List.class);
+        assertThat(rule.getSpecificField(LOCAL_BOUND_CONSTANTS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(CONSTANTS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(THEORY_AXIOMS)).isInstanceOf(Set.class);
+
+      } else if (ruleName.contains("INFERENCE")) {
+        assertThat(rule.getSpecificField(ASSUMED_FORMULAS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(PROVIDED_FORMULAS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(LOCAL_BOUND_CONSTANTS)).isInstanceOf(Set.class);
+        assertThat(rule.getSpecificField(CONSTANTS)).isInstanceOf(Set.class);
+      }
+
+      // Specific fields per rule type
+      switch (ruleName) {
+        case "BETA_CERTIFICATE":
+          assertThat(rule.getSpecificField(LEFT_FORMULA)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RIGHT_FORMULA)).isInstanceOf(Formula.class);
+
+          break;
+        case "CUT_CERTIFICATE":
+          assertThat(rule.getSpecificField(CUT_FORMULA)).isInstanceOf(Formula.class);
+          break;
+        case "OMEGA_CERTIFICATE":
+          assertThat(rule.getSpecificField(ELIM_CONSTANT)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(OMEGA_BOUNDS_A)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(OMEGA_BOUNDS_B)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(OMEGA_STRENGTHEN_CASES)).isInstanceOf(List.class);
+          break;
+        case "SPLIT_EQ_CERTIFICATE":
+          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
+          break;
+        case "STRENGTHEN_CERTIFICATE":
+          assertThat(rule.getSpecificField(WEAK_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(EQ_CASES)).isInstanceOf(BigInteger.class);
+          break;
+        case "BRANCH_INFERENCE_CERTIFICATE":
+          assertThat(rule.getSpecificField(CLOSING_CONSTRAINT)).isInstanceOf(Formula.class);
+          break;
+
+        case "ALPHA_INFERENCE":
+          assertThat(rule.getSpecificField(SPLIT_FORMULA)).isInstanceOf(Formula.class);
+          break;
+        case "ANTI_SYMMETRY_INFERENCE":
+          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "COLUMN_REDUCE_INFERENCE":
+          assertThat(rule.getSpecificField(OLD_SYMBOL)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(NEW_SYMBOL)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(DEFINING_EQUATION)).isInstanceOf(Formula.class);
+          break;
+        case "COMBINE_EQUATIONS_INFERENCE":
+          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "COMBINE_INEQUALITIES_INFERENCE":
+          assertThat(rule.getSpecificField(LEFT_COEFFICIENT)).isInstanceOf(BigInteger.class);
+          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RIGHT_COEFFICIENT)).isInstanceOf(BigInteger.class);
+          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "DIRECT_STRENGTHEN_INFERENCE":
+          assertThat(rule.getSpecificField(INEQUALITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(EQUATION)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "DIV_RIGHT_INFERENCE":
+          assertThat(rule.getSpecificField(DIVISIBILITY)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "GROUND_INST_INFERENCE":
+          assertThat(rule.getSpecificField(QUANTIFIED_FORMULA)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(INSTANCE_TERMS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(INSTANCE_FORMULA)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(DISCHARGED_ATOMS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "MACRO_INFERENCE":
+          List<PrincessProofRule> expandedInferences =
+              (List<PrincessProofRule>) rule.getSpecificField(EXPANDED_INFERENCES);
+          assertThat(expandedInferences).isInstanceOf(List.class);
+          for (PrincessProofRule subInf : expandedInferences) {
+            checkPrincessSpecificFields(subInf);
+          }
+          break;
+        case "PRED_UNIFY_INFERENCE":
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "QUANTIFIER_INFERENCE":
+          assertThat(rule.getSpecificField(QUANTIFIED_FORMULA)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(NEW_CONSTANTS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "REDUCE_INFERENCE":
+        case "REDUCE_PRED_INFERENCE":
+          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
+        case "SIMP_INFERENCE":
+          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(CONSTANT_DIFF)).isInstanceOf(BigInteger.class);
+          assertThat(rule.getSpecificField(FACTOR)).isInstanceOf(BigInteger.class);
+          break;
+        case "THEORY_AXIOM_INFERENCE":
+          assertThat(rule.getSpecificField(AXIOM)).isInstanceOf(Formula.class);
+          break;
+        case "CLOSE_CERTIFICATE":
+          // No specific fields to check here.
+          break;
+        default:
+          // Either a rule without specific fields (like PARTIAL_CERTIFICATE_INFERENCE)
+          // or a new/unhandled one.
+          break;
+      }
+    } catch (IllegalArgumentException e) {
+      // This is expected if a specific proof does not contain an optional field.
+    }
   }
 }
