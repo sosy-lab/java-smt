@@ -32,9 +32,13 @@ This is one of the most critical steps in JavaSMT development.
 
 By default, Java-based solvers are copied over from Maven Central.
 Please execute the following in the root directory of the [Ivy Repository][]:
-
-- ant install -Dorganisation=io.github.uuverifiers -Dmodule=princess_2.13 -Drevision=????-??-??
-- ant install -Dorganisation=de.uni-freiburg.informatik.ultimate -Dmodule=smtinterpol -Drevision=?.?-???-g???????
+```bash
+ant install -Dorganisation=io.github.uuverifiers -Dmodule=princess_2.13 -Drevision=????-??-??
+```
+```bash
+ant install -Dorganisation=de.uni-freiburg.informatik.ultimate -Dmodule=smtinterpol 
+-Drevision=?.?-???-g???????
+```
 
 Potentially outdated:
 For manually uploading a Java-based solver to the [Ivy Repository][],
@@ -51,7 +55,6 @@ please build from source only if necessary (e.g., in case of an important bugfix
 To publish Z3, download the **Linux**, **Windows**, and **OSX** binary (for both, x64 and ARM64 architecture)
 and the sources (for JavaDoc) for the [latest release](https://github.com/Z3Prover/z3/releases) and unzip them.
 For example, the directory structure can look like this:
-
 ```
 z3/                                 // <-- parent directory
  |-- z3-4.13.3-arm64-glibc-2.34/    // <-- unpacked release artifact
@@ -71,48 +74,61 @@ For simple usage, we provide a Docker definition/environment under `/docker`, in
 In the unpacked sources directory, prepare Java sources via `python3 scripts/mk_make.py --java`.
 Then execute the following command in the JavaSMT directory,
 where `$Z3_DIR` is the path of the sources directory and `$Z3_VERSION` is the version number:
-```
+```bash
 ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION
 ```
 Example:
-```
+```bash
 ant publish-z3 -Dz3.path=/workspace/solvers/z3/z3-z3-4.13.3 -Dz3.version=4.13.3
 ```
 Finally, follow the instructions shown in the message at the end.
 
 
 #### Optional (from source for Linux target with older GLIBC)
+
 This step is for the following use case:
 Newer releases of Z3 depend on newer versions of GLIBC (>=v2.35),
 so we want to compile the Linux release on our own and then combine it with the provided libraries for Windows and macOS.
 We follow the steps from above, download and unpack the given zip archives for all platforms, except the Linux release (where the GLIBC is too new).
 For simple usage, we provide a Docker definition/environment under `/docker` (based on Ubuntu 18.04 with GLIBC 2.27),
 in which the following build command can be run in the unpacked source directory:
-```
+```bash
 python3 scripts/mk_make.py --java && cd build && make -j 2
 ```
 Afterward, copy the native libraries for Linux (`libz3.so` and `libz3java.so`) from the directory 
 `./build` into `./bin` (if needed, adjust the directory to match the x64 or arm64 path for Linux).
 Then perform as written above with adding the additional pre-compiled binaries for other operating systems,
 and publish the directory `./bin` with an ant command like the one from above:
-```
+```bash
 ant publish-z3 -Dz3.path=$Z3_DIR -Dz3.version=$Z3_VERSION-glibc_2.27
 ```
 
 
-#### Optional (from source for Linux target) (Info: this step is outdated and no longer used for releases of JavaSMT)
-To publish Z3 from source, [download it](https://github.com/Z3Prover/z3) and build
-it with the following command in its directory on a 64bit Ubuntu 16.04 system:
+### Publishing Z3 v4.5.0 (aka LegacyZ3)
+
+The legacy version of Z3 (v4.5.0) is still integrated,
+because it provides support for Craig interpolation in Z3.
+This feature was removed in some later version of Z3.
+
+For publishing the legacy version of Z3 (v4.5.0),
+please follow the instructions in the `lib/native/source/z3-4.5.0/README.md` file,
+which explains how to patch the original Z3 v4.5.0 source code
+so that the Java package names include the string `legacy`.
+This is necessary to avoid conflicts with later versions of Z3.
+
+These steps can be performed in a Docker environment based on Ubuntu 18.04,
+which is provided under `/docker` in the JavaSMT repository.
+After building the patched Z3 v4.5.0 version,
+you can publish it with the following command in the JavaSMT directory:
+```bash
+ant publish-z3-legacy -Dz3.path=<Z3_PATH> -Dz3.legacy.version=<VERSION>
 ```
-./configure --staticlib --java --git-describe && cd build && make -j 2
+
+Example:
+```bash
+ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.legacy.version=4.5.0-dev.1
 ```
-(Note that additional binaries for other operating systems need to be provided, too.
-This step is currently not fully tested from our side.)
-Then execute the following command in the JavaSMT directory, where `$Z3_DIR` is the absolute path of the Z3 directory:
-```
-ant publish-z3 -Dz3.path=$Z3_DIR/build
-```
-Finally follow the instructions shown in the message at the end.
+
 
 ### Publishing CVC5
 
@@ -125,8 +141,7 @@ Our build-script downloads daily build artifacts, extracts the native libraries 
 and publishes them for JavaSMT.
 
 To publish a daily version of CVC5, execute the following command in the JavaSMT directory:
-
-```
+```bash
 ant publish-cvc5 -Dcvc5.version=$CVC5_VERSION
 ```
 
@@ -134,8 +149,7 @@ Where `CVC5_VERSION` must match one of the daily releases from
 their [GitHub](https://github.com/cvc5/cvc5/releases/tag/latest) website
 
 Example:
-
-```
+```bash
 ant publish-cvc5 -Dcvc5.version=2025-03-31-34518c3
 ```
 
@@ -158,12 +172,12 @@ and include the following directories:
 If you want to build your own dependencies, please apply the following steps:
 Provide GMP from http://gmplib.org/ in version 6.3.0 (version 6.2.1 also works) and build GMP:
 - For linux-x64 in directory $GMP_DIR_LINUX_X64:
-  ```
+  ```bash
   ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat
   make -j4
   ```
 - For linux-arm64 in directory $GMP_DIR_LINUX_ARM64:
-  ```
+  ```bash
   ./configure --enable-cxx --with-pic --disable-shared --enable-static --enable-fat \
   --host=aarch64-linux-gnu \
   CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld
@@ -175,7 +189,7 @@ Download the zip archive from https://jdk.java.net/ and unpack it into $JDK_DIR_
 
 To publish OpenSMT, checkout the [OpenSMT repository](https://github.com/usi-verification-and-security/opensmt).
 Then execute the following command in the JavaSMT directory:
-```
+```bash
 ant publish-opensmt \
     -Dopensmt.path=$OPENSMT_DIR \
     -Dopensmt.customRev=$VERSION \
@@ -184,7 +198,7 @@ ant publish-opensmt \
     -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
 Example:
-```
+```bash
 ant publish-opensmt \
     -Dopensmt.path=/workspace/solvers/opensmt/opensmt \
     -Dopensmt.customRev=2.9.0 \
@@ -215,11 +229,11 @@ in which the following command can be run.
 To publish Boolector, checkout the [Boolector repository](https://github.com/Boolector/boolector).
 Then execute the following command in the JavaSMT directory,
 where `$BTOR_DIR` is the path to the Boolector directory and `$BTOR_VERSION` is the version number:
-```
+```bash
 CC=gcc-7 ant publish-boolector -Dboolector.path=$BTOR_DIR -Dboolector.customRev=$BTOR_VERSION
 ```
 Example:
-```
+```bash
 ant publish-boolector -Dboolector.path=../boolector -Dboolector.customRev=3.2.2
 ```
 Our build script will automatically append the git revision of Boolector, if available.
@@ -238,7 +252,7 @@ in which the following command can be run.
 
 To publish Bitwuzla, checkout the [Bitwuzla repository](https://github.com/bitwuzla/bitwuzla).
 Then execute the following command in the JavaSMT directory:
-```
+```bash
 ant publish-bitwuzla \
      -Dbitwuzla.path=$BITWUZLA_DIR \
      -Dbitwuzla.customRev=$VERSION \
@@ -247,7 +261,7 @@ ant publish-bitwuzla \
      -Djdk-linux-arm64.path=$JDK_DIR_LINUX_ARM64
 ```
 Example:
-```
+```bash
 ant publish-bitwuzla \
     -Dbitwuzla.path=/workspace/solvers/bitwuzla/bitwuzla/ \
     -Dbitwuzla.customRev=0.7.0-13 \
@@ -281,7 +295,7 @@ as described in the compilation scripts (see `lib/native/source/libmathsat5j/com
 Then execute the following command in the JavaSMT directory,
 where `$MATHSAT_PATH_<ARCH>` is the paths to the corresponding MathSAT root directory,
 and `$MATHSAT_VERSION` is the version number of MathSAT (all-in-one command, runtime is about 10s):
-```
+```bash
 ant publish-mathsat \
     -Dmathsat-linux-x64.path=$MATHSAT_PATH_LINUX_X64 \
     -Dgmp-linux-x64.path=$GMP_PATH_LINUX_X64 \
@@ -294,7 +308,7 @@ ant publish-mathsat \
     -Dmathsat.version=$MATHSAT_VERSION
 ```
 Example:
-```
+```bash
 ant publish-mathsat \
      -Dmathsat-linux-x64.path=/workspace/solvers/mathsat/mathsat-5.6.12-linux-x86_64 \
      -Dgmp-linux-x64.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
@@ -310,11 +324,11 @@ Finally, follow the instructions shown in the message at the end.
 
 A similar procedure applies to [OptiMathSAT](http://optimathsat.disi.unitn.it/) solver,
 except that Windows is not yet supported and the publishing command is simpler:
-```
+```bash
 ant publish-optimathsat -Dmathsat.path=$OPTIMATHSAT_PATH -Dgmp.path=$GMP_PATH -Dmathsat.version=$OPTIMATHSAT_VERSION
 ```
 Example:
-```
+```bash
 ant publish-optimathsat \
     -Dmathsat.path=/workspace/solvers/optimathsat/optimathsat-1.7.3-linux-64-bit \
     -Dgmp.path=/workspace/solvers/gmp/gmp-6.3.0-linux-x64 \
@@ -330,23 +344,23 @@ The Java components were splitt from the rest of JavaSMT because of the GPL.
 #### Publishing the solver binary for Yices2
 
 Prepare gperf and gmp (required for our own static binary):
-```
+```bash
 wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
 wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
 ```
 
 Download and build Yices2 from source:
-```
+```bash
 git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
 ```
 
 Get the version of Yices2:
-```
+```bash
 git describe --tags
 ```
 
 Publish the solver binary from within JavaSMT (adjust all paths to your system!):
-```
+```bash
 ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
 ```
 
