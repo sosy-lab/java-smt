@@ -363,6 +363,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   protected void requireArrayModel() {
