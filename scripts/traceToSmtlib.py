@@ -101,6 +101,8 @@ float ::= ...
 string ::= "\"" .* "\""
 """
 
+argument = forward_declaration()
+
 litInt = (regex(r"-?[0-9]+").map(int) << string("L").optional() |
           string("new") >> whitespace >> string("BigInteger(") >> whitespace.optional() >>
           regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
@@ -208,6 +210,24 @@ litProverOptions = from_enum(ProverOptions)
 def test_proverOptions():
     assert litProverOptions.parse("SolverContext.ProverOptions.GENERATE_MODELS") == ProverOptions.GENERATE_MODELS
 
+@generate
+def litList():
+    yield (string("List.of(") | string("ImmutableList.of("))
+    yield whitespace.optional()
+    arg0 = yield argument.optional().map(lambda p: [p] if p is not None else [])
+    args = []
+    if (arg0 is not []):
+        args = yield (whitespace.optional() >> string(",") >> whitespace.optional() >> argument).many()
+    yield whitespace.optional()
+    yield string(")")
+    return arg0 + args
+
+
+def test_list():
+    assert litList.parse("List.of(1, 2, var)") == [1, 2, "var"]
+    assert litList.parse("ImmutableList.of()") == []
+    assert litList.parse("List.of(ImmutableList.of(1,2), ImmutableList.of(3,7))") == [[1, 2], [3, 7]]
+
 
 variable = regex(r"[A-Za-z][A-Za-z0-9]*")
 
@@ -217,7 +237,7 @@ def test_variable():
     assert variable.parse("mgr") == "mgr"
 
 
-argument = litBool | litInt | litString | litType | litSolvers | litProverOptions | variable
+argument.become(litBool | litInt | litString | litType | litSolvers | litProverOptions | litList | variable)
 
 
 @dataclass
