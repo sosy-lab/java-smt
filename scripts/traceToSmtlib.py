@@ -210,6 +210,15 @@ litProverOptions = from_enum(ProverOptions)
 def test_proverOptions():
     assert litProverOptions.parse("SolverContext.ProverOptions.GENERATE_MODELS") == ProverOptions.GENERATE_MODELS
 
+
+class Quantifier(Enum):
+    FORALL = "QuantifiedFormulaManager.Quantifier.FORALL"
+    EXISTS = "QuantifiedFormulaManager.Quantifier.EXISTS"
+
+
+litQuantifier = from_enum(Quantifier)
+
+
 @generate
 def litList():
     yield (string("List.of(") | string("ImmutableList.of("))
@@ -237,7 +246,16 @@ def test_variable():
     assert variable.parse("mgr") == "mgr"
 
 
-argument.become(litBool | litInt | litString | litType | litSolvers | litProverOptions | litList | variable)
+argument.become(alt(
+    litBool,
+    litInt,
+    litString,
+    litType,
+    litSolvers,
+    litProverOptions,
+    litQuantifier,
+    litList,
+    variable))
 
 
 @dataclass
