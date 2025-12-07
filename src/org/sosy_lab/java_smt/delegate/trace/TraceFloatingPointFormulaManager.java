@@ -60,6 +60,12 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   }
 
   @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+  }
+
+  @Override
   public FloatingPointFormula makeNumber(double n, FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
