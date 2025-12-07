@@ -761,7 +761,7 @@ def translate(prog: List[Definition]):
                     raise Exception("makeNumber is only supported for constant integer arguments")
                 sortMap[stmt.variable] = IntegerType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1 if arg1 >= 0 else f'(- {abs(arg1)})'})')
 
             elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
