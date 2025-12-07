@@ -567,9 +567,28 @@ public class TraceFormulaManager implements FormulaManager {
                 String.format(
                     "EQ not supported for theory " + "%s", declaration.getArgumentTypes().get(0)));
           }
-        // TODO
-        // case EQ_ZERO:
-        // case GTE_ZERO:
+        case EQ_ZERO:
+          if (args.get(0) instanceof IntegerFormula) {
+            return (T)
+                getIntegerFormulaManager()
+                    .equal((IntegerFormula) args.get(0), getIntegerFormulaManager().makeNumber(0));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .equal((NumeralFormula) args.get(0), getRationalFormulaManager().makeNumber(0));
+          }
+        case GTE_ZERO:
+          if (args.get(0) instanceof IntegerFormula) {
+            return (T)
+                getIntegerFormulaManager()
+                    .greaterOrEquals(
+                        (IntegerFormula) args.get(0), getIntegerFormulaManager().makeNumber(0));
+          } else {
+            return (T)
+                getRationalFormulaManager()
+                    .greaterOrEquals(
+                        (NumeralFormula) args.get(0), getRationalFormulaManager().makeNumber(0));
+          }
         case TO_REAL:
           return (T)
               getRationalFormulaManager().sum(ImmutableList.of((NumeralFormula) args.get(0)));
