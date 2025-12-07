@@ -574,6 +574,11 @@ public class TraceFormulaManager implements FormulaManager {
                   getIntegerFormulaManager()
                       .equal((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
             }
+          } else if (declaration.getArgumentTypes().get(0).isStringType()) {
+            return (T)
+                getStringFormulaManager()
+                    .equal((StringFormula) args.get(0), (StringFormula) args.get(1));
+
           } else if (declaration.getArgumentTypes().get(0).isBitvectorType()) {
             return (T)
                 getBitvectorFormulaManager()
