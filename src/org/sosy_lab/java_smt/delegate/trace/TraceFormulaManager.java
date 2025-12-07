@@ -56,6 +56,7 @@ import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 import org.sosy_lab.java_smt.api.Tactic;
 import org.sosy_lab.java_smt.api.UFManager;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
@@ -946,9 +947,30 @@ public class TraceFormulaManager implements FormulaManager {
                       (StringFormula) args.get(0),
                       (StringFormula) args.get(1),
                       (IntegerFormula) args.get(2));
-        // TODO
-        // case STR_TO_RE:
-        // case STR_IN_RE:
+        case STR_TO_RE:
+          // String to RE injection
+          // We only support this for constant Strings
+          Preconditions.checkArgument(args.size() == 1);
+          String str =
+              delegate.visit(
+                  args.get(0),
+                  new DefaultFormulaVisitor<>() {
+                    @Override
+                    protected String visitDefault(Formula f) {
+                      throw new IllegalArgumentException(
+                          "We only support constant Strings for str.to_re");
+                    }
+
+                    @Override
+                    public String visitConstant(Formula f, Object value) {
+                      return (String) value;
+                    }
+                  });
+          return (T) getStringFormulaManager().makeRegex(str);
+        case STR_IN_RE:
+          Preconditions.checkArgument(args.size() == 2);
+          return (T)
+              getStringFormulaManager().in((StringFormula) args.get(0), (RegexFormula) args.get(1));
         case STR_TO_INT:
           Preconditions.checkArgument(args.size() == 1);
           return (T) getStringFormulaManager().toIntegerFormula((StringFormula) args.get(0));
