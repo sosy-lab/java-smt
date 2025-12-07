@@ -896,6 +896,13 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls()[-1] == "isUnsat":
             output.append(f'(check-sat)')
 
+        elif stmt.getCalls() == ["mgr", "makeVariable"]:
+            arg1 = stmt.value[-1].args[0]
+            arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+            sortMap[stmt.variable] = arg1
+            output.append(
+                f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
         elif stmt.getCalls()[-1] == "newProverEnvironment":
             # TODO Apply options at the top of the file
             pass
