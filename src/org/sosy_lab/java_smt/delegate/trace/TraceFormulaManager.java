@@ -139,7 +139,7 @@ public class TraceFormulaManager implements FormulaManager {
             logger.logDef(
                 "mgr",
                 String.format(
-                    "makeVariable(%s, %s)",
+                    "makeVariable(%s, \"%s\")",
                     logger.printFormulaType(delegate.getFormulaType(f)), name),
                 () -> delegate.makeVariable(delegate.getFormulaType(f), name));
         Preconditions.checkArgument(g.equals(f));
