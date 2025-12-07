@@ -26,14 +26,18 @@ public class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
     logger = checkNotNull(pLogger);
   }
 
+  private String printQuantifier(Quantifier pQuantifier) {
+    return "QuantifiedFormulaManager.Quantifier." + pQuantifier.name();
+  }
+
   @Override
   public BooleanFormula mkQuantifier(
       Quantifier q, List<? extends Formula> pVariables, BooleanFormula pBody) {
     return logger.logDef(
         "mgr.getQuantifiedFormulaManager()",
         String.format(
-            "mkQuantifier(Quantifier.%s, List.of(%s), %s)",
-            q, logger.toVariables(pVariables), logger.toVariable(pBody)),
+            "mkQuantifier(%s, List.of(%s), %s)",
+            printQuantifier(q), logger.toVariables(pVariables), logger.toVariable(pBody)),
         () -> delegate.mkQuantifier(q, pVariables, pBody));
   }
 
