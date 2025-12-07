@@ -307,12 +307,20 @@ public class TraceFormulaManager implements FormulaManager {
       case BV_SUB:
       case BV_ADD:
       case BV_MUL:
+      case STR_CONCAT:
+      case STR_LT:
+      case STR_LE:
       case RE_CONCAT:
+      case RE_DIFFERENCE:
+      case RE_UNION:
+      case RE_INTERSECT:
         return -1;
 
       case RE_NONE:
+      case SEP_NIL:
         return 0;
 
+      case INT_TO_BV:
       case NOT:
       case UMINUS:
       case EQ_ZERO:
@@ -339,10 +347,16 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_IS_NORMAL:
       case FP_AS_IEEEBV:
       case FP_FROM_IEEEBV:
+      case RE_PLUS:
+      case RE_STAR:
+      case INT_TO_STR:
+      case STR_FROM_CODE:
+      case STR_TO_CODE:
       case STR_LENGTH:
+      case STR_TO_INT:
       case STR_TO_RE:
       case RE_COMPLEMENT:
-      case SEP_NIL:
+      case RE_OPTIONAL:
         return 1;
 
       case SELECT:
@@ -380,7 +394,11 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_CASTTO_FP:
       case FP_CASTTO_SBV:
       case FP_CASTTO_UBV:
-      case STR_CONCAT:
+      case STR_CHAR_AT:
+      case STR_CONTAINS:
+      case STR_IN_RE:
+      case STR_PREFIX:
+      case STR_SUFFIX:
       case RE_RANGE:
       case SEP_PTO:
       case SEP_EMP:
@@ -395,6 +413,8 @@ public class TraceFormulaManager implements FormulaManager {
       case FP_DIV:
       case FP_MUL:
       case STR_INDEX_OF:
+      case STR_REPLACE:
+      case STR_REPLACE_ALL:
       case STR_SUBSTRING:
         return 3;
 
