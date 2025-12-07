@@ -502,15 +502,10 @@ public class TraceFormulaManager implements FormulaManager {
                     .subtract((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
           }
         case ADD:
-          Preconditions.checkArgument(args.size() == 2);
           if (declaration.getType().isIntegerType()) {
-            return (T)
-                getIntegerFormulaManager()
-                    .add((IntegerFormula) args.get(0), (IntegerFormula) args.get(1));
+            return (T) getIntegerFormulaManager().sum((List<IntegerFormula>) args);
           } else {
-            return (T)
-                getRationalFormulaManager()
-                    .add((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
+            return (T) getRationalFormulaManager().sum((List<NumeralFormula>) args);
           }
         case DIV:
           Preconditions.checkArgument(args.size() == 2);
