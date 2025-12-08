@@ -481,7 +481,7 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (concat {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "distinct":
-                args = stmt.value[-1].args
+                args = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
