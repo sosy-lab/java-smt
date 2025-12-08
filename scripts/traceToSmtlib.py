@@ -1099,7 +1099,7 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
-                if arg1 is Type and arg2 is Type:
+                if isinstance(arg1, Type) and isinstance(arg2, Type):
                     # Build a const array
                     sortMap[stmt.variable] = ArrayType(arg1, arg2)
                     output.append(
