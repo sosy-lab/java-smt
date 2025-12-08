@@ -103,6 +103,14 @@ string ::= "\"" .* "\""
 
 argument = forward_declaration()
 
+litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
+
+
+def test_bool():
+    assert litBool.parse('true') == True
+    assert litBool.parse('false') == False
+
+
 litInt = (regex(r"-?[0-9]+").map(int) << string("L").optional() |
           string("new") >> whitespace >> string("BigInteger(") >> whitespace.optional() >>
           regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
@@ -114,14 +122,6 @@ def test_integer():
     assert litInt.parse('-123') == -123
     assert litInt.parse('123L') == 123
     assert litInt.parse('new BigInteger("123")') == 123
-
-
-litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
-
-
-def test_bool():
-    assert litBool.parse('true') == True
-    assert litBool.parse('false') == False
 
 
 litString = string('"') >> regex(r'[^"]*') << string('"')
