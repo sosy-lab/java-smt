@@ -923,19 +923,6 @@ def translate(prog: List[Definition]):
     return '\n'.join(output)
 
 
-"""
-def collect(prog: List[Definition]):
-    "List JavaSMT functions that were used in the trace"
-    known = set()
-    for decl in prog:
-        if decl.value[0].fn == "mgr":
-            known.add((decl.value[-2].fn, decl.value[-1].fn))
-        else:
-            known.add(("-", decl.value[-1].fn))
-    for p in sorted(known):
-        print(p)
-"""
-
 if __name__ == '__main__':
     arg = sys.argv
     if not len(sys.argv) == 2:
