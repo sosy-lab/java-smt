@@ -455,6 +455,7 @@ def flattenProvers(prog: List[Definition]):
 def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
+    nameMap = {} # Stores UF names for function declarations
     output = ["(set-option :produce-models true)",
               "(set-option :global-declarations true)"]
     for stmt in prog[5:]:
@@ -1132,17 +1133,19 @@ def translate(prog: List[Definition]):
             if stmt.getCalls()[-1] == "callUF":
                 arg0 = stmt.value[-1].args[0]
                 args = stmt.value[-1].args[1:]
+                name = nameMap[arg0]
                 sortMap[stmt.variable] = sortMap[arg0].value
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({arg0} {' '.join(args)}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "declareUF":
                 arg0 = stmt.value[-1].args[0]
                 arg1 = stmt.value[-1].args[1]
                 args = stmt.value[-1].args[2:]
-                sortMap[arg0] = FunctionType(args, arg1)
+                sortMap[stmt.variable] = FunctionType(args, arg1)
+                nameMap[stmt.variable] = arg0
                 output.append(
-                    f'(declare-fun {arg0} {sortMap[arg0].toSmtlib()})')
+                    f'(declare-fun {arg0} {sortMap[stmt.variable].toSmtlib()})')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
