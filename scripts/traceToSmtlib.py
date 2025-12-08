@@ -149,7 +149,7 @@ def litBitvectorType():
 
 @generate
 def litFloatType():
-    yield string("FormulaType.getBitvectorTypeWithSize(") >> whitespace.optional()
+    yield string("FormulaType.getFloatingPointType(") >> whitespace.optional()
     exponent = yield regex(r'[0-9]+').map(int)
     yield whitespace.optional() << string(",") << whitespace.optional()
     significand = yield regex(r'[0-9]+').map(int)
