@@ -111,17 +111,37 @@ def test_bool():
     assert litBool.parse('false') == False
 
 
-litInt = (regex(r"-?[0-9]+").map(int) << string("L").optional() |
-          string("new") >> whitespace >> string("BigInteger(") >> whitespace.optional() >>
-          regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
-          << whitespace.optional() << string(")"))
+@generate
+def litBigInt():
+    yield string("new") >> whitespace >> (string("BigInteger(") | string("BigDecimal(")) >> whitespace.optional()
+    integer = yield regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
+    yield whitespace.optional() << string(")")
+    return integer
+
+
+@generate
+def litNum0():
+    sign = yield string('-').optional().map(lambda opt: "+" if opt is None else "-")
+    integerPart = yield regex(r'[0-9]+')
+    dot = yield string('.').optional()
+    if dot is None:
+        yield string('L').optional()
+        return int(sign + integerPart)
+    else:
+        fractionPart = yield regex(r'[0-9]+')
+        return float(sign + integerPart + '.' + fractionPart)
+
+
+litNum = litNum0 | litBigInt
 
 
 def test_integer():
-    assert litInt.parse('123') == 123
-    assert litInt.parse('-123') == -123
-    assert litInt.parse('123L') == 123
-    assert litInt.parse('new BigInteger("123")') == 123
+    assert litNum.parse('123') == 123
+    assert litNum.parse('-123') == -123
+    assert litNum.parse('123L') == 123
+    assert litNum.parse('new BigInteger("123")') == 123
+    assert litNum.parse('123.4') == 123.4
+    assert litNum.parse('-123.4') == -123.4
 
 
 litString = string('"') >> regex(r'[^"]*') << string('"')
@@ -130,6 +150,24 @@ litString = string('"') >> regex(r'[^"]*') << string('"')
 def test_string():
     assert litString.parse('"str"') == "str"
 
+
+class RoundingMode(Enum):
+    NEAREST_TIES_TO_EVEN = "FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN"
+    NEAREST_TIES_AWAY = "FloatingPointRoundingMode.NEAREST_TIES_AWAY"
+    TOWARD_POSITIVE = "FloatingPointRoundingMode.TOWARDS_POSITIVE"
+    TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARDS_NEGATIVE"
+    TOWARD_ZERO = "FloatingPointRoundingMode.TOWARDS_ZERO"
+
+
+litRoundingMode = from_enum(RoundingMode)
+
+
+class Sign(Enum):
+    POSITIVE = "FloatingPointNumber.Sign.POSITIVE"
+    NEGATIVE = "FloatingPointNumber.Sign.NEGATIVE"
+
+
+litSign = from_enum(Sign)
 
 litType = forward_declaration()
 
@@ -248,7 +286,9 @@ def test_variable():
 
 argument.become(alt(
     litBool,
-    litInt,
+    litNum,
+    litRoundingMode,
+    litSign,
     litString,
     litType,
     litSolvers,
@@ -816,6 +856,227 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "sum":
                 # FIXME Requires list arguments
                 raise Exception("sum not supported")
+
+            else:
+                raise Exception(f'Unsupported call: {stmt.getCalls()}')
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getFloatingPointFormulaManager"]:
+            if stmt.getCalls()[-1] == "abs":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.abs {arg1}))')
+
+            elif stmt.getCalls()[-1] == "add":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.add {arg3} {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "assignment":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "castTo":
+                # Converts from float to bv/int, or convert between different fp precisions
+                arg1 = stmt.value[-1].args[0]  # source (fp term)
+                arg2 = stmt.value[-1].args[1]  # signed?
+                arg3 = stmt.value[-1].args[2]  # target type (any type)
+                arg4 = stmt.value[-1].args[3]  # rounding mode
+                sortMap[stmt.variable] = arg3
+                if isinstance(arg3, FloatType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4} {arg1})')
+                elif isinstance(arg3, IntegerType):
+                    raise Exception("Converting from float to integer is not supported in SMTLIB")
+                elif isinstance(arg3, RationalType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.to_real {arg1})')
+                elif isinstance(arg3, BitvectorType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'fp.to_sbv' if arg2 else 'fp.to_ubv'}  {arg3.width}) {arg4} {arg1})')
+                else:
+                    raise Exception(f"Illegal cast from float to {arg3}")
+
+            elif stmt.getCalls()[-1] == "castFrom":
+                # Converts from bv/int to float, or convert between different fp precisions
+                arg1 = stmt.value[-1].args[0]  # source (any term)
+                arg2 = stmt.value[-1].args[1]  # signed?
+                arg3 = stmt.value[-1].args[2]  # target type (fp type)
+                arg4 = stmt.value[-1].args[3]  # rounding mode
+                sortMap[stmt.variable] = arg3
+                sourceType = sortMap[arg1]
+                if isinstance(sourceType, FloatType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4} {arg1})')
+                elif isinstance(sourceType, IntegerType):
+                    raise Exception("Converting from float to integer is not supported in SMTLIB")
+                elif isinstance(sourceType, RationalType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg1})')
+                elif isinstance(sourceType, BitvectorType):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent}) {arg3.significand}) {arg3} {arg1})')
+                else:
+                    raise Exception(f"Illegal cast from {sourceType} to float")
+
+            elif stmt.getCalls()[-1] == "divide":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.div {arg3} {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "equalWithFPSemantics":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.eq {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "fromIeeeBitvector":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg2.exponent} {arg2.significand}) {arg1}))')
+
+            elif stmt.getCalls()[-1] == "greaterOrEquals":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.geq {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "greaterThan":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.gt {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "lessOrEquals":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.leq {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "lessThan":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.lt {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "makeMinusInfinity":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ -oo {arg1.exponent} {arg1.significand}))')
+
+            elif stmt.getCalls()[-1] == "makeNaN":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ NaN {arg1.exponent} {arg1.significand}))')
+
+            elif stmt.getCalls()[-1] == "makeNumber":
+                if len(stmt.value[-1].args) < 4:
+                    raise Exception(f'Expected 4 arguments to fp.makeNumber, got {len(stmt.value)}')
+                arg1 = stmt.value[-1].args[0]  # exponent
+                arg2 = stmt.value[-1].args[1]  # significand
+                arg3 = stmt.value[-1].args[2]  # sign
+                arg4 = stmt.value[-1].args[3]  # type
+                if not (isinstance(arg1, int) and
+                        isinstance(arg2, int) and
+                        isinstance(arg3, Sign) and
+                        isinstance(arg4, FloatType)):
+                    # TODO Support more value constructors
+                    raise Exception(
+                        "We currently only support fp.makeNumber when sign, exponent and mantissa are given explicitly")
+                sortMap[stmt.variable] = arg4
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp {'#1' if arg3 == Sign.NEGATIVE else '#0'} {printBitvector(arg4.exponent, arg1)} {printBitvector(arg4.significand, arg2)}))')
+
+            elif stmt.getCalls()[-1] == "makePlusInfinity":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ +oo {arg1.exponent} {arg1.significand}))')
+
+            elif stmt.getCalls()[-1] == "makeVariable":
+                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = arg2
+                output.append(
+                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+
+            elif stmt.getCalls()[-1] == "max":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.max {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "min":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.min {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "multiply":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.mul {arg3} {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "negate":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.neg {arg1}))')
+
+            elif stmt.getCalls()[-1] == "remainder":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.rem {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "round":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.roundToIntegral {arg2} {arg1}))')
+
+            elif stmt.getCalls()[-1] == "sqrt":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sqrt {arg2} {arg1}))')
+
+            elif stmt.getCalls()[-1] == "subtract":
+                arg1 = stmt.value[-1].args[0]
+                arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
+                sortMap[stmt.variable] = sortMap[arg1]
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sub {arg3} {arg1} {arg2}))')
+
+            elif stmt.getCalls()[-1] == "toIeeBitvector":
+                raise Exception("Recasting from float to bitvector is not supported in SMTLIB")
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
