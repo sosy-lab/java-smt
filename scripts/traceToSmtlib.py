@@ -365,7 +365,7 @@ def test_program():
 
 def test_toSmtlib():
     assert (ArrayType(IntegerType(), ArrayType(BitvectorType(32), FloatType(8, 24))).toSmtlib()
-            == "(Array Integer (Array (_ BitVec 32) (_ FloatingPoint 8 24)))")
+            == "(Array Int (Array (_ BitVec 32) (_ FloatingPoint 8 24)))")
 
 
 def printBitvector(width, value):
