@@ -625,7 +625,7 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({"bvashr" if arg3 else "bvlshr"} {arg1} {arg2}))')
 
-            elif stmt.getCalls()[-1] == "smod":
+            elif stmt.getCalls()[-1] == "smodulo":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
