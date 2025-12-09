@@ -58,7 +58,7 @@ public class TraceUFManager implements UFManager {
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
     if (funcType.getKind().equals(FunctionDeclarationKind.UF)) {
       return logger.logDef(
-          "mgr.getUFManager",
+          "mgr.getUFManager()",
           String.format("callUF(%s, %s)", logger.toVariable(funcType), logger.toVariables(args)),
           () -> delegate.callUF(funcType, args));
     } else {

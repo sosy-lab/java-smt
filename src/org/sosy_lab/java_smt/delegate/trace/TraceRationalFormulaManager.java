@@ -32,7 +32,7 @@ public class TraceRationalFormulaManager
   public RationalFormula makeNumber(double number) {
     return logger.logDef(
         "mgr.getRationalFormulaManager()",
-        String.format("makeNumber(%s))", number),
+        String.format("makeNumber(%s)", number),
         () -> delegate.makeNumber(number));
   }
 
