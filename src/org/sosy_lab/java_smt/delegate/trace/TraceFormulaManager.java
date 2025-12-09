@@ -207,7 +207,7 @@ public class TraceFormulaManager implements FormulaManager {
           var g =
               logger.logDef(
                   "mgr.getStringFormulaManager()",
-                  String.format("makeString(%s)", value),
+                  String.format("makeString(%s)", logger.printString((String) value)),
                   () -> delegate.getStringFormulaManager().makeString((String) value));
           Preconditions.checkArgument(g.equals(f));
         } else {
@@ -1081,7 +1081,7 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     String var = logger.newVariable();
-    logger.appendDef(var, String.format("mgr.parse(\"%s\")", s));
+    logger.appendDef(var, String.format("mgr.parse(%s)", logger.printString(s)));
     BooleanFormula f = delegate.parse(s);
     logger.undoLast();
     return rebuild(f);
@@ -1115,7 +1115,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T simplify(T input) throws InterruptedException {
-    return logger.logDef(
+    return logger.logDefDiscard(
         "mgr",
         String.format("simplify(%s)", logger.toVariable(input)),
         () -> delegate.simplify(input));

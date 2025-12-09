@@ -187,7 +187,7 @@ public class TraceStringFormulaManager implements StringFormulaManager {
   public RegexFormula makeRegex(String value) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeRegex(\"%s\")", value),
+        String.format("makeRegex(%s)", logger.printString(value)),
         () -> delegate.makeRegex(value));
   }
 

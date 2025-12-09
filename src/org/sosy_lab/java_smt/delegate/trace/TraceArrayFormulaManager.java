@@ -56,8 +56,10 @@ public class TraceArrayFormulaManager implements ArrayFormulaManager {
     return logger.logDef(
         "mgr.getArrayFormulaManager()",
         String.format(
-            "makeArray(\"%s\", %s, %s)",
-            pName, logger.printFormulaType(pIndexType), logger.printFormulaType(pElementType)),
+            "makeArray(%s, %s, %s)",
+            logger.printString(pName),
+            logger.printFormulaType(pIndexType),
+            logger.printFormulaType(pElementType)),
         () -> delegate.makeArray(pName, pIndexType, pElementType));
   }
 
