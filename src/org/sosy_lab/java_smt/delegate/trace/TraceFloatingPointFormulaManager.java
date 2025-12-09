@@ -165,7 +165,8 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   public FloatingPointFormula makeVariable(String pVar, FloatingPointType type) {
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
-        String.format("makeVariable(\"%s\", %s)", pVar, logger.printFormulaType(type)),
+        String.format(
+            "makeVariable(%s, %s)", logger.printString(pVar), logger.printFormulaType(type)),
         () -> delegate.makeVariable(pVar, type));
   }
 

@@ -55,7 +55,7 @@ public abstract class TraceNumeralFormulaManager<
   public ResultFormulaType makeVariable(String pVar) {
     return logger.logDef(
         getPrefix(),
-        String.format("makeVariable(\"%s\")", pVar),
+        String.format("makeVariable(%s)", logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 

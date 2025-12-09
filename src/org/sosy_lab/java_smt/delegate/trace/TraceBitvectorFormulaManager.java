@@ -63,7 +63,7 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeVariable(int length, String pVar) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeVariable(%s, \"%s\")", length, pVar),
+        String.format("makeVariable(%s, %s)", length, logger.printString(pVar)),
         () -> delegate.makeVariable(length, pVar));
   }
 
@@ -71,7 +71,8 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
   public BitvectorFormula makeVariable(BitvectorType type, String pVar) {
     return logger.logDef(
         "mgr.getBitvectorFormulaManager()",
-        String.format("makeVariable(%s, \"%s\")", logger.printFormulaType(type), pVar),
+        String.format(
+            "makeVariable(%s, %s)", logger.printFormulaType(type), logger.printString(pVar)),
         () -> delegate.makeVariable(type, pVar));
   }
 

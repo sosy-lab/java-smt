@@ -31,7 +31,7 @@ public class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula makeString(String value) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeString(\"%s\")", value),
+        String.format("makeString(%s)", logger.printString(value)),
         () -> delegate.makeString(value));
   }
 
@@ -39,7 +39,7 @@ public class TraceStringFormulaManager implements StringFormulaManager {
   public StringFormula makeVariable(String pVar) {
     return logger.logDef(
         "mgr.getStringFormulaManager()",
-        String.format("makeVariable(\"%s\")", pVar),
+        String.format("makeVariable(%s)", logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 

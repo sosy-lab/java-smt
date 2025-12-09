@@ -216,8 +216,19 @@ class TraceLogger {
   }
 
   /**
-   * Takes a {@link org.sosy_lab.java_smt.api.FormulaType} and returns a Java expression to
-   * construct this type.
+   * Print a String for the trace.
+   *
+   * <p>Adds quotes around the literal and escapes special characters.
+   */
+  public String printString(String pString) {
+    // TODO Do we need more escape sequences?
+    return String.format("\"%s\"", pString.replace("\"", "\\\"").replace("\n", "\\\n"));
+  }
+
+  /**
+   * Print a {@link org.sosy_lab.java_smt.api.FormulaType} for the trace.
+   *
+   * <p>Returns a Java expression that will construct the type.
    */
   public <T extends Formula> String printFormulaType(FormulaType<T> pType) {
     if (pType.isBooleanType()) {

@@ -49,7 +49,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula makeVariable(String pVar) {
     return logger.logDef(
         "mgr.getBooleanFormulaManager()",
-        String.format("makeVariable(\"%s\")", pVar),
+        String.format("makeVariable(%s)", logger.printString(pVar)),
         () -> delegate.makeVariable(pVar));
   }
 

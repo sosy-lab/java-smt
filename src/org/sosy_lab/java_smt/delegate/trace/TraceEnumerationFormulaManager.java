@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.delegate.trace;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
@@ -32,8 +33,9 @@ public class TraceEnumerationFormulaManager implements EnumerationFormulaManager
     return logger.logDefKeep(
         "mgr.getEnumerationFormulaManager()",
         String.format(
-            "declareEnumeration(\"%s\", Set.of(\"%s\"))",
-            name, Joiner.on("\", \"").join(elementNames)),
+            "declareEnumeration(%s, Set.of(%s))",
+            logger.printString(name),
+            FluentIterable.from(elementNames).transform(logger::printString).join(Joiner.on(", "))),
         () -> delegate.declareEnumeration(name, elementNames));
   }
 
@@ -41,7 +43,7 @@ public class TraceEnumerationFormulaManager implements EnumerationFormulaManager
   public EnumerationFormula makeConstant(String pName, EnumerationFormulaType pType) {
     return logger.logDef(
         "mgr.getEnumerationFormulaManager()",
-        String.format("makeConstant(\"%s\", %s)", pName, logger.toVariable(pType)),
+        String.format("makeConstant(%s, %s)", logger.printString(pName), logger.toVariable(pType)),
         () -> delegate.makeConstant(pName, pType));
   }
 
@@ -49,7 +51,7 @@ public class TraceEnumerationFormulaManager implements EnumerationFormulaManager
   public EnumerationFormula makeVariable(String pVar, EnumerationFormulaType pType) {
     return logger.logDef(
         "mgr.getEnumerationFormulaManager()",
-        String.format("makeVariable(\"%s\", %s)", pVar, logger.toVariable(pType)),
+        String.format("makeVariable(%s, %s)", logger.printString(pVar), logger.toVariable(pType)),
         () -> delegate.makeVariable(pVar, pType));
   }
 

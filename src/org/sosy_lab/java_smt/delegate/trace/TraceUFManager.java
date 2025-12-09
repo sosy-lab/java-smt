@@ -40,8 +40,8 @@ public class TraceUFManager implements UFManager {
     logger.appendDef(
         var,
         String.format(
-            "mgr.getUFManager().declareUF(\"%s\", %s, %s)",
-            name,
+            "mgr.getUFManager().declareUF(%s, %s, %s)",
+            logger.printString(name),
             logger.printFormulaType(returnType),
             FluentIterable.from(args).transform(logger::printFormulaType).join(Joiner.on(", "))));
     FunctionDeclaration<T> f = delegate.declareUF(name, returnType, args);
