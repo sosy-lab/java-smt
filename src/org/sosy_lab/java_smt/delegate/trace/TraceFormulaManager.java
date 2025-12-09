@@ -1177,7 +1177,7 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public <T extends Formula> T substitute(
       T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
-    return logger.logDef(
+    return logger.logDefDiscard(
         "mgr",
         String.format(
             "substitute(%s, ImmutableMap.ofEntries(%s))",
