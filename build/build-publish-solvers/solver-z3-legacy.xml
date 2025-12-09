@@ -60,11 +60,6 @@ SPDX-License-Identifier: Apache-2.0
         <!-- Linux files -->
         <move file="${z3legacy.dist.dir}/libz3legacy.so" tofile="${z3legacy.dist.dir}/x64/libz3legacy-${z3.legacy.version}.so" verbose="true"/>
         <move file="${z3legacy.dist.dir}/libz3javalegacy.so" tofile="${z3legacy.dist.dir}/x64/libz3javalegacy-${z3.legacy.version}.so" verbose="true"/>
-        <!-- rpath is required for libz3javalegacy.so to find libz3legacy.so when loaded via SosyLab-NativeLibraries -->
-        <exec executable="patchelf" dir="${z3legacy.dist.dir}/x64" failonerror="true">
-            <arg value="--set-rpath"/><arg value="$ORIGIN"/>
-            <arg value="libz3javalegacy-${z3.legacy.version}.so"/>
-        </exec>
         <!-- soname is required for libz3legacy.so -->
         <exec executable="patchelf" dir="${z3legacy.dist.dir}/x64" failonerror="true">
             <arg value="--set-soname"/><arg value="libz3legacy.so"/>
