@@ -803,8 +803,10 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "distinct":
-                # FIXME Requires list arguments
-                raise Exception("distinct not supported")
+                args = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
 
             elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "divide"]:
                 arg1 = stmt.value[-1].args[0]
@@ -940,8 +942,10 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "sum":
-                # FIXME Requires list arguments
-                raise Exception("sum not supported")
+                args = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = IntegerType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(args)}))')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
