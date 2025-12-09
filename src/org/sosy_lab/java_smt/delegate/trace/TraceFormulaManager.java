@@ -1098,19 +1098,10 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException, SolverException {
-    String var = logger.newVariable();
-    logger.appendDef(
-        var,
-        String.format(
-            "mgr.applyTactic(%s, %s)", logger.toVariable(input), "Tactic." + tactic.name()));
-    BooleanFormula f = delegate.applyTactic(input, tactic);
-    if (logger.isTracked(f)) {
-      logger.undoLast();
-      return f;
-    } else {
-      logger.mapVariable(var, f);
-      return rebuild(f);
-    }
+    return logger.logDefDiscard(
+        "mgr",
+        String.format("applyTactic(%s, %s)", logger.toVariable(input), "Tactic." + tactic.name()),
+        () -> delegate.applyTactic(input, tactic));
   }
 
   @Override
