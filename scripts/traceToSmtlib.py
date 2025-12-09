@@ -1223,7 +1223,7 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls()[:-1] == ["mgr", "getUFManager"]:
             if stmt.getCalls()[-1] == "callUF":
                 arg0 = stmt.value[-1].args[0]
-                args = stmt.value[-1].args[1:]
+                args = stmt.value[-1].args[1]
                 name = nameMap[arg0]
                 sortMap[stmt.variable] = sortMap[arg0].value
                 output.append(
@@ -1232,7 +1232,7 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "declareUF":
                 arg0 = stmt.value[-1].args[0]
                 arg1 = stmt.value[-1].args[1]
-                args = stmt.value[-1].args[2:]
+                args = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = FunctionType(args, arg1)
                 nameMap[stmt.variable] = arg0
                 output.append(
