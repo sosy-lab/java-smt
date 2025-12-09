@@ -118,7 +118,6 @@ public class SolverContextFactoryTest {
       case BOOLECTOR:
       case CVC4:
       case YICES2:
-      case Z3_4_5_0:
         return IS_LINUX && !IS_ARCH_ARM64;
       case CVC5:
         return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni"))
@@ -133,6 +132,8 @@ public class SolverContextFactoryTest {
             || (IS_WINDOWS && !IS_ARCH_ARM64);
       case Z3:
         return (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
+      case Z3_4_5_0:
+        return IS_LINUX;
       default:
         throw new AssertionError("unexpected solver: " + solverToUse());
     }

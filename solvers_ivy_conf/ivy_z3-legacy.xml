@@ -28,17 +28,22 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- main configurations -->
         <conf name="solver-z3-legacy-x64" extends="solver-z3-legacy-linux-x64"/>
+        <conf name="solver-z3-legacy-arm64" extends="solver-z3-legacy-linux-arm64"/>
 
         <!-- basic configurations -->
         <conf name="solver-z3-legacy-linux-x64" extends="solver-z3-legacy-common"/>
+        <conf name="solver-z3-legacy-linux-arm64" extends="solver-z3-legacy-common"/>
 
         <conf name="solver-z3-legacy-common" visibility="private"/>
     </configurations>
 
     <publications defaultconf="solver-z3-legacy">
-        <!-- Linux files -->
+        <!-- Linux x64 files -->
         <artifact name="libz3legacy" conf="solver-z3-legacy-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
         <artifact name="libz3javalegacy" conf="solver-z3-legacy-linux-x64" e:arch="x64" type="shared-object" ext="so"/>
+        <!-- Linux am64 files -->
+        <artifact name="libz3legacy" conf="solver-z3-legacy-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
+        <artifact name="libz3javalegacy" conf="solver-z3-legacy-linux-arm64" e:arch="arm64" type="shared-object" ext="so"/>
 
         <!-- common Java file, Java is platform independent -->
         <artifact name="com.microsoft.z3legacy" conf="solver-z3-legacy-common" ext="jar"/>

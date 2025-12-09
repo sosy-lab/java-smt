@@ -121,12 +121,12 @@ which is provided under `/docker` in the JavaSMT repository.
 After building the patched Z3 v4.5.0 version,
 you can publish it with the following command in the JavaSMT directory:
 ```bash
-ant publish-z3-legacy -Dz3.path=<Z3_PATH> -Dz3.legacy.version=<VERSION>
+ant publish-z3-legacy -Dz3.path=<Z3_PATH> -Dz3.customRev=<VERSION>
 ```
 
 Example:
 ```bash
-ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.legacy.version=4.5.0-dev.1
+ant publish-z3-legacy -Dz3.path=../solvers/z3/z3 -Dz3.customRev=4.5.0
 ```
 
 
