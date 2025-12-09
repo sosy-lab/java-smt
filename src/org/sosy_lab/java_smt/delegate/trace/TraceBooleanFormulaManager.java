@@ -152,7 +152,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   @Override
   public <R> R visit(BooleanFormula pFormula, BooleanFormulaVisitor<R> visitor) {
     return logger.logDefDiscard(
-        "mgr",
+        "mgr.getBooleanFormulaManager()",
         String.format(
             "visit(%s, new DefaultBooleanFormulaVisitor<>() {"
                 + "protected Formula visitDefault(Formula f) {"
@@ -166,7 +166,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public void visitRecursively(
       BooleanFormula f, BooleanFormulaVisitor<TraversalProcess> rFormulaVisitor) {
     logger.logStmtDiscard(
-        "mgr",
+        "mgr.getBooleanFormulaManager()",
         String.format(
             "visitRecursively(%s, new DefaultBooleanFormulaVisitor<>() {"
                 + "protected TraversalProcess visitDefault(Formula f) {"
@@ -180,7 +180,7 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   public BooleanFormula transformRecursively(
       BooleanFormula f, BooleanFormulaTransformationVisitor pVisitor) {
     return logger.logDefDiscard(
-        "mgr",
+        "mgr.getBooleanFormulaManager()",
         String.format(
             "transformRecursively(%s, new BooleanFormulaTransformationVisitor(%s) {})",
             logger.toVariable(f), "mgr"),
@@ -190,7 +190,9 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   @Override
   public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
     logger.appendStmt(
-        String.format("mgr.toConjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
+        String.format(
+            "mgr.getBooleanFormulaManager().toConjunctionArgs(%s, %s)",
+            logger.toVariable(f), flatten));
     Set<BooleanFormula> set = delegate.toConjunctionArgs(f, flatten);
     logger.undoLast();
     return mgr.rebuildAll(set);
@@ -199,7 +201,9 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
   @Override
   public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
     logger.appendStmt(
-        String.format("mgr.toDisjunctionArgs(%s, %s)", logger.toVariable(f), flatten));
+        String.format(
+            "mgr.getBooleanFormulaManager().toDisjunctionArgs(%s, %s)",
+            logger.toVariable(f), flatten));
     Set<BooleanFormula> set = delegate.toDisjunctionArgs(f, flatten);
     logger.undoLast();
     return mgr.rebuildAll(set);
