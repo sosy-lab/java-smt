@@ -208,11 +208,19 @@ def test_number():
 
 
 # String constants
-litString = regex(r'"(\\"|[^"])*"').map(lambda str: str.replace(r'\"', '"').replace(r'\n', '\n'))
-
+@generate
+def litString():
+    yield string('"')
+    lit = yield regex(r'(\\"|\\\'|\\n|\\\\|[^"])*')
+    yield string('"')
+    return lit.replace('\\"', '"').replace('\\\'', '\'').replace('\\n', '\n').replace('\\\\', '\\')
 
 def test_string():
-    assert litString.parse('"str"') == "str"
+    assert litString.parse('"str"') == 'str'
+    assert litString.parse('"\\""') == '"'
+    assert litString.parse('"\\\\"') == '\\'
+    assert litString.parse('"\\\'"') == '\''
+    assert litString.parse('"\\n"') == '\n'
 
 
 class RoundingMode(Enum):

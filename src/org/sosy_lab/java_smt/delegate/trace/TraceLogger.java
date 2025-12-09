@@ -221,8 +221,31 @@ class TraceLogger {
    * <p>Adds quotes around the literal and escapes special characters.
    */
   public String printString(String pString) {
-    // TODO Do we need more escape sequences?
-    return String.format("\"%s\"", pString.replace("\"", "\\\"").replace("\n", "\\\n"));
+    StringBuilder builder = new StringBuilder();
+    builder.append("\"");
+    for (var c : pString.codePoints().toArray()) {
+      switch (c) {
+        case '\'':
+          builder.append("\\'");
+          break;
+        case '"':
+          builder.append("\\\"");
+          break;
+        case '\\':
+          builder.append("\\\\");
+          break;
+        case '\n':
+          builder.append("\\n");
+          break;
+        case '\t':
+          builder.append("\\t");
+          break;
+        default:
+          builder.appendCodePoint(c);
+      }
+    }
+    builder.append("\"");
+    return builder.toString();
   }
 
   /**
