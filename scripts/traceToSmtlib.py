@@ -12,6 +12,7 @@ import sys
 
 from dataclasses import dataclass
 from enum import Enum
+from fractions import Fraction
 from pathlib import Path
 from typing import List, Optional
 
@@ -103,6 +104,7 @@ string ::= "\"" .* "\""
 
 argument = forward_declaration()
 
+# Boolean constants
 litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
 
 
@@ -111,40 +113,102 @@ def test_bool():
     assert litBool.parse('false') == False
 
 
+litNumeral = regex(r'0|-?[1-9][0-9]*').map(int)
+
+
 @generate
-def litBigInt():
-    yield string("new") >> whitespace >> (string("BigInteger(") | string("BigDecimal(")) >> whitespace.optional()
-    integer = yield regex(r'"-?[0-9]+"').map(lambda str: int(str[1:-1]))
-    yield whitespace.optional() << string(")")
+def litDecimal():
+    sign = yield string('-').optional()
+    integer = yield regex(r'0|[1-9][0-9]*')
+    yield string(".")
+    fraction = yield regex(r'[0-9]*')
+    shift = len(fraction)
+    num = int(integer) * 10 ** shift + int(fraction)
+    den = 10 ** shift
+    return Fraction(num if sign is None else -num, den)
+
+
+@generate
+def litFpConstant():
+    sign = yield string('-').optional("")
+    integerPart = yield regex(r'[0-9]+')
+    yield string('.')
+    fractionPart = yield regex(r'[0-9]+')
+    exponentPart = "0"
+    hasExponent = yield string('E').optional()
+    if hasExponent is not None:
+        exponentPart = yield regex(r'-?[0-9]+')
+    return float(sign + integerPart + '.' + fractionPart + "e" + exponentPart)
+
+
+# Integer constants
+litInt = litNumeral << string("L").optional()
+
+# Double constants
+litFloat = string("Double.NaN").map(lambda str: float('nan')) | \
+           string("Double.POSITIVE_INFINITY").map(lambda str: float('inf')) | \
+           string("Double.NEGATIVE_INFINITY").map(lambda str: float('-inf')) | \
+           litFpConstant
+
+
+# BigInteger constants
+@generate
+def litBigInteger():
+    yield string('new') >> whitespace >> string('BigInteger(') >> whitespace.optional()
+    yield string('"')
+    integer = yield litNumeral
+    yield string('"')
+    yield whitespace.optional() << string(')')
     return integer
 
 
+# BigDecimal constants
 @generate
-def litNum0():
-    sign = yield string('-').optional().map(lambda opt: "+" if opt is None else "-")
-    integerPart = yield regex(r'[0-9]+')
-    dot = yield string('.').optional()
-    if dot is None:
-        yield string('L').optional()
-        return int(sign + integerPart)
-    else:
-        fractionPart = yield regex(r'[0-9]+')
-        return float(sign + integerPart + '.' + fractionPart)
+def litBigDecimal():
+    yield string('new') >> whitespace >> (string('BigDecimal(')) >> whitespace.optional()
+    yield string('"')
+    number = yield (litDecimal | litNumeral)
+    yield string('"')
+    yield whitespace.optional() << string(')')
+    return number
 
 
-litNum = litNum0 | litBigInt
+# Rational constants
+@generate
+def litRational():
+    yield string('Rational.of("')
+    num = yield regex(r'-?[0-9]+').map(int)
+    isFraction = yield string("/").optional()
+    den = 1
+    if isFraction is not None:
+        den = yield regex(r'[0-9]+').map(int)
+    yield string('")')
+    return Fraction(num, den)
 
 
-def test_integer():
-    assert litNum.parse('123') == 123
-    assert litNum.parse('-123') == -123
-    assert litNum.parse('123L') == 123
-    assert litNum.parse('new BigInteger("123")') == 123
-    assert litNum.parse('123.4') == 123.4
-    assert litNum.parse('-123.4') == -123.4
+litNumber = litBigInteger | litBigDecimal | litRational | litFloat | litInt
 
 
-litString = string('"') >> regex(r'[^"]*') << string('"')
+def test_number():
+    assert litNumber.parse('123') == 123
+    assert litNumber.parse('-123') == -123
+    assert litNumber.parse('123L') == 123
+    assert litNumber.parse('0.0') == 0.0
+    assert litNumber.parse('1.23') == 1.23
+    assert litNumber.parse('-1.23') == -1.23
+    assert litNumber.parse('12.3E1') == 123.0
+    assert litNumber.parse('12.3E-1') == 1.23
+    assert litNumber.parse('Double.NEGATIVE_INFINITY') == float('-inf')
+    assert litNumber.parse('new BigInteger("123")') == 123
+    assert litNumber.parse('new BigDecimal("123")') == Fraction(123)
+    assert litNumber.parse('new BigDecimal("123.4")') == Fraction(1234, 10)
+    assert litNumber.parse('new BigDecimal("0.0625")') == Fraction(625, 10000)
+    assert litNumber.parse('Rational.of("4")') == Fraction(4)
+    assert litNumber.parse('Rational.of("1/4")') == Fraction(1, 4)
+
+
+# String constants
+litString = regex(r'"(\\"|[^"])*"').map(lambda str: str.replace(r'\"', '"').replace(r'\n', '\n'))
 
 
 def test_string():
@@ -154,9 +218,9 @@ def test_string():
 class RoundingMode(Enum):
     NEAREST_TIES_TO_EVEN = "FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN"
     NEAREST_TIES_AWAY = "FloatingPointRoundingMode.NEAREST_TIES_AWAY"
-    TOWARD_POSITIVE = "FloatingPointRoundingMode.TOWARDS_POSITIVE"
-    TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARDS_NEGATIVE"
-    TOWARD_ZERO = "FloatingPointRoundingMode.TOWARDS_ZERO"
+    TOWARD_POSITIVE = "FloatingPointRoundingMode.TOWARD_POSITIVE"
+    TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARD_NEGATIVE"
+    TOWARD_ZERO = "FloatingPointRoundingMode.TOWARD_ZERO"
 
 
 litRoundingMode = from_enum(RoundingMode)
@@ -259,7 +323,7 @@ litQuantifier = from_enum(Quantifier)
 
 @generate
 def litList():
-    yield (string("List.of(") | string("ImmutableList.of("))
+    yield (string("List.of(") | string("ImmutableList.of(") | string("Set.of("))
     yield whitespace.optional()
     arg0 = yield argument.optional().map(lambda p: [p] if p is not None else [])
     args = []
@@ -274,6 +338,7 @@ def test_list():
     assert litList.parse("List.of(1, 2, var)") == [1, 2, "var"]
     assert litList.parse("ImmutableList.of()") == []
     assert litList.parse("List.of(ImmutableList.of(1,2), ImmutableList.of(3,7))") == [[1, 2], [3, 7]]
+    assert litList.parse("Set.of(1,2)") == [1, 2]
 
 
 variable = regex(r"[A-Za-z][A-Za-z0-9]*")
@@ -286,7 +351,7 @@ def test_variable():
 
 argument.become(alt(
     litBool,
-    litNum,
+    litNumber,
     litRoundingMode,
     litSign,
     litString,
