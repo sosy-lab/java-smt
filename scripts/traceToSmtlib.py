@@ -811,7 +811,7 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "distinct":
-                args = stmt.value[-1].args[0]
+                args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
@@ -950,7 +950,7 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "sum":
-                args = stmt.value[-1].args[0]
+                args = stmt.value[-1].args
                 sortMap[stmt.variable] = IntegerType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(args)}))')
