@@ -520,7 +520,7 @@ def flattenProvers(prog: List[Definition]):
 def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
-    nameMap = {} # Stores UF names for function declarations
+    nameMap = {}  # Stores UF names for function declarations
     output = ["(set-option :produce-models true)",
               "(set-option :global-declarations true)"]
     for stmt in prog[5:]:
@@ -869,20 +869,34 @@ def translate(prog: List[Definition]):
 
             elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
-                if not isinstance(arg1, int):
-                    raise Exception("makeNumber is only supported for constant integer arguments")
                 sortMap[stmt.variable] = IntegerType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1 if arg1 >= 0 else f'(- {abs(arg1)})'})')
+                if isinstance(arg1, int):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1 if arg1 >= 0 else f'(- {abs(arg1)})'})')
+                elif isinstance(arg1, Fraction):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (div {arg1.numerator} {arg1.denominator}))')
+                elif isinstance(arg1, float):
+                    # FIXME We need to use euclidean division here. Converting with int() will (probably?) truncate
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {int(arg1)})')
+                else:
+                    raise Exception("makeNumber is only supported for constant integer arguments")
 
             elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
-                if not isinstance(arg1, int):
-                    # TODO Allow rational values
-                    raise Exception("makeNumber is only supported for constant integer arguments")
                 sortMap[stmt.variable] = RationalType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+                if isinstance(arg1, int):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+                elif isinstance(arg1, Fraction):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (/ {arg1.numerator} {arg1.denominator}))')
+                elif isinstance(arg1, float):
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
+                else:
+                    raise Exception("makeNumber is only supported for constant integer arguments")
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
