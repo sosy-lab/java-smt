@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<!-- vim: set tabstop=8 shiftwidth=4 expandtab sts=4 filetype=ant fdm=marker: -->
+<project name="publish-solvers-z3-legacy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <property name="z3legacy.dist.dir" value="${ivy.solver.dist.dir}/z3legacy"/>
+
+    <import file="macros.xml"/>
+
+    <target name="check-z3-legacy-path">
+        <fail unless="z3.path">
+            INFO
+            Please specify the path to Z3 sources directory with the flag '-Dz3.path=/path/to/z3'.
+            The path should contain directories like './build/', and should be absolute.
+            Please provide the patched legacy Z3 version in this path.
+            This build script will compile and package Z3 as required for JavaSMT.
+            Currently only Linux x64 and arm64 version for Z3 is available.
+            For example, the directory structure can look like this:
+
+            z3/            // &lt;-- parent directory and target of 'z3.path'
+            |-- build/
+            |-- scripts/
+            |-- src/
+            |-- ...
+
+            The patched version can be achieved by following the steps in '/lib/native/source/z3-4.5.0/README.md'.
+        </fail>
+    </target>
+
+    <target name="check-z3-legacy-version">
+        <fail unless="z3.customRev">
+            INFO
+            Please specify the version string used for Z3 legacy with the flag '-Dz3.customRev=SOME_VERSION'.
+            This is just '4.5.0' or some updated version.
+        </fail>
+    </target>
+
+    <target name="set-properties-for-z3-legacy" depends="check-z3-legacy-path, check-z3-legacy-version">
+        <!-- Get a naive version (let's ignore patched/dirty status) -->
+        <exec executable="git" dir="${z3.path}" outputproperty="z3.revision" failonerror="true">
+            <arg value="show"/>
+            <arg value="-s"/>
+            <arg value="--format=%h"/>
+        </exec>
+        <property name="z3.legacy.version" value="${z3.customRev}-g${z3.revision}"/>
+        <echo message="Building Z3 Legacy in version '${z3.legacy.version}'"/>
+
+        <!-- set properties for the next steps -->
+        <property name="z3.installPathLinuxX64" location="${z3.path}/install-linux-x64"/>
+        <property name="z3.installPathLinuxArm64" location="${z3.path}/install-linux-arm64"/>
+
+        <!-- cleanup target directories, will be created and filled during the build-process -->
+        <delete dir="${z3.installPathLinuxX64}" quiet="true"/>
+        <delete dir="${z3.installPathLinuxArm64}" quiet="true"/>
+        <delete dir="${z3.path}/build" quiet="true"/>
+    </target>
+
+    <target name="build-z3-legacy-linux-x64" depends="set-properties-for-z3-legacy">
+        <delete dir="${z3.path}/build"/>
+        <mkdir dir="${z3.installPathLinuxX64}"/>
+        <exec executable="python3" dir="${z3.path}" failonerror="true">
+            <arg value="scripts/mk_make.py"/>
+            <arg value="--prefix=${z3.installPathLinuxX64}"/>
+            <arg value="--java"/>
+        </exec>
+        <exec executable="make" dir="${z3.path}/build" failonerror="true">
+            <arg value="-j"/>
+        </exec>
+        <exec executable="make" dir="${z3.path}/build" failonerror="true">
+            <arg value="install"/>
+        </exec>
+        <!-- soname is required for libz3legacy.so -->
+        <!-- Only required for older versions of Z3. Newer versions of Z3 already include this fix in their build-scripts. -->
+        <exec executable="patchelf" dir="${z3.installPathLinuxX64}/lib" failonerror="true">
+            <arg value="--set-soname"/><arg value="libz3legacy.so"/>
+            <arg value="libz3legacy.so"/>
+        </exec>
+    </target>
+
+    <target name="build-z3-legacy-linux-arm64" depends="set-properties-for-z3-legacy">
+        <delete dir="${z3.path}/build"/>
+        <mkdir dir="${z3.installPathLinuxArm64}"/>
+        <exec executable="python3" dir="${z3.path}" failonerror="true">
+            <env key="CXX" value="aarch64-linux-gnu-g++"/>
+            <env key="CC" value="aarch64-linux-gnu-gcc"/>
+            <env key="AR" value="aarch64-linux-gnu-ar"/>
+            <arg value="scripts/mk_make.py"/>
+            <arg value="--prefix=${z3.installPathLinuxArm64}"/>
+            <arg value="--java"/>
+        </exec>
+        <exec executable="make" dir="${z3.path}/build" failonerror="true">
+            <arg value="-j"/>
+        </exec>
+        <exec executable="make" dir="${z3.path}/build" failonerror="true">
+            <arg value="install"/>
+        </exec>
+        <!-- soname is required for libz3legacy.so -->
+        <!-- Only required for older versions of Z3. Newer versions of Z3 already include this fix in their build-scripts. -->
+        <exec executable="patchelf" dir="${z3.installPathLinuxArm64}/lib" failonerror="true">
+            <arg value="--set-soname"/><arg value="libz3legacy.so"/>
+            <arg value="libz3legacy.so"/>
+        </exec>
+    </target>
+
+    <target name="package-z3-legacy" depends="set-properties-for-z3-legacy, build-z3-legacy-linux-x64, build-z3-legacy-linux-arm64">
+        <mkdir dir="${z3legacy.dist.dir}/x64"/>
+        <mkdir dir="${z3legacy.dist.dir}/arm64"/>
+
+        <!-- copy library files into directory to be published for Ivy -->
+        <!-- Linux x64 files -->
+        <copy file="${z3.installPathLinuxX64}/lib/libz3legacy.so" tofile="${z3legacy.dist.dir}/x64/libz3legacy-${z3.legacy.version}.so" failonerror="true"/>
+        <copy file="${z3.installPathLinuxX64}/lib/libz3javalegacy.so" tofile="${z3legacy.dist.dir}/x64/libz3javalegacy-${z3.legacy.version}.so" failonerror="true"/>
+        <!-- Linux ARM64 files -->
+        <copy file="${z3.installPathLinuxArm64}/lib/libz3legacy.so" tofile="${z3legacy.dist.dir}/arm64/libz3legacy-${z3.legacy.version}.so" failonerror="true"/>
+        <copy file="${z3.installPathLinuxArm64}/lib/libz3javalegacy.so" tofile="${z3legacy.dist.dir}/arm64/libz3javalegacy-${z3.legacy.version}.so" failonerror="true"/>
+
+        <!-- TODO: add Windows and MacOS releases -->
+
+        <!-- common Java file, Java is platform independent -->
+        <copy file="${z3.installPathLinuxX64}/lib/com.microsoft.z3legacy.jar" tofile="${z3legacy.dist.dir}/com.microsoft.z3legacy-${z3.legacy.version}.jar" failonerror="true"/>
+    </target>
+
+    <target name="publish-z3-legacy" depends="package-z3-legacy, load-ivy"
+        description="Publish Z3 legacy binaries to Ivy repo.">
+        <ivy:resolve conf="solver-z3-legacy,solver-z3-legacy-x64" file="solvers_ivy_conf/ivy_z3-legacy.xml"/>
+        <publishToRepository solverName="Z3-legacy" solverVersion="${z3.legacy.version}" distDir="${z3legacy.dist.dir}"/>
+
+        <!--
+          We additionally provide x64-files without arch-attribute for backwards compatibility,
+          such that applications can load dependencies without changing their Ivy configuration.
+          Those files are not part of any direct configuration, but will be resolved if the
+          arch-attribute is not used.
+        -->
+        <echo>
+            Lets copy the files for architecture x64 into main directory, for backwards compatibility.
+            Afterward, please execute the SVN command from above.
+        </echo>
+        <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
+            <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">
+                <include name="*-${z3.legacy.version}.*"/>
+            </fileset>
+        </copy>
+    </target>
+</project>

@@ -235,6 +235,10 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(bvmgr)
         .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support bitvectors for interpolation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   protected final void requireBitvectorToInt() {
@@ -298,6 +302,10 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
         .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support floats for interpolation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   /** Skip test if the solver does not support strings. */
@@ -355,6 +363,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
   }
 
   protected void requireArrayModel() {
@@ -459,6 +474,7 @@ public abstract class SolverBasedTest0 {
         if (eval != null) {
           switch (solverToUse()) {
             case Z3:
+            case Z3_4_5_0:
               // ignore, Z3 provides arbitrary values
               break;
             case BOOLECTOR:

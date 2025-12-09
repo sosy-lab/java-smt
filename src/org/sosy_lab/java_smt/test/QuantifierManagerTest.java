@@ -1050,6 +1050,10 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void testExistsBasicStringTheorie() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
 
     // exists var ("a" < var < "c") & length var == 1  -> var == "b"
     StringFormula stringA = smgr.makeString("a");
@@ -1070,6 +1074,11 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
   public void testForallBasicStringTheorie() throws SolverException, InterruptedException {
     requireStrings();
     requireIntegers();
+
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_4_5_0);
 
     // forall var ("a" < var < "c") & length var == 1
     StringFormula stringA = smgr.makeString("a");
