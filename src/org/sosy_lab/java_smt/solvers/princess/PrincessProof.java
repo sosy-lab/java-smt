@@ -341,14 +341,7 @@ public final class PrincessProof extends AbstractProof {
     return new PrincessProof(rule, null);
   }
 
-  /**
-   * Recursively wraps a sequence of BranchInference objects (which includes MacroInference).
-   *
-   * @param inferences The sequence of Princess BranchInference objects to process.
-   * @param api The SimpleAPI instance.
-   * @param creator The formula creator.
-   * @return A list of wrapped JavaSMT PrincessProofRule objects.
-   */
+  //Recursively wraps a sequence of BranchInference objects.
   private static List<PrincessProofRule> getWrappedInferences(
       Seq<BranchInference> inferences, SimpleAPI api, PrincessFormulaCreator creator) {
 
@@ -630,6 +623,7 @@ public final class PrincessProof extends AbstractProof {
 
     // 2. Create the container rule
     PrincessBranchCertificate containerRule = new PrincessBranchCertificate(wrappedInferences);
+    containerRule.specificFields.put(INFERENCES, wrappedInferences);
 
     // 3. Store common fields for the container certificate itself
     storeCommonFields(bic, containerRule, api, creator);

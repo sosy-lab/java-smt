@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // Defines all known field keys used by various Princess proof rules (Certificates and Inferences).
 public final class PrincessProofFields {
@@ -25,6 +26,7 @@ public final class PrincessProofFields {
     return new ProofFieldKey<>((Class<T>) clazz, name);
   }
 
+  public static final ProofFieldKey<List<ProofRule>> INFERENCES = createKey(List.class, "inferences");
   public static final ProofFieldKey<Formula> CLOSING_CONSTRAINT =
       createKey(Formula.class, "closingConstraint");
   public static final ProofFieldKey<Set<Formula>> LOCAL_ASSUMED_FORMULAS =
