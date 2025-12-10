@@ -990,7 +990,7 @@ def translate(prog: List[Definition]):
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = IntegerType() if 'Integer' in stmt.getCalls()[1] else RationalType()
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
 
