@@ -1051,7 +1051,7 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "equalWithFPSemantics":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = sortMap[arg1]
+                sortMap[stmt.variable] = BooleanType()
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.eq {arg1} {arg2}))')
 
