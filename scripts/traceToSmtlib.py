@@ -1351,9 +1351,9 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[1]
                 args = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = FunctionType(args, arg1)
-                nameMap[stmt.variable] = arg0
+                nameMap[stmt.variable] = arg0 if arg0[0] == '|' and arg0[-1] == '|' else f'|{arg0}|'
                 output.append(
-                    f'(declare-fun {arg0} {sortMap[stmt.variable].toSmtlib()})')
+                    f'(declare-fun {nameMap[stmt.variable]} {sortMap[stmt.variable].toSmtlib()})')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
