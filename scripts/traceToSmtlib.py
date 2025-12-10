@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import argparse
 import math
 # This file is part of JavaSMT,
 # an API wrapper for a collection of SMT solvers:
@@ -1422,19 +1423,30 @@ def translate(prog: List[Definition]):
         else:
             raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
+    output.append("")
     return '\n'.join(output)
 
 
 if __name__ == '__main__':
-    arg = sys.argv
-    if not len(sys.argv) == 2:
-        print('Expecting a path to a JavaSMT trace as argument')
-        exit(-1)
+    options = argparse.ArgumentParser(description='Convert JavaSMT traces to SMTLIB files')
 
-    path = Path(sys.argv[1])
-    if not (path.is_file()):
-        print(f'Could not find file "{path}"')
+    options.add_argument('file', type=Path, help='Input file')
+    options.add_argument('--save', action='store_true',
+                         help='Save the output in a *.smt2 file. The path to the file is the same as for the input, but with a different extension')
+
+    args = options.parse_args()
+
+    if not args.file.is_file():
+        print(f'Could not find input file "{args.file}"')
         exit(-1)
 
     # Translate the trace
-    print(translate(flattenProvers(program.parse(open(path).read()))))
+    try:
+        output = translate(flattenProvers(program.parse(open(args.file).read())))
+    except Exception as exception:
+        print(f'In {args.file}: {exception}')
+        exit(-1)
+
+    out = open(args.file.with_suffix('.smt2'), 'w') if args.save else sys.stdout
+    out.write(output)
+    out.close()
