@@ -1060,12 +1060,12 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = arg3
                 if isinstance(arg3, FloatType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
                 elif isinstance(arg3, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(arg3, RationalType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.to_real {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.to_real {arg1}))')
                 elif isinstance(arg3, BitvectorType):
                     output.append(
                         f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'fp.to_sbv' if arg2 else 'fp.to_ubv'}  {arg3.width}) {arg4.toSmtlib()} {arg1}))')
@@ -1082,15 +1082,15 @@ def translate(prog: List[Definition]):
                 sourceType = sortMap[arg1]
                 if isinstance(sourceType, FloatType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
                 elif isinstance(sourceType, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(sourceType, RationalType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
                 elif isinstance(sourceType, BitvectorType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent}) {arg3.significand}) {arg4.toSmtlib()} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
                 else:
                     raise Exception(f"Illegal cast from {sourceType} to float")
 
