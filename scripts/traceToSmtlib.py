@@ -623,6 +623,15 @@ def translate(prog: List[Definition]):
               "(set-option :produce-models true)",
               "(set-option :global-declarations true)"]
     for stmt in prog[5:]:
+        def matchType(param, arg):
+            "Convert argument to match the given type"
+            if param == IntegerType() and sortMap[arg] == RationalType():
+                return f'(to_int {arg})'
+            elif param == RationalType() and sortMap[arg] == IntegerType():
+                return f'(to_real {arg})'
+            else:
+                return arg
+
         if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
             if stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
@@ -902,95 +911,82 @@ def translate(prog: List[Definition]):
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[1] == "getIntegerFormulaManager" or stmt.getCalls()[1] == "getRationalFormulaManager":
+            theoryType = IntegerType() if "Integer" in stmt.getCalls()[1] else RationalType()
+
+            def conv(arg):
+                "Convert argument to match the type of the parameter"
+                return matchType(theoryType, arg)
+
             if stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "distinct":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(map(conv, args))}))')
 
-            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "divide"]:
+            elif stmt.getCalls()[-1] == "divide":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (div {arg1} {arg2}))')
-
-            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "divide"]:
-                arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = RationalType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (/ {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({'div' if theoryType == IntegerType() else '/'} {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "equal":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (= {conv(arg1)} {conv(arg2)}))')
 
-            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "floor"]:
+            elif stmt.getCalls()[-1] == "floor":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = IntegerType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
-
-            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "floor"]:
-                arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = IntegerType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (to_int {arg1}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {matchType(IntegerType(), arg1)})')
 
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (>= {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (>= {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "greaterThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (> {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (> {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (<= {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (<= {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "lessThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (< {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (< {conv(arg1)} {conv(arg2)}))')
 
-            elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "makeNumber"]:
+            elif stmt.getCalls()[-1] == "makeNumber":
                 arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toIntSmtlib(arg1)})')
-
-            elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "makeNumber"]:
-                arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = RationalType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toRealSmtlib(arg1)})')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toIntSmtlib(arg1) if theoryType == IntegerType() else toRealSmtlib(arg1)})')
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
-                sortMap[stmt.variable] = IntegerType() if 'Integer' in stmt.getCalls()[1] else RationalType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
 
@@ -1012,28 +1008,28 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "multiply":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (* {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (* {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "negate":
                 arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {conv(arg1)}))')
 
             elif stmt.getCalls()[-1] == "subtract":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (- {conv(arg1)} {conv(arg2)}))')
 
             elif stmt.getCalls()[-1] == "sum":
                 args = stmt.value[-1].args
-                sortMap[stmt.variable] = IntegerType()
+                sortMap[stmt.variable] = theoryType
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(args)}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(map(conv, args))}))')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
@@ -1363,9 +1359,10 @@ def translate(prog: List[Definition]):
                 arg0 = stmt.value[-1].args[0]
                 args = stmt.value[-1].args[1]
                 name = nameMap[arg0]
+                values = [matchType(param, arg) for param, arg in zip(sortMap[arg0].arguments, args)]
                 sortMap[stmt.variable] = sortMap[arg0].value
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(args)}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(values)}))')
 
             elif stmt.getCalls()[-1] == "declareUF":
                 arg0 = stmt.value[-1].args[0]
