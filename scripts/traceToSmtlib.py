@@ -1070,7 +1070,7 @@ def translate(prog: List[Definition]):
                         f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.to_real {arg1})')
                 elif isinstance(arg3, BitvectorType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'fp.to_sbv' if arg2 else 'fp.to_ubv'}  {arg3.width}) {arg4} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'fp.to_sbv' if arg2 else 'fp.to_ubv'}  {arg3.width}) {arg4.toSmtlib()} {arg1}))')
                 else:
                     raise Exception(f"Illegal cast from float to {arg3}")
 
