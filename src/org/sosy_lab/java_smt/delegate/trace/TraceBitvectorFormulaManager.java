@@ -15,6 +15,7 @@ import java.util.List;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 
@@ -61,10 +62,7 @@ public class TraceBitvectorFormulaManager implements BitvectorFormulaManager {
 
   @Override
   public BitvectorFormula makeVariable(int length, String pVar) {
-    return logger.logDef(
-        "mgr.getBitvectorFormulaManager()",
-        String.format("makeVariable(%s, %s)", length, logger.printString(pVar)),
-        () -> delegate.makeVariable(length, pVar));
+    return makeVariable(FormulaType.getBitvectorTypeWithSize(length), pVar);
   }
 
   @Override
