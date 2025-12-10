@@ -215,6 +215,7 @@ def litString():
     yield string('"')
     return lit.replace('\\"', '"').replace('\\\'', '\'').replace('\\n', '\n').replace('\\\\', '\\')
 
+
 def test_string():
     assert litString.parse('"str"') == 'str'
     assert litString.parse('"\\""') == '"'
@@ -1059,6 +1060,42 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.gt {arg1} {arg2}))')
 
+            elif stmt.getCalls()[-1] == "isInfinity":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isInfinite {arg1}))')
+
+            elif stmt.getCalls()[-1] == "isNaN":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isNaN {arg1}))')
+
+            elif stmt.getCalls()[-1] == "isNegative":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isNegative {arg1}))')
+
+            elif stmt.getCalls()[-1] == "isNormal":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isNormal {arg1}))')
+
+            elif stmt.getCalls()[-1] == "isSubnormal":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isSubnormal {arg1}))')
+
+            elif stmt.getCalls()[-1] == "isZero":
+                arg1 = stmt.value[-1].args[0]
+                sortMap[stmt.variable] = BooleanType()
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.isZero {arg1}))')
+
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
@@ -1108,6 +1145,9 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ +oo {arg1.exponent} {arg1.significand}))')
+
+            elif stmt.getCalls()[-1] == "makeRoundingMode":
+                pass
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
