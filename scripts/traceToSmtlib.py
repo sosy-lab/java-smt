@@ -536,6 +536,23 @@ def parseNumber(repr):
         raise Exception(f'Could not parse "{repr}"')
 
 
+def toIntSmtlib(value):
+    "Print integer value as smtlib"
+    if isinstance(value, str):
+        return toIntSmtlib(parseNumber(value))
+    if isinstance(value, float) and not math.isnan(value) and not math.isinf(value):
+        return toIntSmtlib(Fraction(value))
+    if isinstance(value, int):
+        return f'(- {-value})' if value < 0 else str(value)
+    if isinstance(value, Fraction):
+        if value < 0:
+            return f'(div (- {-value.numerator}) {value.denominator})'
+        else:
+            return f'(div {value.numerator} {value.denominator})'
+    else:
+        raise Exception(f'Can\'t convert "{value}" to Integer')
+
+
 def toRealSmtlib(value):
     "Print real value as smtlib"
     if isinstance(value, str):
@@ -953,33 +970,14 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = IntegerType()
-                if isinstance(arg1, int):
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1 if arg1 >= 0 else f'(- {abs(arg1)})'})')
-                elif isinstance(arg1, Fraction):
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (div {arg1.numerator} {arg1.denominator}))')
-                elif isinstance(arg1, float):
-                    # FIXME We need to use euclidean division here. Converting with int() will (probably?) truncate
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {int(arg1)})')
-                else:
-                    raise Exception("makeNumber is only supported for constant integer arguments")
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toIntSmtlib(arg1)})')
 
             elif stmt.getCalls() == ["mgr", "getRationalFormulaManager", "makeNumber"]:
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = RationalType()
-                if isinstance(arg1, int):
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
-                elif isinstance(arg1, Fraction):
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (/ {arg1.numerator} {arg1.denominator}))')
-                elif isinstance(arg1, float):
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {arg1})')
-                else:
-                    raise Exception("makeNumber is only supported for constant integer arguments")
+                output.append(
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toRealSmtlib(arg1)})')
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
