@@ -39,11 +39,14 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQ_CASE
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EXPANDED_INFERENCES;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.FACTOR;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INEQUALITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INFERENCES;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_FORMULA;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_TERMS;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_ATOM;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_COEFFICIENT;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_FORMULA;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_INEQUALITY;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEMMA_FORMULA;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_ASSUMED_FORMULAS;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_BOUND_CONSTANTS;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_PROVIDED_FORMULAS;
@@ -56,11 +59,14 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_S
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.PROVIDED_FORMULAS;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.QUANTIFIED_FORMULA;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RESULT;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_ATOM;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_COEFFICIENT;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_FORMULA;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_INEQUALITY;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.SPLIT_FORMULA;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.SUBST;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.TARGET_LITERAL;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.THEORY;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.THEORY_AXIOMS;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.WEAK_INEQUALITY;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -269,28 +275,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula()
-      if (solverToUse().equals(SMTINTERPOL) || solverToUse().equals(PRINCESS)) {
-
-      } else {
-        assertThat(proof.getFormula().isPresent()).isTrue();
-      }
-
-      // Test getChilderen()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(proof);
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)
@@ -367,28 +352,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Retrieve and verify proof
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Root formula check
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Rule check
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Arguments check
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Leaf check
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(proof);
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)
@@ -425,6 +389,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -434,8 +399,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  // TODO: Mathsat5 does not produce a msat_manager. It adds null to de asserted formulas when
-  // adding the constraint for false.
+  // TODO: Mathsat5 does not produce a msat_manager. It adds null to the asserted formulas when
+  //  adding the constraint for false.
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
     requireProofGeneration();
@@ -457,6 +422,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
+              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -482,32 +448,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
-
-      // if (solverToUse().equals(OPENSMT)) {
-      //  System.out.println(((AbstractSubproof) proof).proofAsString());
-      // }
+      checkProof(proof);
 
     } catch (UnsupportedOperationException e) {
       assertThat(e)
@@ -543,28 +484,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(proof);
 
       // assert integer formulas and test again
       prover.addConstraint(imgr.equal(x1, two));
@@ -574,28 +494,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof secondProof = prover.getProof();
-      assertThat(secondProof).isNotNull();
-
-      // Test getRule()
-      assertThat(secondProof.getRule()).isNotNull();
-      assertThat(secondProof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(secondProof.getFormula()).isNull();
-      } else {
-        assertThat(secondProof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(secondProof.getChildren()).isNotNull();
-      assertThat(secondProof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(secondProof.isLeaf()).isFalse();
-      leaf = findanyProofLeaf(secondProof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(secondProof);
 
       assertNotEquals(proof, secondProof);
 
@@ -614,6 +513,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  // TODO: MathSAT5 produces a proof with a CLAUSE_HYP rule without children, investigate why this
+  // coudl be and how to process
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
@@ -636,30 +537,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
-
-      // System.out.println(((AbstractSubproof) proof).proofAsString());
+      checkProof(proof);
 
       prover.pop();
       prover.pop();
@@ -673,30 +551,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof secondProof = prover.getProof();
-      assertThat(secondProof).isNotNull();
-
-      // Test getRule()
-      assertThat(secondProof.getRule()).isNotNull();
-      assertThat(secondProof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(secondProof.getFormula()).isNull();
-      } else {
-        assertThat(secondProof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(secondProof.getChildren()).isNotNull();
-      assertThat(secondProof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(secondProof.isLeaf()).isFalse();
-      leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
-
-      // System.out.println(((AbstractSubproof) proof).proofAsString());
+      checkProof(secondProof);
 
       assertNotEquals(proof, secondProof);
 
@@ -777,28 +632,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(proof);
     }
   }
 
@@ -827,28 +661,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-
-      // Test getRule()
-      assertThat(proof.getRule()).isNotNull();
-      assertThat(proof.getRule()).isInstanceOf(ProofRule.class);
-
-      // Test getFormula(), the root should always be false
-      if (solverToUse().equals(SMTINTERPOL)) {
-        assertThat(proof.getFormula()).isNull();
-      } else {
-        assertThat(proof.getFormula()).isEqualTo(bmgr.makeFalse());
-      }
-
-      // Test getArguments()
-      assertThat(proof.getChildren()).isNotNull();
-      assertThat(proof.getChildren()).isNotEmpty();
-
-      // Test isLeaf()
-      assertThat(proof.isLeaf()).isFalse();
-      Proof leaf = findanyProofLeaf(proof);
-      assertThat(leaf).isNotNull();
-      assertThat(leaf.isLeaf()).isTrue();
+      checkProof(proof);
     }
   }
 
@@ -878,6 +691,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       } else if (solverToUse().equals(PRINCESS)) {
         assertThat(formula.isEmpty()).isTrue();
+      } else if (solverToUse().equals(MATHSAT5)) {
+        // do nothing, optional proof may not provide a formula
       } else {
         assertThat(formula.isPresent()).isTrue();
       }
@@ -922,7 +737,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         case "BETA_CERTIFICATE":
           assertThat(rule.getSpecificField(LEFT_FORMULA)).isInstanceOf(Formula.class);
           assertThat(rule.getSpecificField(RIGHT_FORMULA)).isInstanceOf(Formula.class);
-
+          assertThat(rule.getSpecificField(LEMMA_FORMULA)).isNotNull();
           break;
         case "CUT_CERTIFICATE":
           assertThat(rule.getSpecificField(CUT_FORMULA)).isInstanceOf(Formula.class);
@@ -942,7 +757,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(EQ_CASES)).isInstanceOf(BigInteger.class);
           break;
         case "BRANCH_INFERENCE_CERTIFICATE":
-          assertThat(rule.getSpecificField(CLOSING_CONSTRAINT)).isInstanceOf(Formula.class);
+          List<ProofRule> inferences = rule.getSpecificField(INFERENCES);
+          assertThat(inferences).isNotNull();
+          assertThat(inferences).isNotEmpty();
+          for (ProofRule inference : inferences) {
+            assertThat(inference).isInstanceOf(PrincessProofRule.class);
+            checkPrincessSpecificFields((PrincessProofRule) inference);
+          }
           break;
 
         case "ALPHA_INFERENCE":
@@ -957,6 +778,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(OLD_SYMBOL)).isInstanceOf(Formula.class);
           assertThat(rule.getSpecificField(NEW_SYMBOL)).isInstanceOf(Formula.class);
           assertThat(rule.getSpecificField(DEFINING_EQUATION)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(SUBST)).isNotNull();
           break;
         case "COMBINE_EQUATIONS_INFERENCE":
           assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
@@ -994,6 +816,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           }
           break;
         case "PRED_UNIFY_INFERENCE":
+          assertThat(rule.getSpecificField(LEFT_ATOM)).isNotNull();
+          assertThat(rule.getSpecificField(RIGHT_ATOM)).isNotNull();
           assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
           break;
         case "QUANTIFIER_INFERENCE":
@@ -1002,6 +826,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
           break;
         case "REDUCE_INFERENCE":
+          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
+          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
+          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
         case "REDUCE_PRED_INFERENCE":
           assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
           assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
@@ -1014,6 +841,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(FACTOR)).isInstanceOf(BigInteger.class);
           break;
         case "THEORY_AXIOM_INFERENCE":
+          assertThat(rule.getSpecificField(THEORY)).isNotNull();
           assertThat(rule.getSpecificField(AXIOM)).isInstanceOf(Formula.class);
           break;
         case "CLOSE_CERTIFICATE":

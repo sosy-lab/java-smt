@@ -26,7 +26,8 @@ public final class PrincessProofFields {
     return new ProofFieldKey<>((Class<T>) clazz, name);
   }
 
-  public static final ProofFieldKey<List<ProofRule>> INFERENCES = createKey(List.class, "inferences");
+  public static final ProofFieldKey<List<ProofRule>> INFERENCES =
+      createKey(List.class, "inferences");
   public static final ProofFieldKey<Formula> CLOSING_CONSTRAINT =
       createKey(Formula.class, "closingConstraint");
   public static final ProofFieldKey<Set<Formula>> LOCAL_ASSUMED_FORMULAS =

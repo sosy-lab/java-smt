@@ -341,7 +341,7 @@ public final class PrincessProof extends AbstractProof {
     return new PrincessProof(rule, null);
   }
 
-  //Recursively wraps a sequence of BranchInference objects.
+  // Recursively wraps a sequence of BranchInference objects.
   private static List<PrincessProofRule> getWrappedInferences(
       Seq<BranchInference> inferences, SimpleAPI api, PrincessFormulaCreator creator) {
 
