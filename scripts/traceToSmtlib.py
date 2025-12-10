@@ -1341,6 +1341,22 @@ def translate(prog: List[Definition]):
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
+        elif stmt.getCalls()[:-1] == ["mgr", "getQuantifiedFormulaManager"]:
+            # TODOThro
+            raise Exception(f'Quantifiers are not supported yet')
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getStringFormulaManager"]:
+            # TODO
+            raise Exception(f'Strings are not supported yet')
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getEnumerationFormulaManager"]:
+            # TODO
+            raise Exception(f'Enumerations are not supported yet')
+
+        elif stmt.getCalls()[:-1] == ["mgr", "getSLFormulaManager"]:
+            # TODO
+            raise Exception(f'Separation logic is not supported yet')
+
         elif stmt.getCalls()[:-1] == ["mgr", "getUFManager"]:
             if stmt.getCalls()[-1] == "callUF":
                 arg0 = stmt.value[-1].args[0]
