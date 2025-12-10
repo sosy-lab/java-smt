@@ -1123,22 +1123,33 @@ def translate(prog: List[Definition]):
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ NaN {arg1.exponent} {arg1.significand}))')
 
             elif stmt.getCalls()[-1] == "makeNumber":
-                if len(stmt.value[-1].args) < 4:
-                    raise Exception(f'Expected 4 arguments to fp.makeNumber, got {len(stmt.value)}')
-                arg1 = stmt.value[-1].args[0]  # exponent
-                arg2 = stmt.value[-1].args[1]  # significand
-                arg3 = stmt.value[-1].args[2]  # sign
-                arg4 = stmt.value[-1].args[3]  # type
-                if not (isinstance(arg1, int) and
-                        isinstance(arg2, int) and
-                        isinstance(arg3, Sign) and
-                        isinstance(arg4, FloatType)):
-                    # TODO Support more value constructors
-                    raise Exception(
-                        "We currently only support fp.makeNumber when sign, exponent and mantissa are given explicitly")
-                sortMap[stmt.variable] = arg4
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp {'#1' if arg3 == Sign.NEGATIVE else '#0'} {printBitvector(arg4.exponent, arg1)} {printBitvector(arg4.significand, arg2)}))')
+                args = stmt.value[-1].args
+                if (len(args) == 3
+                        and (isinstance(args[0], float) or isinstance(args[0], int) or isinstance(args[0], str))
+                        and isinstance(args[1], Type)
+                        and isinstance(args[2], RoundingMode)):
+                    rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
+                    sortMap[stmt.variable] = args[1]
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm} {args[0]}))')
+                elif (len(args) == 3
+                      and isinstance(args[0], Fraction)
+                      and isinstance(args[1], Type)
+                      and isinstance(args[2], RoundingMode)):
+                    rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
+                    sortMap[stmt.variable] = args[1]
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm} (/ {args[0].numerator} {args[0].denominator})))')
+                elif (len(args) == 4
+                      and isinstance(args[0], int)
+                      and isinstance(args[1], int)
+                      and isinstance(args[2], Sign)
+                      and isinstance(args[3], FloatType)):
+                    sortMap[stmt.variable] = args[3]
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp {'#1' if args[2] == Sign.NEGATIVE else '#0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand, args[1])}))')
+                else:
+                    raise Exception(f'Unsupported call: {stmt.getCalls()} ({type(args[0])} {args})')
 
             elif stmt.getCalls()[-1] == "makePlusInfinity":
                 arg1 = stmt.value[-1].args[0]
