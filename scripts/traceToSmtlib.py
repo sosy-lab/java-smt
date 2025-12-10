@@ -530,7 +530,9 @@ def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
     sortMap = {}
     nameMap = {}  # Stores UF names for function declarations
-    output = ["(set-option :produce-models true)",
+    output = ["(set-logic ALL)",
+              "(set-option :interactive-mode true)"
+              "(set-option :produce-models true)",
               "(set-option :global-declarations true)"]
     for stmt in prog[5:]:
         if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
