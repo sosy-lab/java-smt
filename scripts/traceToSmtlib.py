@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import math
 # This file is part of JavaSMT,
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
@@ -509,6 +509,62 @@ def printBitvector(width, value):
 def test_printBitvector():
     assert printBitvector(8, 5) == "#b00000101"
     assert printBitvector(8, -5) == "#b11111011"
+
+
+def parseNumber(repr):
+    "Parse a String as a number"
+    value = None
+    try:
+        value = int(repr)
+    except Exception:
+        pass
+    if value is not None:
+        return value
+    try:
+        value = Fraction(repr)
+    except Exception:
+        pass
+    if value is not None:
+        return value
+    try:
+        value = float(repr)
+    except Exception:
+        pass
+    if value is not None:
+        return value
+    else:
+        raise Exception(f'Could not parse "{repr}"')
+
+
+def toRealSmtlib(value):
+    "Print real value as smtlib"
+    if isinstance(value, str):
+        return toRealSmtlib(parseNumber(value))
+    if isinstance(value, int):
+        return toRealSmtlib(Fraction(value))
+    elif isinstance(value, Fraction):
+        if value < 0:
+            return f'(/ (- {-value.numerator}) {value.denominator})'
+        else:
+            return f'(/ {value.numerator} {value.denominator})'
+    else:
+        raise Exception(f'Can\'t convert "{value}" to Real')
+
+
+def toFpSmtlib(rm, fpType, value):
+    "Print float value as smtlib"
+    if isinstance(value, str):
+        return toFpSmtlib(rm, fpType, parseNumber(value))
+    elif value == float('-inf'):
+        return f'(_ -oo {fpType.exponent} {fpType.significand})'
+    elif value == float('+inf'):
+        return f'(_ +oo {fpType.exponent} {fpType.significand})'
+    elif isinstance(value, float) and math.isnan(value):
+        return f'(_ NaN {fpType.exponent} {fpType.significand})'
+    elif isinstance(value, float):
+        return toFpSmtlib(rm, fpType, Fraction.from_float(value))
+    else:
+        return f'((_ to_fp {fpType.exponent} {fpType.significand}) {rm.toSmtlib()} {toRealSmtlib(value)})'
 
 
 def flattenProvers(prog: List[Definition]):
@@ -1141,21 +1197,13 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "makeNumber":
                 args = stmt.value[-1].args
                 if (len(args) == 3
-                        and (isinstance(args[0], float) or isinstance(args[0], int) or isinstance(args[0], str))
+                        and (isinstance(args[0], float | int | Fraction | str))
                         and isinstance(args[1], Type)
                         and isinstance(args[2], RoundingMode)):
                     rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
                     sortMap[stmt.variable] = args[1]
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm.toSmtlib()} {args[0]}))')
-                elif (len(args) == 3
-                      and isinstance(args[0], Fraction)
-                      and isinstance(args[1], Type)
-                      and isinstance(args[2], RoundingMode)):
-                    rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
-                    sortMap[stmt.variable] = args[1]
-                    output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm.toSmtlib()} (/ {args[0].numerator} {args[0].denominator})))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {toFpSmtlib(rm, args[1], args[0])})')
                 elif (len(args) == 4
                       and isinstance(args[0], int)
                       and isinstance(args[1], int)
