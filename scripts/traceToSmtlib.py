@@ -1366,7 +1366,7 @@ def translate(prog: List[Definition]):
 
         elif stmt.getCalls()[-1] == "evaluate":
             arg1 = stmt.value[-1].args[0]
-            output.append(f'(get-values ({arg1}))')
+            output.append(f'(get-value ({arg1}))')
 
         elif stmt.getCalls()[-1] == "getModel":
             output.append(f'(get-model)')
