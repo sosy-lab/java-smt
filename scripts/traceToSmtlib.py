@@ -683,26 +683,30 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (>= {arg1} {arg2}))')
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({'bvsge' if arg3 else 'bvuge'} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "greaterThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (> {arg1} {arg2}))')
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({'bvsgt' if arg3 else 'bvugt'} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (<= {arg1} {arg2}))')
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({'bvsle' if arg3 else 'bvule'} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "lessThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
+                arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (< {arg1} {arg2}))')
+                output.append(f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({'bvslt' if arg3 else 'bvult'} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "makeBitvector":
                 arg1 = stmt.value[-1].args[0]
