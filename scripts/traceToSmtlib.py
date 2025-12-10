@@ -279,7 +279,7 @@ def litFloatType():
     yield whitespace.optional() << string(",") << whitespace.optional()
     significand = yield regex(r'[0-9]+').map(int)
     yield whitespace.optional() << string(")")
-    return FloatType(exponent, significand)
+    return FloatType(exponent, 1 + significand)
 
 
 @generate
@@ -1182,13 +1182,13 @@ def translate(prog: List[Definition]):
 
             elif stmt.getCalls()[-1] == "makeMinusInfinity":
                 arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                sortMap[stmt.variable] = arg1
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ -oo {arg1.exponent} {arg1.significand}))')
 
             elif stmt.getCalls()[-1] == "makeNaN":
                 arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                sortMap[stmt.variable] = arg1
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ NaN {arg1.exponent} {arg1.significand}))')
 
@@ -1209,13 +1209,13 @@ def translate(prog: List[Definition]):
                       and isinstance(args[3], FloatType)):
                     sortMap[stmt.variable] = args[3]
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp {'#1' if args[2] == Sign.NEGATIVE else '#0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand, args[1])}))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp '#1' if args[2] == Sign.NEGATIVE else '#0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand-1, args[1])}))')
                 else:
                     raise Exception(f'Unsupported call: {stmt.getCalls()} ({type(args[0])} {args})')
 
             elif stmt.getCalls()[-1] == "makePlusInfinity":
                 arg1 = stmt.value[-1].args[0]
-                sortMap[stmt.variable] = FloatType(arg1.exponent, arg1.significand)
+                sortMap[stmt.variable] = arg1
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (_ +oo {arg1.exponent} {arg1.significand}))')
 
