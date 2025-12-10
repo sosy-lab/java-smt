@@ -231,6 +231,20 @@ class RoundingMode(Enum):
     TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARD_NEGATIVE"
     TOWARD_ZERO = "FloatingPointRoundingMode.TOWARD_ZERO"
 
+    def toSmtlib(self):
+        if self == RoundingMode.NEAREST_TIES_TO_EVEN:
+            return "RNE"
+        elif self == RoundingMode.NEAREST_TIES_AWAY:
+            return "RNA"
+        elif self == RoundingMode.TOWARD_POSITIVE:
+            return "RTP"
+        elif self == RoundingMode.TOWARD_NEGATIVE:
+            return "RTN"
+        elif self == RoundingMode.TOWARD_ZERO:
+            return "RTZ"
+        else:
+            raise Exception("Unknown rounding mode")
+
 
 litRoundingMode = from_enum(RoundingMode)
 
@@ -974,7 +988,7 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.add {arg3} {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.add {arg3.toSmtlib()} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "assignment":
                 arg1 = stmt.value[-1].args[0]
@@ -992,7 +1006,7 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = arg3
                 if isinstance(arg3, FloatType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
                 elif isinstance(arg3, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(arg3, RationalType):
@@ -1014,15 +1028,15 @@ def translate(prog: List[Definition]):
                 sourceType = sortMap[arg1]
                 if isinstance(sourceType, FloatType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
                 elif isinstance(sourceType, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(sourceType, RationalType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1})')
                 elif isinstance(sourceType, BitvectorType):
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent}) {arg3.significand}) {arg3} {arg1})')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent}) {arg3.significand}) {arg4.toSmtlib()} {arg1})')
                 else:
                     raise Exception(f"Illegal cast from {sourceType} to float")
 
@@ -1032,7 +1046,7 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.div {arg3} {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.div {arg3.toSmtlib()} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "equalWithFPSemantics":
                 arg1 = stmt.value[-1].args[0]
@@ -1133,7 +1147,7 @@ def translate(prog: List[Definition]):
                     rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
                     sortMap[stmt.variable] = args[1]
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm} {args[0]}))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm.toSmtlib()} {args[0]}))')
                 elif (len(args) == 3
                       and isinstance(args[0], Fraction)
                       and isinstance(args[1], Type)
@@ -1141,7 +1155,7 @@ def translate(prog: List[Definition]):
                     rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
                     sortMap[stmt.variable] = args[1]
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm} (/ {args[0].numerator} {args[0].denominator})))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {args[1].exponent} {args[1].significand}) {rm.toSmtlib()} (/ {args[0].numerator} {args[0].denominator})))')
                 elif (len(args) == 4
                       and isinstance(args[0], int)
                       and isinstance(args[1], int)
@@ -1189,7 +1203,7 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.mul {arg3} {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.mul {arg3.toSmtlib()} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "negate":
                 arg1 = stmt.value[-1].args[0]
@@ -1209,14 +1223,14 @@ def translate(prog: List[Definition]):
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.roundToIntegral {arg2} {arg1}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.roundToIntegral {arg2.toSmtlib()} {arg1}))')
 
             elif stmt.getCalls()[-1] == "sqrt":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sqrt {arg2} {arg1}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sqrt {arg2.toSmtlib()} {arg1}))')
 
             elif stmt.getCalls()[-1] == "subtract":
                 arg1 = stmt.value[-1].args[0]
@@ -1224,7 +1238,7 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sub {arg3} {arg1} {arg2}))')
+                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sub {arg3.toSmtlib()} {arg1} {arg2}))')
 
             elif stmt.getCalls()[-1] == "toIeeBitvector":
                 raise Exception("Recasting from float to bitvector is not supported in SMTLIB")
