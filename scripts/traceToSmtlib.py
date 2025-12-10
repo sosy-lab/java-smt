@@ -258,7 +258,7 @@ litSign = from_enum(Sign)
 
 litType = forward_declaration()
 
-litBoolType = string("FormulaType.BooleanType").map(lambda str: IntegerType())
+litBoolType = string("FormulaType.BooleanType").map(lambda str: BooleanType())
 litIntegerType = string("FormulaType.IntegerType").map(lambda str: IntegerType())
 litRationalType = string("FormulaType.RationalType").map(lambda str: RationalType())
 litStringType = string("FormulaType.StringType").map(lambda str: StringType())
