@@ -1209,7 +1209,7 @@ def translate(prog: List[Definition]):
                       and isinstance(args[3], FloatType)):
                     sortMap[stmt.variable] = args[3]
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp '#1' if args[2] == Sign.NEGATIVE else '#0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand-1, args[1])}))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp #b{'1' if args[2] == Sign.NEGATIVE else '0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand-1, args[1])}))')
                 else:
                     raise Exception(f'Unsupported call: {stmt.getCalls()} ({type(args[0])} {args})')
 
