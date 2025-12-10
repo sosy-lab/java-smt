@@ -67,10 +67,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(double n, FloatingPointType type) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("makeNumber(%s, %s)", toString(n), logger.printFormulaType(type)),
-        () -> delegate.makeNumber(n, type));
+    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -88,10 +85,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(BigDecimal n, FloatingPointType type) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("makeNumber(new BigDecimal(\"%s\"), %s)", n, logger.printFormulaType(type)),
-        () -> delegate.makeNumber(n, type));
+    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -107,10 +101,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(String n, FloatingPointType type) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("makeNumber(\"%s\", %s)", n, logger.printFormulaType(type)),
-        () -> delegate.makeNumber(n, type));
+    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -126,10 +117,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula makeNumber(Rational n, FloatingPointType type) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("makeNumber(Rational.of(\"%s\"), %s)", n, logger.printFormulaType(type)),
-        () -> delegate.makeNumber(n, type));
+    return makeNumber(n, type, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -138,11 +126,8 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
     return logger.logDef(
         "mgr.getFloatingPointFormulaManager()",
         String.format(
-            "makeNumber(Rational.of(%s, %s), %s, %s)",
-            n.getNum(),
-            n.getDen(),
-            logger.printFormulaType(type),
-            printRoundingMode(pFloatingPointRoundingMode)),
+            "makeNumber(Rational.of(\"%s\"), %s, %s)",
+            n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
   }
 
@@ -197,12 +182,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   @Override
   public <T extends Formula> T castTo(
       FloatingPointFormula source, boolean signed, FormulaType<T> targetType) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "castTo(%s, %s, %s)",
-            logger.toVariable(source), signed, logger.printFormulaType(targetType)),
-        () -> delegate.castTo(source, signed, targetType));
+    return castTo(source, signed, targetType, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -225,12 +205,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   @Override
   public FloatingPointFormula castFrom(
       Formula source, boolean signed, FloatingPointType targetType) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format(
-            "castFrom(%s, %s, %s)",
-            logger.toVariable(source), signed, logger.printFormulaType(targetType)),
-        () -> delegate.castFrom(source, signed, targetType));
+    return castFrom(source, signed, targetType, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -312,10 +287,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula sqrt(FloatingPointFormula number) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("sqrt(%s)", logger.toVariable(number)),
-        () -> delegate.sqrt(number));
+    return sqrt(number, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -329,10 +301,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula add(FloatingPointFormula number1, FloatingPointFormula number2) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("add(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
-        () -> delegate.add(number1, number2));
+    return add(number1, number2, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -352,10 +321,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula subtract(FloatingPointFormula number1, FloatingPointFormula number2) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("subtract(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
-        () -> delegate.subtract(number1, number2));
+    return subtract(number1, number2, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -375,10 +341,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula divide(FloatingPointFormula number1, FloatingPointFormula number2) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("divide(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
-        () -> delegate.divide(number1, number2));
+    return divide(number1, number2, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
@@ -398,10 +361,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
 
   @Override
   public FloatingPointFormula multiply(FloatingPointFormula number1, FloatingPointFormula number2) {
-    return logger.logDef(
-        "mgr.getFloatingPointFormulaManager()",
-        String.format("multiply(%s, %s)", logger.toVariable(number1), logger.toVariable(number2)),
-        () -> delegate.multiply(number1, number2));
+    return multiply(number1, number2, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
   }
 
   @Override
