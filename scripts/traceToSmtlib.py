@@ -557,8 +557,10 @@ def toRealSmtlib(value):
     "Print real value as smtlib"
     if isinstance(value, str):
         return toRealSmtlib(parseNumber(value))
-    if isinstance(value, int):
+    elif isinstance(value, int):
         return toRealSmtlib(Fraction(value))
+    elif isinstance(value, float):
+        return toRealSmtlib(Fraction.from_float(value))
     elif isinstance(value, Fraction):
         if value < 0:
             return f'(/ (- {-value.numerator}) {value.denominator})'
@@ -578,8 +580,6 @@ def toFpSmtlib(rm, fpType, value):
         return f'(_ +oo {fpType.exponent} {fpType.significand})'
     elif isinstance(value, float) and math.isnan(value):
         return f'(_ NaN {fpType.exponent} {fpType.significand})'
-    elif isinstance(value, float):
-        return toFpSmtlib(rm, fpType, Fraction.from_float(value))
     else:
         return f'((_ to_fp {fpType.exponent} {fpType.significand}) {rm.toSmtlib()} {toRealSmtlib(value)})'
 
