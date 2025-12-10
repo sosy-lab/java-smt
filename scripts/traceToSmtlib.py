@@ -1112,7 +1112,7 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "fromIeeeBitvector":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
-                sortMap[stmt.variable] = sortMap[arg1]
+                sortMap[stmt.variable] = arg2
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg2.exponent} {arg2.significand}) {arg1}))')
 
