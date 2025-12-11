@@ -742,6 +742,8 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+                if '|' in arg2:
+                    continue
                 sortMap[stmt.variable] = arg1
                 output.append(f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
 
@@ -896,6 +898,8 @@ def translate(prog: List[Definition]):
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                if '|' in arg1:
+                    continue
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
@@ -1008,6 +1012,8 @@ def translate(prog: List[Definition]):
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                if '|' in arg1:
+                    continue
                 sortMap[stmt.variable] = theoryType
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
@@ -1259,6 +1265,8 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
                 arg2 = stmt.value[-1].args[1]
+                if '|' in arg1:
+                    continue
                 sortMap[stmt.variable] = arg2
                 output.append(
                     f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
@@ -1401,8 +1409,10 @@ def translate(prog: List[Definition]):
                 arg0 = stmt.value[-1].args[0]
                 arg1 = stmt.value[-1].args[1]
                 args = stmt.value[-1].args[2]
+                if '|' in arg0:
+                    continue
                 sortMap[stmt.variable] = FunctionType(args, arg1)
-                nameMap[stmt.variable] = arg0 if arg0[0] == '|' and arg0[-1] == '|' else f'|{arg0}|'
+                nameMap[stmt.variable] = f'|{arg0}|'
                 if args != []:
                     output.append(
                         f'(declare-fun {nameMap[stmt.variable]} {sortMap[stmt.variable].toSmtlib()})')
@@ -1433,6 +1443,8 @@ def translate(prog: List[Definition]):
         elif stmt.getCalls() == ["mgr", "makeVariable"]:
             arg1 = stmt.value[-1].args[0]
             arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+            if '|' in arg2:
+                continue
             sortMap[stmt.variable] = arg1
             output.append(
                 f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
