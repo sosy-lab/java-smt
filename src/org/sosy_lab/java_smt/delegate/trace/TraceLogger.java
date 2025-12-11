@@ -37,6 +37,10 @@ class TraceLogger {
   private final Map<Object, String> valueMap = new HashMap<>();
   private final RandomAccessFile output;
 
+  /**
+   * Contains lines that were recently added to the log. Entries on this list are preliminary and
+   * can still be removed from the final trace
+   */
   private final Deque<Long> lastLines = new ArrayDeque<>();
 
   TraceLogger(TraceFormulaManager pMgr, File pFile) {
@@ -106,8 +110,10 @@ class TraceLogger {
     }
   }
 
+  /** Undo the last line and remove it from the trace. */
   public void undoLast() {
-    Preconditions.checkArgument(!lastLines.isEmpty(), "Cannot undo last trace");
+    Preconditions.checkArgument(
+        !lastLines.isEmpty(), "Cannot undo last trace, no undo points found");
     try {
       var start = lastLines.pop();
       output.seek(start);
@@ -129,6 +135,13 @@ class TraceLogger {
     }
   }
 
+  /** Remove an undo point and permanently commit the line to the trace. */
+  public void keepLast() {
+    Preconditions.checkArgument(
+        !lastLines.isEmpty(), "Cannot remove undo point, list is already empty");
+    lastLines.pop();
+  }
+
   /** Log an API call with return value. */
   public <R extends Formula> R logDef(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
@@ -139,8 +152,8 @@ class TraceLogger {
         undoLast();
         return f;
       } else {
+        keepLast();
         mapVariable(var, f);
-        lastLines.pop();
         return mgr.rebuild(f);
       }
     } catch (Exception e) {
@@ -159,6 +172,7 @@ class TraceLogger {
     try {
       appendDef(var, prefix + "." + method);
       R f = closure.call();
+      keepLast();
       mapVariable(var, f);
       return f;
     } catch (Exception e) {
@@ -194,6 +208,7 @@ class TraceLogger {
     try {
       appendStmt(prefix + "." + method);
       closure.run();
+      keepLast();
     } catch (Exception e) {
       Throwables.throwIfUnchecked(e);
       throw new RuntimeException(e);

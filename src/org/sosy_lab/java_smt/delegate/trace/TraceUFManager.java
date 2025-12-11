@@ -48,6 +48,7 @@ public class TraceUFManager implements UFManager {
     if (logger.isTracked(f)) {
       logger.undoLast();
     } else {
+      logger.keepLast();
       logger.mapVariable(var, f);
     }
     return f;

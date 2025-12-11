@@ -47,6 +47,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
         String.format(
             "%s.addConstraint(%s)", logger.toVariable(this), logger.toVariable(constraint)));
     T f = delegate.addConstraint(constraint);
+    logger.keepLast();
     logger.mapVariable(var, f);
     return f;
   }
@@ -66,6 +67,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     String var = logger.newVariable();
     logger.appendDef(var, String.format("%s.isUnsat()", logger.toVariable(this)));
     boolean unsat = delegate.isUnsat();
+    logger.keepLast();
     logger.mapVariable(var, unsat);
     return unsat;
   }
@@ -80,6 +82,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
             "%s.isUnsatWithAssumptions(ImmutableList.of(%s))",
             logger.toVariable(this), logger.toVariables(assumptions)));
     boolean unsat = delegate.isUnsatWithAssumptions(assumptions);
+    logger.keepLast();
     logger.mapVariable(var, unsat);
     return unsat;
   }
@@ -90,6 +93,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
     String var = logger.newVariable();
     logger.appendDef(var, String.format("%s.getModel()", logger.toVariable(this)));
     Model model = new TraceModel(delegate.getModel(), mgr, logger);
+    logger.keepLast();
     logger.mapVariable(var, model);
     return model;
   }
