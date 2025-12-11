@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.collect.FluentIterable;
 import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -35,7 +36,16 @@ public class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvi
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    logger.appendStmt(
+        String.format(
+            "%s.getSeqInterpolant(ImmutableList.of(%s))",
+            logger.toVariable(this),
+            FluentIterable.from(partitionedFormulas)
+                .transform(
+                    p -> String.format("ImmutableList" + ".of(%s)", logger.toVariables(p)))));
+    List<BooleanFormula> seq = delegate.getSeqInterpolants(partitionedFormulas);
+    logger.undoLast();
+    return mgr.rebuildAll(seq);
   }
 
   @Override
