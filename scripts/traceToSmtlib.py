@@ -1028,8 +1028,12 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "sum":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(map(conv, args))}))')
+                if len(args) == 1:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {conv(args[0])})')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(map(conv, args))}))')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
