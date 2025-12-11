@@ -534,7 +534,7 @@ def parseNumber(repr):
     if value is not None:
         return value
     else:
-        raise Exception(f'Could not parse "{repr}"')
+        raise Exception(f'Could not parse "{repr}" as a number')
 
 
 def toIntSmtlib(value):
@@ -1368,7 +1368,7 @@ def translate(prog: List[Definition]):
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[:-1] == ["mgr", "getQuantifiedFormulaManager"]:
-            # TODOThro
+            # TODO
             raise Exception(f'Quantifiers are not supported yet')
 
         elif stmt.getCalls()[:-1] == ["mgr", "getStringFormulaManager"]:
