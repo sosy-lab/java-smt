@@ -657,8 +657,12 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "distinct":
                 args = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
+                if len(args) < 2:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} true)')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "divide":
                 arg1 = stmt.value[-1].args[0]
@@ -842,8 +846,15 @@ def translate(prog: List[Definition]):
             if stmt.getCalls()[-1] == "and":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (and {' '.join(args)}))')
+                if len(args) == 0:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} true)')
+                elif len(args) == 1:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {args[0]})')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (and {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "equivalence":
                 arg1 = stmt.value[-1].args[0]
@@ -897,8 +908,15 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "or":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (or {' '.join(args)}))')
+                if len(args) == 0:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} false)')
+                elif len(args) == 1:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {args[0]})')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (or {' '.join(args)}))')
 
             elif stmt.getCalls()[-1] == "xor":
                 arg1 = stmt.value[-1].args[0]
@@ -927,8 +945,12 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "distinct":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(map(conv, args))}))')
+                if len(args) < 2:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} true)')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(map(conv, args))}))')
 
             elif stmt.getCalls()[-1] == "divide":
                 arg1 = stmt.value[-1].args[0]
@@ -1028,7 +1050,10 @@ def translate(prog: List[Definition]):
             elif stmt.getCalls()[-1] == "sum":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = theoryType
-                if len(args) == 1:
+                if len(args) == 0:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {"0" if theoryType == IntegerType() else "0.0"})')
+                elif len(args) == 1:
                     output.append(
                         f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {conv(args[0])})')
                 else:
