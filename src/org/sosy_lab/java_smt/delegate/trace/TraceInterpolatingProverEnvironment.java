@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +42,8 @@ public class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvi
             "%s.getSeqInterpolant(ImmutableList.of(%s))",
             logger.toVariable(this),
             FluentIterable.from(partitionedFormulas)
-                .transform(
-                    p -> String.format("ImmutableList" + ".of(%s)", logger.toVariables(p)))));
+                .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
+                .join(Joiner.on(", "))));
     List<BooleanFormula> seq = delegate.getSeqInterpolants(partitionedFormulas);
     logger.undoLast();
     return mgr.rebuildAll(seq);
