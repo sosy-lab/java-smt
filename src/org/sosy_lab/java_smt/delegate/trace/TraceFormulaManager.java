@@ -1098,18 +1098,21 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException, SolverException {
-    return logger.logDefDiscard(
-        "mgr",
-        String.format("applyTactic(%s, %s)", logger.toVariable(input), "Tactic." + tactic.name()),
-        () -> delegate.applyTactic(input, tactic));
+    return rebuild(
+        logger.logDefDiscard(
+            "mgr",
+            String.format(
+                "applyTactic(%s, %s)", logger.toVariable(input), "Tactic." + tactic.name()),
+            () -> delegate.applyTactic(input, tactic)));
   }
 
   @Override
   public <T extends Formula> T simplify(T input) throws InterruptedException {
-    return logger.logDefDiscard(
-        "mgr",
-        String.format("simplify(%s)", logger.toVariable(input)),
-        () -> delegate.simplify(input));
+    return rebuild(
+        logger.logDefDiscard(
+            "mgr",
+            String.format("simplify(%s)", logger.toVariable(input)),
+            () -> delegate.simplify(input)));
   }
 
   @Override
@@ -1168,19 +1171,21 @@ public class TraceFormulaManager implements FormulaManager {
   @Override
   public <T extends Formula> T substitute(
       T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
-    return logger.logDefDiscard(
-        "mgr",
-        String.format(
-            "substitute(%s, ImmutableMap.ofEntries(%s))",
-            logger.toVariable(f),
-            FluentIterable.from(fromToMapping.entrySet())
-                .transform(
-                    entry ->
-                        String.format(
-                            "Map.entry(%s, %s)",
-                            logger.toVariable(entry.getKey()), logger.toVariable(entry.getValue())))
-                .join(Joiner.on(", "))),
-        () -> delegate.substitute(f, fromToMapping));
+    return rebuild(
+        logger.logDefDiscard(
+            "mgr",
+            String.format(
+                "substitute(%s, ImmutableMap.ofEntries(%s))",
+                logger.toVariable(f),
+                FluentIterable.from(fromToMapping.entrySet())
+                    .transform(
+                        entry ->
+                            String.format(
+                                "Map.entry(%s, %s)",
+                                logger.toVariable(entry.getKey()),
+                                logger.toVariable(entry.getValue())))
+                    .join(Joiner.on(", "))),
+            () -> delegate.substitute(f, fromToMapping)));
   }
 
   @Override
