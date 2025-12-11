@@ -1390,8 +1390,12 @@ def translate(prog: List[Definition]):
                 name = nameMap[arg0]
                 values = [matchType(param, arg) for param, arg in zip(sortMap[arg0].arguments, args)]
                 sortMap[stmt.variable] = sortMap[arg0].value
-                output.append(
-                    f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(values)}))')
+                if args == []:
+                    output.append(
+                        f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                else:
+                    output.append(
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(values)}))')
 
             elif stmt.getCalls()[-1] == "declareUF":
                 arg0 = stmt.value[-1].args[0]
@@ -1399,8 +1403,9 @@ def translate(prog: List[Definition]):
                 args = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = FunctionType(args, arg1)
                 nameMap[stmt.variable] = arg0 if arg0[0] == '|' and arg0[-1] == '|' else f'|{arg0}|'
-                output.append(
-                    f'(declare-fun {nameMap[stmt.variable]} {sortMap[stmt.variable].toSmtlib()})')
+                if args != []:
+                    output.append(
+                        f'(declare-fun {nameMap[stmt.variable]} {sortMap[stmt.variable].toSmtlib()})')
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
