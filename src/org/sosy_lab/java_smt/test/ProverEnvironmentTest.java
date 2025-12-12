@@ -284,7 +284,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -361,7 +360,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -389,7 +387,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
               || contextClass.equals(BoolectorSolverContext.class)
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
@@ -399,12 +396,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  // TODO: Mathsat5 does not produce a msat_manager. It adds null to the asserted formulas when
-  //  adding the constraint for false.
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
     requireProofGeneration();
-    assume().that(solverToUse()).isNotEqualTo(MATHSAT5);
+    // assume().that(solverToUse()).isNotEqualTo(MATHSAT5);
 
     BooleanFormula bottom = bmgr.makeFalse();
 
@@ -416,9 +411,14 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(proof).isNotNull();
 
     } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
+      if (solverToUse().equals(MATHSAT5)) {
+        assertThat(e).hasMessageThat().isEqualTo("No proof available.");
+
+      } else {
+        assertThat(e)
+            .hasMessageThat()
+            .isEqualTo("Proof generation is not available for the current solver.");
+      }
       Class<?> contextClass = context.getClass();
       boolean isExpected =
           contextClass.equals(CVC4SolverContext.class)
@@ -691,7 +691,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       } else if (solverToUse().equals(PRINCESS)) {
         assertThat(formula.isEmpty()).isTrue();
-      } else if (solverToUse().equals(MATHSAT5)) {
+      } else if (solverToUse().equals(MATHSAT5) || solverToUse().equals(OPENSMT)) {
         // do nothing, optional proof may not provide a formula
       } else {
         assertThat(formula.isPresent()).isTrue();

@@ -323,7 +323,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
           if (creator.getLogic().doesLogicSupportReals()) {
             // This fixes error where OpenSMT tries to parse Int and Real operations e.g. (* Int
             // Real) but when doing operations between integers it causes that exact problem.
-            //formulaString = formulaString.replaceAll("(?<=[\\s\\(])(-?\\d+)(?=[\\s\\)])", "$1.0");
+            // formulaString = formulaString.replaceAll("(?<=[\\s\\(])(-?\\d+)(?=[\\s\\)])",
+            // "$1.0");
           }
 
           if (formulaString.startsWith("(")) {
