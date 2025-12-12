@@ -622,6 +622,7 @@ def translate(prog: List[Definition]):
               "(set-option :interactive-mode true)",
               "(set-option :produce-models true)",
               "(set-option :global-declarations true)"]
+    solver = prog[3].value[1].args[3]  # Get solver name from createSolverContext call in the preamble
     for stmt in prog[5:]:
         def matchType(param, arg):
             "Convert argument to match the given type"
@@ -736,8 +737,9 @@ def translate(prog: List[Definition]):
                         f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} {printBitvector(arg1, arg2)})')
                 else:
                     # Convert integer formula to bv formula
+                    operation = "to_bv" if solver == Solvers.MATHSAT5 else "int_to_bv"
                     output.append(
-                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ int_to_bv {arg1}) {arg2}))')
+                        f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} ((_ {operation} {arg1}) {arg2}))')
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]
