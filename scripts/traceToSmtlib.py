@@ -1487,7 +1487,7 @@ if __name__ == '__main__':
 
     # Translate the trace
     try:
-        output = translate(flattenProvers(program.parse(open(args.file).read())))
+        output = translate(flattenProvers(program.parse("\n" + open(args.file).read())))
     except Exception as exception:
         print(f'In {args.file}: {exception}')
         exit(-1)
