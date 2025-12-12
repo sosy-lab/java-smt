@@ -84,8 +84,12 @@ class OpenSMTProof extends AbstractProof {
             if (!currentIter.hasNext()) {
               throw new IllegalStateException("Expected formula string after ';'");
             }
-            formulaStr = (String) currentIter.next();
-            // formula = creator.encapsulate(creator.getEnv().parseFormula(formulaStr));
+            Object next = currentIter.next();
+            if (next instanceof Deque) {
+              formulaStr = serializeDeque((Deque<?>) next);
+            } else {
+              formulaStr = (String) next;
+            }
             break;
 
           default:
