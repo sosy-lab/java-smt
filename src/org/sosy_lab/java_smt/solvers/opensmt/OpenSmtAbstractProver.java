@@ -294,7 +294,10 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   // TODO perform resolution throughout the DAG to calculate formulas that might not be present.
   @Override
-  public Proof getProof() {
+  public Proof getProof() throws SolverException, InterruptedException {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(this.isUnsat());
+    checkGenerateProofs();
     // throw new UnsupportedOperationException(
     //    "Proof generation is not available for the current solver.");
 
@@ -304,7 +307,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     return root;
   }
 
-  // TODO: the parse method is asigning true as the formula always. This should not be.
   private void parseFormulas(Proof root) {
     Deque<Proof> stack = new ArrayDeque<>();
     stack.push(root);
@@ -315,21 +317,37 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
       String formulaString = ((OpenSMTProof) proof).sFormula;
       // System.out.println(formulaString);
 
-      if (formulaString.startsWith("(")) {
-        formula = formulaManager.parse(formulaString);
-        // System.out.println(formula);
-        ((OpenSMTProof) proof).setFormula(formula);
-      } else if (formulaString.equals("-")) {
-        formula = formulaManager.getBooleanFormulaManager().makeFalse();
-        ((OpenSMTProof) proof).setFormula(formula);
-      } else {
-        if (formulaManager.isValidName(formulaString)) {
-          formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
-          ((OpenSMTProof) proof).setFormula(formula);
-        } else {
-          formula = formulaManager.parse("(" + formulaString + ")");
-          ((OpenSMTProof) proof).setFormula(formula);
+      if (formulaString != null) {
+        try {
+          // Replace integer literals with real literals to avoid parsing errors
+          if (creator.getLogic().doesLogicSupportReals()) {
+            // This fixes error where OpenSMT tries to parse Int and Real operations e.g. (* Int
+            // Real) but when doing operations between integers it causes that exact problem.
+            //formulaString = formulaString.replaceAll("(?<=[\\s\\(])(-?\\d+)(?=[\\s\\)])", "$1.0");
+          }
+
+          if (formulaString.startsWith("(")) {
+            formulaString = "(assert " + formulaString + ")";
+            formula = formulaManager.parse(formulaString);
+            // System.out.println(formula);
+            ((OpenSMTProof) proof).setFormula(formula);
+          } else if (formulaString.equals("-") || formulaString.equals("false")) {
+            formula = formulaManager.getBooleanFormulaManager().makeFalse();
+            ((OpenSMTProof) proof).setFormula(formula);
+          } else {
+            if (formulaManager.isValidName(formulaString)) {
+              formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
+              ((OpenSMTProof) proof).setFormula(formula);
+            } else {
+              formula = formulaManager.parse("(assert (" + formulaString + "))");
+              ((OpenSMTProof) proof).setFormula(formula);
+            }
+          }
+        } catch (IllegalArgumentException e) {
+          throw new IllegalArgumentException("Error parsing formula: " + formulaString, e);
         }
+      } else {
+        ((OpenSMTProof) proof).setFormula(null);
       }
 
       // ((OpenSMTSubproof) subproof).setFormula(formula);
