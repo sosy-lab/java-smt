@@ -299,7 +299,7 @@ litType.become(
 
 
 def test_sort():
-    assert litType.parse("FormulaType.BooleanType") == IntegerType()
+    assert litType.parse("FormulaType.BooleanType") == BooleanType()
     assert litType.parse("FormulaType.IntegerType") == IntegerType()
     assert litType.parse("FormulaType.getBitvectorTypeWithSize(8)") == BitvectorType(8)
     assert (litType.parse("FormulaType.getArrayType(FormulaType.IntegerType, FormulaType.IntegerType)")
