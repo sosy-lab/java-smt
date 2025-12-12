@@ -10,9 +10,7 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.IntegerFormulaManager;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -27,38 +25,6 @@ public class TraceIntegerFormulaManager
     super(pDelegate, pLogger);
     delegate = pDelegate;
     logger = pLogger;
-  }
-
-  @Override
-  public IntegerFormula makeNumber(double number) {
-    return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
-        String.format("makeNumber(%s)", number),
-        () -> delegate.makeNumber(number));
-  }
-
-  @Override
-  public IntegerFormula makeNumber(BigDecimal number) {
-    return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
-        String.format("makeNumber(new BigDecimal(\"%s\"))", number),
-        () -> delegate.makeNumber(number));
-  }
-
-  @Override
-  public IntegerFormula makeNumber(String pI) {
-    return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
-        String.format("makeNumber(\"%s\")", pI),
-        () -> delegate.makeNumber(pI));
-  }
-
-  @Override
-  public IntegerFormula makeNumber(Rational pRational) {
-    return logger.logDef(
-        "mgr.getIntegerFormulaManager()",
-        String.format("makeNumber(Rational.of(\"%s\"))", pRational),
-        () -> delegate.makeNumber(pRational));
   }
 
   @Override

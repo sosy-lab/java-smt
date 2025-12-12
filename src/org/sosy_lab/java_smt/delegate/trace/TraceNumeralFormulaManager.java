@@ -10,8 +10,10 @@
 
 package org.sosy_lab.java_smt.delegate.trace;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.NumeralFormula;
@@ -49,6 +51,30 @@ public abstract class TraceNumeralFormulaManager<
         getPrefix(),
         String.format("makeNumber(new BigInteger(\"%s\"))", number),
         () -> delegate.makeNumber(number));
+  }
+
+  @Override
+  public ResultFormulaType makeNumber(double number) {
+    return logger.logDef(
+        getPrefix(), String.format("makeNumber(%s)", number), () -> delegate.makeNumber(number));
+  }
+
+  @Override
+  public ResultFormulaType makeNumber(BigDecimal number) {
+    return makeNumber(Rational.ofBigDecimal(number));
+  }
+
+  @Override
+  public ResultFormulaType makeNumber(String pI) {
+    return makeNumber(new BigDecimal(pI));
+  }
+
+  @Override
+  public ResultFormulaType makeNumber(Rational pRational) {
+    return logger.logDef(
+        getPrefix(),
+        String.format("makeNumber(Rational.of(\"%s\"))", pRational),
+        () -> delegate.makeNumber(pRational));
   }
 
   @Override
