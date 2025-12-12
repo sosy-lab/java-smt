@@ -187,7 +187,7 @@ public class TraceFormulaManager implements FormulaManager {
           var g =
               logger.logDef(
                   "mgr.getRationalFormulaManager()",
-                  String.format("makeNumber(%s)", value),
+                  String.format("makeNumber(Rational.of(\"%s\"))", value),
                   () -> delegate.getRationalFormulaManager().makeNumber((Rational) value));
           Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof FloatingPointRoundingModeFormula
