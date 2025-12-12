@@ -71,7 +71,7 @@ public abstract class AbstractProof implements Proof {
   // }
 
   public void setFormula(@Nullable Formula pFormula) {
-    formula = Optional.of(pFormula);
+    formula = Optional.ofNullable(pFormula);
   }
 
   public void setRule(ProofRule pRule) {
