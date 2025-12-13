@@ -61,12 +61,16 @@ public abstract class TraceNumeralFormulaManager<
 
   @Override
   public ResultFormulaType makeNumber(BigDecimal number) {
-    return makeNumber(Rational.ofBigDecimal(number));
+    return logger.logDef(
+        getPrefix(),
+        String.format("makeNumber(new BigInteger(\"%s\"))", number),
+        () -> delegate.makeNumber(number));
   }
 
   @Override
   public ResultFormulaType makeNumber(String pI) {
-    return makeNumber(new BigDecimal(pI));
+    return logger.logDef(
+        getPrefix(), String.format("makeNumber(\"%s\")", pI), () -> delegate.makeNumber(pI));
   }
 
   @Override
