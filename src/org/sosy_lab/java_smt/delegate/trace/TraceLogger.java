@@ -12,7 +12,6 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Throwables;
 import com.google.common.collect.FluentIterable;
 import java.io.File;
 import java.io.IOException;
@@ -142,6 +141,11 @@ class TraceLogger {
     lastLines.pop();
   }
 
+  @SuppressWarnings("unchecked")
+  public static <E extends Throwable> void sneakyThrow(Throwable e) throws E {
+    throw (E) e;
+  }
+
   /** Log an API call with return value. */
   public <R extends Formula> R logDef(String prefix, String method, Callable<R> closure) {
     String var = newVariable();
@@ -157,7 +161,7 @@ class TraceLogger {
         return mgr.rebuild(f);
       }
     } catch (Exception e) {
-      Throwables.throwIfUnchecked(e);
+      sneakyThrow(e);
       throw new RuntimeException(e);
     }
   }
@@ -176,7 +180,7 @@ class TraceLogger {
       mapVariable(var, f);
       return f;
     } catch (Exception e) {
-      Throwables.throwIfUnchecked(e);
+      sneakyThrow(e);
       throw new RuntimeException(e);
     }
   }
@@ -193,7 +197,7 @@ class TraceLogger {
       undoLast();
       return f;
     } catch (Exception e) {
-      Throwables.throwIfUnchecked(e);
+      sneakyThrow(e);
       throw new RuntimeException(e);
     }
   }
@@ -210,8 +214,7 @@ class TraceLogger {
       closure.run();
       keepLast();
     } catch (Exception e) {
-      Throwables.throwIfUnchecked(e);
-      throw new RuntimeException(e);
+      sneakyThrow(e);
     }
   }
 
@@ -225,8 +228,7 @@ class TraceLogger {
       closure.run();
       undoLast();
     } catch (Exception e) {
-      Throwables.throwIfUnchecked(e);
-      throw new RuntimeException(e);
+      sneakyThrow(e);
     }
   }
 
