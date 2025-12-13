@@ -10,11 +10,10 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_PROJECTION_BASED_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.NATIVE;
 import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
+import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS;
+import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
+import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
 import static org.sosy_lab.java_smt.test.BooleanFormulaSubject.assertUsing;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
@@ -22,12 +21,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.truth.Truth;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.junit.After;
 import org.junit.Before;
@@ -92,7 +92,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.Logics;
  *  }
  * </code>
  * </pre>
- *
+ * <p>
  * {@link #assertThatFormula(BooleanFormula)} can be used to easily write assertions about formulas
  * using Truth.
  *
@@ -132,7 +132,9 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
-  /** This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront. */
+  /**
+   * This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront.
+   */
   protected Logics logicToUse() {
     return Logics.QF_AUFLIRA;
   }
@@ -145,6 +147,12 @@ public abstract class SolverBasedTest0 {
     }
     return newConfig;
   }
+
+  private static final ImmutableList<ProverOptions> INDEPENDENT_INTERPOLATION_STRATEGIES =
+      ImmutableList.of(
+          GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+          GENERATE_PROJECTION_BASED_INTERPOLANTS,
+          GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
 
   @Before
   public final void initSolver() throws InvalidConfigurationException {
@@ -220,7 +228,9 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  /** Skip test if the solver does not support integers. */
+  /**
+   * Skip test if the solver does not support integers.
+   */
   protected final void requireIntegers() {
     assume()
         .withMessage("Solver %s does not support the theory of integers", solverToUse())
@@ -228,7 +238,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support rationals. */
+  /**
+   * Skip test if the solver does not support rationals.
+   */
   protected final void requireRationals() {
     assume()
         .withMessage("Solver %s does not support the theory of rationals", solverToUse())
@@ -243,7 +255,9 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.OPENSMT);
   }
 
-  /** Skip test if the solver does not support bitvectors. */
+  /**
+   * Skip test if the solver does not support bitvectors.
+   */
   protected final void requireBitvectors() {
     assume()
         .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
@@ -273,7 +287,9 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  /** Skip test if the solver does not support quantifiers. */
+  /**
+   * Skip test if the solver does not support quantifiers.
+   */
   protected final void requireQuantifiers() {
     assume()
         .withMessage("Solver %s does not support quantifiers", solverToUse())
@@ -290,7 +306,9 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA);
   }
 
-  /** Skip test if the solver does not support arrays. */
+  /**
+   * Skip test if the solver does not support arrays.
+   */
   protected final void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
@@ -305,7 +323,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support strings. */
+  /**
+   * Skip test if the solver does not support strings.
+   */
   protected final void requireStrings() {
     assume()
         .withMessage("Solver %s does not support the theory of strings", solverToUse())
@@ -317,7 +337,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support enumeration theory. */
+  /**
+   * Skip test if the solver does not support enumeration theory.
+   */
   protected final void requireEnumeration() {
     assume()
         .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
@@ -332,7 +354,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support optimization. */
+  /**
+   * Skip test if the solver does not support optimization.
+   */
   protected final void requireOptimization() {
     try {
       context.newOptimizationProverEnvironment().close();
@@ -359,19 +383,33 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected final void requireSeqItp(InterpolationOption... options) {
+  protected final void requireSeqItp(ProverOptions... options) {
     assume()
         .withMessage(
             "Solver independent interpolation strategy %s does not support sequential "
-                + "or tree interpolation",
+                + "interpolation",
             solverToUse())
         .that(options)
         .asList()
         .containsNoneIn(
-            ImmutableList.of(
-                GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-                GENERATE_PROJECTION_BASED_INTERPOLANTS,
-                GENERATE_UNIFORM_FORWARD_INTERPOLANTS));
+            INDEPENDENT_INTERPOLATION_STRATEGIES);
+  }
+
+  protected final void requireTreeItp(ProverOptions... options) {
+    requireInterpolation();
+    var test = Arrays.asList(options);
+    assume()
+        .withMessage("Solver does not support tree-interpolation.")
+        .that(solverToUse())
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+
+    assume()
+        .withMessage(
+            "Strategy %s does not support tree interpolation",
+            Arrays.toString(options)) // Optional: print the options for clarity
+        .that(options)
+        .asList()
+        .contains(INDEPENDENT_INTERPOLATION_STRATEGIES);
   }
 
   protected void requireParser() {
@@ -438,14 +476,18 @@ public abstract class SolverBasedTest0 {
     return assertUsing(context).that(formula);
   }
 
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  /**
+   * Check that the interpolant in the subject is valid fot the formulas A and B.
+   */
   public void isValidInterpolant(BooleanFormula interpolant, BooleanFormula a, BooleanFormula b)
       throws SolverException, InterruptedException {
     // TODO: move into assertion framework
     isValidInterpolant(interpolant, ImmutableList.of(a), ImmutableList.of(b));
   }
 
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  /**
+   * Check that the interpolant in the subject is valid fot the formulas A and B.
+   */
   public void isValidInterpolant(
       BooleanFormula interpolant,
       List<BooleanFormula> formulasOfA,
@@ -568,18 +610,18 @@ public abstract class SolverBasedTest0 {
     // GENERATE_MODELS as stand-in for native
     private static final Set<ProverOptions> ALL_INTERPOLATION_STRATEGIES =
         ImmutableSet.of(
-            ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
-            ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
+            GENERATE_PROJECTION_BASED_INTERPOLANTS,
+            GENERATE_UNIFORM_BACKWARD_INTERPOLANTS,
+            GENERATE_UNIFORM_FORWARD_INTERPOLANTS);
 
     @Parameters(name = "solver {0} with interpolation strategy {1}")
     public static List<Object[]> getAllSolversAndItpStrategies() {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
         // No arg for no option (== solver native interpolation)
-        lst.add(new Object[] {solver, null});
+        lst.add(new Object[]{solver, null});
         for (ProverOptions itpStrat : ALL_INTERPOLATION_STRATEGIES) {
-          lst.add(new Object[] {solver, itpStrat});
+          lst.add(new Object[]{solver, itpStrat});
         }
       }
       return lst;

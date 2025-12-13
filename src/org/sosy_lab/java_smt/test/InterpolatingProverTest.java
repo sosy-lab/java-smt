@@ -46,7 +46,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   /** Generate a prover environment depending on the parameter above. */
   @SuppressWarnings("unchecked")
   private <T> InterpolatingProverEnvironment<T> newEnvironmentForTest() {
-    requireInterpolation();
+    requireInterpolation(itpStrategyToUse());
     ProverOptions itpStrat = itpStrategyToUse();
     if (itpStrat == null) {
       return (InterpolatingProverEnvironment<T>) context.newProverEnvironmentWithInterpolation();
@@ -250,16 +250,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
     checkItpSequence(ImmutableList.of(D, C, B, A), ImmutableList.of(itpD, itpDC, itpDCB));
   }
 
-  private void requireTreeItp() {
-    requireInterpolation();
-    assume()
-        .withMessage("Solver does not support tree-interpolation.")
-        .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
-  }
-
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
+    requireSeqItp(itpStrategyToUse());
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
 
@@ -312,6 +305,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   public <T> void sequentialInterpolationIsNotRepeatedIndividualInterpolation()
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
+    requireSeqItp(itpStrategyToUse());
     requireIntegers();
 
     IntegerFormula zero = imgr.makeNumber(0);
@@ -347,6 +341,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   public <T> void sequentialInterpolationWithoutPartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSeqItp(itpStrategyToUse());
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     stack.push(imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1)));
@@ -361,6 +356,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   public <T> void sequentialInterpolationWithOnePartition()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSeqItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -389,6 +385,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   public <T> void sequentialInterpolationWithFewPartitions()
       throws SolverException, InterruptedException {
     requireIntegers();
+    requireSeqItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     int i = index.getFreshId();
@@ -421,6 +418,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
+    requireSeqItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -470,7 +468,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public void treeInterpolation() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     int i = index.getFreshId();
 
@@ -640,7 +638,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolation2() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -699,7 +697,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolation3() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -755,7 +753,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolation4() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -802,7 +800,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolationForSequence() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -827,7 +825,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolationBranching() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -868,7 +866,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed1() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -884,7 +882,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed2() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -900,7 +898,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @SuppressWarnings({"unchecked", "varargs"})
   public <T> void treeInterpolationMalFormed3() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -915,7 +913,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolationMalFormed4() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -930,7 +928,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolationMalFormed5() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -945,7 +943,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @Test
   public <T> void treeInterpolationMalFormed6() throws SolverException, InterruptedException {
 
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     BooleanFormula A = imgr.equal(imgr.makeNumber(0), imgr.makeNumber(1));
@@ -959,7 +957,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
 
   @Test
   public <T> void treeInterpolationWithoutPartition() throws SolverException, InterruptedException {
-    requireTreeItp();
+    requireTreeItp(itpStrategyToUse());
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -974,8 +972,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
 
   @Test
   public <T> void treeInterpolationWithOnePartition() throws SolverException, InterruptedException {
-    requireTreeItp();
-
+    requireTreeItp(itpStrategyToUse());
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     int i = index.getFreshId();
@@ -1005,6 +1002,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   public <T> void bigSeqInterpolationTest() throws InterruptedException, SolverException {
     requireBitvectors();
     requireInterpolation();
+    requireSeqItp(itpStrategyToUse());
 
     assume()
         .withMessage("Solver %s runs into timeout on this test", solverToUse())
@@ -1074,7 +1072,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
 
   @Test
   public <T> void testTrivialInterpolation() throws InterruptedException, SolverException {
-    requireInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     IntegerFormula zero = imgr.makeNumber(0);
     IntegerFormula one = imgr.makeNumber(1);
@@ -1121,7 +1118,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
   @SuppressWarnings({"unchecked", "unused"})
   @Test
   public <T> void testInvalidToken() throws InterruptedException, SolverException {
-    requireInterpolation();
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
     // create and push formulas and solve them
@@ -1171,6 +1167,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
    */
   @Test
   public <T> void issue381InterpolationTest1() throws InterruptedException, SolverException {
+    requireSeqItp(itpStrategyToUse());
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
@@ -1197,6 +1194,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedInter
    */
   @Test
   public <T> void issue381InterpolationTest2() throws InterruptedException, SolverException {
+    requireSeqItp(itpStrategyToUse());
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       var x = imgr.makeVariable("x");
       var one = imgr.makeNumber(1);
