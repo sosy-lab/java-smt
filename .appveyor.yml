@@ -77,6 +77,10 @@ on_finish:
       echo "Compressing and uploading JUnit HTML report..."
       7z a JUnit.html.zip JUnit.html
       Push-AppveyorArtifact JUnit.html.zip -DeploymentName "JUnit Report"
+  - ps: |
+      echo "Compressing and uploading trace files..."
+      7z a traces.zip .\traces
+      Push-AppveyorArtifact traces.zip -DeploymentName "Traces"
 
 cache:
   - C:\ant

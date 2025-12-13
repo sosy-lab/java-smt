@@ -74,6 +74,8 @@ abstract class Z3NumeralFormulaManager<
   protected Long sumImpl(List<Long> operands) {
     if (operands.isEmpty()) {
       return makeNumberImpl(0);
+    } else if (operands.size() == 1) {
+      return operands.get(0);
     } else {
       return Native.mkAdd(z3context, operands.size(), Longs.toArray(operands));
     }

@@ -298,6 +298,8 @@ public enum FunctionDeclarationKind {
   STR_TO_CODE,
   STR_LT,
   STR_LE,
+
+  RE_NONE,
   RE_PLUS,
   RE_STAR,
   RE_OPTIONAL,
@@ -307,6 +309,13 @@ public enum FunctionDeclarationKind {
   RE_INTERSECT,
   RE_COMPLEMENT,
   RE_DIFFERENCE,
+
+  // Separation logic
+  SEP_EMP,
+  SEP_NIL,
+  SEP_PTO,
+  SEP_STAR,
+  SEP_WAND,
 
   // default case
 

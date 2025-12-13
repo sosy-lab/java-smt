@@ -482,6 +482,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.BITVECTOR_NEG, FunctionDeclarationKind.BV_NEG)
           .put(Kind.BITVECTOR_EXTRACT, FunctionDeclarationKind.BV_EXTRACT)
           .put(Kind.BITVECTOR_CONCAT, FunctionDeclarationKind.BV_CONCAT)
+          .put(Kind.BITVECTOR_TO_NAT, FunctionDeclarationKind.UBV_TO_INT)
           .put(Kind.BITVECTOR_SIGN_EXTEND, FunctionDeclarationKind.BV_SIGN_EXTENSION)
           .put(Kind.BITVECTOR_ZERO_EXTEND, FunctionDeclarationKind.BV_ZERO_EXTENSION)
           // Floating-point theory
@@ -545,6 +546,12 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.STORE_ALL, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .buildOrThrow();
 
   private FunctionDeclarationKind getDeclarationKind(Expr f) {
