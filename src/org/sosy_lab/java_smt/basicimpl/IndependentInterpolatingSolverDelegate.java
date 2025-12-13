@@ -32,6 +32,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
@@ -111,12 +112,18 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     List<Formula> exclusiveVariablesInB = removeVariablesFrom(variablesInB, sharedVariables);
 
     BooleanFormula interpolant;
+
+    if (bmgr.isFalse(conjugatedFormulasOfA)) {
+      return bmgr.makeFalse();
+    } else if  (bmgr.isFalse(conjugatedFormulasOfB)) {
+      return bmgr.makeTrue();
+    } else if (sharedVariables.isEmpty()) {
+      return bmgr.makeFalse();
+    }
+
     if (interpolationStrategy == null) {
       interpolant = delegate.getInterpolant(identifiersForA);
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
-      if (sharedVariables.isEmpty()) {
-        return bmgr.makeFalse();
-      }
       interpolant =
           getModelBasedProjectionInterpolant(
               conjugatedFormulasOfA,
@@ -127,12 +134,12 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
       // Will generate interpolants based on quantifier elimination
       if (exclusiveVariablesInA.isEmpty()) {
-        return bmgr.makeFalse();
+        return bmgr.makeTrue();
       }
       interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       if (exclusiveVariablesInB.isEmpty()) {
-        return bmgr.makeFalse();
+        return bmgr.makeTrue();
       }
       // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
       interpolant =
@@ -354,7 +361,8 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
     BooleanFormula itp =
         ufmgr.declareAndCallUF(
-            "__itp_internal_javasmt_" + termIdGenerator.getFreshId(), BooleanType, sharedVars);
+            "__itp_internal_javasmt_" + termIdGenerator.getFreshId(), FormulaType.BooleanType,
+            sharedVars);
     BooleanFormula left = qfmgr.forall(variablesInA, bmgr.implication(conjugatedFormulasOfA, itp));
     BooleanFormula right =
         qfmgr.forall(variablesInB, bmgr.implication(itp, bmgr.not(conjugatedFormulasOfB)));
