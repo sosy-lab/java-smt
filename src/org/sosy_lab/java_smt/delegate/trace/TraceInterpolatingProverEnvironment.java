@@ -37,28 +37,25 @@ public class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvi
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<T>> partitionedFormulas)
       throws SolverException, InterruptedException {
-    logger.appendStmt(
-        String.format(
-            "%s.getSeqInterpolant(ImmutableList.of(%s))",
+    return mgr.rebuildAll(
+        logger.logDefDiscard(
             logger.toVariable(this),
-            FluentIterable.from(partitionedFormulas)
-                .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
-                .join(Joiner.on(", "))));
-    List<BooleanFormula> seq = delegate.getSeqInterpolants(partitionedFormulas);
-    logger.undoLast();
-    return mgr.rebuildAll(seq);
+            String.format(
+                "getSeqInterpolant(ImmutableList.of(%s))",
+                FluentIterable.from(partitionedFormulas)
+                    .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
+                    .join(Joiner.on(", "))),
+            () -> delegate.getSeqInterpolants(partitionedFormulas)));
   }
 
   @Override
   public BooleanFormula getInterpolant(Collection<T> formulasOfA)
       throws SolverException, InterruptedException {
-    logger.appendStmt(
-        String.format(
-            "%s.getInterpolant(ImmutableList.of(%s))",
-            logger.toVariable(this), logger.toVariables(formulasOfA)));
-    BooleanFormula itp = delegate.getInterpolant(formulasOfA);
-    logger.undoLast();
-    return mgr.rebuild(itp);
+    return mgr.rebuild(
+        logger.logDefDiscard(
+            logger.toVariable(this),
+            String.format("getInterpolant(ImmutableList.of(%s))", logger.toVariables(formulasOfA)),
+            () -> delegate.getInterpolant(formulasOfA)));
   }
 
   @Override

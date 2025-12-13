@@ -151,71 +151,32 @@ public class TraceFormulaManager implements FormulaManager {
     @Override
     public Formula visitConstant(Formula f, Object value) {
       if (!logger.isTracked(f)) {
+        Formula g;
         if (f instanceof BooleanFormula && value instanceof Boolean) {
-          var g =
-              logger.logDef(
-                  "mgr.getBooleanFormulaManager()",
-                  String.format("makeBoolean(%s)", value),
-                  () -> delegate.getBooleanFormulaManager().makeBoolean((Boolean) value));
-          Preconditions.checkArgument(g.equals(f));
+          g = getBooleanFormulaManager().makeBoolean((Boolean) value);
         } else if (f instanceof BitvectorFormula && value instanceof BigInteger) {
           var bvSize = delegate.getBitvectorFormulaManager().getLength((BitvectorFormula) f);
-          var g =
-              logger.logDef(
-                  "mgr.getBitvectorFormulaManager()",
-                  String.format("makeBitvector(%s, %s)", bvSize, value),
-                  () ->
-                      delegate
-                          .getBitvectorFormulaManager()
-                          .makeBitvector(bvSize, (BigInteger) value));
-          Preconditions.checkArgument(g.equals(f));
+          g = getBitvectorFormulaManager().makeBitvector(bvSize, (BigInteger) value);
         } else if (f instanceof IntegerFormula && value instanceof BigInteger) {
-          var g =
-              logger.logDef(
-                  "mgr.getIntegerFormulaManager()",
-                  String.format("makeNumber(%s)", value),
-                  () -> delegate.getIntegerFormulaManager().makeNumber((BigInteger) value));
-          Preconditions.checkArgument(g.equals(f));
+          g = getIntegerFormulaManager().makeNumber((BigInteger) value);
         } else if (f instanceof RationalFormula && value instanceof BigInteger) {
-          var g =
-              logger.logDef(
-                  "mgr.getRationalFormulaManager()",
-                  String.format("makeNumber(%s)", value),
-                  () -> delegate.getRationalFormulaManager().makeNumber((BigInteger) value));
+          g = getRationalFormulaManager().makeNumber((BigInteger) value);
           Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof RationalFormula && value instanceof Rational) {
-          var g =
-              logger.logDef(
-                  "mgr.getRationalFormulaManager()",
-                  String.format("makeNumber(Rational.of(\"%s\"))", value),
-                  () -> delegate.getRationalFormulaManager().makeNumber((Rational) value));
+          g = getRationalFormulaManager().makeNumber((Rational) value);
           Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof FloatingPointRoundingModeFormula
             && value instanceof FloatingPointRoundingMode) {
-          @SuppressWarnings("unused")
-          var g =
-              logger.logDef(
-                  "mgr.getFloatingPointFormulaManager()",
-                  String.format(
-                      "makeRoundingMode(%s)",
-                      "FloatingPointRoundingMode." + ((FloatingPointRoundingMode) value).name()),
-                  () ->
-                      delegate
-                          .getFloatingPointFormulaManager()
-                          .makeRoundingMode((FloatingPointRoundingMode) value));
+          g = getFloatingPointFormulaManager().makeRoundingMode((FloatingPointRoundingMode) value);
         } else if (f instanceof StringFormula && value instanceof String) {
-          var g =
-              logger.logDef(
-                  "mgr.getStringFormulaManager()",
-                  String.format("makeString(%s)", logger.printString((String) value)),
-                  () -> delegate.getStringFormulaManager().makeString((String) value));
-          Preconditions.checkArgument(g.equals(f));
+          g = getStringFormulaManager().makeString((String) value);
         } else {
           throw new IllegalArgumentException(
               String.format(
                   "Unsupported value: Formula=%s, Value=%s",
                   delegate.getFormulaType(f), value.getClass().getName()));
         }
+        Preconditions.checkArgument(g.equals(f));
       }
       return f;
     }
@@ -271,20 +232,11 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
-    String var = logger.newVariable();
-    logger.appendDef(
-        var,
+    return logger.logDef(
+        "mgr",
         String.format(
-            "mgr.makeVariable(%s, %s)",
-            logger.printFormulaType(formulaType), logger.printString(name)));
-    T f = delegate.makeVariable(formulaType, name);
-    if (logger.isTracked(f)) {
-      logger.undoLast();
-    } else {
-      logger.keepLast();
-      logger.mapVariable(var, f);
-    }
-    return f;
+            "makeVariable(%s, %s)", logger.printFormulaType(formulaType), logger.printString(name)),
+        () -> delegate.makeVariable(formulaType, name));
   }
 
   private <T extends Formula> int getArity(FunctionDeclaration<T> pDeclaration) {
@@ -1081,19 +1033,17 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
-    String var = logger.newVariable();
-    logger.appendDef(var, String.format("mgr.parse(%s)", logger.printString(s)));
-    BooleanFormula f = delegate.parse(s);
-    logger.undoLast();
-    return rebuild(f);
+    return rebuild(
+        logger.logDefDiscard(
+            "mgr", String.format("parse(%s)", logger.printString(s)), () -> delegate.parse(s)));
   }
 
   @Override
   public Appender dumpFormula(BooleanFormula pT) {
-    logger.appendStmt(String.format("mgr.dumpFormula(%s)", logger.toVariable(pT)));
-    Appender str = delegate.dumpFormula(pT);
-    logger.undoLast();
-    return str;
+    return logger.logDefDiscard(
+        "mgr",
+        String.format("dumpFormula(%s)", logger.toVariable(pT)),
+        () -> delegate.dumpFormula(pT));
   }
 
   @Override

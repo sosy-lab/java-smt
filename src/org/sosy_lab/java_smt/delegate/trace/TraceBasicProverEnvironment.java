@@ -41,15 +41,10 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public @Nullable T addConstraint(BooleanFormula constraint) throws InterruptedException {
-    String var = logger.newVariable();
-    logger.appendDef(
-        var,
-        String.format(
-            "%s.addConstraint(%s)", logger.toVariable(this), logger.toVariable(constraint)));
-    T f = delegate.addConstraint(constraint);
-    logger.keepLast();
-    logger.mapVariable(var, f);
-    return f;
+    return logger.logDefKeep(
+        logger.toVariable(this),
+        String.format("addConstraint(%s)", logger.toVariable(constraint)),
+        () -> delegate.addConstraint(constraint));
   }
 
   @Override
@@ -64,58 +59,45 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
 
   @Override
   public boolean isUnsat() throws SolverException, InterruptedException {
-    String var = logger.newVariable();
-    logger.appendDef(var, String.format("%s.isUnsat()", logger.toVariable(this)));
-    boolean unsat = delegate.isUnsat();
-    logger.keepLast();
-    logger.mapVariable(var, unsat);
-    return unsat;
+    return logger.logDefKeep(logger.toVariable(this), "isUnsat()", delegate::isUnsat);
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
-    String var = logger.newVariable();
-    logger.appendDef(
-        var,
+    return logger.logDefKeep(
+        logger.toVariable(this),
         String.format(
-            "%s.isUnsatWithAssumptions(ImmutableList.of(%s))",
-            logger.toVariable(this), logger.toVariables(assumptions)));
-    boolean unsat = delegate.isUnsatWithAssumptions(assumptions);
-    logger.keepLast();
-    logger.mapVariable(var, unsat);
-    return unsat;
+            "isUnsatWithAssumptions(ImmutableList.of(%s))", logger.toVariables(assumptions)),
+        () -> delegate.isUnsatWithAssumptions(assumptions));
   }
 
   @SuppressWarnings("resource")
   @Override
   public Model getModel() throws SolverException {
-    String var = logger.newVariable();
-    logger.appendDef(var, String.format("%s.getModel()", logger.toVariable(this)));
-    Model model = new TraceModel(delegate.getModel(), mgr, logger);
-    logger.keepLast();
-    logger.mapVariable(var, model);
-    return model;
+    return logger.logDefKeep(
+        logger.toVariable(this),
+        "getModel()",
+        () -> new TraceModel(delegate.getModel(), mgr, logger));
   }
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    logger.appendStmt(String.format("%s.getUnsatCore()", logger.toVariable(this)));
-    List<BooleanFormula> core = delegate.getUnsatCore();
-    logger.undoLast();
-    return mgr.rebuildAll(core);
+    return mgr.rebuildAll(
+        logger.logDefDiscard(logger.toVariable(this), "getUnsatCore()", delegate::getUnsatCore));
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
-    logger.appendStmt(
-        String.format(
-            "%s.getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
-            logger.toVariable(this), logger.toVariables(assumptions)));
-    Optional<List<BooleanFormula>> maybeCore = delegate.unsatCoreOverAssumptions(assumptions);
-    logger.undoLast();
-    return maybeCore.map(mgr::rebuildAll);
+    return logger
+        .logDefKeep(
+            logger.toVariable(this),
+            String.format(
+                "getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
+                logger.toVariables(assumptions)),
+            () -> delegate.unsatCoreOverAssumptions(assumptions))
+        .map(mgr::rebuildAll);
   }
 
   @Override
@@ -126,22 +108,28 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    // We don't log the call to allSat as it is hard to remove it later on. This is fine as long
-    // as the crash is not (immediately) caused by this call
-    // TODO Redesign the logger and add the call to the log
-    return delegate.allSat(
-        new AllSatCallback<R>() {
-          @Override
-          public void apply(List<BooleanFormula> model) {
-            var newModel = mgr.rebuildAll(model);
-            callback.apply(newModel);
-          }
+    return logger.logDefDiscard(
+        logger.toVariable(this),
+        String.format(
+            "delegate.allSat(new AllSatCallback<>() {"
+                + "  public void apply(List<BooleanFormula> model) {}"
+                + "  public R getResult() { throw new UnsupportedOperationException(); }"
+                + "}, ImmutableList.of(%s));",
+            logger.toVariables(important)),
+        () ->
+            delegate.allSat(
+                new AllSatCallback<R>() {
+                  @Override
+                  public void apply(List<BooleanFormula> model) {
+                    var newModel = mgr.rebuildAll(model);
+                    callback.apply(newModel);
+                  }
 
-          @Override
-          public R getResult() throws InterruptedException {
-            return callback.getResult();
-          }
-        },
-        important);
+                  @Override
+                  public R getResult() throws InterruptedException {
+                    return callback.getResult();
+                  }
+                },
+                important));
   }
 }

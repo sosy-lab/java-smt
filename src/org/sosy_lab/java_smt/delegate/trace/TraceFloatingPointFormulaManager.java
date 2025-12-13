@@ -37,7 +37,11 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
     return "FloatingPointRoundingMode." + pRoundingMode.name();
   }
 
-  private String toString(double number) {
+  private String printSign(Sign pSign) {
+    return "FloatingPointNumber.Sign." + pSign.name();
+  }
+
+  private String printDouble(double number) {
     if (Double.isNaN(number)) {
       return "Double.NaN";
     } else if (Double.isInfinite(number)) {
@@ -62,7 +66,10 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
   @Override
   public FloatingPointRoundingMode fromRoundingModeFormula(
       FloatingPointRoundingModeFormula pRoundingModeFormula) {
-    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
+    return logger.logDefDiscard(
+        "mgr.getFloatingPointFormulaManager()",
+        String.format("fromRoundingModeFormula(%s)", logger.toVariable(pRoundingModeFormula)),
+        () -> delegate.fromRoundingModeFormula(pRoundingModeFormula));
   }
 
   @Override
@@ -77,7 +84,7 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
         "mgr.getFloatingPointFormulaManager()",
         String.format(
             "makeNumber(%s, %s, %s)",
-            toString(n),
+            printDouble(n),
             logger.printFormulaType(type),
             printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
@@ -129,10 +136,6 @@ public class TraceFloatingPointFormulaManager implements FloatingPointFormulaMan
             "makeNumber(Rational.of(\"%s\"), %s, %s)",
             n, logger.printFormulaType(type), printRoundingMode(pFloatingPointRoundingMode)),
         () -> delegate.makeNumber(n, type, pFloatingPointRoundingMode));
-  }
-
-  private String printSign(Sign pSign) {
-    return "FloatingPointNumber.Sign." + pSign.name();
   }
 
   @Override

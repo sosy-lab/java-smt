@@ -143,7 +143,7 @@ public class TraceSolverContext implements SolverContext {
 
   @Override
   public String getVersion() {
-    return delegate.getVersion();
+    return logger.logDefDiscard("context", "getVersion()", delegate::getVersion);
   }
 
   @Override

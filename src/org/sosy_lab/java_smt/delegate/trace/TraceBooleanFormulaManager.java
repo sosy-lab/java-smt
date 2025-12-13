@@ -189,23 +189,19 @@ public class TraceBooleanFormulaManager implements BooleanFormulaManager {
 
   @Override
   public Set<BooleanFormula> toConjunctionArgs(BooleanFormula f, boolean flatten) {
-    logger.appendStmt(
-        String.format(
-            "mgr.getBooleanFormulaManager().toConjunctionArgs(%s, %s)",
-            logger.toVariable(f), flatten));
-    Set<BooleanFormula> set = delegate.toConjunctionArgs(f, flatten);
-    logger.undoLast();
-    return mgr.rebuildAll(set);
+    return mgr.rebuildAll(
+        logger.logDefDiscard(
+            "mgr.getBooleanFormulaManager()",
+            String.format("toConjunctionArgs(%s, %s)", logger.toVariable(f), flatten),
+            () -> delegate.toConjunctionArgs(f, flatten)));
   }
 
   @Override
   public Set<BooleanFormula> toDisjunctionArgs(BooleanFormula f, boolean flatten) {
-    logger.appendStmt(
-        String.format(
-            "mgr.getBooleanFormulaManager().toDisjunctionArgs(%s, %s)",
-            logger.toVariable(f), flatten));
-    Set<BooleanFormula> set = delegate.toDisjunctionArgs(f, flatten);
-    logger.undoLast();
-    return mgr.rebuildAll(set);
+    return mgr.rebuildAll(
+        logger.logDefDiscard(
+            "mgr.getBooleanFormulaManager()",
+            String.format("toDisjunctionArgs(%s, %s)", logger.toVariable(f), flatten),
+            () -> delegate.toDisjunctionArgs(f, flatten)));
   }
 }
