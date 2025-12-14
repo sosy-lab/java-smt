@@ -174,4 +174,9 @@ abstract class SmtInterpolNumeralFormulaManager<
   public Term lessOrEquals(Term pNumber1, Term pNumber2) {
     return env.term("<=", pNumber1, pNumber2);
   }
+
+  @Override
+  protected Term sumImpl(List<Term> operands) {
+    return env.term("+", operands.toArray(new Term[0]));
+  }
 }
