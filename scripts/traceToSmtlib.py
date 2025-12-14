@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-import argparse
-import math
+
 # This file is part of JavaSMT,
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
@@ -9,8 +8,9 @@ import math
 #
 # SPDX-License-Identifier: Apache-2.0
 
+import argparse
+import math
 import sys
-
 from dataclasses import dataclass
 from enum import Enum
 from fractions import Fraction
