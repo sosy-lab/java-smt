@@ -143,7 +143,7 @@ public class TraceFormulaManager implements FormulaManager {
                     "makeVariable(%s, %s)",
                     logger.printFormulaType(delegate.getFormulaType(f)), logger.printString(name)),
                 () -> delegate.makeVariable(delegate.getFormulaType(f), name));
-        Preconditions.checkArgument(g.equals(f));
+        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
     }
@@ -161,10 +161,8 @@ public class TraceFormulaManager implements FormulaManager {
           g = getIntegerFormulaManager().makeNumber((BigInteger) value);
         } else if (f instanceof RationalFormula && value instanceof BigInteger) {
           g = getRationalFormulaManager().makeNumber((BigInteger) value);
-          Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof RationalFormula && value instanceof Rational) {
           g = getRationalFormulaManager().makeNumber((Rational) value);
-          Preconditions.checkArgument(g.equals(f));
         } else if (f instanceof FloatingPointRoundingModeFormula
             && value instanceof FloatingPointRoundingMode) {
           g = getFloatingPointFormulaManager().makeRoundingMode((FloatingPointRoundingMode) value);
@@ -186,11 +184,8 @@ public class TraceFormulaManager implements FormulaManager {
     public Formula visitFunction(
         Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
       if (!logger.isTracked(f)) {
-        // Formula g =
-        //noinspection ResultOfMethodCallIgnored
-        makeApplication(functionDeclaration, args);
-        // precondition is not helpful, as some solvers restructure their formulas.
-        // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        Formula g = makeApplication(functionDeclaration, args);
+        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
     }
@@ -203,16 +198,13 @@ public class TraceFormulaManager implements FormulaManager {
         List<Formula> boundVariables,
         BooleanFormula body) {
       if (!logger.isTracked(f)) {
-        // final Formula g;
+        final Formula g;
         if (quantifier == Quantifier.EXISTS) {
-          // g =
-          getQuantifiedFormulaManager().exists(boundVariables, body);
+          g = getQuantifiedFormulaManager().exists(boundVariables, body);
         } else {
-          // g =
-          getQuantifiedFormulaManager().forall(boundVariables, body);
+          g = getQuantifiedFormulaManager().forall(boundVariables, body);
         }
-        // precondition is not helpful, as some solvers restructure their formulas.
-        // Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
+        Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
     }
