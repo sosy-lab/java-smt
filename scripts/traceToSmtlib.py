@@ -1330,8 +1330,8 @@ def translate(prog: List[Definition]):
                 output.append(
                     f'(define-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()} (fp.sub {arg3.toSmtlib()} {arg1} {arg2}))')
 
-            elif stmt.getCalls()[-1] == "toIeeBitvector":
-                raise Exception("Recasting from float to bitvector is not supported in SMTLIB")
+            elif stmt.getCalls()[-1] == "toIeeeBitvector":
+                raise Exception("Extracting the bits of a floating-point value is not supported in SMTLIB")
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
