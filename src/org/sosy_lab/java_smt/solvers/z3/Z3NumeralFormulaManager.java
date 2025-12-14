@@ -60,9 +60,7 @@ abstract class Z3NumeralFormulaManager<
 
   @Override
   protected Long negate(Long pNumber) {
-    long sort = Native.getSort(z3context, pNumber);
-    long minusOne = Native.mkInt(z3context, -1, sort);
-    return Native.mkMul(z3context, 2, new long[] {minusOne, pNumber});
+    return Native.mkUnaryMinus(z3context, pNumber);
   }
 
   @Override
