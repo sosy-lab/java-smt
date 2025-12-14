@@ -739,7 +739,7 @@ def translate(prog: List[Definition]):
                     # Convert integer formula to bv formula
                     operation = "to_bv" if solver == Solvers.MATHSAT5 else "int_to_bv"
                     output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {operation} {arg1}) {toIntSmtlib(arg2)}))')
+                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {operation} {arg1}) {arg2}))')
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]
