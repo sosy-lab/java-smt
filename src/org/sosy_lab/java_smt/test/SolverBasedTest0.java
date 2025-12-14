@@ -227,6 +227,12 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support floor for rationals", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
+    assume()
+        .withMessage(
+            "Solver %s does not support floor for rationals (random segfaults on ARM64)",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /** Skip test if the solver does not support bitvectors. */
