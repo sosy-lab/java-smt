@@ -38,11 +38,11 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
     return Native.mkQuantifierConst(
         z3context,
         q == Quantifier.FORALL,
-        0,
+        1,
         pVariables.size(),
         Longs.toArray(pVariables),
         0,
-        new long[0],
+        null,
         pBody);
   }
 
