@@ -13,7 +13,7 @@ set -e
 if [[ $# -eq 0 ]]; then
     echo "No command line for the solver"
     echo "Usage: ./tracingTest.sh <cmd>"
-    echo "Where <cmd> is the full command for the solver, including any options that need to be passed" >&2
+    echo "Where <cmd> is the full command for the solver, including any options that need to be passed"
     exit 1
 fi
 
