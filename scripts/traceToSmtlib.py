@@ -316,7 +316,7 @@ class Solvers(Enum):
     CVC4 = "SolverContextFactory.Solvers.CVC4"
     CVC5 = "SolverContextFactory.Solvers.CVC5"
     YICES2 = "SolverContextFactory.Solvers.OPENSMT"
-    BITWUZLA = "SolverContextFactory.Solvers.OPENSMT"
+    BITWUZLA = "SolverContextFactory.Solvers.BITWUZLA"
 
 
 litSolvers = from_enum(Solvers)
