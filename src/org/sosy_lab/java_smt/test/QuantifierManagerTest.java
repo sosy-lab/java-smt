@@ -1053,7 +1053,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     // exists var ("a" < var < "c") & length var == 1  -> var == "b"
     StringFormula stringA = smgr.makeString("a");
@@ -1078,7 +1078,7 @@ public class QuantifierManagerTest extends SolverBasedTest0.ParameterizedSolverB
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     // forall var ("a" < var < "c") & length var == 1
     StringFormula stringA = smgr.makeString("a");

@@ -56,7 +56,7 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
-    Z3_4_5_0,
+    Z3_WITH_INTERPOLATION,
     PRINCESS,
     BOOLECTOR,
     CVC4,
@@ -292,7 +292,7 @@ public class SolverContextFactory {
             nonLinearArithmetic,
             loader);
 
-      case Z3_4_5_0:
+      case Z3_WITH_INTERPOLATION:
         return Z3LegacySolverContext.create(
             logger,
             config,

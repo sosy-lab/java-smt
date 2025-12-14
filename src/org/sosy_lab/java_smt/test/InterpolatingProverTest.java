@@ -179,7 +179,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
     BooleanFormula expectedInterpolant = bmgr.makeFalse();
-    if (solverToUse() == Solvers.Z3_4_5_0) {
+    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
       expectedInterpolant = bmgr.makeTrue(); // LegacyZ3 has an issue here.
     }
     assertThat(
@@ -253,7 +253,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_4_5_0);
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
   }
 
   @Test
@@ -1153,7 +1153,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       case SMTINTERPOL:
         p3 = "some string";
         break;
-      case Z3_4_5_0:
+      case Z3_WITH_INTERPOLATION:
         p3 = 12350;
         break;
       default:

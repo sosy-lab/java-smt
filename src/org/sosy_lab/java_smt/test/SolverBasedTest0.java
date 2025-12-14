@@ -238,7 +238,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support bitvectors for interpolation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   protected final void requireBitvectorToInt() {
@@ -305,7 +305,7 @@ public abstract class SolverBasedTest0 {
     assume()
         .withMessage("Solver %s does not support floats for interpolation", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /** Skip test if the solver does not support strings. */
@@ -369,7 +369,7 @@ public abstract class SolverBasedTest0 {
             "Solver %s segfaults when parsing short queries or reports invalid length",
             solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   protected void requireArrayModel() {
@@ -474,7 +474,7 @@ public abstract class SolverBasedTest0 {
         if (eval != null) {
           switch (solverToUse()) {
             case Z3:
-            case Z3_4_5_0:
+            case Z3_WITH_INTERPOLATION:
               // ignore, Z3 provides arbitrary values
               break;
             case BOOLECTOR:

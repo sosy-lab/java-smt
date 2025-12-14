@@ -137,7 +137,7 @@ public class SolverConcurrencyTest {
             Solvers.OPENSMT,
             Solvers.MATHSAT5,
             Solvers.Z3,
-            Solvers.Z3_4_5_0,
+            Solvers.Z3_WITH_INTERPOLATION,
             Solvers.PRINCESS,
             Solvers.YICES2,
             Solvers.CVC5);
@@ -170,7 +170,7 @@ public class SolverConcurrencyTest {
             Solvers.YICES2,
             Solvers.BITWUZLA,
             Solvers.OPENSMT,
-            Solvers.Z3_4_5_0);
+            Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /**

@@ -167,7 +167,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
         Lists.newArrayList("hello WORLD"),
         Lists.newArrayList(smgr.makeString("hello WORLD")));
 
-    if (solverToUse() != Solvers.Z3_4_5_0) {
+    if (solverToUse() != Solvers.Z3_WITH_INTERPOLATION) {
       // LegacyZ3 has issues with Unicode and they will not be fixed.
 
       // Unicode

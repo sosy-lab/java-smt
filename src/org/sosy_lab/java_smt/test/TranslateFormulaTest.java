@@ -99,7 +99,7 @@ public class TranslateFormulaTest {
         .withMessage(
             "Solver %s segfaults when parsing short queries or reports invalid length", translateTo)
         .that(translateTo)
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireParserFrom() {
@@ -113,7 +113,7 @@ public class TranslateFormulaTest {
             "Solver %s segfaults when parsing short queries or reports invalid length",
             translateFrom)
         .that(translateFrom)
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireIntegers() {

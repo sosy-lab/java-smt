@@ -747,7 +747,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
@@ -778,7 +778,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
@@ -824,7 +824,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     RegexFormula r = smgr.makeRegex("regex1");
     RegexFormula s = smgr.makeRegex("regex2");
@@ -850,7 +850,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assume()
         .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
         .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_4_5_0);
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
 
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");

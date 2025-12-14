@@ -73,7 +73,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  | [maybe](https://github.com/sosy-lab/java-smt/pull/400)⁴ |  |  |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
-| [Z3 4.5.0](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  | an older version of Z3 that still provides interpolation support |
+| [Z3_WITH_INTERPOLATION](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  | an older version of Z3 that still provides interpolation support |
 
 We support a reasonable list of operating systems and versions.
 - Our main target is Linux (mainly Ubuntu or comparable Linux distributions).
