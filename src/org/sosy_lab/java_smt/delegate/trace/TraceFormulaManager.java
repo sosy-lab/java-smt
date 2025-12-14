@@ -421,8 +421,19 @@ public class TraceFormulaManager implements FormulaManager {
           return (T)
               getBooleanFormulaManager()
                   .implication((BooleanFormula) args.get(0), (BooleanFormula) args.get(1));
-        // TODO We only have 'distinct' for some theories
-        // case DISTINCT:
+        case DISTINCT:
+          if (declaration.getType().isIntegerType()) {
+            return (T) getIntegerFormulaManager().distinct((List<IntegerFormula>) args);
+          } else if (declaration.getType().isRationalType()) {
+            return (T) getRationalFormulaManager().distinct((List<NumeralFormula>) args);
+          } else if (declaration.getType().isBitvectorType()) {
+            return (T) getBitvectorFormulaManager().distinct((List<BitvectorFormula>) args);
+          } else {
+            // FIXME JavaSMT only supports 'distinct' for some of its theories
+            throw new UnsupportedOperationException(
+                String.format(
+                    "Operator 'distinct' not " + "supported for %ss", declaration.getType()));
+          }
         case STORE:
           return (T)
               getArrayFormulaManager().store((ArrayFormula) args.get(0), args.get(1), args.get(2));
