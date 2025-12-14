@@ -12,8 +12,10 @@ package org.sosy_lab.java_smt.delegate.trace;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.FluentIterable;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
@@ -62,6 +64,17 @@ public class TraceInterpolatingProverEnvironment<T> extends TraceBasicProverEnvi
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<T>> partitionedFormulas, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException();
+    return mgr.rebuildAll(
+        logger.logDefDiscard(
+            logger.toVariable(this),
+            String.format(
+                "getTreeInterpolant(ImmutableList.of(%s), new int[]{%s})",
+                FluentIterable.from(partitionedFormulas)
+                    .transform(p -> String.format("ImmutableList.of(%s)", logger.toVariables(p)))
+                    .join(Joiner.on(", ")),
+                FluentIterable.from(Arrays.stream(startOfSubTree).boxed().toArray())
+                    .transform(Objects::toString)
+                    .join(Joiner.on(", "))),
+            () -> delegate.getTreeInterpolants(partitionedFormulas, startOfSubTree)));
   }
 }
