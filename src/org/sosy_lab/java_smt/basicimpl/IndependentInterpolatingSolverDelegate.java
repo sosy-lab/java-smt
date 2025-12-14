@@ -13,7 +13,6 @@ package org.sosy_lab.java_smt.basicimpl;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -104,7 +103,6 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
     BooleanFormula conjugatedFormulasOfA = bmgr.and(formulasOfA);
     BooleanFormula conjugatedFormulasOfB = bmgr.and(formulasOfB);
-
     List<? extends Formula> variablesInA = getAllVariables(conjugatedFormulasOfA);
     List<? extends Formula> variablesInB = getAllVariables(conjugatedFormulasOfB);
     List<Formula> sharedVariables = getCommonFormulas(variablesInA, variablesInB);
@@ -115,14 +113,14 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
     if (bmgr.isFalse(conjugatedFormulasOfA)) {
       return bmgr.makeFalse();
-    } else if  (bmgr.isFalse(conjugatedFormulasOfB)) {
+    } else if (bmgr.isFalse(conjugatedFormulasOfB)) {
       return bmgr.makeTrue();
-    } else if (sharedVariables.isEmpty()) {
-      return bmgr.makeFalse();
     }
+
 
     if (interpolationStrategy == null) {
       interpolant = delegate.getInterpolant(identifiersForA);
+
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
       interpolant =
           getModelBasedProjectionInterpolant(
@@ -134,12 +132,12 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
       // Will generate interpolants based on quantifier elimination
       if (exclusiveVariablesInA.isEmpty()) {
-        return bmgr.makeTrue();
+        return conjugatedFormulasOfA;
       }
       interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
     } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       if (exclusiveVariablesInB.isEmpty()) {
-        return bmgr.makeTrue();
+        return bmgr.not(conjugatedFormulasOfB);
       }
       // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
       interpolant =
@@ -281,7 +279,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     return true;
   }
 
-  /** interpolate(A(x,y),B(y,z))=∀z.¬B(y,z) */
+  /**
+   * interpolate(A(x,y),B(y,z))=∀z.¬B(y,z)
+   */
   private BooleanFormula getUniformBackwardInterpolant(
       BooleanFormula formulasOfB, List<Formula> exclusiveVariables)
       throws SolverException, InterruptedException {
@@ -295,10 +295,12 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
           "Error when calculating uniform interpolant, quantifier elimination failed.");
     }
 
-    return itpBackward;
+    return mgr.simplify(itpBackward);
   }
 
-  /** Checks the formula for a quantifier at an arbitrary position/depth. */
+  /**
+   * Checks the formula for a quantifier at an arbitrary position/depth.
+   */
   private boolean isQuantifiedFormula(BooleanFormula maybeQuantifiedFormula) {
     final AtomicBoolean isQuantified = new AtomicBoolean(false);
     mgr.visitRecursively(
@@ -330,7 +332,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
    * <p>Forward means, that the set of formulas A interpolates towards the set of formulas B.
    *
    * @param conjugatedFormulasOfA The set of formulas A, combined into one {@link BooleanFormula}.
-   * @param exclusiveVariables A list of shared variables found in both sets of formulas A and B.
+   * @param exclusiveVariables    A list of shared variables found in both sets of formulas A and B.
    * @return a uniform Craig interpolant or an exception is thrown.
    */
   private BooleanFormula getUniformForwardInterpolant(
@@ -346,7 +348,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
           "Error when calculating uniform interpolant, quantifier elimination failed.");
     }
 
-    return itpForward;
+    return mgr.simplify(itpForward);
   }
 
   private BooleanFormula getModelBasedProjectionInterpolant(
@@ -363,9 +365,23 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
         ufmgr.declareAndCallUF(
             "__itp_internal_javasmt_" + termIdGenerator.getFreshId(), FormulaType.BooleanType,
             sharedVars);
-    BooleanFormula left = qfmgr.forall(variablesInA, bmgr.implication(conjugatedFormulasOfA, itp));
-    BooleanFormula right =
-        qfmgr.forall(variablesInB, bmgr.implication(itp, bmgr.not(conjugatedFormulasOfB)));
+    BooleanFormula left;
+    BooleanFormula right;
+    if (variablesInA.isEmpty()) {
+      left = bmgr.implication(conjugatedFormulasOfA, itp);
+    } else {
+      left = qfmgr.forall(variablesInA, bmgr.implication(conjugatedFormulasOfA, itp));
+    }
+    //BooleanFormula left = qfmgr.forall(variablesInA, bmgr.implication(conjugatedFormulasOfA,
+    // itp));
+    if (variablesInB.isEmpty()) {
+      right = bmgr.implication(itp, bmgr.not(conjugatedFormulasOfB));
+    } else {
+      right =
+          qfmgr.forall(variablesInB, bmgr.implication(itp, bmgr.not(conjugatedFormulasOfB)));
+    }
+//    BooleanFormula right =
+//        qfmgr.forall(variablesInB, bmgr.implication(itp, bmgr.not(conjugatedFormulasOfB)));
 
     BooleanFormula interpolant = bmgr.makeFalse();
     try (ProverEnvironment itpProver = getDistinctProver()) {
@@ -380,7 +396,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
         checkNotNull(interpolant);
       }
     }
-    return interpolant;
+    return mgr.simplify(interpolant);
   }
 
   /**
@@ -393,7 +409,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     return solverContext.newProverEnvironment(ProverOptions.GENERATE_MODELS);
   }
 
-  /** Returns common {@link org.sosy_lab.java_smt.api.Formula}s of the 2 given lists. * */
+  /**
+   * Returns common {@link org.sosy_lab.java_smt.api.Formula}s of the 2 given lists. *
+   */
   private List<Formula> getCommonFormulas(
       List<? extends Formula> variables1, List<? extends Formula> variables2) {
     HashSet<Formula> set = new HashSet<>(variables1);
