@@ -198,11 +198,12 @@ public class TraceFormulaManager implements FormulaManager {
         List<Formula> boundVariables,
         BooleanFormula body) {
       if (!logger.isTracked(f)) {
+        var bound = rebuildAll(boundVariables);
         final Formula g;
         if (quantifier == Quantifier.EXISTS) {
-          g = getQuantifiedFormulaManager().exists(boundVariables, body);
+          g = getQuantifiedFormulaManager().exists(bound, body);
         } else {
-          g = getQuantifiedFormulaManager().forall(boundVariables, body);
+          g = getQuantifiedFormulaManager().forall(bound, body);
         }
         Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
