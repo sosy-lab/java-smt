@@ -537,54 +537,6 @@ def parseNumber(repr):
         raise Exception(f'Could not parse "{repr}" as a number')
 
 
-def toIntSmtlib(value):
-    "Print integer value as smtlib"
-    if isinstance(value, str):
-        return toIntSmtlib(parseNumber(value))
-    if isinstance(value, float) and not math.isnan(value) and not math.isinf(value):
-        return toIntSmtlib(Fraction(value))
-    if isinstance(value, int):
-        return f'(- {-value})' if value < 0 else str(value)
-    if isinstance(value, Fraction):
-        if value < 0:
-            return f'(div (- {-value.numerator}) {value.denominator})'
-        else:
-            return f'(div {value.numerator} {value.denominator})'
-    else:
-        raise Exception(f'Can\'t convert "{value}" to Integer')
-
-
-def toRealSmtlib(value):
-    "Print real value as smtlib"
-    if isinstance(value, str):
-        return toRealSmtlib(parseNumber(value))
-    elif isinstance(value, int):
-        return toRealSmtlib(Fraction(value))
-    elif isinstance(value, float):
-        return toRealSmtlib(Fraction.from_float(value))
-    elif isinstance(value, Fraction):
-        if value < 0:
-            return f'(/ (- {-value.numerator}) {value.denominator})'
-        else:
-            return f'(/ {value.numerator} {value.denominator})'
-    else:
-        raise Exception(f'Can\'t convert "{value}" to Real')
-
-
-def toFpSmtlib(rm, fpType, value):
-    "Print float value as smtlib"
-    if isinstance(value, str):
-        return toFpSmtlib(rm, fpType, parseNumber(value))
-    elif value == float('-inf'):
-        return f'(_ -oo {fpType.exponent} {fpType.significand})'
-    elif value == float('+inf'):
-        return f'(_ +oo {fpType.exponent} {fpType.significand})'
-    elif isinstance(value, float) and math.isnan(value):
-        return f'(_ NaN {fpType.exponent} {fpType.significand})'
-    else:
-        return f'((_ to_fp {fpType.exponent} {fpType.significand}) {rm.toSmtlib()} {toRealSmtlib(value)})'
-
-
 def flattenProvers(prog: List[Definition]):
     "Push all assertions onto the same global prover"
     # We assume that the provers are not used "in parallel"
@@ -614,118 +566,213 @@ def flattenProvers(prog: List[Definition]):
     return trace
 
 
+@dataclass
+class Expr:
+    fn: str
+    args: Optional[List]
+
+    def toSmtlib(self):
+        if self.args == None or self.args == []:
+            return self.fn
+        else:
+            return f'({self.fn} {' '.join([arg.toSmtlib() for arg in self.args])})'
+
+
+@dataclass
+class Def:
+    symbol: str
+    sort: Type
+    value: Optional[Expr]
+
+    def toSmtlib(self):
+        if self.value == None:
+            if isinstance(self.sort, FunctionType):
+                return f'(declare-fun {self.symbol} {self.sort.toSmtlib()})'
+            else:
+                return f'(declare-const {self.symbol} {self.sort.toSmtlib()})'
+        else:
+            return f'(define-fun {self.symbol} () {self.sort.toSmtlib()} {self.value.toSmtlib()})'
+
+
+def const(value):
+    return Expr(value, [])
+
+
+def var(name):
+    return Expr(str(name), None)
+
+
+def app(fn, *args):
+    return Expr(fn, [p if isinstance(p, Expr) else var(p) for p in args])
+
+
+def toIntSmtlib(value):
+    "Print integer value as smtlib"
+    if isinstance(value, str):
+        return toIntSmtlib(parseNumber(value))
+    if isinstance(value, float) and not math.isnan(value) and not math.isinf(value):
+        return toIntSmtlib(Fraction(value))
+    if isinstance(value, int):
+        if value < 0:
+            return app('-', toIntSmtlib(-value))
+        else:
+            return const(str(value))
+    if isinstance(value, Fraction):
+        return app('div', toIntSmtlib(value.numerator), toIntSmtlib(value.numerator))
+    else:
+        raise Exception(f'Can\'t convert "{value}" to Integer')
+
+
+def toRealSmtlib(value):
+    "Print real value as smtlib"
+    if isinstance(value, str):
+        return toRealSmtlib(parseNumber(value))
+    elif isinstance(value, int):
+        return toRealSmtlib(Fraction(value))
+    elif isinstance(value, float):
+        return toRealSmtlib(Fraction.from_float(value))
+    elif isinstance(value, Fraction):
+        return app('/', toIntSmtlib(value.numerator), toIntSmtlib(value.denominator))
+    else:
+        raise Exception(f'Can\'t convert "{value}" to Real')
+
+
+def toFpSmtlib(rm, fpType, value):
+    "Print float value as smtlib"
+    if isinstance(value, str):
+        return toFpSmtlib(rm, fpType, parseNumber(value))
+    elif value == float('-inf'):
+        return const(f'(_ -oo {fpType.exponent} {fpType.significand})')
+    elif value == float('+inf'):
+        return const(f'(_ +oo {fpType.exponent} {fpType.significand})')
+    elif isinstance(value, float) and math.isnan(value):
+        return const(f'(_ NaN {fpType.exponent} {fpType.significand})')
+    else:
+        return app(f'(_ to_fp {fpType.exponent} {fpType.significand})', const(rm.toSmtlib()), toRealSmtlib(value))
+
+
 def translate(prog: List[Definition]):
     "Convert a JavaSMT trace to a SMTLIB2 script"
+    # TODO Print error location
+    # TODO Use actual variable names in declarations
     sortMap = {}
     nameMap = {}  # Stores UF names for function declarations
-    output = ["(set-logic ALL)",
-              "(set-option :interactive-mode true)",
-              "(set-option :produce-models true)",
-              "(set-option :global-declarations true)"]
+    output: List[Def | Expr] = \
+        [app('set-logic', const('ALL')),
+         app('set-option', const(':interactive-mode'), const('true')),
+         app('set-option', const(':produce-models'), const('true')),
+         app('set-option', const(':global-declarations'), const('true'))
+         ]
     solver = prog[3].value[1].args[3]  # Get solver name from createSolverContext call in the preamble
     for stmt in prog[5:]:
         def matchType(param, arg):
             "Convert argument to match the given type"
             if param == IntegerType() and sortMap[arg] == RationalType():
-                return f'(to_int {arg})'
+                return app('to_int', arg)
             elif param == RationalType() and sortMap[arg] == IntegerType():
-                return f'(to_real {arg})'
+                return app('to_real', arg)
             else:
-                return arg
+                return var(arg)
 
         if stmt.getCalls()[:-1] == ["mgr", "getBitvectorFormulaManager"]:
             if stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvadd {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvadd', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "and":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvand {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvand', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "concat":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BitvectorType(sortMap[arg1].width + sortMap[arg2].width)
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (concat {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('concat', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "distinct":
                 args = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 if len(args) < 2:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} true)')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('true')))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(args)}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('distinct', *args)))
 
             elif stmt.getCalls()[-1] == "divide":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({"bvsdiv" if arg3 else "bvudiv"} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsdiv', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvudiv', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "equal":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "extend":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BitvectorType(sortMap[arg1].width + arg2)
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {"sign_extend" if arg3 else "zero_extend"} {arg2}) {arg1}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ sign_extend {arg2})', arg1)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ zero_extend {arg2})', arg1)))
 
             elif stmt.getCalls()[-1] == "extract":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BitvectorType(arg2 - arg3 + 1)
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ extract {arg2} {arg3}) {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ extract {arg2} {arg3})', arg1)))
 
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({'bvsge' if arg3 else 'bvuge'} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsge', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvuge', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "greaterThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({'bvsgt' if arg3 else 'bvugt'} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsgt', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvugt', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({'bvsle' if arg3 else 'bvule'} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsle', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvule', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "lessThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({'bvslt' if arg3 else 'bvult'} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvslt', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvult', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "makeBitvector":
                 arg1 = stmt.value[-1].args[0]
@@ -733,54 +780,51 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = BitvectorType(arg1)
                 if arg2 is int:
                     # Create bv constant
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {printBitvector(arg1, arg2)})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const(printBitvector(arg1, arg2))))
                 else:
                     # Convert integer formula to bv formula
                     operation = "to_bv" if solver == Solvers.MATHSAT5 else "int_to_bv"
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {operation} {arg1}) {arg2}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ {operation} {arg1})', arg2)))
 
             elif stmt.getCalls()[-1] == "makeVariable":
                 arg1 = stmt.value[-1].args[0]
-                arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+                arg2 = stmt.value[-1].args[1]
                 if '|' in arg2:
-                    continue
+                    continue  # Skip illegal names
                 sortMap[stmt.variable] = arg1
-                output.append(f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
             elif stmt.getCalls()[-1] == "multiply":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvmul {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvmul', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "negate":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvneg {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvneg', arg1)))
 
             elif stmt.getCalls()[-1] == "not":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvnot {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvnot', arg1)))
 
             elif stmt.getCalls()[-1] == "or":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvor {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvor', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "remainder":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({"bvsrem" if arg3 else "bvurem"} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsrem', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvurem', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "rotateLeft":
                 arg1 = stmt.value[-1].args[0]
@@ -788,8 +832,7 @@ def translate(prog: List[Definition]):
                 if not isinstance(arg2, int):
                     raise Exception("rotateLeft is only supported for constant rotations")
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ rotate_left {arg2}) {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ rotate_left {arg2})', arg1)))
 
             elif stmt.getCalls()[-1] == "rotateRight":
                 arg1 = stmt.value[-1].args[0]
@@ -797,51 +840,50 @@ def translate(prog: List[Definition]):
                 if not isinstance(arg2, int):
                     raise Exception("rotateRight is only supported for constant rotations")
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ rotate_right {arg2}) {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app(f'(_ rotate_right {arg2})', arg1)))
 
             elif stmt.getCalls()[-1] == "shiftLeft":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvshl {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvshl', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "shiftRight":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({"bvashr" if arg3 else "bvlshr"} {arg1} {arg2}))')
+                if arg3:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvashr', arg1, arg2)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvlshr', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "smodulo":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvsmod {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsmod', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "subtract":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvsub {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvsub', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "toIntegerFormula":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = IntegerType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({"sbv_to_int" if arg2 else "ubv_to_int"} {arg1}))')
+                if arg2:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('sbv_to_int', arg1)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('ubv_to_int', arg1)))
 
             elif stmt.getCalls()[-1] == "xor":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (bvxor {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('bvxor', arg1, arg2)))
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
@@ -851,85 +893,74 @@ def translate(prog: List[Definition]):
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 if len(args) == 0:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} true)')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('true')))
                 elif len(args) == 1:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {args[0]})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], var(args[0])))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (and {' '.join(args)}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('and', *args)))
 
             elif stmt.getCalls()[-1] == "equivalence":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "ifThenElse":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg2]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (ite {arg1} {arg2} {arg3}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('ite', arg1, arg2, arg3)))
 
             elif stmt.getCalls()[-1] == "implication":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (=> {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=>', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "makeFalse":
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} false)')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], const('false')))
 
             elif stmt.getCalls()[-1] == "makeTrue":
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} true)')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], const('true')))
 
             elif stmt.getCalls()[-1] == "makeBoolean":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {'true' if arg1 else 'false'})')
+                if arg1:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('true')))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('false')))
 
             elif stmt.getCalls()[-1] == "makeVariable":
-                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                arg1 = stmt.value[-1].args[0]
                 if '|' in arg1:
-                    continue
+                    continue  # Skip illegal names
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
             elif stmt.getCalls()[-1] == "not":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (not {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('not', arg1)))
 
             elif stmt.getCalls()[-1] == "or":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 if len(args) == 0:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} false)')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('false')))
                 elif len(args) == 1:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {args[0]})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], var(args[0])))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (or {' '.join(args)}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('or', *args)))
 
             elif stmt.getCalls()[-1] == "xor":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (xor {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('xor', arg1, arg2)))
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
@@ -945,128 +976,117 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (+ {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('+', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "distinct":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = BooleanType()
                 if len(args) < 2:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} true)')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], const('true')))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (distinct {' '.join(map(conv, args))}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('distinct', *[conv(p) for p in args])))
 
             elif stmt.getCalls()[-1] == "divide":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({'div' if theoryType == IntegerType() else '/'} {conv(arg1)} {conv(arg2)}))')
+                if theoryType == IntegerType():
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('div', conv(arg1), conv(arg2))))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('/', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "equal":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "floor":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = IntegerType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {matchType(IntegerType(), arg1)})')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], matchType(IntegerType(), arg1)))
 
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (>= {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('>=', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "greaterThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (> {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('>', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (<= {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('<=', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "lessThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (< {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('<', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "makeNumber":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {toIntSmtlib(arg1) if theoryType == IntegerType() else toRealSmtlib(arg1)})')
+                if theoryType == IntegerType():
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], toIntSmtlib(arg1)))
+                else:
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], toRealSmtlib(arg1)))
 
             elif stmt.getCalls()[-1] == "makeVariable":
-                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                arg1 = stmt.value[-1].args[0]
                 if '|' in arg1:
-                    continue
+                    continue  # Skip illegal names
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
             elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "modularCongruence"]:
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= (mod (- {arg1} {arg2}) {arg3}) 0))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                  app('=', app('mod', app('-', arg1, arg2), toIntSmtlib(arg3)),
+                                      toIntSmtlib(0))))
 
             elif stmt.getCalls() == ["mgr", "getIntegerFormulaManager", "modulo"]:
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = IntegerType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (mod {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('mod', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "multiply":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (* {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('*', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "negate":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (- {conv(arg1)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('-', conv(arg1))))
 
             elif stmt.getCalls()[-1] == "subtract":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = theoryType
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (- {conv(arg1)} {conv(arg2)}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('-', conv(arg1), conv(arg2))))
 
             elif stmt.getCalls()[-1] == "sum":
                 args = stmt.value[-1].args
                 sortMap[stmt.variable] = theoryType
                 if len(args) == 0:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {"0" if theoryType == IntegerType() else "0.0"})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      const('0') if theoryType == IntegerType() else const('0.0')))
                 elif len(args) == 1:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {conv(args[0])})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], conv(args[0])))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (+ {' '.join(map(conv, args))}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('+', *[conv(p) for p in args])))
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
@@ -1075,8 +1095,7 @@ def translate(prog: List[Definition]):
             if stmt.getCalls()[-1] == "abs":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.abs {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.abs', arg1)))
 
             elif stmt.getCalls()[-1] == "add":
                 arg1 = stmt.value[-1].args[0]
@@ -1084,14 +1103,13 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.add {arg3.toSmtlib()} {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.add', const(arg3.toSmtlib()), arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "assignment":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "castTo":
                 # Converts from float to bv/int, or convert between different fp precisions
@@ -1101,16 +1119,20 @@ def translate(prog: List[Definition]):
                 arg4 = stmt.value[-1].args[3]  # rounding mode
                 sortMap[stmt.variable] = arg3
                 if isinstance(arg3, FloatType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
+                                          arg1)))
                 elif isinstance(arg3, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(arg3, RationalType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.to_real {arg1}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.to_real', arg1)))
                 elif isinstance(arg3, BitvectorType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {'fp.to_sbv' if arg2 else 'fp.to_ubv'}  {arg3.width}) {arg4.toSmtlib()} {arg1}))')
+                    if arg2:
+                        output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                          app(f'(_ fp.to_sbv {arg3.width})', const(arg4.toSmtlib()), arg1)))
+                    else:
+                        output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                          app(f'(_ fp.to_ubv {arg3.width})', const(arg4.toSmtlib()), arg1)))
                 else:
                     raise Exception(f"Illegal cast from float to {arg3}")
 
@@ -1123,16 +1145,25 @@ def translate(prog: List[Definition]):
                 sortMap[stmt.variable] = arg3
                 sourceType = sortMap[arg1]
                 if isinstance(sourceType, FloatType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
+                                          arg1)))
                 elif isinstance(sourceType, IntegerType):
                     raise Exception("Converting from float to integer is not supported in SMTLIB")
                 elif isinstance(sourceType, RationalType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
+                                          arg1)))
                 elif isinstance(sourceType, BitvectorType):
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ {'to_fp' if arg2 else 'to_fp_unsigned'}  {arg3.exponent} {arg3.significand}) {arg4.toSmtlib()} {arg1}))')
+                    if arg2:
+                        output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                          app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
+                                              arg1)))
+                    else:
+                        output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                          app(f'(_ to_fp_unsigned {arg3.exponent} {arg3.significand})',
+                                              const(arg4.toSmtlib()),
+                                              arg1)))
                 else:
                     raise Exception(f"Illegal cast from {sourceType} to float")
 
@@ -1142,97 +1173,96 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.div {arg3.toSmtlib()} {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.div', const(arg3.toSmtlib()), arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "equalWithFPSemantics":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.eq {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.eq', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "fromIeeeBitvector":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = arg2
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((_ to_fp {arg2.exponent} {arg2.significand}) {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable],
+                        app(f'(_ to_fp {arg2.exponent} {arg2.significand})', arg1)))
 
             elif stmt.getCalls()[-1] == "greaterOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.geq {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.geq', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "greaterThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.gt {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.gt', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "isInfinity":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isInfinite {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isInfinite', arg1)))
 
             elif stmt.getCalls()[-1] == "isNaN":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isNaN {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isNaN', arg1)))
 
             elif stmt.getCalls()[-1] == "isNegative":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isNegative {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isNegative', arg1)))
 
             elif stmt.getCalls()[-1] == "isNormal":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isNormal {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isNormal', arg1)))
 
             elif stmt.getCalls()[-1] == "isSubnormal":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isSubnormal {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isSubnormal', arg1)))
 
             elif stmt.getCalls()[-1] == "isZero":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = BooleanType()
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.isZero {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.isZero', arg1)))
 
             elif stmt.getCalls()[-1] == "lessOrEquals":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.leq {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.leq', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "lessThan":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.lt {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.lt', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "makeMinusInfinity":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = arg1
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (_ -oo {arg1.exponent} {arg1.significand}))')
+                    Def(stmt.variable, sortMap[stmt.variable], const(f'(_ -oo {arg1.exponent} {arg1.significand})')))
 
             elif stmt.getCalls()[-1] == "makeNaN":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = arg1
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (_ NaN {arg1.exponent} {arg1.significand}))')
+                    Def(stmt.variable, sortMap[stmt.variable], const(f'(_ NaN {arg1.exponent} {arg1.significand})')))
 
             elif stmt.getCalls()[-1] == "makeNumber":
                 args = stmt.value[-1].args
@@ -1242,16 +1272,17 @@ def translate(prog: List[Definition]):
                         and isinstance(args[2], RoundingMode)):
                     rm = RoundingMode.NEAREST_TIES_TO_EVEN if len(args) == 2 else args[2]
                     sortMap[stmt.variable] = args[1]
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} {toFpSmtlib(rm, args[1], args[0])})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], toFpSmtlib(rm, args[1], args[0])))
                 elif (len(args) == 4
                       and isinstance(args[0], int)
                       and isinstance(args[1], int)
                       and isinstance(args[2], Sign)
                       and isinstance(args[3], FloatType)):
                     sortMap[stmt.variable] = args[3]
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp #b{'1' if args[2] == Sign.NEGATIVE else '0'} {printBitvector(args[3].exponent, args[0])} {printBitvector(args[3].significand - 1, args[1])}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      app('fp', '#b1' if args[2] == Sign.NEGATIVE else '#b0',
+                                          printBitvector(args[3].exponent, args[0]),
+                                          printBitvector(args[3].significand - 1, args[1]))))
                 else:
                     raise Exception(f'Unsupported call: {stmt.getCalls()} ({type(args[0])} {args})')
 
@@ -1259,33 +1290,30 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = arg1
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (_ +oo {arg1.exponent} {arg1.significand}))')
+                    Def(stmt.variable, sortMap[stmt.variable], const(f'(_ +oo {arg1.exponent} {arg1.significand})')))
 
             elif stmt.getCalls()[-1] == "makeRoundingMode":
                 pass
 
             elif stmt.getCalls()[-1] == "makeVariable":
-                arg1 = stmt.value[-1].args[0]  # We ignore the actual variable name
+                arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 if '|' in arg1:
-                    continue
+                    continue  # Skip illegal names
                 sortMap[stmt.variable] = arg2
-                output.append(
-                    f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
             elif stmt.getCalls()[-1] == "max":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.max {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.max', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "min":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.min {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.min', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "multiply":
                 arg1 = stmt.value[-1].args[0]
@@ -1293,34 +1321,31 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.mul {arg3.toSmtlib()} {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.mul', const(arg3.toSmtlib()), arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "negate":
                 arg1 = stmt.value[-1].args[0]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.neg {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.neg', arg1)))
 
             elif stmt.getCalls()[-1] == "remainder":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.rem {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.rem', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "round":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.roundToIntegral {arg2.toSmtlib()} {arg1}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.roundToIntegral', const(arg2.toSmtlib()), arg1)))
 
             elif stmt.getCalls()[-1] == "sqrt":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.sqrt {arg2.toSmtlib()} {arg1}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('fp.sqrt', const(arg2.toSmtlib()), arg1)))
 
             elif stmt.getCalls()[-1] == "subtract":
                 arg1 = stmt.value[-1].args[0]
@@ -1328,7 +1353,7 @@ def translate(prog: List[Definition]):
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
                 output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (fp.sub {arg3.toSmtlib()} {arg1} {arg2}))')
+                    Def(stmt.variable, sortMap[stmt.variable], app('fp.sub', const(arg3.toSmtlib()), arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "toIeeeBitvector":
                 raise Exception("Extracting the bits of a floating-point value is not supported in SMTLIB")
@@ -1341,8 +1366,7 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BooleanType()
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (= {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('=', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "makeArray":
                 arg1 = stmt.value[-1].args[0]
@@ -1351,28 +1375,25 @@ def translate(prog: List[Definition]):
                 if isinstance(arg1, Type) and isinstance(arg2, Type):
                     # Build a const array
                     sortMap[stmt.variable] = ArrayType(arg1, arg2)
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ((as const {sortMap[stmt.variable].toSmtlib()}) {arg3}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable],
+                                      app(f'(as const {sortMap[stmt.variable].toSmtlib()})', arg3)))
                 else:
                     # Declare a new variable
                     sortMap[stmt.variable] = ArrayType(arg2, arg3)
-                    output.append(
-                        f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
             elif stmt.getCalls()[-1] == "select":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = sortMap[arg1].element
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (select {arg1} {arg2}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('select', arg1, arg2)))
 
             elif stmt.getCalls()[-1] == "store":
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 arg3 = stmt.value[-1].args[2]
                 sortMap[stmt.variable] = sortMap[arg1]
-                output.append(
-                    f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} (store {arg1} {arg2} {arg3}))')
+                output.append(Def(stmt.variable, sortMap[stmt.variable], app('store', arg1, arg2, arg3)))
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
@@ -1401,30 +1422,27 @@ def translate(prog: List[Definition]):
                 values = [matchType(param, arg) for param, arg in zip(sortMap[arg0].arguments, args)]
                 sortMap[stmt.variable] = sortMap[arg0].value
                 if args == []:
-                    output.append(
-                        f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], None))
                 else:
-                    output.append(
-                        f'(define-fun {stmt.variable} () {sortMap[stmt.variable].toSmtlib()} ({name} {' '.join(values)}))')
+                    output.append(Def(stmt.variable, sortMap[stmt.variable], app(name, *values)))
 
             elif stmt.getCalls()[-1] == "declareUF":
                 arg0 = stmt.value[-1].args[0]
                 arg1 = stmt.value[-1].args[1]
                 args = stmt.value[-1].args[2]
                 if '|' in arg0:
-                    continue
+                    continue  # Skip illegal names
                 sortMap[stmt.variable] = FunctionType(args, arg1)
                 nameMap[stmt.variable] = f'|{arg0}|'
                 if args != []:
-                    output.append(
-                        f'(declare-fun {nameMap[stmt.variable]} {sortMap[stmt.variable].toSmtlib()})')
+                    output.append(Def(nameMap[stmt.variable], sortMap[stmt.variable], None))
 
             else:
                 raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
         elif stmt.getCalls()[-1] == "addConstraint":
             arg1 = stmt.value[-1].args[0]
-            output.append(f'(assert {arg1})')
+            output.append(app('assert', arg1))
 
         elif stmt.getCalls()[-1] == "asList":
             pass
@@ -1434,22 +1452,21 @@ def translate(prog: List[Definition]):
 
         elif stmt.getCalls()[-1] == "evaluate":
             arg1 = stmt.value[-1].args[0]
-            output.append(f'(get-value ({arg1}))')
+            output.append(app('get-value', app('', arg1)))
 
         elif stmt.getCalls()[-1] == "getModel":
-            output.append(f'(get-model)')
+            output.append(const('(get-model)'))
 
         elif stmt.getCalls()[-1] == "isUnsat":
-            output.append(f'(check-sat)')
+            output.append(const('(check-sat)'))
 
         elif stmt.getCalls() == ["mgr", "makeVariable"]:
             arg1 = stmt.value[-1].args[0]
-            arg2 = stmt.value[-1].args[1]  # We ignore the actual variable name
+            arg2 = stmt.value[-1].args[1]
             if '|' in arg2:
-                continue
+                continue  # Skip illegal names
             sortMap[stmt.variable] = arg1
-            output.append(
-                f'(declare-const {stmt.variable} {sortMap[stmt.variable].toSmtlib()})')
+            output.append(Def(stmt.variable, sortMap[stmt.variable], None))
 
         elif stmt.getCalls()[-1] == "newProverEnvironment":
             # TODO Apply options at the top of the file
@@ -1460,16 +1477,20 @@ def translate(prog: List[Definition]):
             pass
 
         elif stmt.getCalls()[-1] == "pop":
-            output.append(f'(pop 1)')
+            output.append(app('pop', const('1')))
 
         elif stmt.getCalls()[-1] == "push":
-            output.append(f'(push 1)')
+            output.append(app('push', const('1')))
 
         else:
             raise Exception(f'Unsupported call: {stmt.getCalls()}')
 
-    output.append("")
-    return '\n'.join(output)
+    return output
+
+
+def printSmtlib(program):
+    "Convert intermediate representation to String"
+    return '\n'.join([line.toSmtlib() for line in program]) + '\n'
 
 
 if __name__ == '__main__':
@@ -1487,7 +1508,7 @@ if __name__ == '__main__':
 
     # Translate the trace
     try:
-        output = translate(flattenProvers(program.parse("\n" + open(args.file).read())))
+        output = printSmtlib(translate(flattenProvers(program.parse("\n" + open(args.file).read()))))
     except Exception as exception:
         print(f'In {args.file}: {exception}')
         exit(-1)
