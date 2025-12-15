@@ -1151,7 +1151,7 @@ def translate(prog: List[Definition]):
                                       app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
                                           arg1)))
                 elif isinstance(sourceType, IntegerType):
-                    raise Exception("Converting from float to integer is not supported in SMTLIB")
+                    raise Exception("Converting from integer to float is not supported in SMTLIB")
                 elif isinstance(sourceType, RationalType):
                     output.append(Def(stmt.variable, sortMap[stmt.variable],
                                       app(f'(_ to_fp {arg3.exponent} {arg3.significand})', const(arg4.toSmtlib()),
