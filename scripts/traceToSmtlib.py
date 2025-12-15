@@ -499,11 +499,13 @@ def test_toSmtlib():
 
 def printBitvector(width, value):
     "Print a bitvector literal in SMTLIB format"
-    digits = format(value, f'0{width}b')
     if value < 0:
+        digits = format(-value, f'0{width}b')
         # Convert to 2s complement
         digits = ''.join(['0' if l == '1' else '1' for l in digits])
         digits = format(int(digits, 2) + 1, f'0{width}b')
+    else:
+        digits = format(value, f'0{width}b')
     return '#b' + digits
 
 
