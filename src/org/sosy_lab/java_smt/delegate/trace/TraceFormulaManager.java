@@ -115,7 +115,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
-    return new TraceQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), logger);
+    return new TraceQuantifiedFormulaManager(delegate.getQuantifiedFormulaManager(), this, logger);
   }
 
   @Override

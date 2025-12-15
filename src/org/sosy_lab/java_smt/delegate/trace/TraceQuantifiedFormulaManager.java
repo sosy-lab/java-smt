@@ -19,10 +19,13 @@ import org.sosy_lab.java_smt.api.SolverException;
 public class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
 
   private final QuantifiedFormulaManager delegate;
+  private final TraceFormulaManager mgr;
   private final TraceLogger logger;
 
-  TraceQuantifiedFormulaManager(QuantifiedFormulaManager pDelegate, TraceLogger pLogger) {
+  TraceQuantifiedFormulaManager(
+      QuantifiedFormulaManager pDelegate, TraceFormulaManager pMgr, TraceLogger pLogger) {
     delegate = checkNotNull(pDelegate);
+    mgr = pMgr;
     logger = checkNotNull(pLogger);
   }
 
@@ -44,9 +47,10 @@ public class TraceQuantifiedFormulaManager implements QuantifiedFormulaManager {
   @Override
   public BooleanFormula eliminateQuantifiers(BooleanFormula pF)
       throws InterruptedException, SolverException {
-    return logger.logDef(
-        "mgr.getQuantifiedFormulaManager()",
-        String.format("eliminateQuantifiers(%s)", logger.toVariable(pF)),
-        () -> delegate.eliminateQuantifiers(pF));
+    return mgr.rebuild(
+        logger.logDefDiscard(
+            "mgr.getQuantifiedFormulaManager()",
+            String.format("eliminateQuantifiers(%s)", logger.toVariable(pF)),
+            () -> delegate.eliminateQuantifiers(pF)));
   }
 }
