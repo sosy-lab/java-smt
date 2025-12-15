@@ -778,7 +778,7 @@ def translate(prog: List[Definition]):
                 arg1 = stmt.value[-1].args[0]
                 arg2 = stmt.value[-1].args[1]
                 sortMap[stmt.variable] = BitvectorType(arg1)
-                if arg2 is int:
+                if isinstance(arg2, int):
                     # Create bv constant
                     output.append(Def(stmt.variable, sortMap[stmt.variable], const(printBitvector(arg1, arg2))))
                 else:
