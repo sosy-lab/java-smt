@@ -1298,9 +1298,9 @@ def translate(prog: List[Definition]):
                       and isinstance(args[3], FloatType)):
                     sortMap[stmt.variable] = args[3]
                     log(Def(stmt.variable, sortMap[stmt.variable],
-                            app('fp', '#b1' if args[2] == Sign.NEGATIVE else '#b0',
-                                printBitvector(args[3].exponent, args[0]),
-                                printBitvector(args[3].significand - 1, args[1]))))
+                            app('fp', const('#b1' if args[2] == Sign.NEGATIVE else '#b0'),
+                                const(printBitvector(args[3].exponent, args[0])),
+                                const(printBitvector(args[3].significand - 1, args[1])))))
                 else:
                     raise Exception(f'Unsupported call: {stmt.getCalls()} ({type(args[0])} {args})')
 
