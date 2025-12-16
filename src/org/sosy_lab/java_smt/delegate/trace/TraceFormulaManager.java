@@ -1155,8 +1155,7 @@ public class TraceFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    // TODO Write API calls from all contexts into one file to allow us to support this method
-    throw new UnsupportedOperationException();
+    return rebuild(delegate.translateFrom(formula, otherManager));
   }
 
   @Override
