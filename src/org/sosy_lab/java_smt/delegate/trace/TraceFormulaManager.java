@@ -33,6 +33,7 @@ import org.sosy_lab.java_smt.api.BooleanFormulaManager;
 import org.sosy_lab.java_smt.api.EnumerationFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
@@ -152,6 +153,7 @@ public class TraceFormulaManager implements FormulaManager {
     public Formula visitConstant(Formula f, Object value) {
       if (!logger.isTracked(f)) {
         Formula g;
+        // FIXME Add a case for enum formulas
         if (f instanceof BooleanFormula && value instanceof Boolean) {
           g = getBooleanFormulaManager().makeBoolean((Boolean) value);
         } else if (f instanceof BitvectorFormula && value instanceof BigInteger) {
@@ -163,6 +165,8 @@ public class TraceFormulaManager implements FormulaManager {
           g = getRationalFormulaManager().makeNumber((BigInteger) value);
         } else if (f instanceof RationalFormula && value instanceof Rational) {
           g = getRationalFormulaManager().makeNumber((Rational) value);
+        } else if (f instanceof FloatingPointFormula && value instanceof FloatingPointNumber) {
+          g = getFloatingPointFormulaManager().makeNumber((FloatingPointNumber) value);
         } else if (f instanceof FloatingPointRoundingModeFormula
             && value instanceof FloatingPointRoundingMode) {
           g = getFloatingPointFormulaManager().makeRoundingMode((FloatingPointRoundingMode) value);
