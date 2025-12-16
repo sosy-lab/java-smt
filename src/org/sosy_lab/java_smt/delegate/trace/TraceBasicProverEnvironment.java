@@ -91,7 +91,7 @@ public class TraceBasicProverEnvironment<T> implements BasicProverEnvironment<T>
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws SolverException, InterruptedException {
     return logger
-        .logDefKeep(
+        .logDefDiscard(
             logger.toVariable(this),
             String.format(
                 "getUnsatCoreOverAssumptions(ImmutableList.of(%s))",
