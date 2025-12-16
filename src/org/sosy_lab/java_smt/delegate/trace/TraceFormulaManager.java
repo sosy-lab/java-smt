@@ -517,6 +517,7 @@ public class TraceFormulaManager implements FormulaManager {
               getRationalFormulaManager()
                   .greaterOrEquals((NumeralFormula) args.get(0), (NumeralFormula) args.get(1));
         case EQ:
+          // FIXME Add a case for enum formulas
           Preconditions.checkArgument(args.size() == 2);
           if (declaration.getArgumentTypes().get(0).isBooleanType()) {
             return (T)
@@ -542,6 +543,11 @@ public class TraceFormulaManager implements FormulaManager {
             return (T)
                 getBitvectorFormulaManager()
                     .equal((BitvectorFormula) args.get(0), (BitvectorFormula) args.get(1));
+          } else if (declaration.getArgumentTypes().get(0).isFloatingPointType()) {
+            return (T)
+                getFloatingPointFormulaManager()
+                    .assignment(
+                        (FloatingPointFormula) args.get(0), (FloatingPointFormula) args.get(1));
           } else if (declaration.getArgumentTypes().get(0).isArrayType()) {
             return (T)
                 getArrayFormulaManager()
