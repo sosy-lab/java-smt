@@ -19,6 +19,180 @@ from typing import List, Optional
 
 from parsy import regex, string, whitespace, eof, generate, alt, forward_declaration, from_enum
 
+# TODO Simplify grammar and make sure it matches the parser rules
+"""
+Grammar:
+
+program ::= line+
+line ::= ws* (definition | statement) ";\n"
+definition ::= "var" ws* variable ws* "=" ws* statement
+statement ::= variable ("." variable "(" ws* args ws* ")")+
+args ::= arg ws* ("," ws* arg)*
+arg ::= variable | boolean | integer | float | string
+
+boolean ::= "true" | "false"
+integer ::= -?[0-9]+L? | "new" ws* "BigInteger(\"" -?[0-9]+ "\")"
+float ::= ...
+string ::= "\"" .* "\""
+"""
+
+argument = forward_declaration()
+
+# Boolean constants
+litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
+
+
+def test_bool():
+    assert litBool.parse('true') == True
+    assert litBool.parse('false') == False
+
+
+numeral = regex(r'0|-?[1-9][0-9]*').map(int)
+
+
+@generate
+def decimal():
+    integer = yield numeral
+    yield string(".")
+    fraction = yield regex(r'[0-9]+')
+    shift = len(fraction)
+    num = int(integer) * 10 ** shift + int(fraction)
+    den = 10 ** shift
+    return Fraction(num, den)
+
+
+@generate
+def floatingPoint():
+    sign = yield string('-').optional("")
+    integerPart = yield regex(r'0|[1-9][0-9]*')
+    yield string('.')
+    fractionPart = yield regex(r'[0-9]+')
+    exponentPart = "0"
+    hasExponent = yield regex('E|e').optional()
+    if hasExponent is not None:
+        exponentPart = yield regex(r'0|[+-]?[1-9][0-9]*')
+    return float(sign + integerPart + '.' + fractionPart + "e" + exponentPart)
+
+
+# Integer constants
+litInt = numeral << string("L").optional()
+
+# Double constants
+litFloat = alt(
+    string("Double.NaN").map(lambda str: float('nan')),
+    string("Double.POSITIVE_INFINITY").map(lambda str: float('inf')),
+    string("Double.NEGATIVE_INFINITY").map(lambda str: float('-inf')),
+    floatingPoint)
+
+
+# BigInteger constants
+@generate
+def litBigInteger():
+    yield string('new') >> whitespace >> string('BigInteger(') >> whitespace.optional()
+    yield string('"')
+    integer = yield numeral
+    yield string('"')
+    yield whitespace.optional() << string(')')
+    return integer
+
+
+# BigDecimal constants
+@generate
+def litBigDecimal():
+    yield string('new') >> whitespace >> string('BigDecimal(') >> whitespace.optional()
+    yield string('"')
+    number = yield (decimal | numeral)
+    yield string('"')
+    yield whitespace.optional() << string(')')
+    return number
+
+
+# Rational constants
+@generate
+def litRational():
+    yield string('Rational.of("')
+    num = yield numeral
+    isFraction = yield string("/").optional()
+    den = 1
+    if isFraction is not None:
+        den = yield regex(r'[1-9][0-9]*').map(int)
+    yield string('")')
+    return Fraction(num, den)
+
+
+# Number literal
+litNumber = litBigInteger | litBigDecimal | litRational | litFloat | litInt
+
+
+def test_number():
+    assert litNumber.parse('123') == 123
+    assert litNumber.parse('-123') == -123
+    assert litNumber.parse('123L') == 123
+    assert litNumber.parse('0.0') == 0.0
+    assert litNumber.parse('1.23') == 1.23
+    assert litNumber.parse('-1.23') == -1.23
+    assert litNumber.parse('12.3E1') == 123.0
+    assert litNumber.parse('12.3E-1') == 1.23
+    assert litNumber.parse('Double.NEGATIVE_INFINITY') == float('-inf')
+    assert litNumber.parse('new BigInteger("123")') == 123
+    assert litNumber.parse('new BigDecimal("123")') == Fraction(123)
+    assert litNumber.parse('new BigDecimal("123.4")') == Fraction(1234, 10)
+    assert litNumber.parse('new BigDecimal("0.0625")') == Fraction(625, 10000)
+    assert litNumber.parse('Rational.of("4")') == Fraction(4)
+    assert litNumber.parse('Rational.of("1/4")') == Fraction(1, 4)
+
+
+# String constants
+@generate
+def litString():
+    yield string('"')
+    lit = yield regex(r'(\\"|\\\'|\\n|\\\\|[^"])*')
+    yield string('"')
+    return lit.replace('\\"', '"').replace('\\\'', '\'').replace('\\n', '\n').replace('\\\\', '\\')
+
+
+def test_string():
+    assert litString.parse('"str"') == 'str'
+    assert litString.parse('"\\""') == '"'
+    assert litString.parse('"\\\\"') == '\\'
+    assert litString.parse('"\\\'"') == '\''
+    assert litString.parse('"\\n"') == '\n'
+
+
+class RoundingMode(Enum):
+    NEAREST_TIES_TO_EVEN = "FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN"
+    NEAREST_TIES_AWAY = "FloatingPointRoundingMode.NEAREST_TIES_AWAY"
+    TOWARD_POSITIVE = "FloatingPointRoundingMode.TOWARD_POSITIVE"
+    TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARD_NEGATIVE"
+    TOWARD_ZERO = "FloatingPointRoundingMode.TOWARD_ZERO"
+
+    def toSmtlib(self):
+        if self == RoundingMode.NEAREST_TIES_TO_EVEN:
+            return "RNE"
+        elif self == RoundingMode.NEAREST_TIES_AWAY:
+            return "RNA"
+        elif self == RoundingMode.TOWARD_POSITIVE:
+            return "RTP"
+        elif self == RoundingMode.TOWARD_NEGATIVE:
+            return "RTN"
+        elif self == RoundingMode.TOWARD_ZERO:
+            return "RTZ"
+        else:
+            raise Exception("Unknown rounding mode")
+
+
+# Rounding mode literal
+litRoundingMode = from_enum(RoundingMode)
+
+
+class Sign(Enum):
+    POSITIVE = "FloatingPointNumber.Sign.POSITIVE"
+    NEGATIVE = "FloatingPointNumber.Sign.NEGATIVE"
+
+
+# Sign literal
+litSign = from_enum(Sign)
+
 
 @dataclass
 class Type:
@@ -86,177 +260,12 @@ class FunctionType(Type):
         return f"({' '.join([arg.toSmtlib() for arg in self.arguments])}) {self.value.toSmtlib()}"
 
 
-# TODO Simplify grammar and make sure it matches the parser rules
-"""
-Grammar:
-
-program ::= line+
-line ::= ws* (definition | statement) ";\n"
-definition ::= "var" ws* variable ws* "=" ws* statement
-statement ::= variable ("." variable "(" ws* args ws* ")")+
-args ::= arg ws* ("," ws* arg)*
-arg ::= variable | boolean | integer | float | string
-
-boolean ::= "true" | "false"
-integer ::= -?[0-9]+L? | "new" ws* "BigInteger(\"" -?[0-9]+ "\")"
-float ::= ...
-string ::= "\"" .* "\""
-"""
-
-argument = forward_declaration()
-
-# Boolean constants
-litBool = string("true").map(lambda str: True) | string("false").map(lambda str: False)
+def test_typeToSmtlib():
+    assert ArrayType(IntegerType(), ArrayType(BitvectorType(32), FloatType(8, 24))).toSmtlib() == \
+           "(Array Int (Array (_ BitVec 32) (_ FloatingPoint 8 24)))"
 
 
-def test_bool():
-    assert litBool.parse('true') == True
-    assert litBool.parse('false') == False
-
-
-litNumeral = regex(r'0|-?[1-9][0-9]*').map(int)
-
-
-@generate
-def litDecimal():
-    sign = yield string('-').optional()
-    integer = yield regex(r'0|[1-9][0-9]*')
-    yield string(".")
-    fraction = yield regex(r'[0-9]*')
-    shift = len(fraction)
-    num = int(integer) * 10 ** shift + int(fraction)
-    den = 10 ** shift
-    return Fraction(num if sign is None else -num, den)
-
-
-@generate
-def litFpConstant():
-    sign = yield string('-').optional("")
-    integerPart = yield regex(r'[0-9]+')
-    yield string('.')
-    fractionPart = yield regex(r'[0-9]+')
-    exponentPart = "0"
-    hasExponent = yield string('E').optional()
-    if hasExponent is not None:
-        exponentPart = yield regex(r'-?[0-9]+')
-    return float(sign + integerPart + '.' + fractionPart + "e" + exponentPart)
-
-
-# Integer constants
-litInt = litNumeral << string("L").optional()
-
-# Double constants
-litFloat = string("Double.NaN").map(lambda str: float('nan')) | \
-           string("Double.POSITIVE_INFINITY").map(lambda str: float('inf')) | \
-           string("Double.NEGATIVE_INFINITY").map(lambda str: float('-inf')) | \
-           litFpConstant
-
-
-# BigInteger constants
-@generate
-def litBigInteger():
-    yield string('new') >> whitespace >> string('BigInteger(') >> whitespace.optional()
-    yield string('"')
-    integer = yield litNumeral
-    yield string('"')
-    yield whitespace.optional() << string(')')
-    return integer
-
-
-# BigDecimal constants
-@generate
-def litBigDecimal():
-    yield string('new') >> whitespace >> (string('BigDecimal(')) >> whitespace.optional()
-    yield string('"')
-    number = yield (litDecimal | litNumeral)
-    yield string('"')
-    yield whitespace.optional() << string(')')
-    return number
-
-
-# Rational constants
-@generate
-def litRational():
-    yield string('Rational.of("')
-    num = yield regex(r'-?[0-9]+').map(int)
-    isFraction = yield string("/").optional()
-    den = 1
-    if isFraction is not None:
-        den = yield regex(r'[0-9]+').map(int)
-    yield string('")')
-    return Fraction(num, den)
-
-
-litNumber = litBigInteger | litBigDecimal | litRational | litFloat | litInt
-
-
-def test_number():
-    assert litNumber.parse('123') == 123
-    assert litNumber.parse('-123') == -123
-    assert litNumber.parse('123L') == 123
-    assert litNumber.parse('0.0') == 0.0
-    assert litNumber.parse('1.23') == 1.23
-    assert litNumber.parse('-1.23') == -1.23
-    assert litNumber.parse('12.3E1') == 123.0
-    assert litNumber.parse('12.3E-1') == 1.23
-    assert litNumber.parse('Double.NEGATIVE_INFINITY') == float('-inf')
-    assert litNumber.parse('new BigInteger("123")') == 123
-    assert litNumber.parse('new BigDecimal("123")') == Fraction(123)
-    assert litNumber.parse('new BigDecimal("123.4")') == Fraction(1234, 10)
-    assert litNumber.parse('new BigDecimal("0.0625")') == Fraction(625, 10000)
-    assert litNumber.parse('Rational.of("4")') == Fraction(4)
-    assert litNumber.parse('Rational.of("1/4")') == Fraction(1, 4)
-
-
-# String constants
-@generate
-def litString():
-    yield string('"')
-    lit = yield regex(r'(\\"|\\\'|\\n|\\\\|[^"])*')
-    yield string('"')
-    return lit.replace('\\"', '"').replace('\\\'', '\'').replace('\\n', '\n').replace('\\\\', '\\')
-
-
-def test_string():
-    assert litString.parse('"str"') == 'str'
-    assert litString.parse('"\\""') == '"'
-    assert litString.parse('"\\\\"') == '\\'
-    assert litString.parse('"\\\'"') == '\''
-    assert litString.parse('"\\n"') == '\n'
-
-
-class RoundingMode(Enum):
-    NEAREST_TIES_TO_EVEN = "FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN"
-    NEAREST_TIES_AWAY = "FloatingPointRoundingMode.NEAREST_TIES_AWAY"
-    TOWARD_POSITIVE = "FloatingPointRoundingMode.TOWARD_POSITIVE"
-    TOWARD_NEGATIVE = "FloatingPointRoundingMode.TOWARD_NEGATIVE"
-    TOWARD_ZERO = "FloatingPointRoundingMode.TOWARD_ZERO"
-
-    def toSmtlib(self):
-        if self == RoundingMode.NEAREST_TIES_TO_EVEN:
-            return "RNE"
-        elif self == RoundingMode.NEAREST_TIES_AWAY:
-            return "RNA"
-        elif self == RoundingMode.TOWARD_POSITIVE:
-            return "RTP"
-        elif self == RoundingMode.TOWARD_NEGATIVE:
-            return "RTN"
-        elif self == RoundingMode.TOWARD_ZERO:
-            return "RTZ"
-        else:
-            raise Exception("Unknown rounding mode")
-
-
-litRoundingMode = from_enum(RoundingMode)
-
-
-class Sign(Enum):
-    POSITIVE = "FloatingPointNumber.Sign.POSITIVE"
-    NEGATIVE = "FloatingPointNumber.Sign.NEGATIVE"
-
-
-litSign = from_enum(Sign)
-
+# Type literal
 litType = forward_declaration()
 
 litBoolType = string("FormulaType.BooleanType").map(lambda str: BooleanType())
@@ -268,7 +277,7 @@ litStringType = string("FormulaType.StringType").map(lambda str: StringType())
 @generate
 def litBitvectorType():
     yield string("FormulaType.getBitvectorTypeWithSize(") >> whitespace.optional()
-    width = yield regex(r'[0-9]+').map(int)
+    width = yield litInt
     yield whitespace.optional() << string(")")
     return BitvectorType(width)
 
@@ -276,9 +285,9 @@ def litBitvectorType():
 @generate
 def litFloatType():
     yield string("FormulaType.getFloatingPointType(") >> whitespace.optional()
-    exponent = yield regex(r'[0-9]+').map(int)
+    exponent = yield litInt
     yield whitespace.optional() << string(",") << whitespace.optional()
-    significand = yield regex(r'[0-9]+').map(int)
+    significand = yield litInt
     yield whitespace.optional() << string(")")
     return FloatType(exponent, 1 + significand)
 
@@ -298,7 +307,7 @@ litType.become(
     alt(litBoolType, litIntegerType, litRationalType, litStringType, litBitvectorType, litFloatType, litArrayType))
 
 
-def test_sort():
+def test_type():
     assert litType.parse("FormulaType.BooleanType") == BooleanType()
     assert litType.parse("FormulaType.IntegerType") == IntegerType()
     assert litType.parse("FormulaType.getBitvectorTypeWithSize(8)") == BitvectorType(8)
@@ -319,6 +328,7 @@ class Solvers(Enum):
     BITWUZLA = "SolverContextFactory.Solvers.BITWUZLA"
 
 
+# Solver name literal
 litSolvers = from_enum(Solvers)
 
 
@@ -330,6 +340,7 @@ class ProverOptions(Enum):
     ENABLE_SEPARATION_LOGIC = "SolverContext.ProverOptions.ENABLE_SEPARATION_LOGIC"
 
 
+# Prover option literal
 litProverOptions = from_enum(ProverOptions)
 
 
@@ -342,20 +353,31 @@ class Quantifier(Enum):
     EXISTS = "QuantifiedFormulaManager.Quantifier.EXISTS"
 
 
+# Quantifier literal
 litQuantifier = from_enum(Quantifier)
 
 
+def interleave(sep, element):
+    "Parse a list of elements with separators in between the elements"
+
+    @generate
+    def listOf():
+        element0 = yield element
+        elements = yield (whitespace.optional() >> sep >> whitespace.optional() >> element).many()
+        return [element0] + elements
+
+    return listOf.optional([])
+
+
+# List of literals
 @generate
 def litList():
     yield (string("List.of(") | string("ImmutableList.of(") | string("Set.of("))
     yield whitespace.optional()
-    arg0 = yield argument.optional().map(lambda p: [p] if p is not None else [])
-    args = []
-    if (arg0 is not []):
-        args = yield (whitespace.optional() >> string(",") >> whitespace.optional() >> argument).many()
+    args = yield interleave(string(","), argument)
     yield whitespace.optional()
     yield string(")")
-    return arg0 + args
+    return args
 
 
 def test_list():
@@ -365,6 +387,7 @@ def test_list():
     assert litList.parse("Set.of(1,2)") == [1, 2]
 
 
+# Variable
 variable = regex(r"[A-Za-z][A-Za-z0-9]*")
 
 
@@ -393,21 +416,24 @@ class Call:
     args: Optional[List] = None
 
 
+# Calls
+# Chain of method calls:
+# ".method1().method2(a,b)"
 @generate
 def call():
     yield string(".")
     fn = yield variable
     yield string("(")
     yield whitespace.optional()
-    arg0 = yield argument.optional().map(lambda p: [p] if p is not None else [])
-    args = []
-    if (arg0 is not []):
-        args = yield (whitespace.optional() >> string(",") >> whitespace.optional() >> argument).many()
+    args = yield interleave(string(","), argument)
     yield whitespace.optional()
     yield string(")")
-    return Call(fn, arg0 + args)
+    return Call(fn, args)
 
 
+# Statement
+# Object, followed by a sequence of method calls:
+# "obj.method1().method2(a,b)"
 @generate
 def stmt():
     call0 = yield variable.map(lambda str: Call(str))
@@ -417,8 +443,8 @@ def stmt():
 
 def test_stmt():
     assert stmt.parse("var1.method(123, false)") == [Call("var1"), Call("method", [123, False])]
-    assert (stmt.parse('mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"))')
-            == [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])])
+    assert stmt.parse('mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"))') == \
+           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])]
 
 
 @dataclass
@@ -431,10 +457,13 @@ class Definition:
         return [call.fn for call in self.value]
 
 
+# Definition
+# Variable definition:
+# "var p = obj.method1().method2(a,b)"
 @generate
 def definition():
     yield string("var")
-    yield whitespace.optional()
+    yield whitespace
     var = yield variable
     yield whitespace.optional()
     yield string("=")
@@ -443,29 +472,31 @@ def definition():
     return Definition(var, value)
 
 
+# Line in the program: Either a statement or a definition
 line = whitespace.optional() >> (definition | stmt.map(lambda p: Definition(None, p))) << string(";\n")
 
 
 def test_line():
-    assert (line.parse(
-        'var var5 = mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"));\n')
-            == Definition("var5",
-                          [Call(
-                              "mgr"),
-                              Call(
-                                  "getBitvectorFormulaManager",
-                                  []),
-                              Call(
-                                  "makeBitvector",
-                                  [8,
-                                   0])]))
+    assert line.parse(
+        'var var5 = mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"));\n') == \
+           Definition("var5",
+                      [Call(
+                          "mgr"),
+                          Call(
+                              "getBitvectorFormulaManager",
+                              []),
+                          Call(
+                              "makeBitvector",
+                              [8,
+                               0])])
 
 
+# Program, consists of many lines
 program = line.many() << whitespace.optional() << eof
 
 
 def test_program():
-    assert (program.parse(
+    assert program.parse(
         """
         var var5 = mgr.getBitvectorFormulaManager().makeBitvector(8, new BigInteger("0"));
         var var6 = mgr.getBitvectorFormulaManager().extend(var5, 24, false);
@@ -476,25 +507,20 @@ def test_program():
         var var22 = var2.isUnsat();
         var var23 = var2.getModel();
         var23.close();
-        """)
-            == [Definition("var5",
-                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])]),
-                Definition("var6",
-                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("extend", ["var5", 24, False])]),
-                Definition("var8",
-                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("equal", ["var6", "var6"])]),
-                Definition("var9",
-                           [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [32, 1])]),
-                Definition(None, [Call("var2"), Call("push", [])]),
-                Definition("var21", [Call("var2"), Call("addConstraint", ["var8"])]),
-                Definition("var22", [Call("var2"), Call("isUnsat", [])]),
-                Definition("var23", [Call("var2"), Call("getModel", [])]),
-                Definition(None, [Call("var23"), Call("close", [])])])
-
-
-def test_toSmtlib():
-    assert (ArrayType(IntegerType(), ArrayType(BitvectorType(32), FloatType(8, 24))).toSmtlib()
-            == "(Array Int (Array (_ BitVec 32) (_ FloatingPoint 8 24)))")
+        """) == \
+           [Definition("var5",
+                       [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [8, 0])]),
+            Definition("var6",
+                       [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("extend", ["var5", 24, False])]),
+            Definition("var8",
+                       [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("equal", ["var6", "var6"])]),
+            Definition("var9",
+                       [Call("mgr"), Call("getBitvectorFormulaManager", []), Call("makeBitvector", [32, 1])]),
+            Definition(None, [Call("var2"), Call("push", [])]),
+            Definition("var21", [Call("var2"), Call("addConstraint", ["var8"])]),
+            Definition("var22", [Call("var2"), Call("isUnsat", [])]),
+            Definition("var23", [Call("var2"), Call("getModel", [])]),
+            Definition(None, [Call("var23"), Call("close", [])])]
 
 
 def printBitvector(width, value):
