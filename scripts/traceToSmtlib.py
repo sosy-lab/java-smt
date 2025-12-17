@@ -582,7 +582,6 @@ def parseNumber(repr):
 def flattenProvers(prog: List[Definition]):
     "Push all assertions onto the same global prover"
     # We assume that the provers are not used "in parallel"
-    # FIXME Reorder the instructions to avoid overlapping prover instances
     active = ""
     levels = 0
     trace = []
