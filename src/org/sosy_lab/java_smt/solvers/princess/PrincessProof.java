@@ -59,7 +59,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
@@ -68,7 +68,7 @@ import scala.Tuple2;
 import scala.collection.immutable.Seq;
 import scala.jdk.javaapi.CollectionConverters;
 
-public final class PrincessProof extends AbstractProof {
+final class PrincessProof extends AbstractProof {
   private static class Frame extends ProofFrame<Certificate> {
     protected Frame(Certificate proof) {
       super(proof);
@@ -79,7 +79,7 @@ public final class PrincessProof extends AbstractProof {
     super(pRule, pFormula);
   }
 
-  public static PrincessProof buildProofDAG(
+  static PrincessProof buildProofDAG(
       Certificate root, PrincessFormulaCreator creator, SimpleAPI api) {
     Deque<Frame> stack = new ArrayDeque<>();
 
@@ -252,7 +252,7 @@ public final class PrincessProof extends AbstractProof {
         .collect(Collectors.toList());
   }
 
-  public static PrincessProof handleProofCase(
+  private static PrincessProof handleProofCase(
       Certificate cert, PrincessFormulaCreator creator, SimpleAPI api) {
     PrincessCertificate rule;
 
