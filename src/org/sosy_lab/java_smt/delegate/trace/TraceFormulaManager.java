@@ -137,13 +137,7 @@ public class TraceFormulaManager implements FormulaManager {
     @Override
     public Formula visitFreeVariable(Formula f, String name) {
       if (!logger.isTracked(f)) {
-        var g =
-            logger.logDef(
-                "mgr",
-                String.format(
-                    "makeVariable(%s, %s)",
-                    logger.printFormulaType(delegate.getFormulaType(f)), logger.printString(name)),
-                () -> delegate.makeVariable(delegate.getFormulaType(f), name));
+        var g = makeVariable(delegate.getFormulaType(f), name);
         Preconditions.checkArgument(g.equals(f), "%s (should be: %s)", g, f);
       }
       return f;
