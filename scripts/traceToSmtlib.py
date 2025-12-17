@@ -19,21 +19,35 @@ from typing import List, Optional
 
 from parsy import regex, string, whitespace, eof, generate, alt, forward_declaration, from_enum
 
-# TODO Simplify grammar and make sure it matches the parser rules
 """
-Grammar:
+Grammar for JavaSMT traces:
 
-program ::= line+
-line ::= ws* (definition | statement) ";\n"
-definition ::= "var" ws* variable ws* "=" ws* statement
-statement ::= variable ("." variable "(" ws* args ws* ")")+
-args ::= arg ws* ("," ws* arg)*
-arg ::= variable | boolean | integer | float | string
+program ::= line* ws? EOF
+line    ::= ws? (definition | statement) ";\n"
 
-boolean ::= "true" | "false"
-integer ::= -?[0-9]+L? | "new" ws* "BigInteger(\"" -?[0-9]+ "\")"
-float ::= ...
-string ::= "\"" .* "\""
+definition ::= "var" ws variable ws  "=" ws statement
+statement  ::= variable ("." variable "(" ws? arguments? ws? ")")
+
+arguments ::= argument (ws? "," ws? argument)*
+argument  ::= bool
+            | number
+            | sign
+            | string
+            | type
+            | solver
+            | proverOption
+            | list
+            | variable
+
+bool         ::= enum Boolean
+number       ::= bigInteger | bigDecimal | rational | float | integer
+sign         ::= enum FloatingPointNumber.Sign
+string       ::= '"' .* '"'
+type         ::= enum FormulaType
+solver       ::= enum SolverContextFactory.Solvers
+proverOption ::= enum SolverContext.ProverOptions
+list         ::= "List.of(" ws? arguments? ws? ")"
+variable     ::= letter (letter | digit)*
 """
 
 argument = forward_declaration()
