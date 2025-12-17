@@ -37,13 +37,7 @@ abstract class PrincessNumeralFormulaManager<
 
   @Override
   protected IFormula equal(IExpression pNumber1, IExpression pNumber2) {
-    if (pNumber1.equals(IExpression.i(0))) {
-      return IExpression.eqZero((ITerm) pNumber2);
-    } else if (pNumber2.equals(IExpression.i(0))) {
-      return IExpression.eqZero((ITerm) pNumber1);
-    } else {
-      return ((ITerm) pNumber1).$eq$eq$eq((ITerm) pNumber2);
-    }
+    return ((ITerm) pNumber1).$eq$eq$eq((ITerm) pNumber2);
   }
 
   @Override
