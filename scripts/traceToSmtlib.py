@@ -1542,11 +1542,9 @@ def translate(prog: List[Definition]):
             log(Def(stmt.variable, sortMap[stmt.variable], None))
 
         elif stmt.getCalls()[-1] == "newProverEnvironment":
-            # TODO Apply options at the top of the file
             pass
 
         elif stmt.getCalls()[-1] == "newProverEnvironmentWithInterpolation":
-            # TODO Apply options at the top of the file
             pass
 
         elif stmt.getCalls()[-1] == "pop":
