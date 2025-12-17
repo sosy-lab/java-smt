@@ -15,15 +15,22 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.proofs.ProofFieldKey;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 // Defines all known field keys used by various Princess proof rules (Certificates and Inferences).
 public final class PrincessProofFields {
 
+  private static class PrincessProofFieldKey<T> extends ProofFieldKey<T> {
+    public PrincessProofFieldKey(Class<T> valueType, String externalFieldName) {
+      super(valueType, externalFieldName);
+    }
+  }
+
   // Helper method to correctly define a generic ProofFieldKey
   @SuppressWarnings("unchecked")
   private static <T> ProofFieldKey<T> createKey(Class<?> clazz, String name) {
-    return new ProofFieldKey<>((Class<T>) clazz, name);
+    return new PrincessProofFieldKey<>((Class<T>) clazz, name);
   }
 
   public static final ProofFieldKey<List<ProofRule>> INFERENCES =
