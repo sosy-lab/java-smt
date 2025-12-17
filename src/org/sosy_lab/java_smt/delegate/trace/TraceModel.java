@@ -40,9 +40,8 @@ public class TraceModel implements Model {
 
   @Override
   public ImmutableList<ValueAssignment> asList() {
-    logger.appendStmt(String.format("%s.asList()", logger.toVariable(this)));
-    ImmutableList<ValueAssignment> result = delegate.asList();
-    logger.undoLast();
+    ImmutableList<ValueAssignment> result =
+        logger.logDefDiscard(logger.toVariable(this), "asList()", delegate::asList);
     return FluentIterable.from(result)
         // TODO Fix this in the Z3 model
         .filter((ValueAssignment assignment) -> !assignment.getName().startsWith("#"))
