@@ -103,7 +103,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @Test
-  public void proofTest() throws IllegalStateException, InterruptedException, SolverException {
+  public void proofTest() throws SolverException, InterruptedException {
     long cfg = msat_create_config();
 
     msat_set_option_checked(cfg, "proof_generation", "true");
@@ -117,8 +117,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   // Tests if it is possible to enable proof generation in a shared environment after it was not
   // enabled in the original
   @Test
-  public void proofSharedEnvironmentTest()
-      throws IllegalStateException, InterruptedException, SolverException {
+  public void proofSharedEnvironmentTest() throws SolverException, InterruptedException {
     long cfg = msat_create_config();
     env = msat_create_env(cfg);
     msat_destroy_config(cfg);
@@ -135,7 +134,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   // ProverEnvironmentTest class
   @SuppressWarnings("CheckReturnValue")
   @Test
-  public void testProofOfFalse() throws SolverException, InterruptedException {
+  public void testProofOfFalse() {
     assertThrows(
         IllegalArgumentException.class,
         () -> {
@@ -162,7 +161,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
         });
   }
 
-  @SuppressWarnings("CheckReturnValue")
   @Test
   public void api_exampleProofTest() throws SolverException, InterruptedException {
 
@@ -174,7 +172,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
     msat_set_option_checked(cfg, "theory.fp.mode", "2");
 
-    long env = msat_create_env(cfg);
+    long localEnv = msat_create_env(cfg);
     msat_destroy_config(cfg);
 
     long f;
@@ -195,23 +193,23 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
             + "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))"
             + "(assert (= a (= (+ (f x1) x2) x3)))"
             + "(assert (and (or a c) (not c)))";
-    f = msat_from_smtlib2(env, smtlib2);
+    f = msat_from_smtlib2(localEnv, smtlib2);
 
-    msat_assert_formula(env, f);
+    msat_assert_formula(localEnv, f);
 
-    boolean isSat = msat_check_sat(env);
+    boolean isSat = msat_check_sat(localEnv);
 
     assertThat(isSat).isFalse();
 
-    long pm = msat_get_proof_manager(env);
+    long pm = msat_get_proof_manager(localEnv);
 
-    msat_get_proof(pm);
+    long proof = msat_get_proof(pm);
 
     msat_destroy_proof_manager(pm);
-    msat_destroy_env(env);
+    msat_destroy_env(localEnv);
   }
 
-  private void testProofManager(long testEnv) throws InterruptedException, SolverException {
+  private void testProofManager(long testEnv) throws SolverException, InterruptedException {
     const0 = msat_make_number(testEnv, "0");
     const1 = msat_make_number(testEnv, "1");
     long rationalType = msat_get_rational_type(testEnv);
@@ -313,7 +311,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
   /** Similar problem as sin(pi); Calculates endlessly (even asin(0) == 0). */
   @Ignore
-  public void asinTest() throws IllegalStateException, InterruptedException, SolverException {
+  public void asinTest() throws SolverException, InterruptedException {
     long asin = msat_make_asin(env, var);
 
     msat_push_backtrack_point(env);
