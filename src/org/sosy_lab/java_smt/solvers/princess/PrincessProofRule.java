@@ -15,46 +15,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.sosy_lab.java_smt.api.proofs.ProofFieldKey;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public interface PrincessProofRule extends ProofRule {
 
   // Retrieves a rule-specific field's value
   <T> T getSpecificField(ProofFieldKey<T> key);
-}
-
-// A type-safe key used for storing and retrieving rule-specific fields in a heterogeneous
-// container.
-class ProofFieldKey<T> {
-  private final Class<T> valueType;
-  private final String externalFieldName;
-
-  public ProofFieldKey(Class<T> valueType, String externalFieldName) {
-    this.valueType = valueType;
-    this.externalFieldName = externalFieldName;
-  }
-
-  public Class<T> getValueType() {
-    return valueType;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-    ProofFieldKey<?> that = (ProofFieldKey<?>) o;
-    return valueType.equals(that.valueType) && externalFieldName.equals(that.externalFieldName);
-  }
-
-  @Override
-  public int hashCode() {
-    return 31 * valueType.hashCode() + externalFieldName.hashCode();
-  }
-
-  @Override
-  public String toString() {
-    return String.format("%s (%s)", externalFieldName, valueType.getSimpleName());
-  }
 }
 
 // Base class for all concrete proof rules (certificates and inferences).
