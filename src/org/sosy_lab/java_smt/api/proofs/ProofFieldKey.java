@@ -12,13 +12,14 @@ package org.sosy_lab.java_smt.api.proofs;
 
 import org.sosy_lab.java_smt.solvers.princess.PrincessProofFields;
 
-/** A type-safe key used for storing and retrieving rule-specific fields.
- *  This should allow to store information provided by the solver's proof object. Methods for
- *  retrieving the type and external name of the attributes are provided. Instances of this class
- *  are meant to be used in a map as keys and the value of the field, retrieved from a given
- *  solver as the value. See {@link PrincessProofFields}
-**/
- public abstract class ProofFieldKey<T> {
+/**
+ * A type-safe key used for storing and retrieving rule-specific fields. This should allow to store
+ * information provided by the solver's proof object. Methods for retrieving the type and external
+ * name of the attributes are provided. Instances of this class are meant to be used in a map as
+ * keys and the value of the field, retrieved from a given solver as the value. See {@link
+ * PrincessProofFields}
+ */
+public abstract class ProofFieldKey<T> {
   private final Class<T> valueType;
   private final String externalFieldName;
 

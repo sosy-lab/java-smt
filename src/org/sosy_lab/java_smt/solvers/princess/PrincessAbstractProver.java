@@ -44,7 +44,6 @@ import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
 
-
 @SuppressWarnings("ClassTypeParameterName")
 abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
 
