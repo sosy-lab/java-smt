@@ -17,7 +17,6 @@ import java.util.List;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.ConfigurationBuilder;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -52,7 +51,7 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
   private static int problemSize;
 
   @Override
-  protected ConfigurationBuilder createTestConfigBuilder() throws InvalidConfigurationException {
+  protected ConfigurationBuilder createTestConfigBuilder() {
     problemSize = solverToUse() == Solvers.PRINCESS ? 10 : 50; // Princess is too slow.
     ConfigurationBuilder builder = super.createTestConfigBuilder();
     if (solverToUse() == Solvers.MATHSAT5) {
