@@ -207,7 +207,6 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
     assertThat(msat_proof_is_term(proof)).isFalse();
 
-
     msat_destroy_proof_manager(pm);
     msat_destroy_env(localEnv);
   }

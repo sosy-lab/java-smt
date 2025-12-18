@@ -155,8 +155,6 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
    * @param node the {@link Z3Proof} to convert
    * @return the resulting {@link Proof}
    */
-
-
   Proof handleNode(Z3Proof node) {
     Z3ProofRule.Rule rule = (Z3ProofRule.Rule) node.getRule();
 
@@ -244,7 +242,7 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
       case COMMUTATIVITY:
         handleCommutativity(node);
 
-        // $FALL-THROUGH$
+      // $FALL-THROUGH$
       case DEF_AXIOM:
         return handleDefAxiom(node);
 
@@ -260,7 +258,7 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
       case CLAUSE_TRAIL:
         handleClauseTrail(node);
 
-        // $FALL-THROUGH$
+      // $FALL-THROUGH$
       case DEF_INTRO:
         return handleDefIntro(node);
 
@@ -295,7 +293,7 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
         return handleDefault(node);
     }
 
-    //There are some proofs steps that will be skipped/deleted, temporary fix for the handling
+    // There are some proofs steps that will be skipped/deleted, temporary fix for the handling
     // methods that do not return anything.
     throw new UnsupportedOperationException();
   }
@@ -1022,9 +1020,7 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
     List<BooleanFormula> formulas = new ArrayList<>();
 
     for (Proof pChild : children) {
-      assert (formulaManager
-          .getFormulaType(pChild.getFormula().orElseThrow())
-          .isBooleanType());
+      assert (formulaManager.getFormulaType(pChild.getFormula().orElseThrow()).isBooleanType());
       formulas.add(bfm.not((BooleanFormula) pChild.getFormula().orElseThrow()));
     }
 

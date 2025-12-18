@@ -37,14 +37,13 @@ class OpenSMTProof extends AbstractProof {
     }
   }
 
-  @Nullable
-  String sFormula;
+  @Nullable String sFormula;
 
   protected OpenSMTProof(ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 
-  protected OpenSMTProof(ProofRule rule, @Nullable  String sFormula) {
+  protected OpenSMTProof(ProofRule rule, @Nullable String sFormula) {
     super(rule, null);
     this.sFormula = sFormula;
   }
@@ -142,9 +141,7 @@ class OpenSMTProof extends AbstractProof {
   }
 
   static OpenSMTProof processRes(
-      Object expr,
-      Map<String, OpenSMTProof> nodes,
-      @Nullable String formulaStr) {
+      Object expr, Map<String, OpenSMTProof> nodes, @Nullable String formulaStr) {
 
     Deque<Deque<?>> stack = new ArrayDeque<>();
     Object current = expr;

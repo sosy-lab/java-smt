@@ -602,7 +602,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   public void getBitVectorProofTest() throws InterruptedException, SolverException {
     requireProofGeneration();
     requireBitvectors();
-
+    assert bvmgr != null;
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
 
     // unsigned char
@@ -648,6 +648,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         FormulaType.getArrayType(IntegerType, IntegerType);
     IntegerFormula num2 = imgr.makeNumber(2);
     IntegerFormula num4 = imgr.makeNumber(4);
+    assert amgr != null;
     ArrayFormula<IntegerFormula, IntegerFormula> arr1 = amgr.makeArray("arr1", type);
     ArrayFormula<IntegerFormula, IntegerFormula> arr2 = amgr.makeArray("arr2", type);
     BooleanFormula query =
@@ -706,11 +707,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         stack.push(child);
       }
     }
+    assertThat(findanyProofLeaf(root).isLeaf()).isTrue();
   }
 
   // Performs all necessary feature checks for Princess rules, validating type and existence of
   // fields retrieved via getSpecificFields.
-  @SuppressWarnings("unchecked")
   private void checkPrincessSpecificFields(PrincessProofRule rule) {
 
     String ruleName = rule.getName();
@@ -808,8 +809,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
           break;
         case "MACRO_INFERENCE":
-          List<PrincessProofRule> expandedInferences =
-              (List<PrincessProofRule>) rule.getSpecificField(EXPANDED_INFERENCES);
+          List<PrincessProofRule> expandedInferences = rule.getSpecificField(EXPANDED_INFERENCES);
           assertThat(expandedInferences).isInstanceOf(List.class);
           for (PrincessProofRule subInf : expandedInferences) {
             checkPrincessSpecificFields(subInf);
