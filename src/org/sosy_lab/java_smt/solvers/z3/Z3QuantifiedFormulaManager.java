@@ -53,8 +53,8 @@ class Z3QuantifiedFormulaManager extends AbstractQuantifiedFormulaManager<Long, 
     // to run "qe-light" before "qe".
     // "qe" does not perform a "qe-light" as a preprocessing on its own!
 
-    // One might want to run the tactic "ctx-solver-simplify" on the result.
-
-    return z3FormulaCreator.applyTactics(z3context, pExtractInfo, "qe-light", "qe");
+    return Native.simplify(
+        getFormulaCreator().getEnv(),
+        z3FormulaCreator.applyTactics(z3context, pExtractInfo, "qe-light", "qe"));
   }
 }
