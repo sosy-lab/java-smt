@@ -118,7 +118,7 @@ class OpenSMTProof extends AbstractProof {
         Object v2 = ((Deque<?>) v1).peek();
         if (v2 instanceof String) {
           if (v2.equals("res")) {
-            OpenSMTProof res = processRes(v1, nodes, resNodes, creator, lastSeenFormula);
+            OpenSMTProof res = processRes(v1, nodes, creator, lastSeenFormula);
             nodes.putIfAbsent((String) expression, res);
             resNodes.push(res);
           } else {
@@ -143,7 +143,6 @@ class OpenSMTProof extends AbstractProof {
   static OpenSMTProof processRes(
       Object expr,
       Map<String, OpenSMTProof> nodes,
-      Deque<OpenSMTProof> resNodes,
       OpenSmtFormulaCreator creator,
       String formulaStr) {
 
