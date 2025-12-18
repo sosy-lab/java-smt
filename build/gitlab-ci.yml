@@ -132,7 +132,6 @@ spotbugs:
       - "JUnit.html"
       - "JUnit-coverage/"
       - "junit/coverage.xml"
-      - "traces/"
     when: always
     reports:
       junit: "junit/TESTS-TestSuites.xml"
@@ -144,7 +143,6 @@ spotbugs:
   artifacts:
     paths:
       - "JUnit.html" # no coverage files available
-      - "traces/"
 
 unit-tests:x86_64:jdk-11:
   extends: .unit-tests
