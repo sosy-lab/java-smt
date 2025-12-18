@@ -131,12 +131,12 @@ class Z3ProofRule implements ProofRule {
       this.formula = formula;
     }
 
-    // @Override
+    @Override
     public String getName() {
       return name;
     }
 
-    // @Override
+    @Override
     public String getFormula() {
       return formula;
     }
@@ -148,10 +148,14 @@ class Z3ProofRule implements ProofRule {
     Parameter(T value) {
       this.value = value;
     }
+
+    public T getValue() {
+      return value;
+    }
   }
 
   private final Rule rule;
-  private List<Parameter<?>> parameters;
+  private final List<Parameter<?>> parameters;
 
   Z3ProofRule(Rule pRule, List<Parameter<?>> pParameters) {
     this.rule = pRule;
