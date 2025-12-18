@@ -1,0 +1,122 @@
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<project xmlns:ivy="antlib:org.apache.ivy.ant" name="javasmt-ivy-example" default="run">
+    <!-- Organization and module name for the project -->
+    <property name="project.organization" value="org.sosy_lab.java_smt_example"/>
+    <property name="project.module" value="${ant.project.name}"/>
+    <property name="project.jar" value="${project.module}.jar"/>
+
+    <!-- Path to the "main" function -->
+    <property name="project.main" value="example.Main"/>
+
+    <target name="download-ivy" unless="skip.download">
+        <mkdir dir="lib"/>
+        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/2.5.0/ivy-2.5.0.jar"
+             dest="lib/ivy.jar" usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <path id="ivy.path">
+            <fileset dir="lib" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="ivy.path"/>
+        <ivy:settings file="lib/ivy-settings.xml"/>
+    </target>
+
+    <target name="resolve" depends="init-ivy" description="--> retrieve dependencies with Ivy">
+        <ivy:resolve log="download-only"/>
+        <ivy:retrieve pattern="lib/java/[conf]/([arch]/)[artifact](-[classifier]).[ext]"/>
+    </target>
+
+    <target name="copy" depends="resolve" description="--> copy solver libraries">
+        <mkdir dir="lib/native/x86_64-windows"/>
+        <copy todir="lib/native/x86_64-windows" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.dll"/>
+                <exclude name="arm64/*.dll"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-windows"/>
+        <copy todir="lib/native/arm64-windows" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.dll"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/x86_64-linux"/>
+        <copy todir="lib/native/x86_64-linux" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.so"/>
+                <exclude name="arm64/*.so"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-linux"/>
+        <copy todir="lib/native/arm64-linux" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.so"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/x86_64-macos"/>
+        <copy todir="lib/native/x86_64-macos" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="**/*.dylib"/>
+                <exclude name="arm64/*.dylib"/>
+            </fileset>
+        </copy>
+        <mkdir dir="lib/native/arm64-macos"/>
+        <copy todir="lib/native/arm64-macos" flatten="true">
+            <fileset dir="lib/java/default">
+                <include name="arm64/*.dll"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile" depends="copy" description="--> compile the project">
+        <mkdir dir="build"/>
+        <path id="classpath.build">
+            <pathelement location="build"/>
+            <fileset dir="lib/java" includes="**/*.jar"/>
+        </path>
+        <javac srcdir="src" destdir="build" classpathref="classpath.build"/>
+    </target>
+
+    <target name="package" depends="compile" description="--> build a .jar">
+        <manifestclasspath property="classpath.jar" jarfile="${project.jar}">
+            <classpath>
+                <fileset dir="lib/java/default" includes="*.jar"/>
+            </classpath>
+        </manifestclasspath>
+        <jar basedir="build"
+             destfile="${project.jar}"
+             includes="**"
+             whenmanifestonly="fail">
+            <manifest>
+                <attribute name="Class-Path" value="${classpath.jar}"/>
+                <attribute name="Main-Class" value="${project.main}"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="run" depends="package" description="--> run the program">
+        <java jar="${project.jar}" fork="true"/>
+    </target>
+
+    <target name="clean" description="--> clean the project">
+        <delete includeemptydirs="true" quiet="true">
+            <fileset dir=".">
+                <include name="build/**"/>
+                <include name="lib/ivy.jar"/>
+                <include name="lib/java/**"/>
+                <include name="lib/native/**"/>
+                <include name="${project.jar}"/>
+            </fileset>
+        </delete>
+    </target>
+</project>
