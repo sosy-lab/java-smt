@@ -421,7 +421,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     if (f.is_value()) {
       return visitor.visitConstant(formula, convertValue(f));
     } else if (f.is_const()) {
-      String name = f.symbol();
+      String name = removeQuotes(f.symbol());
       return visitor.visitFreeVariable(formula, name);
 
     } else if (f.is_variable()) {
