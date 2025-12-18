@@ -162,7 +162,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @Test
-  public void api_exampleProofTest() throws SolverException, InterruptedException {
+  public void apiExampleProofTest() throws SolverException, InterruptedException {
 
     long cfg = msat_create_config();
     msat_set_option_checked(cfg, "proof_generation", "true");
@@ -204,6 +204,9 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     long pm = msat_get_proof_manager(localEnv);
 
     long proof = msat_get_proof(pm);
+
+    assertThat(msat_proof_is_term(proof)).isFalse();
+
 
     msat_destroy_proof_manager(pm);
     msat_destroy_env(localEnv);
