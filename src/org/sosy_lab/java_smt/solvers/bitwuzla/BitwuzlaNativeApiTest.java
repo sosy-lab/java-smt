@@ -828,6 +828,7 @@ public class BitwuzlaNativeApiTest {
   @Ignore
   public void illegalSmtlibParseTest() {
     // Even with the quotes added Bitwuzla will not parse keywords
+    // Won't fix, see https://github.com/bitwuzla/bitwuzla/issues/151
     String input =
         "(set-logic ALL)\n"
             + "(declare-const |exit| Bool)\n"
