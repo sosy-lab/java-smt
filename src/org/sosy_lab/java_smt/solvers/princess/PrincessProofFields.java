@@ -50,7 +50,6 @@ public final class PrincessProofFields {
       createKey(Set.class, "theoryAxioms");
 
   // Specialized Certificate Fields (PrincessCertificate)
-
   public static final ProofFieldKey<Formula> CUT_FORMULA = createKey(Formula.class, "cutFormula");
   public static final ProofFieldKey<Formula> LEFT_FORMULA = createKey(Formula.class, "leftFormula");
   public static final ProofFieldKey<Formula> RIGHT_FORMULA =
@@ -108,7 +107,8 @@ public final class PrincessProofFields {
   public static final ProofFieldKey<Formula> TARGET_LITERAL = createKey(Formula.class, "targetLit");
   public static final ProofFieldKey<Object> THEORY = createKey(Object.class, "theory");
   public static final ProofFieldKey<Formula> AXIOM = createKey(Formula.class, "axiom");
-  public static final ProofFieldKey<List> EXPANDED_INFERENCES = createKey(List.class, "expand");
+  public static final ProofFieldKey<List<PrincessProofRule>> EXPANDED_INFERENCES =
+      createKey(List.class, "expand");
   public static final ProofFieldKey<BigInteger> CONSTANT_DIFF =
       createKey(BigInteger.class, "constantDiff");
   public static final ProofFieldKey<BigInteger> FACTOR = createKey(BigInteger.class, "factor");
