@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
@@ -36,13 +37,14 @@ class OpenSMTProof extends AbstractProof {
     }
   }
 
+  @Nullable
   String sFormula;
 
   protected OpenSMTProof(ProofRule rule, Formula formula) {
     super(rule, formula);
   }
 
-  protected OpenSMTProof(ProofRule rule, String sFormula) {
+  protected OpenSMTProof(ProofRule rule, @Nullable  String sFormula) {
     super(rule, null);
     this.sFormula = sFormula;
   }
@@ -55,7 +57,7 @@ class OpenSMTProof extends AbstractProof {
     Deque<Iterator<Object>> iterStack = new ArrayDeque<>();
     iterStack.push(rootStack.iterator());
 
-    OpenSMTProof result = null;
+    OpenSMTProof result;
     String formulaStr = "";
 
     while (!iterStack.isEmpty()) {
@@ -100,7 +102,6 @@ class OpenSMTProof extends AbstractProof {
       }
     }
     result = resNodes.pop();
-    assert result != null;
     return result;
   }
 
@@ -118,7 +119,7 @@ class OpenSMTProof extends AbstractProof {
         Object v2 = ((Deque<?>) v1).peek();
         if (v2 instanceof String) {
           if (v2.equals("res")) {
-            OpenSMTProof res = processRes(v1, nodes, creator, lastSeenFormula);
+            OpenSMTProof res = processRes(v1, nodes, lastSeenFormula);
             nodes.putIfAbsent((String) expression, res);
             resNodes.push(res);
           } else {
@@ -143,12 +144,11 @@ class OpenSMTProof extends AbstractProof {
   static OpenSMTProof processRes(
       Object expr,
       Map<String, OpenSMTProof> nodes,
-      OpenSmtFormulaCreator creator,
-      String formulaStr) {
+      @Nullable String formulaStr) {
 
     Deque<Deque<?>> stack = new ArrayDeque<>();
     Object current = expr;
-    OpenSMTProof result = null;
+    OpenSMTProof result;
 
     while (true) {
       if (!(current instanceof Deque)) {
@@ -165,6 +165,7 @@ class OpenSMTProof extends AbstractProof {
         String cls1 = (String) first;
         String cls2 = (String) deque.pollFirst();
         Object rawPivot = deque.pollFirst();
+        assert rawPivot != null;
         String pivotStr =
             rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
 
@@ -192,6 +193,7 @@ class OpenSMTProof extends AbstractProof {
       Deque<?> tokens = stack.pop();
       String cls2 = (String) tokens.pollFirst();
       Object rawPivot = tokens.pollFirst();
+      assert rawPivot != null;
       String pivotStr =
           rawPivot instanceof String ? (String) rawPivot : serializeDeque((Deque<?>) rawPivot);
 
@@ -274,9 +276,7 @@ class OpenSMTProof extends AbstractProof {
       Deque<Deque<Object>> stack = new ArrayDeque<>();
       Deque<Object> current = new ArrayDeque<>();
 
-      for (int i = 0; i < tokens.size(); i++) {
-        String token = tokens.get(i);
-
+      for (String token : tokens) {
         if ("(".equals(token)) {
           stack.push(current);
           current = new ArrayDeque<>();
