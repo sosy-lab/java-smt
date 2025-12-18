@@ -354,7 +354,9 @@ public abstract class SolverBasedTest0 {
 
   protected final void requireTreeItp(ProverOptions... options) {
     requireInterpolation();
-    var test = Arrays.asList(options);
+    assume().withMessage("Solver independent interpolation strategy %s does not support tree "
+            + "interpolation", solverToUse()).that(options).asList()
+        .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);
     assume().withMessage("Solver does not support tree-interpolation.").that(solverToUse())
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
 
@@ -558,16 +560,8 @@ public abstract class SolverBasedTest0 {
       return lst;
     }
 
-    @Parameter(0)
-    public Solvers solver;
-
     @Parameter(1)
     public ProverOptions interpolationStrategy;
-
-    @Override
-    protected Solvers solverToUse() {
-      return solver;
-    }
 
     protected ProverOptions itpStrategyToUse() {
       return interpolationStrategy;
