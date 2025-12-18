@@ -383,9 +383,6 @@ public class TraceFormulaManager implements FormulaManager {
                   declaration.getName(), declaration.getType(), declaration.getArgumentTypes());
       return getUFManager().callUF(uf, args);
     } else {
-      // TODO Handle operations with a variable number of arguments
-      // TODO Figure out how to handle rounding mode for floats
-      // TODO Handle rational formulas
       Preconditions.checkArgument(
           getArity(declaration) == -1 ? args.size() > 1 : args.size() == getArity(declaration),
           "Term \"%s\" (%s): expecting %s arguments, but found %s",
