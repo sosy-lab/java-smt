@@ -41,7 +41,7 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
  * @see Z3ProofRule for the list of Z3 proof rules.
  * @see org.sosy_lab.java_smt.ResProofRule for the list of RESOLUTE axioms.
  */
-@SuppressWarnings({"unchecked", "rawtypes", "unused", "static-access", "ModifiedButNotUsed"})
+@SuppressWarnings({"unused", "ModifiedButNotUsed"})
 public class Z3ToResolutionProofConverter { // This class is inclompete and currently not used. The
   // strategy for transforming proof rules should be proved first.
   private final Z3FormulaManager formulaManager;
@@ -104,13 +104,14 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     }
 
     @Override
-    public TraversalProcess visitAnd(List<BooleanFormula> operands) {
+    public TraversalProcess visitAnd(List<BooleanFormula> pOperands) {
+      operands.addAll(pOperands);
       return TraversalProcess.ABORT;
     }
 
     @Override
-    public TraversalProcess visitOr(List<BooleanFormula> operands) {
-      this.operands.addAll(operands);
+    public TraversalProcess visitOr(List<BooleanFormula> pOperands) {
+      this.operands.addAll(pOperands);
       return TraversalProcess.ABORT;
     }
 
@@ -154,6 +155,8 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
    * @param node the {@link Z3Proof} to convert
    * @return the resulting {@link Proof}
    */
+
+
   Proof handleNode(Z3Proof node) {
     Z3ProofRule.Rule rule = (Z3ProofRule.Rule) node.getRule();
 
@@ -193,7 +196,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
       case DISTRIBUTIVITY:
         handleDistributivity(node);
-
+        break;
       case AND_ELIM:
         return handleAndElim(node);
 
@@ -232,13 +235,16 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
 
       case IFF_TRUE:
         handleIffTrue(node);
+        break;
 
       case IFF_FALSE:
         handleIffFalse(node);
+        break;
 
       case COMMUTATIVITY:
         handleCommutativity(node);
 
+        // $FALL-THROUGH$
       case DEF_AXIOM:
         return handleDefAxiom(node);
 
@@ -254,6 +260,7 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
       case CLAUSE_TRAIL:
         handleClauseTrail(node);
 
+        // $FALL-THROUGH$
       case DEF_INTRO:
         return handleDefIntro(node);
 
@@ -287,6 +294,10 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
       default:
         return handleDefault(node);
     }
+
+    //There are some proofs steps that will be skipped/deleted, temporary fix for the handling
+    // methods that do not return anything.
+    throw new UnsupportedOperationException();
   }
 
   Proof handleTrue(Z3Proof node) {
@@ -1010,11 +1021,11 @@ public class Z3ToResolutionProofConverter { // This class is inclompete and curr
     int n = children.size();
     List<BooleanFormula> formulas = new ArrayList<>();
 
-    for (int i = 0; i < n; i++) {
+    for (Proof pChild : children) {
       assert (formulaManager
-          .getFormulaType(children.get(i).getFormula().orElseThrow())
+          .getFormulaType(pChild.getFormula().orElseThrow())
           .isBooleanType());
-      formulas.add(bfm.not((BooleanFormula) children.get(i).getFormula().orElseThrow()));
+      formulas.add(bfm.not((BooleanFormula) pChild.getFormula().orElseThrow()));
     }
 
     assert (formulaManager.getFormulaType(node.getFormula().orElseThrow()).isBooleanType());
