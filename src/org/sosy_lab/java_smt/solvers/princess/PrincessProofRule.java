@@ -10,7 +10,6 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
-import ap.proof.certificates.Certificate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
