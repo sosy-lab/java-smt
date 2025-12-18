@@ -82,6 +82,7 @@ public abstract class AbstractSolverContext implements SolverContext {
       // If native interpolation is not available, we wrap a normal prover such that it returns
       // interpolation points
       ProverEnvironment normalProver = newProverEnvironment0(options);
+      // TODO: only allow this if there is a quantified formula manager available!
       out = new InterpolatingSolverDelegate(normalProver, options);
     }
 
