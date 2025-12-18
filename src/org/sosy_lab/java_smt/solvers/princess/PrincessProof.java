@@ -91,9 +91,10 @@ final class PrincessProof extends AbstractProof {
       Frame frame = stack.peek();
 
       if (!frame.isVisited()) {
-
-        Seq<Certificate> subs = (Seq<Certificate>) frame.getProof().subCertificates();
-        List<Certificate> children = CollectionConverters.asJava(subs);
+        List<Certificate> children =
+            CollectionConverters.asJava((Seq<?>) frame.getProof().subCertificates()).stream()
+                .map(Certificate.class::cast)
+                .collect(Collectors.toList());
         frame.setNumArgs(children.size());
         frame.setAsVisited(true);
 
@@ -110,8 +111,10 @@ final class PrincessProof extends AbstractProof {
         Certificate cert = frame.getProof();
         PrincessProof node = generateProof(cert, creator, api);
 
-        Seq<Certificate> subs = (Seq<Certificate>) cert.subCertificates();
-        List<Certificate> children = CollectionConverters.asJava(subs);
+        List<Certificate> children =
+            CollectionConverters.asJava((Seq<?>) cert.subCertificates()).stream()
+                .map(Certificate.class::cast)
+                .collect(Collectors.toList());
 
         for (Certificate c : children) {
           PrincessProof childNode = computed.get(c);
