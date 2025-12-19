@@ -134,31 +134,18 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   // ProverEnvironmentTest class
   @SuppressWarnings("CheckReturnValue")
   @Test
-  public void testProofOfFalse() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> {
-          long cfg = msat_create_config();
+  public void testProofOfFalse() throws SolverException, InterruptedException {
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
 
-          msat_set_option_checked(cfg, "proof_generation", "true");
+    long bottom = msat_make_false(env);
+    msat_assert_formula(env, bottom);
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isFalse();
 
-          env = msat_create_env(cfg);
-          msat_destroy_config(cfg);
-          long bottom = msat_make_false(env);
-
-          msat_assert_formula(env, bottom);
-
-          boolean isSat = msat_check_sat(env);
-
-          assertThat(isSat).isFalse();
-
-          long pm = msat_get_proof_manager(env);
-
-          msat_get_proof(pm);
-
-          msat_destroy_proof_manager(pm);
-          msat_destroy_env(env);
-        });
+    assertThrows(IllegalArgumentException.class, () -> msat_get_proof_manager(env));
   }
 
   @Test
