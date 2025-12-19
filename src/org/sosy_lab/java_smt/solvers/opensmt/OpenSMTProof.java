@@ -48,7 +48,7 @@ class OpenSMTProof extends AbstractProof {
     this.sFormula = sFormula;
   }
 
-  static OpenSMTProof generateProof(String proof, OpenSmtFormulaCreator creator) {
+  static OpenSMTProof generateProof(String proof) {
     Deque<OpenSMTProof> resNodes = new ArrayDeque<>();
     Map<String, OpenSMTProof> nodes = new HashMap<>();
     Deque<Object> rootStack = ProofParser.parse(ProofParser.tokenize(proof));
@@ -78,7 +78,7 @@ class OpenSMTProof extends AbstractProof {
               throw new IllegalStateException("Expected argument after 'let'");
             }
             Object letArg = currentIter.next();
-            handleLet(letArg, nodes, resNodes, creator, formulaStr);
+            handleLet(letArg, nodes, resNodes, formulaStr);
             break;
 
           case ";":
@@ -108,7 +108,6 @@ class OpenSMTProof extends AbstractProof {
       Object stack,
       Map<String, OpenSMTProof> nodes,
       Deque<OpenSMTProof> resNodes,
-      OpenSmtFormulaCreator creator,
       String lastSeenFormula) {
     assert stack instanceof Deque; // no unchecked cast
     Object expression = ((Deque<?>) stack).pop();
