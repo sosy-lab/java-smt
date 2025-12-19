@@ -38,8 +38,12 @@ public abstract class ProofFieldKey<T> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o) {
+      return true;
+    }
+    if (!(o instanceof ProofFieldKey)) {
+      return false;
+    }
     ProofFieldKey<?> that = (ProofFieldKey<?>) o;
     return valueType.equals(that.valueType) && externalFieldName.equals(that.externalFieldName);
   }
