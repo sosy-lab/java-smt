@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
@@ -261,6 +262,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
+  @SuppressWarnings("MissingFail")
   public void testGetSimpleBooleanProof() throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
@@ -292,9 +294,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
+  @SuppressWarnings("MissingFail")
   public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
-    requireProofGeneration(); // Ensures proofs are supported
+    requireProofGeneration(); // Ensures proofs are supported  @SuppressWarnings("MissingFail")
+
     requireRationals();
 
     // "(declare-fun x1 () Real)" +
@@ -379,7 +383,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
-
+      fail("Expected IllegalStateException");
     } catch (UnsupportedOperationException e) {
       assertThat(e)
           .hasMessageThat()
@@ -427,12 +431,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
               || contextClass.equals(BitwuzlaSolverContext.class)
               || contextClass.equals(Yices2SolverContext.class);
       assertThat(isExpected).isTrue();
-    } catch (IllegalStateException ie) {
-      // this should be thrown as getProof was called when last evaluation was SAT
     }
   }
 
   @Test
+  @SuppressWarnings("MissingFail")
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
@@ -449,7 +452,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Test getProof()
       Proof proof = prover.getProof();
       checkProof(proof);
-
     } catch (UnsupportedOperationException e) {
       assertThat(e)
           .hasMessageThat()
@@ -514,7 +516,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   // TODO: MathSAT5 produces a proof with a CLAUSE_HYP rule without children, investigate why this
-  // coudl be and how to process
+  //  could be and how to process
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
@@ -829,6 +831,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
           assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
           assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
+          break;
         case "REDUCE_PRED_INFERENCE":
           assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
           assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
