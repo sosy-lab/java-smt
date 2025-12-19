@@ -1020,11 +1020,11 @@ public class Z3ToResolutionProofConverter { // This class is incomplete and curr
     List<BooleanFormula> formulas = new ArrayList<>();
 
     for (Proof pChild : children) {
-      assert (formulaManager.getFormulaType(pChild.getFormula().orElseThrow()).isBooleanType());
+      assert formulaManager.getFormulaType(pChild.getFormula().orElseThrow()).isBooleanType();
       formulas.add(bfm.not((BooleanFormula) pChild.getFormula().orElseThrow()));
     }
 
-    assert (formulaManager.getFormulaType(node.getFormula().orElseThrow()).isBooleanType());
+    assert formulaManager.getFormulaType(node.getFormula().orElseThrow()).isBooleanType();
     formulas.add((BooleanFormula) node.getFormula().orElseThrow());
 
     BooleanFormula axiomFormula = bfm.or(formulas);
