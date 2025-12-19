@@ -53,7 +53,7 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.IdentityHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -83,7 +83,7 @@ final class PrincessProof extends AbstractProof {
       Certificate root, PrincessFormulaCreator creator, SimpleAPI api) {
     Deque<Frame> stack = new ArrayDeque<>();
 
-    Map<Certificate, PrincessProof> computed = new IdentityHashMap<>();
+    Map<Certificate, PrincessProof> computed = new HashMap<>();
 
     stack.push(new Frame(root));
 
