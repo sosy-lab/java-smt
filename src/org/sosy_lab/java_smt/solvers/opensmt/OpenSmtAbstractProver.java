@@ -302,7 +302,7 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     //    "Proof generation is not available for the current solver.");
 
     // System.out.println(osmtSolver.printResolutionProofSMT2());
-    OpenSMTProof root = generateProof(osmtSolver.printResolutionProofSMT2(), creator);
+    OpenSMTProof root = generateProof(osmtSolver.printResolutionProofSMT2());
     parseFormulas(root);
     return root;
   }
