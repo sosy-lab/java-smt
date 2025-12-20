@@ -22,6 +22,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnvironment<T> {
 
@@ -119,6 +120,11 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
     synchronized (sync) {
       return delegate.getStatistics();
     }
+  }
+
+  @Override
+  public Proof getProof() throws SolverException, InterruptedException {
+    return delegate.getProof();
   }
 
   @Override
