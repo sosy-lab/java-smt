@@ -67,7 +67,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
+  @SuppressWarnings({"ResultOfMethodCallIgnored", "resource"})
   private InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation1(
       Set<ProverOptions> options) {
     InterpolatingProverEnvironment<?> out;
