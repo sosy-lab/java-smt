@@ -29,6 +29,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -37,6 +38,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   protected final boolean generateAllSat;
   protected final boolean generateUnsatCores;
   private final boolean generateUnsatCoresOverAssumptions;
+  protected final boolean generateProofs;
   protected final boolean enableSL;
 
   // flags for status
@@ -61,6 +63,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    generateProofs = pOptions.contains(ProverOptions.GENERATE_PROOFS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -91,6 +94,13 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         generateUnsatCoresOverAssumptions,
         TEMPLATE,
         ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
+  }
+
+  protected final void checkGenerateProofs() {
+    Preconditions.checkState(generateProofs, TEMPLATE, ProverOptions.GENERATE_PROOFS);
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
@@ -244,5 +254,11 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     assertedFormulas.clear();
     closeAllEvaluators();
     closed = true;
+  }
+
+  @Override
+  public Proof getProof() throws InterruptedException, SolverException {
+    throw new UnsupportedOperationException(
+        "Proof generation is not available for the current solver.");
   }
 }
