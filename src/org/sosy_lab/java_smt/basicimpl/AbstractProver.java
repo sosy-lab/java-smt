@@ -184,7 +184,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   /** Provides the set of BooleanFormulas to interpolate on. */
-  public static class InterpolationGroups {
+  public static final class InterpolationGroups {
     private final Collection<BooleanFormula> formulasOfA;
     private final Collection<BooleanFormula> formulasOfB;
 
@@ -196,16 +196,16 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       formulasOfB = pFormulasOfB;
     }
 
-    protected static InterpolationGroups of(
+    public static InterpolationGroups of(
         Collection<BooleanFormula> pFormulasOfA, Collection<BooleanFormula> pFormulasOfB) {
       return new InterpolationGroups(pFormulasOfA, pFormulasOfB);
     }
 
-    protected Collection<BooleanFormula> getFormulasOfA() {
+    public Collection<BooleanFormula> getFormulasOfA() {
       return formulasOfA;
     }
 
-    protected Collection<BooleanFormula> getFormulasOfB() {
+    public Collection<BooleanFormula> getFormulasOfB() {
       return formulasOfB;
     }
   }

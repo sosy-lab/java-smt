@@ -8,10 +8,6 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_PROJECTION_BASED_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
-import static org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption.GENERATE_UNIFORM_FORWARD_INTERPOLANTS;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
@@ -24,7 +20,6 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
-import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment.InterpolationOption;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
@@ -72,6 +67,7 @@ public abstract class AbstractSolverContext implements SolverContext {
     return out;
   }
 
+  @SuppressWarnings("ResultOfMethodCallIgnored")
   private InterpolatingProverEnvironment<?> newProverEnvironmentWithInterpolation1(
       Set<ProverOptions> options) {
     InterpolatingProverEnvironment<?> out;
@@ -79,6 +75,13 @@ public abstract class AbstractSolverContext implements SolverContext {
     try {
       out = newProverEnvironmentWithInterpolation0(options);
     } catch (UnsupportedOperationException e) {
+      // Check if QuantifiedFormulaManager is available before attempting independent interpolation
+      try {
+        getFormulaManager().getQuantifiedFormulaManager();
+      } catch (UnsupportedOperationException error) {
+        e.addSuppressed(error);
+        throw e;
+      }
       // If native interpolation is not available, we wrap a normal prover such that it returns
       // interpolation points
       ProverEnvironment normalProver = newProverEnvironment0(options);
