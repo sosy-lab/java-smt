@@ -361,10 +361,8 @@ public abstract class SolverBasedTest0 {
               Solvers.OPENSMT,
               Solvers.MATHSAT5,
               Solvers.BOOLECTOR,
-              Solvers.CVC4,
               Solvers.CVC5,
-              Solvers.BITWUZLA,
-              Solvers.YICES2);
+              Solvers.BITWUZLA);
     } else if (optionList.contains(GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
       assume()
           .withMessage("Only Z3 is enabled for projection-based interpolation")
@@ -375,7 +373,7 @@ public abstract class SolverBasedTest0 {
       assume()
           .withMessage("Solver %s does not support Quantifier Elimination", solverToUse())
           .that(solverToUse())
-          .isNoneOf(Solvers.OPENSMT, Solvers.SMTINTERPOL);
+          .isNoneOf(Solvers.OPENSMT, Solvers.SMTINTERPOL, Solvers.YICES2);
     }
     try {
       if (optionList.contains(null)) {
