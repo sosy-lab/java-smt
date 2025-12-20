@@ -149,6 +149,28 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula equal(List<Formula> pArgs) {
+    debugging.assertThreadLocal();
+    for (Formula f : pArgs) {
+      debugging.assertFormulaInContext(f);
+    }
+    BooleanFormula result = delegate.equal(pArgs);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public BooleanFormula distinct(List<Formula> pArgs) {
+    debugging.assertThreadLocal();
+    for (Formula f : pArgs) {
+      debugging.assertFormulaInContext(f);
+    }
+    BooleanFormula result = delegate.distinct(pArgs);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T formula) {
     debugging.assertThreadLocal();
     debugging.assertFormulaInContext(formula);

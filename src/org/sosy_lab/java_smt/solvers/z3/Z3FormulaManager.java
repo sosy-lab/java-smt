@@ -59,6 +59,20 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
+  public Long equalImpl(Long pArg1, Long pArgs) {
+    // We need to add a phantom reference here, otherwise Z3 will hang
+    // TODO Remove this hack
+    var term = Native.mkEq(getEnvironment(), pArg1, pArgs);
+    Native.incRef(getEnvironment(), term);
+    return term;
+  }
+
+  @Override
+  public Long distinctImpl(List<Long> pArgs) {
+    return Native.mkDistinct(getEnvironment(), pArgs.size(), Longs.toArray(pArgs));
+  }
+
+  @Override
   public Long parseImpl(String str) throws IllegalArgumentException {
 
     // Z3 does not access the existing symbols on its own,

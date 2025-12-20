@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.List;
@@ -130,6 +131,18 @@ public interface FormulaManager {
    * @return Constructed formula
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
+
+  default BooleanFormula equal(Formula... pArgs) {
+    return equal(ImmutableList.copyOf(pArgs));
+  }
+
+  BooleanFormula equal(List<Formula> pArgs);
+
+  default BooleanFormula distinct(Formula... pArgs) {
+    return distinct(ImmutableList.copyOf(pArgs));
+  }
+
+  BooleanFormula distinct(List<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

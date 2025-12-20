@@ -122,6 +122,18 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
+  public BooleanFormula equal(List<Formula> pArgs) {
+    stats.booleanOperations.getAndIncrement(); // TODO Check the formula type?
+    return delegate.equal(pArgs);
+  }
+
+  @Override
+  public BooleanFormula distinct(List<Formula> pArgs) {
+    stats.booleanOperations.getAndIncrement(); // TODO Check the formula type?
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public <T extends Formula> FormulaType<T> getFormulaType(T pFormula) {
     return delegate.getFormulaType(pFormula);
   }

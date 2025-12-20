@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -262,6 +263,58 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       throw new UnsupportedOperationException("Solver does not support enumeration theory");
     }
     return enumManager;
+  }
+
+  /** Override if the solver API only supports binary equality. */
+  protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
+    return equalImpl(ImmutableList.of(pArg1, pArgs));
+  }
+
+  /** Override if the solver API supports equality with many arguments. */
+  protected TFormulaInfo equalImpl(List<TFormulaInfo> pArgs) {
+    ImmutableList.Builder<TFormulaInfo> builder = ImmutableList.builder();
+    for (int i = 1; i < pArgs.size(); i++) {
+      builder.add(equalImpl(pArgs.get(i - 1), pArgs.get(i)));
+    }
+    return booleanManager.andImpl(builder.build());
+  }
+
+  @Override
+  public BooleanFormula equal(List<Formula> pArgs) {
+    Preconditions.checkArgument(
+        pArgs.size() > 1,
+        "Called `equal` with %s arguments, but at least two are needed",
+        pArgs.size());
+    Preconditions.checkArgument(
+        ImmutableSet.copyOf(Lists.transform(pArgs, formulaCreator::getFormulaType)).size() == 1,
+        "All arguments to `equal` must have the same type, but found %s different types",
+        Lists.transform(pArgs, formulaCreator::getFormulaType).size());
+    return formulaCreator.encapsulateBoolean(
+        equalImpl(Lists.transform(pArgs, formulaCreator::extractInfo)));
+  }
+
+  /** Override if the solver API supports <code>distinct</code>. */
+  protected TFormulaInfo distinctImpl(List<TFormulaInfo> pArgs) {
+    ImmutableList.Builder<TFormulaInfo> builder = ImmutableList.builder();
+    for (int i = 0; i < pArgs.size(); i++) {
+      for (int j = i + 1; j < pArgs.size(); j++) {
+        builder.add(booleanManager.not(equalImpl(pArgs.get(i), pArgs.get(j))));
+      }
+    }
+    return booleanManager.andImpl(builder.build());
+  }
+
+  @Override
+  public BooleanFormula distinct(List<Formula> pArgs) {
+    Preconditions.checkArgument(
+        pArgs.size() > 1,
+        "Called `distinct` with %s arguments, but at least two are needed",
+        pArgs.size());
+    Preconditions.checkArgument(
+        ImmutableSet.copyOf(Lists.transform(pArgs, formulaCreator::getFormulaType)).size() == 1,
+        "All arguments to `distinct` must have the same type, but found %s different types",
+        Lists.transform(pArgs, formulaCreator::getFormulaType).size());
+    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(pArgs)));
   }
 
   protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;

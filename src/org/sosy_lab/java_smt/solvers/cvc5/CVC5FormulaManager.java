@@ -17,6 +17,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -62,6 +63,16 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+  }
+
+  @Override
+  public Term equalImpl(List<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.EQUAL, pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  public Term distinctImpl(List<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.DISTINCT, pArgs.toArray(new Term[0]));
   }
 
   @Override

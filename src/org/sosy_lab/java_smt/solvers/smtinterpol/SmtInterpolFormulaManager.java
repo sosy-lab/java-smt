@@ -29,6 +29,7 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -66,6 +67,16 @@ public class SmtInterpolFormulaManager
 
   BooleanFormula encapsulateBooleanFormula(Term t) {
     return getFormulaCreator().encapsulateBoolean(t);
+  }
+
+  @Override
+  protected Term equalImpl(List<Term> pArgs) {
+    return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  protected Term distinctImpl(List<Term> pArgs) {
+    return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
   }
 
   @Override
