@@ -10,11 +10,8 @@
 
 package org.sosy_lab.java_smt.example;
 
-import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import java.util.List;
 import java.util.logging.Level;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -32,21 +29,29 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
-public class IndependentInterpolation {
+public final class IndependentInterpolation {
+
+  private IndependentInterpolation() {
+    // never called
+  }
 
   public static void main(String[] args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
 
+    // set up a basic environment
     Configuration config = Configuration.defaultConfiguration();
     LogManager logger = BasicLogManager.create(config);
     ShutdownNotifier notifier = ShutdownNotifier.createDummy();
 
+    // choose solver
     Solvers solver = Solvers.Z3;
 
+    // setup context
     try (SolverContext context =
              SolverContextFactory.createSolverContext(config, logger, notifier, solver);
          InterpolatingProverEnvironment<?> prover =
-             context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
+             context.newProverEnvironmentWithInterpolation(
+                 ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -55,6 +60,11 @@ public class IndependentInterpolation {
       // example
       prover.push();
       interpolateExample(prover, bmgr, imgr, logger);
+      prover.pop();
+
+      // another example
+      prover.push();
+      interpolateExample2(prover, bmgr, imgr, logger);
       prover.pop();
 
     } catch (InvalidConfigurationException | UnsatisfiedLinkError e) {
@@ -79,7 +89,6 @@ public class IndependentInterpolation {
     // B: y = z && z = 2
     // -> y = 1, y != 2
 
-
     // create some variables
     IntegerFormula x = imgr.makeVariable("x");
     IntegerFormula y = imgr.makeVariable("y");
@@ -89,14 +98,9 @@ public class IndependentInterpolation {
 
     // create and assert some formulas
     // instead of 'named' formulas, we return a 'handle' (of generic type T)
-
-    T ip0 =
-        prover.push(
-            bmgr.and(
-                imgr.equal(y, z), imgr.equal(z, two)
-            ));
-    T ip1 = prover.push(bmgr.and(imgr.equal(x, one), imgr.equal(y, x)));
-
+    @SuppressWarnings("unused")
+    T ip0 = prover.addConstraint(bmgr.and(imgr.equal(y, z), imgr.equal(z, two)));
+    T ip1 = prover.addConstraint(bmgr.and(imgr.equal(x, one), imgr.equal(y, x)));
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
@@ -123,10 +127,9 @@ public class IndependentInterpolation {
     IntegerFormula one = imgr.makeNumber(1);
     IntegerFormula zero = imgr.makeNumber(0);
 
-    T ip0 =
-        prover.push(imgr.lessThan(y, zero));
-    T ip1 = prover.push(bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one))));
-
+    @SuppressWarnings("unused")
+    T ip0 = prover.addConstraint(imgr.lessThan(y, zero));
+    T ip1 = prover.addConstraint(bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one))));
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
@@ -135,36 +138,4 @@ public class IndependentInterpolation {
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip1));
     logger.log(Level.INFO, "Interpolants are:", itp);
   }
-
-  private static <T> void interpolateExample3(
-      InterpolatingProverEnvironment<T> prover,
-      BooleanFormulaManager bmgr,
-      IntegerFormulaManager imgr,
-      LogManager logger)
-      throws InterruptedException, SolverException {
-
-    IntegerFormula zero = imgr.makeNumber(0);
-    IntegerFormula one = imgr.makeNumber(1);
-    IntegerFormula thousand = imgr.makeNumber(1000);
-
-    IntegerFormula i3 = imgr.makeVariable("i3");
-    IntegerFormula i4 = imgr.makeVariable("i4");
-
-    BooleanFormula A = imgr.equal(i3, zero);
-    BooleanFormula B = bmgr.and(imgr.lessThan(i3, thousand), imgr.equal(i4, imgr.add(i3, one)));
-    BooleanFormula C = imgr.greaterThan(i4, thousand);
-
-    T TA = prover.push(A);
-    T TB = prover.push(B);
-    T TC = prover.push(C);
-
-    assertThat(prover).isUnsatisfiable();
-
-    List<BooleanFormula> itpSeq = prover.getSeqInterpolants0(ImmutableList.of(TA, TB, TC));
-
-    BooleanFormula itp1 = prover.getInterpolant(ImmutableList.of(TA));
-    BooleanFormula itp2 = prover.getInterpolant(ImmutableList.of(TA, TB));
-  }
 }
-
-
