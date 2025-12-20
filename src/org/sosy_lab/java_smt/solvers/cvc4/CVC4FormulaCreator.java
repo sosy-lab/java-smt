@@ -337,7 +337,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isRoundingMode()) {
         return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
-        return visitor.visitConstant(formula, f.getConstString());
+        return visitor.visitConstant(formula, f.getConstString().toString());
       } else if (type.isArray()) {
         ArrayStoreAll storeAll = f.getConstArrayStoreAll();
         Expr constant = storeAll.getExpr();
