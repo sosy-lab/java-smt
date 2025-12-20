@@ -48,10 +48,10 @@ public final class IndependentInterpolation {
 
     // setup context
     try (SolverContext context =
-             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
-         InterpolatingProverEnvironment<?> prover =
-             context.newProverEnvironmentWithInterpolation(
-                 ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
+            SolverContextFactory.createSolverContext(config, logger, notifier, solver);
+        InterpolatingProverEnvironment<?> prover =
+            context.newProverEnvironmentWithInterpolation(
+                ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
@@ -98,8 +98,7 @@ public final class IndependentInterpolation {
 
     // create and assert some formulas
     // instead of 'named' formulas, we return a 'handle' (of generic type T)
-    @SuppressWarnings("unused")
-    T ip0 = prover.addConstraint(bmgr.and(imgr.equal(y, z), imgr.equal(z, two)));
+    prover.addConstraint(bmgr.and(imgr.equal(y, z), imgr.equal(z, two)));
     T ip1 = prover.addConstraint(bmgr.and(imgr.equal(x, one), imgr.equal(y, x)));
 
     // check for satisfiability
@@ -127,9 +126,9 @@ public final class IndependentInterpolation {
     IntegerFormula one = imgr.makeNumber(1);
     IntegerFormula zero = imgr.makeNumber(0);
 
-    @SuppressWarnings("unused")
-    T ip0 = prover.addConstraint(imgr.lessThan(y, zero));
-    T ip1 = prover.addConstraint(bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one))));
+    prover.addConstraint(imgr.lessThan(y, zero));
+    T ip1 =
+        prover.addConstraint(bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one))));
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
