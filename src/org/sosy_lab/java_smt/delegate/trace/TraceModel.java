@@ -63,11 +63,12 @@ public class TraceModel implements Model {
 
   @Override
   public <T extends Formula> @Nullable T eval(T formula) {
-    return mgr.rebuild(
+    var value =
         logger.logDefDiscard(
             logger.toVariable(this),
             String.format("eval(%s)", logger.toVariable(formula)),
-            () -> delegate.eval(formula)));
+            () -> delegate.eval(formula));
+    return value == null ? null : mgr.rebuild(value);
   }
 
   @Override
