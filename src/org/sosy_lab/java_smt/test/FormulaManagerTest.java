@@ -22,34 +22,41 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
-  public void testEqualityWrongSorts() {
-    // Check that an exception is thrown if the arguments to `=` don't have matching types
+  public void testWrongSorts() {
+    // Check that an exception is thrown if the arguments to `=` or `distinct` don't have matching
+    // types
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
 
     var var1 = mgr.makeVariable(BooleanType, "var1");
     var var2 = mgr.makeVariable(formulaType, "var2");
 
     assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1, var2));
 
     if (bvmgr != null) {
       var bv1 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv1");
       var bv2 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv2");
 
       assertThrows(IllegalArgumentException.class, () -> mgr.equal(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(bv1, bv2));
     }
 
     if (amgr != null) {
@@ -60,18 +67,21 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
 
       assertThrows(IllegalArgumentException.class, () -> mgr.equal(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(arr1, arr2));
     }
   }
 
   @Test
-  public void testEqualityWrongNumberArgs() {
-    // Check that an exception is thrown if `=` is called with fewer than 2 arguments
+  public void testWrongNumberArgs() {
+    // Check that an exception is thrown if `=` or `distinct` is called with fewer than 2 arguments
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
-
     var var1 = mgr.makeVariable(formulaType, "var1");
 
     assertThrows(IllegalArgumentException.class, () -> mgr.equal());
+    assertThrows(IllegalArgumentException.class, () -> mgr.distinct());
+
     assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1));
+    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1));
   }
 
   @Test
@@ -95,8 +105,53 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     }
   }
 
+  private class Rebuilder extends FormulaTransformationVisitor {
+    Rebuilder(FormulaManager fmgr) {
+      super(fmgr);
+    }
+
+    @Override
+    public Formula visitFreeVariable(Formula f, String name) {
+      return mgr.makeVariable(mgr.getFormulaType(f), name);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      switch (functionDeclaration.getKind()) {
+        case AND:
+          return bmgr.and((List<BooleanFormula>) (List<?>) args);
+        case NOT:
+          return bmgr.not((BooleanFormula) args.get(0));
+        case EQ:
+          return mgr.equal(args);
+        case DISTINCT:
+          return mgr.distinct(args);
+        default:
+          throw new UnsupportedOperationException();
+      }
+    }
+  }
+
   @Test
-  public void testEqualityRewrites() {
+  public void testEqualityVisitor() {
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.equal(var1, var2, var3);
+    var g = mgr.transformRecursively(f, new Rebuilder(mgr));
+
+    assertThat(f).isEqualTo(g);
+  }
+
+  @Test
+  public void testEqualityParser() {
     // Check that we can recreate `=` terms from the parser
     requireParser();
 
@@ -105,7 +160,6 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var1 = mgr.makeVariable(formulaType, "var1");
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
-    var var4 = mgr.makeVariable(formulaType, "var4");
 
     var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
 
@@ -113,10 +167,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
         String.format("(define-const %s %s)", var1, formulaSort)
             + String.format("(define-const %s %s)", var2, formulaSort)
             + String.format("(define-const %s %s)", var3, formulaSort)
-            + String.format("(define-const %s %s)", var4, formulaSort)
-            + String.format("(assert (= %s %s %s %s))", var1, var2, var3, var4);
+            + String.format("(assert (= %s %s %s))", var1, var2, var3);
 
-    var f = mgr.equal(var1, var2, var3, var4);
+    var f = mgr.equal(var1, var2, var3);
     var g = mgr.parse(str);
 
     assertThat(f).isEqualTo(g);
@@ -149,7 +202,23 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testDistinctRewrites() {
+  public void testDistinctVisitor() {
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.distinct(var1, var2, var3);
+    var g = mgr.transformRecursively(f, new Rebuilder(mgr));
+
+    assertThat(f).isEqualTo(g);
+  }
+
+  @Test
+  public void testDistinctParser() {
     // Check that we can recreate `distinct` terms from the parser
     requireParser();
 
