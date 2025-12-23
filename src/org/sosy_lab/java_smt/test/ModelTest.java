@@ -92,9 +92,14 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(getBitvectorTypeWithSize(32), getBitvectorTypeWithSize(32));
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3);
+      ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION);
   private static final ImmutableList<Solvers> SOLVERS_WITH_PERSISTENT_MODEL =
-      ImmutableList.of(Solvers.MATHSAT5, Solvers.Z3, Solvers.SMTINTERPOL, Solvers.YICES2);
+      ImmutableList.of(
+          Solvers.MATHSAT5,
+          Solvers.Z3,
+          Solvers.Z3_WITH_INTERPOLATION,
+          Solvers.SMTINTERPOL,
+          Solvers.YICES2);
 
   /** Model value for irrelevant variable. */
   private BigInteger defaultValue;
