@@ -14,6 +14,7 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -56,6 +57,20 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
         pStringManager,
         pEnumerationManager);
     formulaCreator = pFormulaCreator;
+  }
+
+  @Override
+  public Long equalImpl(Long pArg1, Long pArgs) {
+    // We need to add a phantom reference here, otherwise Z3 will hang
+    // TODO Remove this hack
+    var term = Native.mkEq(getEnvironment(), pArg1, pArgs);
+    Native.incRef(getEnvironment(), term);
+    return term;
+  }
+
+  @Override
+  public Long distinctImpl(Collection<Long> pArgs) {
+    return Native.mkDistinct(getEnvironment(), pArgs.size(), Longs.toArray(pArgs));
   }
 
   @Override
