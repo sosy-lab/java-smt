@@ -227,6 +227,12 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support floor for rationals", solverToUse())
         .that(solverToUse())
         .isNotEqualTo(Solvers.OPENSMT);
+    assume()
+        .withMessage(
+            "Solver %s does not support floor for rationals (random segfaults on ARM64)",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /** Skip test if the solver does not support bitvectors. */
@@ -235,6 +241,10 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
         .that(bvmgr)
         .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support bitvectors for interpolation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   protected final void requireBitvectorToInt() {
@@ -284,11 +294,24 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
+  /** Skip test if the solver does not support constant arrays. */
+  protected final void requireConstArrays() {
+    assume()
+        .withMessage("Solver %s does not support constant arrays", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.OPENSMT);
+  }
+
+  /** Skip test if the solver does not support floats. */
   protected final void requireFloats() {
     assume()
         .withMessage("Solver %s does not support the theory of floats", solverToUse())
         .that(fpmgr)
         .isNotNull();
+    assume()
+        .withMessage("Solver %s does not support floats for interpolation", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   /** Skip test if the solver does not support strings. */
@@ -346,6 +369,13 @@ public abstract class SolverBasedTest0 {
         .withMessage("Solver %s does not support parsing formulae", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length",
+            solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   protected void requireArrayModel() {
@@ -450,6 +480,7 @@ public abstract class SolverBasedTest0 {
         if (eval != null) {
           switch (solverToUse()) {
             case Z3:
+            case Z3_WITH_INTERPOLATION:
               // ignore, Z3 provides arbitrary values
               break;
             case BOOLECTOR:

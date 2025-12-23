@@ -94,6 +94,12 @@ public class TranslateFormulaTest {
         .withMessage("Solver %s does not support parsing formulae", translateTo)
         .that(translateTo)
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length", translateTo)
+        .that(translateTo)
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireParserFrom() {
@@ -101,6 +107,13 @@ public class TranslateFormulaTest {
         .withMessage("Solver %s does not support parsing formulae", translateFrom)
         .that(translateFrom)
         .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2, Solvers.CVC5);
+
+    assume()
+        .withMessage(
+            "Solver %s segfaults when parsing short queries or reports invalid length",
+            translateFrom)
+        .that(translateFrom)
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
   }
 
   private void requireIntegers() {

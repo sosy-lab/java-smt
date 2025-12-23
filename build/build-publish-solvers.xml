@@ -21,5 +21,6 @@ SPDX-License-Identifier: Apache-2.0
     <import file="build-publish-solvers/solver-opensmt.xml"/>
     <import file="build-publish-solvers/solver-yices.xml"/>
     <import file="build-publish-solvers/solver-z3.xml"/>
+    <import file="build-publish-solvers/solver-z3-legacy.xml"/>
 
 </project>

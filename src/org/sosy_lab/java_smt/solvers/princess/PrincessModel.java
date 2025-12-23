@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 
 import ap.api.PartialModel;
