@@ -26,10 +26,10 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.StringReader;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.sosy_lab.common.log.LogManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -70,12 +70,12 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
-  protected Term equalImpl(List<Term> pArgs) {
+  protected Term equalImpl(Collection<Term> pArgs) {
     return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
   }
 
   @Override
-  protected Term distinctImpl(List<Term> pArgs) {
+  protected Term distinctImpl(Collection<Term> pArgs) {
     return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
   }
 

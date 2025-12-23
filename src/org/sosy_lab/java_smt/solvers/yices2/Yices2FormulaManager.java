@@ -28,7 +28,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.primitives.Ints;
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -78,7 +78,7 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  protected Integer distinctImpl(List<Integer> pArgs) {
+  protected Integer distinctImpl(Collection<Integer> pArgs) {
     return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
   }
 

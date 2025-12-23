@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -72,16 +73,15 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testWrongNumberArgs() {
-    // Check that an exception is thrown if `=` or `distinct` is called with fewer than 2 arguments
+  public void testSmallNumberOfArgs() {
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
     var var1 = mgr.makeVariable(formulaType, "var1");
 
-    assertThrows(IllegalArgumentException.class, () -> mgr.equal());
-    assertThrows(IllegalArgumentException.class, () -> mgr.distinct());
+    assertEquals(bmgr.makeTrue(), mgr.equal());
+    assertEquals(bmgr.makeTrue(), mgr.distinct());
 
-    assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1));
-    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1));
+    assertEquals(bmgr.makeTrue(), mgr.equal(var1));
+    assertEquals(bmgr.makeTrue(), mgr.distinct(var1));
   }
 
   @Test

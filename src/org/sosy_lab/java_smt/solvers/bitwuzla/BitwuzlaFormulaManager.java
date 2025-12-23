@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -60,12 +61,12 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public Term equalImpl(List<Term> pArgs) {
+  public Term equalImpl(Collection<Term> pArgs) {
     return creator.getTermManager().mk_term(Kind.EQUAL, new Vector_Term(pArgs), new Vector_Int());
   }
 
   @Override
-  public Term distinctImpl(List<Term> pArgs) {
+  public Term distinctImpl(Collection<Term> pArgs) {
     return creator
         .getTermManager()
         .mk_term(Kind.DISTINCT, new Vector_Term(pArgs), new Vector_Int());

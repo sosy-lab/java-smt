@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.api;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -132,17 +133,45 @@ public interface FormulaManager {
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
 
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
   default BooleanFormula equal(Formula... pArgs) {
     return equal(ImmutableList.copyOf(pArgs));
   }
 
-  BooleanFormula equal(List<Formula> pArgs);
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
+  BooleanFormula equal(Collection<Formula> pArgs);
 
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
   default BooleanFormula distinct(Formula... pArgs) {
     return distinct(ImmutableList.copyOf(pArgs));
   }
 
-  BooleanFormula distinct(List<Formula> pArgs);
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
+  BooleanFormula distinct(Collection<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

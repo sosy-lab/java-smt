@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -51,12 +51,12 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
   }
 
   @Override
-  protected PTRef equalImpl(List<PTRef> pArgs) {
+  protected PTRef equalImpl(Collection<PTRef> pArgs) {
     return getEnvironment().mkEq(new VectorPTRef(pArgs));
   }
 
   @Override
-  public PTRef distinctImpl(List<PTRef> pArgs) {
+  public PTRef distinctImpl(Collection<PTRef> pArgs) {
     return getEnvironment().mkDistinct(new VectorPTRef(pArgs));
   }
 
