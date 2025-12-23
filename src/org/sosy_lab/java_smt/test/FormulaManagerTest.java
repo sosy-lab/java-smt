@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
@@ -77,11 +76,11 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
     var var1 = mgr.makeVariable(formulaType, "var1");
 
-    assertEquals(bmgr.makeTrue(), mgr.equal());
-    assertEquals(bmgr.makeTrue(), mgr.distinct());
+    assertThat(mgr.equal()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.distinct()).isEqualTo(bmgr.makeTrue());
 
-    assertEquals(bmgr.makeTrue(), mgr.equal(var1));
-    assertEquals(bmgr.makeTrue(), mgr.distinct(var1));
+    assertThat(mgr.equal(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.distinct(var1)).isEqualTo(bmgr.makeTrue());
   }
 
   @Test
