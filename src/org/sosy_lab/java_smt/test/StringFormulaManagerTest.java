@@ -157,6 +157,11 @@ public class StringFormulaManagerTest extends SolverBasedTest0.ParameterizedSolv
 
   @Test
   public void testOutputUnescape() throws SolverException, InterruptedException {
+    // Princess does not (fully) support evaluating String formulas when the partial model is
+    // used. This has already been fixed upstream
+    // TODO Enable this test once we update Princess to the next version
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
     // Test if Unicode escape sequences get properly converted back when reading from the model.
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       assertThat(!prover.isUnsat()).isTrue();
