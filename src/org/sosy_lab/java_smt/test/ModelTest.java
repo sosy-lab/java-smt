@@ -955,9 +955,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
-        .withMessage("As of now, only Z3 supports partial model evaluation")
-        .that(solver)
-        .isEqualTo(Solvers.Z3);
+        .withMessage("Solver %s does not support partial model evaluation", solverToUse())
+        .that(solverToUse())
+        .isIn(SOLVERS_WITH_PARTIAL_MODEL);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
@@ -1252,10 +1252,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
 
-    assume()
-        .withMessage("Solvers have problems with multi-dimensional arrays")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -1311,10 +1308,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
 
     assume()
-        .withMessage("Solvers have problems with multi-dimensional arrays")
+        .withMessage("Boolector supports bitvector arrays only")
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2, Solvers.BOOLECTOR, Solvers.BITWUZLA);
+        .isNotEqualTo(Solvers.BOOLECTOR);
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -1366,10 +1363,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   @Test
   public void testGetArrays3() throws SolverException, InterruptedException {
-    // We're having some issues handling arrays with more than one index in our Princess backend
-    // TODO Enable this test once model generation is fixed
-    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
-
     requireParser();
     requireIntegers();
     requireArrays();
@@ -2608,7 +2601,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // FIXME Broken in JavaSMT
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array =
@@ -2631,9 +2623,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array =
@@ -2665,9 +2655,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2741,7 +2729,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
@@ -2764,9 +2752,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireConstArrays();
 
-    assume()
-        .that(solver)
-        .isNoneOf(Solvers.Z3, Solvers.PRINCESS, Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.IntegerType;
 
@@ -2802,7 +2788,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
     requireIntegers();
 
-    assume().that(solver).isNoneOf(Solvers.PRINCESS, Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     var array =
         amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
