@@ -152,7 +152,7 @@ final class Z3LegacyModel extends AbstractModel<Long, Long, Long> {
   private Collection<ValueAssignment> getConstantArrayAssignment(long arrayFormula, long value) {
     Z3_sort_kind sortKind =
         Z3_sort_kind.fromInt(Native.getSortKind(z3context, Native.getSort(z3context, value)));
-    checkState(sortKind == Z3_sort_kind.Z3_ARRAY_SORT, "unexpected sort: " + sortKind);
+    checkState(sortKind == Z3_sort_kind.Z3_ARRAY_SORT, "unexpected sort: %s", sortKind);
 
     List<ValueAssignment> out = new ArrayList<>();
 
