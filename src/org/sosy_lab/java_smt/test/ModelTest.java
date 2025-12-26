@@ -2548,8 +2548,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
       // Check that the model contains all expected assignments, except maybe one that may be
       // covered by the default value
-      assertThat(Maps.difference(model, expected).entriesDiffering()).isEmpty();
-      assertThat(Maps.difference(model, expected).entriesOnlyOnRight().size()).isLessThan(2);
+      assertWithMessage(
+              "Model assignments are different.\nActual model: %s\nExpected model: %s",
+              model, expected)
+          .that(Maps.difference(model, expected).entriesDiffering())
+          .isEmpty();
+      assertWithMessage(
+              "Model assignments differ too much.\nActual model: %s\nExpected model: %s",
+              model, expected)
+          .that(Maps.difference(model, expected).entriesOnlyOnRight().size())
+          .isLessThan(2);
 
     } catch (SolverException | InterruptedException e) {
       throw new RuntimeException(e);
@@ -2623,8 +2631,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
+    // Test for 2d bitvector arrays with formula like:
+    //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
+    // We have no default value, so the solver can choose any value for other indices,
+    // and thus, we can miss one of the assignments in the model.
     var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
     var array =
         amgr.makeArray(
@@ -2638,24 +2650,33 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     var idxB2 = bvmgr.makeBitvector(8, 2);
     var valB = bvmgr.makeBitvector(8, 5);
 
+    var idxC1 = bvmgr.makeBitvector(8, 5);
+    var idxC2 = bvmgr.makeBitvector(8, 4);
+    var valC = bvmgr.makeBitvector(8, 20);
+
     checkModelContains(
         bmgr.and(
             bvmgr.equal(amgr.select(amgr.select(array, idxA1), idxA2), valA),
-            bvmgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB)),
+            bvmgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB),
+            bvmgr.equal(amgr.select(amgr.select(array, idxC1), idxC2), valC)),
         "array",
         ImmutableMap.of(
-            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
+            ImmutableList.of(idxA1, idxA2), valA,
+            ImmutableList.of(idxB1, idxB2), valB,
+            ImmutableList.of(idxC1, idxC2), valC));
   }
 
   @Test
   public void testArrayStore1BvBvBv() {
-    // Test for 3d bitvector arrays with exactly one element
-    // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    // Test for 3d bitvector arrays with exactly one element, and default value 0:
+    //     array[1][7][21] = 11 && all other elements = 0,
+    // modeled as:
+    //     array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
     requireArrays();
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
@@ -2667,22 +2688,69 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
     var idxA = bvmgr.makeBitvector(scalarType.getSize(), 1);
     var idxB = bvmgr.makeBitvector(scalarType.getSize(), 7);
-    var idxC = bvmgr.makeBitvector(scalarType.getSize(), 2);
-    var val = bvmgr.makeBitvector(scalarType.getSize(), 10);
+    var idxC1 = bvmgr.makeBitvector(scalarType.getSize(), 2);
+    var val = bvmgr.makeBitvector(scalarType.getSize(), 1);
 
+    // create empty 3d array, with default value 0
     var scalarConst = bvmgr.makeBitvector(scalarType.getSize(), 0);
     var array1Const = amgr.makeArray(array1Type, scalarConst);
     var array2Const = amgr.makeArray(array2Type, array1Const);
     var array3Const = amgr.makeArray(array3Type, array2Const);
 
-    var array1Value = amgr.store(array1Const, idxC, val);
+    // store the value at the given indices
+    var array1Value = amgr.store(array1Const, idxC1, val);
     var array2Value = amgr.store(array2Const, idxB, array1Value);
     var array3Value = amgr.store(array3Const, idxA, array2Value);
 
     checkModelContains(
         amgr.equivalence(array, array3Value),
         "array",
-        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC), val));
+        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC1), val));
+  }
+
+  @Test
+  public void testArrayStore2BvBvBv() {
+    // Test for 3d bitvector arrays with exactly two elements, and default value 0:
+    //     array[1][7][21] = 11 && array[1][7][22] = 12 && all other elements = 0
+    // modeled as:
+    //     array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume().that(solver).isNoneOf(Solvers.CVC4, Solvers.YICES2); // FIXME Broken in JavaSMT
+
+    var scalarType = FormulaType.getBitvectorTypeWithSize(8);
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = bvmgr.makeBitvector(scalarType.getSize(), 1);
+    var idxB = bvmgr.makeBitvector(scalarType.getSize(), 7);
+    var idxC1 = bvmgr.makeBitvector(scalarType.getSize(), 21);
+    var idxC2 = bvmgr.makeBitvector(scalarType.getSize(), 22);
+    var val1 = bvmgr.makeBitvector(scalarType.getSize(), 11);
+    var val2 = bvmgr.makeBitvector(scalarType.getSize(), 12);
+
+    // create empty 3d array, with default value 0
+    var scalarConst = bvmgr.makeBitvector(scalarType.getSize(), 0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    // store the value at the given indices
+    var array1Value = amgr.store(amgr.store(array1Const, idxC1, val1), idxC2, val2);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA, idxB, idxC1), val1, ImmutableList.of(idxA, idxB, idxC2), val2));
   }
 
   @Test
@@ -2752,7 +2820,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireConstArrays();
 
-    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
 
     var scalarType = FormulaType.IntegerType;
 
