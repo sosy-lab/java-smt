@@ -561,6 +561,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    *
    * @param pF the formula to be converted.
    */
+  @Nullable
   public Object convertValue(TFormulaInfo pF) {
     throw new UnsupportedOperationException(
         "This SMT solver needs a second term to determine a correct type. "
@@ -575,6 +576,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @param pF the formula to be converted.
    */
   // only some solvers require the additional (first) parameter, other solvers ignore it.
+  @Nullable
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);
