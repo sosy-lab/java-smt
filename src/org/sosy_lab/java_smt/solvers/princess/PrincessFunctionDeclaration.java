@@ -9,10 +9,13 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
 import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
@@ -561,6 +564,43 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public FunctionDeclarationKind getKind() {
       return FunctionDeclarationKind.OTHER;
+    }
+  }
+
+  static class PrincessStringRangeDeclaration extends PrincessFunctionDeclaration {
+    static final PrincessStringRangeDeclaration INSTANCE = new PrincessStringRangeDeclaration() {};
+
+    private PrincessStringRangeDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 2);
+      // Precondition: Both bounds must be single character Strings
+      // Princess already checks that the lower bound is smaller than the upper bound and returns
+      // the empty language otherwise.
+      ITerm one = new IIntLit(IdealInt.apply(1));
+      IFormula cond =
+          new IBinFormula(
+              IBinJunctor.And(),
+              new IFunApp(PrincessEnvironment.stringTheory.str_len(), toITermSeq(args.get(0)))
+                  .$eq$eq$eq(one),
+              new IFunApp(PrincessEnvironment.stringTheory.str_len(), toITermSeq(args.get(1)))
+                  .$eq$eq$eq(one));
+      return new ITermITE(
+          cond,
+          new IFunApp(
+              PrincessEnvironment.stringTheory.re_range(), toITermSeq(args.get(0), args.get(1))),
+          new IFunApp(PrincessEnvironment.stringTheory.re_none(), toITermSeq()));
+    }
+
+    @Override
+    public String getName() {
+      return "range";
+    }
+
+    @Override
+    public FunctionDeclarationKind getKind() {
+      return FunctionDeclarationKind.RE_RANGE;
     }
   }
 }

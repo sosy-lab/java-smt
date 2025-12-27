@@ -91,6 +91,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.Prince
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalDivisionDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalFloorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessRationalMultiplyDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessStringRangeDeclaration;
 import scala.Enumeration;
 import scala.collection.JavaConverters;
 
@@ -674,7 +675,14 @@ class PrincessFormulaCreator
         buildPattern(
             PrincessModularCongruenceDeclaration.INSTANCE,
             ImmutableList.of(symbolInt1, symbolInt2, IExpression.i(3)),
-            true));
+            true),
+
+        // String.range
+        buildPattern(
+            PrincessStringRangeDeclaration.INSTANCE,
+            ImmutableList.of(
+                makeVariable(getStringType(), "@1Str"), makeVariable(getStringType(), "@2Str")),
+            false));
   }
 
   @SuppressWarnings("deprecation")
