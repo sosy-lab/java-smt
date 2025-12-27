@@ -33,9 +33,11 @@ import org.sosy_lab.common.UniqueIdGenerator;
 import org.sosy_lab.common.collect.PathCopyingPersistentTreeMap;
 import org.sosy_lab.common.collect.PersistentMap;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.CachingModel;
 import scala.Enumeration.Value;
@@ -100,8 +102,20 @@ abstract class PrincessAbstractProver<E> extends AbstractProverWithAllSat<E> {
     partitions.push(partitions.pop().putAndCopy(formulaId, constraint));
     api.setPartitionNumber(formulaId);
 
-    final IFormula t = (IFormula) mgr.extractInfo(constraint);
-    api.addAssertion(api.abbrevSharedExpressions(t, creator.getEnv().getMinAtomsForAbbreviation()));
+    var abbrev =
+        api.abbrevSharedExpressions(
+            (IFormula) mgr.extractInfo(constraint), creator.getEnv().getMinAtomsForAbbreviation());
+    var rebuild =
+        mgr.transformRecursively(
+            creator.encapsulateBoolean(abbrev),
+            new FormulaTransformationVisitor(mgr) {
+              @Override
+              public Formula visitFreeVariable(Formula f, String name) {
+                // Add abbrev symbols to variable cache
+                return mgr.makeVariable(creator.getFormulaType(f), name);
+              }
+            });
+    api.addAssertion((IFormula) mgr.extractInfo(rebuild));
 
     return formulaId;
   }

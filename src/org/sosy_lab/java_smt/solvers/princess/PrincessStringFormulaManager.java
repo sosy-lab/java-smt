@@ -11,16 +11,11 @@ package org.sosy_lab.java_smt.solvers.princess;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toITermSeq;
 
-import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
-import ap.parser.IBinFormula;
-import ap.parser.IBinJunctor;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
-import ap.parser.IIntLit;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
 import ap.types.Sort;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -87,12 +82,12 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm concatImpl(List<IExpression> parts) {
-    ITerm result = (ITerm) makeStringImpl("");
-    for (IExpression expr : parts) {
+    ITerm result = (ITerm) parts.get(0);
+    for (int i = 1; i < parts.size(); i++) {
       result =
           new IFunApp(
               PrincessEnvironment.stringTheory.str_$plus$plus(),
-              PrincessEnvironment.toSeq(ImmutableList.of(result, (ITerm) expr)));
+              PrincessEnvironment.toSeq(ImmutableList.of(result, (ITerm) parts.get(i))));
     }
     return result;
   }
@@ -170,17 +165,9 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm range(IExpression start, IExpression end) {
-    // Precondition: Both bounds must be single character Strings
-    // Princess already checks that the lower bound is smaller than the upper bound and returns the
-    // empty language otherwise.
-    ITerm one = new IIntLit(IdealInt.apply(1));
-    IFormula cond =
-        new IBinFormula(
-            IBinJunctor.And(), length(start).$eq$eq$eq(one), length(end).$eq$eq$eq(one));
-    return new ITermITE(
-        cond,
-        new IFunApp(PrincessEnvironment.stringTheory.re_range(), toITermSeq(start, end)),
-        noneImpl());
+    return (ITerm)
+        PrincessFunctionDeclaration.PrincessStringRangeDeclaration.INSTANCE.makeApp(
+            getFormulaCreator().getEnv(), ImmutableList.of(start, end));
   }
 
   @Override
