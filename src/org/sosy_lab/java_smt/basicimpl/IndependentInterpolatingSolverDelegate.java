@@ -111,9 +111,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
     BooleanFormula interpolant;
 
-    if (bmgr.isFalse(conjugatedFormulasOfA)) {
+    if (isTrivialFalse(mgr, conjugatedFormulasOfA)) {
       return bmgr.makeFalse();
-    } else if (bmgr.isFalse(conjugatedFormulasOfB)) {
+    } else if (isTrivialFalse(mgr, conjugatedFormulasOfB)) {
       return bmgr.makeTrue();
     }
 
@@ -337,6 +337,37 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
       }
     }
     return mgr.simplify(interpolant);
+  }
+
+  /**
+   * We need a trivial check to abort early and for projection based to not fail. But we also may
+   * need to check for unsat, if we have a more complex trivial formula e.g. (x (mod 2) = 0) ∧ (x
+   * (mod 2) = 1)
+   */
+  private boolean isTrivialFalse(FormulaManager mgr, BooleanFormula f) {
+    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
+
+    // 1. Fast check: is it "False"?
+    if (bmgr.isFalse(f)) {
+      return true;
+    }
+
+    // 2. Medium check: Simplify the formula, then check if it became "False"
+    try {
+      BooleanFormula simplified = mgr.simplify(f);
+      if (bmgr.isFalse(simplified)) {
+        return true;
+      }
+    } catch (InterruptedException e) {
+      return false;
+    }
+    // The Expensive Check
+    try (ProverEnvironment itpProver = getDistinctProver()) {
+      itpProver.push(f);
+      return itpProver.isUnsat();
+    } catch (SolverException | InterruptedException e) {
+      return false;
+    }
   }
 
   /**
