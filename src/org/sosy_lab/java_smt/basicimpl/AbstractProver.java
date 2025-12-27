@@ -97,6 +97,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
 
+  protected final void checkGenerateInterpolants() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(
+        !changedSinceLastSatQuery,
+        "Interpolants can only be calculated right after a call to isUnsat()");
+    Preconditions.checkState(
+        !wasLastSatCheckSatisfiable,
+        "Interpolants can only be calculated if the assertions on the solver stack are "
+            + "unsatisfiable.");
+  }
+
   protected final void checkEnableSeparationLogic() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(enableSL, TEMPLATE, ProverOptions.ENABLE_SEPARATION_LOGIC);
