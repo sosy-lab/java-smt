@@ -957,6 +957,22 @@ class PrincessFormulaCreator
       return visit(visitor, f, ((IIntFormula) input).t());
     }
 
+    if (kind == FunctionDeclarationKind.EQ_ZERO) {
+      // Rewrite EQ_ZERO(num) as EQ(num,0) for the visitor
+      var term = (IIntFormula) input;
+      var decl = PrincessEquationDeclaration.INSTANCE;
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(
+              encapsulateWithTypeOf(term.apply(0)), encapsulateWithTypeOf(IExpression.i(0))),
+          FunctionDeclarationImpl.of(
+              decl.getName(),
+              decl.getKind(),
+              ImmutableList.of(FormulaType.IntegerType, FormulaType.IntegerType),
+              FormulaType.BooleanType,
+              PrincessEquationDeclaration.INSTANCE));
+    }
+
     ImmutableList.Builder<Formula> args = ImmutableList.builder();
     ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
     int arity = input.length();
@@ -1129,10 +1145,8 @@ class PrincessFormulaCreator
           // predicate (=0 (uf ...)) is then wrapped around the function application to get a
           // (boolean) formula
           return FunctionDeclarationKind.UF;
-        } else if (sort == PrincessEnvironment.INTEGER_SORT) {
-          return FunctionDeclarationKind.EQ_ZERO;
         } else {
-          return FunctionDeclarationKind.EQ;
+          return FunctionDeclarationKind.EQ_ZERO;
         }
       } else if (f.rel().equals(IIntRelation.GeqZero())) {
         return FunctionDeclarationKind.GTE_ZERO;

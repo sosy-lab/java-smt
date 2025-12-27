@@ -38,7 +38,6 @@ import ap.types.Sort.MultipleValueBool$;
 import ap.types.SortedConstantTerm;
 import ap.types.SortedIFunction$;
 import com.google.common.base.Preconditions;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
@@ -299,7 +298,13 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
       checkArgument(args.size() == 2);
-      return ((ITerm) args.get(0)).$eq$eq$eq((ITerm) args.get(1));
+      var left = (ITerm) args.get(0);
+      var right = (ITerm) args.get(1);
+      if (right instanceof IIntLit && ((IIntLit) right).value().isZero()) {
+        return IExpression.eqZero(left);
+      } else {
+        return left.$eq$eq$eq(right);
+      }
     }
 
     @Override
