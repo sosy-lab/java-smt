@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.princess;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static scala.collection.JavaConverters.asJava;
 import static scala.collection.JavaConverters.asScala;
 
@@ -91,7 +92,7 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
     }
 
     // do the hard work
-    final Seq<IFormula> itps;
+    Seq<IFormula> itps;
     try {
       itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
     } catch (StackOverflowError e) {
@@ -100,6 +101,17 @@ class PrincessInterpolatingProver extends PrincessAbstractProver<Integer>
       // so we can do the same for getInterpolants().
       throw new SolverException(
           "Princess ran out of stack memory, try increasing the stack size.", e);
+    } catch (NullPointerException npe) {
+      try {
+        checkState(isUnsat(), "Illegal solver state");
+        itps = api.getInterpolants(args.toSeq(), api.getInterpolants$default$2());
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        throw new SolverException("Thread was interrupted", ie);
+      } catch (StackOverflowError e) {
+        throw new SolverException(
+            "Princess ran out of stack memory, try increasing the stack size.", e);
+      }
     }
 
     assert itps.length() == pPartitions.size() - 1
