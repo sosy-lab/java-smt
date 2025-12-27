@@ -207,7 +207,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // Call without a SAT check
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       T f1 = prover.addConstraint(varA);
-      T f2 = prover.addConstraint(bmgr.not(varB));
+      prover.addConstraint(bmgr.not(varB));
 
       assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
     }
@@ -215,7 +215,7 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // Call when the assertions are not UNSAT
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       T f1 = prover.addConstraint(varA);
-      T f2 = prover.addConstraint(bmgr.not(varB));
+      prover.addConstraint(bmgr.not(varB));
 
       assertThat(prover.isUnsat()).isFalse();
       assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
@@ -224,16 +224,16 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     // Call when the SAT check is outdated
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       T f1 = prover.addConstraint(varA);
-      T f2 = prover.addConstraint(bmgr.not(varA));
+      prover.addConstraint(bmgr.not(varA));
       assertThat(prover.isUnsat()).isTrue();
-      T f3 = prover.addConstraint(varB);
+      prover.addConstraint(varB);
       assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
     }
 
     // Finally, call after a SAT check that returned UNSAT
     try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
       T f1 = prover.addConstraint(varA);
-      T f2 = prover.addConstraint(bmgr.not(varA));
+      prover.addConstraint(bmgr.not(varA));
       assertThat(prover.isUnsat()).isTrue();
       checkItpSequence(
           ImmutableList.of(varA, bmgr.not(varA)),

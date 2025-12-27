@@ -104,7 +104,8 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
         "Interpolants can only be calculated right after a call to isUnsat()");
     Preconditions.checkState(
         !wasLastSatCheckSatisfiable,
-        "Interpolants can only be calculated if the assertions on the solver stack are unsatisfiable.");
+        "Interpolants can only be calculated if the assertions on the solver stack are "
+            + "unsatisfiable.");
   }
 
   protected final void checkEnableSeparationLogic() {
