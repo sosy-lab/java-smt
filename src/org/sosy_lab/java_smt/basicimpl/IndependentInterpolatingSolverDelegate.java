@@ -111,9 +111,9 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
 
     BooleanFormula interpolant;
 
-    if (isTrivialFalse(mgr, conjugatedFormulasOfA)) {
+    if (isTrivialFalse(conjugatedFormulasOfA)) {
       return bmgr.makeFalse();
-    } else if (isTrivialFalse(mgr, conjugatedFormulasOfB)) {
+    } else if (isTrivialFalse(conjugatedFormulasOfB)) {
       return bmgr.makeTrue();
     }
 
@@ -344,9 +344,7 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
    * need to check for unsat, if we have a more complex trivial formula e.g. (x (mod 2) = 0) ∧ (x
    * (mod 2) = 1)
    */
-  private boolean isTrivialFalse(FormulaManager mgr, BooleanFormula f) {
-    BooleanFormulaManager bmgr = mgr.getBooleanFormulaManager();
-
+  private boolean isTrivialFalse(BooleanFormula f) {
     // 1. Fast check: is it "False"?
     if (bmgr.isFalse(f)) {
       return true;
