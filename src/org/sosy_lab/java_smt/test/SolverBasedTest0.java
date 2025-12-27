@@ -351,7 +351,7 @@ public abstract class SolverBasedTest0 {
   protected final void requireInterpolation(ProverOptions... options) {
     List<ProverOptions> optionList =
         (options == null) ? Collections.emptyList() : Arrays.asList(options);
-    if (optionList.contains(null)) {
+    if (optionList.contains(null) || optionList.isEmpty()) {
       assume()
           .withMessage("Solver %s does not support native interpolation", solverToUse())
           .that(solverToUse())
