@@ -167,23 +167,27 @@ public class ModelEvaluationTest extends SolverBasedTest0.ParameterizedSolverBas
         Lists.newArrayList("hello WORLD"),
         Lists.newArrayList(smgr.makeString("hello WORLD")));
 
-    // Unicode
-    evaluateInModel(
-        smgr.equal(
-            smgr.makeVariable("x"),
-            smgr.makeString(
-                AbstractStringFormulaManager.unescapeUnicodeForSmtlib(
-                    "hello æ@€ \u1234 \\u{4321}"))),
-        smgr.makeVariable("x"),
-        Lists.newArrayList("hello \u00e6@\u20ac \u1234 \u4321"),
-        Lists.newArrayList(smgr.makeString("hello \u00e6@\u20ac \u1234 \u4321")));
+    if (solverToUse() != Solvers.Z3_WITH_INTERPOLATION) {
+      // LegacyZ3 has issues with Unicode and they will not be fixed.
 
-    // invalid Unicode escape sequences (should be treated as normal characters)
-    evaluateInModel(
-        smgr.equal(smgr.makeVariable("x"), smgr.makeString("\\u")),
-        smgr.makeVariable("x"),
-        Lists.newArrayList("\\u"),
-        Lists.newArrayList(smgr.makeString("\\u")));
+      // Unicode
+      evaluateInModel(
+          smgr.equal(
+              smgr.makeVariable("x"),
+              smgr.makeString(
+                  AbstractStringFormulaManager.unescapeUnicodeForSmtlib(
+                      "hello æ@€ \u1234 \\u{4321}"))),
+          smgr.makeVariable("x"),
+          Lists.newArrayList("hello \u00e6@\u20ac \u1234 \u4321"),
+          Lists.newArrayList(smgr.makeString("hello \u00e6@\u20ac \u1234 \u4321")));
+
+      // invalid Unicode escape sequences (should be treated as normal characters)
+      evaluateInModel(
+          smgr.equal(smgr.makeVariable("x"), smgr.makeString("\\u")),
+          smgr.makeVariable("x"),
+          Lists.newArrayList("\\u"),
+          Lists.newArrayList(smgr.makeString("\\u")));
+    }
 
     // foreign variable: x vs y
     evaluateInModel(

@@ -26,6 +26,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.StringReader;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -66,6 +67,16 @@ public class SmtInterpolFormulaManager
 
   BooleanFormula encapsulateBooleanFormula(Term t) {
     return getFormulaCreator().encapsulateBoolean(t);
+  }
+
+  @Override
+  protected Term equalImpl(Collection<Term> pArgs) {
+    return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  protected Term distinctImpl(Collection<Term> pArgs) {
+    return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
   }
 
   @Override

@@ -82,7 +82,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   private final long btor;
   private final BoolectorAbstractProver<?> prover;
   private final BoolectorFormulaCreator bfCreator;
-  private final ImmutableList<Long> assertedTerms;
+  private final ImmutableList<ValueAssignment> model;
 
   BoolectorModel(
       long btor,
@@ -93,7 +93,11 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
     this.bfCreator = creator;
     this.btor = btor;
     this.prover = pProver;
-    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
+
+    // We need to generate and save this at construction time as Boolector has no functionality to
+    // give a persistent reference to the model. If the SMT engine is used somewhere else, the
+    // values we get out of it might change!
+    model = generateModel(assertedTerms);
   }
 
   @Override
@@ -126,8 +130,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   * Further, it might be that Boolector returns the variable name with its own escape added, so
   * we have to strip this if it occurs
   */
-  @Override
-  public ImmutableList<ValueAssignment> asList() {
+  private ImmutableList<ValueAssignment> generateModel(Collection<Long> assertedTerms) {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
     // Use String instead of the node (long) as we need the name again later!
@@ -156,7 +159,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
       // maybeVars may include a lot of unnecessary Strings, including SMT keywords or empty
       // strings. However, removing them would just increase runtime with no benefit as we check
       // them against the variables cache.
-      // TODO: decide if its benefitial to code cleanness and structure to handle the strings
+      // TODO: decide if its beneficial to code cleanness and structure to handle the strings
       // proper, or else remove the SMT_KEYWORDS
 
       // Strings in maybeVars may not have SMTLIB2 keywords
@@ -192,8 +195,7 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
       // We get the formula here as we need the name.
       // Reason: Boolector returns names of variables with its own escape sequence sometimes. If you
       // however name your variable like the escape sequence, we can't discern anymore if it's a
-      // real
-      // name or an escape seq.
+      // real name or an escape seq.
       long entry = bfCreator.getFormulaFromCache(name).orElseThrow();
       if (BtorJNI.boolector_is_array(btor, entry)) {
         assignmentBuilder.add(getArrayAssignment(entry, name));
@@ -281,5 +283,10 @@ class BoolectorModel extends AbstractModel<Long, Long, Long> {
   protected Long evalImpl(Long pFormula) {
     Preconditions.checkState(!isClosed());
     return pFormula;
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> asList() {
+    return model;
   }
 }

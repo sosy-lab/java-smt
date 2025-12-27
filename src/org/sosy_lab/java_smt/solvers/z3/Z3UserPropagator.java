@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.PropagatorBackend;
 import org.sosy_lab.java_smt.api.UserPropagator;
 
@@ -28,7 +29,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   /* We use this map to reuse existing formula wrappers and avoid creating unnecessary phantom
   references (if enabled). This is particularly useful, because the user propagator frequently
   reports the same formulas. */
-  private final Map<Long, BooleanFormula> canonicalizer = new HashMap<>();
+  private final Map<Long, Formula> canonicalizer = new HashMap<>();
 
   Z3UserPropagator(
       long ctx,
@@ -70,7 +71,7 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   @Override
   protected void fixedWrapper(long lvar, long lvalue) {
     assert lvalue == z3True || lvalue == z3False;
-    userPropagator.onKnownValue(encapsulate(lvar), lvalue == z3True);
+    userPropagator.onKnownValue(encapsulateBoolean(lvar), lvalue == z3True);
   }
 
   // TODO: This method is called if Z3 re-instantiates a user propagator for a sub-problem
@@ -91,7 +92,12 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
   protected void decideWrapper(long lvar, int bit, boolean isPositive) {
     // We currently only allow tracking of decision on boolean formulas,
     // so we ignore the <bit> parameter
-    userPropagator.onDecision(encapsulate(lvar), isPositive);
+    userPropagator.onDecision(encapsulateBoolean(lvar), isPositive);
+  }
+
+  @Override
+  protected boolean onBindingWrapper(long quantifiedVar, long instantiation) {
+    return userPropagator.onBinding(encapsulate(quantifiedVar), encapsulate(instantiation));
   }
 
   // ===========================================================================
@@ -160,12 +166,16 @@ final class Z3UserPropagator extends UserPropagatorBase implements PropagatorBac
     return formulaInfos;
   }
 
-  private BooleanFormula encapsulate(final long z3Expr) {
+  private BooleanFormula encapsulateBoolean(final long z3Expr) {
+    return (BooleanFormula) encapsulate(z3Expr);
+  }
+
+  private Formula encapsulate(final long z3Expr) {
     // Due to pointer alignment, the lowest 2-3 bits are always 0 which can lead to
     // more collisions in the hashmap. To counteract, we fill the lowest bits by rotating the
     // value. The rotation guarantees a bijective transformation.
     return canonicalizer.computeIfAbsent(
-        Long.rotateRight(z3Expr, 3), key -> creator.encapsulateBoolean(z3Expr));
+        Long.rotateRight(z3Expr, 3), key -> creator.encapsulateWithTypeOf(z3Expr));
   }
 
   @Override

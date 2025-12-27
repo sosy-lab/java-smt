@@ -110,4 +110,25 @@ public interface UserPropagator {
    * @param theoryExpr The expression to observe.
    */
   void registerExpression(BooleanFormula theoryExpr);
+
+  /**
+   * The on_binding method allows custom user-defined propagators to intercept and control
+   * quantifier instantiations during solving. This callback is invoked whenever the solver performs
+   * a quantifier instantiation (i.e., binds a quantifier to a specific instance). It provides a
+   * hook for the user propagator to inspect the quantifier and its instantiation.
+   *
+   * <p>The default implementation does nothing and accepts all instantiations. It serves for
+   * backward compatibility in the API.
+   *
+   * @param quantifiedVar The quantified variable being instantiated. This is a BooleanFormula
+   *     representing the variable in the quantifier.
+   * @param instantiation The specific instantiation being applied to the quantified variable. It
+   *     has the same formula type as the quantified variable.
+   * @since Z3 release 4.15.3
+   * @return By returning false, the callback signals that the instantiation should be discarded by
+   *     the solver.
+   */
+  default <T extends Formula> boolean onBinding(T quantifiedVar, T instantiation) {
+    return true;
+  }
 }
