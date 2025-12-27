@@ -47,6 +47,8 @@ import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
 import ap.theories.bitvectors.ModuloArithmetic;
+import ap.theories.bitvectors.ModuloArithmetic$;
+import ap.theories.bitvectors.ModuloArithmetic.ModSort;
 import ap.theories.nia.GroebnerMultiplication;
 import ap.theories.nia.GroebnerMultiplication$;
 import ap.theories.rationals.Rationals;
@@ -78,8 +80,10 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorFromIntegerDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBitvectorDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToBooleanDeclaration;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessBitvectorToIntegerDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessByExampleDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessConstArrayDeclaration;
 import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessEquationDeclaration;
@@ -739,9 +743,151 @@ class PrincessFormulaCreator
     }
 
     if (isValue(input)) {
-      return visitor.visitConstant(encapsulateWithTypeOf(input), convertValue(input));
-    }
-    if (input instanceof IQuantified) {
+      return visitor.visitConstant(f, convertValue(input));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic$.MODULE$.int_cast())) {
+      // Is it a cast from bv to integer?
+      var arg = (ITerm) input.apply(0);
+      var sort = (ModSort) Sort.sortOf(arg);
+      var kind =
+          sort.lower().isZero()
+              ? FunctionDeclarationKind.UBV_TO_INT
+              : FunctionDeclarationKind.SBV_TO_INT;
+      if (kind == FunctionDeclarationKind.SBV_TO_INT) {
+        arg = (ITerm) arg.apply(2);
+      }
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(PrincessEnvironment.getFormulaType(arg)),
+              FormulaType.IntegerType,
+              kind == FunctionDeclarationKind.SBV_TO_INT
+                  ? PrincessBitvectorToIntegerDeclaration.SIGNED
+                  : PrincessBitvectorToIntegerDeclaration.UNSIGNED));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic$.MODULE$.zero_extend())) {
+      // Is it zero_extend?
+      var kind = FunctionDeclarationKind.BV_ZERO_EXTENSION;
+      var p1 = (IIntLit) input.apply(0);
+      var p2 = (IIntLit) input.apply(1);
+      var arg = input.apply(2);
+      var extend = p2.value().intValue();
+      var declaration =
+          new PrincessFunctionDeclaration.PrincessBitvectorExtendDeclaration(extend, false);
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(getFormulaType(arg)),
+              FormulaType.getBitvectorTypeWithSize(p1.value().$plus(p2.value()).intValue()),
+              declaration));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.mod_cast())
+        && input.apply(2) instanceof IFunApp
+        && ((IFunApp) input.apply(2)).fun().equals(ModuloArithmetic.mod_cast())) {
+      // Is it sign_extend?
+      var app1 = (IFunApp) input;
+      var lower1 = (IIntLit) app1.apply(0);
+      var upper1 = (IIntLit) app1.apply(1);
+      var arg1 = app1.apply(2);
+      if (!lower1.value().isZero()) {
+        throw new AssertionError();
+      }
+      var size1 = upper1.value().getHighestSetBit() + 1;
+
+      var app2 = (IFunApp) arg1;
+      var lower2 = (IIntLit) app2.apply(0);
+      var upper2 = (IIntLit) app2.apply(1);
+      var arg2 = app2.apply(2);
+      if (lower2.value().isZero()) {
+        throw new AssertionError();
+      }
+      var size2 = upper2.value().$minus(lower2.value()).getHighestSetBit() + 1;
+      var size = size1 - size2;
+      var declaration =
+          new PrincessFunctionDeclaration.PrincessBitvectorExtendDeclaration(size, true);
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg2)),
+          FunctionDeclarationImpl.of(
+              declaration.getKind().toString(),
+              declaration.getKind(),
+              ImmutableList.of(FormulaType.getBitvectorTypeWithSize(size2)),
+              FormulaType.getBitvectorTypeWithSize(size1),
+              declaration));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.mod_cast())) {
+      // Is it int_to_bv?
+      var kind = FunctionDeclarationKind.INT_TO_BV;
+      var app = (IFunApp) input;
+      var lower = (IIntLit) app.apply(0);
+      var upper = (IIntLit) app.apply(1);
+      var arg = app.apply(2);
+      if (!lower.value().isZero()) {
+        throw new AssertionError();
+      }
+      var size = upper.value().getHighestSetBit() + 1;
+      var declaration = new PrincessBitvectorFromIntegerDeclaration(size);
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(FormulaType.IntegerType),
+              FormulaType.getBitvectorTypeWithSize(size),
+              declaration));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_extract())) {
+      // Is it extract?
+      var kind = FunctionDeclarationKind.BV_EXTRACT;
+      var upper = ((IIntLit) input.apply(0)).value().intValue();
+      var lower = ((IIntLit) input.apply(1)).value().intValue();
+      var arg = input.apply(2);
+      var argType = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg);
+
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(argType),
+              FormulaType.getBitvectorTypeWithSize(upper - lower + 1),
+              new PrincessFunctionDeclaration.PrincessBitvectorExtractDeclaration(upper, lower)));
+
+    } else if (input instanceof IFunApp
+        && ((IFunApp) input).fun().equals(ModuloArithmetic.bv_concat())) {
+      // Is it concat?
+      var kind = FunctionDeclarationKind.BV_CONCAT;
+      var size1 = ((IIntLit) input.apply(0)).value().intValue();
+      var size2 = ((IIntLit) input.apply(1)).value().intValue();
+      var arg1 = input.apply(2);
+      var arg2 = input.apply(3);
+      var arg1Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg1);
+      var arg2Type = (FormulaType.BitvectorType) PrincessEnvironment.getFormulaType(arg2);
+
+      return visitor.visitFunction(
+          f,
+          ImmutableList.of(encapsulateWithTypeOf(arg1), encapsulateWithTypeOf(arg2)),
+          FunctionDeclarationImpl.of(
+              kind.toString(),
+              kind,
+              ImmutableList.of(arg1Type, arg2Type),
+              FormulaType.getBitvectorTypeWithSize(size1 + size2),
+              new PrincessFunctionDeclaration.PrincessBitvectorConcatDeclaration()));
+
+    } else if (input instanceof IQuantified) {
       // Is it a quantifier?
       return visitQuantifier(visitor, (BooleanFormula) f, (IQuantified) input);
 
@@ -949,7 +1095,7 @@ class PrincessFormulaCreator
       } else if (ExtArray.Const$.MODULE$.unapply(fun).isDefined()) {
         return FunctionDeclarationKind.CONST;
       } else if (fun == ModuloArithmetic.mod_cast()) {
-        return FunctionDeclarationKind.OTHER;
+        return FunctionDeclarationKind.INT_TO_BV;
       } else if (((IFunApp) input).fun().equals(Rationals.fromRing())) {
         return FunctionDeclarationKind.TO_REAL;
       } else {

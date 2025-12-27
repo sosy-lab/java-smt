@@ -577,8 +577,8 @@ class PrincessEnvironment {
         && ((IFunApp) pFormula).fun().equals(ModuloArithmetic.bv_extract())) {
       IIntLit upper = (IIntLit) pFormula.apply(0);
       IIntLit lower = (IIntLit) pFormula.apply(1);
-      IdealInt bwResult = upper.value().$minus(lower.value());
-      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue() + 1);
+      IdealInt bwResult = upper.value().$minus(lower.value()).$plus(IdealInt.ONE());
+      return FormulaType.getBitvectorTypeWithSize(bwResult.intValue());
     } else if (pFormula instanceof IFunApp
         && ((IFunApp) pFormula).fun().equals(ModuloArithmetic.bv_concat())) {
       IIntLit upper = (IIntLit) pFormula.apply(0);

@@ -131,7 +131,8 @@ class PrincessBitvectorFormulaManager
 
   @Override
   protected IExpression makeBitvectorImpl(int pLength, IExpression pIntegerFormula) {
-    return ModuloArithmetic$.MODULE$.cast2UnsignedBV(pLength, (ITerm) pIntegerFormula);
+    return new PrincessFunctionDeclaration.PrincessBitvectorFromIntegerDeclaration(pLength)
+        .makeApp(getFormulaCreator().getEnv(), ImmutableList.of(pIntegerFormula));
   }
 
   @Override

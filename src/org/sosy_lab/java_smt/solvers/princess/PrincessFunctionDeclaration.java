@@ -313,6 +313,30 @@ abstract class PrincessFunctionDeclaration {
     }
   }
 
+  static class PrincessBitvectorFromIntegerDeclaration extends PrincessFunctionDeclaration {
+    private final int bitwidth;
+
+    public PrincessBitvectorFromIntegerDeclaration(int pBitwidth) {
+      bitwidth = pBitwidth;
+    }
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 1);
+      return ModuloArithmetic$.MODULE$.cast2UnsignedBV(bitwidth, (ITerm) args.get(0));
+    }
+
+    @Override
+    public String getName() {
+      return "int_to_bv";
+    }
+
+    @Override
+    public FunctionDeclarationKind getKind() {
+      return FunctionDeclarationKind.INT_TO_BV;
+    }
+  }
+
   static class PrincessBitvectorToIntegerDeclaration extends PrincessFunctionDeclaration {
     static final PrincessBitvectorToIntegerDeclaration SIGNED =
         new PrincessBitvectorToIntegerDeclaration(true) {};
@@ -335,23 +359,10 @@ abstract class PrincessFunctionDeclaration {
       Preconditions.checkArgument(bitWidth.isDefined());
       final int size = (Integer) bitWidth.get();
 
-      // compute range for integer value,
-      // example: bitWidth=4 => signed_range=[-8;7] and unsigned_range=[0;15]
-      final BigInteger min;
-      final BigInteger max;
       if (signed) {
-        min = BigInteger.ONE.shiftLeft(size - 1).negate();
-        max = BigInteger.ONE.shiftLeft(size - 1).subtract(BigInteger.ONE);
-      } else {
-        min = BigInteger.ZERO;
-        max = BigInteger.ONE.shiftLeft(size).subtract(BigInteger.ONE);
+        bvFormula = ModuloArithmetic$.MODULE$.cast2SignedBV(size, bvFormula);
       }
-
-      ITerm bvInRange =
-          ModuloArithmetic$.MODULE$.cast2Interval(
-              IdealInt.apply(min), IdealInt.apply(max), bvFormula);
-
-      return ModuloArithmetic$.MODULE$.cast2Int(bvInRange);
+      return ModuloArithmetic$.MODULE$.cast2Int(bvFormula);
     }
 
     @Override
@@ -361,7 +372,7 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public FunctionDeclarationKind getKind() {
-      return FunctionDeclarationKind.OTHER;
+      return signed ? FunctionDeclarationKind.SBV_TO_INT : FunctionDeclarationKind.UBV_TO_INT;
     }
   }
 
@@ -564,6 +575,53 @@ abstract class PrincessFunctionDeclaration {
     @Override
     public FunctionDeclarationKind getKind() {
       return FunctionDeclarationKind.OTHER;
+    }
+  }
+
+  static class PrincessBitvectorExtractDeclaration extends PrincessFunctionDeclaration {
+    private final int upper;
+    private final int lower;
+
+    PrincessBitvectorExtractDeclaration(int pUpper, int pLower) {
+      upper = pUpper;
+      lower = pLower;
+    }
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 1);
+      return ModuloArithmetic$.MODULE$.extract(upper, lower, (ITerm) args.get(0));
+    }
+
+    @Override
+    public String getName() {
+      return "extract";
+    }
+
+    @Override
+    public FunctionDeclarationKind getKind() {
+      return FunctionDeclarationKind.BV_EXTRACT;
+    }
+  }
+
+  static class PrincessBitvectorConcatDeclaration extends PrincessFunctionDeclaration {
+
+    PrincessBitvectorConcatDeclaration() {}
+
+    @Override
+    public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
+      checkArgument(args.size() == 2);
+      return ModuloArithmetic$.MODULE$.concat((ITerm) args.get(0), (ITerm) args.get(1));
+    }
+
+    @Override
+    public String getName() {
+      return "concat";
+    }
+
+    @Override
+    public FunctionDeclarationKind getKind() {
+      return FunctionDeclarationKind.BV_CONCAT;
     }
   }
 
