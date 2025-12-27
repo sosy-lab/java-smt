@@ -709,6 +709,13 @@ class PrincessFormulaCreator
               Rewriter.rewrite(
                   updated,
                   v -> {
+                    if (v instanceof IFunApp) {
+                      var app = (IFunApp) v;
+                      if (app.fun().name().equals("mul") && app.apply(0) instanceof IIntLit) {
+                        var factor = (IIntLit) app.apply(0);
+                        return new ITimes(factor.value(), app.apply(1));
+                      }
+                    }
                     if (v instanceof ITimes) {
                       var times = (ITimes) v;
                       if (times.apply(0) instanceof IIntLit) {
