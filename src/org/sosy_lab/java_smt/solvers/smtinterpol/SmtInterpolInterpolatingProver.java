@@ -47,7 +47,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pTermNamesOfA)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(pTermNamesOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -74,7 +74,7 @@ class SmtInterpolInterpolatingProver extends SmtInterpolAbstractProver<String>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<String>> partitionedTermNames, int[] startOfSubTree)
       throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
+    checkGenerateInterpolants();
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
         partitionedTermNames.stream().allMatch(assertedConstraintIds::containsAll),
