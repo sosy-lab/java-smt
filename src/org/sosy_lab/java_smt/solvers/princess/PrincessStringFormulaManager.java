@@ -87,12 +87,12 @@ public class PrincessStringFormulaManager
 
   @Override
   protected ITerm concatImpl(List<IExpression> parts) {
-    ITerm result = (ITerm) makeStringImpl("");
-    for (IExpression expr : parts) {
+    ITerm result = (ITerm) parts.get(0);
+    for (int i = 1; i < parts.size(); i++) {
       result =
           new IFunApp(
               PrincessEnvironment.stringTheory.str_$plus$plus(),
-              PrincessEnvironment.toSeq(ImmutableList.of(result, (ITerm) expr)));
+              PrincessEnvironment.toSeq(ImmutableList.of(result, (ITerm) parts.get(i))));
     }
     return result;
   }
