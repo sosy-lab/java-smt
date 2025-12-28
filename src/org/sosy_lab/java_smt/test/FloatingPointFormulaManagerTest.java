@@ -671,7 +671,7 @@ public class FloatingPointFormulaManagerTest
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
     if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
       // check unequality for very large types
-      FloatingPointType largeType = FormulaType.getFloatingPointType(100, 100);
+      FloatingPointType largeType = FormulaType.getFloatingPointType(50, 100);
       FloatingPointFormula k1 =
           fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
       FloatingPointFormula k2 =
