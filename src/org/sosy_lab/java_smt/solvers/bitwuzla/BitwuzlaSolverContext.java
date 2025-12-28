@@ -48,7 +48,6 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_AS
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_CORES;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_CONST_BITS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_INFER_INEQ_BOUNDS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NORMALIZE;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NPROPS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NUPDATES;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_OPT_LT_CONCAT_SEXT;
@@ -56,7 +55,6 @@ import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PATH_SEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_RANDOM_INPUT;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_USE_INV_VALUE;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_SEXT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.RELEVANT_TERMS;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.REWRITE_LEVEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SAT_SOLVER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SEED;
@@ -328,6 +326,8 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
   }
 
   public static Option getBitwuzlaOptByString(String optionName) {
+    // We're probably missing some options here
+    // FIXME Use Options.set(List<String>) to pass user arguments to Bitwuzla
     switch (optionName) {
       case "LOGLEVEL":
         return LOGLEVEL;
@@ -345,8 +345,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         return TIME_LIMIT_PER;
       case "MEMORY_LIMIT":
         return MEMORY_LIMIT;
-      case "RELEVANT_TERMS":
-        return RELEVANT_TERMS;
       case "BV_SOLVER":
         return BV_SOLVER;
       case "REWRITE_LEVEL":
@@ -371,8 +369,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         return PROP_PROB_USE_INV_VALUE;
       case "PROP_SEXT":
         return PROP_SEXT;
-      case "PROP_NORMALIZE":
-        return PROP_NORMALIZE;
       case "ABSTRACTION":
         return ABSTRACTION;
       case "ABSTRACTION_BV_SIZE":
