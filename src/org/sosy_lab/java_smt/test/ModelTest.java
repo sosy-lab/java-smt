@@ -1311,7 +1311,12 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
         .withMessage("Boolector supports bitvector arrays only")
         .that(solverToUse())
         .isNotEqualTo(Solvers.BOOLECTOR);
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume()
+        .withMessage(
+            "Yices2 does not report any specific element value for the array, "
+                + "but reports only default 123")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -2483,7 +2488,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     assume()
         .withMessage("Solver is quite slow for this example")
         .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.BITWUZLA);
+        .isNoneOf(Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
 
     BooleanFormula formula =
         context
@@ -2631,7 +2636,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
 
     // Test for 2d bitvector arrays with formula like:
     //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
@@ -2718,7 +2723,10 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireBitvectors();
 
     assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
-    assume().that(solver).isNoneOf(Solvers.CVC4, Solvers.YICES2); // FIXME Broken in JavaSMT
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
+
+    // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
+    assume().that(solver).isNotEqualTo(Solvers.CVC4);
 
     var scalarType = FormulaType.getBitvectorTypeWithSize(8);
 
