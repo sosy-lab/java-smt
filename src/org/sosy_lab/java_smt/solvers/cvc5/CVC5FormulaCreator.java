@@ -86,7 +86,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   // String representation is equal (and they are equal)
   protected final Table<String, String, Term> variablesCache = HashBasedTable.create();
   protected final Map<String, Term> functionsCache = new HashMap<>();
-  protected boolean registerUnknownBoundVariables = false;
+
   private final TermManager termManager;
   private final Solver solver;
 
