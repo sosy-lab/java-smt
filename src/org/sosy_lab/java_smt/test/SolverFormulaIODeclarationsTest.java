@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2021 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -105,7 +105,7 @@ public class SolverFormulaIODeclarationsTest
   public void parseInvalidQuery1() {
     for (final String q :
         ImmutableList.of("()", "(x)", "(exit)", "(and)", "(or)", "(not)", "(=)")) {
-      if (solverToUse() == Solvers.MATHSAT5) {
+      if (ImmutableList.of(Solvers.MATHSAT5, Solvers.OPENSMT).contains(solverToUse())) {
         assertThat(mgr.parse(q)).isEqualTo(bmgr.makeTrue());
       } else {
         assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
