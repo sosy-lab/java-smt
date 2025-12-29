@@ -10,9 +10,12 @@ package org.sosy_lab.java_smt.solvers.princess;
 
 import ap.parser.IBinFormula;
 import ap.parser.IBinJunctor;
+import ap.parser.IEquation;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
+import ap.parser.Rewriter;
 import ap.types.Sort;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -59,11 +62,13 @@ final class PrincessFormulaManager
   }
 
   @Override
-  protected IExpression equalImpl(IExpression pArg1, IExpression pArgs) {
+  protected IExpression equalImpl(IExpression pArg1, IExpression pArg2) {
     if (pArg1 instanceof IFormula) {
-      return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArgs);
+      return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArg2);
+    } else if (pArg2 instanceof IIntLit && ((IIntLit) pArg2).value().isZero()) {
+      return IExpression.eqZero((ITerm) pArg1);
     } else {
-      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs);
+      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArg2);
     }
   }
 
@@ -74,7 +79,19 @@ final class PrincessFormulaManager
         formulas.size() == 1,
         "parsing expects exactly one asserted term, but got %s terms",
         formulas.size());
-    return formulas.get(0);
+    // Rewrite (= term 0) to (=0 term)
+    return Rewriter.rewrite(
+        formulas.get(0),
+        term -> {
+          if (term instanceof IEquation) {
+            var equation = (IEquation) term;
+            if (equation.right() instanceof IIntLit
+                && ((IIntLit) equation.right()).value().isZero()) {
+              return IExpression.eqZero(equation.left());
+            }
+          }
+          return term;
+        });
   }
 
   @Override
