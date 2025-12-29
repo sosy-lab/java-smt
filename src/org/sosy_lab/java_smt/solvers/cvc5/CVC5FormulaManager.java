@@ -301,12 +301,11 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
+    // We use our own map (instead of calling plain "extractVariablesAndUFs" without a map),
+    // and then apply "buildKeepingLast" due to UFs;
+    // an UF might be applied multiple times. But the names and the types are consistent.
     ImmutableMap.Builder<String, Term> allKnownVarsAndUFsBuilder = ImmutableMap.builder();
-    // Get all symbols relevant for the input term
     creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
-
-    // buildKeepingLast due to UFs; 1 UF might be applied multiple times. But the names and the
-    // types are consistent.
     return getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast());
   }
 
@@ -320,10 +319,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
       Term varOrUf = entry.getValue();
-      StringBuilder line = new StringBuilder();
-
-      // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      line.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
 
       // add function parameters
       Iterable<Sort> childrenTypes;
@@ -338,21 +333,18 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       }
 
       Sort sort = varOrUf.getSort();
+      Sort returnType = sort;
       if (sort.isFunction()) {
         childrenTypes = Arrays.asList(sort.getFunctionDomainSorts());
+        returnType = sort.getFunctionCodomainSort();
       } else {
         childrenTypes = Iterables.transform(varOrUf, Term::getSort);
       }
 
-      line.append(Joiner.on(" ").join(childrenTypes));
-
-      // Return type
-      String returnTypeString = sort.toString();
-      if (sort.isFunction()) {
-        returnTypeString = sort.getFunctionCodomainSort().toString();
-      }
-      line.append(") ").append(returnTypeString).append(")\n");
-      declarations.append(line);
+      // escaping is stolen from SMTInterpol, lets hope this remains consistent
+      String qName = PrintTerm.quoteIdentifier(name);
+      String args = Joiner.on(" ").join(childrenTypes);
+      declarations.append(String.format("(declare-fun %s (%s) %s)\n", qName, args, returnType));
     }
     return declarations;
   }
