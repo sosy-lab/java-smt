@@ -31,6 +31,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -40,9 +42,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   private final CVC5FormulaCreator creator;
 
   private static final String INVOKE_SUCCESS = "success\n";
-  public static final String PARSING_MISSING_SYMBOL_START = "Symbol ";
-  public static final String PARSING_MISSING_SYMBOL_END = " not declared as a variable";
-  private SymbolManager symbolManager;
+  private static final Pattern PARSING_UNDECLARED_SYMBOL_PATTERN =
+      Pattern.compile("Symbol '(?<undeclaredSymbol>.*)' not declared as a variable");
+  private final SymbolManager symbolManager;
 
   @SuppressWarnings("checkstyle:parameternumber")
   CVC5FormulaManager(
@@ -104,33 +106,34 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   // symbols included if needed (this way we can use the correct symbols from the input string
   // easily to not include them from the cache and reduce possible mistakes with symbols that
   // need to be included from the cache)
-  private Term parseCVC5(final String formulaStr) {
-    // checkState(definitionsInInput.isEmpty()); // TODO: remove or use
+  private Term parseCVC5(final String smtQuery) {
     final Solver parseSolver = new Solver(creator.getEnv());
     final InputParser parser = getParser(parseSolver);
 
-    parser.setStringInput(InputLanguage.SMT_LIB_2_6, formulaStr, "");
+    parser.setStringInput(InputLanguage.SMT_LIB_2_6, smtQuery, "");
 
-    ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
-    ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
-
-    // "Commands" represent 1 definition or assertion from the input string
-    Command command;
     try {
-      // throws CVC5ParserException for errors, which can only be caught with Exception
-      command = parser.nextCommand();
-      while (!command.isNull()) {
-        // Note: push and pop are not handled as we disallow SMTLIB2 input including it!
-
-        // This WILL read in asserts, and they are no longer available for getTerm(), but on the
-        // solver as assertions
-        String invokeReturn = invokeCommand(command, parseSolver, symbolManager);
-
-        if (!invokeReturn.equals(INVOKE_SUCCESS)) {
-          throw new IllegalArgumentException("Error when parsing using CVC5: " + invokeReturn);
+      // "Commands" represent 1 definition or assertion from the input string
+      for (Command command = parser.nextCommand();
+          !command.isNull();
+          command = parser.nextCommand()) {
+        // Note:
+        // Commands for PUSH and POP are not handled, as we disallow SMTLIB2 input including it!
+        // We parse ASSERTs, which are then not available for getTerm(),
+        // but are placed on the solver as assertions.
+        String result;
+        try {
+          // throws CVC5ParserException for errors
+          result = command.invoke(parseSolver, symbolManager);
+        } catch (Exception parseException) {
+          throw new IllegalArgumentException(
+              "Error when parsing using CVC5: " + parseException.getMessage(), parseException);
         }
 
-        command = parser.nextCommand();
+        if (!result.equals(INVOKE_SUCCESS)) {
+          throw new IllegalArgumentException(
+              "Error when parsing using CVC5: Unexpected parser result: " + result);
+        }
       }
     } catch (Exception parseException) {
       // nextCommand(); throws CVC5ParserException for errors, which can only be caught with
@@ -140,29 +143,29 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       }
 
       String message = parseException.getMessage();
-      if (message.startsWith(PARSING_MISSING_SYMBOL_START)
-          && message.endsWith(PARSING_MISSING_SYMBOL_END)) {
+      Matcher matcher = PARSING_UNDECLARED_SYMBOL_PATTERN.matcher(message);
+      if (matcher.find()) {
         // This case seems to happen only very rarely (maybe just boolean variables or assertions
         // with 1 symbol in them?)! CVC5 seems to recognize most declared symbols just fine.
 
-        // Strip the error message until only the symbol is left
-        String symbolNotDeclared = message.substring(8, message.length() - 28);
-
-        Term knownTerm = creator.functionsCache.get(symbolNotDeclared);
-        if (knownTerm == null) {
-          Map<String, Term> variableRow = creator.variablesCache.row(symbolNotDeclared);
-          if (variableRow.size() == 1) {
-            knownTerm = variableRow.values().iterator().next();
-            return parseWithAddedSymbol(formulaStr, symbolNotDeclared, knownTerm);
-          }
-        } else {
-          return parseWithAddedSymbol(formulaStr, symbolNotDeclared, knownTerm);
+        String undeclaredSymbol = matcher.group("undeclaredSymbol");
+        Term knownTerm = creator.functionsCache.get(undeclaredSymbol);
+        if (knownTerm != null) {
+          return parseWithAddedSymbol(smtQuery, undeclaredSymbol, knownTerm);
+        }
+        Map<String, Term> variableRow = creator.variablesCache.row(undeclaredSymbol);
+        if (variableRow.size() == 1) {
+          knownTerm = Iterables.getOnlyElement(variableRow.values());
+          return parseWithAddedSymbol(smtQuery, undeclaredSymbol, knownTerm);
         }
       }
 
       throw new IllegalArgumentException(
-          "Error parsing with CVC5: " + parseException.getMessage(), parseException);
+          "Error when parsing using CVC5: " + parseException.getMessage(), parseException);
     }
+
+    ImmutableSet.Builder<Term> substituteFromBuilder = ImmutableSet.builder();
+    ImmutableSet.Builder<Term> substituteToBuilder = ImmutableSet.builder();
 
     // Register new terms in our caches or throw for errors
     registerNewTermsInCache(symbolManager, substituteFromBuilder, substituteToBuilder);
@@ -232,8 +235,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     // safely and get better error messaged.
     parseSolver.setOption("term-sort-overload", "false");
 
-    InputParser parser = new InputParser(parseSolver, symbolManager);
-    return parser;
+    return new InputParser(parseSolver, symbolManager);
   }
 
   private void registerNewTermsInCache(
@@ -363,16 +365,6 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     Term input = extractInfo(f);
     FormulaType<T> type = getFormulaType(f);
     return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
-  }
-
-  private String invokeCommand(Command command, Solver parseSolver, SymbolManager sm) {
-    try {
-      // throws CVC5ParserException for errors
-      return command.invoke(parseSolver, sm);
-    } catch (Exception parseException) {
-      throw new IllegalArgumentException(
-          "Error parsing with CVC5 " + parseException.getMessage(), parseException);
-    }
   }
 
   private static Term resubstituteCachedVariables(
