@@ -79,11 +79,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   static Term getCVC5Term(Formula pT) {
-    if (pT instanceof CVC5Formula) {
-      return ((CVC5Formula) pT).getTerm();
-    }
-    throw new IllegalArgumentException(
-        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+    checkArgument(
+        pT instanceof CVC5Formula,
+        "Cannot get the CVC5 term of type " + pT.getClass().getSimpleName() + " in the Solver!");
+    return ((CVC5Formula) pT).getTerm();
   }
 
   @Override
@@ -101,8 +100,9 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
 
   @Override
   public String dumpFormulaImpl(Term f) {
-    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
-        : "Only BooleanFormulas may be dumped";
+    checkArgument(
+        getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType,
+        "Only BooleanFormulas may be dumped");
 
     StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
 
@@ -356,17 +356,10 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   @Override
   public <T extends Formula> T substitute(
       final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
-    Term[] changeFrom = new Term[fromToMapping.size()];
-    Term[] changeTo = new Term[fromToMapping.size()];
-    int idx = 0;
-    for (Map.Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
-      changeFrom[idx] = extractInfo(e.getKey());
-      changeTo[idx] = extractInfo(e.getValue());
-      idx++;
-    }
-    Term input = extractInfo(f);
-    FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
+    Map<Term, Term> castedMap = new LinkedHashMap<>();
+    fromToMapping.forEach((k, v) -> castedMap.put(extractInfo(k), extractInfo(v)));
+    Term substitutedTerm = resubstituteVariables(extractInfo(f), castedMap);
+    return getFormulaCreator().encapsulate(getFormulaType(f), substitutedTerm);
   }
 
   private Term resubstituteVariables(Term parsedTerm, Map<Term, Term> fromToMapping) {
