@@ -14,7 +14,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
@@ -135,7 +134,7 @@ class CVC5Parser {
       throws CVC5ParserException {
     for (Command cmd = parser.nextCommand(); !cmd.isNull(); cmd = parser.nextCommand()) {
       String result = cmd.invoke(parseSolver, symbolManager);
-      Preconditions.checkArgument(
+      checkArgument(
           INVOKE_SUCCESS.equals(result),
           "%sUnexpected parser result: %s",
           PARSER_ERROR_CVC5,
@@ -268,7 +267,8 @@ class CVC5Parser {
   private static Term getAssertedTerm(Term[] assertions) {
     checkArgument(
         assertions.length > 0,
-        PARSER_ERROR_CVC5 + "no term found. Did the input query contain assertions?");
+        "%sNo term found. Did the input query contain assertions?",
+        PARSER_ERROR_CVC5);
 
     // There is only one assertion at index 0 in the parser's assertions array
     Term parsedTerm = checkNotNull(assertions[0]);
@@ -277,9 +277,10 @@ class CVC5Parser {
     // such that transitive substitutions can be applied correctly.
     for (int i = assertions.length - 1; i >= 1; i--) {
       final Term definition = checkNotNull(assertions[i]);
-      checkState(
+      checkArgument(
           definition.getKind() == Kind.EQUAL,
-          PARSER_ERROR_CVC5 + "unexpected term '%s' with kind '%s'",
+          "%sUnexpected term '%s' with kind '%s'",
+          PARSER_ERROR_CVC5,
           definition,
           definition.getKind());
       try {

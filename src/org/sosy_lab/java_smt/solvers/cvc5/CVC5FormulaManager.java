@@ -65,7 +65,8 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   static Term getCVC5Term(Formula pT) {
     checkArgument(
         pT instanceof CVC5Formula,
-        "Cannot get the CVC5 term of type " + pT.getClass().getSimpleName() + " in the Solver!");
+        "Cannot get the CVC5 term of type %s in the Solver!",
+        pT.getClass().getSimpleName());
     return ((CVC5Formula) pT).getTerm();
   }
 
@@ -141,7 +142,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
       // escaping is stolen from SMTInterpol, lets hope this remains consistent
       String qName = PrintTerm.quoteIdentifier(name);
       String args = Joiner.on(" ").join(childrenTypes);
-      declarations.append(String.format("(declare-fun %s (%s) %s)\n", qName, args, returnType));
+      declarations.append(String.format("(declare-fun %s (%s) %s)%n", qName, args, returnType));
     }
     return declarations;
   }
