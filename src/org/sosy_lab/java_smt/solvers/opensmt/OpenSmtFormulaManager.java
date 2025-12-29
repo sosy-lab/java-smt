@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.opensmt;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import java.util.Collection;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -18,6 +19,7 @@ import org.sosy_lab.java_smt.solvers.opensmt.api.PTRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.SymRef;
 import org.sosy_lab.java_smt.solvers.opensmt.api.Symbol;
+import org.sosy_lab.java_smt.solvers.opensmt.api.VectorPTRef;
 
 class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, SymRef> {
   private final OpenSmtFormulaCreator creator;
@@ -46,6 +48,16 @@ class OpenSmtFormulaManager extends AbstractFormulaManager<PTRef, SRef, Logic, S
 
     creator = pFormulaCreator;
     osmtLogic = pFormulaCreator.getEnv();
+  }
+
+  @Override
+  protected PTRef equalImpl(Collection<PTRef> pArgs) {
+    return getEnvironment().mkEq(new VectorPTRef(pArgs));
+  }
+
+  @Override
+  public PTRef distinctImpl(Collection<PTRef> pArgs) {
+    return getEnvironment().mkDistinct(new VectorPTRef(pArgs));
   }
 
   @Override

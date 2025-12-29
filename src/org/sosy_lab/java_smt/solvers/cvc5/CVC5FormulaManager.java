@@ -20,6 +20,7 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -66,6 +67,16 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
         pT instanceof CVC5Formula,
         "Cannot get the CVC5 term of type " + pT.getClass().getSimpleName() + " in the Solver!");
     return ((CVC5Formula) pT).getTerm();
+  }
+
+  @Override
+  public Term equalImpl(Collection<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.EQUAL, pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  public Term distinctImpl(Collection<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.DISTINCT, pArgs.toArray(new Term[0]));
   }
 
   @Override

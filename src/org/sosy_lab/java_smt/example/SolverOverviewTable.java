@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -242,7 +243,12 @@ public class SolverOverviewTable {
     private final List<String> lines = new ArrayList<>();
     // Minimum number of lines so that you can be sure a solver was added
     private static final int MIN_NUM_OF_LINES = 4;
-    private static final int SOLVER_COLUMN_WIDTH = 11;
+    private static final int SOLVER_COLUMN_WIDTH =
+        Arrays.stream(Solvers.values())
+            .map(Solvers::name)
+            .mapToInt(String::length)
+            .max()
+            .orElseThrow();
     private static final int VERSION_COLUMN_WIDTH = 40;
     private static final int THEORIES_COLUMN_WIDTH = 40;
     private static final int FEATURES_COLUMN_WIDTH = 40;

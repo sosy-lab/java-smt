@@ -114,7 +114,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void unsatCoreWithAssumptionsNullTest() {
+  public void unsatCoreWithAssumptionsNullTest() throws InterruptedException, SolverException {
     requireUnsatCore();
     assume()
         .withMessage(
@@ -124,6 +124,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      pe.push(bmgr.makeFalse());
+      assertThat(pe).isUnsatisfiable();
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }

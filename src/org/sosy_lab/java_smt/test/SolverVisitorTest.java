@@ -744,6 +744,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     RegexFormula r = smgr.makeRegex("regex1");
@@ -770,6 +775,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     StringFormula z = smgr.makeString("zAsString");
@@ -811,6 +821,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInRegexFormulaVisit() {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     RegexFormula r = smgr.makeRegex("regex1");
     RegexFormula s = smgr.makeRegex("regex2");
 
@@ -832,6 +847,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     IntegerFormula offset = imgr.makeVariable("offset");
