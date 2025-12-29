@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
@@ -101,6 +102,10 @@ public class SmtInterpolFormulaManager
       throw new IllegalArgumentException(nested);
     }
 
+    checkArgument(
+        parseScript.getAssertedTerms().size() == 1,
+        "Expected exactly one formula, but got %s",
+        parseScript.getAssertedTerms().size());
     Term term = getOnlyElement(parseScript.getAssertedTerms());
     return new FormulaUnLet().unlet(term);
   }

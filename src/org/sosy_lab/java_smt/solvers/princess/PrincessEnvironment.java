@@ -23,6 +23,7 @@ import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
 import ap.parser.ITerm;
+import ap.parser.Parser2InputAbsy.ParseException;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -313,7 +314,7 @@ class PrincessEnvironment {
 
     try {
       parserResult = extractFromSTMLIB(s);
-    } catch (TranslationException | EnvironmentException nested) {
+    } catch (TranslationException | EnvironmentException | ParseException nested) {
       throw new IllegalArgumentException(nested);
     }
 
@@ -345,6 +346,7 @@ class PrincessEnvironment {
    *
    * @throws EnvironmentException from Princess when the parsing fails
    * @throws TranslationException from Princess when the parsing fails due to type mismatch
+   * @throws ParseException from Princess when the parsing fails due to syntax errors
    */
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
@@ -353,7 +355,8 @@ class PrincessEnvironment {
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
           scala.collection.immutable.Map<ConstantTerm, SMTType>,
           scala.collection.immutable.Map<Predicate, SMTFunctionType>>
-      extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
+      extractFromSTMLIB(String s)
+          throws EnvironmentException, TranslationException, ParseException {
     // replace let-terms and function definitions by their full term.
     final boolean fullyInlineLetsAndFunctions = true;
     return api.extractSMTLIBAssertionsSymbols(new StringReader(s), fullyInlineLetsAndFunctions);

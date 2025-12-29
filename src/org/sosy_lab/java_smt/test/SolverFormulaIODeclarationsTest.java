@@ -8,11 +8,13 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.truth.Truth;
 import java.util.EnumSet;
 import org.junit.Before;
@@ -97,6 +99,27 @@ public class SolverFormulaIODeclarationsTest
     IntegerFormula var = imgr.makeVariable("x");
     BooleanFormula calledFoo = fmgr.declareAndCallUF("foo", BooleanType, imgr.makeNumber(1), var);
     Truth.assertThat(mgr.extractVariablesAndUFs(formula).values()).containsExactly(var, calledFoo);
+  }
+
+  @Test
+  public void parseInvalidQuery1() {
+    for (final String q :
+        ImmutableList.of("()", "(x)", "(exit)", "(and)", "(or)", "(not)", "(=)")) {
+      if (solverToUse() == Solvers.MATHSAT5) {
+        assertThat(mgr.parse(q)).isEqualTo(bmgr.makeTrue());
+      } else {
+        assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+      }
+    }
+  }
+
+  @Test
+  public void parseInvalidQuery2() {
+    for (final String q :
+        ImmutableList.of(
+            "(pop)", "(push)", "(assert)", "(assert true", "(assert", "assert", "1", "true")) {
+      assertThrows(IllegalArgumentException.class, () -> mgr.parse(q));
+    }
   }
 
   @Test
