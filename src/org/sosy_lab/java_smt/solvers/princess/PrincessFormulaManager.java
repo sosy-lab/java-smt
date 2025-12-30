@@ -70,7 +70,7 @@ final class PrincessFormulaManager
   @Override
   public IExpression parseImpl(String pS) throws IllegalArgumentException {
     List<? extends IExpression> formulas = getEnvironment().parseStringToTerms(pS, creator);
-    Preconditions.checkState(
+    Preconditions.checkArgument(
         formulas.size() == 1,
         "parsing expects exactly one asserted term, but got %s terms",
         formulas.size());

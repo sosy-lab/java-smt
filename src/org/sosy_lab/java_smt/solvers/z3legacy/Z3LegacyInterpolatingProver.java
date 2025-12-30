@@ -68,7 +68,7 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
   @SuppressWarnings({"unchecked", "varargs"})
   public BooleanFormula getInterpolant(final Collection<Long> pFormulasOfA)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    checkGenerateInterpolants();
     final Set<Long> assertedConstraints = getAssertedConstraintIds();
     checkArgument(
         assertedConstraints.containsAll(pFormulasOfA),
@@ -90,7 +90,11 @@ class Z3LegacyInterpolatingProver extends Z3LegacyAbstractProver<Long>
   public List<BooleanFormula> getTreeInterpolants(
       List<? extends Collection<Long>> partitionedFormulas, int[] startOfSubTree)
       throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+    checkGenerateInterpolants();
+    final ImmutableSet<Long> assertedConstraintIds = getAssertedConstraintIds();
+    checkArgument(
+        partitionedFormulas.stream().allMatch(assertedConstraintIds::containsAll),
+        "interpolation can only be done over previously asserted formulas.");
     assert InterpolatingProverEnvironment.checkTreeStructure(
         partitionedFormulas.size(), startOfSubTree);
 
