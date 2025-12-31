@@ -2485,16 +2485,16 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver is quite slow for this example")
-        .that(solverToUse())
-        .isNoneOf(Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
-
     BooleanFormula formula =
         context
             .getFormulaManager()
             .parse(
                 Files.readString(Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
+
+    assume()
+        .withMessage("Solver is quite slow for this example")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
 
     checkModelIteration(formula, false);
   }
