@@ -113,7 +113,12 @@ namespace bitwuzla {
 }
 %extend Term {
   std::string symbol() {
-    return $self->symbol().value();
+    std::string sym = $self->symbol().value();
+    if (sym.front() == '|' && sym.back() == '|') {
+      return sym.substr(1, sym.size() - 2);
+    } else {
+      return sym;
+    }
   }
 }
 

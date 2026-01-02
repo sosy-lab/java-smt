@@ -1200,7 +1200,12 @@ SWIGINTERN std::vector< int > bitwuzla_Term_indices(bitwuzla::Term *self){
     return result;
   }
 SWIGINTERN std::string bitwuzla_Term_symbol(bitwuzla::Term *self){
-    return self->symbol().value();
+    std::string sym = self->symbol().value();
+    if (sym.front() == '|' && sym.back() == '|') {
+      return sym.substr(1, sym.size() - 2);
+    } else {
+      return sym;
+    }
   }
 SWIGINTERN bool bitwuzla_Term_to_bool(bitwuzla::Term *self){
     assert(self->is_value() && self->sort().is_bool());
