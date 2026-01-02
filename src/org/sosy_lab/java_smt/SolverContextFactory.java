@@ -28,6 +28,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.basicimpl.AbstractNumeralFormulaManager.NonLinearArithmetic;
 import org.sosy_lab.java_smt.delegate.debugging.DebuggingSolverContext;
 import org.sosy_lab.java_smt.delegate.logging.LoggingSolverContext;
+import org.sosy_lab.java_smt.delegate.parsing.ParsingSolverContext;
 import org.sosy_lab.java_smt.delegate.statistics.StatisticsSolverContext;
 import org.sosy_lab.java_smt.delegate.synchronize.SynchronizedSolverContext;
 import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
@@ -96,6 +97,13 @@ public class SolverContextFactory {
 
   @Option(secure = true, description = "Apply additional checks to catch common user errors.")
   private boolean useDebugMode = false;
+
+  @Option(
+      secure = true,
+      description =
+          "Parse Smtlib with the built-in Antlr parser, instead of relying on the solver for "
+              + "parsing")
+  private boolean useAntlrParser = false;
 
   @Option(
       secure = true,
@@ -231,6 +239,9 @@ public class SolverContextFactory {
     }
     if (useDebugMode) {
       context = new DebuggingSolverContext(solverToCreate, config, context);
+    }
+    if (useAntlrParser) {
+      context = new ParsingSolverContext(context);
     }
     if (collectStatistics) {
       // statistics need to be the most outer wrapping layer.
