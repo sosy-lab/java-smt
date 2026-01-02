@@ -173,10 +173,24 @@ public class SmtlibEvaluator {
 
       @Override
       public Function<List<Formula>, Formula> visitIndexed(SmtlibParser.IndexedContext ctx) {
-        return lookup(getSymbolValue(ctx.symbol()))
-            .apply(
-                transformedImmutableListCopy(
-                    ctx.integer(), idx -> getIntegerValue(idx).intValueExact()));
+        var symbol = getSymbolValue(ctx.symbol());
+        if (symbol.matches("bv\\d+")) {
+          // Special case: BV defines symbols (_ bvX m) to create bitvector literals. Here we
+          // have to get the value of the bitvector straight from the symbol name
+          Preconditions.checkArgument(ctx.integer().size() == 1);
+          return p -> {
+            Preconditions.checkArgument(p.isEmpty());
+            return mgr.getBitvectorFormulaManager()
+                .makeBitvector(
+                    getIntegerValue(ctx.integer(0)).intValueExact(),
+                    new BigInteger(symbol.substring(2)));
+          };
+        } else {
+          return lookup(getSymbolValue(ctx.symbol()))
+              .apply(
+                  transformedImmutableListCopy(
+                      ctx.integer(), idx -> getIntegerValue(idx).intValueExact()));
+        }
       }
 
       @SuppressWarnings("unchecked")
