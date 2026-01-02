@@ -283,7 +283,7 @@ public interface SmtlibVisitor<T> extends ParseTreeVisitor<T> {
   T visitDefine(SmtlibParser.DefineContext ctx);
 
   /**
-   * Visit a parse tree produced by {@link SmtlibParser#assert}.
+   * Visit a parse tree produced by {@link SmtlibParser#assert_}.
    *
    * @param ctx the parse tree
    * @return the visitor result
