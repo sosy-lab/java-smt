@@ -10,6 +10,8 @@
 
 package org.sosy_lab.java_smt.basicimpl.parser;
 
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -173,9 +175,8 @@ public class SmtlibEvaluator {
       public Function<List<Formula>, Formula> visitIndexed(SmtlibParser.IndexedContext ctx) {
         return lookup(getSymbolValue(ctx.symbol()))
             .apply(
-                FluentIterable.from(ctx.integer())
-                    .transform(idx -> getIntegerValue(idx).intValueExact())
-                    .toList());
+                transformedImmutableListCopy(
+                    ctx.integer(), idx -> getIntegerValue(idx).intValueExact()));
       }
 
       @SuppressWarnings("unchecked")
@@ -239,7 +240,7 @@ public class SmtlibEvaluator {
       }
       ImmutableMap.Builder<String, Function<List<Integer>, Function<List<Formula>, Formula>>>
           builder = ImmutableMap.builder();
-      var updated = builder.putAll(context).putAll(local).build();
+      var updated = builder.putAll(context).putAll(local).buildOrThrow();
       return new ExprEvaluator(updated).visit(ctx.expr());
     }
 
@@ -333,7 +334,7 @@ public class SmtlibEvaluator {
     @Override
     public SmtlibEvaluator visitDeclare(SmtlibParser.DeclareContext ctx) {
       var name = getSymbolValue(ctx.symbol());
-      var sorts = FluentIterable.from(ctx.sort()).transform(p -> sortEvaluator.visit(p)).toList();
+      var sorts = transformedImmutableListCopy(ctx.sort(), p -> sortEvaluator.visit(p));
       var left = sorts.subList(0, sorts.size() - 1);
       var right = sorts.get(sorts.size() - 1);
       if (sorts.size() == 1) {

@@ -1263,6 +1263,6 @@ public class Predefined {
           };
         });
 
-    return predefined.build();
+    return predefined.buildOrThrow();
   }
 }
