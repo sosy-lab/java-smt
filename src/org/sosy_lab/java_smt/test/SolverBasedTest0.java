@@ -125,7 +125,9 @@ public abstract class SolverBasedTest0 {
 
   protected ConfigurationBuilder createTestConfigBuilder() {
     ConfigurationBuilder newConfig =
-        Configuration.builder().setOption("solver.solver", solverToUse().toString());
+        Configuration.builder()
+            .setOption("solver.solver", solverToUse().toString())
+            .setOption("solver.useAntlrParser", "true");
     if (solverToUse() == Solvers.OPENSMT) {
       newConfig.setOption("solver.opensmt.logic", logicToUse().toString());
     }
