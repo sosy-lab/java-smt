@@ -125,6 +125,8 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value" rev="1.11.0" conf="build->default"/>
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.11.0" conf="build->default; contrib->sources"/>
 
+        <dependency org="org.antlr" name="antlr4-runtime" rev="4.13.2" conf="core->default"/>
+
         <!-- Annotations we use for @Nullable etc. -->
         <dependency org="org.checkerframework" name="checker-qual" rev="3.51.0" conf="core->default; contrib->sources"/>
 
