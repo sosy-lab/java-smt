@@ -36,7 +36,7 @@ public class SmtlibLexer extends Lexer {
     RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION);
   }
 
-  protected static final DFA[] _decisionToDFA;
+  static final DFA[] _decisionToDFA;
   protected static final PredictionContextCache _sharedContextCache = new PredictionContextCache();
   public static final int T__0 = 1,
       T__1 = 2,
@@ -76,9 +76,9 @@ public class SmtlibLexer extends Lexer {
       Simple = 36,
       Quoted = 37,
       Keyword = 38;
-  public static String[] channelNames = {"DEFAULT_TOKEN_CHANNEL", "HIDDEN"};
+  static final String[] channelNames = {"DEFAULT_TOKEN_CHANNEL", "HIDDEN"};
 
-  public static String[] modeNames = {"DEFAULT_MODE"};
+  static final String[] modeNames = {"DEFAULT_MODE"};
 
   private static String[] makeRuleNames() {
     return new String[] {
@@ -128,7 +128,7 @@ public class SmtlibLexer extends Lexer {
     };
   }
 
-  public static final String[] ruleNames = makeRuleNames();
+  static final String[] ruleNames = makeRuleNames();
 
   private static String[] makeLiteralNames() {
     return new String[] {
@@ -217,7 +217,7 @@ public class SmtlibLexer extends Lexer {
   /**
    * @deprecated Use {@link #VOCABULARY} instead.
    */
-  @Deprecated public static final String[] tokenNames;
+  @Deprecated static final String[] tokenNames;
 
   static {
     tokenNames = new String[_SYMBOLIC_NAMES.length];

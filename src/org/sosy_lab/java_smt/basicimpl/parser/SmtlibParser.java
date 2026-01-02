@@ -11,6 +11,7 @@
 // Generated from Smtlib.g4 by ANTLR 4.13.2
 package org.sosy_lab.java_smt.basicimpl.parser;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.antlr.v4.runtime.NoViableAltException;
 import org.antlr.v4.runtime.Parser;
@@ -38,12 +39,13 @@ import org.antlr.v4.runtime.tree.TerminalNode;
   "CheckReturnValue",
   "this-escape"
 })
+@SuppressFBWarnings({"NM_METHOD_NAMING_CONVENTION", "SF_SWITCH_NO_DEFAULT"})
 public class SmtlibParser extends Parser {
   static {
     RuntimeMetaData.checkVersion("4.13.2", RuntimeMetaData.VERSION);
   }
 
-  protected static final DFA[] _decisionToDFA;
+  static final DFA[] _decisionToDFA;
   protected static final PredictionContextCache _sharedContextCache = new PredictionContextCache();
   public static final int T__0 = 1,
       T__1 = 2,
@@ -133,7 +135,7 @@ public class SmtlibParser extends Parser {
     };
   }
 
-  public static final String[] ruleNames = makeRuleNames();
+  static final String[] ruleNames = makeRuleNames();
 
   private static String[] makeLiteralNames() {
     return new String[] {
@@ -222,7 +224,7 @@ public class SmtlibParser extends Parser {
   /**
    * @deprecated Use {@link #VOCABULARY} instead.
    */
-  @Deprecated public static final String[] tokenNames;
+  @Deprecated static final String[] tokenNames;
 
   static {
     tokenNames = new String[_SYMBOLIC_NAMES.length];
