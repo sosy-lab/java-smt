@@ -25,7 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.sosy_lab.java_smt.api.*;
+import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager;
 
 public class SmtlibEvaluator {
   private final FormulaManager mgr;
@@ -35,7 +40,7 @@ public class SmtlibEvaluator {
 
   private static int counter = 0;
 
-  private SmtlibEvaluator(
+  protected SmtlibEvaluator(
       FormulaManager pManager,
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
       List<BooleanFormula> pAsserted) {
@@ -207,8 +212,7 @@ public class SmtlibEvaluator {
 
     private FunctionEvaluator functionEvaluator = new FunctionEvaluator();
 
-    public ExprEvaluator(
-        Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pContext) {
+    ExprEvaluator(Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pContext) {
       context = pContext;
     }
 
