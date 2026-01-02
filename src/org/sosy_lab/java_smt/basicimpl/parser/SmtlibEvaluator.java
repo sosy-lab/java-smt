@@ -29,12 +29,6 @@ import org.sosy_lab.java_smt.api.*;
 public class SmtlibEvaluator {
   private final FormulaManager mgr;
 
-  private final BooleanFormulaManager bool;
-  private final IntegerFormulaManager integer;
-  private final RationalFormulaManager real;
-  private final BitvectorFormulaManager bitvec;
-  private final FloatingPointFormulaManager floating;
-
   private final Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> globalDefs;
   private final List<BooleanFormula> asserted;
 
@@ -45,12 +39,6 @@ public class SmtlibEvaluator {
       Map<String, Function<List<Integer>, Function<List<Formula>, Formula>>> pGlobalDefs,
       List<BooleanFormula> pAsserted) {
     mgr = pManager;
-    bool = mgr.getBooleanFormulaManager();
-    integer = mgr.getIntegerFormulaManager();
-    real = mgr.getRationalFormulaManager();
-    bitvec = mgr.getBitvectorFormulaManager();
-    floating = mgr.getFloatingPointFormulaManager();
-
     globalDefs = pGlobalDefs;
     asserted = pAsserted;
   }
@@ -140,16 +128,17 @@ public class SmtlibEvaluator {
   class ConstEvalator extends SmtlibBaseVisitor<Formula> {
     @Override
     public Formula visitBoolean(SmtlibParser.BooleanContext ctx) {
-      return bool.makeBoolean(Boolean.parseBoolean(ctx.getText()));
+      return mgr.getBooleanFormulaManager().makeBoolean(Boolean.parseBoolean(ctx.getText()));
     }
 
     @Override
     public Formula visitBitvec(SmtlibParser.BitvecContext ctx) {
       var str = ctx.getText().substring(2);
       if (ctx.getText().startsWith("#b")) {
-        return bitvec.makeBitvector(str.length(), new BigInteger(str, 2));
+        return mgr.getBitvectorFormulaManager().makeBitvector(str.length(), new BigInteger(str, 2));
       } else {
-        return bitvec.makeBitvector(str.length() * 4, new BigInteger(str, 16));
+        return mgr.getBitvectorFormulaManager()
+            .makeBitvector(str.length() * 4, new BigInteger(str, 16));
       }
     }
 
@@ -159,17 +148,18 @@ public class SmtlibEvaluator {
       var b1 = ctx.bitvec(1).getText().substring(2);
       var b2 = ctx.bitvec(2).getText().substring(2);
       Preconditions.checkArgument(b0.length() == 1);
-      return floating.makeNumber(FloatingPointNumber.of(b0 + b1 + b2, b1.length(), b2.length()));
+      return mgr.getFloatingPointFormulaManager()
+          .makeNumber(FloatingPointNumber.of(b0 + b1 + b2, b1.length(), b2.length()));
     }
 
     @Override
     public Formula visitInteger(SmtlibParser.IntegerContext ctx) {
-      return integer.makeNumber(getIntegerValue(ctx));
+      return mgr.getIntegerFormulaManager().makeNumber(getIntegerValue(ctx));
     }
 
     @Override
     public Formula visitReal(SmtlibParser.RealContext ctx) {
-      return real.makeNumber(new BigDecimal(ctx.getText()));
+      return mgr.getRationalFormulaManager().makeNumber(new BigDecimal(ctx.getText()));
     }
   }
 
