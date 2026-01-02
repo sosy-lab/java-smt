@@ -366,19 +366,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected void requireParser() {
-    assume()
-        .withMessage("Solver %s does not support parsing formulae", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.YICES2);
-
-    assume()
-        .withMessage(
-            "Solver %s segfaults when parsing short queries or reports invalid length",
-            solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
-  }
+  protected void requireParser() {}
 
   protected void requireArrayModel() {
     assume()
