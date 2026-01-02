@@ -51,68 +51,84 @@ public class ParsingFormulaManager implements FormulaManager {
     delegate = pDelegate;
   }
 
+  @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
     return delegate.getIntegerFormulaManager();
   }
 
+  @Override
   public RationalFormulaManager getRationalFormulaManager() {
     return delegate.getRationalFormulaManager();
   }
 
+  @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
     return delegate.getBooleanFormulaManager();
   }
 
+  @Override
   public ArrayFormulaManager getArrayFormulaManager() {
     return delegate.getArrayFormulaManager();
   }
 
+  @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
     return delegate.getBitvectorFormulaManager();
   }
 
+  @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
     return delegate.getFloatingPointFormulaManager();
   }
 
+  @Override
   public UFManager getUFManager() {
     return delegate.getUFManager();
   }
 
+  @Override
   public SLFormulaManager getSLFormulaManager() {
     return delegate.getSLFormulaManager();
   }
 
+  @Override
   public QuantifiedFormulaManager getQuantifiedFormulaManager() {
     return delegate.getQuantifiedFormulaManager();
   }
 
+  @Override
   public StringFormulaManager getStringFormulaManager() {
     return delegate.getStringFormulaManager();
   }
 
+  @Override
   public EnumerationFormulaManager getEnumerationFormulaManager() {
     return delegate.getEnumerationFormulaManager();
   }
 
+  @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
     return delegate.makeVariable(formulaType, name);
   }
 
+  @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, List<? extends Formula> args) {
     return delegate.makeApplication(declaration, args);
   }
 
+  @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, Formula... args) {
     return delegate.makeApplication(declaration, args);
   }
 
+  @Override
   public BooleanFormula equal(Collection<Formula> pArgs) {
     return delegate.equal(pArgs);
   }
 
+  @Override
   public BooleanFormula distinct(Collection<Formula> pArgs) {
     return delegate.distinct(pArgs);
   }
@@ -122,6 +138,7 @@ public class ParsingFormulaManager implements FormulaManager {
     return delegate.getFormulaType(formula);
   }
 
+  @Override
   public BooleanFormula parse(String s) throws IllegalArgumentException {
     var input = CharStreams.fromString(s);
     var lexer = new SmtlibLexer(input);
@@ -135,57 +152,70 @@ public class ParsingFormulaManager implements FormulaManager {
     return SmtlibEvaluator.link(this).apply(ast).getAssertions().get(0);
   }
 
+  @Override
   public Appender dumpFormula(BooleanFormula pT) {
     return delegate.dumpFormula(pT);
   }
 
+  @Override
   public BooleanFormula applyTactic(BooleanFormula input, Tactic tactic)
       throws InterruptedException, SolverException {
     return delegate.applyTactic(input, tactic);
   }
 
+  @Override
   public <T extends Formula> T simplify(T input) throws InterruptedException {
     return delegate.simplify(input);
   }
 
+  @Override
   public <R> R visit(Formula f, FormulaVisitor<R> rFormulaVisitor) {
     return delegate.visit(f, rFormulaVisitor);
   }
 
+  @Override
   public void visitRecursively(Formula f, FormulaVisitor<TraversalProcess> rFormulaVisitor) {
     delegate.visitRecursively(f, rFormulaVisitor);
   }
 
+  @Override
   public <T extends Formula> T transformRecursively(
       T f, FormulaTransformationVisitor pFormulaVisitor) {
     return delegate.transformRecursively(f, pFormulaVisitor);
   }
 
+  @Override
   public ImmutableMap<String, Formula> extractVariables(Formula f) {
     return delegate.extractVariables(f);
   }
 
+  @Override
   public ImmutableMap<String, Formula> extractVariablesAndUFs(Formula f) {
     return delegate.extractVariablesAndUFs(f);
   }
 
+  @Override
   public <T extends Formula> T substitute(
       T f, Map<? extends Formula, ? extends Formula> fromToMapping) {
     return delegate.substitute(f, fromToMapping);
   }
 
+  @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
     return delegate.translateFrom(formula, otherManager);
   }
 
+  @Override
   public boolean isValidName(String variableName) {
     return delegate.isValidName(variableName);
   }
 
+  @Override
   public String escape(String variableName) {
     return delegate.escape(variableName);
   }
 
+  @Override
   public String unescape(String variableName) {
     return delegate.unescape(variableName);
   }

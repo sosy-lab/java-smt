@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.api.*;
 
 public class SmtlibEvaluator {
@@ -41,10 +40,6 @@ public class SmtlibEvaluator {
     mgr = pManager;
     globalDefs = pGlobalDefs;
     asserted = pAsserted;
-  }
-
-  public static SmtlibEvaluator init(SolverContextFactory.Solvers pSolver) {
-    throw new UnsupportedOperationException();
   }
 
   public static SmtlibEvaluator link(FormulaManager pManager) {
