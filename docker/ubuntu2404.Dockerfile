@@ -40,6 +40,7 @@ RUN apt-get update \
  && apt-get install -y \
         ninja-build python3-pip meson \
  && apt-get clean
+RUN ln -s /usr/bin/pkg-config /usr/bin/aarch64-linux-gnu-pkg-config
 
 # OpenSMT requires swig, gmp, flex and bison
 # - swig v4.1 or newer for unique_ptr support
