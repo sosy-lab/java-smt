@@ -16,10 +16,13 @@ import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
 import org.sosy_lab.java_smt.SolverContextFactory;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FormulaManager;
+import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 
 public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -173,6 +176,43 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
     var config2 =
         createTestConfigBuilder().setOption("solver.cvc5.furtherOptions", "foo=bar").build();
     var factory2 = new SolverContextFactory(config2, logger, shutdownNotifierToUse());
+    assertThrows(InvalidConfigurationException.class, factory2::generateContext);
+  }
+
+  @Test
+  public void testBitwuzlaWithValidOptionsModelGeneration()
+      throws InvalidConfigurationException, InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(Solvers.BITWUZLA);
+
+    // the option and its value are irrelevant,
+    // as long as we can parse and inject them as real options.
+    var validConfig =
+        createTestConfigBuilder()
+            .setOption("solver.bitwuzla.furtherOptions", "PRODUCE_MODELS=1")
+            .build();
+    var factory2 = new SolverContextFactory(validConfig, logger, shutdownNotifierToUse());
+    try (SolverContext context2 = factory2.generateContext()) {
+      FormulaManager fmgr2 = context2.getFormulaManager();
+      BitvectorFormulaManager bvmgr2 = fmgr2.getBitvectorFormulaManager();
+      try (ProverEnvironment prover2 =
+          context2.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover2.addConstraint(
+            bvmgr2.equal(bvmgr2.makeVariable(8, "x"), bvmgr2.makeBitvector(8, 17)));
+        assertThat(prover2.isUnsat()).isFalse();
+        try (Model model = prover2.getModel()) {
+          assertThat(model.asList().size()).isEqualTo(1);
+        }
+      }
+    }
+  }
+
+  @Test
+  public void testBitwuzlaWithInvalidOptions() throws InvalidConfigurationException {
+    assume().that(solverToUse()).isEqualTo(Solvers.BITWUZLA);
+
+    var invalidConfig =
+        createTestConfigBuilder().setOption("solver.bitwuzla.furtherOptions", "foo=bar").build();
+    var factory2 = new SolverContextFactory(invalidConfig, logger, shutdownNotifierToUse());
     assertThrows(InvalidConfigurationException.class, factory2::generateContext);
   }
 }
