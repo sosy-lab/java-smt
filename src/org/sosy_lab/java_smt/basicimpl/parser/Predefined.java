@@ -46,7 +46,11 @@ public class Predefined {
   }
 
   private <T> T foldl1(BinaryOperator<T> f, List<T> list) {
-    return foldr1(f, Lists.reverse(list));
+    var acc = list.get(0);
+    for (var term : list.subList(1, list.size())) {
+      acc = f.apply(acc, term);
+    }
+    return acc;
   }
 
   private <T extends Formula> BooleanFormula chain(
