@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -575,5 +575,119 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
         fmgr.declareUF("fun_b", FormulaType.BooleanType, FormulaType.IntegerType);
     BooleanFormula res1 = fmgr.callUF(funA, arg);
     return bmgr.and(res1, bmgr.makeBoolean(true));
+  }
+
+  @Test
+  public void quantifierIntegerDumpTest() {
+    requireIntegers();
+    requireQuantifiers();
+
+    // build formula: (FORALL (x Int) (= 1 x))
+    IntegerFormula int1 = imgr.makeNumber(1);
+    IntegerFormula var = imgr.makeVariable("x");
+    BooleanFormula body = imgr.equal(int1, var);
+    BooleanFormula formula = qmgr.forall(var, body);
+
+    final String formDump = mgr.dumpFormula(formula).toString();
+
+    final String expected;
+    switch (solverToUse()) {
+      case Z3:
+        expected = "forall ((x Int)) (! (= 1 x) :weight 0)"; // with weight
+        break;
+      case PRINCESS:
+        expected = "forall ((var0 Int)) (= 1 var0)"; // renamed symbols
+        break;
+      case CVC4:
+        expected = "forall ((x Int)) (= 1 x) "; // with trailing space
+        break;
+      case YICES2:
+        expected = "forall (x::int) (= 1 x)"; // special type annotation
+        break;
+      default:
+        expected = "forall ((x Int)) (= 1 x)"; // normal
+        break;
+    }
+
+    assertThat(formDump).isEqualTo("(assert (" + expected + "))\n");
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
+  }
+
+  @Test
+  public void quantifierBitvectorDumpTest() {
+    requireBitvectors();
+    requireQuantifiers();
+
+    // build formula: (FORALL (x (_ BitVec 8)) (= #b00000001 x))
+    BitvectorFormula int1 = bvmgr.makeBitvector(8, 1);
+    BitvectorFormula var = bvmgr.makeVariable(8, "x");
+    BooleanFormula body = bvmgr.equal(int1, var);
+    BooleanFormula formula = qmgr.forall(var, body);
+
+    final String formDump = mgr.dumpFormula(formula).toString();
+
+    final String expected;
+    switch (solverToUse()) {
+      case Z3:
+        expected = "forall ((x (_ BitVec 8))) (! (= #x01 x) :weight 0)"; // with weight
+        break;
+      case PRINCESS:
+        expected = "forall ((var0 (_ BitVec 8))) (= (_ bv1 8) var0)"; // renamed symbols
+        break;
+      case CVC4:
+        expected = "forall ((x (_ BitVec 8))) (= #b00000001 x) "; // with trailing space
+        break;
+      case YICES2:
+        expected = "forall (x::(bitvector 8)) (= 0b00000001 x)"; // special type annotation
+        break;
+      default:
+        expected = "forall ((x (_ BitVec 8))) (= #b00000001 x)"; // normal
+        break;
+    }
+
+    // check that function is dumped correctly + necessary assert that has to be there
+    assertThat(formDump).isEqualTo("(assert (" + expected + "))\n");
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
+  }
+
+  @Test
+  public void quantifierBitvectorDumpTest_withSize6() {
+    // bitvector size 6 does not allow solvers like Z3 to use hexadecimal notation for numbers
+    requireBitvectors();
+    requireQuantifiers();
+
+    // build formula: (FORALL (x (_ BitVec 6)) (= #b000001 x))
+    BitvectorFormula int1 = bvmgr.makeBitvector(6, 1);
+    BitvectorFormula var = bvmgr.makeVariable(6, "x");
+    BooleanFormula body = bvmgr.equal(int1, var);
+    BooleanFormula formula = qmgr.forall(var, body);
+
+    final String formDump = mgr.dumpFormula(formula).toString();
+
+    final String expected;
+    switch (solverToUse()) {
+      case Z3:
+        expected = "forall ((x (_ BitVec 6))) (! (= #b000001 x) :weight 0)"; // with weight
+        break;
+      case PRINCESS:
+        expected = "forall ((var0 (_ BitVec 6))) (= (_ bv1 6) var0)"; // renamed symbols
+        break;
+      case CVC4:
+        expected = "forall ((x (_ BitVec 6))) (= #b000001 x) "; // with trailing space
+        break;
+      case YICES2:
+        expected = "forall (x::(bitvector 6)) (= 0b000001 x)"; // special type annotation
+        break;
+      default:
+        expected = "forall ((x (_ BitVec 6))) (= #b000001 x)"; // normal
+        break;
+    }
+
+    // check that function is dumped correctly + necessary assert that has to be there
+    assertThat(formDump).isEqualTo("(assert (" + expected + "))\n");
+    checkThatAssertIsInLastLine(formDump);
+    checkThatDumpIsParseable(formDump);
   }
 }
