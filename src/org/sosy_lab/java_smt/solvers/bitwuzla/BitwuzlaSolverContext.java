@@ -300,6 +300,6 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
         break;
       }
     }
-    return allOptions.build();
+    return allOptions.buildOrThrow();
   }
 }
