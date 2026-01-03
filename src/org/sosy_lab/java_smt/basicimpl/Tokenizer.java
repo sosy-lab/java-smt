@@ -166,7 +166,7 @@ public final class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isDefinitionToken(String token) {
-    return matchesOneOf(token, "define-fun");
+    return matchesOneOf(token, "define-fun", "define-const");
   }
 
   /**

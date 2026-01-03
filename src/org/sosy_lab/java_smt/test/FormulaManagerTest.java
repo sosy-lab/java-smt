@@ -163,9 +163,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
 
     var str =
-        String.format("(define-const %s %s)", var1, formulaSort)
-            + String.format("(define-const %s %s)", var2, formulaSort)
-            + String.format("(define-const %s %s)", var3, formulaSort)
+        String.format("(declare-const %s %s)", var1, formulaSort)
+            + String.format("(declare-const %s %s)", var2, formulaSort)
+            + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (= %s %s %s))", var1, var2, var3);
 
     var f = mgr.equal(var1, var2, var3);
@@ -230,9 +230,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
 
     var str =
-        String.format("(define-const %s %s)", var1, formulaSort)
-            + String.format("(define-const %s %s)", var2, formulaSort)
-            + String.format("(define-const %s %s)", var3, formulaSort)
+        String.format("(declare-const %s %s)", var1, formulaSort)
+            + String.format("(declare-const %s %s)", var2, formulaSort)
+            + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (distinct %s %s %s))", var1, var2, var3);
 
     var f = mgr.distinct(var1, var2, var3);

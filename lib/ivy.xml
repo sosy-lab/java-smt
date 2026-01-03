@@ -198,7 +198,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="2025-11-13-ef82847" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.1-gc1454189" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.2-104-g7c96f469" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-z3-legacy" rev="4.5.0-gd57a2a6dc" conf="runtime-z3-legacy-x64->solver-z3-legacy-x64; runtime-z3-legacy-arm64->solver-z3-legacy-arm64" />
 
         <!-- additional JavaSMT components with Solver Binaries -->

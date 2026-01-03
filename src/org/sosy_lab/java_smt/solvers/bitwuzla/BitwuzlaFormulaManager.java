@@ -89,10 +89,6 @@ public final class BitwuzlaFormulaManager
         Term parsed = declParser.get_declared_funs().get(0);
 
         String symbol = parsed.symbol();
-        if (symbol.startsWith("|") && symbol.endsWith("|")) {
-          // Strip quotes from the name
-          symbol = symbol.substring(1, symbol.length() - 1);
-        }
         Sort sort = parsed.sort();
 
         // Check if the symbol is already defined in the variable cache
