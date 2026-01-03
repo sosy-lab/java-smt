@@ -2,7 +2,7 @@
 # an API wrapper for a collection of SMT solvers:
 # https://github.com/sosy-lab/java-smt
 #
-# SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+# SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 #
 # SPDX-License-Identifier: Apache-2.0
 
