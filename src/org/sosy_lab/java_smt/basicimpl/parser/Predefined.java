@@ -159,7 +159,16 @@ public class Predefined {
           Preconditions.checkArgument(idx.isEmpty());
           return p -> {
             Preconditions.checkArgument(p.size() >= 2);
-            return mgr.equal(p);
+            var argType = mgr.getFormulaType(p.get(0));
+            if (argType.isIntegerType() || argType.isRationalType()) {
+              // Special case: Cast numeric terms to real for comparison
+              return chain(
+                  (a, b) ->
+                      mgr.getRationalFormulaManager().equal((NumeralFormula) a, (NumeralFormula) b),
+                  p);
+            } else {
+              return mgr.equal(p);
+            }
           };
         });
     predefined.put(
