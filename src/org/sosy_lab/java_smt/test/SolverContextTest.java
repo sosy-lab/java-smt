@@ -200,7 +200,7 @@ public class SolverContextTest extends SolverBasedTest0.ParameterizedSolverBased
             bvmgr2.equal(bvmgr2.makeVariable(8, "x"), bvmgr2.makeBitvector(8, 17)));
         assertThat(prover2.isUnsat()).isFalse();
         try (Model model = prover2.getModel()) {
-          assertThat(model.asList().size()).isEqualTo(1);
+          assertThat(model.asList()).hasSize(1);
         }
       }
     }
