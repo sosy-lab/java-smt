@@ -202,7 +202,11 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public BooleanFormula translateFrom(BooleanFormula formula, FormulaManager otherManager) {
-    return delegate.translateFrom(formula, otherManager);
+    if (otherManager == this) {
+      return formula;
+    } else {
+      return parse(otherManager.dumpFormula(formula).toString());
+    }
   }
 
   @Override
