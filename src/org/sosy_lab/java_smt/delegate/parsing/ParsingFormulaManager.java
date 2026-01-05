@@ -3,23 +3,20 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
 
 package org.sosy_lab.java_smt.delegate.parsing;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ConsoleErrorListener;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.sosy_lab.common.Appender;
 import org.sosy_lab.java_smt.api.ArrayFormulaManager;
 import org.sosy_lab.java_smt.api.BitvectorFormulaManager;
@@ -49,75 +46,44 @@ import org.sosy_lab.java_smt.basicimpl.parser.SmtlibParser;
 
 public class ParsingFormulaManager implements FormulaManager {
   private final FormulaManager delegate;
-  private final SymbolManager symbolManager;
-
-  /** Registers all variable/uf declarations made in JavaSMT with the evaluator. * */
-  public static class SymbolManager {
-    SmtlibEvaluator evaluator;
-
-    SymbolManager(FormulaManager delegate) {
-      evaluator = SmtlibEvaluator.link(delegate);
-    }
-
-    void addConstant(String name, Formula term) {
-      evaluator = evaluator.addConstant(name, term);
-    }
-
-    void addFunction(String name, Function<List<Formula>, Formula> function) {
-      evaluator = evaluator.addFunction(name, function);
-    }
-
-    BooleanFormula evaluate(ParseTree ast) {
-      evaluator = evaluator.apply(ast);
-      List<BooleanFormula> assertions = evaluator.getAssertions();
-      evaluator = evaluator.reset();
-      Preconditions.checkArgument(
-          assertions.size() == 1,
-          "Expecting exactly one assertion, but found %s",
-          assertions.size());
-      return assertions.get(0);
-    }
-  }
 
   public ParsingFormulaManager(FormulaManager pDelegate) {
     delegate = pDelegate;
-    symbolManager = new SymbolManager(delegate);
   }
 
   @Override
   public IntegerFormulaManager getIntegerFormulaManager() {
-    return new ParsingIntegerFormulaManager(symbolManager, delegate.getIntegerFormulaManager());
+    return delegate.getIntegerFormulaManager();
   }
 
   @Override
   public RationalFormulaManager getRationalFormulaManager() {
-    return new ParsingRationalFormulaManager(symbolManager, delegate.getRationalFormulaManager());
+    return delegate.getRationalFormulaManager();
   }
 
   @Override
   public BooleanFormulaManager getBooleanFormulaManager() {
-    return new ParsingBooleanFormulaManager(symbolManager, delegate.getBooleanFormulaManager());
+    return delegate.getBooleanFormulaManager();
   }
 
   @Override
   public ArrayFormulaManager getArrayFormulaManager() {
-    return new ParsingArrayFormulaManager(symbolManager, delegate.getArrayFormulaManager());
+    return delegate.getArrayFormulaManager();
   }
 
   @Override
   public BitvectorFormulaManager getBitvectorFormulaManager() {
-    return new ParsingBitvectorFormulaManager(symbolManager, delegate.getBitvectorFormulaManager());
+    return delegate.getBitvectorFormulaManager();
   }
 
   @Override
   public FloatingPointFormulaManager getFloatingPointFormulaManager() {
-    return new ParsingFloatingPointFormulaManager(
-        symbolManager, delegate.getFloatingPointFormulaManager());
+    return delegate.getFloatingPointFormulaManager();
   }
 
   @Override
   public UFManager getUFManager() {
-    return new ParsingUFManager(symbolManager, delegate, delegate.getUFManager());
+    return delegate.getUFManager();
   }
 
   @Override
@@ -132,7 +98,7 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public StringFormulaManager getStringFormulaManager() {
-    return new ParsingStringFormulaManager(symbolManager, delegate.getStringFormulaManager());
+    return delegate.getStringFormulaManager();
   }
 
   @Override
@@ -142,9 +108,7 @@ public class ParsingFormulaManager implements FormulaManager {
 
   @Override
   public <T extends Formula> T makeVariable(FormulaType<T> formulaType, String name) {
-    var term = delegate.makeVariable(formulaType, name);
-    symbolManager.addConstant(name, term);
-    return term;
+    return delegate.makeVariable(formulaType, name);
   }
 
   @Override
@@ -185,7 +149,7 @@ public class ParsingFormulaManager implements FormulaManager {
     parser.removeErrorListener(ConsoleErrorListener.INSTANCE);
     parser.addErrorListener(new FaultingErrorListener("Parsing error"));
     var ast = parser.smtlib();
-    return symbolManager.evaluate(ast);
+    return SmtlibEvaluator.link(this).apply(ast).getAssertions().get(0);
   }
 
   @Override
