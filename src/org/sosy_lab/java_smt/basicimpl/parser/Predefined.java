@@ -160,8 +160,8 @@ public class Predefined {
           return p -> {
             Preconditions.checkArgument(p.size() >= 2);
             var argType = mgr.getFormulaType(p.get(0));
-            if (argType.isIntegerType() || argType.isRationalType()) {
-              // Special case: Cast numeric terms to real for comparison
+            if (argType.isNumeralType() && calculateReturnType(p).isRationalType()) {
+              // Special case: Cast mixed numeric terms to real for comparison
               return chain(
                   (a, b) ->
                       mgr.getRationalFormulaManager().equal((NumeralFormula) a, (NumeralFormula) b),
