@@ -49,17 +49,50 @@ public class SmtlibEvaluator {
     asserted = pAsserted;
   }
 
+  /**
+   * Create a new {@link SmtlibEvaluator} instance.
+   *
+   * <p>The new instance is linked to the {@link FormulaManager} from the argument. During
+   * evaluation this {@link FormulaManager} will be used to declare new symbols and build new terms.
+   */
   public static SmtlibEvaluator link(FormulaManager pManager) {
     return new SmtlibEvaluator(
         pManager, new Predefined(pManager).addTheorySymbols(), ImmutableList.of());
   }
 
+  /** Register a function symbol with the evaluator. */
+  public SmtlibEvaluator addFunction(String name, Function<List<Formula>, Formula> function) {
+    return new SmtlibEvaluator(mgr, addFunction(globalDefs, name, function), asserted);
+  }
+
+  /** Register a constant symbol with the evaluator. */
+  public SmtlibEvaluator addConstant(String name, Formula value) {
+    return new SmtlibEvaluator(mgr, addConstant(globalDefs, name, value), asserted);
+  }
+
+  /** Evaluate a parsed Smtlib script. */
   public SmtlibEvaluator apply(ParseTree pSmtlib) {
     return commandVisitor.visit(pSmtlib);
   }
 
+  /**
+   * Returns all assertions from the script.
+   *
+   * <p>Call after {@link #apply} to get the results of the evaluation. Empty if nothing was
+   * evaluated yet. It's possible to evaluate several scripts first before getting the assertions.
+   */
   public List<BooleanFormula> getAssertions() {
     return asserted;
+  }
+
+  /**
+   * Reset all assertions.
+   *
+   * <p>Call after {@link #getAssertions()} to reset the evaluator and make it forget all previous
+   * assertions. Note that previous declarations are not reset by this command.
+   */
+  public SmtlibEvaluator reset() {
+    return new SmtlibEvaluator(mgr, globalDefs, ImmutableList.of());
   }
 
   public static String genSymbol() {
