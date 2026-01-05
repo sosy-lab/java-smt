@@ -8,11 +8,11 @@
 
 package org.sosy_lab.java_smt.test;
 
+import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.truth.Truth;
 import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
@@ -30,6 +30,28 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 
   @Test
+  public void testUfZeroArgs() {
+    // Check if we can declare ufs with no parameters
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
+    var var = fmgr.declareUF("var", type);
+  }
+
+  @Test
+  public void testUfZeroArgsEqualsVar() throws SolverException, InterruptedException {
+    // Check if "(var)" and "var" are the same
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
+    var var1 = fmgr.callUF(fmgr.declareUF("var", type), ImmutableList.of());
+    var var2 = mgr.makeVariable(type, "var");
+
+    assertThat(var1).isEqualTo(var2);
+    assertThatFormula(mgr.distinct(var1, var2)).isUnsatisfiable();
+  }
+
+  @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
     requireIntegers();
 
@@ -41,10 +63,10 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
           fmgr.declareAndCallUF(
               name, FormulaType.IntegerType, ImmutableList.of(imgr.makeNumber(1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
-      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      assertThat(declaration.getName()).isEqualTo(name);
 
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
-      Truth.assertThat(f2).isEqualTo(f);
+      assertThat(f2).isEqualTo(f);
 
       assertThatFormula(imgr.equal(value, x))
           .implies(
@@ -66,10 +88,10 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
           fmgr.declareAndCallUF(
               name, FormulaType.RationalType, ImmutableList.of(rmgr.makeNumber(1.5)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
-      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      assertThat(declaration.getName()).isEqualTo(name);
 
       Formula f2 = mgr.makeApplication(declaration, rmgr.makeNumber(1.5));
-      Truth.assertThat(f2).isEqualTo(f);
+      assertThat(f2).isEqualTo(f);
 
       assertThatFormula(rmgr.equal(value, x))
           .implies(
@@ -100,7 +122,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
           fmgr.declareAndCallUF(
               name, FormulaType.RationalType, ImmutableList.of(rmgr.makeNumber(1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
-      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      assertThat(declaration.getName()).isEqualTo(name);
 
       Formula f2 = mgr.makeApplication(declaration, imgr.makeNumber(1));
       switch (solverToUse()) {
@@ -109,18 +131,18 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
         case Z3:
         case Z3_WITH_INTERPOLATION:
           // some solvers have an explicit cast for the parameter
-          Truth.assertThat(f2).isNotEqualTo(f);
+          assertThat(f2).isNotEqualTo(f);
           List<Formula> args = getArguments(f2);
-          Truth.assertThat(args).hasSize(1);
+          assertThat(args).hasSize(1);
           FunctionDeclaration<?> cast = getDeclaration(args.get(0));
-          Truth.assertThat(cast.getName()).isEqualTo("to_real");
-          Truth.assertThat(cast.getKind()).isEqualTo(FunctionDeclarationKind.TO_REAL);
+          assertThat(cast.getName()).isEqualTo("to_real");
+          assertThat(cast.getKind()).isEqualTo(FunctionDeclarationKind.TO_REAL);
           List<Formula> castedValues = getArguments(args.get(0));
-          Truth.assertThat(castedValues).hasSize(1);
-          Truth.assertThat(castedValues.get(0).toString()).isEqualTo("1");
+          assertThat(castedValues).hasSize(1);
+          assertThat(castedValues.get(0).toString()).isEqualTo("1");
           break;
         default:
-          Truth.assertThat(f2).isEqualTo(f);
+          assertThat(f2).isEqualTo(f);
       }
 
       assertThatFormula(rmgr.equal(value, x))
@@ -271,9 +293,9 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
               FormulaType.getBitvectorTypeWithSize(4),
               ImmutableList.of(bvmgr.makeBitvector(4, 1)));
       FunctionDeclaration<?> declaration = getDeclaration(f);
-      Truth.assertThat(declaration.getName()).isEqualTo(name);
+      assertThat(declaration.getName()).isEqualTo(name);
       Formula f2 = mgr.makeApplication(declaration, bvmgr.makeBitvector(4, 1));
-      Truth.assertThat(f2).isEqualTo(f);
+      assertThat(f2).isEqualTo(f);
     }
   }
 
@@ -368,9 +390,9 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       String name, FormulaType<? extends Formula> retType, Formula... args) {
     Formula f = fmgr.declareAndCallUF(name, retType, args);
     FunctionDeclaration<?> declaration = getDeclaration(f);
-    Truth.assertThat(declaration.getName()).isEqualTo(name);
+    assertThat(declaration.getName()).isEqualTo(name);
     Formula f2 = mgr.makeApplication(declaration, args);
-    Truth.assertThat(f2).isEqualTo(f);
+    assertThat(f2).isEqualTo(f);
   }
 
   private FunctionDeclaration<?> getDeclaration(Formula pFormula) {
