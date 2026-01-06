@@ -32,8 +32,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testUfZeroArgs() {
     // Check if we can declare ufs with no parameters
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
     var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
     var var = fmgr.declareUF("var", type);
   }
@@ -41,8 +39,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   @Test
   public void testUfZeroArgsEqualsVar() throws SolverException, InterruptedException {
     // Check if "(var)" and "var" are the same
-    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
-
     var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
     var var1 = fmgr.callUF(fmgr.declareUF("var", type), ImmutableList.of());
     var var2 = mgr.makeVariable(type, "var");

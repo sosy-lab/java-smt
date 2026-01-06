@@ -1493,13 +1493,9 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     assertThat(mapping).containsEntry("v", v);
     assertThat(mapping).containsEntry("q", q);
 
-    // some solvers distinguish between nullary UFs and variables and do not provide variables
-    if (ImmutableList.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertThat(mapping2).isEmpty();
-    } else {
-      assertThat(mapping2).hasSize(1);
-      assertThat(mapping2).containsEntry("v", v);
-    }
+    // for nullary UFs we expect a single symbol
+    assertThat(mapping2).hasSize(1);
+    assertThat(mapping2).containsEntry("v", v);
   }
 
   private final FormulaVisitor<Formula> plainFunctionVisitor =
