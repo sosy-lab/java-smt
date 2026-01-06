@@ -660,7 +660,11 @@ class PrincessFormulaCreator
   @Override
   public PrincessFunctionDeclaration declareUFImpl(
       String pName, Sort pReturnType, List<Sort> args) {
-    return new PrincessIFunctionDeclaration(environment.declareFun(pName, pReturnType, args));
+    if (args.isEmpty()) {
+      return new PrincessByExampleDeclaration(environment.makeVariable(pReturnType, pName));
+    } else {
+      return new PrincessIFunctionDeclaration(environment.declareFun(pName, pReturnType, args));
+    }
   }
 
   @Override
