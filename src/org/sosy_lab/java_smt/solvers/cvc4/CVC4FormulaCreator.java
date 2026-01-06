@@ -572,7 +572,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Expr callFunctionImpl(Expr pDeclaration, List<Expr> pArgs) {
     if (pArgs.isEmpty()) {
-      return exprManager.mkExpr(pDeclaration);
+      if (exprManager.getType(pDeclaration).isFunction()) {
+        // Builtin operator
+        return exprManager.mkExpr(pDeclaration);
+      } else {
+        // Uf
+        return pDeclaration;
+      }
     } else {
       vectorExpr args = new vectorExpr();
       for (Expr expr : pArgs) {
@@ -584,6 +590,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
   @Override
   public Expr declareUFImpl(String pName, Type pReturnType, List<Type> pArgTypes) {
+    if (pArgTypes.isEmpty()) {
+      return makeVariable(pReturnType, pName);
+    }
     Expr exp = functionsCache.get(pName);
     if (exp == null) {
       vectorType args = new vectorType();
