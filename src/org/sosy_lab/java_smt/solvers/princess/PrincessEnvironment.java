@@ -624,6 +624,7 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(Sort type, String varname) {
     if (type == BOOL_SORT) {
+      Preconditions.checkArgument(!sortedVariablesCache.containsKey(varname));
       if (boolVariablesCache.containsKey(varname)) {
         return boolVariablesCache.get(varname);
       } else {
@@ -633,6 +634,7 @@ class PrincessEnvironment {
         return var;
       }
     } else {
+      Preconditions.checkArgument(!boolVariablesCache.containsKey(varname));
       if (sortedVariablesCache.containsKey(varname)) {
         var cached = sortedVariablesCache.get(varname);
         Preconditions.checkArgument(getFormulaType(cached).equals(getFormulaTypeFromSort(type)));
