@@ -634,6 +634,8 @@ class PrincessEnvironment {
       }
     } else {
       if (sortedVariablesCache.containsKey(varname)) {
+        var cached = sortedVariablesCache.get(varname);
+        Preconditions.checkArgument(getFormulaType(cached).equals(getFormulaTypeFromSort(type)));
         return sortedVariablesCache.get(varname);
       } else {
         ITerm var = api.createConstant(varname, type);
