@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.solvers.boolector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
@@ -197,16 +196,18 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
 
   @Override
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
-    Preconditions.checkArgument(
-        !pArgs.isEmpty(), "Boolector does not support UFs without arguments.");
-    return BtorJNI.boolector_apply(getEnv(), Longs.toArray(pArgs), pArgs.size(), pDeclaration);
+    if (BtorJNI.boolector_is_var(getEnv(), pDeclaration)) {
+      return pDeclaration;
+    } else {
+      return BtorJNI.boolector_apply(getEnv(), Longs.toArray(pArgs), pArgs.size(), pDeclaration);
+    }
   }
 
   @Override
   public Long declareUFImpl(String name, Long pReturnType, List<Long> pArgTypes) {
-    Preconditions.checkArgument(
-        !pArgTypes.isEmpty(), "Boolector does not support UFs without arguments.");
-
+    if (pArgTypes.isEmpty()) {
+      return makeVariable(pReturnType, name);
+    }
     long[] funSorts = Longs.toArray(pArgTypes);
     long sort = BtorJNI.boolector_fun_sort(getEnv(), funSorts, funSorts.length, pReturnType);
     Long maybeFormula = formulaCache.get(name, sort);
