@@ -30,24 +30,6 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 
   @Test
-  public void testUfZeroArgs() {
-    // Check if we can declare ufs with no parameters
-    var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
-    var var = fmgr.declareUF("var", type);
-  }
-
-  @Test
-  public void testUfZeroArgsEqualsVar() throws SolverException, InterruptedException {
-    // Check if "(var)" and "var" are the same
-    var type = imgr == null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
-    var var1 = fmgr.callUF(fmgr.declareUF("var", type), ImmutableList.of());
-    var var2 = mgr.makeVariable(type, "var");
-
-    assertThat(var1).isEqualTo(var2);
-    assertThatFormula(mgr.distinct(var1, var2)).isUnsatisfiable();
-  }
-
-  @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
     requireIntegers();
 

@@ -1178,9 +1178,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testVariableAndUFWithEqualSort() {
+  public void testVariableAndUFWithEqualSort() throws SolverException, InterruptedException {
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
     assertThat(z1).isEqualTo(z2);
+    assertThatFormula(mgr.distinct(z1, z2)).isUnsatisfiable();
   }
 }
