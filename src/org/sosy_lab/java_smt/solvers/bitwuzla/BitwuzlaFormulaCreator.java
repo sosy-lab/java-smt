@@ -502,34 +502,32 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   public Term callFunctionImpl(BitwuzlaDeclaration declaration, List<Term> args) {
     // For UFs the declaration needs to be a const wrapping of the function sort
     // For all other functions it needs to be the kind
-    // BUT, we can never use a bitwuzla_term_is... function on a KIND
-    if (!declaration.isKind() && declaration.getTerm().num_indices() > 0) {
-      // The term might be indexed, then we need index creation
-      Term term = declaration.getTerm();
-      Kind properKind = term.kind();
-      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
-    }
-
-    if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
+    if (declaration.isTerm() && declaration.getTerm().sort().is_fun()) {
+      // UF symbol
       Vector_Term functionAndArgs = new Vector_Term();
       functionAndArgs.add(declaration.getTerm());
       functionAndArgs.addAll(args);
       return termManager.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() == 0) {
+      // Constant UF symbol
+      return declaration.getTerm();
+    } else if (declaration.isTerm() && declaration.getTerm().num_indices() > 0) {
+      // Indexed operator
+      Term term = declaration.getTerm();
+      Kind properKind = term.kind();
+      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
+    } else {
+      // Operator
+      return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
     }
-
-    assert declaration.isKind();
-
-    return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
   public BitwuzlaDeclaration declareUFImpl(String name, Sort pReturnType, List<Sort> pArgTypes) {
-    if (pArgTypes.isEmpty()) {
-      // Bitwuzla does not support UFs with no args, so we make a variable
-      // TODO: implement
-      throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
-    }
-    Sort functionSort = termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
+    Sort functionSort =
+        pArgTypes.isEmpty()
+            ? pReturnType
+            : termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
