@@ -95,7 +95,7 @@ abstract class PrincessFunctionDeclaration {
       super(pApp.fun());
 
       ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
-      for (int i = 0; i < pApp.args().length(); i++) {
+      for (int i = 0; i < pApp.fun().arity(); i++) {
         builder.add(PrincessEnvironment.getFormulaType(pApp.apply(i)));
       }
       argSorts = builder.build();
