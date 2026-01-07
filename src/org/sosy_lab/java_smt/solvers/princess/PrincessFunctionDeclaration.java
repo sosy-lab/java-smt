@@ -13,7 +13,6 @@ import static org.sosy_lab.java_smt.solvers.princess.PrincessEnvironment.toSeq;
 
 import ap.basetypes.IdealInt;
 import ap.parser.IAtom;
-import ap.parser.IConstant;
 import ap.parser.IExpression;
 import ap.parser.IExpression.BooleanFunApplier;
 import ap.parser.IFormula;
@@ -22,13 +21,10 @@ import ap.parser.IFunction;
 import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.parser.ITermITE;
-import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.nia.GroebnerMultiplication;
-import ap.types.MonoSortedIFunction;
 import ap.types.Sort;
 import ap.types.Sort$;
-import ap.types.SortedConstantTerm;
 import ap.types.SortedIFunction$;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -121,19 +117,20 @@ abstract class PrincessFunctionDeclaration {
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
-
-      // TODO: check argument types
-      checkArgument(args.size() == function.arity(), "functiontype has different number of args.");
-
       final List<ITerm> argsList = new ArrayList<>();
       for (int i = 0; i < args.size(); i++) {
         final IExpression arg = args.get(i);
         final ITerm termArg;
-        if (arg instanceof IFormula) { // boolean term -> build ITE(t,0,1)
+
+        final FormulaType<?> actualType = PrincessEnvironment.getFormulaType(arg);
+        final FormulaType<?> expectedType = argSorts.get(i);
+
+        if (actualType.isBooleanType()) {
+          // boolean term -> build ITE(t,0,1)
           termArg =
               new ITermITE(
                   (IFormula) arg, new IIntLit(IdealInt.ZERO()), new IIntLit(IdealInt.ONE()));
-        } else if (!exprIsRational(arg) && functionTakesRational(i)) {
+        } else if (actualType.isIntegerType() && expectedType.isRationalType()) {
           // sort does not match, so we need  to cast the argument to rational theory.
           termArg = PrincessEnvironment.rationalTheory.int2ring((ITerm) arg);
         } else {
@@ -152,36 +149,6 @@ abstract class PrincessFunctionDeclaration {
       } else {
         return returnFormula;
       }
-    }
-
-    /* Check if the expression returns a "Rational". */
-    private boolean exprIsRational(IExpression arg) {
-      if (arg instanceof IFunApp) {
-        IFunction fun = ((IFunApp) arg).fun();
-        if (fun instanceof MonoSortedIFunction) {
-          Sort sort = ((MonoSortedIFunction) fun).resSort();
-          return PrincessEnvironment.FRACTION_SORT.equals(sort);
-        }
-      }
-      if (arg instanceof IConstant) {
-        ConstantTerm constant = ((IConstant) arg).c();
-        if (constant instanceof SortedConstantTerm) {
-          Sort sort = ((SortedConstantTerm) constant).sort();
-          return PrincessEnvironment.FRACTION_SORT.equals(sort);
-        }
-      }
-      // TODO: What about other terms?
-      return false;
-    }
-
-    /* Checks if the k-th argument of the function is a "Rational". */
-    private boolean functionTakesRational(Integer index) {
-      // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
-      if (function instanceof MonoSortedIFunction) {
-        Sort sort = ((MonoSortedIFunction) function).argSorts().apply(index);
-        return PrincessEnvironment.rationalTheory.FractionSort().equals(sort);
-      }
-      return false;
     }
   }
 
