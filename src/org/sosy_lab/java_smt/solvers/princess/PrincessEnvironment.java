@@ -626,7 +626,10 @@ class PrincessEnvironment {
 
   public IExpression makeVariable(Sort type, String varname) {
     if (type == BOOL_SORT) {
-      Preconditions.checkArgument(!sortedVariablesCache.containsKey(varname));
+      Preconditions.checkArgument(
+          !sortedVariablesCache.containsKey(varname),
+          "Variable %s already defined with a different type",
+          varname);
       if (boolVariablesCache.containsKey(varname)) {
         return boolVariablesCache.get(varname);
       } else {
@@ -636,10 +639,17 @@ class PrincessEnvironment {
         return var;
       }
     } else {
-      Preconditions.checkArgument(!boolVariablesCache.containsKey(varname));
+      Preconditions.checkArgument(
+          !boolVariablesCache.containsKey(varname),
+          "Variable %s already defined with a different type",
+          varname);
       if (sortedVariablesCache.containsKey(varname)) {
         var cached = sortedVariablesCache.get(varname);
-        Preconditions.checkArgument(getFormulaType(cached).equals(getFormulaTypeFromSort(type)));
+        Preconditions.checkArgument(
+            !boolVariablesCache.containsKey(varname)
+                && getFormulaType(cached).equals(getFormulaTypeFromSort(type)),
+            "Variable %s already defined with a different type",
+            varname);
         return sortedVariablesCache.get(varname);
       } else {
         ITerm var = api.createConstant(varname, type);
@@ -658,7 +668,9 @@ class PrincessEnvironment {
           cached
                   .getArgSorts()
                   .equals(Lists.transform(args, PrincessEnvironment::getFormulaTypeFromSort))
-              && cached.getReturnSort().equals(getFormulaTypeFromSort(returnType)));
+              && cached.getReturnSort().equals(getFormulaTypeFromSort(returnType)),
+          "Function %s already defined with different types",
+          name);
       return functionsCache.get(name);
     } else {
       IFunction funcDecl =

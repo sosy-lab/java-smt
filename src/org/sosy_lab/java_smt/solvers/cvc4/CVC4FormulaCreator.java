@@ -593,7 +593,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
       functionsCache.put(pName, exp);
     } else {
-      // We can't cast the cached type to FomulaType, even though it is a function type, due to a
+      // We can't cast the cached type to FormulaType, even though it is a function type, due to a
       // bug in the CVC4 Java bindings. As a workaround we create another function type for the
       // current arguments and then compare it to the type from the cache
       vectorType args = new vectorType();
@@ -602,7 +602,10 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
       var argumentType = exprManager.mkFunctionType(args, pReturnType);
       var cachedType = exp.getType();
-      Preconditions.checkArgument(cachedType.equals(argumentType));
+      Preconditions.checkArgument(
+          cachedType.equals(argumentType),
+          "Function %s already defined with different types or a different number of arguments",
+          pName);
     }
     return exp;
   }

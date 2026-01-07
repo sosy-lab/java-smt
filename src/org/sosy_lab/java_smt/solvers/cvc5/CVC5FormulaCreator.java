@@ -789,16 +789,20 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     } else {
       var cachedDomain = exp.getSort().getFunctionDomainSorts();
       var cachedRange = exp.getSort().getFunctionCodomainSort();
-      Preconditions.checkArgument(pArgTypes.size() == cachedDomain.length);
+      Preconditions.checkArgument(
+          pArgTypes.size() == cachedDomain.length,
+          "Function %s already defined with a different number of arguments",
+          pName);
       for (int i = 0; i < cachedDomain.length; i++) {
         checkArgument(
             cachedDomain[i].equals(pArgTypes.get(i)),
-            "Argument %s with type %s does not match expected type %s",
-            i + 1,
-            pArgTypes.get(i),
-            cachedDomain[i]);
+            "Function %s already defined with different types",
+            pName);
       }
-      Preconditions.checkArgument(pReturnType.equals(cachedRange));
+      Preconditions.checkArgument(
+          pReturnType.equals(cachedRange),
+          "Function %s already defined with different types",
+          pName);
     }
     return exp;
   }
