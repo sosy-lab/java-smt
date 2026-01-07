@@ -79,6 +79,7 @@ import org.sosy_lab.common.configuration.Options;
 import org.sosy_lab.common.io.PathCounterTemplate;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+import org.sosy_lab.java_smt.solvers.princess.PrincessFunctionDeclaration.PrincessIFunctionDeclaration;
 import ostrich.OFlags;
 import ostrich.OstrichStringTheory;
 import scala.Tuple2;
@@ -172,7 +173,7 @@ class PrincessEnvironment {
 
   private final Map<String, ITerm> sortedVariablesCache = new HashMap<>();
 
-  private final Map<String, IFunction> functionsCache = new HashMap<>();
+  private final Map<String, PrincessIFunctionDeclaration> functionsCache = new HashMap<>();
 
   private final int randomSeed;
   private final @Nullable PathCounterTemplate basicLogfile;
@@ -219,7 +220,7 @@ class PrincessEnvironment {
     // add all symbols, that are available until now
     boolVariablesCache.values().forEach(newApi::addBooleanVariable);
     sortedVariablesCache.values().forEach(newApi::addConstant);
-    functionsCache.values().forEach(newApi::addFunction);
+    functionsCache.values().forEach(p -> newApi.addFunction(p.getFunction()));
 
     PrincessAbstractProver<?> prover;
     if (useForInterpolation) {
@@ -332,8 +333,9 @@ class PrincessEnvironment {
         boolVariablesCache.put(((IAtom) var).pred().name(), (IFormula) var);
         addSymbol((IAtom) var);
       } else if (var instanceof IFunApp) {
-        IFunction fun = ((IFunApp) var).fun();
-        functionsCache.put(fun.name(), fun);
+        IFunApp app = (IFunApp) var;
+        IFunction fun = app.fun();
+        functionsCache.put(fun.name(), new PrincessIFunctionDeclaration(app));
         addFunction(fun);
       }
     }
@@ -649,16 +651,27 @@ class PrincessEnvironment {
   }
 
   /** This function declares a new functionSymbol with the given argument types and result. */
-  public IFunction declareFun(String name, Sort returnType, List<Sort> args) {
+  public PrincessFunctionDeclaration declareFun(String name, Sort returnType, List<Sort> args) {
     if (functionsCache.containsKey(name)) {
+      var cached = functionsCache.get(name);
+      Preconditions.checkArgument(
+          cached
+                  .getArgSorts()
+                  .equals(Lists.transform(args, PrincessEnvironment::getFormulaTypeFromSort))
+              && cached.getReturnSort().equals(getFormulaTypeFromSort(returnType)));
       return functionsCache.get(name);
     } else {
       IFunction funcDecl =
           api.createFunction(
               name, toSeq(args), returnType, false, SimpleAPI.FunctionalityMode$.MODULE$.Full());
       addFunction(funcDecl);
-      functionsCache.put(name, funcDecl);
-      return funcDecl;
+      var uf =
+          new PrincessIFunctionDeclaration(
+              Lists.transform(args, PrincessEnvironment::getFormulaTypeFromSort),
+              getFormulaTypeFromSort(returnType),
+              funcDecl);
+      functionsCache.put(name, uf);
+      return uf;
     }
   }
 

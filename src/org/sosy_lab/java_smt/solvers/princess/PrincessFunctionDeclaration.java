@@ -30,8 +30,10 @@ import ap.types.Sort;
 import ap.types.Sort$;
 import ap.types.SortedConstantTerm;
 import ap.types.SortedIFunction$;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
+import org.sosy_lab.java_smt.api.FormulaType;
 import scala.collection.immutable.Seq;
 
 /**
@@ -79,17 +81,49 @@ abstract class PrincessFunctionDeclaration {
   }
 
   static class PrincessIFunctionDeclaration extends AbstractDeclaration<IFunction> {
+    private final List<FormulaType<?>> argSorts;
+    private final FormulaType<?> returnSort;
 
-    PrincessIFunctionDeclaration(IFunction pApp) {
-      super(pApp);
+    private final IFunction function;
+
+    PrincessIFunctionDeclaration(
+        List<FormulaType<?>> pArgSorts, FormulaType<?> pReturnSort, IFunction pFunction) {
+      super(pFunction);
+
+      argSorts = pArgSorts;
+      returnSort = pReturnSort;
+      function = pFunction;
+    }
+
+    PrincessIFunctionDeclaration(IFunApp pApp) {
+      super(pApp.fun());
+
+      ImmutableList.Builder<FormulaType<?>> builder = ImmutableList.builder();
+      for (int i = 0; i < pApp.args().length(); i++) {
+        builder.add(PrincessEnvironment.getFormulaType(pApp.apply(i)));
+      }
+      argSorts = builder.build();
+      returnSort = PrincessEnvironment.getFormulaType(pApp);
+      function = pApp.fun();
+    }
+
+    public IFunction getFunction() {
+      return function;
+    }
+
+    public List<FormulaType<?>> getArgSorts() {
+      return argSorts;
+    }
+
+    public FormulaType<?> getReturnSort() {
+      return returnSort;
     }
 
     @Override
     public IExpression makeApp(PrincessEnvironment env, List<IExpression> args) {
 
       // TODO: check argument types
-      checkArgument(
-          args.size() == declarationItem.arity(), "functiontype has different number of args.");
+      checkArgument(args.size() == function.arity(), "functiontype has different number of args.");
 
       final List<ITerm> argsList = new ArrayList<>();
       for (int i = 0; i < args.size(); i++) {
@@ -108,12 +142,12 @@ abstract class PrincessFunctionDeclaration {
         argsList.add(termArg);
       }
       final Seq<ITerm> argsBuf = toSeq(argsList);
-      IFunApp returnFormula = new IFunApp(declarationItem, argsBuf);
-      Sort returnType = SortedIFunction$.MODULE$.iResultSort(declarationItem, returnFormula.args());
+      IFunApp returnFormula = new IFunApp(function, argsBuf);
+      Sort returnType = SortedIFunction$.MODULE$.iResultSort(function, returnFormula.args());
 
       // boolean term, so we have to use the fun-applier instead of the function itself
       if (returnType == PrincessEnvironment.BOOL_SORT) {
-        BooleanFunApplier ap = new BooleanFunApplier(declarationItem);
+        BooleanFunApplier ap = new BooleanFunApplier(function);
         return ap.apply(argsBuf);
       } else {
         return returnFormula;
@@ -143,8 +177,8 @@ abstract class PrincessFunctionDeclaration {
     /* Checks if the k-th argument of the function is a "Rational". */
     private boolean functionTakesRational(Integer index) {
       // we switch from "int" to "Integer" in the signature to avoid ambiguous types with Scala API.
-      if (declarationItem instanceof MonoSortedIFunction) {
-        Sort sort = ((MonoSortedIFunction) declarationItem).argSorts().apply(index);
+      if (function instanceof MonoSortedIFunction) {
+        Sort sort = ((MonoSortedIFunction) function).argSorts().apply(index);
         return PrincessEnvironment.rationalTheory.FractionSort().equals(sort);
       }
       return false;
