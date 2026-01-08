@@ -22,6 +22,7 @@ import ap.parser.IExpression;
 import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
+import ap.parser.IIntLit;
 import ap.parser.ITerm;
 import ap.terfor.preds.Predicate;
 import ap.theories.arrays.ExtArray;
@@ -79,6 +80,14 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
     return var instanceof IAtom && abbrevs.contains(((IAtom) var).pred());
   }
 
+  private IFormula makeEquality(ITerm key, ITerm value) {
+    if (value instanceof IIntLit && ((IIntLit) value).value().isZero()) {
+      return IExpression.eqZero(key);
+    } else {
+      return key.$eq$eq$eq(value);
+    }
+  }
+
   private Collection<ValueAssignment> getAssignments(IExpression key, IExpression value) {
 
     // first check array-access.
@@ -107,7 +116,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
 
       } else if (key instanceof IConstant) {
         name = key.toString();
-        fAssignment = ((IConstant) key).$eq$eq$eq((ITerm) value);
+        fAssignment = makeEquality((IConstant) key, (ITerm) value);
 
       } else if (key instanceof IFunApp) {
         IFunApp cKey = (IFunApp) key;
@@ -120,7 +129,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
           argumentInterpretations.add(creator.convertValue(arg));
         }
         name = cKey.fun().name();
-        fAssignment = ((ITerm) key).$eq$eq$eq((ITerm) value);
+        fAssignment = makeEquality((ITerm) key, (ITerm) value);
 
       } else {
         throw new AssertionError(
@@ -191,8 +200,7 @@ class PrincessModel extends AbstractModel<IExpression, Sort, PrincessEnvironment
             new ValueAssignment(
                 creator.encapsulateWithTypeOf(select),
                 creator.encapsulateWithTypeOf(element),
-                creator.encapsulateBoolean(
-                    ap.parser.IExpression.Eq$.MODULE$.apply(select, element)),
+                creator.encapsulateBoolean(makeEquality(select, element)),
                 getVar(arraySymbol),
                 creator.convertValue(element),
                 transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
