@@ -75,3 +75,8 @@ build.properties
 /downloads
 
 pom.xml
+
+# Local SSD Setup
+.tools/
+.caches/
+env.sh
