@@ -301,9 +301,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(tru);
       assertThat(prover.isUnsat()).isFalse();
 
+      @SuppressWarnings("unused")
       Proof proof = prover.getProof();
       throw new AssertionError("Expected IllegalStateException was not thrown");
-      // assertThat(proof).isNotNull(); // unreachable
 
     } catch (IllegalStateException e) {
       // this should be thrown as getProof was called when last evaluation
