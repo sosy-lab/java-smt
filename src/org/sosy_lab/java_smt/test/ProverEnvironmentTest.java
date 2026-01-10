@@ -10,10 +10,7 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
@@ -285,7 +282,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           bmgr.equivalence(a, rfmgr.equal(rfmgr.add(mgr.makeApplication(f, x1), x2), x3)));
       // "(assert (and (or a c) (not c)))"
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
-      assertTrue(prover.isUnsat());
+      assertThat(prover.isUnsat()).isTrue();
 
       // Retrieve and verify proof
       Proof proof = prover.getProof();
@@ -305,10 +302,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       Proof proof = prover.getProof();
-      fail("Expected IllegalStateException was not thrown");
-      assertThat(proof).isNotNull();
+      throw new AssertionError("Expected IllegalStateException was not thrown");
+      // assertThat(proof).isNotNull(); // unreachable
 
-    } catch (IllegalStateException ie) {
+    } catch (IllegalStateException e) {
       // this should be thrown as getProof was called when last evaluation
       // was SAT
     }
@@ -383,7 +380,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof secondProof = prover.getProof();
       checkProof(secondProof);
 
-      assertNotEquals(proof, secondProof);
+      assertThat(proof).isNotEqualTo(secondProof);
     }
   }
 
@@ -428,7 +425,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof secondProof = prover.getProof();
       checkProof(secondProof);
 
-      assertNotEquals(proof, secondProof);
+      assertThat(proof).isNotEqualTo(secondProof);
     }
   }
 
@@ -445,12 +442,14 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       @SuppressWarnings("unused")
       Proof proof = prover.getProof();
-      fail("Expected IllegalStateException was not thrown");
+      throw new AssertionError("Expected IllegalStateException was not thrown");
 
       // Z3 always has proof generation on
       // if (solverToUse().equals(Z3)) {
       //  assertThat(proof.getFormula()).isNotNull();
       // }
+    } catch (IllegalStateException e) {
+      assertThat(e.getMessage()).isEqualTo("Please set the prover option GENERATE_PROOFS.");
     }
   }
 
@@ -540,7 +539,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(rule).isInstanceOf(ProofRule.class);
       assertThat(proof.getChildren()).isNotNull();
       if (solverToUse().equals(SMTINTERPOL)) {
-
+// do nothing
       } else if (solverToUse().equals(PRINCESS)) {
         assertThat(formula.isEmpty()).isTrue();
       } else if (solverToUse().equals(MATHSAT5) || solverToUse().equals(OPENSMT)) {
