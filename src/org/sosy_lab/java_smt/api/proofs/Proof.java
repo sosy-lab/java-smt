@@ -14,9 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
-/**
- * A proof node in the proof DAG of a proof.
- */
+/** A proof node in the proof DAG of a proof. */
 public interface Proof {
 
   /** Get the children of the proof node. */

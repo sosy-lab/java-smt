@@ -539,7 +539,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(rule).isInstanceOf(ProofRule.class);
       assertThat(proof.getChildren()).isNotNull();
       if (solverToUse().equals(SMTINTERPOL)) {
-// do nothing
+        // do nothing
       } else if (solverToUse().equals(PRINCESS)) {
         assertThat(formula.isEmpty()).isTrue();
       } else if (solverToUse().equals(MATHSAT5) || solverToUse().equals(OPENSMT)) {
