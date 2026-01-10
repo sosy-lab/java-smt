@@ -36,6 +36,7 @@ enum CVC5ProofRule implements ProofRule {
   DRAT_REFUTATION("drat_refutation", ""),
   SAT_EXTERNAL_PROVE("sat_external_prove", ""),
   RESOLUTION("resolution", ""),
+  CHAIN_M_RESOLUTION("chain_m_resolution", ""),
   CHAIN_RESOLUTION("chain_resolution", ""),
   FACTORING("factoring", ""),
   REORDERING("reordering", ""),
