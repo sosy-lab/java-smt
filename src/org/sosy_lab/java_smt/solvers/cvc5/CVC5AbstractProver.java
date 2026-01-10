@@ -327,9 +327,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
     checkState(isUnsat());
 
     io.github.cvc5.Proof[] proofs = solver.getProof();
-    if (proofs == null || proofs.length == 0) {
-      throw new IllegalStateException("No proof available");
-    }
+    checkState(proofs != null && proofs.length != 0, "No proof available");
 
     // CVC5ProofProcessor pp = new CVC5ProofProcessor(creator);
     try {
