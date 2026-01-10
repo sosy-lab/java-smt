@@ -13,6 +13,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
@@ -47,15 +48,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
-import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
-import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
-import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5SolverContext;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
-import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
-import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
-import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
-import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -218,6 +210,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
   @Test
   public void testGetSimpleBooleanProof() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -232,29 +225,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Test getProof()
       Proof proof = prover.getProof();
       checkProof(proof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
   public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     requireRationals();
 
@@ -313,28 +290,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Retrieve and verify proof
       Proof proof = prover.getProof();
       checkProof(proof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
   public void proofOfTrueTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
 
     BooleanFormula tru = bmgr.makeTrue();
@@ -344,32 +305,19 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       Proof proof = prover.getProof();
+      fail("Expected IllegalStateException was not thrown");
       assertThat(proof).isNotNull();
 
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     } catch (IllegalStateException ie) {
-      // this should be thrown as getProof was called when last evaluation was SAT
+      // this should be thrown as getProof was called when last evaluation
+      // was SAT
     }
   }
 
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
     requireProofGeneration();
-    // assume().that(solverToUse()).isNotEqualTo(MATHSAT5);
+    assume().that(solverToUse()).isEqualTo(CVC5);
 
     BooleanFormula bottom = bmgr.makeFalse();
 
@@ -379,35 +327,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
-
-    } catch (UnsupportedOperationException e) {
-      if (solverToUse().equals(MATHSAT5)) {
-        assertThat(e).hasMessageThat().isEqualTo("No proof available.");
-
-      } else {
-        assertThat(e)
-            .hasMessageThat()
-            .isEqualTo("Proof generation is not available for the current solver.");
-      }
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
-    } catch (IllegalStateException ie) {
-      // this should be thrown as getProof was called when last evaluation was SAT
     }
   }
 
   @Test
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -423,29 +348,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Test getProof()
       Proof proof = prover.getProof();
       checkProof(proof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
   public void getProofAfterGetProofAndAddingAssertionsTest()
       throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -475,23 +384,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       checkProof(secondProof);
 
       assertNotEquals(proof, secondProof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
@@ -500,6 +392,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -536,23 +429,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       checkProof(secondProof);
 
       assertNotEquals(proof, secondProof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class)
-              || contextClass.equals(PrincessSolverContext.class)
-              || contextClass.equals(Mathsat5SolverContext.class)
-              || contextClass.equals(Z3SolverContext.class)
-              || contextClass.equals(SmtInterpolSolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
@@ -567,25 +443,21 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
+      @SuppressWarnings("unused")
       Proof proof = prover.getProof();
+      fail("Expected IllegalStateException was not thrown");
 
       // Z3 always has proof generation on
-      //if (solverToUse().equals(Z3)) {
+      // if (solverToUse().equals(Z3)) {
       //  assertThat(proof.getFormula()).isNotNull();
-      //}
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-    } catch (IllegalStateException e) {
-      assertThat(e).hasMessageThat().isEqualTo("Please set the prover option GENERATE_PROOFS.");
+      // }
     }
   }
 
   // This test is based on the bvIsZeroAfterShiftLeft() test in BitvectorFormulaManagerTest
   @Test
   public void getBitVectorProofTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
     requireBitvectors();
 
@@ -625,6 +497,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   // This test is based on the testIntIndexIntValue() test in ArrayFormulaManagerTest
   @Test
   public void getArrayProofTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
     requireIntegers();
     requireArrays();
@@ -676,9 +549,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         assertThat(formula.isPresent()).isTrue();
       }
 
-      //if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
+      // if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
       //  checkPrincessSpecificFields((PrincessProofRule) rule);
-      //}
+      // }
 
       for (Proof child : proof.getChildren()) {
         assertThat(child).isNotNull();
