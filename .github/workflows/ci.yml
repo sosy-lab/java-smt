@@ -88,7 +88,8 @@ jobs:
 
       - name: Prepare native libraries
         run: |
-          find lib/java -name "*.dylib" -exec cp {} lib/native/ \;
+          mkdir -p lib/native/arm64-macosx/
+          find lib/java -name "*.dylib" -exec cp {} lib/native/arm64-macosx/ \;
 
       - name: Run tests
         run: ant unit-tests
