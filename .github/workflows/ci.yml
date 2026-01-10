@@ -88,7 +88,6 @@ jobs:
 
       - name: Prepare native libraries
         run: |
-          mkdir -p lib/native
           find lib/java -name "*.dylib" -exec cp {} lib/native/ \;
 
       - name: Run tests
@@ -143,7 +142,6 @@ jobs:
       - name: Prepare native libraries
         shell: pwsh
         run: |
-          mkdir -p lib/native/x86_64-windows
           Get-ChildItem -Path "lib/java" -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/x86_64-windows/" -Force
 
       - name: Run tests
