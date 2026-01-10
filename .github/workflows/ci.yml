@@ -33,6 +33,16 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
+      - name: Cache Ivy and Ant
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: linux-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            linux-ivy-
+
       - name: Install Ant
         run: |
           sudo apt-get update
@@ -46,7 +56,6 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
-        continue-on-error: true
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -77,6 +86,16 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
+      - name: Cache Ivy and Ant
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: macos-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            macos-ivy-
+
       - name: Install Ant
         run: brew install ant
 
@@ -93,7 +112,6 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
-        continue-on-error: true
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -124,15 +142,18 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
+      - name: Cache Ivy and Ant
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\Users\runneradmin\.ivy2\cache
+            C:\Users\runneradmin\.ant\lib
+          key: windows-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            windows-ivy-
+
       - name: Install Ant
-        shell: pwsh
-        run: |
-          if (!(Test-Path "C:\ant")) {
-            Write-Host "Downloading Ant..."
-            Invoke-WebRequest -Uri https://archive.apache.org/dist/ant/binaries/apache-ant-1.10.15-bin.zip -OutFile ant.zip
-            Expand-Archive ant.zip -DestinationPath C:\ant
-          }
-          echo "C:\ant\apache-ant-1.10.15\bin" >> $env:GITHUB_PATH
+        run: choco install ant -y
 
       - name: Build dependencies
         run: ant build-dependencies
@@ -147,7 +168,6 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
-        continue-on-error: true
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
