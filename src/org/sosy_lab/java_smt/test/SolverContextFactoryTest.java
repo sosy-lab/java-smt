@@ -41,7 +41,6 @@ public class SolverContextFactoryTest {
       StandardSystemProperty.OS_ARCH.value().toLowerCase(Locale.getDefault()).replace(" ", "");
 
   protected static final boolean IS_WINDOWS = OS.startsWith("windows");
-  private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
 
   private static final boolean IS_ARCH_ARM64 = ARCH.equals("aarch64");
@@ -175,7 +174,7 @@ public class SolverContextFactoryTest {
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
     try (SolverContext context = factory.generateContext()) {
-      FormulaManager mgr = context.getFormulaManager();
+      context.getFormulaManager();
       checkVersion(context);
     }
   }
@@ -214,7 +213,7 @@ public class SolverContextFactoryTest {
             System::loadLibrary);
 
     try (SolverContext context = factory.generateContext()) {
-      FormulaManager mgr = context.getFormulaManager();
+      context.getFormulaManager();
       checkVersion(context);
     }
   }
