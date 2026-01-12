@@ -32,6 +32,10 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.test.SolverBasedTest0.ParameterizedSolverBasedTest0;
 
+/**
+ * This JUnit test class is mainly intended for automated CI checks on different operating systems,
+ * where a plain environment without pre-installed solvers is guaranteed.
+ */
 @RunWith(Parameterized.class)
 public class SolverContextFactoryTest {
 
@@ -41,6 +45,7 @@ public class SolverContextFactoryTest {
       StandardSystemProperty.OS_ARCH.value().toLowerCase(Locale.getDefault()).replace(" ", "");
 
   protected static final boolean IS_WINDOWS = OS.startsWith("windows");
+  private static final boolean IS_MAC = OS.startsWith("macos");
   private static final boolean IS_LINUX = OS.startsWith("linux");
 
   private static final boolean IS_ARCH_ARM64 = ARCH.equals("aarch64");
@@ -62,24 +67,30 @@ public class SolverContextFactoryTest {
   }
 
   private void requireNoNativeLibrary() {
-    assume().withMessage("Solver %s requires to load a native library", solverToUse())
+    assume()
+        .withMessage("Solver %s requires to load a native library", solverToUse())
         .that(solverToUse())
         .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
   private void requireNativeLibrary() {
-    assume().withMessage("Solver %s requires to load a native library", solverToUse())
+    assume()
+        .withMessage("Solver %s requires to load a native library", solverToUse())
         .that(solverToUse())
         .isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
   }
 
+  /**
+   * Let's allow to disable some checks on certain combinations of operating systems and solvers,
+   * because of missing support.
+   *
+   * <p>We update this list, whenever a new solver or operating system is added.
+   */
   private void requirePlatformSupported() {
     assume()
         .withMessage(
             "Solver %s is not yet supported in the operating system %s with architecture %s",
-            solverToUse(),
-            OS,
-            ARCH)
+            solverToUse(), OS, ARCH)
         .that(isSupportedOperatingSystemAndArchitecture())
         .isTrue();
   }
@@ -88,50 +99,51 @@ public class SolverContextFactoryTest {
     assume()
         .withMessage(
             "Solver %s is not yet supported in the operating system %s with architecture %s",
-            solverToUse(),
-            OS,
-            ARCH)
+            solverToUse(), OS, ARCH)
         .that(isSupportedOperatingSystemAndArchitecture())
         .isFalse();
   }
 
+  /**
+   * This method represents the matrix of supported operating systems and architectures, which can
+   * be tested in our CI. It might be possible that JavaSMT runs on more systems than listed here,
+   * but we do not explicitly test them in our CI.
+   */
   private boolean isSupportedOperatingSystemAndArchitecture() {
     switch (solverToUse()) {
       case SMTINTERPOL:
       case PRINCESS:
+        // Any operating system and any architecture is allowed, Java is sufficient
         return true;
-
       case BOOLECTOR:
       case CVC4:
       case YICES2:
         return IS_LINUX && !IS_ARCH_ARM64;
-
       case CVC5:
         return (IS_LINUX && isSufficientVersionOfLibcxx("cvc5jni"))
-            || (IS_WINDOWS && !IS_ARCH_ARM64);
-
+            || (IS_WINDOWS && !IS_ARCH_ARM64)
+            || IS_MAC;
       case OPENSMT:
         return IS_LINUX && isSufficientVersionOfLibcxx("opensmtj");
-
       case BITWUZLA:
         return (IS_LINUX && isSufficientVersionOfLibcxx("bitwuzlaj"))
             || (IS_WINDOWS && !IS_ARCH_ARM64);
-
       case MATHSAT5:
         return (IS_LINUX && isSufficientVersionOfLibcxx("mathsat5j"))
             || (IS_WINDOWS && !IS_ARCH_ARM64);
-
       case Z3:
-        return (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS;
-
+        return (IS_LINUX && isSufficientVersionOfLibcxx("z3")) || IS_WINDOWS || IS_MAC;
       case Z3_WITH_INTERPOLATION:
         return IS_LINUX;
-
       default:
         throw new AssertionError("unexpected solver: " + solverToUse());
     }
   }
 
+  /**
+   * Some libraries require GLIBC in version 2.34 or GLIBCXX in version 3.4.26 or newer. This
+   * excludes Ubuntu 18.04 or 20.04 for some solvers.
+   */
   private boolean isSufficientVersionOfLibcxx(String library) {
     try {
       NativeLibraries.loadLibrary(library);
@@ -174,27 +186,23 @@ public class SolverContextFactoryTest {
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
     try (SolverContext context = factory.generateContext()) {
-      context.getFormulaManager();
+      @SuppressWarnings("unused")
+      FormulaManager mgr = context.getFormulaManager();
       checkVersion(context);
     }
   }
 
   @Test
   public void createSolverContextFactoryWithSystemLoader() throws InvalidConfigurationException {
-
-    assume().that(solverToUse()).isNoneOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
-
     requireNativeLibrary();
     requirePlatformSupported();
 
+    // we assume that no native solvers are installed on the testing machine by default.
     SolverContextFactory factory =
         new SolverContextFactory(
-            config,
-            logger,
-            shutdownManager.getNotifier(),
-            System::loadLibrary);
-
-    assert_().that(assertThrows(InvalidConfigurationException.class, factory::generateContext))
+            config, logger, shutdownManager.getNotifier(), System::loadLibrary);
+    assert_()
+        .that(assertThrows(InvalidConfigurationException.class, factory::generateContext))
         .hasCauseThat()
         .isInstanceOf(UnsatisfiedLinkError.class);
   }
@@ -207,40 +215,37 @@ public class SolverContextFactoryTest {
 
     SolverContextFactory factory =
         new SolverContextFactory(
-            config,
-            logger,
-            shutdownManager.getNotifier(),
-            System::loadLibrary);
-
+            config, logger, shutdownManager.getNotifier(), System::loadLibrary);
     try (SolverContext context = factory.generateContext()) {
-      context.getFormulaManager();
+      @SuppressWarnings("unused")
+      FormulaManager mgr = context.getFormulaManager();
       checkVersion(context);
     }
   }
 
-  private void checkVersion(SolverContext context) {
+  /** Check whether each solver reports a nice and readable version string. */
+  private void checkVersion(SolverContext pContext) {
     String solverName = solverToUse().toString();
     if (solverToUse() == Solvers.YICES2) {
-      solverName = "YICES";
+      solverName = "YICES"; // remove the number "2" from the name
     } else if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
       solverName = "Z3";
     }
-
-    String optionalSuffix = "([A-Za-z0-9.,:_+\\-\\s()@]+)?";
-    String versionNumberRegex = "(version\\s)?\\d+\\.\\d+(\\.\\d+)?(\\.\\d+)?";
-
+    String optionalSuffix = "([A-Za-z0-9.,:_+\\-\\s()@]+)?"; // any string
+    String versionNumberRegex = "(version\\s)?\\d+\\.\\d+(\\.\\d+)?(\\.\\d+)?"; // 2-4 numbers with
+    // dots
     if (solverToUse() == Solvers.PRINCESS) {
-      versionNumberRegex = "\\d+-\\d+-\\d+";
+      versionNumberRegex = "\\d+-\\d+-\\d+"; // Princess uses date instead of version
     }
-
     String versionRegex = solverName + "\\s+" + versionNumberRegex + optionalSuffix;
     Pattern versionPattern = Pattern.compile(versionRegex, Pattern.CASE_INSENSITIVE);
-
-    assert_().withMessage("Solver did not report a nice readable version number.")
-        .that(context.getVersion())
+    assert_()
+        .withMessage("Solver did not report a nice readable version number.")
+        .that(pContext.getVersion())
         .matches(versionPattern);
   }
 
+  /** Negative test for failing to load native library. */
   @Test
   public void testFailToLoadNativeLibraryWithInvalidOperatingSystem()
       throws InvalidConfigurationException {
@@ -250,11 +255,16 @@ public class SolverContextFactoryTest {
     SolverContextFactory factory =
         new SolverContextFactory(config, logger, shutdownManager.getNotifier());
 
+    // Verify that creating the context fails with UnsatisfiedLinkError
     InvalidConfigurationException thrown =
-        assertThrows(InvalidConfigurationException.class, factory::generateContext);
-
+        assertThrows(
+            "Expected InvalidConfigurationException due to failure in loading native library",
+            InvalidConfigurationException.class,
+            factory::generateContext);
     assert_().that(thrown).hasCauseThat().isInstanceOf(UnsatisfiedLinkError.class);
-    assert_().that(thrown.getMessage())
+    assert_()
+        .that(thrown)
+        .hasMessageThat()
         .startsWith(
             String.format(
                 "The SMT solver %s is not available on this machine because of missing libraries ",
