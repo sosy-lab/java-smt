@@ -152,7 +152,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         new CVC5BitvectorFormulaManager(pCreator, booleanTheory);
     CVC5FloatingPointFormulaManager fpTheory =
         new CVC5FloatingPointFormulaManager(pCreator, pFloatingPointRoundingMode);
-    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator);
+    CVC5QuantifiedFormulaManager qfTheory = new CVC5QuantifiedFormulaManager(pCreator, newSolver);
     CVC5ArrayFormulaManager arrayTheory = new CVC5ArrayFormulaManager(pCreator);
     CVC5SLFormulaManager slTheory = new CVC5SLFormulaManager(pCreator);
     CVC5StringFormulaManager strTheory = new CVC5StringFormulaManager(pCreator);

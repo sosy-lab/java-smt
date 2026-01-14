@@ -26,10 +26,10 @@ public class CVC5QuantifiedFormulaManager
   private final TermManager termManager;
   private final Solver solver;
 
-  protected CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator) {
+  protected CVC5QuantifiedFormulaManager(CVC5FormulaCreator pFormulaCreator, Solver pSolver) {
     super(pFormulaCreator);
     termManager = pFormulaCreator.getEnv();
-    solver = new Solver(termManager);
+    solver = pSolver;
   }
 
   /*
