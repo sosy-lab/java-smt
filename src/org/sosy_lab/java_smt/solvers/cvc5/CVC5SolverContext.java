@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.github.cvc5.CVC5ApiRecoverableException;
+import io.github.cvc5.Context;
 import io.github.cvc5.Solver;
 import io.github.cvc5.TermManager;
 import java.util.Map.Entry;
@@ -75,18 +76,19 @@ public final class CVC5SolverContext extends AbstractSolverContext {
 
   // creator is final, except after closing, then null.
   private CVC5FormulaCreator creator;
-  private final TermManager termManager;
   private final Solver solver;
   private final ShutdownNotifier shutdownNotifier;
   private final int randomSeed;
   private final CVC5Settings settings;
   private boolean closed = false;
 
+  /** Counts the number of (open) CVC5 solver contexts. * */
+  private static int instances = 0;
+
   private CVC5SolverContext(
       CVC5FormulaCreator pCreator,
       CVC5FormulaManager pManager,
       ShutdownNotifier pShutdownNotifier,
-      TermManager pTermManager,
       Solver pSolver,
       int pRandomSeed,
       CVC5Settings pSettings) {
@@ -94,7 +96,6 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     creator = pCreator;
     shutdownNotifier = pShutdownNotifier;
     randomSeed = pRandomSeed;
-    termManager = pTermManager;
     solver = pSolver;
     settings = pSettings;
   }
@@ -118,6 +119,11 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
+
+    synchronized (CVC5SolverContext.class) {
+      // Increase counter *before* any CVC5 objects are created
+      instances++;
+    }
 
     CVC5Settings settings = new CVC5Settings(pConfig);
 
@@ -173,7 +179,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
             enumTheory);
 
     return new CVC5SolverContext(
-        pCreator, manager, pShutdownNotifier, termManager, newSolver, randomSeed, settings);
+        pCreator, manager, pShutdownNotifier, newSolver, randomSeed, settings);
   }
 
   /**
@@ -204,8 +210,17 @@ public final class CVC5SolverContext extends AbstractSolverContext {
   public void close() {
     if (creator != null) {
       closed = true;
-      solver.deletePointer();
-      termManager.deletePointer();
+      synchronized (CVC5SolverContext.class) {
+        if (instances == 1) {
+          // Delete all solver objects if we're closing the last instance
+          Context.deletePointers();
+        } else {
+          // Otherwise, only delete the Solver, but keep the TermManager and all other objects
+          // Closing the TermManager here will cause a segfault later
+          solver.deletePointer();
+        }
+        instances--;
+      }
       creator = null;
     }
   }
