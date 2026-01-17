@@ -156,14 +156,14 @@ class Mathsat5Proof extends AbstractProof {
       // built
     } else if (rule.equals(Rule.THEORY_LEMMA)) {
       if (msat_proof_is_term(msat_proof_get_child(proof, 0))) {
-        long and = msat_proof_get_term(msat_proof_get_child(proof, 0));
+        long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
         for (int i = 1; i < children; i++) {
           if (msat_proof_is_term(msat_proof_get_child(proof, i))) {
             long child = msat_proof_get_term(msat_proof_get_child(proof, i));
-            and = msat_make_and(prover.curEnv, and, child);
+            or = msat_make_or(prover.curEnv, or, child);
           }
         }
-        formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(and), and);
+        formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(or), or);
       }
     }
     return formula;

@@ -20,6 +20,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -153,7 +154,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     }
   }
 
-  // Perform resolution between two  clauses using a given pivot
+  // Perform resolution between two clauses using a given pivot
   private BooleanFormula resolve(
       BooleanFormula clause1,
       BooleanFormula clause2,
@@ -161,33 +162,35 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       BooleanFormulaManager bfmgr) {
     List<BooleanFormula> literals1 = flattenLiterals(clause1, bfmgr);
     List<BooleanFormula> literals2 = flattenLiterals(clause2, bfmgr);
-    List<BooleanFormula> combined = new ArrayList<>();
 
+    // Use LinkedHashSet to maintain order and uniqueness
+    Set<BooleanFormula> combined = new LinkedHashSet<>();
+
+    // Add literals from first clause, filtering out the pivot/complement
     for (BooleanFormula lit : literals1) {
-      if (!isComplement(lit, pivot, bfmgr)) {
+      if (!lit.equals(pivot) && !isComplement(lit, pivot, bfmgr)) {
         combined.add(lit);
       }
     }
 
-    List<BooleanFormula> temp = new ArrayList<>();
+    // Add literals from second clause, filtering out the pivot/complement
     for (BooleanFormula lit : literals2) {
-      if (!isComplement(lit, pivot, bfmgr)) {
-        temp.add(lit);
+      if (!lit.equals(pivot) && !isComplement(lit, pivot, bfmgr)) {
+        combined.add(lit);
       }
     }
-
-    combined.addAll(temp);
 
     if (combined.isEmpty()) {
       return bfmgr.makeFalse();
     } else if (combined.size() == 1) {
-      return combined.get(0);
+      return combined.iterator().next();
     } else {
-      return bfmgr.or(combined);
+      return bfmgr.or(new ArrayList<>(combined));
     }
   }
 
-  // Helper method to flatten an OR/AND-formula into a list of disjunctive literals
+  // Helper method to flatten an OR-formula into a list of disjunctive literals.
+  // Correctly treats AND and other operators as atomic literals for resolution purposes.
   private List<BooleanFormula> flattenLiterals(
       BooleanFormula formula, BooleanFormulaManager bfmgr) {
     List<BooleanFormula> result = new ArrayList<>();
@@ -205,60 +208,64 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
 
           @Override
           public TraversalProcess visitAnd(List<BooleanFormula> operands) {
-            for (BooleanFormula op : operands) {
-              result.addAll(flattenLiterals(op, bfmgr));
-            }
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitNot(BooleanFormula operand) {
-            result.add(formula); // add original NOT node
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitAtom(
               BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
-            result.add(formula); // add original atom
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
-          // others unchanged...
           @Override
           public TraversalProcess visitXor(BooleanFormula first, BooleanFormula second) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitEquivalence(BooleanFormula first, BooleanFormula second) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitImplication(BooleanFormula first, BooleanFormula second) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitIfThenElse(
               BooleanFormula c, BooleanFormula t, BooleanFormula e) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitQuantifier(
               Quantifier q, BooleanFormula qBody, List<Formula> vars, BooleanFormula body) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitConstant(boolean value) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
+            result.add(formula);
             return TraversalProcess.SKIP;
           }
         });
@@ -266,81 +273,8 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     return result;
   }
 
-  // Check whether two formulas are logical complements
+  // Check whether two formulas are logical complements using the FormulaManager
   private boolean isComplement(BooleanFormula a, BooleanFormula b, BooleanFormulaManager bfmgr) {
-    // Define the visitor to check for complement relation
-    final boolean[] isComplement = {false};
-
-    bfmgr.visitRecursively(
-        a,
-        new BooleanFormulaVisitor<>() {
-          @Override
-          public TraversalProcess visitNot(BooleanFormula operand) {
-            // Check if the negation of 'operand' equals 'b'
-            if (operand.equals(b)) {
-              isComplement[0] = true;
-            }
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitAtom(
-              BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
-            if (atom.equals(b)) {
-              isComplement[0] = true;
-            }
-            return TraversalProcess.SKIP;
-          }
-
-          // Default implementation for other nodes, such as OR, AND, etc.
-          @Override
-          public TraversalProcess visitOr(List<BooleanFormula> operands) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitAnd(List<BooleanFormula> operands) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitXor(BooleanFormula first, BooleanFormula second) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitEquivalence(BooleanFormula first, BooleanFormula second) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitImplication(BooleanFormula first, BooleanFormula second) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitIfThenElse(
-              BooleanFormula c, BooleanFormula t, BooleanFormula e) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitQuantifier(
-              Quantifier q, BooleanFormula qBody, List<Formula> vars, BooleanFormula body) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitConstant(boolean value) {
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
-            return TraversalProcess.SKIP;
-          }
-        });
-
-    return isComplement[0];
+    return bfmgr.not(a).equals(b) || bfmgr.not(b).equals(a);
   }
 }
