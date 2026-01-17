@@ -185,8 +185,8 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="bitwuzla.i"/>
         </exec>
 
-        <!-- Apply patch for the phantom reference issue: Sorts and Terms are currently not being deleted, even when the TermManager is closed-->
-        <!-- FIXME: This will lead to memory leaks. We should look for a proper fix. -->
+        <!-- Apply patch to fix memory management issues -->
+        <!-- TODO We still can't all memory, however, now only vectors of terms/sorts are a problem -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="--no-backup-if-mismatch"/>

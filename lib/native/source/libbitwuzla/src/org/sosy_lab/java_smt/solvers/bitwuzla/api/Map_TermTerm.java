@@ -50,7 +50,8 @@ public class Map_TermTerm extends java.util.AbstractMap<Term, Term> {
     if (swigCPtr != 0) {
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
+        // Disabled to fix memory management issues
+        // BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
       }
       swigCPtr = 0;
     }

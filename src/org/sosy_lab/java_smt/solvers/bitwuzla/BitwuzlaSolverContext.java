@@ -87,6 +87,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
+  /** Counts the number of (open) Bitwuzla solver contexts. * */
+  private static int instances = 0;
+
   BitwuzlaSolverContext(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
@@ -108,6 +111,12 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
+
+    synchronized (BitwuzlaSolverContext.class) {
+      // Increase counter *before* any Bitwuzla objects are created
+      instances++;
+    }
+
     loadLibrary(pLoader);
 
     TermManager termManager = new TermManager();
@@ -239,9 +248,15 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    */
   @Override
   public void close() {
-    if (!closed) {
-      creator.getTermManager().delete();
-      closed = true;
+    synchronized (BitwuzlaSolverContext.class) {
+      if (!closed) {
+        closed = true;
+        if (instances == 1) {
+          // Delete all solver objects if we're closing the last instance
+          TermManager.deleteReferences();
+        }
+        instances--;
+      }
     }
   }
 

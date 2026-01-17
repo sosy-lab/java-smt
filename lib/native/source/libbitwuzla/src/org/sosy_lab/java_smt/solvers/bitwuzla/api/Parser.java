@@ -16,44 +16,20 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Parser {
-  private transient long swigCPtr;
-  protected transient boolean swigCMemOwn;
+public class Parser extends Reference{
 
   protected Parser(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+    super(cPtr, cMemoryOwn);
   }
 
   protected static long getCPtr(Parser obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(Parser obj) {
-    long ptr = 0;
-    if (obj != null) {
-      if (!obj.swigCMemOwn)
-        throw new RuntimeException("Cannot release ownership as memory is not owned");
-      ptr = obj.swigCPtr;
-      obj.swigCMemOwn = false;
-      obj.delete();
-    }
-    return ptr;
-  }
 
-  @SuppressWarnings({"deprecation", "removal"})
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Parser(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
+  @Override
+  public void delete() {
+    BitwuzlaNativeJNI.delete_Parser(swigCPtr);
   }
 
   public Parser(TermManager tm, Options options, String language) {

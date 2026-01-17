@@ -16,45 +16,19 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Sort {
-  private transient long swigCPtr;
-  protected transient boolean swigCMemOwn;
+public class Sort extends Reference {
 
   protected Sort(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+    super(cPtr, cMemoryOwn);
   }
 
   protected static long getCPtr(Sort obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(Sort obj) {
-    long ptr = 0;
-    if (obj != null) {
-      if (!obj.swigCMemOwn)
-        throw new RuntimeException("Cannot release ownership as memory is not owned");
-      ptr = obj.swigCPtr;
-      obj.swigCMemOwn = false;
-      obj.delete();
-    }
-    return ptr;
-  }
-
-  @SuppressWarnings({"deprecation", "removal"})
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        // Disabled to fix memory management issues
-        // BitwuzlaNativeJNI.delete_Sort(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
+  @Override
+  public void delete() {
+    BitwuzlaNativeJNI.delete_Sort(swigCPtr);
   }
 
   public boolean equals(Object object) {
