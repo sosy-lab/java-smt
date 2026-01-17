@@ -10,29 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public abstract class Reference {
-  protected transient long swigCPtr;
-  protected transient boolean swigCMemOwn;
-
-  Reference(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
-    TermManager.addReference(this);
-  }
-
-  abstract void delete();
-
-  long getSwigCPtr() {
-    return swigCPtr;
-  }
-
-  void close() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        delete();
-        swigCMemOwn = false;
-      }
-      swigCPtr = 0;
-    }
-  }
+public interface Reference {
+  long getSwigCPtr();
+  void close();
 }

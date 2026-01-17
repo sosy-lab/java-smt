@@ -16,7 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Sort extends Reference {
+public class Sort extends AbstractReference {
 
   protected Sort(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);

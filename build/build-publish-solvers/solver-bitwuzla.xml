@@ -186,7 +186,6 @@ SPDX-License-Identifier: Apache-2.0
         </exec>
 
         <!-- Apply patch to fix memory management issues -->
-        <!-- TODO We still can't all memory, however, now only vectors of terms/sorts are a problem -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="--no-backup-if-mismatch"/>

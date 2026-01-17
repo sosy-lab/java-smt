@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.LinkedHashMap;
 
-public class TermManager extends Reference {
+public class TermManager extends AbstractReference {
 
   private static final Map<Long, Reference> references = new LinkedHashMap<>();
 
@@ -40,7 +40,7 @@ public class TermManager extends Reference {
 
   static void addReference(Reference pointer) {
     synchronized (TermManager.class) {
-      references.put(pointer.swigCPtr, pointer);
+      references.put(pointer.getSwigCPtr(), pointer);
     }
   }
 

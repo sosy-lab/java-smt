@@ -16,7 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Parser extends Reference{
+public class Parser extends AbstractReference{
 
   protected Parser(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);

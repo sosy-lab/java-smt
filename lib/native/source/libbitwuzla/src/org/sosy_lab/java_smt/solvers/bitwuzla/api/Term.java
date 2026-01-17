@@ -16,7 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Term extends Reference {
+public class Term extends AbstractReference {
 
   protected Term(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);

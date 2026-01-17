@@ -16,7 +16,7 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Bitwuzla extends Reference {
+public class Bitwuzla extends AbstractReference {
 
   protected Bitwuzla(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);
