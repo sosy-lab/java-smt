@@ -217,6 +217,7 @@ class BitwuzlaTheoremProver extends AbstractProverWithAllSat<Void> implements Pr
   public void close() {
     if (!closed) {
       closed = true;
+      env.close();
     }
     super.close();
   }
