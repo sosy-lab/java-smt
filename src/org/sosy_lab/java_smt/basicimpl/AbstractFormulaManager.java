@@ -273,19 +273,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
+  public BooleanFormula equal(Iterable<Formula> pArgs) {
+    final Collection<Formula> args = ImmutableList.copyOf(pArgs);
+    if (args.size() < 2) {
       return booleanManager.makeTrue(); // trivially true
     }
     final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+        Collections2.transform(args, formulaCreator::getFormulaType);
     Preconditions.checkArgument(
         ImmutableSet.copyOf(types).size() == 1,
         "All arguments to `equal` must have the same type, but found %s different types: %s",
         types.size(),
         types);
-    return formulaCreator.encapsulateBoolean(
-        equalImpl(Collections2.transform(pArgs, formulaCreator::extractInfo)));
+    return formulaCreator.encapsulateBoolean(equalImpl(formulaCreator.extractInfo(args)));
   }
 
   /** Override if the solver API supports equality with many arguments. */
@@ -312,18 +312,19 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
+  public BooleanFormula distinct(Iterable<Formula> pArgs) {
+    final Collection<Formula> args = ImmutableList.copyOf(pArgs);
+    if (args.size() < 2) {
       return booleanManager.makeTrue(); // trivially true
     }
     final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+        Collections2.transform(args, formulaCreator::getFormulaType);
     Preconditions.checkArgument(
         ImmutableSet.copyOf(types).size() == 1,
         "All arguments to `equal` must have the same type, but found %s different types: %s",
         types.size(),
         types);
-    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(pArgs)));
+    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(args)));
   }
 
   /** Override if the solver API supports <code>distinct</code>. */
