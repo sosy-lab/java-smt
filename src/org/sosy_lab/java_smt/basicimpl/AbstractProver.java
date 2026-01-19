@@ -66,6 +66,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
+    generateProofs = pOptions.contains(ProverOptions.GENERATE_PROOFS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
