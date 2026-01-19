@@ -1112,7 +1112,7 @@ public class FloatingPointFormulaManagerTest
             IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, singlePrecType));
     assertThat(exSingle.getMessage())
         .contains(
-            "The total size 32 of type FloatingPoint<exp=8,mant=23> "
+            "The total size 32 of type FloatingPoint<exp=8,mant=24> "
                 + "has to match the size 9 of type Bitvector<9>.");
 
     var exDouble =
@@ -1120,7 +1120,7 @@ public class FloatingPointFormulaManagerTest
             IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, doublePrecType));
     assertThat(exDouble.getMessage())
         .contains(
-            "The total size 64 of type FloatingPoint<exp=11,mant=52> "
+            "The total size 64 of type FloatingPoint<exp=11,mant=53> "
                 + "has to match the size 9 of type Bitvector<9>.");
   }
 
