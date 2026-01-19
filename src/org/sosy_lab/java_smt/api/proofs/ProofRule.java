@@ -15,9 +15,4 @@ public interface ProofRule {
 
   /** Get the name of the proof rule. */
   String getName();
-
-  /** Get the formula of the proof rule. */
-  default String getFormula() {
-    return "no formula available";
-  }
 }

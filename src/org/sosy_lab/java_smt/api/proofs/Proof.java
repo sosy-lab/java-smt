@@ -14,16 +14,17 @@ import java.util.Optional;
 import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
-/**
- * A proof node in the proof DAG of a proof.
- *
- * @author Gabriel Carpio
- */
+/** A proof node in the proof DAG of a proof. */
 public interface Proof {
 
   /** Get the children of the proof node. */
   Set<Proof> getChildren();
 
+  /**
+   * Check if the proof node is a leaf.
+   *
+   * @return True if the proof node is a leaf, false otherwise.
+   */
   boolean isLeaf();
 
   /**
@@ -33,5 +34,10 @@ public interface Proof {
    */
   Optional<Formula> getFormula();
 
+  /**
+   * Get the rule of the proof node.
+   *
+   * @return The rule of the proof node.
+   */
   ProofRule getRule();
 }
