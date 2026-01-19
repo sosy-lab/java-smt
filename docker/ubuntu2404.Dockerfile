@@ -20,9 +20,9 @@ ENV LANGUAGE=en_US.UTF-8
 # Install basic packages for building several solvers
 RUN apt-get update \
  && apt-get install -y \
-        wget curl git build-essential cmake patchelf unzip \
+        wget curl git build-essential cmake pkg-config patchelf unzip \
         openjdk-11-jdk ant maven \
-        gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix \
+        gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix mingw-w64-tools \
         gcc-aarch64-linux-gnu g++-aarch64-linux-gnu \
         binutils-aarch64-linux-gnu libc6-dev-arm64-cross \
         zlib1g-dev m4 \
@@ -34,12 +34,13 @@ RUN  apt-get update \
         autoconf gperf \
  && apt-get clean
 
-# Bitwuzla requires Ninja and Meson (updated version from pip), and uses SWIG >4.0 from dependencies.
-# GMP >6.3.0 is automatically downloaded and build within Bitwuzla.
+# Bitwuzla requires Ninja and Meson (updated version from pip), and uses SWIG >4.0, GMP >=6.3 and
+# MPFR >=4.2.1 from dependencies. We use pkg-config to locate the dependencies
 RUN apt-get update \
  && apt-get install -y \
         ninja-build python3-pip meson \
  && apt-get clean
+RUN ln -s /usr/bin/pkg-config /usr/bin/aarch64-linux-gnu-pkg-config
 
 # OpenSMT requires swig, gmp, flex and bison
 # - swig v4.1 or newer for unique_ptr support
@@ -54,30 +55,71 @@ RUN apt-get update \
 WORKDIR /dependencies
 
 # Install GMP for linux on x64 and arm64
-# We could add another build for windows when needed
-RUN wget https://gmplib.org/download/gmp/gmp-6.2.1.tar.lz \
- && tar xf gmp-6.2.1.tar.lz \
- && rm gmp-6.2.1.tar.lz \
- && cd gmp-6.2.1 \
+RUN wget https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz \
+ && tar xf gmp-6.3.0.tar.xz \
+ && rm gmp-6.3.0.tar.xz \
+ && cd gmp-6.3.0 \
  && ./configure \
       --enable-cxx \
       --with-pic \
       --disable-shared \
       --enable-fat \
-      --prefix=/dependencies/gmp-6.2.1/install/x64-linux \
+      --prefix=/dependencies/gmp-6.3.0/install/x64-linux \
  && make -j4 \
  && make install \
  && make clean \
  && ./configure \
+      --host=aarch64-linux-gnu \
       --enable-cxx \
       --with-pic \
       --disable-shared \
       --enable-fat \
-      --host=aarch64-linux-gnu \
-      --prefix=/dependencies/gmp-6.2.1/install/arm64-linux \
+      --prefix=/dependencies/gmp-6.3.0/install/arm64-linux \
  && CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld make -j4 \
  && make install \
- && make clean
+ && make clean \
+ && ./configure \
+       --host=x86_64-w64-mingw32 \
+       --enable-cxx \
+       --with-pic \
+       --disable-shared \
+       --enable-fat \
+       --prefix=/dependencies/gmp-6.3.0/install/x64-windows \
+  && CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix LD=x86_64-w64-mingw32-gcc-ld make -j4 \
+  && make install \
+  && make clean
+
+# Install MPFR for linux on x64 and arm64
+RUN wget https://www.mpfr.org/mpfr-current/mpfr-4.2.2.tar.xz \
+ && tar xf mpfr-4.2.2.tar.xz \
+ && rm mpfr-4.2.2.tar.xz \
+ && cd mpfr-4.2.2 \
+ && ./configure \
+      --with-gmp=/dependencies/gmp-6.3.0/install/x64-linux \
+      --enable-pic \
+      --disable-shared \
+      --prefix=/dependencies/mpfr-4.2.2/install/x64-linux \
+ && make -j4 \
+ && make install \
+ && make clean \
+ && ./configure \
+      --host=aarch64-linux-gnu \
+      --with-gmp=/dependencies/gmp-6.3.0/install/arm64-linux \
+      --with-pic \
+      --disable-shared \
+      --prefix=/dependencies/mpfr-4.2.2/install/arm64-linux \
+ && CC=aarch64-linux-gnu-gcc CXX=aarch64-linux-gnu-g++ LD=aarch64-linux-gnu-ld make -j4 \
+ && make install \
+ && make clean \
+ && ./configure \
+      --host=x86_64-w64-mingw32 \
+      --with-gmp=/dependencies/gmp-6.3.0/install/x64-windows \
+      --with-pic \
+      --disable-shared \
+      --prefix=/dependencies/mpfr-4.2.2/install/x64-windows \
+  && CC=x86_64-w64-mingw32-gcc-posix CXX=x86_64-w64-mingw32-g++-posix LD=x86_64-w64-mingw32-gcc-ld make -j4 \
+  && make install \
+  && make clean
 
 # Install the Jdk for Windows x64
 RUN wget https://download.java.net/openjdk/jdk11/ri/openjdk-11+28_windows-x64_bin.zip \
@@ -104,4 +146,3 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 # Podman-Specific Label for Auto-Update
 LABEL io.containers.autoupdate=registry
-

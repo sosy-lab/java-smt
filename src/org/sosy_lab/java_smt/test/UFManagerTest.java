@@ -107,6 +107,7 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
         case CVC5:
         case SMTINTERPOL:
         case Z3:
+        case Z3_WITH_INTERPOLATION:
           // some solvers have an explicit cast for the parameter
           Truth.assertThat(f2).isNotEqualTo(f);
           List<Formula> args = getArguments(f2);

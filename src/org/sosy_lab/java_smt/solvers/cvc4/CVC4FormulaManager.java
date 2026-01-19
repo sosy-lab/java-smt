@@ -13,9 +13,12 @@ import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import edu.stanford.CVC4.Expr;
 import edu.stanford.CVC4.ExprManager;
+import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Type;
+import edu.stanford.CVC4.vectorExpr;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -61,6 +64,20 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
     }
     throw new IllegalArgumentException(
         "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+  }
+
+  @Override
+  public Expr equalImpl(Expr pArg1, Expr pArgs) {
+    return getEnvironment().mkExpr(Kind.EQUAL, pArg1, pArgs);
+  }
+
+  @Override
+  public Expr distinctImpl(Collection<Expr> pArgs) {
+    vectorExpr vec = new vectorExpr();
+    for (Expr e : pArgs) {
+      vec.add(e);
+    }
+    return getEnvironment().mkExpr(Kind.DISTINCT, vec);
   }
 
   @Override

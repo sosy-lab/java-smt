@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.LinkedHashMultimap;
@@ -20,6 +21,8 @@ import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -63,7 +66,6 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     generateUnsatCores = pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE);
     generateUnsatCoresOverAssumptions =
         pOptions.contains(ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS);
-    generateProofs = pOptions.contains(ProverOptions.GENERATE_PROOFS);
     enableSL = pOptions.contains(ProverOptions.ENABLE_SEPARATION_LOGIC);
 
     assertedFormulas.add(LinkedHashMultimap.create());
@@ -102,6 +104,17 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
     Preconditions.checkState(!wasLastSatCheckSatisfiable);
+  }
+
+  protected final void checkGenerateInterpolants() {
+    Preconditions.checkState(!closed);
+    Preconditions.checkState(
+        !changedSinceLastSatQuery,
+        "Interpolants can only be calculated right after a call to isUnsat()");
+    Preconditions.checkState(
+        !wasLastSatCheckSatisfiable,
+        "Interpolants can only be calculated if the assertions on the solver stack are "
+            + "unsatisfiable.");
   }
 
   protected final void checkEnableSeparationLogic() {
@@ -229,6 +242,23 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
       builder.addAll(level.values());
     }
     return builder.build();
+  }
+
+  /**
+   * Flatten and inverse the prover-stack and return all asserted constraints.
+   *
+   * <p>Each formula can be asserted several times. However, each assertion has a unique id. This
+   * implies that the inverted mapping is a plain {@link Map}, not a {@link Multimap}.
+   */
+  protected ImmutableMap<T, BooleanFormula> getAssertedFormulasById() {
+    ImmutableMap.Builder<T, BooleanFormula> builder = ImmutableMap.builder();
+    for (Multimap<BooleanFormula, T> level : assertedFormulas) {
+      for (Entry<BooleanFormula, T> entry : level.entries()) {
+        // the id (entry.value) is unique across all levels.
+        builder.put(entry.getValue(), entry.getKey());
+      }
+    }
+    return builder.buildOrThrow();
   }
 
   /**
