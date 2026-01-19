@@ -335,7 +335,7 @@ diff -ur --unidirectional-new-file lib/native/source/libbitwuzla/src/org/sosy_la
 diff -ur --unidirectional-new-file lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Reference.java lib/native/source/libbitwuzla.patched/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Reference.java
 --- lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Reference.java	1970-01-01 01:00:00.000000000 +0100
 +++ lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Reference.java	2026-01-19 11:27:36.707079154 +0100
-@@ -0,0 +1,17 @@
+@@ -0,0 +1,16 @@
 +/*
 + * This file is part of JavaSMT,
 + * an API wrapper for a collection of SMT solvers:
@@ -348,9 +348,8 @@ diff -ur --unidirectional-new-file lib/native/source/libbitwuzla/src/org/sosy_la
 +
 +package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 +
-+public interface Reference extends AutoCloseable {
++public interface Reference {
 +  /** Destroy the reference and free its native object. **/
-+  @Override
 +  void close();
 +}
 diff -ur --unidirectional-new-file lib/native/source/libbitwuzla/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Result.java lib/native/source/libbitwuzla.patched/src/org/sosy_lab/java_smt/solvers/bitwuzla/api/Result.java
