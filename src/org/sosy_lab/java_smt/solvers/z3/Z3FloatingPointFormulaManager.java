@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import java.math.BigInteger;
@@ -79,6 +81,8 @@ class Z3FloatingPointFormulaManager
 
     final long signSort = getFormulaCreator().getBitvectorType(1);
     final long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
+    // The mantissa without hidden bit is correct here to generate the FP correctly with a
+    // mantissa incremented by one (with the hidden bit) below!
     final long mantSort =
         getFormulaCreator().getBitvectorType(type.getMantissaSizeWithoutHiddenBit());
 
@@ -93,6 +97,14 @@ class Z3FloatingPointFormulaManager
     Native.decRef(z3context, mantBv);
     Native.decRef(z3context, expoBv);
     Native.decRef(z3context, signBv);
+
+    checkState(
+        type.getMantissaSizeWithHiddenBit()
+            == Native.fpaGetSbits(z3context, Native.getSort(z3context, fp)));
+    assert type.getExponentSize() == Native.fpaGetEbits(z3context, Native.getSort(z3context, fp));
+    assert type.getTotalSize()
+        == Native.fpaGetEbits(z3context, Native.getSort(z3context, fp))
+            + Native.fpaGetSbits(z3context, Native.getSort(z3context, fp));
     return fp;
   }
 
