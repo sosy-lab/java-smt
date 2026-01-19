@@ -122,17 +122,17 @@ class StatisticsFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Iterable<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     // can be more than one operation, however, we count only once
     stats.booleanOperations.getAndIncrement();
-    return delegate.equal(pArgs);
+    return delegate.makeEqual(pArgs);
   }
 
   @Override
-  public BooleanFormula distinct(Iterable<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     // can be more than one operation, however, we count only once
     stats.booleanOperations.getAndIncrement();
-    return delegate.distinct(pArgs);
+    return delegate.makeDistinct(pArgs);
   }
 
   @Override

@@ -152,16 +152,16 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Iterable<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     synchronized (sync) {
-      return delegate.equal(pArgs);
+      return delegate.makeEqual(pArgs);
     }
   }
 
   @Override
-  public BooleanFormula distinct(Iterable<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     synchronized (sync) {
-      return delegate.distinct(pArgs);
+      return delegate.makeDistinct(pArgs);
     }
   }
 

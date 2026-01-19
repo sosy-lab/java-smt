@@ -273,7 +273,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula equal(Iterable<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     final Collection<Formula> args = ImmutableList.copyOf(pArgs);
     if (args.size() < 2) {
       return booleanManager.makeTrue(); // trivially true
@@ -312,7 +312,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula distinct(Iterable<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     final Collection<Formula> args = ImmutableList.copyOf(pArgs);
     if (args.size() < 2) {
       return booleanManager.makeTrue(); // trivially true

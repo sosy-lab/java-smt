@@ -139,8 +139,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  default BooleanFormula equal(Formula... pArgs) {
-    return equal(FluentIterable.from(pArgs));
+  default BooleanFormula makeEqual(Formula... pArgs) {
+    return makeEqual(FluentIterable.from(pArgs));
   }
 
   /**
@@ -150,7 +150,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  BooleanFormula equal(Iterable<Formula> pArgs);
+  BooleanFormula makeEqual(Iterable<Formula> pArgs);
 
   /**
    * Create a distinctness formula between the given arguments. We return "true" if all arguments
@@ -159,8 +159,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  default BooleanFormula distinct(Formula... pArgs) {
-    return distinct(FluentIterable.from(pArgs));
+  default BooleanFormula makeDistinct(Formula... pArgs) {
+    return makeDistinct(FluentIterable.from(pArgs));
   }
 
   /**
@@ -170,7 +170,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  BooleanFormula distinct(Iterable<Formula> pArgs);
+  BooleanFormula makeDistinct(Iterable<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

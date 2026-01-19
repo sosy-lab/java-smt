@@ -48,15 +48,15 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var1 = mgr.makeVariable(BooleanType, "var1");
     var var2 = mgr.makeVariable(formulaType, "var2");
 
-    assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1, var2));
-    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(var1, var2));
 
     if (bvmgr != null) {
       var bv1 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv1");
       var bv2 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv2");
 
-      assertThrows(IllegalArgumentException.class, () -> mgr.equal(bv1, bv2));
-      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(bv1, bv2));
     }
 
     if (amgr != null) {
@@ -66,8 +66,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
       var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
 
-      assertThrows(IllegalArgumentException.class, () -> mgr.equal(arr1, arr2));
-      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(arr1, arr2));
     }
   }
 
@@ -76,11 +76,11 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
     var var1 = mgr.makeVariable(formulaType, "var1");
 
-    assertThat(mgr.equal()).isEqualTo(bmgr.makeTrue());
-    assertThat(mgr.distinct()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeEqual()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeDistinct()).isEqualTo(bmgr.makeTrue());
 
-    assertThat(mgr.equal(var1)).isEqualTo(bmgr.makeTrue());
-    assertThat(mgr.distinct(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeEqual(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.makeDistinct(var1)).isEqualTo(bmgr.makeTrue());
   }
 
   @Test
@@ -92,8 +92,8 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.equal(var1, var2, var3);
-    var g = bmgr.and(mgr.equal(var1, var2), mgr.equal(var2, var3));
+    var f = mgr.makeEqual(var1, var2, var3);
+    var g = bmgr.and(mgr.makeEqual(var1, var2), mgr.makeEqual(var2, var3));
 
     if (solver == Solvers.SMTINTERPOL) {
       // Only SmtInterpol support equality with more than two arguments
@@ -124,9 +124,9 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
         case NOT:
           return bmgr.not((BooleanFormula) args.get(0));
         case EQ:
-          return mgr.equal(args);
+          return mgr.makeEqual(args);
         case DISTINCT:
-          return mgr.distinct(args);
+          return mgr.makeDistinct(args);
         default:
           throw new UnsupportedOperationException();
       }
@@ -143,7 +143,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.equal(var1, var2, var3);
+    var f = mgr.makeEqual(var1, var2, var3);
     var g = mgr.transformRecursively(f, new Rebuilder(mgr));
 
     assertThat(f).isEqualTo(g);
@@ -168,7 +168,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (= %s %s %s))", var1, var2, var3);
 
-    var f = mgr.equal(var1, var2, var3);
+    var f = mgr.makeEqual(var1, var2, var3);
     var g = mgr.parse(str);
 
     assertThat(f).isEqualTo(g);
@@ -183,12 +183,12 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g =
         bmgr.and(
-            bmgr.not(mgr.equal(var1, var2)),
-            bmgr.not(mgr.equal(var1, var3)),
-            bmgr.not(mgr.equal(var2, var3)));
+            bmgr.not(mgr.makeEqual(var1, var2)),
+            bmgr.not(mgr.makeEqual(var1, var3)),
+            bmgr.not(mgr.makeEqual(var2, var3)));
 
     if (ImmutableList.of(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.PRINCESS).contains(solver)) {
       // Solvers that rewrite
@@ -210,7 +210,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var var2 = mgr.makeVariable(formulaType, "var2");
     var var3 = mgr.makeVariable(formulaType, "var3");
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g = mgr.transformRecursively(f, new Rebuilder(mgr));
 
     assertThat(f).isEqualTo(g);
@@ -235,7 +235,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
             + String.format("(declare-const %s %s)", var3, formulaSort)
             + String.format("(assert (distinct %s %s %s))", var1, var2, var3);
 
-    var f = mgr.distinct(var1, var2, var3);
+    var f = mgr.makeDistinct(var1, var2, var3);
     var g = mgr.parse(str);
 
     assertThat(f).isEqualTo(g);
