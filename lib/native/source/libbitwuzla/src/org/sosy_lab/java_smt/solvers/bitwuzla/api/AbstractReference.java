@@ -10,9 +10,9 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public abstract class AbstractReference implements Reference {
-  protected transient long swigCPtr;
-  protected transient boolean swigCMemOwn;
+abstract class AbstractReference implements Reference {
+  protected long swigCPtr;
+  protected boolean swigCMemOwn;
 
   AbstractReference(long cPtr, boolean cMemoryOwn) {
     swigCMemOwn = cMemoryOwn;
@@ -20,17 +20,16 @@ public abstract class AbstractReference implements Reference {
     TermManager.addReference(this);
   }
 
-  abstract void delete();
+  /** Delete the native object. **/
+  abstract void deleteCPtr();
 
-  public long getSwigCPtr() {
-    return swigCPtr;
-  }
-
-  public void close() {
+  @Override
+  public synchronized void close() {
     if (swigCPtr != 0) {
+      TermManager.removeReference(this);
       if (swigCMemOwn) {
-        delete();
         swigCMemOwn = false;
+        deleteCPtr();
       }
       swigCPtr = 0;
     }

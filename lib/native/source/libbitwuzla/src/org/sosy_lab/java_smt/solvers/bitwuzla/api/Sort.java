@@ -27,7 +27,7 @@ public class Sort extends AbstractReference {
   }
 
   @Override
-  public void delete() {
+  void deleteCPtr() {
     BitwuzlaNativeJNI.delete_Sort(swigCPtr);
   }
 

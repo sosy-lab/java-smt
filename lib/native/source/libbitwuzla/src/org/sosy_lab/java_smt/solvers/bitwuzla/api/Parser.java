@@ -26,9 +26,8 @@ public class Parser extends AbstractReference{
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-
   @Override
-  public void delete() {
+  void deleteCPtr() {
     BitwuzlaNativeJNI.delete_Parser(swigCPtr);
   }
 

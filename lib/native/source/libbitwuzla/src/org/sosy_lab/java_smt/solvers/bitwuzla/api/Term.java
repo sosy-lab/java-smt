@@ -27,7 +27,7 @@ public class Term extends AbstractReference {
   }
 
   @Override
-  public void delete() {
+  void deleteCPtr() {
     BitwuzlaNativeJNI.delete_Term(swigCPtr);
   }
 

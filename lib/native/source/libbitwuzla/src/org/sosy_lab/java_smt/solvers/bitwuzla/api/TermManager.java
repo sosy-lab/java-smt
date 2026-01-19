@@ -16,14 +16,12 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 public class TermManager extends AbstractReference {
 
-  private static final Map<Long, Reference> references = new LinkedHashMap<>();
+  private static final Deque<Reference> references = new ArrayDeque<>();
 
   protected TermManager(long cPtr, boolean cMemoryOwn) {
     super(cPtr, cMemoryOwn);
@@ -34,24 +32,32 @@ public class TermManager extends AbstractReference {
   }
 
   @Override
-  public void delete() {
+  void deleteCPtr() {
     BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
   }
 
   static void addReference(Reference pointer) {
     synchronized (TermManager.class) {
-      references.put(pointer.getSwigCPtr(), pointer);
+      references.addLast(pointer);
     }
   }
 
+  static void removeReference(Reference pointer) {
+    synchronized (TermManager.class) {
+      references.removeLastOccurrence(pointer);
+    }
+  }
+
+  /**
+   * Destroy all native references.
+   *
+   * <p>Call this method when closing the final TermManager to destroy all native objects and free their memory
+   **/
   public static void deleteReferences() {
     synchronized (TermManager.class) {
-      LinkedList<Reference> values = new LinkedList<Reference>(references.values());
-      Iterator<Reference> i = values.descendingIterator();
-      while (i.hasNext()) {
-        i.next().close();
+      while (!references.isEmpty()) {
+        references.peekLast().close();
       }
-      references.clear();
     }
   }
 

@@ -62,9 +62,7 @@ public class BitwuzlaNativeApiTest {
 
   @After
   public void freeEnvironment() {
-    if (bitwuzla != null) {
-      bitwuzla.delete();
-    }
+    TermManager.deleteReferences();
   }
 
   @Test

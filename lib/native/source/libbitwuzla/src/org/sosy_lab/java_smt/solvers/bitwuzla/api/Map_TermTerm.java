@@ -30,17 +30,17 @@ public class Map_TermTerm extends java.util.AbstractMap<Term, Term> implements R
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @Override
-  public long getSwigCPtr() {
-    return swigCPtr;
+  void deleteCPtr() {
+    BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     if (swigCPtr != 0) {
+      TermManager.removeReference(this);
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Map_TermTerm(swigCPtr);
+        deleteCPtr();
       }
       swigCPtr = 0;
     }

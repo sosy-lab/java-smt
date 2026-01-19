@@ -27,7 +27,7 @@ public class Bitwuzla extends AbstractReference {
   }
 
   @Override
-  public void delete() {
+  void deleteCPtr() {
     BitwuzlaNativeJNI.delete_Bitwuzla(swigCPtr);
   }
 

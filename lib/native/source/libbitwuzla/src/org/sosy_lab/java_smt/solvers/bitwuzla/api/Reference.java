@@ -10,7 +10,8 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public interface Reference {
-  long getSwigCPtr();
+public interface Reference extends AutoCloseable {
+  /** Destroy the reference and free its native object. **/
+  @Override
   void close();
 }

@@ -30,17 +30,17 @@ public class Vector_Sort extends java.util.AbstractList<Sort> implements java.ut
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  @Override
-  public long getSwigCPtr() {
-    return swigCPtr;
+  void deleteCPtr() {
+    BitwuzlaNativeJNI.delete_Vector_Sort(swigCPtr);
   }
 
   @Override
-  public void close() {
+  public synchronized void close() {
     if (swigCPtr != 0) {
+      TermManager.removeReference(this);
       if (swigCMemOwn) {
         swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Vector_Sort(swigCPtr);
+        deleteCPtr();
       }
       swigCPtr = 0;
     }
