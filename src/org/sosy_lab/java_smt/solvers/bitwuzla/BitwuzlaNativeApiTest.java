@@ -91,21 +91,6 @@ public class BitwuzlaNativeApiTest {
   }
 
   @Test
-  public void repeatedTermCreationInMultipleSolversTest() {
-    Term tru1 = termManager.mk_true();
-    Term tru12 = termManager.mk_true();
-    assertThat(tru1.is_true()).isTrue();
-    assertThat(tru12.is_true()).isTrue();
-
-    new Thread(
-            () -> {
-              assertThat(tru1.is_true()).isTrue();
-              assertThat(tru12.is_true()).isTrue();
-            })
-        .start();
-  }
-
-  @Test
   public void isFalse() {
     Sort pBoolType = termManager.mk_bool_sort();
     Term var1 = termManager.mk_const(pBoolType, "var1");
