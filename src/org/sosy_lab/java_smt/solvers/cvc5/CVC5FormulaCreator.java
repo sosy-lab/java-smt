@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashBasedTable;
@@ -786,25 +787,22 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       functionsCache.put(pName, exp);
 
     } else {
-      checkArgument(
-          exp.getSort().equals(exp.getSort()),
-          "Symbol %s already in use for different return type %s",
-          exp,
-          exp.getSort());
-      for (int i = 1; i < exp.getNumChildren(); i++) {
-        // CVC5s first argument in a function/Uf is the declaration, we don't need that here
-        try {
-          checkArgument(
-              pArgTypes.get(i).equals(exp.getChild(i).getSort()),
-              "Argument %s with type %s does not match expected type %s",
-              i - 1,
-              pArgTypes.get(i),
-              exp.getChild(i).getSort());
-        } catch (CVC5ApiException e) {
-          throw new IllegalArgumentException(
-              "Failure visiting the Term '" + exp + "' at index " + i + ".", e);
-        }
+      var cachedDomain = exp.getSort().getFunctionDomainSorts();
+      var cachedRange = exp.getSort().getFunctionCodomainSort();
+      Preconditions.checkArgument(
+          pArgTypes.size() == cachedDomain.length,
+          "Function %s already defined with a different number of arguments",
+          pName);
+      for (int i = 0; i < cachedDomain.length; i++) {
+        checkArgument(
+            cachedDomain[i].equals(pArgTypes.get(i)),
+            "Function %s already defined with different types",
+            pName);
       }
+      Preconditions.checkArgument(
+          pReturnType.equals(cachedRange),
+          "Function %s already defined with different types",
+          pName);
     }
     return exp;
   }
