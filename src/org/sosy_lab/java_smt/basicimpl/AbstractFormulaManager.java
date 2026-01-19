@@ -14,12 +14,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -264,10 +267,92 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return enumManager;
   }
 
+  /** Override if the solver API only supports binary equality. */
+  protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
+    return equalImpl(ImmutableList.of(pArg1, pArgs));
+  }
+
+  @Override
+  public BooleanFormula equal(Collection<Formula> pArgs) {
+    if (pArgs.size() < 2) {
+      return booleanManager.makeTrue(); // trivially true
+    }
+    final Collection<FormulaType<Formula>> types =
+        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+    Preconditions.checkArgument(
+        ImmutableSet.copyOf(types).size() == 1,
+        "All arguments to `equal` must have the same type, but found %s different types: %s",
+        types.size(),
+        types);
+    return formulaCreator.encapsulateBoolean(
+        equalImpl(Collections2.transform(pArgs, formulaCreator::extractInfo)));
+  }
+
+  /** Override if the solver API supports equality with many arguments. */
+  protected TFormulaInfo equalImpl(Collection<TFormulaInfo> pArgs) {
+    List<TFormulaInfo> equalities = new ArrayList<>();
+    for (TFormulaInfo[] pair : pairwise(pArgs)) {
+      equalities.add(equalImpl(pair[0], pair[1]));
+    }
+    return booleanManager.andImpl(equalities);
+  }
+
+  /** for an Iterable [1, 2, 3, 4, 5], collect pairs [(1,2), (2,3), (3,4), (4,5)]. */
+  @SuppressWarnings("unchecked")
+  private <T> List<T[]> pairwise(Iterable<T> pArgs) {
+    final List<T[]> result = new ArrayList<>();
+    T prev = null;
+    for (T arg : pArgs) {
+      if (prev != null) {
+        result.add((T[]) new Object[] {prev, arg});
+      }
+      prev = arg;
+    }
+    return result;
+  }
+
+  @Override
+  public BooleanFormula distinct(Collection<Formula> pArgs) {
+    if (pArgs.size() < 2) {
+      return booleanManager.makeTrue(); // trivially true
+    }
+    final Collection<FormulaType<Formula>> types =
+        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+    Preconditions.checkArgument(
+        ImmutableSet.copyOf(types).size() == 1,
+        "All arguments to `equal` must have the same type, but found %s different types: %s",
+        types.size(),
+        types);
+    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(pArgs)));
+  }
+
+  /** Override if the solver API supports <code>distinct</code>. */
+  protected TFormulaInfo distinctImpl(Collection<TFormulaInfo> pArgs) {
+    List<TFormulaInfo> inequalities = new ArrayList<>();
+    for (TFormulaInfo[] pair : allUniquePairs(pArgs)) {
+      inequalities.add(booleanManager.not(equalImpl(pair[0], pair[1])));
+    }
+    return booleanManager.andImpl(inequalities);
+  }
+
+  /** for an Iterable [1, 2, 3, 4], collect all pairs [(1,2), (1,3), (1,4), (2,3), (2,4), (3,4)]. */
+  @SuppressWarnings("unchecked")
+  private <T> List<T[]> allUniquePairs(Iterable<T> pArgs) {
+    final List<T[]> result = new ArrayList<>();
+    final List<T> seenSoFar = new ArrayList<>(); // local cache for visited elements
+    for (T current : pArgs) {
+      for (T previous : seenSoFar) {
+        result.add((T[]) new Object[] {previous, current});
+      }
+      seenSoFar.add(current);
+    }
+    return result;
+  }
+
   protected abstract TFormulaInfo parseImpl(String formulaStr) throws IllegalArgumentException;
 
   /**
-   * Takes a SMT-LIB2 script and cleans it up.
+   * Takes an SMT-LIB2 script and cleans it up.
    *
    * <p>We remove all comments and put each command on its own line. Declarations and asserts are
    * kept and everything else is removed. For <code>(set-logic ..)</code> we make sure that it's at
@@ -542,7 +627,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   @Override
   public <T extends Formula> T makeApplication(
       FunctionDeclaration<T> declaration, Formula... args) {
-    return makeApplication(declaration, Arrays.asList(args));
+    return makeApplication(declaration, ImmutableList.copyOf(args));
   }
 
   @Override

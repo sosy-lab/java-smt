@@ -19,6 +19,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -32,6 +33,20 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
       FloatingPointFormulaManager pDelegate, SolverStatistics pStats) {
     delegate = checkNotNull(pDelegate);
     stats = checkNotNull(pStats);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.makeRoundingMode(pRoundingMode);
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    stats.fpOperations.getAndIncrement();
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
   }
 
   @Override

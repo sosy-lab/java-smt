@@ -22,10 +22,8 @@ import ap.parser.IFormula;
 import ap.parser.IFunApp;
 import ap.parser.IFunction;
 import ap.parser.IIntFormula;
-import ap.parser.IPlus;
 import ap.parser.ITerm;
-import ap.parser.ITermITE;
-import ap.parser.ITimes;
+import ap.parser.Parser2InputAbsy.ParseException;
 import ap.parser.Parser2InputAbsy.TranslationException;
 import ap.parser.PartialEvaluator;
 import ap.parser.SMTLineariser;
@@ -58,7 +56,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -320,7 +317,7 @@ class PrincessEnvironment {
 
     try {
       parserResult = extractFromSTMLIB(s);
-    } catch (TranslationException | EnvironmentException nested) {
+    } catch (TranslationException | EnvironmentException | ParseException nested) {
       throw new IllegalArgumentException(nested);
     }
 
@@ -352,6 +349,7 @@ class PrincessEnvironment {
    *
    * @throws EnvironmentException from Princess when the parsing fails
    * @throws TranslationException from Princess when the parsing fails due to type mismatch
+   * @throws ParseException from Princess when the parsing fails due to syntax errors
    */
   /* EnvironmentException is not unused, but the Java compiler does not like Scala. */
   @SuppressWarnings("unused")
@@ -360,7 +358,8 @@ class PrincessEnvironment {
           scala.collection.immutable.Map<IFunction, SMTFunctionType>,
           scala.collection.immutable.Map<ConstantTerm, SMTType>,
           scala.collection.immutable.Map<Predicate, SMTFunctionType>>
-      extractFromSTMLIB(String s) throws EnvironmentException, TranslationException {
+      extractFromSTMLIB(String s)
+          throws EnvironmentException, TranslationException, ParseException {
     // replace let-terms and function definitions by their full term.
     final boolean fullyInlineLetsAndFunctions = true;
     return api.extractSMTLIBAssertionsSymbols(new StringReader(s), fullyInlineLetsAndFunctions);
@@ -373,7 +372,6 @@ class PrincessEnvironment {
    * Exception at run time.
    */
   @SuppressWarnings("unchecked")
-  @SuppressFBWarnings("THROWS_METHOD_THROWS_CLAUSE_THROWABLE")
   private static <E extends Throwable> void throwCheckedAsUnchecked(Throwable e) throws E {
     throw (E) e;
   }
@@ -568,26 +566,10 @@ class PrincessEnvironment {
   }
 
   static FormulaType<?> getFormulaType(IExpression pFormula) {
-    // TODO: We could use Sort.sortof() here, but it sometimes returns `integer` even though the
-    //  term is rational. We should figure out why and then open a new issue for this.
     if (pFormula instanceof IFormula) {
       return FormulaType.BooleanType;
-    } else if (pFormula instanceof ITimes) {
-      // coeff is always INT, lets check the subterm.
-      ITimes times = (ITimes) pFormula;
-      return getFormulaType(times.subterm());
-    } else if (pFormula instanceof IPlus) {
-      IPlus plus = (IPlus) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.t1());
-      FormulaType<?> t2 = getFormulaType(plus.t2());
-      return mergeFormulaTypes(t1, t2);
-    } else if (pFormula instanceof ITermITE) {
-      ITermITE plus = (ITermITE) pFormula;
-      FormulaType<?> t1 = getFormulaType(plus.left());
-      FormulaType<?> t2 = getFormulaType(plus.right());
-      return mergeFormulaTypes(t1, t2);
     } else {
-      final Sort sort = Sort$.MODULE$.sortOf((ITerm) pFormula);
+      final Sort sort = Sort.sortOf((ITerm) pFormula);
       try {
         return getFormulaTypeFromSort(sort);
       } catch (IllegalArgumentException e) {
@@ -599,28 +581,6 @@ class PrincessEnvironment {
             e);
       }
     }
-  }
-
-  /**
-   * Merge INTEGER and RATIONAL type or INTEGER and BITVECTOR and return the more general type. The
-   * ordering is: RATIONAL > INTEGER > BITVECTOR.
-   *
-   * @throws IllegalArgumentException for any other type.
-   */
-  private static FormulaType<?> mergeFormulaTypes(FormulaType<?> type1, FormulaType<?> type2) {
-    if (type1.equals(type2)) {
-      return type1;
-    }
-    if ((type1.isIntegerType() || type1.isRationalType())
-        && (type2.isIntegerType() || type2.isRationalType())) {
-      return type1.isRationalType() ? type1 : type2;
-    }
-    if ((type1.isIntegerType() || type1.isBitvectorType())
-        && (type2.isIntegerType() || type2.isBitvectorType())) {
-      return type1.isIntegerType() ? type1 : type2;
-    }
-    throw new IllegalArgumentException(
-        String.format("Types %s and %s can not be merged.", type1, type2));
   }
 
   private static FormulaType<?> getFormulaTypeFromSort(final Sort sort) {
@@ -645,13 +605,16 @@ class PrincessEnvironment {
     } else if (sort instanceof MultipleValueBool$) {
       return FormulaType.BooleanType;
     } else {
+      // Check if it's a bitvector sort
       scala.Option<Object> bitWidth = getBitWidth(sort);
       if (bitWidth.isDefined()) {
         return FormulaType.getBitvectorTypeWithSize((Integer) bitWidth.get());
+      } else {
+        // Otherwise, fail
+        throw new IllegalArgumentException(
+            String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
       }
     }
-    throw new IllegalArgumentException(
-        String.format("Unknown formula type '%s' for sort '%s'.", sort.getClass(), sort));
   }
 
   static scala.Option<Object> getBitWidth(final Sort sort) {
@@ -767,7 +730,7 @@ class PrincessEnvironment {
   }
 
   static Seq<ITerm> toITermSeq(IExpression... exprs) {
-    return toITermSeq(Arrays.asList(exprs));
+    return toITermSeq(ImmutableList.copyOf(exprs));
   }
 
   IExpression simplify(IExpression f) {

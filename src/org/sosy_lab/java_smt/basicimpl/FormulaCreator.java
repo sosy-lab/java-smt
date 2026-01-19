@@ -16,6 +16,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,12 +26,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
@@ -134,6 +137,16 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
     return regexType;
   }
 
+  public FloatingPointRoundingMode getRoundingMode(FloatingPointRoundingModeFormula f) {
+    return getRoundingMode(extractInfo(f));
+  }
+
+  @SuppressWarnings("unused")
+  protected FloatingPointRoundingMode getRoundingMode(TFormulaInfo f) {
+    throw new UnsupportedOperationException(
+        "Floating point rounding modes are not supported by this solver.");
+  }
+
   public abstract TFormulaInfo makeVariable(TType type, String varName);
 
   public BooleanFormula encapsulateBoolean(TFormulaInfo pTerm) {
@@ -158,6 +171,14 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
         "Floatingpoint formula has unexpected type: %s",
         getFormulaType(pTerm));
     return new FloatingPointFormulaImpl<>(pTerm);
+  }
+
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(TFormulaInfo pTerm) {
+    checkArgument(
+        getFormulaType(pTerm).isFloatingPointRoundingModeType(),
+        "Floatingpoint rounding mode formula has unexpected type: %s",
+        getFormulaType(pTerm));
+    return new FloatingPointRoundingModeFormulaImpl<>(pTerm);
   }
 
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
@@ -301,8 +322,8 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    */
   public abstract <R> R visit(FormulaVisitor<R> visitor, Formula formula, TFormulaInfo f);
 
-  protected List<TFormulaInfo> extractInfo(List<? extends Formula> input) {
-    return Lists.transform(input, this::extractInfo);
+  protected List<TFormulaInfo> extractInfo(Collection<? extends Formula> input) {
+    return input.stream().map(this::extractInfo).collect(Collectors.toList());
   }
 
   /**
@@ -471,7 +492,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
               alreadyVisited),
           body);
 
-      // Afterwards, we skip the already finished body-formula.
+      // Afterward, we skip the already finished body-formula.
       return TraversalProcess.SKIP;
     }
   }
@@ -540,6 +561,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    *
    * @param pF the formula to be converted.
    */
+  @Nullable
   public Object convertValue(TFormulaInfo pF) {
     throw new UnsupportedOperationException(
         "This SMT solver needs a second term to determine a correct type. "
@@ -554,6 +576,7 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
    * @param pF the formula to be converted.
    */
   // only some solvers require the additional (first) parameter, other solvers ignore it.
+  @Nullable
   public Object convertValue(
       @SuppressWarnings("unused") TFormulaInfo pAdditionalF, TFormulaInfo pF) {
     return convertValue(pF);

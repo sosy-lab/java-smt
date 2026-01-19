@@ -23,11 +23,14 @@ import org.sosy_lab.java_smt.api.Model.ValueAssignment;
  * <p>This class is an extensions of {@link Evaluator} and provides more features:
  *
  * <ul>
- *   <li>a listing of model assignments, i.e., the user can iterate over all available symbols and
+ *   <li>a listing of model assignments, i.e., the user can iterate over most available symbols and
  *       their assignments,
- *   <li>a guaranteed availability even after applying any operation on the original prover stack, i
- *       .e., the model instance stays constant and remains valid for one given satisfiable prover
- *       environment.
+ *   <li>for several solvers (such as MATHSAT5, SMTInterpol, Z3), a guaranteed availability even
+ *       after applying any operation on the original prover stack, i.e., the model instance stays
+ *       constant and remains valid for one given satisfiable prover environment. Solvers without
+ *       this guarantee (CVC4, CVC5, Princess, Boolector, and Bitwuzla) are failing when accessing
+ *       the corresponding methods (we call {@link Model#close()} as soon as the guarantee is
+ *       violated).
  * </ul>
  */
 public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseable {
@@ -55,13 +58,26 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
     return asList().iterator();
   }
 
-  /** Build a list of assignments that stays valid after closing the model. */
+  /**
+   * Returns a list of model assignments that remains valid after the model is closed (via {@link
+   * Model#close()}).
+   *
+   * <p>The returned {@link ImmutableList} contains the same {@link ValueAssignment} elements that
+   * {@link #iterator()} would provide, but it is a materialized copy such that the list and its
+   * elements can still be accessed safely after the model has been closed. Methods that rely on
+   * live solver state such as {@link #iterator()} or {@link #evaluate(Formula)} should not be used
+   * after {@link #close()}, whereas the returned list can always be used, until the underlying
+   * solver context is closed ({@link SolverContext#close()}).
+   *
+   * <p>This representation is primarily intended for model inspection and debugging. For precise
+   * evaluation of individual formulas prefer targeted calls to {@link #evaluate(Formula)}.
+   */
   ImmutableList<ValueAssignment> asList();
 
   /**
    * Pretty-printing of the model values.
    *
-   * <p>Please only use this method for debugging and not for retrieving relevant information about
+   * <p>Please use this method only for debugging and not for retrieving relevant information about
    * the model. The returned model representation is not intended for further usage like parsing,
    * because we do not guarantee any specific format, e.g., for arrays and uninterpreted functions,
    * and we allow the SMT solver to include arbitrary additional information about the current
@@ -74,6 +90,11 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
   /**
    * Free resources associated with this model (existing {@link ValueAssignment} instances stay
    * valid, but {@link #evaluate(Formula)} etc. and {@link #iterator()} must not be called again).
+   *
+   * <p>For several solvers (such as MATHSAT5, SMTInterpol, Z3) the model remains valid even after
+   * changes to the prover environment from which it was obtained. For other solvers (CVC4, CVC5,
+   * Princess, Boolector, Bitwuzla) the model becomes invalid after any change to the prover
+   * environment.
    */
   @Override
   void close();
@@ -85,8 +106,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the application of the UF with arguments.
      *
-     * <p>For arrays we use the selection-statement with an index. We do not support Array theory as
-     * {@link #value} during a model evaluation, but we provide assignments like <code>
+     * <p>For arrays, we use the selection-statement with an index. We do not support Array theory
+     * as {@link #value} during a model evaluation, but we provide assignments like <code>
      * select(arr, 12) := 34</code> where <code>arr</code> itself is a plain symbol (without an
      * explicit const- or zero-based initialization, as done by some SMT solvers).
      */
@@ -107,8 +128,8 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      *
      * <p>For UFs we use the arguments.
      *
-     * <p>For arrays we use the index of a selection or an empty list for wildcard-selection, if the
-     * whole array is filled with a constant value. In the latter case any additionally given
+     * <p>For arrays, we use the index of a selection or an empty list for wildcard-selection, if
+     * the whole array is filled with a constant value. In the latter case any additionally given
      * array-assignment overrides the wildcard-selection for the given index. Example: "arr=0,
      * arr[2]=3" corresponds to an array {0,0,3,0,...}.
      */
@@ -120,7 +141,7 @@ public interface Model extends Evaluator, Iterable<ValueAssignment>, AutoCloseab
      * <p>For UFs we use their name without parameters. Parameters are given as {@link
      * #argumentsInterpretation}.
      *
-     * <p>For arrays we use the name without any index. The index is given as {@link
+     * <p>For arrays, we use the name without any index. The index is given as {@link
      * #argumentsInterpretation}, if required.
      */
     private final String name;

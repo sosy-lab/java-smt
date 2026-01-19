@@ -2,22 +2,22 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import java.util.ArrayDeque;
+import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
@@ -30,11 +30,8 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
-
   private final BitwuzlaTheoremProver prover;
-
-  private final BitwuzlaFormulaCreator bitwuzlaCreator;
-  private final ImmutableList<Term> assertedTerms;
+  private final ImmutableList<ValueAssignment> model;
 
   protected BitwuzlaModel(
       Bitwuzla bitwuzlaEnv,
@@ -44,158 +41,88 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     super(prover, bitwuzlaCreator);
     this.bitwuzlaEnv = bitwuzlaEnv;
     this.prover = prover;
-    this.bitwuzlaCreator = bitwuzlaCreator;
-    this.assertedTerms = ImmutableList.copyOf(assertedTerms);
+
+    // We need to generate and save this at construction time as Bitwuzla has no functionality to
+    // give a persistent reference to the model. If the SMT engine is used somewhere else, the
+    // values we get out of it might change!
+    model = generateModel(assertedTerms);
   }
 
   /** Build a list of assignments that stays valid after closing the model. */
-  @Override
-  public ImmutableList<ValueAssignment> asList() {
-    Preconditions.checkState(!isClosed());
-    Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
-    ImmutableSet.Builder<ValueAssignment> variablesBuilder = ImmutableSet.builder();
-    Deque<Term> queue = new ArrayDeque<>(assertedTerms);
-    while (!queue.isEmpty()) {
-      Term term = queue.removeFirst();
-      Sort sort = term.sort();
-      Vector_Term children = term.children();
-      // The term might be a value (variable or const, w only variable having a symbol)
-      // an array, an UF, or an FP or a function.
-      // Functions are just split into their children and those are traversed
-      if (sort.is_rm()) {
-        // Do nothing
-      } else if (term.kind() == Kind.APPLY) {
-        variablesBuilder.add(getUFAssignment(term));
-        for (int i = 1; i < children.size(); i++) {
-          queue.addLast(children.get(i));
-        }
+  private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedTerms) {
+    checkState(!isClosed());
+    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
+    ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
+    for (Term expr : assertedTerms) {
+      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
+    }
+    return builder.build().asList();
+  }
 
-      } else if (sort.is_bv() && term.is_const()) {
-        variablesBuilder.add(getSimpleAssignment(term));
+  /**
+   * Takes a (nested) select statement and returns its indices. For example: From "(SELECT (SELECT(
+   * SELECT 3 arr) 2) 1)" we return "[1,2,3]"
+   */
+  private ImmutableList<Term> getArrayIndices(Term array) {
+    ImmutableList.Builder<Term> indices = ImmutableList.builder();
+    while (array.kind().equals(Kind.ARRAY_SELECT)) {
+      indices.add(array.get(1));
+      array = array.get(0);
+    }
+    return indices.build().reverse();
+  }
 
-      } else if (sort.is_bool() && term.is_const()) {
-        variablesBuilder.add(getSimpleAssignment(term));
+  /** Takes a select statement with multiple indices and returns the variable name at the bottom. */
+  private String getVar(Term array) {
+    while (array.kind().equals(Kind.ARRAY_SELECT)) {
+      array = array.get(0);
+    }
+    return array.symbol();
+  }
 
-      } else if (sort.is_fp() && term.is_const()) {
-        // We can't eval FP properly at the moment, we just return whatever the solver gives us
-        // (BV representation of the FP)
-        variablesBuilder.add(getSimpleAssignment(term));
+  /**
+   * Build assignment for an array value.
+   *
+   * @param expr The array term, e.g., a variable
+   * @param value The model value term returned by Bitwuzla for the array, e.g., a Store chain
+   * @return A list of value assignments for all elements in the array, including nested arrays
+   */
+  private List<ValueAssignment> buildArrayAssignments(Term expr, Term value) {
+    // Iterate down the Store-chain: (Store tail index element)
+    List<ValueAssignment> result = new ArrayList<>();
+    while (value.kind().equals(Kind.ARRAY_STORE)) {
+      Term index = value.get(1);
+      Term element = value.get(2);
+      Term select =
+          ((BitwuzlaFormulaCreator) creator)
+              .getTermManager()
+              .mk_term(Kind.ARRAY_SELECT, expr, index);
 
-      } else if (sort.is_array() && term.is_const()) {
-        variablesBuilder.addAll(getArrayAssignment(term));
+      // CASE 1: nested array dimension, let's recurse deeper
+      if (expr.sort().array_element().is_array()) {
+        result.addAll(buildArrayAssignments(select, element));
 
       } else {
-        for (Term child : children) {
-          queue.addLast(child);
-        }
-      }
-    }
-
-    return variablesBuilder.build().asList();
-  }
-
-  private ValueAssignment getSimpleAssignment(Term pTerm) {
-    List<Object> argumentInterpretation = new ArrayList<>();
-    Term valueTerm = bitwuzlaEnv.get_value(pTerm);
-    String name = pTerm.symbol();
-    assert name != null;
-    return new ValueAssignment(
-        bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
-        bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-        bitwuzlaCreator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
-        name,
-        bitwuzlaCreator.convertValue(valueTerm),
-        argumentInterpretation);
-  }
-
-  private Collection<ValueAssignment> getArrayAssignment(Term pTerm) {
-    return getArrayAssignments(pTerm, ImmutableList.of());
-  }
-
-  // TODO: check this in detail. I think this might be incomplete.
-  // We should add more Model tests in general. As most are parsing and int based!
-  private Collection<ValueAssignment> getArrayAssignments(Term pTerm, List<Object> upperIndices) {
-    // Array children for store are structured in the following way:
-    // {starting array, index, value} in "we add value at index to array"
-    // Selections are structured: {starting array, index}
-    // Just declared (empty) arrays return an empty array
-
-    // Example Formula: (SELECT ARRAY INDEX)
-    // new ValueAssignment((SELECT ARRAY INDEX), value formula of INDEX, (SELECT ARRAY INDEX) =
-    // value of index, name of INDEX, actual java value of index, {return java value of the
-    // formula})
-
-    // TODO: Array equals value
-    Term array = pTerm;
-    Collection<ValueAssignment> assignments = new ArrayList<>();
-    Set<Term> indices = new HashSet<>();
-    while (array.sort().is_array()) {
-      // Here we either have STORE; SELECT or an empty Array
-      Vector_Term children = array.children();
-      List<Object> innerIndices = new ArrayList<>(upperIndices);
-      String name = getArrayName(array);
-      assert name != null;
-      if (children.isEmpty()) {
-        // Empty array
-        return assignments;
-      } else if (children.size() == 2) {
-        // SELECT expression
-        Term index = children.get(1);
-        if (!indices.add(index)) {
-          continue;
-        }
-
-        Term indexValue = bitwuzlaEnv.get_value(index);
-        innerIndices.add(evaluateImpl(indexValue));
-
-        // The value of an SELECT is equal to the content
-        Term valueTerm = bitwuzlaEnv.get_value(array);
-
-        assignments.add(
+        // CASE 2: final element, let's get the assignment and proceed with its sibling
+        result.add(
             new ValueAssignment(
-                bitwuzlaCreator.encapsulateWithTypeOf(array),
-                bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-                creator.encapsulateBoolean(buildEqForTwoTerms(array, valueTerm)),
-                name,
-                evaluateImpl(valueTerm),
-                innerIndices));
-        array = children.get(0);
-
-      } else {
-        // STORE expression
-        assert children.size() == 3;
-        Term index = children.get(1);
-        Term content = children.get(2);
-
-        if (!indices.add(index)) {
-          continue;
-        }
-
-        Term indexValue = bitwuzlaEnv.get_value(index);
-        Term contentValue = bitwuzlaEnv.get_value(content);
-        innerIndices.add(evaluateImpl(indexValue));
-        assignments.add(
-            new ValueAssignment(
-                bitwuzlaCreator.encapsulateWithTypeOf(array),
-                bitwuzlaCreator.encapsulateWithTypeOf(content),
-                creator.encapsulateBoolean(buildEqForTwoTerms(array, contentValue)),
-                name,
-                evaluateImpl(contentValue),
-                innerIndices));
-
-        array = children.get(0);
-        assignments.addAll(getArrayAssignments(array, innerIndices));
+                creator.encapsulate(creator.getFormulaType(element), select),
+                creator.encapsulate(creator.getFormulaType(element), element),
+                creator.encapsulateBoolean(buildEqForTwoTerms(select, element)),
+                getVar(expr),
+                creator.convertValue(element, element),
+                transformedImmutableListCopy(getArrayIndices(select), this::evaluateImpl)));
       }
-    }
-    return assignments;
-  }
 
-  private String getArrayName(Term array) {
-    String name = array.symbol();
-    if (name != null) {
-      return name;
+      // Move to the next Store in the chain
+      value = value.get(0);
     }
-    return getArrayName(array.get(0));
+
+    // End of chain must be CONST_ARRAY.
+    checkState(
+        value.kind().equals(Kind.CONST_ARRAY), "Unexpected array value structure: %s", value);
+
+    return result;
   }
 
   private Term buildEqForTwoTerms(Term left, Term right) {
@@ -204,10 +131,10 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     if (left.sort().is_fp() || right.sort().is_fp()) {
       kind = Kind.FP_EQUAL;
     }
-    return bitwuzlaCreator.getTermManager().mk_term(kind, left, right);
+    return ((BitwuzlaFormulaCreator) creator).getTermManager().mk_term(kind, left, right);
   }
 
-  private ValueAssignment getUFAssignment(Term pTerm) {
+  private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {
     Term valueTerm = bitwuzlaEnv.get_value(pTerm);
     // The first child is the decl, the others are args
     Vector_Term children = pTerm.children();
@@ -215,24 +142,56 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     assert name != null;
 
     List<Object> argumentInterpretation = new ArrayList<>();
-    for (int i = 1; i < children.size(); i++) {
-      Term child = children.get(i);
-      Term childValue = bitwuzlaEnv.get_value(child);
-      argumentInterpretation.add(creator.convertValue(childValue));
+    for (Term child : Iterables.skip(children, 1)) {
+      argumentInterpretation.add(this.evaluateImpl(child));
     }
 
     return new ValueAssignment(
-        bitwuzlaCreator.encapsulateWithTypeOf(pTerm),
-        bitwuzlaCreator.encapsulateWithTypeOf(valueTerm),
-        bitwuzlaCreator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
+        creator.encapsulateWithTypeOf(pTerm),
+        creator.encapsulateWithTypeOf(valueTerm),
+        creator.encapsulateBoolean(buildEqForTwoTerms(pTerm, valueTerm)),
         name,
-        bitwuzlaCreator.convertValue(valueTerm),
+        creator.convertValue(valueTerm),
         argumentInterpretation);
+  }
+
+  private List<ValueAssignment> getAssignments(Term pKeyTerm) {
+
+    // handle UF instantiations
+    if (pKeyTerm.kind() == Kind.APPLY) {
+      return ImmutableList.of(getAssignmentForUfInstantiation(pKeyTerm));
+    }
+
+    // handle array assignments
+    final Term valueTerm = bitwuzlaEnv.get_value(pKeyTerm);
+    if (pKeyTerm.sort().is_array()) {
+      return buildArrayAssignments(pKeyTerm, valueTerm);
+    }
+
+    // handle simple assignments
+    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
+    for (Term child : pKeyTerm.children()) {
+      argumentInterpretationBuilder.add(evaluateImpl(child));
+    }
+    return ImmutableList.of(
+        new ValueAssignment(
+            creator.encapsulateWithTypeOf(pKeyTerm),
+            creator.encapsulateWithTypeOf(valueTerm),
+            creator.encapsulateBoolean(buildEqForTwoTerms(pKeyTerm, valueTerm)),
+            checkNotNull(pKeyTerm.symbol()),
+            creator.convertValue(pKeyTerm, valueTerm),
+            argumentInterpretationBuilder.build()));
   }
 
   @Override
   protected @Nullable Term evalImpl(Term formula) {
-    Preconditions.checkState(!prover.isClosed(), "Cannot use model after prover is closed");
+    checkState(!isClosed());
+    checkState(!prover.isClosed(), "Cannot use model after prover is closed");
     return bitwuzlaEnv.get_value(formula);
+  }
+
+  @Override
+  public ImmutableList<ValueAssignment> asList() {
+    return model;
   }
 }

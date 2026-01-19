@@ -14,6 +14,7 @@ import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -39,7 +38,6 @@ import org.sosy_lab.java_smt.api.SolverException;
  * Tests bitvectors for all solvers that support it. Notice: Boolector does not support integer
  * theory or bitvectors length 1.
  */
-@RunWith(Parameterized.class)
 public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
   private static final BitvectorType bvType4 = FormulaType.getBitvectorTypeWithSize(4);
@@ -395,9 +393,9 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula a = bvmgr.makeVariable(4, "a");
     BitvectorFormula num3 = bvmgr.makeBitvector(4, 3);
 
-    assertThatFormula(bvmgr.distinct(List.of(a, num3))).isSatisfiable();
-    assertThatFormula(bvmgr.distinct(List.of(a, a))).isUnsatisfiable();
-    assertThatFormula(bvmgr.distinct(List.of(num3, num3))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(a, num3))).isSatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(a, a))).isUnsatisfiable();
+    assertThatFormula(bvmgr.distinct(ImmutableList.of(num3, num3))).isUnsatisfiable();
   }
 
   @Test
@@ -409,7 +407,7 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     BitvectorFormula b = bvmgr.makeVariable(8, "char_b");
     BitvectorFormula rightOp = bvmgr.makeBitvector(32, 7);
 
-    // 'cast' a to unsigned int
+    // 'cast' to unsigned int
     a = bvmgr.extend(a, 32 - 8, false);
     b = bvmgr.extend(b, 32 - 8, false);
     a = bvmgr.or(a, one);
@@ -466,12 +464,17 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
 
   @Test
   public void bvRotateByBV() throws SolverException, InterruptedException {
-    assume()
-        .withMessage("Princess is too slow for this test")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
+    int[] bitsizes;
+    switch (solverToUse()) {
+      case PRINCESS:
+        bitsizes = new int[] {2, 3}; // Princess is too slow for larger bitvectors
+        break;
+      default:
+        bitsizes = new int[] {2, 3, 4, 8, 13, 25, 31};
+        break;
+    }
 
-    for (int bitsize : new int[] {8, 13, 25, 31}) {
+    for (int bitsize : bitsizes) {
       BitvectorFormula zero = bvmgr.makeBitvector(bitsize, 0);
       BitvectorFormula a = bvmgr.makeVariable(bitsize, "a" + bitsize);
       BitvectorFormula b = bvmgr.makeVariable(bitsize, "b" + bitsize);
@@ -601,6 +604,16 @@ public class BitvectorFormulaManagerTest extends SolverBasedTest0.ParameterizedS
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, five), zero)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, three), two)).isTautological();
     assertThatFormula(bvmgr.equal(bvmgr.smodulo(minusTen, minusThree), minusOne)).isTautological();
+  }
+
+  @Test
+  public void bvModulo2() throws SolverException, InterruptedException {
+    BitvectorFormula one = bvmgr.makeBitvector(2, 1);
+    BitvectorFormula two = bvmgr.makeBitvector(2, 2);
+    BitvectorFormula three = bvmgr.makeBitvector(2, 3);
+
+    // check that SMOD works for small bitvectors: 1_2 % 2_2 == 3_2 or 01 % 10 == 11
+    assertThatFormula(bvmgr.equal(bvmgr.smodulo(one, two), three)).isTautological();
   }
 
   @Test

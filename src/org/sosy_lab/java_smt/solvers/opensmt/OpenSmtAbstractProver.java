@@ -8,16 +8,10 @@
 
 package org.sosy_lab.java_smt.solvers.opensmt;
 
-import static org.sosy_lab.java_smt.solvers.opensmt.OpenSMTProof.generateProof;
-
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,13 +21,10 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Evaluator;
-import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
-import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext.OpenSMTOptions;
@@ -52,9 +43,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   protected final OpenSmtFormulaCreator creator;
   protected final MainSolver osmtSolver;
   protected final SMTConfig osmtConfig;
-  private final FormulaManager formulaManager;
-
-  private boolean changedSinceLastSatQuery = false;
 
   protected OpenSmtAbstractProver(
       OpenSmtFormulaCreator pFormulaCreator,
@@ -70,10 +58,9 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     // not get garbage collected
     osmtConfig = pConfig;
     osmtSolver = new MainSolver(creator.getEnv(), pConfig, "JavaSmt");
-    formulaManager = pMgr; // needed for parsing formulas in proofs
   }
 
-  protected static SMTConfig getConfigInstance(
+  static SMTConfig getConfigInstance(
       Set<ProverOptions> pOptions, OpenSMTOptions pSolverOptions, boolean interpolation) {
     SMTConfig config = new SMTConfig();
     config.setOption(":random-seed", new SMTOption(pSolverOptions.randomSeed));
@@ -86,12 +73,15 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
     config.setOption(":produce-unsat-cores", optUnsatCore);
     config.setOption(":print-cores-full", optUnsatCore);
     config.setOption(":produce-interpolants", new SMTOption(interpolation));
-    config.setOption(
-        ":produce-proofs", new SMTOption(pOptions.contains(ProverOptions.GENERATE_PROOFS)));
     if (interpolation) {
-      config.setOption(":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool));
-      config.setOption(":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf));
-      config.setOption(":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra));
+      config.setOption(
+          ":interpolation-bool-algorithm", new SMTOption(pSolverOptions.algBool.getValue()));
+      config.setOption(
+          ":interpolation-euf-algorithm", new SMTOption(pSolverOptions.algUf.getValue()));
+      config.setOption(
+          ":interpolation-lra-algorithm", new SMTOption(pSolverOptions.algLra.getValue()));
+      config.setOption(
+          ":simplify-interpolants", new SMTOption(pSolverOptions.simplifyInterpolants));
     }
     return config;
   }
@@ -101,14 +91,17 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
+  @Override
   protected void pushImpl() {
-    setChanged();
     osmtSolver.push();
   }
 
   @Override
   protected void popImpl() {
-    setChanged();
     osmtSolver.pop();
   }
 
@@ -118,7 +111,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   @Nullable
   protected T addConstraintImpl(BooleanFormula pF) throws InterruptedException {
-    setChanged();
     PTRef f = creator.extractInfo(pF);
     return addConstraintImpl(f);
   }
@@ -126,18 +118,14 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @SuppressWarnings("resource")
   @Override
   public Model getModel() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
-
-    Model model =
+    return registerEvaluator(
         new OpenSmtModel(
-            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo));
-    return registerEvaluator(model);
+            this, creator, Collections2.transform(getAssertedFormulas(), creator::extractInfo)));
   }
 
   @Override
   public Evaluator getEvaluator() {
-    Preconditions.checkState(!closed);
     checkGenerateModels();
     return getEvaluatorWithoutChecks();
   }
@@ -146,20 +134,6 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
   @Override
   protected Evaluator getEvaluatorWithoutChecks() {
     return registerEvaluator(new OpenSmtEvaluator(this, creator));
-  }
-
-  protected void setChanged() {
-    if (!changedSinceLastSatQuery) {
-      changedSinceLastSatQuery = true;
-      closeAllEvaluators();
-    }
-  }
-
-  @Override
-  public ImmutableList<ValueAssignment> getModelAssignments() throws SolverException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(!changedSinceLastSatQuery);
-    return super.getModelAssignments();
   }
 
   /**
@@ -234,11 +208,8 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   @SuppressWarnings("try") // ShutdownHook is never referenced, and this is correct.
-  public boolean isUnsat() throws InterruptedException, SolverException {
-    Preconditions.checkState(!closed);
+  protected boolean isUnsatImpl() throws InterruptedException, SolverException {
     closeAllEvaluators();
-    changedSinceLastSatQuery = false;
-
     sstat result;
     try (ShutdownHook listener = new ShutdownHook(shutdownNotifier, osmtSolver::stop)) {
       shutdownNotifier.shutdownIfNecessary();
@@ -274,93 +245,20 @@ public abstract class OpenSmtAbstractProver<T> extends AbstractProverWithAllSat<
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    Preconditions.checkState(!closed);
     checkGenerateUnsatCores();
-    Preconditions.checkState(!changedSinceLastSatQuery);
     return Lists.transform(osmtSolver.getUnsatCore(), creator::encapsulateBoolean);
   }
 
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> pAssumptions) throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("OpenSMT does not support solving with assumptions.");
-  }
-
-  // TODO perform resolution throughout the DAG to calculate formulas that might not be present.
-  @Override
-  public Proof getProof() throws SolverException, InterruptedException {
-    Preconditions.checkState(!closed);
-    Preconditions.checkState(this.isUnsat());
-    checkGenerateProofs();
-    // throw new UnsupportedOperationException(
-    //    "Proof generation is not available for the current solver.");
-
-    // System.out.println(osmtSolver.printResolutionProofSMT2());
-    OpenSMTProof root = generateProof(osmtSolver.printResolutionProofSMT2());
-    parseFormulas(root);
-    return root;
-  }
-
-  private void parseFormulas(Proof root) {
-    Deque<Proof> stack = new ArrayDeque<>();
-    stack.push(root);
-
-    while (!stack.isEmpty()) {
-      Proof proof = stack.pop();
-      Formula formula;
-      String formulaString = ((OpenSMTProof) proof).sFormula;
-      // System.out.println(formulaString);
-
-      if (formulaString != null) {
-        try {
-          // Replace integer literals with real literals to avoid parsing errors
-          if (creator.getLogic().doesLogicSupportReals()) {
-            // This fixes error where OpenSMT tries to parse Int and Real operations e.g. (* Int
-            // Real) but when doing operations between integers it causes that exact problem.
-            // formulaString = formulaString.replaceAll("(?<=[\\s\\(])(-?\\d+)(?=[\\s\\)])",
-            // "$1.0");
-          }
-
-          if (formulaString.startsWith("(")) {
-            formulaString = "(assert " + formulaString + ")";
-            formula = formulaManager.parse(formulaString);
-            // System.out.println(formula);
-            ((OpenSMTProof) proof).setFormula(formula);
-          } else if (formulaString.equals("-") || formulaString.equals("false")) {
-            formula = formulaManager.getBooleanFormulaManager().makeFalse();
-            ((OpenSMTProof) proof).setFormula(formula);
-          } else {
-            if (formulaManager.isValidName(formulaString)) {
-              formula = formulaManager.getBooleanFormulaManager().makeVariable(formulaString);
-              ((OpenSMTProof) proof).setFormula(formula);
-            } else {
-              formula = formulaManager.parse("(assert (" + formulaString + "))");
-              ((OpenSMTProof) proof).setFormula(formula);
-            }
-          }
-        } catch (IllegalArgumentException e) {
-          throw new IllegalArgumentException("Error parsing formula: " + formulaString, e);
-        }
-      } else {
-        ((OpenSMTProof) proof).setFormula(null);
-      }
-
-      // ((OpenSMTSubproof) subproof).setFormula(formula);
-      // System.out.println(".");
-      // System.out.println(subproof.getFormula());
-      if (!proof.isLeaf()) {
-        Proof[] children = proof.getChildren().toArray(new Proof[0]);
-        for (int i = children.length - 1; i >= 0; i--) {
-          stack.push(children[i]);
-        }
-      }
-    }
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override

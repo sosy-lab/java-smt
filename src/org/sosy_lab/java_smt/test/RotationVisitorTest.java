@@ -51,8 +51,8 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
                 FunctionDeclarationKind.ITE,
                 FunctionDeclarationKind.EQ,
                 FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.BV_SMOD,
-                FunctionDeclarationKind.BV_SMOD,
+                FunctionDeclarationKind.BV_UREM,
+                FunctionDeclarationKind.BV_UREM,
                 FunctionDeclarationKind.BV_LSHR,
                 FunctionDeclarationKind.BV_SUB);
         break;
@@ -62,8 +62,8 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
             .containsExactly(
                 FunctionDeclarationKind.BV_OR,
                 FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.BV_SMOD,
-                FunctionDeclarationKind.BV_SMOD,
+                FunctionDeclarationKind.BV_UREM,
+                FunctionDeclarationKind.BV_UREM,
                 FunctionDeclarationKind.BV_LSHR,
                 FunctionDeclarationKind.BV_SUB);
         break;
@@ -114,8 +114,8 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
                 FunctionDeclarationKind.ITE,
                 FunctionDeclarationKind.EQ,
                 FunctionDeclarationKind.EQ,
-                FunctionDeclarationKind.BV_SMOD,
-                FunctionDeclarationKind.BV_SMOD,
+                FunctionDeclarationKind.BV_UREM,
+                FunctionDeclarationKind.BV_UREM,
                 FunctionDeclarationKind.BV_SHL,
                 FunctionDeclarationKind.BV_SUB);
         break;
@@ -125,8 +125,8 @@ public class RotationVisitorTest extends SolverBasedTest0.ParameterizedSolverBas
             .containsExactly(
                 FunctionDeclarationKind.BV_OR,
                 FunctionDeclarationKind.BV_SHL,
-                FunctionDeclarationKind.BV_SMOD,
-                FunctionDeclarationKind.BV_SMOD,
+                FunctionDeclarationKind.BV_UREM,
+                FunctionDeclarationKind.BV_UREM,
                 FunctionDeclarationKind.BV_LSHR,
                 FunctionDeclarationKind.BV_SUB);
         break;

@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
+import org.sosy_lab.java_smt.solvers.z3legacy.Z3LegacySolverContext;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -55,6 +56,7 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
+    Z3_WITH_INTERPOLATION,
     PRINCESS,
     BOOLECTOR,
     CVC4,
@@ -142,7 +144,7 @@ public class SolverContextFactory {
    *     via this LogManager.
    * @param pShutdownNotifier This central instance allows to request the termination of all
    *     operations in the created solver. Please note that the solver can decide on its own to
-   *     accept the shutdown request and terminate its operation afterwards. We do not forcefully
+   *     accept the shutdown request and terminate its operation afterward. We do not forcefully
    *     terminate any solver query eagerly. In general, a solver is of good nature, and maturely
    *     developed, and terminates accordingly.
    * @param pLoader The loading mechanism (loading method) in this class can be injected by the user
@@ -283,6 +285,17 @@ public class SolverContextFactory {
         return Z3SolverContext.create(
             logger,
             Configuration.builder().copyFrom(config).setOption("requireProofs", "true").build(),
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            nonLinearArithmetic,
+            loader);
+
+      case Z3_WITH_INTERPOLATION:
+        return Z3LegacySolverContext.create(
+            logger,
+            config,
             shutdownNotifier,
             logfile,
             randomSeed,

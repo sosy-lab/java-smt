@@ -27,7 +27,7 @@ public class PrincessRationalFormulaManager
     extends PrincessNumeralFormulaManager<NumeralFormula, RationalFormula>
     implements RationalFormulaManager {
 
-  private PrincessIntegerFormulaManager ifmgr;
+  private final PrincessIntegerFormulaManager ifmgr;
 
   PrincessRationalFormulaManager(
       PrincessFormulaCreator pCreator,
@@ -40,15 +40,14 @@ public class PrincessRationalFormulaManager
   @Override
   protected boolean isNumeral(IExpression value) {
     if (value instanceof IFunApp) {
-      IFunApp fun = (IFunApp) value;
-      switch (fun.fun().name()) {
-        case "int":
-        case "Rat_int":
-          assert fun.fun().arity() == 1;
-          return ifmgr.isNumeral(fun.apply(0));
-        case "frac":
-          assert fun.fun().arity() == 2;
-          return ifmgr.isNumeral(fun.apply(0)) && ifmgr.isNumeral(fun.apply(1));
+      IFunApp app = (IFunApp) value;
+      switch (app.fun().name()) {
+        case "Rat_fromRing":
+          assert app.fun().arity() == 1;
+          return ifmgr.isNumeral(app.apply(0));
+        case "Rat_frac":
+          assert app.fun().arity() == 2;
+          return ifmgr.isNumeral(app.apply(0)) && ifmgr.isNumeral(app.apply(1));
       }
     }
     return false;
@@ -69,37 +68,31 @@ public class PrincessRationalFormulaManager
   }
 
   @Override
-  protected IExpression makeNumberImpl(Rational pI) {
-    return divide(makeNumberImpl(pI.getNum()), makeNumberImpl(pI.getDen()));
-  }
-
-  @Override
-  protected IExpression makeNumberImpl(String i) {
-    return makeNumberImpl(new BigDecimal(i));
-  }
-
-  @Override
   protected IExpression makeNumberImpl(double pNumber) {
     return makeNumberImpl(BigDecimal.valueOf(pNumber));
   }
 
   @Override
   protected IExpression makeNumberImpl(BigDecimal pNumber) {
-    if (pNumber.stripTrailingZeros().scale() <= 0) {
-      // We have an integer number
-      // Return the term for a/1
-      return PrincessEnvironment.rationalTheory.int2ring(
-          ifmgr.makeNumberImpl(pNumber.toBigInteger()));
+    return makeNumberImpl(Rational.ofBigDecimal(pNumber));
+  }
+
+  @Override
+  protected IExpression makeNumberImpl(Rational pI) {
+    if (pI.isIntegral()) {
+      return makeNumberImpl(pI.getNum());
     } else {
-      // We have a fraction a/b
-      // Convert the numerator and the divisor and then return the fraction
-      List<ITerm> args =
-          ImmutableList.of(
-              ifmgr.makeNumberImpl(pNumber.unscaledValue()),
-              ifmgr.makeNumberImpl(BigInteger.valueOf(10).pow(pNumber.scale())));
       return new IFunApp(
-          PrincessEnvironment.rationalTheory.frac(), PrincessEnvironment.toSeq(args));
+          PrincessEnvironment.rationalTheory.frac(),
+          PrincessEnvironment.toSeq(
+              ImmutableList.of(
+                  ifmgr.makeNumberImpl(pI.getNum()), ifmgr.makeNumberImpl(pI.getDen()))));
     }
+  }
+
+  @Override
+  protected IExpression makeNumberImpl(String i) {
+    return makeNumberImpl(new BigDecimal(i));
   }
 
   @Override
@@ -117,7 +110,7 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression floor(IExpression number) {
-    throw new UnsupportedOperationException("floor is not supported in Princess");
+    return Rationals.ring2int((ITerm) number);
   }
 
   @Override
@@ -142,7 +135,10 @@ public class PrincessRationalFormulaManager
 
   @Override
   protected IExpression divide(IExpression number1, IExpression number2) {
-    return Rationals.div(toType(number1), toType(number2));
+    // SMT-LIB allows division by zero, so we use divWithSpecialZero here.
+    // If the divisor is zero, divWithSpecialZero will evaluate to a unary UF `ratDivZero`,
+    // otherwise it is the normal division
+    return Rationals.divWithSpecialZero(toType(number1), toType(number2));
   }
 
   @Override

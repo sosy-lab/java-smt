@@ -12,15 +12,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Table;
 import com.google.common.primitives.Longs;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -29,10 +26,8 @@ import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
-import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorArrayFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBitvectorFormula;
 import org.sosy_lab.java_smt.solvers.boolector.BoolectorFormula.BoolectorBooleanFormula;
@@ -47,9 +42,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    * per var name, meaning there is only 1 column per row!
    */
   private final Table<String, Long, Long> formulaCache = HashBasedTable.create();
-
-  // Remember uf sorts, as Boolector does not give them back correctly
-  private final Map<Long, List<Long>> ufArgumentsSortMap = new HashMap<>();
 
   // Possibly we need to split this up into vars, ufs, and arrays
 
@@ -203,50 +195,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
         "Boolector has no methods to access internal nodes for visitation.");
   }
 
-  // Hopefully a helpful template for when visitor gets implemented
-  // Btor only has bitvec arrays and ufs with bitvecs and arrays of bitvecs
-  // (and quantifier with bitvecs only)
-  @SuppressWarnings("unused")
-  private <R> R visit1(FormulaVisitor<R> visitor, Formula formula, Long f) {
-    if (BtorJNI.boolector_is_const(getEnv(), f)) {
-      // Handles all constants (bitvec, bool)
-      String bits = BtorJNI.boolector_get_bits(getEnv(), f);
-      return visitor.visitConstant(formula, convertValue(f, parseBitvector(bits)));
-    } else if (BtorJNI.boolector_is_param(getEnv(), f)) {
-      // Quantifier have their own variables called param.
-      // They can only be bound once! (use them as bitvec)
-      int deBruijnIdx = 0; // TODO: Ask Developers for this because this is WRONG!
-      return visitor.visitBoundVariable(formula, deBruijnIdx);
-    } else if (false) {
-      // Quantifier
-      // there is currently no way to find out if the formula is a quantifier
-      // do we need them separately?
-      /*
-       * return visitor .visitQuantifier( (BoolectorBooleanFormula) formula, quantifier,
-       * boundVariables, new BoolectorBooleanFormula(body, getEnv()));
-       */
-    } else if (BtorJNI.boolector_is_var(getEnv(), f)) {
-      // bitvec var (size 1 is bool!)
-      return visitor.visitFreeVariable(formula, getName(f));
-    } else {
-      ImmutableList.Builder<Formula> args = ImmutableList.builder();
-
-      ImmutableList.Builder<FormulaType<?>> argTypes = ImmutableList.builder();
-
-      return visitor.visitFunction(
-          formula,
-          args.build(),
-          FunctionDeclarationImpl.of(
-              getName(f), getDeclarationKind(f), argTypes.build(), getFormulaType(f), f));
-    } // TODO: fix declaration in visitFunction
-    return null;
-  }
-
-  // TODO: returns kind of formula (add, uf etc....) once methods are provided
-  private FunctionDeclarationKind getDeclarationKind(@SuppressWarnings("unused") long f) {
-    return null;
-  }
-
   @Override
   public Long callFunctionImpl(Long pDeclaration, List<Long> pArgs) {
     Preconditions.checkArgument(
@@ -270,7 +218,6 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     }
     long uf = BtorJNI.boolector_uf(getEnv(), sort, name);
     formulaCache.put(name, sort, uf);
-    ufArgumentsSortMap.put(uf, pArgTypes);
     return uf;
   }
 
@@ -325,8 +272,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
    */
   private BigInteger parseBigInt(String assignment) {
     try {
-      BigInteger bigInt = new BigInteger(assignment, 2);
-      return bigInt;
+      return new BigInteger(assignment, 2);
     } catch (NumberFormatException e) {
       char[] charArray = assignment.toCharArray();
       for (int i = 0; i < charArray.length; i++) {
@@ -401,7 +347,7 @@ public class BoolectorFormulaCreator extends FormulaCreator<Long, Long, Long, Lo
     Iterator<java.util.Map.Entry<Long, Long>> entrySetIter =
         formulaCache.row(variable).entrySet().iterator();
     if (entrySetIter.hasNext()) {
-      // If there is a non empty row for an entry, there is only one entry
+      // If there is a non-empty row for an entry, there is only one entry
       return Optional.of(entrySetIter.next().getValue());
     }
     return Optional.empty();

@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
-import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
 
 import com.google.common.base.Preconditions;
@@ -87,6 +86,11 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return true;
+  }
+
+  @Override
   protected void pushImpl() {
     annotatedTerms.add(annotatedTerms.peek());
     env.push(1);
@@ -113,9 +117,7 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   }
 
   @Override
-  public boolean isUnsat() throws InterruptedException {
-    checkState(!closed);
-
+  protected boolean isUnsatImpl() throws InterruptedException {
     // We actually terminate SmtInterpol during the analysis
     // by using a shutdown listener. However, SmtInterpol resets the
     // mStopEngine flag in DPLLEngine before starting to solve,
@@ -152,7 +154,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @SuppressWarnings("resource")
   @Override
   public org.sosy_lab.java_smt.api.Model getModel() {
-    checkState(!closed);
     checkGenerateModels();
     final Model model;
     try {
@@ -179,7 +180,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
 
   @Override
   public List<BooleanFormula> getUnsatCore() {
-    checkState(!closed);
     checkGenerateUnsatCores();
     return getUnsatCore0(annotatedTerms.peek());
   }
@@ -203,7 +203,6 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public Optional<List<BooleanFormula>> unsatCoreOverAssumptions(
       Collection<BooleanFormula> assumptions) throws InterruptedException, SolverException {
-    checkState(!closed);
     checkGenerateUnsatCoresOverAssumptions();
     Map<String, BooleanFormula> annotatedConstraints = new LinkedHashMap<>();
     push();
@@ -279,13 +278,12 @@ abstract class SmtInterpolAbstractProver<T> extends AbstractProver<T> {
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> pAssumptions)
       throws SolverException, InterruptedException {
-    throw new UnsupportedOperationException("Assumption-solving is not supported.");
+    throw new UnsupportedOperationException(ASSUMPTION_SOLVING_NOT_SUPPORTED);
   }
 
   @Override
   public <R> R allSat(AllSatCallback<R> callback, List<BooleanFormula> important)
       throws InterruptedException, SolverException {
-    checkState(!closed);
     checkGenerateAllSat();
 
     Term[] importantTerms = new Term[important.size()];

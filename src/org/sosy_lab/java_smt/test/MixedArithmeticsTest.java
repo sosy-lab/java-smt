@@ -16,7 +16,6 @@ import static com.google.common.truth.TruthJUnit.assume;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.junit.Before;
@@ -69,7 +68,7 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   public void createIntegerNumberTest() throws SolverException, InterruptedException {
     IntegerFormula num1 = imgr.makeNumber(1.0);
     for (IntegerFormula num2 :
-        List.of(
+        ImmutableList.of(
             imgr.makeNumber(1.0),
             imgr.makeNumber("1"),
             imgr.makeNumber(1),
@@ -86,7 +85,7 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   public void createRationalNumberTest() throws SolverException, InterruptedException {
     RationalFormula num1 = rmgr.makeNumber(1.0);
     for (RationalFormula num2 :
-        List.of(
+        ImmutableList.of(
             rmgr.makeNumber(1.0),
             rmgr.makeNumber("1"),
             rmgr.makeNumber(1),
@@ -103,7 +102,7 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   public void createRational2NumberTest() throws SolverException, InterruptedException {
     RationalFormula num1 = rmgr.makeNumber(1.5);
     for (RationalFormula num2 :
-        List.of(
+        ImmutableList.of(
             rmgr.makeNumber(1.5),
             rmgr.makeNumber("1.5"),
             rmgr.makeNumber(BigDecimal.valueOf(1.5)),
@@ -258,6 +257,8 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   @Test
   public void floorTest() throws SolverException, InterruptedException {
     requireRationalFloor();
+    // FIXME Princess will loop forever. Report to the developers
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
     testIntegerOperation(rmgr::floor, imgr.makeNumber(1.0), imgr.makeNumber(1.0));
     testIntegerOperation(rmgr::floor, rmgr.makeNumber(1.5), imgr.makeNumber(1.0));
   }

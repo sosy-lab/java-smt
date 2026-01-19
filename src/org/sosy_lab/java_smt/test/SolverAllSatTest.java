@@ -77,9 +77,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-        // CVC4 and Boolector do not support interpolation
-        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.Z3);
-
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
 
@@ -149,10 +146,13 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     assertThat(env.allSat(callback, ImmutableList.of(v1, v2))).isEqualTo(EXPECTED_RESULT);
   }
 
-  @Test
+  @Test(timeout = 5_000)
   public void allSatTest_xor() throws SolverException, InterruptedException {
     requireIntegers();
 
+    // We have the following constraint: '(i=1) XOR (i=2)'
+    // with the predicates b1 and b2 defined as: '(i=1) <=> b1' and '(i=2) <=> b2'.
+    // We expect exactly two models from ALLSAT: {b1,-b2} and {-b1, b2}.
     IntegerFormula a = imgr.makeVariable("i");
     IntegerFormula n1 = imgr.makeNumber(1);
     IntegerFormula n2 = imgr.makeNumber(2);
@@ -167,9 +167,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
 
     env.push(bmgr.equivalence(v1, cond1));
     env.push(bmgr.equivalence(v2, cond2));
-
-    // ((i=1) XOR (i=2)) & b1 <=> (i=1) & b2 <=> (i=2)
-    // query ALLSAT for predicates [b1, b2] --> {[b1,-b2], [-b1,b2]}
 
     TestAllSatCallback callback = new TestAllSatCallback();
 
@@ -217,13 +214,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     if ("itp".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a inconclusive sat-check when using interpolation")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
-
-    if ("normal".equals(proverEnv)) {
-      assume()
-          .withMessage("solver reports a partial model when using quantifiers")
           .that(solverToUse())
           .isNotEqualTo(Solvers.PRINCESS);
     }

@@ -47,7 +47,7 @@ public final class Tokenizer {
           inComment = false;
           if (level > 0) {
             // If we're in an expression we need to replace the entire comment (+ the newline) with
-            // some whitespace. Otherwise symbols might get merged across line-wraps. This is not
+            // some whitespace. Otherwise, symbols might get merged across line-wraps. This is not
             // a problem at the top-level where all terms are surrounded by brackets.
             token.append(c);
           }
@@ -133,7 +133,7 @@ public final class Tokenizer {
     }
     if (level != 0) {
       // Throw an exception if the brackets don't match
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("brackets do not match, too many open brackets");
     }
     return builder.build();
   }
@@ -166,7 +166,7 @@ public final class Tokenizer {
    * <p>Use {@link #tokenize(String)} to turn an SMT-LIB2 script into a string of input tokens.
    */
   public static boolean isDefinitionToken(String token) {
-    return matchesOneOf(token, "define-fun");
+    return matchesOneOf(token, "define-fun", "define-const");
   }
 
   /**

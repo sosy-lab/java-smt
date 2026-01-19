@@ -100,7 +100,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
     Future<?> result =
         exec.submit(
             () -> {
-              // Generate a non trivial problem for our tests
+              // Generate a non-trivial problem for our tests
               BooleanFormula varA = debugBmgr.makeVariable("a");
               BooleanFormula formula = debugBmgr.and(varA, debugBmgr.not(varA));
 
@@ -149,7 +149,7 @@ public class DebugModeTest extends SolverBasedTest0.ParameterizedSolverBasedTest
       BooleanFormula formula = hardProblem.generate(DEFAULT_PROBLEM_SIZE);
 
       // We expect debug mode to throw an exception for all solvers, except CVC4, CVC5 and Yices
-      if (!List.of(Solvers.CVC4, Solvers.YICES2).contains(solverToUse())) {
+      if (!ImmutableList.of(Solvers.CVC4, Solvers.YICES2).contains(solverToUse())) {
         assertThrows(IllegalArgumentException.class, () -> checkFormulaInDebugContext(formula));
       } else {
         checkFormulaInDebugContext(formula);

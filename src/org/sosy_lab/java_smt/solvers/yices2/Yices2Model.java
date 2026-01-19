@@ -8,14 +8,12 @@
 
 package org.sosy_lab.java_smt.solvers.yices2;
 
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_ALGEBRAIC;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_BOOL;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_BV;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_FUNCTION;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_MAPPING;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_RATIONAL;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_SCALAR;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_TUPLE;
-import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.YVAL_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_application;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_bvtype_size;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_def_terms;
@@ -65,7 +63,7 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   private final Yices2TheoremProver prover;
   private final Yices2FormulaCreator formulaCreator;
 
-  protected Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
+  Yices2Model(long model, Yices2TheoremProver prover, Yices2FormulaCreator pCreator) {
     super(prover, pCreator);
     this.model = model;
     this.prover = prover;
@@ -84,18 +82,22 @@ public class Yices2Model extends AbstractModel<Integer, Integer, Long> {
   public ImmutableList<ValueAssignment> asList() {
     Preconditions.checkState(!isClosed());
     Preconditions.checkState(!prover.isClosed(), "cannot use model after prover is closed");
-    List<Integer> complex =
-        ImmutableList.of(YVAL_SCALAR, YVAL_FUNCTION, YVAL_MAPPING, YVAL_UNKNOWN, YVAL_TUPLE);
     ImmutableList.Builder<ValueAssignment> assignments = ImmutableList.builder();
     int[] termsInModel = yices_def_terms(model);
     for (int term : termsInModel) {
       int[] yvalTag = yices_get_value(model, term);
-      if (!complex.contains(yvalTag[1])) { // TODO Switch with other if for less complex check?
-        assignments.add(getSimpleAssignment(term));
-      } else if (yvalTag[1] == YVAL_FUNCTION) {
-        assignments.addAll(getFunctionAssignment(term, yvalTag));
-      } else {
-        throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
+      switch (yvalTag[1]) {
+        case YVAL_BOOL:
+        case YVAL_RATIONAL:
+        case YVAL_ALGEBRAIC:
+        case YVAL_BV:
+          assignments.add(getSimpleAssignment(term));
+          continue;
+        case YVAL_FUNCTION: // UFs and Arrays
+          assignments.addAll(getFunctionAssignment(term, yvalTag));
+          continue;
+        default:
+          throw new UnsupportedOperationException("YVAL with unexpected tag: " + yvalTag[1]);
       }
     }
 

@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.test;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Random;
 import java.util.stream.IntStream;
 import org.sosy_lab.java_smt.api.FormulaManager;
@@ -43,7 +42,6 @@ class IntegerTheoryFuzzer {
     return recFuzz(formulaSize);
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula recFuzz(int pFormulaSize) {
     if (pFormulaSize == 1) {
 
@@ -78,12 +76,10 @@ class IntegerTheoryFuzzer {
     }
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula getConstant() {
     return ifmgr.makeNumber((long) r.nextInt(2 * maxConstant) - maxConstant);
   }
 
-  @SuppressFBWarnings(value = "DMI_RANDOM_USED_ONLY_ONCE")
   private IntegerFormula getVar() {
     return vars[r.nextInt(vars.length)];
   }

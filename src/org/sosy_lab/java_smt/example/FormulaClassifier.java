@@ -88,14 +88,12 @@ public class FormulaClassifier {
       List<String> definitions = new ArrayList<>();
       for (String line : Files.readAllLines(path)) {
         // we assume a line-based content
-        if (Iterables.any(
-            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
-          continue;
-        } else if (line.startsWith("(assert ")) {
+        if (line.startsWith("(assert ")) {
           BooleanFormula bf =
               context.getFormulaManager().parse(Joiner.on("").join(definitions) + line);
           formulas.add(bf);
-        } else {
+        } else if (!Iterables.any(
+            ImmutableList.of(";", "(push ", "(pop ", "(reset", "(set-logic"), line::startsWith)) {
           // it is a definition
           definitions.add(line);
         }
@@ -249,12 +247,6 @@ public class FormulaClassifier {
 
     @Override
     public Integer visitFreeVariable(Formula pF, String pName) {
-      checkType(pF);
-      return 1;
-    }
-
-    @Override
-    public Integer visitBoundVariable(Formula pF, int pDeBruijnIdx) {
       checkType(pF);
       return 1;
     }

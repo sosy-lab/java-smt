@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Supplier;
@@ -88,8 +89,7 @@ public class SolverOverviewTable {
    * UnsatCoreWithAssumptions, Assumptions, AllSat, Interpolation
    *
    * @param context SolverContext you want to check for features.
-   * @return String with the features of the entered solver separated by a comma. Empty if none
-   *     available.
+   * @return supported features of the entered solver separated by a comma. Empty if none available.
    */
   @SuppressWarnings({"CheckReturnValue", "resource"})
   private List<String> getFeatures(SolverContext context)
@@ -158,7 +158,7 @@ public class SolverOverviewTable {
    * as String with each theory separated by a comma.
    *
    * @param context JavaSMT SolverContext of the Solver you want to check for theories.
-   * @return String of all supported theories except Booleans, separated by a comma. Empty if none
+   * @return supported theories except Boolean theory, separated by a comma. Empty if none
    *     available.
    */
   private List<String> getTheories(SolverContext context) {
@@ -243,7 +243,12 @@ public class SolverOverviewTable {
     private final List<String> lines = new ArrayList<>();
     // Minimum number of lines so that you can be sure a solver was added
     private static final int MIN_NUM_OF_LINES = 4;
-    private static final int SOLVER_COLUMN_WIDTH = 11;
+    private static final int SOLVER_COLUMN_WIDTH =
+        Arrays.stream(Solvers.values())
+            .map(Solvers::name)
+            .mapToInt(String::length)
+            .max()
+            .orElseThrow();
     private static final int VERSION_COLUMN_WIDTH = 40;
     private static final int THEORIES_COLUMN_WIDTH = 40;
     private static final int FEATURES_COLUMN_WIDTH = 40;
@@ -323,20 +328,20 @@ public class SolverOverviewTable {
     private List<String> formatLines(String lineToSplit, int maxLength) {
       List<String> versionSplit = Splitter.on(" ").splitToList(lineToSplit);
       List<String> versionLines = new ArrayList<>();
-      String line = versionSplit.get(0);
+      StringBuilder line = new StringBuilder(versionSplit.get(0));
       int lineCounter = line.length();
       for (String current : Iterables.skip(versionSplit, 1)) {
         lineCounter += current.length() + 1;
 
         if (lineCounter > maxLength) {
           lineCounter = current.length() + 1;
-          versionLines.add(line);
-          line = current;
+          versionLines.add(line.toString());
+          line = new StringBuilder(current);
         } else {
-          line = line + " " + current;
+          line.append(" ").append(current);
         }
       }
-      versionLines.add(line);
+      versionLines.add(line.toString());
       return versionLines;
     }
 

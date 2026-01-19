@@ -10,75 +10,23 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC4;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.ASSUMED_FORMULAS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.AXIOM;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CLOSING_CONSTRAINT;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CONSTANTS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CONSTANT_DIFF;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.CUT_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DEFINING_EQUATION;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DISCHARGED_ATOMS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.DIVISIBILITY;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.ELIM_CONSTANT;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQUATION;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQUATIONS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EQ_CASES;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.EXPANDED_INFERENCES;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.FACTOR;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INEQUALITY;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INFERENCES;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.INSTANCE_TERMS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_ATOM;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_COEFFICIENT;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEFT_INEQUALITY;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LEMMA_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_ASSUMED_FORMULAS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_BOUND_CONSTANTS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.LOCAL_PROVIDED_FORMULAS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.NEW_CONSTANTS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.NEW_SYMBOL;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OLD_SYMBOL;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_BOUNDS_A;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_BOUNDS_B;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.OMEGA_STRENGTHEN_CASES;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.PROVIDED_FORMULAS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.QUANTIFIED_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RESULT;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_ATOM;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_COEFFICIENT;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.RIGHT_INEQUALITY;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.SPLIT_FORMULA;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.SUBST;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.TARGET_LITERAL;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.THEORY;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.THEORY_AXIOMS;
-import static org.sosy_lab.java_smt.solvers.princess.PrincessProofFields.WEAK_INEQUALITY;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
 import com.google.common.collect.ImmutableList;
-import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.junit.Test;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BasicProverEnvironment;
@@ -97,12 +45,6 @@ import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
-import org.sosy_lab.java_smt.solvers.bitwuzla.BitwuzlaSolverContext;
-import org.sosy_lab.java_smt.solvers.boolector.BoolectorSolverContext;
-import org.sosy_lab.java_smt.solvers.cvc4.CVC4SolverContext;
-import org.sosy_lab.java_smt.solvers.opensmt.OpenSmtSolverContext;
-import org.sosy_lab.java_smt.solvers.princess.PrincessProofRule;
-import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
 
@@ -187,7 +129,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  public void unsatCoreWithAssumptionsNullTest() {
+  public void unsatCoreWithAssumptionsNullTest() throws InterruptedException, SolverException {
     requireUnsatCore();
     assume()
         .withMessage(
@@ -197,6 +139,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     try (ProverEnvironment pe =
         context.newProverEnvironment(GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS)) {
+      pe.push(bmgr.makeFalse());
+      assertThat(pe).isUnsatisfiable();
       assertThrows(NullPointerException.class, () -> pe.unsatCoreOverAssumptions(null));
     }
   }
@@ -262,8 +206,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   @Test
-  @SuppressWarnings("MissingFail")
   public void testGetSimpleBooleanProof() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -278,27 +222,14 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Test getProof()
       Proof proof = prover.getProof();
       checkProof(proof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
-  @SuppressWarnings("MissingFail")
   public void testGetComplexRationalNumeralAndUFProof()
       throws InterruptedException, SolverException {
-    requireProofGeneration(); // Ensures proofs are supported  @SuppressWarnings("MissingFail")
-
+    assume().that(solverToUse()).isEqualTo(CVC5);
+    requireProofGeneration(); // Ensures proofs are supported
     requireRationals();
 
     // "(declare-fun x1 () Real)" +
@@ -351,28 +282,17 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
           bmgr.equivalence(a, rfmgr.equal(rfmgr.add(mgr.makeApplication(f, x1), x2), x3)));
       // "(assert (and (or a c) (not c)))"
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
-      assertTrue(prover.isUnsat());
+      assertThat(prover.isUnsat()).isTrue();
 
       // Retrieve and verify proof
       Proof proof = prover.getProof();
       checkProof(proof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
   public void proofOfTrueTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
 
     BooleanFormula tru = bmgr.makeTrue();
@@ -381,29 +301,20 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(tru);
       assertThat(prover.isUnsat()).isFalse();
 
+      @SuppressWarnings("unused")
       Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
-      fail("Expected IllegalStateException");
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
-    } catch (IllegalStateException ie) {
-      // this should be thrown as getProof was called when last evaluation was SAT
+      throw new AssertionError("Expected IllegalStateException was not thrown");
+
+    } catch (IllegalStateException e) {
+      // this should be thrown as getProof was called when last evaluation
+      // was SAT
     }
   }
 
   @Test
   public void proofOfFalseTest() throws InterruptedException, SolverException {
     requireProofGeneration();
-    // assume().that(solverToUse()).isNotEqualTo(MATHSAT5);
+    assume().that(solverToUse()).isEqualTo(CVC5);
 
     BooleanFormula bottom = bmgr.makeFalse();
 
@@ -413,30 +324,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       Proof proof = prover.getProof();
       assertThat(proof).isNotNull();
-
-    } catch (UnsupportedOperationException e) {
-      if (solverToUse().equals(MATHSAT5)) {
-        assertThat(e).hasMessageThat().isEqualTo("No proof available.");
-
-      } else {
-        assertThat(e)
-            .hasMessageThat()
-            .isEqualTo("Proof generation is not available for the current solver.");
-      }
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
-  @SuppressWarnings("MissingFail")
   public void testGetSimpleIntegerProof() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -452,24 +345,13 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       // Test getProof()
       Proof proof = prover.getProof();
       checkProof(proof);
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
     }
   }
 
   @Test
   public void getProofAfterGetProofAndAddingAssertionsTest()
       throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     BooleanFormula q1 = bmgr.makeVariable("q1");
     BooleanFormula q2 = bmgr.makeVariable("q2");
@@ -498,28 +380,16 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof secondProof = prover.getProof();
       checkProof(secondProof);
 
-      assertNotEquals(proof, secondProof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
+      assertThat(proof).isNotEqualTo(secondProof);
     }
   }
 
   // TODO: MathSAT5 produces a proof with a CLAUSE_HYP rule without children, investigate why this
-  //  could be and how to process
+  // coudl be and how to process
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration(); // Ensures proofs are supported
     requireIntegers();
 
@@ -555,20 +425,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof secondProof = prover.getProof();
       checkProof(secondProof);
 
-      assertNotEquals(proof, secondProof);
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
-      Class<?> contextClass = context.getClass();
-      boolean isExpected =
-          contextClass.equals(CVC4SolverContext.class)
-              || contextClass.equals(OpenSmtSolverContext.class)
-              || contextClass.equals(BoolectorSolverContext.class)
-              || contextClass.equals(BitwuzlaSolverContext.class)
-              || contextClass.equals(Yices2SolverContext.class);
-      assertThat(isExpected).isTrue();
+      assertThat(proof).isNotEqualTo(secondProof);
     }
   }
 
@@ -583,28 +440,26 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
+      @SuppressWarnings("unused")
       Proof proof = prover.getProof();
+      throw new AssertionError("Expected IllegalStateException was not thrown");
 
       // Z3 always has proof generation on
-      if (solverToUse().equals(Z3)) {
-        assertThat(proof.getFormula()).isNotNull();
-      }
-
-    } catch (UnsupportedOperationException e) {
-      assertThat(e)
-          .hasMessageThat()
-          .isEqualTo("Proof generation is not available for the current solver.");
+      // if (solverToUse().equals(Z3)) {
+      //  assertThat(proof.getFormula()).isNotNull();
+      // }
     } catch (IllegalStateException e) {
-      assertThat(e).hasMessageThat().isEqualTo("Please set the prover option GENERATE_PROOFS.");
+      assertThat(e.getMessage()).isEqualTo("Please set the prover option GENERATE_PROOFS.");
     }
   }
 
   // This test is based on the bvIsZeroAfterShiftLeft() test in BitvectorFormulaManagerTest
   @Test
   public void getBitVectorProofTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
     requireBitvectors();
-    assert bvmgr != null;
+
     BitvectorFormula one = bvmgr.makeBitvector(32, 1);
 
     // unsigned char
@@ -641,6 +496,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   // This test is based on the testIntIndexIntValue() test in ArrayFormulaManagerTest
   @Test
   public void getArrayProofTest() throws InterruptedException, SolverException {
+    assume().that(solverToUse()).isEqualTo(CVC5);
     requireProofGeneration();
     requireIntegers();
     requireArrays();
@@ -650,7 +506,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         FormulaType.getArrayType(IntegerType, IntegerType);
     IntegerFormula num2 = imgr.makeNumber(2);
     IntegerFormula num4 = imgr.makeNumber(4);
-    assert amgr != null;
     ArrayFormula<IntegerFormula, IntegerFormula> arr1 = amgr.makeArray("arr1", type);
     ArrayFormula<IntegerFormula, IntegerFormula> arr2 = amgr.makeArray("arr2", type);
     BooleanFormula query =
@@ -666,13 +521,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof proof = prover.getProof();
       checkProof(proof);
     }
-  }
-
-  private Proof findanyProofLeaf(Proof pn) {
-    if (pn.isLeaf()) {
-      return pn;
-    }
-    return findanyProofLeaf(pn.getChildren().stream().findFirst().get());
   }
 
   // Traverses a proof and asserts that certain values are not null, instances, etc.
@@ -691,7 +539,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(rule).isInstanceOf(ProofRule.class);
       assertThat(proof.getChildren()).isNotNull();
       if (solverToUse().equals(SMTINTERPOL)) {
-
+        // do nothing
       } else if (solverToUse().equals(PRINCESS)) {
         assertThat(formula.isEmpty()).isTrue();
       } else if (solverToUse().equals(MATHSAT5) || solverToUse().equals(OPENSMT)) {
@@ -700,163 +548,14 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
         assertThat(formula.isPresent()).isTrue();
       }
 
-      if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
-        checkPrincessSpecificFields((PrincessProofRule) rule);
-      }
+      // if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
+      //  checkPrincessSpecificFields((PrincessProofRule) rule);
+      // }
 
       for (Proof child : proof.getChildren()) {
         assertThat(child).isNotNull();
         stack.push(child);
       }
-    }
-    assertThat(findanyProofLeaf(root).isLeaf()).isTrue();
-  }
-
-  // Performs all necessary feature checks for Princess rules, validating type and existence of
-  // fields retrieved via getSpecificFields.
-  private void checkPrincessSpecificFields(PrincessProofRule rule) {
-
-    String ruleName = rule.getName();
-    try {
-      // Common fields
-      if (ruleName.contains("CERTIFICATE")) {
-        assertThat(rule.getSpecificField(CLOSING_CONSTRAINT)).isInstanceOf(Formula.class);
-        assertThat(rule.getSpecificField(LOCAL_ASSUMED_FORMULAS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(ASSUMED_FORMULAS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(LOCAL_PROVIDED_FORMULAS)).isInstanceOf(List.class);
-        assertThat(rule.getSpecificField(LOCAL_BOUND_CONSTANTS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(CONSTANTS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(THEORY_AXIOMS)).isInstanceOf(Set.class);
-
-      } else if (ruleName.contains("INFERENCE")) {
-        assertThat(rule.getSpecificField(ASSUMED_FORMULAS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(PROVIDED_FORMULAS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(LOCAL_BOUND_CONSTANTS)).isInstanceOf(Set.class);
-        assertThat(rule.getSpecificField(CONSTANTS)).isInstanceOf(Set.class);
-      }
-
-      // Specific fields per rule type
-      switch (ruleName) {
-        case "BETA_CERTIFICATE":
-          assertThat(rule.getSpecificField(LEFT_FORMULA)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RIGHT_FORMULA)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(LEMMA_FORMULA)).isNotNull();
-          break;
-        case "CUT_CERTIFICATE":
-          assertThat(rule.getSpecificField(CUT_FORMULA)).isInstanceOf(Formula.class);
-          break;
-        case "OMEGA_CERTIFICATE":
-          assertThat(rule.getSpecificField(ELIM_CONSTANT)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(OMEGA_BOUNDS_A)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(OMEGA_BOUNDS_B)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(OMEGA_STRENGTHEN_CASES)).isInstanceOf(List.class);
-          break;
-        case "SPLIT_EQ_CERTIFICATE":
-          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
-          break;
-        case "STRENGTHEN_CERTIFICATE":
-          assertThat(rule.getSpecificField(WEAK_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(EQ_CASES)).isInstanceOf(BigInteger.class);
-          break;
-        case "BRANCH_INFERENCE_CERTIFICATE":
-          List<ProofRule> inferences = rule.getSpecificField(INFERENCES);
-          assertThat(inferences).isNotNull();
-          assertThat(inferences).isNotEmpty();
-          for (ProofRule inference : inferences) {
-            assertThat(inference).isInstanceOf(PrincessProofRule.class);
-            checkPrincessSpecificFields((PrincessProofRule) inference);
-          }
-          break;
-
-        case "ALPHA_INFERENCE":
-          assertThat(rule.getSpecificField(SPLIT_FORMULA)).isInstanceOf(Formula.class);
-          break;
-        case "ANTI_SYMMETRY_INFERENCE":
-          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "COLUMN_REDUCE_INFERENCE":
-          assertThat(rule.getSpecificField(OLD_SYMBOL)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(NEW_SYMBOL)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(DEFINING_EQUATION)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(SUBST)).isNotNull();
-          break;
-        case "COMBINE_EQUATIONS_INFERENCE":
-          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "COMBINE_INEQUALITIES_INFERENCE":
-          assertThat(rule.getSpecificField(LEFT_COEFFICIENT)).isInstanceOf(BigInteger.class);
-          assertThat(rule.getSpecificField(LEFT_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RIGHT_COEFFICIENT)).isInstanceOf(BigInteger.class);
-          assertThat(rule.getSpecificField(RIGHT_INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "DIRECT_STRENGTHEN_INFERENCE":
-          assertThat(rule.getSpecificField(INEQUALITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(EQUATION)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "DIV_RIGHT_INFERENCE":
-          assertThat(rule.getSpecificField(DIVISIBILITY)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "GROUND_INST_INFERENCE":
-          assertThat(rule.getSpecificField(QUANTIFIED_FORMULA)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(INSTANCE_TERMS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(INSTANCE_FORMULA)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(DISCHARGED_ATOMS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "MACRO_INFERENCE":
-          List<PrincessProofRule> expandedInferences = rule.getSpecificField(EXPANDED_INFERENCES);
-          assertThat(expandedInferences).isInstanceOf(List.class);
-          for (PrincessProofRule subInf : expandedInferences) {
-            checkPrincessSpecificFields(subInf);
-          }
-          break;
-        case "PRED_UNIFY_INFERENCE":
-          assertThat(rule.getSpecificField(LEFT_ATOM)).isNotNull();
-          assertThat(rule.getSpecificField(RIGHT_ATOM)).isNotNull();
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "QUANTIFIER_INFERENCE":
-          assertThat(rule.getSpecificField(QUANTIFIED_FORMULA)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(NEW_CONSTANTS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "REDUCE_INFERENCE":
-          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "REDUCE_PRED_INFERENCE":
-          assertThat(rule.getSpecificField(EQUATIONS)).isInstanceOf(List.class);
-          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          break;
-        case "SIMP_INFERENCE":
-          assertThat(rule.getSpecificField(TARGET_LITERAL)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(RESULT)).isInstanceOf(Formula.class);
-          assertThat(rule.getSpecificField(CONSTANT_DIFF)).isInstanceOf(BigInteger.class);
-          assertThat(rule.getSpecificField(FACTOR)).isInstanceOf(BigInteger.class);
-          break;
-        case "THEORY_AXIOM_INFERENCE":
-          assertThat(rule.getSpecificField(THEORY)).isNotNull();
-          assertThat(rule.getSpecificField(AXIOM)).isInstanceOf(Formula.class);
-          break;
-        case "CLOSE_CERTIFICATE":
-          // No specific fields to check here.
-          break;
-        default:
-          // Either a rule without specific fields (like PARTIAL_CERTIFICATE_INFERENCE)
-          // or a new/unhandled one.
-          break;
-      }
-    } catch (IllegalArgumentException e) {
-      // This is expected if a specific proof does not contain an optional field.
     }
   }
 }

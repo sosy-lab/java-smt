@@ -24,7 +24,6 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +118,7 @@ public class CVC5NativeAPITest {
     // Note: toString on String values does not equal the value!!
     assertThat(termManager.mkString("").toString()).isNotEqualTo("");
     assertThat(termManager.mkString("").getStringValue()).isEqualTo("");
-    // Variables (named const, because thats not confusing....)
+    // Variables (named const, because that's not confusing....)
     // Variables (Consts) return false if checked for value!
     assertThat(termManager.mkConst(termManager.getBooleanSort()).isBooleanValue()).isFalse();
     assertThat(termManager.mkConst(termManager.getIntegerSort()).isIntegerValue()).isFalse();
@@ -137,7 +136,7 @@ public class CVC5NativeAPITest {
         .contains(
             "invalid argument 'int_const' for '*d_node', expected Term to be an integer value when"
                 + " calling getIntegerValue()");
-    // Build a formula such that is has a value, assert and check sat and then check again
+    // Build a formula such that it has a value, assert and check sat and then check again
     Term equality = termManager.mkTerm(Kind.EQUAL, intVar, termManager.mkInteger(1));
     solver.assertFormula(equality);
     // Is sat, no need to check
@@ -934,7 +933,7 @@ public class CVC5NativeAPITest {
     // or extract_0_0 x = 1
 
     // Note from CVC5: a witness expression; first parameter is a BOUND_VAR_LIST, second is the
-    // witness body"
+    // witness body
 
     int width = 2;
 
@@ -1031,7 +1030,7 @@ public class CVC5NativeAPITest {
 
     // UnsatCores are iterable
     for (Term e : unsatCore) {
-      assertThat(e.toString()).isIn(Arrays.asList("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 

@@ -44,7 +44,7 @@ SPDX-License-Identifier: Apache-2.0
             The script will append the git revision.
         </fail>
         <fail unless="bitwuzla.rebuildWrapper">
-            Please specify if the Bitwuzla wrapper should be rebuild with the flag
+            Please specify if the Bitwuzla wrapper should be rebuilt with the flag
             -Dbitwuzla.rebuildWrapper=BOOL. Rebuilding the wrapper is necessary if the Bitwuzla API
             has changed since the last release, but requires the SWIG tool to be installed on
             this machine.
@@ -66,6 +66,14 @@ SPDX-License-Identifier: Apache-2.0
         <property name="source.installPathLinuxArm64" location="${source.path}/install-linux-arm64"/>
         <property name="source.installPathWindows" location="${source.path}/install-windows-x64"/>
 
+        <property name="gmp.x64-linux" location="/dependencies/gmp-6.3.0/install/x64-linux/"/>
+        <property name="gmp.x64-windows" location="/dependencies/gmp-6.3.0/install/x64-windows/"/>
+        <property name="gmp.arm64-linux" location="/dependencies/gmp-6.3.0/install/arm64-linux/"/>
+
+        <property name="mpfr.x64-linux" location="/dependencies/mpfr-4.2.2/install/x64-linux/"/>
+        <property name="mpfr.x64-windows" location="/dependencies/mpfr-4.2.2/install/x64-windows/"/>
+        <property name="mpfr.arm64-linux" location="/dependencies/mpfr-4.2.2/install/arm64-linux/"/>
+
         <!-- cleanup target directories, will be created and filled during the build-process -->
         <delete dir="${source.installPathLinuxX64}" quiet="true"/>
         <delete dir="${source.installPathLinuxArm64}" quiet="true"/>
@@ -82,6 +90,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- configure and build Bitwuzla -->
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
+            <env key="PKG_CONFIG_PATH" value="build/:${gmp.x64-linux}/lib/pkgconfig/:${mpfr.x64-linux}/lib/pkgconfig/"/>
             <arg value="--static"/>
             <arg value="--wipe"/>
             <arg value="--fpexp"/>
@@ -105,6 +114,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- configure and build Bitwuzla -->
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
+            <env key="PKG_CONFIG_PATH" value="build/:${gmp.arm64-linux}/lib/pkgconfig/:${mpfr.arm64-linux}/lib/pkgconfig/"/>
             <arg value="--arm64"/>
             <arg value="--static"/>
             <arg value="--wipe"/>
@@ -129,6 +139,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- configure and build Bitwuzla -->
         <exec executable="./configure.py" dir="${bitwuzla.path}" failonerror="true">
+            <env key="PKG_CONFIG_PATH" value="build/:${gmp.x64-windows}/lib/pkgconfig/:${mpfr.x64-windows}/lib/pkgconfig/"/>
             <arg value="--win64"/>
             <arg value="--static"/>
             <arg value="--wipe"/>
@@ -174,10 +185,8 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="bitwuzla.i"/>
         </exec>
 
-        <!-- apply patch for the phantom reference issue -->
+        <!-- Apply patch for the phantom reference issue: Sorts and Terms are currently not being deleted, even when the TermManager is closed-->
         <!-- FIXME: This will lead to memory leaks. We should look for a proper fix. -->
-        <!-- Update: the TermManger introduced in 0.4.0 handles memory of Terms/Sorts 
-             now and should clean up everything when we destroy it. -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="--no-backup-if-mismatch"/>
@@ -234,8 +243,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlabb.a"/>
             <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlabv.a"/>
             <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libbitwuzlals.a"/>
-            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libgmp.a"/>
-            <arg value="${source.installPathLinuxX64}/lib/x86_64-linux-gnu/libgmpxx.a"/>
+            <arg value="${gmp.x64-linux}/lib/libgmp.a"/>
+            <arg value="${gmp.x64-linux}/lib/libgmpxx.a"/>
+            <arg value="${mpfr.x64-linux}/lib/libmpfr.a"/>
             <arg value="-Wl,--no-whole-archive,--allow-multiple-definition"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
@@ -246,7 +256,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="build-bitwuzla-bindings-linux-arm64" if="${bitwuzla.buildForLinuxArm64}"
-            depends="build-bitwuzla-bindings-jni">
+            depends="compile-bitwuzla-linux-arm64, build-bitwuzla-bindings-jni">
         <!-- compile the swig wrapper -->
         <exec executable="aarch64-linux-gnu-g++" dir="${source.path}" failonerror="true">
             <arg value="-fPIC"/>
@@ -276,8 +286,9 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="${source.installPathLinuxArm64}/lib/libbitwuzlabb.a"/>
             <arg value="${source.installPathLinuxArm64}/lib/libbitwuzlabv.a"/>
             <arg value="${source.installPathLinuxArm64}/lib/libbitwuzlals.a"/>
-            <arg value="${source.installPathLinuxArm64}/lib/libgmp.a"/>
-            <arg value="${source.installPathLinuxArm64}/lib/libgmpxx.a"/>
+            <arg value="${gmp.arm64-linux}/lib/libgmp.a"/>
+            <arg value="${gmp.arm64-linux}/lib/libgmpxx.a"/>
+            <arg value="${mpfr.arm64-linux}/lib/libmpfr.a"/>
             <arg value="-Wl,--no-whole-archive,--allow-multiple-definition"/>
             <arg value="-Wl,-z,defs"/>
         </exec>
@@ -288,7 +299,7 @@ SPDX-License-Identifier: Apache-2.0
     </target>
 
     <target name="build-bitwuzla-bindings-windows-x64" if="${bitwuzla.buildForWindowsX64}"
-            depends="build-bitwuzla-bindings-jni">
+            depends="compile-bitwuzla-windows-x64, build-bitwuzla-bindings-jni">
         <!-- compile the swig wrapper -->
         <exec executable="x86_64-w64-mingw32-g++" dir="${source.path}" failonerror="true">
             <arg value="-std=c++17"/>
@@ -327,12 +338,13 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="bitwuzla_wrap.o"/>
             <arg value="-Wl,--whole-archive"/>
             <arg value="/usr/x86_64-w64-mingw32/lib/libwinpthread.a"/>
-            <arg value="${source.installPathWindows}/lib/libgmp.a"/>
-            <arg value="${source.installPathWindows}/lib/libgmpxx.a"/>
             <arg value="${source.installPathWindows}/lib/libbitwuzlabb.a"/>
             <arg value="${source.installPathWindows}/lib/libbitwuzlabv.a"/>
             <arg value="${source.installPathWindows}/lib/libbitwuzlals.a"/>
             <arg value="${source.installPathWindows}/lib/libbitwuzla.a"/>
+            <arg value="${gmp.x64-windows}/lib/libgmp.a"/>
+            <arg value="${gmp.x64-windows}/lib/libgmpxx.a"/>
+            <arg value="${mpfr.x64-windows}/lib/libmpfr.a"/>
             <arg value="-Wl,--no-whole-archive"/>
             <arg value="-static-libgcc"/>
             <arg value="-static-libstdc++"/>
@@ -376,7 +388,7 @@ SPDX-License-Identifier: Apache-2.0
         -->
         <echo>
             Lets copy the files for architecture x64 into main directory, for backwards compatibility.
-            Afterwards, please execute the SVN command from above.
+            Afterward, please execute the SVN command from above.
         </echo>
         <copy todir="repository/${ivy.organisation}/${ivy.module}/" verbose="true">
             <fileset dir="repository/${ivy.organisation}/${ivy.module}/x64/">

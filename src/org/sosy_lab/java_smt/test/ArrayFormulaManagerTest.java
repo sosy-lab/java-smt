@@ -57,7 +57,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not String Arrays are possible with String indexes
+   *  Test whether String Arrays are possible with String indexes
    */
   @Test
   public void testStringIndexStringValue() throws SolverException, InterruptedException {
@@ -78,7 +78,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not String Arrays with Int indexes are possible
+   *  Test whether String Arrays with Int indexes are possible
    */
   @Test
   public void testIntIndexStringValue() throws SolverException, InterruptedException {
@@ -99,7 +99,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not String Arrays with bitvector indexes are possible
+   *  Test whether String Arrays with bitvector indexes are possible
    */
   @Test
   public void testBvIndexStringValue() throws SolverException, InterruptedException {
@@ -120,7 +120,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not Bitvector Arrays are possible with bv index
+   *  Test whether Bitvector Arrays are possible with bv index
    */
   @Test
   public void testBvIndexBvValue() throws SolverException, InterruptedException {
@@ -141,7 +141,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not Rational Arrays are possible with Rational index
+   *  Test whether Rational Arrays are possible with Rational index
    */
   @Test
   public void testRationalIndexRationalValue() throws SolverException, InterruptedException {
@@ -162,7 +162,7 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
   }
 
   /*
-   *  Test whether or not Float Arrays are possible with Float index
+   *  Test whether Float Arrays are possible with Float index
    */
   @Test
   public void testFloatIndexFloatValue() throws SolverException, InterruptedException {
@@ -245,5 +245,33 @@ public class ArrayFormulaManagerTest extends SolverBasedTest0.ParameterizedSolve
         assertThatFormula(bvmgr.equal(defaultElement, selectFromStore)).isUnsatisfiable();
       }
     }
+  }
+
+  @Test
+  public void testArrayWithManyValues() throws SolverException, InterruptedException {
+    requireIntegers();
+    requireArrays();
+
+    // The example array formula is: for x in [1...N]: arr = store(arr, x, x)
+    // as SMTLIB: arr = store(store(store(... store(array, 0, 0), 1, 1), ... , N-1, N-1)
+    ArrayFormula<IntegerFormula, IntegerFormula> array =
+        amgr.makeArray("array", IntegerType, IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> storedArray = array;
+    final int numValues = 100;
+    for (int i = 0; i < numValues; i++) {
+      storedArray = amgr.store(storedArray, imgr.makeNumber(i), imgr.makeNumber(i));
+    }
+
+    // (x >= 0 && x < numValues) => (x == arr[x]) for the defined array
+    IntegerFormula x = imgr.makeVariable("x");
+    BooleanFormula indexAssignment = imgr.equal(x, amgr.select(storedArray, x)); // x == arr[x]
+    BooleanFormula query =
+        bmgr.implication(
+            bmgr.and(
+                imgr.greaterOrEquals(x, imgr.makeNumber(0)),
+                imgr.lessThan(x, imgr.makeNumber(numValues))),
+            indexAssignment);
+
+    assertThatFormula(query).isTautological();
   }
 }

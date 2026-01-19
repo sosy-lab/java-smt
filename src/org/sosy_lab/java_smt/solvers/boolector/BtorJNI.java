@@ -494,7 +494,7 @@ final class BtorJNI {
   /**
    * Helper method for boolector_print_stats() that does not print to the commandline. This needs
    * verbosity level 3 or more! Since this prints debug info all the time it is recommended to set
-   * the option to 3 before using this and setting it back to 0 afterwards.
+   * the option to 3 before using this and setting it back to 0 afterward.
    *
    * @param btor boolector instance.
    * @return a String representing the stats that Boolector gives out.
