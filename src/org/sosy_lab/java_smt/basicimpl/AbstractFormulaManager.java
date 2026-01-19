@@ -321,7 +321,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
         Collections2.transform(args, formulaCreator::getFormulaType);
     Preconditions.checkArgument(
         ImmutableSet.copyOf(types).size() == 1,
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
+        "All arguments to `distinct` must have the same type, but found %s different types: %s",
         types.size(),
         types);
     return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(args)));
