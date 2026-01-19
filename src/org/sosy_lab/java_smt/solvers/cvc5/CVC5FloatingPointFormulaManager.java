@@ -421,7 +421,7 @@ public class CVC5FloatingPointFormulaManager
           termManager.mkOp(
               Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
               pTargetType.getExponentSize(),
-              pTargetType.getMantissaSizeWithoutHiddenBit()), // add sign bit
+              pTargetType.getMantissaSizeWithoutHiddenBit() + 1), // adding sign bit
           pBitvector);
     } catch (CVC5ApiException cvc5ApiException) {
       // This seems to only be thrown for wrong exponent and mantissa sizes (e.g. negative
