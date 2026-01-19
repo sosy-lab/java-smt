@@ -2,13 +2,16 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2022 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
 import io.github.cvc5.CVC5ApiException;
@@ -16,8 +19,11 @@ import io.github.cvc5.Kind;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -57,71 +63,108 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   static Term getCVC5Term(Formula pT) {
-    if (pT instanceof CVC5Formula) {
-      return ((CVC5Formula) pT).getTerm();
-    }
-    throw new IllegalArgumentException(
-        "Cannot get the formula info of type " + pT.getClass().getSimpleName() + " in the Solver!");
+    checkArgument(
+        pT instanceof CVC5Formula,
+        "Cannot get the CVC5 term of type %s in the Solver!",
+        pT.getClass().getSimpleName());
+    return ((CVC5Formula) pT).getTerm();
   }
 
   @Override
-  public Term parseImpl(String formulaStr) throws IllegalArgumentException {
-    throw new UnsupportedOperationException();
+  public Term equalImpl(Collection<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.EQUAL, pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  public Term distinctImpl(Collection<Term> pArgs) {
+    return getEnvironment().mkTerm(Kind.DISTINCT, pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  public Term parseImpl(String smtQuery) throws IllegalArgumentException {
+    return new CVC5Parser(creator, this).parse(smtQuery);
   }
 
   @Override
   public String dumpFormulaImpl(Term f) {
-    assert getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType
-        : "Only BooleanFormulas may be dumped";
+    checkArgument(
+        getFormulaCreator().getFormulaType(f) == FormulaType.BooleanType,
+        "Only BooleanFormulas may be dumped");
 
-    StringBuilder out = new StringBuilder();
-    // get all symbols
-    final Map<String, Term> allVars = new LinkedHashMap<>();
-    creator.extractVariablesAndUFs(f, true, allVars::put);
+    StringBuilder variablesAndUFsAsSMTLIB2 = getAllDeclaredVariablesAndUFsAsSMTLIB2(f);
 
-    // print all symbols
-    for (Map.Entry<String, Term> entry : allVars.entrySet()) {
+    // Add the final assert after the declarations
+    variablesAndUFsAsSMTLIB2.append("(assert ").append(f).append(')');
+    return variablesAndUFsAsSMTLIB2.toString();
+  }
+
+  private StringBuilder getAllDeclaredVariablesAndUFsAsSMTLIB2(Term f) {
+    // We use our own map (instead of calling plain "extractVariablesAndUFs" without a map),
+    // and then apply "buildKeepingLast" due to UFs;
+    // an UF might be applied multiple times. But the names and the types are consistent.
+    ImmutableMap.Builder<String, Term> allKnownVarsAndUFsBuilder = ImmutableMap.builder();
+    creator.extractVariablesAndUFs(f, true, allKnownVarsAndUFsBuilder::put);
+    return getSMTLIB2DeclarationsFor(allKnownVarsAndUFsBuilder.buildKeepingLast());
+  }
+
+  /**
+   * Returns the SMTLIB2 declarations for the input Map with key=symbol for the value=term, line by
+   * line with one declaration per line, with a line-break at the end of all lines. The output order
+   * will match the order of the input map.
+   */
+  StringBuilder getSMTLIB2DeclarationsFor(ImmutableMap<String, Term> varsAndUFs) {
+    StringBuilder declarations = new StringBuilder();
+    for (Entry<String, Term> entry : varsAndUFs.entrySet()) {
       String name = entry.getKey();
-      Term var = entry.getValue();
-
-      // escaping is stolen from SMTInterpol, lets hope this remains consistent
-      out.append("(declare-fun ").append(PrintTerm.quoteIdentifier(name)).append(" (");
+      Term varOrUf = entry.getValue();
 
       // add function parameters
       Iterable<Sort> childrenTypes;
       try {
-        if (var.getSort().isFunction() || var.getKind() == Kind.APPLY_UF) {
-          childrenTypes = Iterables.skip(Iterables.transform(var, Term::getSort), 1);
-        } else {
-          childrenTypes = Iterables.transform(var, Term::getSort);
+        if (varOrUf.getKind() == Kind.APPLY_UF) {
+          // Unpack the def of the UF to get to the declaration which has the types
+          varOrUf = varOrUf.getChild(0);
         }
-      } catch (CVC5ApiException e) {
-        childrenTypes = Iterables.transform(var, Term::getSort);
+      } catch (CVC5ApiException apiEx) {
+        // Does not happen anyway
+        throw new IllegalArgumentException("CVC5 internal error: " + apiEx.getMessage(), apiEx);
       }
-      out.append(Joiner.on(" ").join(childrenTypes));
 
-      // and return type
-      out.append(") ").append(var.getSort().toString()).append(")\n");
+      Sort sort = varOrUf.getSort();
+      Sort returnType = sort;
+      if (sort.isFunction()) {
+        childrenTypes = Arrays.asList(sort.getFunctionDomainSorts());
+        returnType = sort.getFunctionCodomainSort();
+      } else {
+        childrenTypes = Iterables.transform(varOrUf, Term::getSort);
+      }
+
+      // escaping is stolen from SMTInterpol, lets hope this remains consistent
+      String qName = PrintTerm.quoteIdentifier(name);
+      String args = Joiner.on(" ").join(childrenTypes);
+      declarations.append(String.format("(declare-fun %s (%s) %s)%n", qName, args, returnType));
     }
-
-    // now add the final assert
-    out.append("(assert ").append(f).append(')');
-    return out.toString();
+    return declarations;
   }
 
   @Override
   public <T extends Formula> T substitute(
       final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
-    Term[] changeFrom = new Term[fromToMapping.size()];
-    Term[] changeTo = new Term[fromToMapping.size()];
+    Map<Term, Term> castedMap = new LinkedHashMap<>();
+    fromToMapping.forEach((k, v) -> castedMap.put(extractInfo(k), extractInfo(v)));
+    Term substitutedTerm = substitute(extractInfo(f), castedMap);
+    return getFormulaCreator().encapsulate(getFormulaType(f), substitutedTerm);
+  }
+
+  Term substitute(Term parsedTerm, Map<Term, Term> fromToMapping) {
+    Term[] substituteFrom = new Term[fromToMapping.size()];
+    Term[] substituteTo = new Term[fromToMapping.size()];
     int idx = 0;
-    for (Map.Entry<? extends Formula, ? extends Formula> e : fromToMapping.entrySet()) {
-      changeFrom[idx] = extractInfo(e.getKey());
-      changeTo[idx] = extractInfo(e.getValue());
+    for (Map.Entry<Term, Term> entry : fromToMapping.entrySet()) {
+      substituteFrom[idx] = entry.getKey();
+      substituteTo[idx] = entry.getValue();
       idx++;
     }
-    Term input = extractInfo(f);
-    FormulaType<T> type = getFormulaType(f);
-    return getFormulaCreator().encapsulate(type, input.substitute(changeFrom, changeTo));
+    return parsedTerm.substitute(substituteFrom, substituteTo);
   }
 }

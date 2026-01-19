@@ -416,25 +416,19 @@ public class CVC5FloatingPointFormulaManager
     // total size = mantissa without hidden bit + sign bit + exponent
     assert size == mantissaSizeWithoutHiddenBit + 1 + pTargetType.getExponentSize();
 
-    Op signExtract;
-    Op exponentExtract;
-    Op mantissaExtract;
     try {
-      signExtract = termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 1, size - 1);
-      exponentExtract =
-          termManager.mkOp(Kind.BITVECTOR_EXTRACT, size - 2, mantissaSizeWithoutHiddenBit);
-      mantissaExtract =
-          termManager.mkOp(Kind.BITVECTOR_EXTRACT, mantissaSizeWithoutHiddenBit - 1, 0);
-    } catch (CVC5ApiException e) {
-      throw new IllegalArgumentException(
-          "You tried creating a invalid bitvector extract in term " + pBitvector + ".", e);
+      return termManager.mkTerm(
+          termManager.mkOp(
+              Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
+              pTargetType.getExponentSize(),
+              pTargetType.getMantissaSizeWithoutHiddenBit()), // add sign bit
+          pBitvector);
+    } catch (CVC5ApiException cvc5ApiException) {
+      // This seems to only be thrown for wrong exponent and mantissa sizes (e.g. negative
+      // numbers, size not equal to BV size etc.). We check for this beforehand, so this should
+      // not be thrown.
+      throw new IllegalArgumentException(cvc5ApiException);
     }
-
-    Term sign = termManager.mkTerm(signExtract, pBitvector);
-    Term exponent = termManager.mkTerm(exponentExtract, pBitvector);
-    Term mantissa = termManager.mkTerm(mantissaExtract, pBitvector);
-
-    return termManager.mkTerm(Kind.FLOATINGPOINT_FP, sign, exponent, mantissa);
   }
 
   @Override

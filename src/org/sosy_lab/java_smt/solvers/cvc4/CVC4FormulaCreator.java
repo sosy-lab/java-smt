@@ -26,6 +26,7 @@ import edu.stanford.CVC4.FunctionType;
 import edu.stanford.CVC4.Integer;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.Rational;
+import edu.stanford.CVC4.RoundingMode;
 import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import edu.stanford.CVC4.vectorType;
@@ -41,6 +42,8 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -263,6 +266,15 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Expr pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getType(), getFormulaType(pTerm));
+    return new CVC4FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Expr pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -286,7 +298,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     return new CVC4RegexFormula(pTerm);
   }
 
-  private static String getName(Expr e) {
+  static String getName(Expr e) {
     checkState(!e.isNull());
     if (!e.isConst() && !e.isVariable()) {
       e = e.getOperator();
@@ -321,8 +333,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       } else if (type.isFloatingPoint()) {
         return visitor.visitConstant(formula, convertFloatingPoint(f));
       } else if (type.isRoundingMode()) {
-        // TODO is this correct?
-        return visitor.visitConstant(formula, f.getConstRoundingMode());
+        return visitor.visitConstant(formula, getRoundingMode(f));
       } else if (type.isString()) {
         return visitor.visitConstant(formula, f.getConstString());
       } else if (type.isArray()) {
@@ -366,6 +377,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (f.isVariable()) {
       assert f.getKind() != Kind.BOUND_VARIABLE;
       return visitor.visitFreeVariable(formula, getName(f));
+
+    } else if (f.getKind() == Kind.SEP_NIL) {
+      return visitor.visitConstant(formula, null);
 
     } else {
       // Expressions like uninterpreted function calls (Kind.APPLY_UF) or operators (e.g. Kind.AND).
@@ -576,6 +590,20 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       }
       exp = exprManager.mkVar(pName, exprManager.mkFunctionType(args, pReturnType));
       functionsCache.put(pName, exp);
+    } else {
+      // We can't cast the cached type to FormulaType, even though it is a function type, due to a
+      // bug in the CVC4 Java bindings. As a workaround we create another function type for the
+      // current arguments and then compare it to the type from the cache
+      vectorType args = new vectorType();
+      for (Type t : pArgTypes) {
+        args.add(t);
+      }
+      var argumentType = exprManager.mkFunctionType(args, pReturnType);
+      var cachedType = exp.getType();
+      Preconditions.checkArgument(
+          cachedType.equals(argumentType),
+          "Function %s already defined with different types or a different number of arguments",
+          pName);
     }
     return exp;
   }
@@ -612,6 +640,9 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     } else if (valueType.isFloatingPoint()) {
       return convertFloatingPoint(value);
 
+    } else if (valueType.isRoundingMode()) {
+      return getRoundingMode(value);
+
     } else if (valueType.isString()) {
       return unescapeUnicodeForSmtlib(value.getConstString().toString());
 
@@ -647,5 +678,28 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         new BigInteger(mant, 2),
         expWidth,
         mantWidthWithoutHiddenBit);
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Expr pExpr) {
+    checkArgument(
+        pExpr.isConst() && pExpr.getType().isRoundingMode(),
+        "Expected a constant rounding mode, but got: %s",
+        pExpr);
+    RoundingMode rm = pExpr.getConstRoundingMode();
+    if (rm.equals(RoundingMode.roundNearestTiesToAway)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (rm.equals(RoundingMode.roundNearestTiesToEven)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (rm.equals(RoundingMode.roundTowardNegative)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (rm.equals(RoundingMode.roundTowardPositive)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (rm.equals(RoundingMode.roundTowardZero)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", pExpr));
+    }
   }
 }

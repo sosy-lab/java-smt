@@ -10,26 +10,236 @@ package org.sosy_lab.java_smt.test;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.TruthJUnit.assume;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.api.FormulaType.BooleanType;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
+import static org.sosy_lab.java_smt.api.FormulaType.RationalType;
+import static org.sosy_lab.java_smt.api.FormulaType.getArrayType;
+import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.testing.EqualsTester;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.ArrayFormula;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
 public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
+
+  @Test
+  public void testWrongSorts() {
+    // Check that an exception is thrown if the arguments to `=` or `distinct` don't have matching
+    // types
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(BooleanType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+
+    assertThrows(IllegalArgumentException.class, () -> mgr.equal(var1, var2));
+    assertThrows(IllegalArgumentException.class, () -> mgr.distinct(var1, var2));
+
+    if (bvmgr != null) {
+      var bv1 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv1");
+      var bv2 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv2");
+
+      assertThrows(IllegalArgumentException.class, () -> mgr.equal(bv1, bv2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(bv1, bv2));
+    }
+
+    if (amgr != null) {
+      var domainType = formulaType;
+      var rangeType = formulaType == IntegerType ? RationalType : getBitvectorTypeWithSize(16);
+
+      var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
+      var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
+
+      assertThrows(IllegalArgumentException.class, () -> mgr.equal(arr1, arr2));
+      assertThrows(IllegalArgumentException.class, () -> mgr.distinct(arr1, arr2));
+    }
+  }
+
+  @Test
+  public void testSmallNumberOfArgs() {
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+    var var1 = mgr.makeVariable(formulaType, "var1");
+
+    assertThat(mgr.equal()).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.distinct()).isEqualTo(bmgr.makeTrue());
+
+    assertThat(mgr.equal(var1)).isEqualTo(bmgr.makeTrue());
+    assertThat(mgr.distinct(var1)).isEqualTo(bmgr.makeTrue());
+  }
+
+  @Test
+  public void testEquality() {
+    // Check if `=` terms are rewritten
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.equal(var1, var2, var3);
+    var g = bmgr.and(mgr.equal(var1, var2), mgr.equal(var2, var3));
+
+    if (solver == Solvers.SMTINTERPOL) {
+      // Only SmtInterpol support equality with more than two arguments
+      assertThat(f).isNotEqualTo(g);
+    } else {
+      // ... all other solvers will rewrite
+      assertThat(f).isEqualTo(g);
+    }
+  }
+
+  private class Rebuilder extends FormulaTransformationVisitor {
+    Rebuilder(FormulaManager fmgr) {
+      super(fmgr);
+    }
+
+    @Override
+    public Formula visitFreeVariable(Formula f, String name) {
+      return mgr.makeVariable(mgr.getFormulaType(f), name);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Formula visitFunction(
+        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+      switch (functionDeclaration.getKind()) {
+        case AND:
+          return bmgr.and((List<BooleanFormula>) (List<?>) args);
+        case NOT:
+          return bmgr.not((BooleanFormula) args.get(0));
+        case EQ:
+          return mgr.equal(args);
+        case DISTINCT:
+          return mgr.distinct(args);
+        default:
+          throw new UnsupportedOperationException();
+      }
+    }
+  }
+
+  @Test
+  public void testEqualityVisitor() {
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.equal(var1, var2, var3);
+    var g = mgr.transformRecursively(f, new Rebuilder(mgr));
+
+    assertThat(f).isEqualTo(g);
+  }
+
+  @Test
+  public void testEqualityParser() {
+    // Check that we can recreate `=` terms from the parser
+    requireParser();
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
+
+    var str =
+        String.format("(declare-const %s %s)", var1, formulaSort)
+            + String.format("(declare-const %s %s)", var2, formulaSort)
+            + String.format("(declare-const %s %s)", var3, formulaSort)
+            + String.format("(assert (= %s %s %s))", var1, var2, var3);
+
+    var f = mgr.equal(var1, var2, var3);
+    var g = mgr.parse(str);
+
+    assertThat(f).isEqualTo(g);
+  }
+
+  @Test
+  public void testDistinct() {
+    // Check if `distinct` terms are rewritten
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.distinct(var1, var2, var3);
+    var g =
+        bmgr.and(
+            bmgr.not(mgr.equal(var1, var2)),
+            bmgr.not(mgr.equal(var1, var3)),
+            bmgr.not(mgr.equal(var2, var3)));
+
+    if (ImmutableList.of(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.PRINCESS).contains(solver)) {
+      // Solvers that rewrite
+      assertThat(f).isEqualTo(g);
+    } else {
+      // Solvers that keep the distinct term
+      // Note that Bitwuzla will partially rewrite and only supports distinct for 2 arguments
+      assertThat(f).isNotEqualTo(g);
+    }
+  }
+
+  @Test
+  public void testDistinctVisitor() {
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR);
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var f = mgr.distinct(var1, var2, var3);
+    var g = mgr.transformRecursively(f, new Rebuilder(mgr));
+
+    assertThat(f).isEqualTo(g);
+  }
+
+  @Test
+  public void testDistinctParser() {
+    // Check that we can recreate `distinct` terms from the parser
+    requireParser();
+
+    var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+
+    var var1 = mgr.makeVariable(formulaType, "var1");
+    var var2 = mgr.makeVariable(formulaType, "var2");
+    var var3 = mgr.makeVariable(formulaType, "var3");
+
+    var formulaSort = imgr != null ? "Int" : "(_ BitVec 8)";
+
+    var str =
+        String.format("(declare-const %s %s)", var1, formulaSort)
+            + String.format("(declare-const %s %s)", var2, formulaSort)
+            + String.format("(declare-const %s %s)", var3, formulaSort)
+            + String.format("(assert (distinct %s %s %s))", var1, var2, var3);
+
+    var f = mgr.distinct(var1, var2, var3);
+    var g = mgr.parse(str);
+
+    assertThat(f).isEqualTo(g);
+  }
 
   @Test
   public void testEmptySubstitution() throws SolverException, InterruptedException {

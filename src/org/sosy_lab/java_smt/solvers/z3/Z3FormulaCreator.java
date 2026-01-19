@@ -48,6 +48,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -368,6 +369,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType();
+    cleanupReferences();
+    return storePhantomReference(new Z3FloatingPointRoundingModeFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
   protected StringFormula encapsulateString(Long pTerm) {
     assert getFormulaType(pTerm).isStringType()
         : String.format(
@@ -409,6 +417,32 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       allocatedArraySorts.put(pIndexType, pElementType, allocatedArraySort);
     }
     return allocatedArraySort;
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    checkArgument(
+        Native.getSortKind(environment, Native.getSort(environment, f))
+            == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt(),
+        "Expected a floating point rounding mode, but got %s",
+        Native.astToString(environment, f));
+
+    int roundingModeOp = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
+    switch (Z3_decl_kind.fromInt(roundingModeOp)) {
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
+        return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
+        return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
+        return FloatingPointRoundingMode.TOWARD_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
+        return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO:
+        return FloatingPointRoundingMode.TOWARD_ZERO;
+      default:
+        throw new IllegalArgumentException(
+            "Cannot get rounding mode for Z3 operator: " + roundingModeOp);
+    }
   }
 
   @Override
@@ -499,6 +533,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         if (arity == 0) {
           // constants
           Object value = Z3_CONSTANTS.get(declKind);
+          int sortKind = Native.getSortKind(environment, Native.getSort(environment, f));
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
@@ -506,15 +541,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Rounding mode
-          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
-              || Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
+          } else if (sortKind == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+            return visitor.visitConstant(formula, getRoundingMode(f));
 
             // string constant
           } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
-              && Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+              && sortKind == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Free variable
@@ -804,16 +838,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_GT;
       case Z3_OP_FPA_EQ:
         return FunctionDeclarationKind.FP_EQ;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
-        return FunctionDeclarationKind.FP_ROUND_EVEN;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
-        return FunctionDeclarationKind.FP_ROUND_AWAY;
-      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
-        return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
-        return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-      case Z3_OP_FPA_RM_TOWARD_ZERO:
-        return FunctionDeclarationKind.FP_ROUND_ZERO;
       case Z3_OP_FPA_ROUND_TO_INTEGRAL:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
       case Z3_OP_FPA_TO_FP_UNSIGNED:

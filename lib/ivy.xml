@@ -53,6 +53,9 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-bitwuzla" extends="runtime-bitwuzla-x64,runtime-bitwuzla-arm64" description="only one solver included"/>
         <conf name="runtime-bitwuzla-x64" extends="core" description="only one solver included"/>
         <conf name="runtime-bitwuzla-arm64" extends="core" description="only one solver included"/>
+        <conf name="runtime-z3-legacy" extends="runtime-z3-legacy-x64,runtime-z3-legacy-arm64" description="only one solver included"/>
+        <conf name="runtime-z3-legacy-x64" extends="core" description="only one solver included"/>
+        <conf name="runtime-z3-legacy-arm64" extends="core" description="only one solver included"/>
 
         <!-- default config, provides only x64 for backwards-compatibility -->
         <conf name="runtime" extends="runtime-x64" description="all solvers for x64 architecture included"/>
@@ -68,7 +71,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-x64-without-gpl"
-              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5-x64,runtime-boolector,runtime-bitwuzla-x64"
+              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5-x64,runtime-boolector,runtime-bitwuzla-x64,runtime-z3-legacy-x64"
               description="all solvers for x64 architecture included, except those under GPL"/>
         <conf name="runtime-arm64-without-gpl"
               extends="runtime-mathsat-arm64,runtime-opensmt-arm64,runtime-smtinterpol,runtime-princess,runtime-cvc5-arm64,runtime-z3-arm64,runtime-bitwuzla-arm64"
@@ -170,10 +173,10 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-06-25" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="2.0" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <!-- Princess and Ostrich for our Ivy release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-06-25" conf="runtime-princess->default; contrib->sources">
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess->default; contrib->sources">
             <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -188,14 +191,15 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11-sosy1" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.15.2" conf="runtime-z3-x64->solver-z3-x64; runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.15" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.15.4" conf="runtime-z3-x64->solver-z3-x64; runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.9.0-gef441e1c" conf="runtime-opensmt-x64->solver-opensmt-x64; runtime-opensmt-arm64->solver-opensmt-arm64; contrib->sources,javadoc"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.3-sosy1" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="2025-07-29-6dacfa5" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="2025-11-13-ef82847" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.1-gc1454189" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.2-104-g7c96f469" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3-legacy" rev="4.5.0-gd57a2a6dc" conf="runtime-z3-legacy-x64->solver-z3-legacy-x64; runtime-z3-legacy-arm64->solver-z3-legacy-arm64" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
         <dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources" />

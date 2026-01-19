@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -22,8 +23,10 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -58,6 +61,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    return getFormulaCreator().encapsulateRoundingMode(getRoundingMode(pRoundingMode));
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return getFormulaCreator().getRoundingMode(extractInfo(pRoundingModeFormula));
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
@@ -245,6 +260,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
+    Preconditions.checkArgument(
+        bvType.getSize() == pTargetType.getTotalSize(),
+        MoreStrings.lazyString(
+            () ->
+                String.format(
+                    "The total size %s of type %s has to match the size %s of type %s.",
+                    pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 

@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -12,7 +12,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.Z3;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
@@ -35,16 +34,22 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
+import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
+import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
 
 public class FloatingPointFormulaManagerTest
     extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -89,6 +94,67 @@ public class FloatingPointFormulaManagerTest
     assertWithMessage("mantissa sizes not equal")
         .that(result.getMantissaSizeWithHiddenBit())
         .isEqualTo(type.getMantissaSizeWithHiddenBit());
+  }
+
+  @Test
+  public void roundingModeVisitor() {
+    FloatingPointFormula variable =
+        fpmgr.makeVariable("a", FormulaType.getSinglePrecisionFloatingPointType());
+    FloatingPointFormula original =
+        fpmgr.sqrt(variable, FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+
+    for (FloatingPointRoundingMode rm : FloatingPointRoundingMode.values()) {
+      if (solver == Solvers.MATHSAT5 && rm == FloatingPointRoundingMode.NEAREST_TIES_AWAY) {
+        // SKIP MathSAT does not support rounding mode "nearest-ties-away"
+        continue;
+      }
+      // Build a term with a different rounding mode, then replace it in the visitor
+      FloatingPointFormula substituted =
+          (FloatingPointFormula)
+              mgr.visit(
+                  fpmgr.sqrt(variable, rm),
+                  new FormulaVisitor<Formula>() {
+                    @Override
+                    public Formula visitFreeVariable(Formula f, String name) {
+                      return f;
+                    }
+
+                    @Override
+                    public Formula visitConstant(Formula f, Object value) {
+                      assertThat(f).isInstanceOf(FloatingPointRoundingModeFormula.class);
+                      assertThat(value).isInstanceOf(FloatingPointRoundingMode.class);
+                      assertThat(value).isEqualTo(rm);
+
+                      // Return the default rounding mode
+                      return fpmgr.makeRoundingMode(FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN);
+                    }
+
+                    @Override
+                    public Formula visitFunction(
+                        Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+                      assertThat(functionDeclaration.getKind())
+                          .isEqualTo(FunctionDeclarationKind.FP_SQRT);
+                      assertThat(args).hasSize(2);
+                      return mgr.makeApplication(
+                          functionDeclaration,
+                          mgr.visit(args.get(0), this),
+                          mgr.visit(args.get(1), this));
+                    }
+
+                    @Override
+                    public Formula visitQuantifier(
+                        BooleanFormula f,
+                        Quantifier quantifier,
+                        List<Formula> boundVariables,
+                        BooleanFormula body) {
+                      throw new IllegalArgumentException(
+                          String.format("Unexpected quantifier %s", quantifier));
+                    }
+                  });
+
+      // Check that after the substitution the rounding mode is the default again
+      assertThat(original).isEqualTo(substituted);
+    }
   }
 
   @Test
@@ -606,9 +672,11 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!ImmutableSet.of(Z3, Solvers.CVC4).contains(solver)) {
+    if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
       // check unequality for very large types
-      FloatingPointType largeType = getFloatingPointTypeFromSizesWithoutHiddenBit(100, 100);
+      int exponentSize = solver == Solvers.BITWUZLA ? 30 : 100; // Bitwuzla has issues above 40 bit.
+      FloatingPointType largeType =
+          getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, 100);
       FloatingPointFormula k1 =
           fpmgr.makeNumber(BigDecimal.TEN.pow(200).multiply(BigDecimal.valueOf(1.001)), largeType);
       FloatingPointFormula k2 =
@@ -787,6 +855,17 @@ public class FloatingPointFormulaManagerTest
   private void assertEqualsAsFormula(FloatingPointFormula f1, FloatingPointFormula f2)
       throws SolverException, InterruptedException {
     assertThatFormula(fpmgr.assignment(f1, f2)).isTautological();
+  }
+
+  @Test
+  public void roundingModeMapping() {
+    for (FloatingPointRoundingMode rm : FloatingPointRoundingMode.values()) {
+      if (solver == Solvers.MATHSAT5 && rm == FloatingPointRoundingMode.NEAREST_TIES_AWAY) {
+        // SKIP MathSAT does not support rounding mode "nearest-ties-away"
+        continue;
+      }
+      assertThat(fpmgr.fromRoundingModeFormula(fpmgr.makeRoundingMode(rm))).isEqualTo(rm);
+    }
   }
 
   @Test
@@ -1022,6 +1101,27 @@ public class FloatingPointFormulaManagerTest
             fpmgr.equalWithFPSemantics(
                 fpmgr.makeNumber(pDouble, doublePrecType),
                 fpmgr.makeNumber(Double.toString(pDouble), doublePrecType)));
+  }
+
+  @Test
+  public void checkErrorOnInvalidSize_IeeeBv2FpConversion() {
+    BitvectorFormula bv = bvmgr.makeBitvector(9, 123);
+
+    var exSingle =
+        assertThrows(
+            IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, singlePrecType));
+    assertThat(exSingle.getMessage())
+        .contains(
+            "The total size 32 of type FloatingPoint<exp=8,mant=23> "
+                + "has to match the size 9 of type Bitvector<9>.");
+
+    var exDouble =
+        assertThrows(
+            IllegalArgumentException.class, () -> fpmgr.fromIeeeBitvector(bv, doublePrecType));
+    assertThat(exDouble.getMessage())
+        .contains(
+            "The total size 64 of type FloatingPoint<exp=11,mant=52> "
+                + "has to match the size 9 of type Bitvector<9>.");
   }
 
   @Test

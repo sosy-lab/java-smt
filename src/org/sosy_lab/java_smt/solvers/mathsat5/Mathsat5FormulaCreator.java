@@ -75,7 +75,6 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_OR;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_PLUS;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_TIMES;
-import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_UNKNOWN;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arg_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_tag;
@@ -109,6 +108,10 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_get_type;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_constant;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_false;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_minus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_nearest_even;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_plus_inf;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_fp_roundingmode_zero;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_number;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_true;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_term_is_uf;
@@ -131,6 +134,8 @@ import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -153,7 +158,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   private static final Pattern FLOATING_POINT_PATTERN = Pattern.compile("^(\\d+)_(\\d+)_(\\d+)$");
   private static final Pattern BITVECTOR_PATTERN = Pattern.compile("^(\\d+)_(\\d+)$");
 
-  Mathsat5FormulaCreator(final Long msatEnv) {
+  private final boolean usingOptiMathSAT;
+
+  Mathsat5FormulaCreator(final Long msatEnv, boolean pUsingOptiMathSAT5) {
     super(
         msatEnv,
         msat_get_bool_type(msatEnv),
@@ -161,6 +168,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         msat_get_rational_type(msatEnv),
         null,
         null);
+    usingOptiMathSAT = pUsingOptiMathSAT5;
   }
 
   @Override
@@ -298,6 +306,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType();
+    return new Mathsat5FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Long pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -339,9 +353,12 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return visitor.visitConstant(formula, true);
     } else if (msat_term_is_false(environment, f)) {
       return visitor.visitConstant(formula, false);
+    } else if (msat_is_fp_roundingmode_type(environment, msat_term_get_type(f))) {
+      return visitor.visitConstant(formula, getRoundingMode(f));
     } else if (msat_term_is_constant(environment, f)) {
       return visitor.visitFreeVariable(formula, msat_term_repr(f));
-    } else if (msat_is_enum_type(environment, msat_term_get_type(f))) {
+    } else if (!usingOptiMathSAT // OptiMathSAT does not support enumerations
+        && msat_is_enum_type(environment, msat_term_get_type(f))) {
       assert !msat_term_is_constant(environment, f) : "Enumeration constants are no variables";
       assert arity == 0 : "Enumeration constants have no parameters";
       return visitor.visitConstant(formula, msat_term_repr(f));
@@ -375,6 +392,22 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
               argTypes.build(),
               getFormulaType(f),
               msat_term_get_decl(f)));
+    }
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    if (msat_term_is_fp_roundingmode_nearest_even(environment, f)) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (msat_term_is_fp_roundingmode_plus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (msat_term_is_fp_roundingmode_minus_inf(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (msat_term_is_fp_roundingmode_zero(environment, f)) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", msat_term_repr(f)));
     }
   }
 
@@ -530,22 +563,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_IS_SUBNORMAL;
       case MSAT_TAG_FP_ISNORMAL:
         return FunctionDeclarationKind.FP_IS_NORMAL;
-
-      case MSAT_TAG_UNKNOWN:
-        switch (msat_decl_get_name(decl)) {
-          case "`fprounding_even`":
-            return FunctionDeclarationKind.FP_ROUND_EVEN;
-          case "`fprounding_plus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-          case "`fprounding_minus_inf`":
-            return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-          case "`fprounding_zero`":
-            return FunctionDeclarationKind.FP_ROUND_ZERO;
-
-          default:
-            return FunctionDeclarationKind.OTHER;
-        }
-
       case MSAT_TAG_FLOOR:
         return FunctionDeclarationKind.FLOOR;
 
