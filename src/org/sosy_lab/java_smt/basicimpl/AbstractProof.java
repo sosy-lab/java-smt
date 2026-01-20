@@ -10,7 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
-import java.util.LinkedHashSet;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -25,7 +25,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  */
 public abstract class AbstractProof implements Proof {
 
-  private final Set<Proof> children = new LinkedHashSet<>();
+  private final Set<Proof> children = ImmutableSet.of();
   private ProofRule rule;
   protected Optional<Formula> formula = Optional.empty();
 
@@ -58,12 +58,10 @@ public abstract class AbstractProof implements Proof {
     return getChildren().isEmpty();
   }
 
-
   public void setFormula(@Nullable Formula pFormula) {
     formula = Optional.ofNullable(pFormula);
   }
 
-  
   public void setRule(ProofRule pRule) {
     rule = pRule;
   }
