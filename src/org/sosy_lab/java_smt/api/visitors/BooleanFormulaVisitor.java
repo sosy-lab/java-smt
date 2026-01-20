@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
  *
  * @param <R> Desired return type.
  */
-public interface BooleanFormulaVisitor<R> {
+public interface  BooleanFormulaVisitor<R> {
 
   /**
    * Visit a constant with a given value.
