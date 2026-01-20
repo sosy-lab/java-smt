@@ -438,7 +438,7 @@ public abstract class SolverBasedTest0 {
             Solvers.YICES2,
             Solvers.CVC4,
             Solvers.PRINCESS,
-            Solvers.MATHSAT5,
+            Solvers.Z3_WITH_INTERPOLATION,
             Solvers.Z3,
             Solvers.OPENSMT,
             Solvers.SMTINTERPOL);
