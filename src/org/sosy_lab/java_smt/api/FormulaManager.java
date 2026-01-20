@@ -8,9 +8,9 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -140,7 +140,7 @@ public interface FormulaManager {
    * @return Equality formula
    */
   default BooleanFormula makeEqual(Formula... pArgs) {
-    return makeEqual(FluentIterable.from(pArgs));
+    return makeEqual(Arrays.asList(pArgs));
   }
 
   /**
@@ -160,7 +160,7 @@ public interface FormulaManager {
    * @return Distinctness formula
    */
   default BooleanFormula makeDistinct(Formula... pArgs) {
-    return makeDistinct(FluentIterable.from(pArgs));
+    return makeDistinct(Arrays.asList(pArgs));
   }
 
   /**
