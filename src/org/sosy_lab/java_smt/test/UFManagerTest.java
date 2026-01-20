@@ -30,6 +30,56 @@ public class UFManagerTest extends SolverBasedTest0.ParameterizedSolverBasedTest
   private static final ImmutableList<String> VALID_NAMES = ImmutableList.of("Func", "(Func)");
 
   @Test
+  public void testCollisionVar() {
+    var type1 = bvmgr != null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
+    var type2 = bvmgr != null ? FormulaType.getBitvectorTypeWithSize(16) : FormulaType.RationalType;
+
+    var variable = mgr.makeVariable(type1, "var");
+
+    if (ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.BITWUZLA)
+        .contains(solver)) {
+      assertThat(variable).isNotEqualTo(mgr.makeVariable(type2, "var"));
+    } else {
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeVariable(type2, "var"));
+    }
+  }
+
+  @Test
+  public void testCollisionVarBool() {
+    // Boolean variables are a special case in Princess
+    var type1 = FormulaType.BooleanType;
+    var type2 = bvmgr != null ? FormulaType.getBitvectorTypeWithSize(16) : FormulaType.RationalType;
+
+    var variable = mgr.makeVariable(type1, "var");
+
+    if (ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.BITWUZLA)
+        .contains(solver)) {
+      assertThat(variable).isNotEqualTo(mgr.makeVariable(type2, "var"));
+    } else {
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeVariable(type2, "var"));
+    }
+  }
+
+  @Test
+  public void testCollisionUf() {
+    var type1 = bvmgr != null ? FormulaType.getBitvectorTypeWithSize(8) : FormulaType.IntegerType;
+    var type2 = bvmgr != null ? FormulaType.getBitvectorTypeWithSize(16) : FormulaType.RationalType;
+
+    var uf1 = fmgr.declareUF("f", type1, type1);
+    if (ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.BITWUZLA)
+        .contains(solver)) {
+      var uf2 = fmgr.declareUF("f", type2, type2);
+
+      var f = mgr.makeApplication(uf1, mgr.makeVariable(type1, "var1"));
+      var g = mgr.makeApplication(uf2, mgr.makeVariable(type2, "var2"));
+
+      assertThat(f).isNotEqualTo(g);
+    } else {
+      assertThrows(IllegalArgumentException.class, () -> fmgr.declareUF("f", type2, type2));
+    }
+  }
+
+  @Test
   public void testDeclareAndCallUFWithInt() throws SolverException, InterruptedException {
     requireIntegers();
 
