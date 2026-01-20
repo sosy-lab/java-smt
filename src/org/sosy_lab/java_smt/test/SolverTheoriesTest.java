@@ -1180,18 +1180,10 @@ public class SolverTheoriesTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testVariableAndUFWithEqualSort() {
-    assume()
-        .withMessage("Solver %s does not support UFs without arguments", solverToUse())
-        .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.CVC5, Solvers.BITWUZLA);
-
+  public void testVariableAndUFWithEqualSort() throws SolverException, InterruptedException {
     BooleanFormula z1 = bmgr.makeVariable("z");
     BooleanFormula z2 = fmgr.declareAndCallUF("z", FormulaType.BooleanType);
-    if (ImmutableSet.of(Solvers.CVC4, Solvers.PRINCESS).contains(solverToUse())) {
-      assertThat(z1).isNotEqualTo(z2);
-    } else {
-      assertThat(z1).isEqualTo(z2);
-    }
+    assertThat(z1).isEqualTo(z2);
+    assertThatFormula(mgr.distinct(z1, z2)).isUnsatisfiable();
   }
 }
