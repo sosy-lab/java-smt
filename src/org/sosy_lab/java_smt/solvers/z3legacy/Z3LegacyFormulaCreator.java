@@ -245,8 +245,9 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
+        // fpaGetSbits returns the mantissa with hidden bit
         return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
@@ -461,7 +462,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
     long fpSort =
-        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit() + 1);
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -990,7 +991,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           expo,
           mant,
           pType.getExponentSize(),
-          pType.getMantissaSizeWithHiddenBit());
+          pType.getMantissaSizeWithoutHiddenBit());
 
       //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       //      // Floating Point Inf uses:
@@ -1024,7 +1025,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           new BigInteger(exponent),
           new BigInteger(mantissa),
           pType.getExponentSize(),
-          pType.getMantissaSizeWithHiddenBit());
+          pType.getMantissaSizeWithoutHiddenBit());
     }
   }
 
