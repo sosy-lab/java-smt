@@ -104,9 +104,9 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
     Preconditions.checkState(generateProofs, TEMPLATE, ProverOptions.GENERATE_PROOFS);
     Preconditions.checkState(!closed);
     Preconditions.checkState(!changedSinceLastSatQuery);
-    Preconditions.checkState(!wasLastSatCheckSatisfiable);  
+    Preconditions.checkState(!wasLastSatCheckSatisfiable);
   }
-    
+
   protected final void checkGenerateInterpolants() {
     Preconditions.checkState(!closed);
     Preconditions.checkState(

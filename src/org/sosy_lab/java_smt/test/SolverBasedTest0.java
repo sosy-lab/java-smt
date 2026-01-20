@@ -432,8 +432,16 @@ public abstract class SolverBasedTest0 {
         .withMessage(
             "Current version of solver %s does not support proof generation", solverToUse())
         .that(solverToUse())
-        .isNoneOf(Solvers.BOOLECTOR, Solvers.BITWUZLA, Solvers.YICES2, Solvers.CVC4,
-            Solvers.PRINCESS, Solvers.MATHSAT5, Solvers.Z3, Solvers.OPENSMT, Solvers.SMTINTERPOL);
+        .isNoneOf(
+            Solvers.BOOLECTOR,
+            Solvers.BITWUZLA,
+            Solvers.YICES2,
+            Solvers.CVC4,
+            Solvers.PRINCESS,
+            Solvers.MATHSAT5,
+            Solvers.Z3,
+            Solvers.OPENSMT,
+            Solvers.SMTINTERPOL);
   }
 
   /**
