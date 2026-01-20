@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -173,7 +173,7 @@ enum CVC5ProofRule implements ProofRule {
 
   private final String name;
 
-  CVC5ProofRule(String pName){
+  CVC5ProofRule(String pName) {
     name = pName;
   }
 
@@ -181,5 +181,4 @@ enum CVC5ProofRule implements ProofRule {
   public String getName() {
     return name;
   }
-
 }
