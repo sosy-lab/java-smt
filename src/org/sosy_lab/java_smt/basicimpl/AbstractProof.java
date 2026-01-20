@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -25,13 +25,6 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  */
 public abstract class AbstractProof implements Proof {
 
-  // protected abstract class Transformation {
-  //  protected <TFormulaInfo, TType, TEnv, TFuncDecl, T> Transformation(
-  //      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> formulaCreator, T proof) {}
-
-  //    protected abstract Proof generateProof();
-  // }
-
   private final Set<Proof> children = new LinkedHashSet<>();
   private ProofRule rule;
   protected Optional<Formula> formula = Optional.empty();
@@ -41,7 +34,6 @@ public abstract class AbstractProof implements Proof {
     this.formula = Optional.ofNullable(formula);
   }
 
-  // TODO: Use Optional instead of nullable
   @Override
   public Optional<Formula> getFormula() {
     return this.formula;
@@ -65,10 +57,6 @@ public abstract class AbstractProof implements Proof {
   public boolean isLeaf() {
     return getChildren().isEmpty();
   }
-
-  // void setRule(ProofRule rule) {
-  //  this.rule = rule;
-  // }
 
   public void setFormula(@Nullable Formula pFormula) {
     formula = Optional.ofNullable(pFormula);
