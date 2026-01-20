@@ -283,18 +283,18 @@ public abstract class FloatingPointNumber {
   }
 
   private BitSet getBits() {
-    var mantissaSizeWithoutSign = getMantissaSizeWithoutHiddenBit();
+    var mantissaSizeWithoutHiddenBit = getMantissaSizeWithoutHiddenBit();
     var exponentSize = getExponentSize();
     var mantissa = getMantissa();
     var exponent = getExponent();
     var bits = new BitSet(getTotalSize());
     if (getMathSign().isNegative()) {
-      bits.set(exponentSize + mantissaSizeWithoutSign); // if negative, set first bit to 1
+      bits.set(exponentSize + mantissaSizeWithoutHiddenBit); // if negative, set first bit to 1
     }
     for (int i = 0; i < exponentSize; i++) {
-      bits.set(mantissaSizeWithoutSign + i, exponent.testBit(i));
+      bits.set(mantissaSizeWithoutHiddenBit + i, exponent.testBit(i));
     }
-    for (int i = 0; i < mantissaSizeWithoutSign; i++) {
+    for (int i = 0; i < mantissaSizeWithoutHiddenBit; i++) {
       bits.set(i, mantissa.testBit(i));
     }
     return bits;
