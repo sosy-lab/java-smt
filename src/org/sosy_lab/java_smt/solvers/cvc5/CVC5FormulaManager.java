@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import de.uni_freiburg.informatik.ultimate.logic.PrintTerm;
@@ -20,7 +21,6 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -71,13 +71,23 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   @Override
-  public Term equalImpl(Collection<Term> pArgs) {
-    return getEnvironment().mkTerm(Kind.EQUAL, pArgs.toArray(new Term[0]));
+  public Term equalImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().mkTrue();
+    } else {
+      return getEnvironment().mkTerm(Kind.EQUAL, array);
+    }
   }
 
   @Override
-  public Term distinctImpl(Collection<Term> pArgs) {
-    return getEnvironment().mkTerm(Kind.DISTINCT, pArgs.toArray(new Term[0]));
+  public Term distinctImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().mkTrue();
+    } else {
+      return getEnvironment().mkTerm(Kind.DISTINCT, array);
+    }
   }
 
   @Override
