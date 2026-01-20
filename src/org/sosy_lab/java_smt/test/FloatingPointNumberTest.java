@@ -151,6 +151,7 @@ public class FloatingPointNumberTest {
               + precisionToTest.getMantissaSizeWithHiddenBit()
               + ")";
       assertThat(smtlib2StringFromPrecision).isEqualTo(expectedString1);
+      // Test that output with getMantissaSizeWithoutHiddenBit + 1 == getMantissaSizeWithHiddenBit
       String expectedString2 =
           "(_ FloatingPoint "
               + precisionToTest.getExponentSize()

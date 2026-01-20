@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
-
 import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
