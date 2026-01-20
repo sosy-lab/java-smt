@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+
 import com.google.common.collect.ImmutableList;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Kind;
@@ -411,17 +412,17 @@ public class CVC5FloatingPointFormulaManager
 
   @Override
   protected Term fromIeeeBitvectorImpl(Term pBitvector, FloatingPointType pTargetType) {
-    int mantissaSizeWithoutHiddenBit = pTargetType.getMantissaSizeWithoutHiddenBit();
+    int mantissaSizeWithHiddenBit = pTargetType.getMantissaSizeWithHiddenBit();
     int size = pTargetType.getTotalSize();
-    // total size = mantissa without hidden bit + sign bit + exponent
-    assert size == mantissaSizeWithoutHiddenBit + 1 + pTargetType.getExponentSize();
+    // total size = mantissa with hidden bit + exponent
+    assert size == mantissaSizeWithHiddenBit + pTargetType.getExponentSize();
 
     try {
       return termManager.mkTerm(
           termManager.mkOp(
               Kind.FLOATINGPOINT_TO_FP_FROM_IEEE_BV,
               pTargetType.getExponentSize(),
-              pTargetType.getMantissaSizeWithoutHiddenBit() + 1), // adding sign bit
+              pTargetType.getMantissaSizeWithHiddenBit()),
           pBitvector);
     } catch (CVC5ApiException cvc5ApiException) {
       // This seems to only be thrown for wrong exponent and mantissa sizes (e.g. negative
