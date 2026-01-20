@@ -416,6 +416,7 @@ public class CVC5FloatingPointFormulaManager
     // total size = mantissa with hidden bit + exponent
     assert size == mantissaSizeWithHiddenBit + pTargetType.getExponentSize();
 
+    // CVC5 defines its FPs as the SMTLIB2 standard does, hence mantissa is including the hidden bit
     try {
       return termManager.mkTerm(
           termManager.mkOp(
