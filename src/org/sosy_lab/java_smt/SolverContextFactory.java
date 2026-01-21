@@ -379,4 +379,42 @@ public class SolverContextFactory {
             NativeLibraries::loadLibrary)
         .generateContext(solver);
   }
+
+  /**
+   * Create a new optimization prover environment.
+   * @param context The solver context
+   * @param options The prover options
+   * @return An optimization prover environment
+   * @throws SolverOptimizationException if the solver doesn't support optimization
+   */
+  public static OptimizationProverEnvironment createOptimizationProver(
+          SolverContext context, Set<ProverOptions> options) {
+    Solvers solver = context.getSolver();
+    
+    // Check if optimization is supported
+    if (!SolverVersionChecker.isOptimizationSupported(solver)) {
+        logger.log(Level.WARNING, SolverVersionChecker.getOptimizationSupportMessage(solver));
+        return new FallbackOptimizationProver(context, logger, context.getFormulaManager(), options);
+    }
+    
+    // Check version compatibility for MathSAT5
+    if (solver == Solvers.MATHSAT5) {
+        try {
+            SolverVersionChecker.checkMathSATVersion(context.getVersion());
+        } catch (SolverOptimizationException e) {
+            logger.log(Level.WARNING, e.getMessage());
+            return new FallbackOptimizationProver(context, logger, context.getFormulaManager(), options);
+        }
+    }
+    
+    // Create solver-specific optimization prover
+    switch (solver) {
+        case Z3:
+            return new Z3OptimizationProver(/*...*/);
+        case MATHSAT5:
+            return new MathSATOptimizationProver(/*...*/);
+        default:
+            return new FallbackOptimizationProver(context, logger, context.getFormulaManager(), options);
+    }
+  }
 }
