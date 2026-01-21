@@ -986,12 +986,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert "0".equals(sign) || "1".equals(sign);
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
-      return FloatingPointNumber.of(
-          Sign.of(sign.charAt(0) == '1'),
-          expo,
-          mant,
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithoutHiddenBit());
+      return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
 
       //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       //      // Floating Point Inf uses:
@@ -1021,11 +1016,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       var exponent = Native.fpaGetNumeralExponentString(environment, pValue);
       var mantissa = Native.fpaGetNumeralSignificandString(environment, pValue);
       return FloatingPointNumber.of(
-          sign,
-          new BigInteger(exponent),
-          new BigInteger(mantissa),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithoutHiddenBit());
+          sign, new BigInteger(exponent), new BigInteger(mantissa), pType);
     }
   }
 

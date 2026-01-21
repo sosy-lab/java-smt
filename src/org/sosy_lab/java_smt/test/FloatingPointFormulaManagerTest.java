@@ -1596,11 +1596,7 @@ public class FloatingPointFormulaManagerTest
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
-                  sign,
-                  BigInteger.valueOf(exponent),
-                  BigInteger.valueOf(mantissa),
-                  singlePrecType.getExponentSize(),
-                  singlePrecType.getMantissaSizeWithoutHiddenBit());
+                  sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), singlePrecType);
           assertThat(fpNumber.getMantissaSizeWithHiddenBit())
               .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit());
           assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())
@@ -1628,11 +1624,7 @@ public class FloatingPointFormulaManagerTest
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
-                  sign,
-                  BigInteger.valueOf(exponent),
-                  BigInteger.valueOf(mantissa),
-                  doublePrecType.getExponentSize(),
-                  doublePrecType.getMantissaSizeWithoutHiddenBit());
+                  sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), doublePrecType);
           assertThat(fpNumber.getMantissaSizeWithHiddenBit())
               .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit());
           assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())

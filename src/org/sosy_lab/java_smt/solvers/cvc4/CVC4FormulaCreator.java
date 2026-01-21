@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
@@ -676,8 +677,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
         Sign.of(sign.charAt(0) == '1'),
         new BigInteger(exp, 2),
         new BigInteger(mant, 2),
-        expWidth,
-        mantWidthWithoutHiddenBit);
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   @Override

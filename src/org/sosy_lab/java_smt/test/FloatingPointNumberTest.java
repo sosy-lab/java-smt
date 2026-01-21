@@ -102,7 +102,12 @@ public class FloatingPointNumberTest {
 
   @Test
   public void floatingPointNumberWithArbitraryPrecision() {
-    var fpNum = FloatingPointNumber.of(Sign.POSITIVE, BigInteger.valueOf(10), BigInteger.ONE, 5, 7);
+    var fpNum =
+        FloatingPointNumber.of(
+            Sign.POSITIVE,
+            BigInteger.valueOf(10),
+            BigInteger.ONE,
+            getFloatingPointTypeFromSizesWithHiddenBit(5, 8));
     assertThat(fpNum.toString()).isEqualTo("0" + "01010" + "0000001");
     assertThrows(IllegalArgumentException.class, fpNum::floatValue);
     assertThrows(IllegalArgumentException.class, fpNum::doubleValue);

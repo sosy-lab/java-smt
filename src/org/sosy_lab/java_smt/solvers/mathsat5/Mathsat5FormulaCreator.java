@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_CONST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
@@ -613,7 +614,11 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutHiddenBit, expWidth);
     BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutHiddenBit);
 
-    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidthWithoutHiddenBit);
+    return FloatingPointNumber.of(
+        sign,
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   /**
