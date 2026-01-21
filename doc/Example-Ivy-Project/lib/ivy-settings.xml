@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivysettings>
+    <settings defaultResolver="Sosy-Lab"/>
+    <property name="ivy.repo.url" value="https://www.sosy-lab.org/ivy"/>
+    <resolvers>
+        <url name="Sosy-Lab" descriptor="required">
+            <ivy pattern="${ivy.repo.url}/[organisation]/[module]/ivy-[revision].xml"/>
+            <artifact pattern="${ivy.repo.url}/[organisation]/[module]/([arch]/)[artifact]-[revision](-[classifier]).[ext]"/>
+        </url>
+    </resolvers>
+
+    <caches defaultCacheDir="${user.home}/.ivy2/cache"
+            artifactPattern="[organisation]/[module]/[type]s/([arch]/)[artifact]-[revision](-[classifier]).[ext]"/>
+</ivysettings>

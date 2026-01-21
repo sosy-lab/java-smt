@@ -1,0 +1,16 @@
+<!--
+This file is part of JavaSMT,
+an API wrapper for a collection of SMT solvers:
+https://github.com/sosy-lab/java-smt
+
+SPDX-FileCopyrightText: 2025 Dirk Beyer <https://www.sosy-lab.org>
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<ivy-module version="2.0">
+    <info organisation="${project.organization}" module="${project.module}"/>
+    <dependencies>
+        <dependency org="org.sosy_lab" name="java-smt" rev="5.0.1-618-ga6bdbf912" conf="default->runtime-x64,runtime-arm64"/>
+    </dependencies>
+</ivy-module>
