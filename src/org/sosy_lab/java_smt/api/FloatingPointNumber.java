@@ -8,12 +8,15 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
 import com.google.errorprone.annotations.Immutable;
 import com.google.errorprone.annotations.InlineMe;
 import java.math.BigInteger;
 import java.util.BitSet;
+import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
  * Represents a floating-point number with customizable precision, consisting of sign, exponent, and
@@ -195,6 +198,30 @@ public abstract class FloatingPointNumber {
     Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
     return new AutoValue_FloatingPointNumber(
         sign, exponent, mantissa, exponentSize, mantissaSizeWithoutHiddenBit);
+  }
+
+  /**
+   * Get a floating-point number with the given sign, exponent, and mantissa.
+   *
+   * @param sign the sign of the floating-point number.
+   * @param exponent the exponent of the floating-point number, given as unsigned (not negative)
+   *     number, including a bias of 2^(exponent size - 1) - 1.
+   * @param mantissa the mantissa of the floating-point number, given as unsigned (not negative)
+   *     number without hidden bit.
+   * @param floatingPointType {@link FloatingPointType} to use. Mantissa and exponent sizes are used
+   *     based on this type.
+   */
+  public static FloatingPointNumber of(
+      Sign sign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
+    checkNotNull(floatingPointType);
+    Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
+    Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
+    return new AutoValue_FloatingPointNumber(
+        sign,
+        exponent,
+        mantissa,
+        floatingPointType.getExponentSize(),
+        floatingPointType.getMantissaSizeWithoutHiddenBit());
   }
 
   /**
