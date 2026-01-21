@@ -1011,8 +1011,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           sign
               + "1".repeat(pType.getExponentSize())
               + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithoutHiddenBit());
+          pType);
 
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
@@ -1025,8 +1024,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           "0"
               + "1".repeat(pType.getExponentSize())
               + "1".repeat(pType.getMantissaSizeWithoutHiddenBit()),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithoutHiddenBit());
+          pType);
 
     } else {
       Sign sign = getSign(pValue);

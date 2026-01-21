@@ -603,8 +603,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     }
     if (sort.is_fp()) {
       int exponentSize = sort.fp_exp_size();
-      int mantissaSizeWithoutHiddenBit = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.to_bv(), exponentSize, mantissaSizeWithoutHiddenBit);
+      int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      return FloatingPointNumber.of(
+          term.to_bv(),
+          FloatingPointType.getFloatingPointTypeFromSizesWithHiddenBit(
+              exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
   }

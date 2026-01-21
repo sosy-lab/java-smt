@@ -861,11 +861,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   private FloatingPointNumber convertFloatingPoint(Term value) throws CVC5ApiException {
     final var fpValue = value.getFloatingPointValue();
     final var expWidth = Ints.checkedCast(fpValue.first);
-    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without hidden bit
+    final var mantWidth = Ints.checkedCast(fpValue.second); // with hidden bit
     final var bvValue = fpValue.third;
     checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
-    return FloatingPointNumber.of(bits, expWidth, mantWidth);
+    return FloatingPointNumber.of(
+        bits, FloatingPointType.getFloatingPointTypeFromSizesWithHiddenBit(expWidth, mantWidth));
   }
 
   @Override

@@ -26,11 +26,6 @@ import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 public class FloatingPointNumberTest {
 
-  private static final int SINGLE_PRECISION_EXPONENT_SIZE = 8;
-  private static final int SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 23;
-  private static final int DOUBLE_PRECISION_EXPONENT_SIZE = 11;
-  private static final int DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT = 52;
-
   @Test
   public void floatingPointNumberWithSinglePrecision() {
     for (float f :
@@ -56,11 +51,7 @@ public class FloatingPointNumberTest {
           Float.MIN_NORMAL,
         }) {
       var bits = Strings.padStart(Integer.toBinaryString(Float.floatToRawIntBits(f)), 32, '0');
-      var fpNum =
-          FloatingPointNumber.of(
-              bits,
-              SINGLE_PRECISION_EXPONENT_SIZE,
-              SINGLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
+      var fpNum = FloatingPointNumber.of(bits, getSinglePrecisionFloatingPointType());
       assertThat(fpNum.floatValue()).isEqualTo(f);
       assertThat(fpNum.doubleValue()).isEqualTo((double) f); // float is a strict subtype of double.
     }
@@ -91,11 +82,7 @@ public class FloatingPointNumberTest {
           Double.MIN_NORMAL,
         }) {
       var bits = Strings.padStart(Long.toBinaryString(Double.doubleToRawLongBits(d)), 64, '0');
-      var fpNum =
-          FloatingPointNumber.of(
-              bits,
-              DOUBLE_PRECISION_EXPONENT_SIZE,
-              DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT);
+      var fpNum = FloatingPointNumber.of(bits, getDoublePrecisionFloatingPointType());
       assertThat(fpNum.doubleValue()).isEqualTo(d);
     }
   }

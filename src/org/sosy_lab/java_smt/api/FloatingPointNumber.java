@@ -240,33 +240,52 @@ public abstract class FloatingPointNumber {
    *
    * @param bits the bit-representation of the floating-point number, consisting of sign bit,
    *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering
-   * @param exponentSize the size of the exponent in bits
+   * @param exponentSize the size of the exponent in bits.
    * @param mantissaSizeWithoutHiddenBit the size of the mantissa in bits (excluding the hidden bit)
+   * @deprecated Use {@link #of(String, FloatingPointType)} instead.
    */
+  @Deprecated(
+      since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
+      forRemoval = true)
   public static FloatingPointNumber of(
       String bits, int exponentSize, int mantissaSizeWithoutHiddenBit) {
     Preconditions.checkArgument(0 < exponentSize);
     Preconditions.checkArgument(0 < mantissaSizeWithoutHiddenBit);
+    return of(
+        bits,
+        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
+            exponentSize, mantissaSizeWithoutHiddenBit));
+  }
+
+  /**
+   * Get a floating-point number encoded as bitvector as defined by IEEE 754.
+   *
+   * @param bits the bit-representation of the floating-point number, consisting of sign bit,
+   *     exponent (without bias) and mantissa (without hidden bit) in this exact ordering.
+   * @param floatingPointType {@link FloatingPointType} to use. Mantissa and exponent sizes are used
+   *     based on this type.
+   */
+  public static FloatingPointNumber of(String bits, FloatingPointType floatingPointType) {
+    checkNotNull(floatingPointType);
+    // Note: sign bit + exponent size + mantissa size without hidden bit == exponent size + mantissa
+    // size with hidden bit
+    var exponentSize = floatingPointType.getExponentSize();
+    var mantissaSizeWithoutHiddenBit = floatingPointType.getMantissaSizeWithoutHiddenBit();
     Preconditions.checkArgument(
-        bits.length() == 1 + exponentSize + mantissaSizeWithoutHiddenBit,
+        bits.length() == 1 + floatingPointType.getTotalSize(),
         "Bitsize (%s) of floating point numeral does not match the size of sign, exponent and "
             + "mantissa (%s + %s + %s).",
         bits.length(),
         1,
         exponentSize,
-        mantissaSizeWithoutHiddenBit);
+        floatingPointType.getMantissaSizeWithoutHiddenBit());
     Preconditions.checkArgument(bits.chars().allMatch(c -> c == '0' || c == '1'));
     Sign sign = Sign.of(bits.charAt(0) == '1');
     BigInteger exponent = new BigInteger(bits.substring(1, 1 + exponentSize), 2);
     BigInteger mantissa =
         new BigInteger(
             bits.substring(1 + exponentSize, 1 + exponentSize + mantissaSizeWithoutHiddenBit), 2);
-    return of(
-        sign,
-        exponent,
-        mantissa,
-        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
-            exponentSize, mantissaSizeWithoutHiddenBit));
+    return of(sign, exponent, mantissa, floatingPointType);
   }
 
   /**
