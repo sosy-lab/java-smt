@@ -152,18 +152,20 @@ public abstract class FloatingPointNumber {
    * @param exponentSize the (maximum) size of the exponent in bits
    * @param mantissaSizeWithoutHiddenBit the (maximum) size of the mantissa in bits (excluding the
    *     hidden bit)
-   * @see #of(Sign, BigInteger, BigInteger, int, int)
+   * @deprecated Use {@link #of(Sign, BigInteger, BigInteger, FloatingPointType)} instead.
    */
   @Deprecated(
       since = "2025.01, because using a boolean flag as signBit is misleading",
       forRemoval = true)
   @InlineMe(
       replacement =
-          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa, exponentSize,"
-              + " mantissaSizeWithoutHiddenBit)",
+          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa,"
+              + " FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
+              + " mantissaSizeWithoutHiddenBit))",
       imports = {
         "org.sosy_lab.java_smt.api.FloatingPointNumber",
-        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign"
+        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign",
+        "org.sosy_lab.java_smt.api.FormulaType"
       })
   public static FloatingPointNumber of(
       boolean sign,
@@ -171,7 +173,12 @@ public abstract class FloatingPointNumber {
       BigInteger mantissa,
       int exponentSize,
       int mantissaSizeWithoutHiddenBit) {
-    return of(Sign.of(sign), exponent, mantissa, exponentSize, mantissaSizeWithoutHiddenBit);
+    return of(
+        Sign.of(sign),
+        exponent,
+        mantissa,
+        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
+            exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**
@@ -185,7 +192,11 @@ public abstract class FloatingPointNumber {
    * @param exponentSize the (maximum) size of the exponent in bits
    * @param mantissaSizeWithoutHiddenBit the (maximum) size of the mantissa in bits (excluding the
    *     hidden bit)
+   * @deprecated Use {@link #of(Sign, BigInteger, BigInteger, FloatingPointType)} instead.
    */
+  @Deprecated(
+      since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
+      forRemoval = true)
   public static FloatingPointNumber of(
       Sign sign,
       BigInteger exponent,
@@ -250,7 +261,12 @@ public abstract class FloatingPointNumber {
     BigInteger mantissa =
         new BigInteger(
             bits.substring(1 + exponentSize, 1 + exponentSize + mantissaSizeWithoutHiddenBit), 2);
-    return of(sign, exponent, mantissa, exponentSize, mantissaSizeWithoutHiddenBit);
+    return of(
+        sign,
+        exponent,
+        mantissa,
+        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
+            exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**
