@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -25,7 +26,7 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
  */
 public abstract class AbstractProof implements Proof {
 
-  private final Set<Proof> children = new LinkedHashSet<>();
+  private Set<Proof> children = ImmutableSet.of();
   private ProofRule rule;
   protected Optional<Formula> formula = Optional.empty();
 
@@ -45,7 +46,9 @@ public abstract class AbstractProof implements Proof {
   }
 
   protected void addChild(Proof child) {
-    this.children.add(child);
+    Set<Proof> tempChildren = new LinkedHashSet<>(this.children);
+    tempChildren.add(child);
+    this.children = ImmutableSet.copyOf(tempChildren);
   }
 
   @Override
