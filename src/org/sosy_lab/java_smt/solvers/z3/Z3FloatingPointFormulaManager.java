@@ -8,7 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Verify.verify;
 
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
@@ -98,10 +98,13 @@ class Z3FloatingPointFormulaManager
     Native.decRef(z3context, expoBv);
     Native.decRef(z3context, signBv);
 
-    checkState(
+    // The relation of mantissa without hidden bit above to the mantissa with hidden bit here is
+    // the result of how SMTLIB2 defines its floating-point numbers. While the IEEE standard uses
+    // "sign bit + exponent + mantissa without hidden bit", SMTLIB2 uses "exponent + mantissa with
+    // hidden bit" as total size.
+    verify(
         type.getMantissaSizeWithHiddenBit()
             == Native.fpaGetSbits(z3context, Native.getSort(z3context, fp)));
-    assert type.getExponentSize() == Native.fpaGetEbits(z3context, Native.getSort(z3context, fp));
     assert type.getTotalSize()
         == Native.fpaGetEbits(z3context, Native.getSort(z3context, fp))
             + Native.fpaGetSbits(z3context, Native.getSort(z3context, fp));
