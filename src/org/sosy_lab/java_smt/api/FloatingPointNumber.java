@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.api;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Preconditions;
@@ -160,13 +161,15 @@ public abstract class FloatingPointNumber {
   @InlineMe(
       replacement =
           "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa,"
-              + " FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
+              + " getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
               + " mantissaSizeWithoutHiddenBit))",
       imports = {
         "org.sosy_lab.java_smt.api.FloatingPointNumber",
         "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign",
-        "org.sosy_lab.java_smt.api.FormulaType"
-      })
+      },
+      staticImports =
+          "org.sosy_lab.java_smt.api.FormulaType"
+              + ".getFloatingPointTypeFromSizesWithoutHiddenBit")
   public static FloatingPointNumber of(
       boolean sign,
       BigInteger exponent,
@@ -177,8 +180,7 @@ public abstract class FloatingPointNumber {
         Sign.of(sign),
         exponent,
         mantissa,
-        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
-            exponentSize, mantissaSizeWithoutHiddenBit));
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**
@@ -253,8 +255,7 @@ public abstract class FloatingPointNumber {
     Preconditions.checkArgument(0 < mantissaSizeWithoutHiddenBit);
     return of(
         bits,
-        FloatingPointType.getFloatingPointTypeFromSizesWithoutHiddenBit(
-            exponentSize, mantissaSizeWithoutHiddenBit));
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**

@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -234,7 +235,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
       // CVC5 wants the hidden bit as part of the mantissa. We add that manually in creation.
-      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+      return getFloatingPointTypeFromSizesWithHiddenBit(
           sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize());
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
@@ -866,7 +867,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
     return FloatingPointNumber.of(
-        bits, FloatingPointType.getFloatingPointTypeFromSizesWithHiddenBit(expWidth, mantWidth));
+        bits, getFloatingPointTypeFromSizesWithHiddenBit(expWidth, mantWidth));
   }
 
   @Override

@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -181,8 +182,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
       int mantissaWithHiddenBit = pSort.fp_sig_size();
-      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
-          exponent, mantissaWithHiddenBit);
+      return getFloatingPointTypeFromSizesWithHiddenBit(exponent, mantissaWithHiddenBit);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -392,7 +392,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       int exp = sort.fp_exp_size();
       int mantissaWithHiddenBit = sort.fp_sig_size();
       return (FormulaType<T>)
-          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(exp, mantissaWithHiddenBit);
+          getFloatingPointTypeFromSizesWithHiddenBit(exp, mantissaWithHiddenBit);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
@@ -606,8 +606,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       int mantissaSizeWithHiddenBit = sort.fp_sig_size();
       return FloatingPointNumber.of(
           term.to_bv(),
-          FloatingPointType.getFloatingPointTypeFromSizesWithHiddenBit(
-              exponentSize, mantissaSizeWithHiddenBit));
+          getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
   }
