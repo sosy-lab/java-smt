@@ -273,7 +273,7 @@ public abstract class FloatingPointNumber {
     var exponentSize = floatingPointType.getExponentSize();
     var mantissaSizeWithoutHiddenBit = floatingPointType.getMantissaSizeWithoutHiddenBit();
     Preconditions.checkArgument(
-        bits.length() == 1 + floatingPointType.getTotalSize(),
+        bits.length() == floatingPointType.getTotalSize(),
         "Bitsize (%s) of floating point numeral does not match the size of sign, exponent and "
             + "mantissa (%s + %s + %s).",
         bits.length(),
