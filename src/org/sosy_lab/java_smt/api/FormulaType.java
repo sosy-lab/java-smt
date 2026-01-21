@@ -365,7 +365,7 @@ public abstract class FormulaType<T extends Formula> {
      * bit".
      */
     public int getTotalSize() {
-      return 1 + exponentSize + getMantissaSizeWithoutHiddenBit();
+      return exponentSize + getMantissaSizeWithHiddenBit();
     }
 
     @Override
