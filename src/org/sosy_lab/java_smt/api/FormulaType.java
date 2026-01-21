@@ -357,7 +357,7 @@ public abstract class FormulaType<T extends Formula> {
 
     /**
      * Return the total bit size of a value of this type (i.e. the precision). Defined by the <a
-     * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a> as being equal
+     * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMT-LIB2 standard</a> as being equal
      * to the "size of the exponent + size of the mantissa including the hidden bit". This is equal
      * to the total size as defined by the <a
      * href="https://ieeexplore.ieee.org/document/4610935">IEEE 754-2008 floating-point</a> standard
