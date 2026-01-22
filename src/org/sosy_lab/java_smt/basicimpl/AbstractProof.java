@@ -30,9 +30,9 @@ public abstract class AbstractProof implements Proof {
   private ProofRule rule;
   protected Optional<Formula> formula = Optional.empty();
 
-  protected AbstractProof(ProofRule rule, @Nullable Formula formula) {
-    this.rule = rule;
-    this.formula = Optional.ofNullable(formula);
+  protected AbstractProof(ProofRule pRule, @Nullable Formula pFormula) {
+    this.rule = pRule;
+    this.formula = Optional.ofNullable(pFormula);
   }
 
   @Override
@@ -45,9 +45,9 @@ public abstract class AbstractProof implements Proof {
     return this.children;
   }
 
-  protected void addChild(Proof child) {
+  protected void addChild(Proof pChild) {
     Set<Proof> tempChildren = new LinkedHashSet<>(this.children);
-    tempChildren.add(child);
+    tempChildren.add(pChild);
     this.children = ImmutableSet.copyOf(tempChildren);
   }
 
@@ -61,22 +61,16 @@ public abstract class AbstractProof implements Proof {
     return getChildren().isEmpty();
   }
 
-  public void setFormula(@Nullable Formula pFormula) {
-    formula = Optional.ofNullable(pFormula);
-  }
-
-  public void setRule(ProofRule pRule) {
-    rule = pRule;
-  }
-
-  // use this for debugging
+  /** This method gibes the proof back as a formatted string. It is meant to have a readable
+   * proof for debugging purposes.
+   */
   public String proofAsString() {
     return proofAsString(0);
   }
 
-  protected String proofAsString(int indentLevel) {
+  protected String proofAsString(int pIndentLevel) {
     StringBuilder sb = new StringBuilder();
-    String indent = "  ".repeat(indentLevel);
+    String indent = "  ".repeat(pIndentLevel);
 
     String sFormula = getFormula().map(Object::toString).orElse("null");
 
@@ -92,7 +86,7 @@ public abstract class AbstractProof implements Proof {
     if (!isLeaf()) {
       for (Proof child : getChildren()) {
         sb.append(indent).append("Child ").append(++i).append(":\n");
-        sb.append(((AbstractProof) child).proofAsString(indentLevel + 1));
+        sb.append(((AbstractProof) child).proofAsString(pIndentLevel + 1));
       }
     }
 
@@ -104,8 +98,8 @@ public abstract class AbstractProof implements Proof {
     int numArgs = 0;
     boolean visited;
 
-    protected ProofFrame(T proof) {
-      this.proof = proof;
+    protected ProofFrame(T pProof) {
+      this.proof = pProof;
       this.visited = false;
     }
 
@@ -125,13 +119,13 @@ public abstract class AbstractProof implements Proof {
     }
 
     /** Set the frame as visited. */
-    public void setAsVisited(boolean isVisited) {
-      this.visited = isVisited;
+    public void setAsVisited() {
+      this.visited = true;
     }
 
     /** Set the number of arguments the proof object has. */
-    public void setNumArgs(int numArgs) {
-      this.numArgs = numArgs;
+    public void setNumArgs(int pNumArgs) {
+      this.numArgs = pNumArgs;
     }
   }
 }
