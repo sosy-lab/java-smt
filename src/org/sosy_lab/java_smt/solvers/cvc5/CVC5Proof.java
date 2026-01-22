@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
-import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
@@ -88,7 +87,7 @@ public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
     }
   }
 
-  public CVC5Proof(ProofRule pProofRule, Formula formula) {
+  private CVC5Proof(ProofRule pProofRule, Formula formula) {
 
     super(pProofRule, formula);
   }
