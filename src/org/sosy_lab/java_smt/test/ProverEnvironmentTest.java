@@ -384,8 +384,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  // TODO: MathSAT5 produces a proof with a CLAUSE_HYP rule without children, investigate why this
-  // coudl be and how to process
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
@@ -444,10 +442,6 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       Proof proof = prover.getProof();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
-      // Z3 always has proof generation on
-      // if (solverToUse().equals(Z3)) {
-      //  assertThat(proof.getFormula()).isNotNull();
-      // }
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).isEqualTo("Please set the prover option GENERATE_PROOFS.");
     }
@@ -524,11 +518,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
   }
 
   // Traverses a proof and asserts that certain values are not null, instances, etc.
-  private void checkProof(Proof root) {
-    assertThat(root).isNotNull();
+  private void checkProof(Proof pRoot) {
+    assertThat(pRoot).isNotNull();
 
     Deque<Proof> stack = new ArrayDeque<>();
-    stack.push(root);
+    stack.push(pRoot);
 
     while (!stack.isEmpty()) {
       Proof proof = stack.pop();
@@ -538,19 +532,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(rule).isNotNull();
       assertThat(rule).isInstanceOf(ProofRule.class);
       assertThat(proof.getChildren()).isNotNull();
-      if (solverToUse().equals(SMTINTERPOL)) {
-        // do nothing
-      } else if (solverToUse().equals(PRINCESS)) {
-        assertThat(formula.isEmpty()).isTrue();
-      } else if (solverToUse().equals(MATHSAT5) || solverToUse().equals(OPENSMT)) {
-        // do nothing, optional proof may not provide a formula
-      } else {
-        assertThat(formula.isPresent()).isTrue();
-      }
-
-      // if (solverToUse().equals(PRINCESS) && rule instanceof PrincessProofRule) {
-      //  checkPrincessSpecificFields((PrincessProofRule) rule);
-      // }
+      assertThat(formula.isPresent()).isTrue();
 
       for (Proof child : proof.getChildren()) {
         assertThat(child).isNotNull();
