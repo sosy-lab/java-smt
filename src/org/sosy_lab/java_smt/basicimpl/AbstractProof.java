@@ -61,8 +61,9 @@ public abstract class AbstractProof implements Proof {
     return getChildren().isEmpty();
   }
 
-  /** This method gibes the proof back as a formatted string. It is meant to have a readable
-   * proof for debugging purposes.
+  /**
+   * This method gibes the proof back as a formatted string. It is meant to have a readable proof
+   * for debugging purposes.
    */
   public String proofAsString() {
     return proofAsString(0);

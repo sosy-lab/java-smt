@@ -10,26 +10,27 @@
 
 package org.sosy_lab.java_smt.solvers.cvc5;
 
+import com.google.common.collect.ImmutableMap;
 import io.github.cvc5.CVC5ApiException;
 import io.github.cvc5.Term;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
+/** A proof of unsatisfiability returned by CVC5 transformed to the general proof API. */
 public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
 
-  static CVC5Proof generateProofImpl(io.github.cvc5.Proof pProof, CVC5FormulaCreator formulaCreator)
-      throws CVC5ApiException {
-
-    // boolean skippedScope = false;
+  static CVC5Proof generateProofImpl(
+      io.github.cvc5.Proof pProof, CVC5FormulaCreator pFormulaCreator) throws CVC5ApiException {
 
     Deque<CVC5Frame> stack = new ArrayDeque<>();
+    Map<io.github.cvc5.Proof, CVC5Proof> tempComputed;
 
-    Map<io.github.cvc5.Proof, CVC5Proof> computed = new HashMap<>();
+    ImmutableMap<io.github.cvc5.Proof, CVC5Proof> computed = ImmutableMap.of();
 
     stack.push(new CVC5Frame(pProof));
 
@@ -39,7 +40,7 @@ public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
       if (!frame.isVisited()) {
 
         frame.setNumArgs(frame.getProof().getChildren().length);
-        frame.setAsVisited(true);
+        frame.setAsVisited();
 
         for (int i = frame.getNumArgs() - 1; i >= 0; i--) {
           io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
@@ -51,22 +52,12 @@ public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
         stack.pop();
         int numChildren = frame.getNumArgs();
 
-        // if (frame.getProof().getRule().getValue() == 1 && !skippedScope) {
-        // Skip processing the frame if its rule is "SCOPE"
-        // This rule seems to just help the processing by CVC5
-        //  pProof = changeRoot(frame.getProof());
-        // skippedScope = true;
-        // continue;
-        // }
-
         CVC5ProofRule proofRule =
             Enum.valueOf(CVC5ProofRule.class, frame.getProof().getRule().toString());
-        // ProofRule.fromName(
-        // CVC5ProofRule.class, frame.getProof().getRule().toString().toLowerCase());
 
         // Generate formula
         Term term = frame.getProof().getResult();
-        Formula pFormula = formulaCreator.encapsulate(formulaCreator.getFormulaType(term), term);
+        Formula pFormula = pFormulaCreator.encapsulate(pFormulaCreator.getFormulaType(term), term);
         CVC5Proof pn = new CVC5Proof(proofRule, pFormula);
         for (int i = 0; i < numChildren; i++) {
           io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
@@ -75,7 +66,9 @@ public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
             pn.addChild(computed.get(child));
           }
         }
-        computed.put(frame.getProof(), pn);
+        tempComputed = new LinkedHashMap<>(computed);
+        tempComputed.put(frame.getProof(), pn);
+        computed = ImmutableMap.copyOf(tempComputed);
       }
     }
     return computed.get(pProof);
@@ -87,19 +80,15 @@ public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
     }
   }
 
-  private CVC5Proof(ProofRule pProofRule, Formula formula) {
+  private CVC5Proof(ProofRule pProofRule, Formula pFormula) {
 
-    super(pProofRule, formula);
+    super(pProofRule, pFormula);
   }
 
   @Override
-  protected void addChild(Proof pProof) {
-    super.addChild(pProof);
+  protected void addChild(Proof pChild) {
+    super.addChild(pChild);
   }
-
-  // private static Proof changeRoot(Proof root) {
-  //  return root.getArguments()[0];
-  //    }
 
   @Override
   public String proofAsString() {
