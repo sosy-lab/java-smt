@@ -988,28 +988,36 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
       return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
 
-      //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
-      //      // Floating Point Inf uses:
-      //      //  - an sign for posiive/negative infinity,
-      //      //  - "11..11" as exponent,
-      //      //  - "00..00" as mantissa.
-      //      String sign = getSign(pValue).isNegative() ? "1" : "0";
-      //      return FloatingPointNumber.of(
-      //          sign + "1".repeat(pType.getExponentSize()) + "0".repeat(pType.getMantissaSize()),
-      //          pType.getExponentSize(),
-      //          pType.getMantissaSize());
-      //
-      //    } else if (Native.fpaIsNumeralNan(environment, pValue)) {
-      //      // TODO We are underspecified here and choose several bits on our own.
-      //      //  This is not sound, if we combine FP anf BV theory.
-      //      // Floating Point NaN uses:
-      //      //  - an unspecified sign (we choose "0"),
-      //      //  - "11..11" as exponent,
-      //      //  - an unspecified mantissa (we choose all "1").
-      //      return FloatingPointNumber.of(
-      //          "0" + "1".repeat(pType.getExponentSize()) + "1".repeat(pType.getMantissaSize()),
-      //          pType.getExponentSize(),
-      //          pType.getMantissaSize());
+      // } else if (Native.fpaIsNumeralInf(environment, pValue)) {
+    } else if (Native.astToString(environment, pValue).startsWith("(_ +oo")
+        || Native.astToString(environment, pValue).startsWith("(_ -oo")) {
+      // Floating Point Inf uses:
+      //  - an sign for posiive/negative infinity,
+      //  - "11..11" as exponent,
+      //  - "00..00" as mantissa.
+      String sign = getSign(pValue).isNegative() ? "1" : "0";
+      return FloatingPointNumber.of(
+          sign
+              + "1".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
+
+      // } else if (Native.fpaIsNumeralNan(environment, pValue)) {
+    } else if (Native.astToString(environment, pValue).startsWith("(_ NaN ")) {
+      // TODO: is_NaN() is currently not exposed in the JNI. It should be added and the string
+      //  comparison should be replaced
+
+      // TODO We are underspecified here and choose several bits on our own.
+      //  This is not sound, if we combine FP anf BV theory.
+      // Floating Point NaN uses:
+      //  - an unspecified sign (we choose "0"),
+      //  - "11..11" as exponent,
+      //  - an unspecified mantissa (we choose all "1").
+      return FloatingPointNumber.of(
+          "0"
+              + "1".repeat(pType.getExponentSize())
+              + "1".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else {
       Sign sign = getSign(pValue);
