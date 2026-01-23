@@ -14,6 +14,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.microsoft.z3legacy.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -987,10 +988,19 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
       return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
+    }
+
+    String astString = Native.astToString(environment, pValue);
+    if (astString.startsWith("(_ +zero") || astString.startsWith("(_ -zero")) {
+      String sign = getSign(pValue).isNegative() ? "1" : "0";
+      return FloatingPointNumber.of(
+          sign
+              + "0".repeat(pType.getExponentSize())
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
       // } else if (Native.fpaIsNumeralInf(environment, pValue)) {
-    } else if (Native.astToString(environment, pValue).startsWith("(_ +oo")
-        || Native.astToString(environment, pValue).startsWith("(_ -oo")) {
+    } else if (astString.startsWith("(_ +oo") || astString.startsWith("(_ -oo")) {
       // Floating Point Inf uses:
       //  - an sign for posiive/negative infinity,
       //  - "11..11" as exponent,
@@ -1003,7 +1013,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           pType);
 
       // } else if (Native.fpaIsNumeralNan(environment, pValue)) {
-    } else if (Native.astToString(environment, pValue).startsWith("(_ NaN ")) {
+    } else if (astString.startsWith("(_ NaN ")) {
       // TODO: is_NaN() is currently not exposed in the JNI. It should be added and the string
       //  comparison should be replaced
 
@@ -1020,11 +1030,18 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
           pType);
 
     } else {
+      // AST is of the form: (fp #b1 #x80 #b10000000000000000000000)
+      String prunedAst = astString.substring(4, astString.length() - 1);
+      List<String> splitAstComponents = Splitter.on(' ').splitToList(prunedAst);
+
+      checkArgument(splitAstComponents.get(1).startsWith("#x"));
+      checkArgument(splitAstComponents.get(2).startsWith("#b"));
+      String hexExponent = splitAstComponents.get(1).substring(2);
+      String binaryMantissa = splitAstComponents.get(2).substring(2);
       Sign sign = getSign(pValue);
-      var exponent = Native.fpaGetNumeralExponentString(environment, pValue);
-      var mantissa = Native.fpaGetNumeralSignificandString(environment, pValue);
+
       return FloatingPointNumber.of(
-          sign, new BigInteger(exponent), new BigInteger(mantissa), pType);
+          sign, new BigInteger(hexExponent, 16), new BigInteger(binaryMantissa, 2), pType);
     }
   }
 
