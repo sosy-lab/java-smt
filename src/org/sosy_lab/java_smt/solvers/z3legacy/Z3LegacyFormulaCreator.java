@@ -1031,18 +1031,30 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     } else {
       // AST is of the form: (fp #b1 #x80 #b10000000000000000000000)
+      // But Z3 might switch up hex and binary representations!
       String prunedAst = astString.substring(4, astString.length() - 1);
       List<String> splitAstComponents = Splitter.on(' ').splitToList(prunedAst);
 
-      checkArgument(splitAstComponents.get(1).startsWith("#x"));
-      checkArgument(splitAstComponents.get(2).startsWith("#b"));
-      String hexExponent = splitAstComponents.get(1).substring(2);
-      String binaryMantissa = splitAstComponents.get(2).substring(2);
+      String exponent = splitAstComponents.get(1);
+      String mantissa = splitAstComponents.get(2);
       Sign sign = getSign(pValue);
 
       return FloatingPointNumber.of(
-          sign, new BigInteger(hexExponent, 16), new BigInteger(binaryMantissa, 2), pType);
+          sign, getBigIntFromHexOrBinary(exponent), getBigIntFromHexOrBinary(mantissa), pType);
     }
+  }
+
+  private BigInteger getBigIntFromHexOrBinary(String hexOrBinaryZ3String) {
+    if (hexOrBinaryZ3String.startsWith("#x")) {
+      return new BigInteger(hexOrBinaryZ3String.substring(2), 16);
+    } else if (hexOrBinaryZ3String.startsWith("#b")) {
+      return new BigInteger(hexOrBinaryZ3String.substring(2), 2);
+    }
+    throw new UnsupportedOperationException(
+        "Unsupported number representation "
+            + hexOrBinaryZ3String
+            + " in "
+            + "floating-point number");
   }
 
   private Sign getSign(Long pValue) {
