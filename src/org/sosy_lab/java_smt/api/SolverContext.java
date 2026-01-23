@@ -52,12 +52,7 @@ public interface SolverContext extends AutoCloseable {
      */
     GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS,
 
-    /**
-     * Whether the solver should generate proofs for unsatisfiable formulas. For Z3, this parameter
-     * is context(not solver)-based, so for setting it, the extra option in the {@link
-     * org.sosy_lab.common.configuration.Configuration} instance: "requireProofs" should be set to
-     * "true".
-     */
+    /** Whether the solver should generate proofs for unsatisfiable formulas. */
     GENERATE_PROOFS,
 
     /** Whether the solver should enable support for formulae build in SL theory. */

@@ -10,15 +10,15 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
-import java.util.Set;
 import org.sosy_lab.java_smt.api.Formula;
 
 /** A proof node in the proof DAG of a proof. */
 public interface Proof {
 
   /** Get the children of the proof node. */
-  Set<Proof> getChildren();
+  ImmutableSet<Proof> getChildren();
 
   /**
    * Check if the proof node is a leaf.

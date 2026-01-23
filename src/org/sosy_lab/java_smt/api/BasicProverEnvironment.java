@@ -162,8 +162,9 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
   }
 
   /**
-   * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. Should
-   * only be called after {@link #isUnsat()} returned <code>true</code>.
+   * Get proof of unsatisfiability of the conjuction of the current satck of all formulas. This
+   * method should be called only immediately after an {@link #isUnsat()} call that returned <code>
+   * true</code>.
    */
   Proof getProof() throws SolverException, InterruptedException;
 
