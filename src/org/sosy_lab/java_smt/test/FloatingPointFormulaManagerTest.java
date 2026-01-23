@@ -672,7 +672,8 @@ public class FloatingPointFormulaManagerTest
     assertThatFormula(fpmgr.isNegative(nj2)).isTautological();
 
     // Z3 supports at least FloatingPointType(15, 112). Larger types seem to be rounded.
-    if (!ImmutableSet.of(Solvers.Z3, Solvers.CVC4).contains(solver)) {
+    if (!ImmutableSet.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.CVC4)
+        .contains(solver)) {
       // check unequality for very large types
       int exponentSize = solver == Solvers.BITWUZLA ? 30 : 100; // Bitwuzla has issues above 40 bit.
       FloatingPointType largeType =
