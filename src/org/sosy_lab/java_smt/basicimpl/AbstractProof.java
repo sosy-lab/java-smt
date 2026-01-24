@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -27,10 +27,10 @@ import org.sosy_lab.java_smt.api.proofs.ProofRule;
 public abstract class AbstractProof implements Proof {
 
   private ImmutableSet<Proof> children = ImmutableSet.of();
-  private ProofRule rule;
+  private Optional<ProofRule> rule;
   protected Optional<Formula> formula = Optional.empty();
 
-  protected AbstractProof(ProofRule pRule, @Nullable Formula pFormula) {
+  protected AbstractProof(Optional<ProofRule> pRule, @Nullable Formula pFormula) {
     this.rule = pRule;
     this.formula = Optional.ofNullable(pFormula);
   }
@@ -51,8 +51,19 @@ public abstract class AbstractProof implements Proof {
     this.children = ImmutableSet.copyOf(tempChildren);
   }
 
+  /**
+   * This method is used to set formulas in post-processing of transformed proofs, so that
+   * implicitly proven formulas are available. It should not be used once a proof object has been
+   * retrieved.
+   *
+   * @param pFormula the formula to be set.
+   */
+  public void setFormula(Formula pFormula) {
+    formula = Optional.of(pFormula);
+  }
+
   @Override
-  public ProofRule getRule() {
+  public Optional<ProofRule> getRule() {
     return rule;
   }
 
@@ -74,9 +85,10 @@ public abstract class AbstractProof implements Proof {
     String indent = "  ".repeat(pIndentLevel);
 
     String sFormula = getFormula().map(Object::toString).orElse("null");
+    String sRule = getRule().map(Object::toString).orElse("null");
 
     sb.append(indent).append("Formula: ").append(sFormula).append("\n");
-    sb.append(indent).append("Rule: ").append(getRule().getName()).append("\n");
+    sb.append(indent).append("Rule: ").append(sRule).append("\n");
     sb.append(indent)
         .append("No. Children: ")
         .append(this.isLeaf() ? 0 : getChildren().size())
