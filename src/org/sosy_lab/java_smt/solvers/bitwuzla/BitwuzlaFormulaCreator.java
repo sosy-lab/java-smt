@@ -59,8 +59,8 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
-  private final TermManager termManager;
+public class BitwuzlaFormulaCreator
+    extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
@@ -81,17 +81,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
-    super(null, pTermManager.mk_bool_sort(), null, null, null, null);
-    termManager = pTermManager;
-  }
-
-  TermManager getTermManager() {
-    return termManager;
+    super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
   }
 
   @Override
   public Sort getBitvectorType(int bitwidth) {
-    return termManager.mk_bv_sort(bitwidth);
+    return environment.mk_bv_sort(bitwidth);
   }
 
   @Override
@@ -105,7 +100,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Sort getFloatingPointType(FloatingPointType type) {
-    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
+    return environment.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -124,7 +119,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public Sort getArrayType(Sort indexType, Sort elementType) {
-    return termManager.mk_array_sort(indexType, elementType);
+    return environment.mk_array_sort(indexType, elementType);
   }
 
   @Override
@@ -158,7 +153,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return maybeFormula;
     }
 
-    Term newVar = termManager.mk_const(pSort, varName);
+    Term newVar = environment.mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
     return newVar;
   }
@@ -172,7 +167,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // return maybeVar;
     // }
 
-    Term newVar = termManager.mk_var(sort, name);
+    Term newVar = environment.mk_var(sort, name);
     // boundFormulaCache.put(name, sort, newVar);
     return newVar;
   }
@@ -453,7 +448,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       for (int i = 0; i < boundVars.length; i++) {
         map.put(boundVars[i], freeVars[i]);
       }
-      body = termManager.substitute_term(body, map);
+      body = environment.substitute_term(body, map);
 
       Quantifier quant = kind.equals(Kind.EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
       return visitor.visitQuantifier(
@@ -509,19 +504,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       // The term might be indexed, then we need index creation
       Term term = declaration.getTerm();
       Kind properKind = term.kind();
-      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
+      return environment.mk_term(properKind, new Vector_Term(args), term.indices());
     }
 
     if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
       Vector_Term functionAndArgs = new Vector_Term();
       functionAndArgs.add(declaration.getTerm());
       functionAndArgs.addAll(args);
-      return termManager.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+      return environment.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
     }
 
     assert declaration.isKind();
 
-    return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
+    return environment.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
@@ -531,14 +526,14 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       // TODO: implement
       throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
     }
-    Sort functionSort = termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
+    Sort functionSort = environment.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
       return BitwuzlaDeclaration.create(maybeFormula);
     }
 
-    Term uf = termManager.mk_const(functionSort, name);
+    Term uf = environment.mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
     return BitwuzlaDeclaration.create(uf);
   }
