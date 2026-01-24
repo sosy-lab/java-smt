@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -33,6 +34,8 @@ import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -102,7 +105,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Sort getFloatingPointType(FloatingPointType type) {
-    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithSignBit());
+    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -129,6 +132,14 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     assert getFormulaType(pTerm).isFloatingPointType()
         : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
     return new BitwuzlaFloatingPointFormula(pTerm);
+  }
+
+  @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)", pTerm, pTerm.sort(), getFormulaType(pTerm));
+    return new BitwuzlaFloatingPointRoundingModeFormula(pTerm);
   }
 
   @Override
@@ -170,8 +181,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // UFs play by different rules. For them, we need to extract the domain
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
-      int mantissa = pSort.fp_sig_size() - 1;
-      return FormulaType.getFloatingPointTypeWithoutSignBit(exponent, mantissa);
+      int mantissaWithHiddenBit = pSort.fp_sig_size();
+      return getFloatingPointTypeFromSizesWithHiddenBit(exponent, mantissaWithHiddenBit);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -379,8 +390,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
             "FloatingPointFormula with actual type " + sort + ": " + pFormula);
       }
       int exp = sort.fp_exp_size();
-      int man = sort.fp_sig_size() - 1;
-      return (FormulaType<T>) FormulaType.getFloatingPointTypeWithoutSignBit(exp, man);
+      int mantissaWithHiddenBit = sort.fp_sig_size();
+      return (FormulaType<T>)
+          getFloatingPointTypeFromSizesWithHiddenBit(exp, mantissaWithHiddenBit);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
@@ -584,15 +596,17 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return term.to_bool();
     }
     if (sort.is_rm()) {
-      return term.to_rm();
+      return getRoundingMode(term);
     }
     if (sort.is_bv()) {
       return new BigInteger(term.to_bv(), 2);
     }
     if (sort.is_fp()) {
-      int sizeExponent = sort.fp_exp_size();
-      int sizeMantissa = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
+      int exponentSize = sort.fp_exp_size();
+      int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      return FloatingPointNumber.of(
+          term.to_bv(),
+          getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
   }
@@ -626,5 +640,24 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     }
 
     return transformedImmutableSetCopy(usedConstraintVariables, constraintsForVariables::get);
+  }
+
+  @Override
+  protected FloatingPointRoundingMode getRoundingMode(Term term) {
+    checkArgument(term.sort().is_rm(), "Term '%s' is not of rounding mode sort.", term);
+    if (term.is_rm_value_rna()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+    } else if (term.is_rm_value_rne()) {
+      return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+    } else if (term.is_rm_value_rtn()) {
+      return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+    } else if (term.is_rm_value_rtp()) {
+      return FloatingPointRoundingMode.TOWARD_POSITIVE;
+    } else if (term.is_rm_value_rtz()) {
+      return FloatingPointRoundingMode.TOWARD_ZERO;
+    } else {
+      throw new IllegalArgumentException(
+          String.format("Unknown rounding mode in Term '%s'.", term));
+    }
   }
 }

@@ -18,6 +18,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
@@ -31,6 +32,23 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
       FloatingPointFormulaManager pDelegate, DebuggingAssertions pDebugging) {
     delegate = pDelegate;
     debugging = pDebugging;
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    debugging.assertThreadLocal();
+    FloatingPointRoundingModeFormula result = delegate.makeRoundingMode(pRoundingMode);
+    debugging.addFormulaTerm(result);
+    return result;
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(pRoundingModeFormula);
+    return delegate.fromRoundingModeFormula(pRoundingModeFormula);
   }
 
   @Override

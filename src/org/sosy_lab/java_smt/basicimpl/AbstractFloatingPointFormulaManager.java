@@ -2,7 +2,7 @@
 // an API wrapper for a collection of SMT solvers:
 // https://github.com/sosy-lab/java-smt
 //
-// SPDX-FileCopyrightText: 2020 Dirk Beyer <https://www.sosy-lab.org>
+// SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointType;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.ImmutableMap;
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -28,8 +29,10 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormulaManager;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
+import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
 /**
@@ -72,6 +75,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private TFormulaInfo getRoundingMode(FloatingPointRoundingMode pFloatingPointRoundingMode) {
     return roundingModes.computeIfAbsent(pFloatingPointRoundingMode, this::getRoundingModeImpl);
+  }
+
+  @Override
+  public FloatingPointRoundingModeFormula makeRoundingMode(
+      FloatingPointRoundingMode pRoundingMode) {
+    return getFormulaCreator().encapsulateRoundingMode(getRoundingMode(pRoundingMode));
+  }
+
+  @Override
+  public FloatingPointRoundingMode fromRoundingModeFormula(
+      FloatingPointRoundingModeFormula pRoundingModeFormula) {
+    return getFormulaCreator().getRoundingMode(extractInfo(pRoundingModeFormula));
   }
 
   protected FloatingPointFormula wrap(TFormulaInfo pTerm) {
@@ -259,6 +274,14 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   @Override
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula pNumber, FloatingPointType pTargetType) {
+    BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
+    checkArgument(
+        bvType.getSize() == pTargetType.getTotalSize(),
+        MoreStrings.lazyString(
+            () ->
+                String.format(
+                    "The total size %s of type %s has to match the size %s of type %s.",
+                    pTargetType.getTotalSize(), pTargetType, bvType.getSize(), bvType)));
     return wrap(fromIeeeBitvectorImpl(extractInfo(pNumber), pTargetType));
   }
 
@@ -294,15 +317,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
     FormulaType.FloatingPointType fpType =
         (FloatingPointType) getFormulaCreator().getFormulaType(f);
-    int mantissaSizeWithSignBit = fpType.getMantissaSizeWithSignBit();
+    // The BV is sign bit + exponent + mantissa without hidden bit
+    int mantissaSizeWithoutHiddenBit = fpType.getMantissaSizeWithoutHiddenBit();
     int exponentSize = fpType.getExponentSize();
     BitvectorFormula bvFormula =
-        bvMgr.makeVariable(mantissaSizeWithSignBit + exponentSize, bitvectorConstantName);
+        bvMgr.makeVariable(1 + exponentSize + mantissaSizeWithoutHiddenBit, bitvectorConstantName);
 
     // When building new Fp types, we don't include the sign bit
     FloatingPointFormula fromIeeeBitvector =
         fromIeeeBitvector(
-            bvFormula, getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1));
+            bvFormula,
+            getFloatingPointTypeFromSizesWithoutHiddenBit(
+                exponentSize, mantissaSizeWithoutHiddenBit));
 
     // assignment() allows a value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
@@ -310,7 +336,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
     // Build special numbers so that we can compare them in the map
-    FloatingPointType precision = getFloatingPointType(exponentSize, mantissaSizeWithSignBit - 1);
+    FloatingPointType precision =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit);
     Set<FloatingPointFormula> specialNumbers =
         ImmutableSet.of(
             makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));

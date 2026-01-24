@@ -8,62 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ASSERT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ASSERT_REFS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_ADD;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_MUL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_SIZE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_UDIV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_BV_UREM;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_EAGER_REFINE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_EQUAL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_INC_BITBLAST;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_INITIAL_LEMMAS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_ITE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_VALUE_LIMIT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.ABSTRACTION_VALUE_ONLY;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.BV_SOLVER;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_MODEL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_CHECK_UNSAT_CORE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_PP_NODE_THRESH;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.DBG_RW_NODE_THRESH;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.LOGLEVEL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.MEMORY_LIMIT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.NUM_OPTS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_CONTRADICTING_ANDS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_ELIM_BV_EXTRACTS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_ELIM_BV_UDIV;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_EMBEDDED_CONSTR;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_FLATTEN_AND;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_NORMALIZE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_SKELETON_PREPROC;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_BV_INEQ;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_DISEQ;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PP_VARIABLE_SUBST_NORM_EQ;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PREPROCESS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_MODELS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_ASSUMPTIONS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PRODUCE_UNSAT_CORES;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_CONST_BITS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_INFER_INEQ_BOUNDS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NORMALIZE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NPROPS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_NUPDATES;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_OPT_LT_CONCAT_SEXT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PATH_SEL;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_RANDOM_INPUT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_PROB_USE_INV_VALUE;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.PROP_SEXT;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.RELEVANT_TERMS;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.REWRITE_LEVEL;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SAT_SOLVER;
 import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.SEED;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.TIME_LIMIT_PER;
-import static org.sosy_lab.java_smt.solvers.bitwuzla.api.Option.VERBOSITY;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
@@ -218,10 +167,17 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       throw new InvalidConfigurationException(
           "Invalid Bitwuzla option in \"" + pFurtherOptions + "\": " + e.getMessage(), e);
     }
+    Map<String, Option> allAvailableOptions = getAllAvailableOptions();
     for (Map.Entry<String, String> option : furtherOptionsMap.entrySet()) {
       String optionName = option.getKey();
       String optionValue = option.getValue();
-      Option bitwuzlaOption = getBitwuzlaOptByString(optionName);
+      Option bitwuzlaOption = allAvailableOptions.get(optionName);
+      if (bitwuzlaOption == null) {
+        throw new InvalidConfigurationException(
+            String.format(
+                "Unknown option: %s. Bitwuzla provides the following options: %s.",
+                optionName, Joiner.on(", ").join(allAvailableOptions.keySet())));
+      }
       try {
         if (pOptions.is_numeric(bitwuzlaOption) || pOptions.is_bool(bitwuzlaOption)) {
           pOptions.set(bitwuzlaOption, Integer.parseInt(optionValue));
@@ -328,120 +284,23 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
     return true;
   }
 
-  public static Option getBitwuzlaOptByString(String optionName) {
-    switch (optionName) {
-      case "LOGLEVEL":
-        return LOGLEVEL;
-      case "PRODUCE_MODELS":
-        return PRODUCE_MODELS;
-      case "PRODUCE_UNSAT_ASSUMPTIONS":
-        return PRODUCE_UNSAT_ASSUMPTIONS;
-      case "PRODUCE_UNSAT_CORES":
-        return PRODUCE_UNSAT_CORES;
-      case "SEED":
-        return SEED;
-      case "VERBOSITY":
-        return VERBOSITY;
-      case "TIME_LIMIT_PER":
-        return TIME_LIMIT_PER;
-      case "MEMORY_LIMIT":
-        return MEMORY_LIMIT;
-      case "RELEVANT_TERMS":
-        return RELEVANT_TERMS;
-      case "BV_SOLVER":
-        return BV_SOLVER;
-      case "REWRITE_LEVEL":
-        return REWRITE_LEVEL;
-      case "SAT_SOLVER":
-        return SAT_SOLVER;
-      case "PROP_CONST_BITS":
-        return PROP_CONST_BITS;
-      case "PROP_INFER_INEQ_BOUNDS":
-        return PROP_INFER_INEQ_BOUNDS;
-      case "PROP_NPROPS":
-        return PROP_NPROPS;
-      case "PROP_NUPDATES":
-        return PROP_NUPDATES;
-      case "PROP_OPT_LT_CONCAT_SEXT":
-        return PROP_OPT_LT_CONCAT_SEXT;
-      case "PROP_PATH_SEL":
-        return PROP_PATH_SEL;
-      case "PROP_PROB_RANDOM_INPUT":
-        return PROP_PROB_RANDOM_INPUT;
-      case "PROP_PROB_USE_INV_VALUE":
-        return PROP_PROB_USE_INV_VALUE;
-      case "PROP_SEXT":
-        return PROP_SEXT;
-      case "PROP_NORMALIZE":
-        return PROP_NORMALIZE;
-      case "ABSTRACTION":
-        return ABSTRACTION;
-      case "ABSTRACTION_BV_SIZE":
-        return ABSTRACTION_BV_SIZE;
-      case "ABSTRACTION_EAGER_REFINE":
-        return ABSTRACTION_EAGER_REFINE;
-      case "ABSTRACTION_VALUE_LIMIT":
-        return ABSTRACTION_VALUE_LIMIT;
-      case "ABSTRACTION_VALUE_ONLY":
-        return ABSTRACTION_VALUE_ONLY;
-      case "ABSTRACTION_ASSERT":
-        return ABSTRACTION_ASSERT;
-      case "ABSTRACTION_ASSERT_REFS":
-        return ABSTRACTION_ASSERT_REFS;
-      case "ABSTRACTION_INITIAL_LEMMAS":
-        return ABSTRACTION_INITIAL_LEMMAS;
-      case "ABSTRACTION_INC_BITBLAST":
-        return ABSTRACTION_INC_BITBLAST;
-      case "ABSTRACTION_BV_ADD":
-        return ABSTRACTION_BV_ADD;
-      case "ABSTRACTION_BV_MUL":
-        return ABSTRACTION_BV_MUL;
-      case "ABSTRACTION_BV_UDIV":
-        return ABSTRACTION_BV_UDIV;
-      case "ABSTRACTION_BV_UREM":
-        return ABSTRACTION_BV_UREM;
-      case "ABSTRACTION_EQUAL":
-        return ABSTRACTION_EQUAL;
-      case "ABSTRACTION_ITE":
-        return ABSTRACTION_ITE;
-      case "PREPROCESS":
-        return PREPROCESS;
-      case "PP_CONTRADICTING_ANDS":
-        return PP_CONTRADICTING_ANDS;
-      case "PP_ELIM_BV_EXTRACTS":
-        return PP_ELIM_BV_EXTRACTS;
-      case "PP_ELIM_BV_UDIV":
-        return PP_ELIM_BV_UDIV;
-      case "PP_EMBEDDED_CONSTR":
-        return PP_EMBEDDED_CONSTR;
-      case "PP_FLATTEN_AND":
-        return PP_FLATTEN_AND;
-      case "PP_NORMALIZE":
-        return PP_NORMALIZE;
-      case "PP_SKELETON_PREPROC":
-        return PP_SKELETON_PREPROC;
-      case "PP_VARIABLE_SUBST":
-        return PP_VARIABLE_SUBST;
-      case "PP_VARIABLE_SUBST_NORM_EQ":
-        return PP_VARIABLE_SUBST_NORM_EQ;
-      case "PP_VARIABLE_SUBST_NORM_DISEQ":
-        return PP_VARIABLE_SUBST_NORM_DISEQ;
-      case "PP_VARIABLE_SUBST_NORM_BV_INEQ":
-        return PP_VARIABLE_SUBST_NORM_BV_INEQ;
-      case "DBG_RW_NODE_THRESH":
-        return DBG_RW_NODE_THRESH;
-      case "DBG_PP_NODE_THRESH":
-        return DBG_PP_NODE_THRESH;
-      case "DBG_CHECK_MODEL":
-        return DBG_CHECK_MODEL;
-      case "DBG_CHECK_UNSAT_CORE":
-        return DBG_CHECK_UNSAT_CORE;
-      case "NUM_OPTS":
-        return NUM_OPTS;
-      default:
-        // Possibly new option that needs to be entered into the switch case
-        throw new IllegalArgumentException(
-            "Unknown option: " + optionName + ". Please use the C++ " + "options of Bitwuzla.");
+  /**
+   * Returns a listing of all options supported by Bitwuzla. The listing contains name and
+   * option-object.
+   */
+  private static Map<String, Option> getAllAvailableOptions() {
+    ImmutableMap.Builder<String, Option> allOptions = ImmutableMap.builder();
+    // Options start at index 0, and go up to about 50, lets count further to be future-proof.
+    // We could also use 'true' as upper limit, as we expect to break with exception at index ~50.
+    // See Option-class at swigValues-length.
+    for (int i = 0; i < 100; i++) {
+      try {
+        Option option = Option.swigToEnum(i);
+        allOptions.put(option.toString(), option);
+      } catch (IllegalArgumentException exception) { // exception is expected at index ~50
+        break;
+      }
     }
+    return allOptions.buildOrThrow();
   }
 }

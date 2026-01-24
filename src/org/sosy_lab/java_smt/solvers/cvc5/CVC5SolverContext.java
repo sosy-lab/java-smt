@@ -14,6 +14,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Solver;
 import io.github.cvc5.TermManager;
@@ -222,7 +223,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         creator,
         shutdownNotifier,
         randomSeed,
-        pOptions,
+        ImmutableSet.copyOf(pOptions),
         getFormulaManager(),
         settings.furtherOptionsMap);
   }
@@ -240,7 +241,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         creator,
         shutdownNotifier,
         randomSeed,
-        pOptions,
+        ImmutableSet.copyOf(pOptions),
         getFormulaManager(),
         settings.furtherOptionsMap,
         settings.validateInterpolants);

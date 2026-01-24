@@ -26,8 +26,12 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
 
+  private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final TermManager termManager;
   private final Term roundingMode;
+
+  // Keeps track of the temporary variables that are created for fp-to-bv casts
+  private static int counter = 0;
 
   protected BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator,
@@ -35,6 +39,7 @@ public class BitwuzlaFloatingPointManager
       BitwuzlaBitvectorFormulaManager pBvMgr,
       BitwuzlaBooleanFormulaManager pBmgr) {
     super(pCreator, pBvMgr, pBmgr);
+    bitwuzlaCreator = pCreator;
     termManager = pCreator.getTermManager();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -70,6 +75,16 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
+  public FloatingPointFormula makeNumber(
+      Rational n,
+      FormulaType.FloatingPointType type,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    BigDecimal num = new BigDecimal(n.getNum());
+    BigDecimal den = new BigDecimal(n.getDen());
+    return makeNumber(num.divide(den), type, pFloatingPointRoundingMode);
+  }
+
+  @Override
   protected Term makeNumberImpl(double n, FloatingPointType type, Term pFloatingPointRoundingMode) {
     return makeNumberImpl(String.valueOf(n), type, pFloatingPointRoundingMode);
   }
@@ -83,7 +98,7 @@ public class BitwuzlaFloatingPointManager
     Sort expSort = termManager.mk_bv_sort(type.getExponentSize());
     Term expTerm = termManager.mk_bv_value(expSort, exponent.toString(2));
 
-    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSizeWithoutSignBit());
+    Sort mantissaSort = termManager.mk_bv_sort(type.getMantissaSizeWithoutHiddenBit());
     Term mantissaTerm = termManager.mk_bv_value(mantissaSort, mantissa.toString(2));
 
     return termManager.mk_fp_value(signTerm, expTerm, mantissaTerm);
@@ -133,7 +148,7 @@ public class BitwuzlaFloatingPointManager
           pRoundingMode,
           pNumber,
           targetType.getExponentSize(),
-          targetType.getMantissaSizeWithSignBit());
+          targetType.getMantissaSizeWithHiddenBit());
     } else if (pTargetType.isBitvectorType()) {
       FormulaType.BitvectorType targetType = (FormulaType.BitvectorType) pTargetType;
       if (pSigned) {
@@ -170,14 +185,14 @@ public class BitwuzlaFloatingPointManager
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSizeWithSignBit());
+            pTargetType.getMantissaSizeWithHiddenBit());
       } else {
         return termManager.mk_term(
             Kind.FP_TO_FP_FROM_UBV,
             roundingMode,
             pNumber,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSizeWithSignBit());
+            pTargetType.getMantissaSizeWithHiddenBit());
       }
 
     } else {
@@ -192,7 +207,49 @@ public class BitwuzlaFloatingPointManager
         Kind.FP_TO_FP_FROM_BV,
         pNumber,
         pTargetType.getExponentSize(),
-        pTargetType.getMantissaSizeWithSignBit());
+        pTargetType.getMantissaSizeWithHiddenBit());
+  }
+
+  @Override
+  protected Term toIeeeBitvectorImpl(Term pNumber) {
+    int sizeExp = pNumber.sort().fp_exp_size();
+    int sizeSig = pNumber.sort().fp_sig_size();
+
+    Sort bvSort = termManager.mk_bv_sort(sizeExp + sizeSig);
+
+    // The following code creates a new variable that is returned as result.
+    // Additionally, we track constraints about the equality of the new variable and the FP number,
+    // which is added onto the prover stack whenever the new variable is used as assertion.
+
+    // TODO This internal implementation is a technical dept and should be removed.
+    //   The additional constraints are not transparent in all cases, e.g., when visiting a
+    //   formula, creating a model, or transferring the assertions onto another prover stack.
+    //   A better way would be a direct implementation of this in Bitwuzla, without interfering
+    //   with JavaSMT.
+
+    // Note that NaN is handled as a special case in this method. This is not strictly necessary,
+    // but if we just use "fpTerm = to_fp(bvVar)" the NaN will be given a random payload (and
+    // sign). Since NaN payloads are not preserved here anyway we might as well pick a canonical
+    // representation, e.g., which is "0 11111111 10000000000000000000000" for single precision.
+    String nanRepr = "0" + "1".repeat(sizeExp + 1) + "0".repeat(sizeSig - 2);
+    Term bvNaN = termManager.mk_bv_value(bvSort, nanRepr);
+
+    // TODO creating our own utility variables might eb unexpected from the user.
+    //   We might need to exclude such variables in models and formula traversal.
+    String newVariable = "__JAVASMT__CAST_FROM_BV_" + counter++;
+    Term bvVar = termManager.mk_const(bvSort, newVariable);
+    Term equal =
+        termManager.mk_term(
+            Kind.ITE,
+            termManager.mk_term(Kind.FP_IS_NAN, pNumber),
+            termManager.mk_term(Kind.EQUAL, bvVar, bvNaN),
+            termManager.mk_term(
+                Kind.EQUAL,
+                termManager.mk_term(Kind.FP_TO_FP_FROM_BV, bvVar, sizeExp, sizeSig),
+                pNumber));
+
+    bitwuzlaCreator.addConstraintForVariable(newVariable, equal);
+    return bvVar;
   }
 
   @Override

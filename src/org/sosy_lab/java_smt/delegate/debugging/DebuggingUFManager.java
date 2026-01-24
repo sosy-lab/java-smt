@@ -35,29 +35,8 @@ public class DebuggingUFManager implements UFManager {
   }
 
   @Override
-  public <T extends Formula> FunctionDeclaration<T> declareUF(
-      String name, FormulaType<T> returnType, FormulaType<?>... args) {
-    debugging.assertThreadLocal();
-    FunctionDeclaration<T> result = delegate.declareUF(name, returnType, args);
-    debugging.addFunctionDeclaration(result);
-    return result;
-  }
-
-  @Override
   public <T extends Formula> T callUF(
       FunctionDeclaration<T> funcType, List<? extends Formula> args) {
-    debugging.assertThreadLocal();
-    debugging.assertDeclarationInContext(funcType);
-    for (Formula t : args) {
-      debugging.assertFormulaInContext(t);
-    }
-    T result = delegate.callUF(funcType, args);
-    debugging.addFormulaTerm(result);
-    return result;
-  }
-
-  @Override
-  public <T extends Formula> T callUF(FunctionDeclaration<T> funcType, Formula... args) {
     debugging.assertThreadLocal();
     debugging.assertDeclarationInContext(funcType);
     for (Formula t : args) {

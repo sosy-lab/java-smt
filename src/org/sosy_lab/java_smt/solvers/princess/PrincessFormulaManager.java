@@ -8,8 +8,11 @@
 
 package org.sosy_lab.java_smt.solvers.princess;
 
+import ap.parser.IBinFormula;
+import ap.parser.IBinJunctor;
 import ap.parser.IExpression;
 import ap.parser.IFormula;
+import ap.parser.ITerm;
 import ap.types.Sort;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
@@ -56,9 +59,18 @@ final class PrincessFormulaManager
   }
 
   @Override
+  protected IExpression equalImpl(IExpression pArg1, IExpression pArgs) {
+    if (pArg1 instanceof IFormula) {
+      return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArgs);
+    } else {
+      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs);
+    }
+  }
+
+  @Override
   public IExpression parseImpl(String pS) throws IllegalArgumentException {
     List<? extends IExpression> formulas = getEnvironment().parseStringToTerms(pS, creator);
-    Preconditions.checkState(
+    Preconditions.checkArgument(
         formulas.size() == 1,
         "parsing expects exactly one asserted term, but got %s terms",
         formulas.size());

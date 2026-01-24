@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import java.math.BigInteger;
 import java.util.List;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
@@ -413,4 +414,8 @@ public interface BitvectorFormulaManager {
 
   /** All given bitvectors are pairwise unequal. */
   BooleanFormula distinct(List<BitvectorFormula> pBits);
+
+  default BooleanFormula distinct(BitvectorFormula... pBits) {
+    return distinct(ImmutableList.copyOf(pBits));
+  }
 }

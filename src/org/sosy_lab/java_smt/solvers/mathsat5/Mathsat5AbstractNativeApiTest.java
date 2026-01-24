@@ -81,7 +81,7 @@ public abstract class Mathsat5AbstractNativeApiTest {
   }
 
   /*
-   * MathSAT5, compared to all other solvers and the standard, does not expect the sign bit to be
+   * MathSAT5, compared to all other solvers and the standard, does not expect the hidden bit to be
    *  included in the mantissa!
    */
   @Test
@@ -93,9 +93,10 @@ public abstract class Mathsat5AbstractNativeApiTest {
     assertThat(msat_get_bv_type_size(env, msat_term_get_type(bvNumber))).isEqualTo(totalBVSize);
 
     int exponent = 8;
-    int mantissaWithoutSign = 23; // excluding sign bit
-    long fpSinglePrecType = msat_get_fp_type(env, exponent, mantissaWithoutSign);
-    assertThat(msat_get_fp_type_mant_width(env, fpSinglePrecType)).isEqualTo(mantissaWithoutSign);
+    int mantissaWithoutHiddenBit = 23;
+    long fpSinglePrecType = msat_get_fp_type(env, exponent, mantissaWithoutHiddenBit);
+    assertThat(msat_get_fp_type_mant_width(env, fpSinglePrecType))
+        .isEqualTo(mantissaWithoutHiddenBit);
     assertThat(msat_get_fp_type_exp_width(env, fpSinglePrecType)).isEqualTo(exponent);
     // total size is exp + man + 1
     assertThat(
@@ -105,10 +106,11 @@ public abstract class Mathsat5AbstractNativeApiTest {
         .isEqualTo(totalBVSize);
 
     long bvToFpSinglePrec =
-        Mathsat5NativeApi.msat_make_fp_from_ieeebv(env, exponent, mantissaWithoutSign, bvNumber);
+        Mathsat5NativeApi.msat_make_fp_from_ieeebv(
+            env, exponent, mantissaWithoutHiddenBit, bvNumber);
     assertThat(msat_type_equals(msat_term_get_type(bvToFpSinglePrec), fpSinglePrecType)).isTrue();
     assertThat(msat_get_fp_type_mant_width(env, msat_term_get_type(bvToFpSinglePrec)))
-        .isEqualTo(mantissaWithoutSign);
+        .isEqualTo(mantissaWithoutHiddenBit);
     assertThat(msat_get_fp_type_exp_width(env, msat_term_get_type(bvToFpSinglePrec)))
         .isEqualTo(exponent);
 

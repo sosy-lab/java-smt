@@ -9,6 +9,7 @@
 package org.sosy_lab.java_smt.solvers.z3;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.microsoft.z3.enumerations.Z3_decl_kind.Z3_OP_DISTINCT;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -47,6 +48,7 @@ import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
 import org.sosy_lab.java_smt.api.FloatingPointNumber.Sign;
 import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
@@ -241,8 +243,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointTypeWithoutSignBit(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
@@ -367,6 +369,13 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Long pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType();
+    cleanupReferences();
+    return storePhantomReference(new Z3FloatingPointRoundingModeFormula(getEnv(), pTerm), pTerm);
+  }
+
+  @Override
   protected StringFormula encapsulateString(Long pTerm) {
     assert getFormulaType(pTerm).isStringType()
         : String.format(
@@ -411,6 +420,32 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   }
 
   @Override
+  protected FloatingPointRoundingMode getRoundingMode(Long f) {
+    checkArgument(
+        Native.getSortKind(environment, Native.getSort(environment, f))
+            == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt(),
+        "Expected a floating point rounding mode, but got %s",
+        Native.astToString(environment, f));
+
+    int roundingModeOp = Native.getDeclKind(environment, Native.getAppDecl(environment, f));
+    switch (Z3_decl_kind.fromInt(roundingModeOp)) {
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
+        return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
+        return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
+        return FloatingPointRoundingMode.TOWARD_POSITIVE;
+      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
+        return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+      case Z3_OP_FPA_RM_TOWARD_ZERO:
+        return FloatingPointRoundingMode.TOWARD_ZERO;
+      default:
+        throw new IllegalArgumentException(
+            "Cannot get rounding mode for Z3 operator: " + roundingModeOp);
+    }
+  }
+
+  @Override
   public Long getBitvectorType(int pBitwidth) {
     checkArgument(pBitwidth > 0, "Cannot use bitvector type with size %s", pBitwidth);
     long bvSort = Native.mkBvSort(getEnv(), pBitwidth);
@@ -421,7 +456,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
   @Override
   public Long getFloatingPointType(FormulaType.FloatingPointType type) {
     long fpSort =
-        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithSignBit());
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -498,6 +533,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         if (arity == 0) {
           // constants
           Object value = Z3_CONSTANTS.get(declKind);
+          int sortKind = Native.getSortKind(environment, Native.getSort(environment, f));
           if (value != null) {
             return visitor.visitConstant(formula, value);
 
@@ -505,15 +541,14 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Rounding mode
-          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()
-              || Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+          } else if (declKind == Z3_decl_kind.Z3_OP_FPA_NUM.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
+          } else if (sortKind == Z3_sort_kind.Z3_ROUNDING_MODE_SORT.toInt()) {
+            return visitor.visitConstant(formula, getRoundingMode(f));
 
             // string constant
           } else if (declKind == Z3_decl_kind.Z3_OP_INTERNAL.toInt()
-              && Native.getSortKind(environment, Native.getSort(environment, f))
-                  == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
+              && sortKind == Z3_sort_kind.Z3_SEQ_SORT.toInt()) {
             return visitor.visitConstant(formula, convertValue(f));
 
             // Free variable
@@ -588,8 +623,11 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     int numBound = Native.getQuantifierNumBound(environment, pF);
     long[] freeVars = new long[numBound];
     for (int i = 0; i < numBound; i++) {
-      long varName = Native.getQuantifierBoundName(environment, pF, i);
-      long varSort = Native.getQuantifierBoundSort(environment, pF, i);
+      // The indices are reversed according to
+      //  https://github.com/Z3Prover/z3/issues/7970#issuecomment-3407924907
+      int inverseIndex = numBound - 1 - i;
+      long varName = Native.getQuantifierBoundName(environment, pF, inverseIndex);
+      long varSort = Native.getQuantifierBoundSort(environment, pF, inverseIndex);
       long freeVar = Native.mkConst(environment, varName, varSort);
       Native.incRef(environment, freeVar);
       freeVars[i] = freeVar;
@@ -614,16 +652,18 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   private FunctionDeclarationKind getDeclarationKind(long f) {
     final int arity = Native.getArity(environment, Native.getAppDecl(environment, f));
-    assert arity > 0
-        : String.format(
-            "Unexpected arity '%s' for formula '%s' for handling a function application.",
-            arity, Native.astToString(environment, f));
     if (getAppName(f).equals("div0")) {
       // Z3 segfaults in getDeclKind for this term (cf. https://github.com/Z3Prover/z3/issues/669)
       return FunctionDeclarationKind.OTHER;
     }
     Z3_decl_kind decl =
         Z3_decl_kind.fromInt(Native.getDeclKind(environment, Native.getAppDecl(environment, f)));
+
+    assert (arity > 0) || (arity == 0 && decl == Z3_OP_DISTINCT)
+        : String.format(
+            "Unexpected arity '%s' for formula '%s' for handling a function application.",
+            arity, Native.astToString(environment, f));
+
     switch (decl) {
       case Z3_OP_AND:
         return FunctionDeclarationKind.AND;
@@ -656,6 +696,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FLOOR;
       case Z3_OP_TO_REAL:
         return FunctionDeclarationKind.TO_REAL;
+      case Z3_OP_INT2BV:
+        return FunctionDeclarationKind.INT_TO_BV;
 
       case Z3_OP_UNINTERPRETED:
         return FunctionDeclarationKind.UF;
@@ -761,6 +803,10 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.BV_ROTATE_LEFT;
       case Z3_OP_EXT_ROTATE_RIGHT:
         return FunctionDeclarationKind.BV_ROTATE_RIGHT;
+      case Z3_OP_BV2INT:
+        return FunctionDeclarationKind.UBV_TO_INT;
+      case Z3_OP_SBV2INT:
+        return FunctionDeclarationKind.SBV_TO_INT;
 
       case Z3_OP_FPA_NEG:
         return FunctionDeclarationKind.FP_NEG;
@@ -792,16 +838,6 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FunctionDeclarationKind.FP_GT;
       case Z3_OP_FPA_EQ:
         return FunctionDeclarationKind.FP_EQ;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN:
-        return FunctionDeclarationKind.FP_ROUND_EVEN;
-      case Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY:
-        return FunctionDeclarationKind.FP_ROUND_AWAY;
-      case Z3_OP_FPA_RM_TOWARD_POSITIVE:
-        return FunctionDeclarationKind.FP_ROUND_POSITIVE;
-      case Z3_OP_FPA_RM_TOWARD_NEGATIVE:
-        return FunctionDeclarationKind.FP_ROUND_NEGATIVE;
-      case Z3_OP_FPA_RM_TOWARD_ZERO:
-        return FunctionDeclarationKind.FP_ROUND_ZERO;
       case Z3_OP_FPA_ROUND_TO_INTEGRAL:
         return FunctionDeclarationKind.FP_ROUND_TO_INTEGRAL;
       case Z3_OP_FPA_TO_FP_UNSIGNED:
@@ -963,12 +999,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert "0".equals(sign) || "1".equals(sign);
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
-      return FloatingPointNumber.of(
-          Sign.of(sign.charAt(0) == '1'),
-          expo,
-          mant,
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+      return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
 
     } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       // Floating Point Inf uses:
@@ -979,9 +1010,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FloatingPointNumber.of(
           sign
               + "1".repeat(pType.getExponentSize())
-              + "0".repeat(pType.getMantissaSizeWithSignBit()),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+              + "0".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else if (Native.fpaIsNumeralNan(environment, pValue)) {
       // TODO We are underspecified here and choose several bits on our own.
@@ -993,9 +1023,8 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       return FloatingPointNumber.of(
           "0"
               + "1".repeat(pType.getExponentSize())
-              + "1".repeat(pType.getMantissaSizeWithSignBit()),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+              + "1".repeat(pType.getMantissaSizeWithoutHiddenBit()),
+          pType);
 
     } else {
       Sign sign = getSign(pValue);
@@ -1004,11 +1033,7 @@ class Z3FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       var mantissaBv = Native.fpaGetNumeralSignificandBv(environment, pValue);
       var mantissa = Native.getNumeralString(environment, mantissaBv);
       return FloatingPointNumber.of(
-          sign,
-          new BigInteger(exponent),
-          new BigInteger(mantissa),
-          pType.getExponentSize(),
-          pType.getMantissaSizeWithSignBit());
+          sign, new BigInteger(exponent), new BigInteger(mantissa), pType);
     }
   }
 

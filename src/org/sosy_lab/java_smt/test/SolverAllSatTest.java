@@ -77,9 +77,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
         // TODO how can we support allsat in MathSat5-interpolation-prover?
         assume().that(solverToUse()).isNotEqualTo(Solvers.MATHSAT5);
 
-        // CVC4 and Boolector do not support interpolation
-        assume().that(solverToUse()).isNoneOf(Solvers.CVC4, Solvers.BOOLECTOR, Solvers.Z3);
-
         env = context.newProverEnvironmentWithInterpolation(ProverOptions.GENERATE_ALL_SAT);
         break;
 
@@ -217,13 +214,6 @@ public class SolverAllSatTest extends SolverBasedTest0 {
     if ("itp".equals(proverEnv)) {
       assume()
           .withMessage("solver reports a inconclusive sat-check when using interpolation")
-          .that(solverToUse())
-          .isNotEqualTo(Solvers.PRINCESS);
-    }
-
-    if ("normal".equals(proverEnv)) {
-      assume()
-          .withMessage("solver reports a partial model when using quantifiers")
           .that(solverToUse())
           .isNotEqualTo(Solvers.PRINCESS);
     }

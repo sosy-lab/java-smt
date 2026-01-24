@@ -24,7 +24,6 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1031,7 +1030,7 @@ public class CVC5NativeAPITest {
 
     // UnsatCores are iterable
     for (Term e : unsatCore) {
-      assertThat(e.toString()).isIn(Arrays.asList("(not (or a b))", "(and a b)"));
+      assertThat(e.toString()).isAnyOf("(not (or a b))", "(and a b)");
     }
   }
 
