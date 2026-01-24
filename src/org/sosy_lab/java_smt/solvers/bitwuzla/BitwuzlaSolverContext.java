@@ -18,6 +18,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -246,6 +247,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    *
    * <p>Necessary for the solvers implemented in native code, frees the associated memory.
    */
+  @SuppressFBWarnings(
+      value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+      justification = "Static reference counter guarded by class-level synchronization")
   @Override
   public void close() {
     synchronized (BitwuzlaSolverContext.class) {

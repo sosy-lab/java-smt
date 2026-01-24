@@ -212,8 +212,8 @@ public final class CVC5SolverContext extends AbstractSolverContext {
       justification = "Static reference counter guarded by class-level synchronization")
   @Override
   public void close() {
-    if (!closed) {
-      synchronized (CVC5SolverContext.class) {
+    synchronized (CVC5SolverContext.class) {
+      if (!closed) {
         if (instances == 1) {
           // Delete all solver objects if we're closing the last instance
           Context.deletePointers();
