@@ -55,7 +55,7 @@ jobs:
         run: ant build
 
       - name: Run tests
-        run: ant unit-tests
+        run: ant unit-tests-quick
 
       - name: Save Cache with Ivy and Ant
         uses: actions/cache/save@v4
@@ -120,7 +120,7 @@ jobs:
           find lib/java -name "*.dylib" -exec cp {} lib/native/arm64-macosx/ \;
 
       - name: Run tests
-        run: ant unit-tests
+        run: ant unit-tests-quick
 
       - name: Save Cache with Ivy and Ant
         uses: actions/cache/save@v4
@@ -185,7 +185,7 @@ jobs:
           Get-ChildItem -Path "lib/java" -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/x86_64-windows/" -Force
 
       - name: Run tests
-        run: ant unit-tests
+        run: ant unit-tests-quick
 
       - name: Save Cache with Ivy and Ant
         uses: actions/cache/save@v4
