@@ -245,8 +245,9 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
         return FormulaType.getArrayType(
             getFormulaTypeFromSort(domainSort), getFormulaTypeFromSort(rangeSort));
       case Z3_FLOATING_POINT_SORT:
-        return FormulaType.getFloatingPointType(
-            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort) - 1);
+        // fpaGetSbits returns the mantissa with hidden bit
+        return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+            Native.fpaGetEbits(z3context, pSort), Native.fpaGetSbits(z3context, pSort));
       case Z3_ROUNDING_MODE_SORT:
         return FormulaType.FloatingPointRoundingModeType;
       case Z3_RE_SORT:
@@ -460,7 +461,8 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FloatingPointType type) {
-    long fpSort = Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSize() + 1);
+    long fpSort =
+        Native.mkFpaSort(getEnv(), type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
     Native.incRef(getEnv(), Native.sortToAst(getEnv(), fpSort));
     return fpSort;
   }
@@ -984,12 +986,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       assert "0".equals(sign) || "1".equals(sign);
       final var expo = new BigInteger(Native.getNumeralString(environment, expoBv));
       final var mant = new BigInteger(Native.getNumeralString(environment, mantBv));
-      return FloatingPointNumber.of(
-          Sign.of(sign.charAt(0) == '1'),
-          expo,
-          mant,
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+      return FloatingPointNumber.of(Sign.of(sign.charAt(0) == '1'), expo, mant, pType);
 
       //    } else if (Native.fpaIsNumeralInf(environment, pValue)) {
       //      // Floating Point Inf uses:
@@ -1019,11 +1016,7 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
       var exponent = Native.fpaGetNumeralExponentString(environment, pValue);
       var mantissa = Native.fpaGetNumeralSignificandString(environment, pValue);
       return FloatingPointNumber.of(
-          sign,
-          new BigInteger(exponent),
-          new BigInteger(mantissa),
-          pType.getExponentSize(),
-          pType.getMantissaSize());
+          sign, new BigInteger(exponent), new BigInteger(mantissa), pType);
     }
   }
 

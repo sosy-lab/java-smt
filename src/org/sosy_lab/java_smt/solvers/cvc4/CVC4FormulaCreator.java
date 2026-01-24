@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc4;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractStringFormulaManager.unescapeUnicodeForSmtlib;
 
 import com.google.common.base.Preconditions;
@@ -117,7 +118,7 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
   @Override
   public Type getFloatingPointType(FloatingPointType pType) {
     return exprManager.mkFloatingPointType(
-        pType.getExponentSize(), pType.getMantissaSize() + 1); // plus sign bit
+        pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -157,9 +158,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
           t.isFloatingPoint(), "FloatingPointFormula with actual type %s: %s", t, pFormula);
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
       return (FormulaType<T>)
-          FormulaType.getFloatingPointType(
-              (int) fpType.getExponentSize(),
-              (int) fpType.getSignificandSize() - 1); // without sign bit
+          FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+              (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
 
     } else if (pFormula instanceof ArrayFormula<?, ?>) {
       FormulaType<T> arrayIndexType = getArrayFormulaIndexType((ArrayFormula<T, T>) pFormula);
@@ -185,9 +185,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
       return FormulaType.getBitvectorTypeWithSize((int) new BitVectorType(t).getSize());
     } else if (t.isFloatingPoint()) {
       edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(t);
-      return FormulaType.getFloatingPointType(
-          (int) fpType.getExponentSize(),
-          (int) fpType.getSignificandSize() - 1); // without sign bit
+      return FormulaType.getFloatingPointTypeFromSizesWithHiddenBit(
+          (int) fpType.getExponentSize(), (int) fpType.getSignificandSize()); // with hidden bit
     } else if (t.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (t.isReal()) {
@@ -663,7 +662,8 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
     final var fp = fpExpr.getConstFloatingPoint();
     final var fpType = fp.getT();
     final var expWidth = Ints.checkedCast(fpType.exponentWidth());
-    final var mantWidth = Ints.checkedCast(fpType.significandWidth() - 1); // without sign bit
+    // CVC4 returns the mantissa with the hidden bit, hence - 1
+    final var mantWidthWithoutHiddenBit = Ints.checkedCast(fpType.significandWidth() - 1);
 
     final var sign = matcher.group("sign");
     final var exp = matcher.group("exp");
@@ -671,14 +671,13 @@ public class CVC4FormulaCreator extends FormulaCreator<Expr, Type, ExprManager, 
 
     Preconditions.checkArgument("1".equals(sign) || "0".equals(sign));
     Preconditions.checkArgument(exp.length() == expWidth);
-    Preconditions.checkArgument(mant.length() == mantWidth);
+    Preconditions.checkArgument(mant.length() == mantWidthWithoutHiddenBit);
 
     return FloatingPointNumber.of(
         Sign.of(sign.charAt(0) == '1'),
         new BigInteger(exp, 2),
         new BigInteger(mant, 2),
-        expWidth,
-        mantWidth);
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   @Override
