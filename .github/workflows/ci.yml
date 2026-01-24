@@ -33,8 +33,8 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
-      - name: Cache Ivy and Ant
-        uses: actions/cache@v4
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.ivy2/cache
@@ -56,6 +56,15 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v4
+        if: always() # also on error
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: linux-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -86,8 +95,8 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
-      - name: Cache Ivy and Ant
-        uses: actions/cache@v4
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v4
         with:
           path: |
             ~/.ivy2/cache
@@ -112,6 +121,15 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v4
+        if: always() # also on error
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: macos-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -142,8 +160,8 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
-      - name: Cache Ivy and Ant
-        uses: actions/cache@v4
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v4
         with:
           path: |
             C:\Users\runneradmin\.ivy2\cache
@@ -168,6 +186,15 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v4
+        if: always() # also on error
+        with:
+          path: |
+            C:\Users\runneradmin\.ivy2\cache
+            C:\Users\runneradmin\.ant\lib
+          key: windows-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
