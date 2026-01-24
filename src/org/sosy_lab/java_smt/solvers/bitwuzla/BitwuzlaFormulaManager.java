@@ -13,7 +13,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
-import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -61,15 +60,23 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public Term equalImpl(Collection<Term> pArgs) {
-    return creator.getTermManager().mk_term(Kind.EQUAL, new Vector_Term(pArgs), new Vector_Int());
+  public Term equalImpl(Iterable<Term> pArgs) {
+    Vector_Term array = new Vector_Term(pArgs);
+    if (array.size() < 2) {
+      return creator.getTermManager().mk_true();
+    } else {
+      return creator.getTermManager().mk_term(Kind.EQUAL, array, new Vector_Int());
+    }
   }
 
   @Override
-  public Term distinctImpl(Collection<Term> pArgs) {
-    return creator
-        .getTermManager()
-        .mk_term(Kind.DISTINCT, new Vector_Term(pArgs), new Vector_Int());
+  public Term distinctImpl(Iterable<Term> pArgs) {
+    Vector_Term array = new Vector_Term(pArgs);
+    if (array.size() < 2) {
+      return creator.getTermManager().mk_true();
+    } else {
+      return creator.getTermManager().mk_term(Kind.DISTINCT, array, new Vector_Int());
+    }
   }
 
   @Override

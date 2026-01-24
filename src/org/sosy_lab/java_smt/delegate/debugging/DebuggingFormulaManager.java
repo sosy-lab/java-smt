@@ -13,7 +13,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -150,19 +149,19 @@ public class DebuggingFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     debugging.assertThreadLocal();
     pArgs.forEach(debugging::assertFormulaInContext);
-    BooleanFormula result = delegate.equal(pArgs);
+    BooleanFormula result = delegate.makeEqual(pArgs);
     debugging.addFormulaTerm(result);
     return result;
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     debugging.assertThreadLocal();
     pArgs.forEach(debugging::assertFormulaInContext);
-    BooleanFormula result = delegate.distinct(pArgs);
+    BooleanFormula result = delegate.makeDistinct(pArgs);
     debugging.addFormulaTerm(result);
     return result;
   }

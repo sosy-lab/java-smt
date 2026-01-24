@@ -18,7 +18,6 @@ import edu.stanford.CVC4.Type;
 import edu.stanford.CVC4.vectorExpr;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -72,12 +71,16 @@ class CVC4FormulaManager extends AbstractFormulaManager<Expr, Type, ExprManager,
   }
 
   @Override
-  public Expr distinctImpl(Collection<Expr> pArgs) {
+  public Expr distinctImpl(Iterable<Expr> pArgs) {
     vectorExpr vec = new vectorExpr();
     for (Expr e : pArgs) {
       vec.add(e);
     }
-    return getEnvironment().mkExpr(Kind.DISTINCT, vec);
+    if (vec.size() < 2) {
+      return getEnvironment().mkConst(true);
+    } else {
+      return getEnvironment().mkExpr(Kind.DISTINCT, vec);
+    }
   }
 
   @Override

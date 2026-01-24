@@ -17,6 +17,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_parse_t
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_child;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_constructor;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_term_to_string;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_true;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_children;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_is_bitvector;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_num_children;
@@ -26,9 +27,9 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_type_to
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -78,8 +79,13 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  protected Integer distinctImpl(Collection<Integer> pArgs) {
-    return yices_distinct(pArgs.size(), Ints.toArray(pArgs));
+  protected Integer distinctImpl(Iterable<Integer> pArgs) {
+    int[] array = Ints.toArray(ImmutableList.copyOf(pArgs));
+    if (array.length < 2) {
+      return yices_true();
+    } else {
+      return yices_distinct(array.length, array);
+    }
   }
 
   @Override

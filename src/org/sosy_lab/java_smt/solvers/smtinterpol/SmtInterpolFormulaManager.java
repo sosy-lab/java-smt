@@ -11,6 +11,7 @@ package org.sosy_lab.java_smt.solvers.smtinterpol;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 
+import com.google.common.collect.ImmutableList;
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
 import de.uni_freiburg.informatik.ultimate.logic.ApplicationTerm;
 import de.uni_freiburg.informatik.ultimate.logic.FormulaLet;
@@ -27,7 +28,6 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.StringReader;
 import java.util.ArrayDeque;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -71,13 +71,23 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
-  protected Term equalImpl(Collection<Term> pArgs) {
-    return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
+  protected Term equalImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().getTheory().mTrue;
+    } else {
+      return getEnvironment().getTheory().equals(array);
+    }
   }
 
   @Override
-  protected Term distinctImpl(Collection<Term> pArgs) {
-    return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
+  protected Term distinctImpl(Iterable<Term> pArgs) {
+    Term[] array = ImmutableList.copyOf(pArgs).toArray(new Term[0]);
+    if (array.length < 2) {
+      return getEnvironment().getTheory().mTrue;
+    } else {
+      return getEnvironment().getTheory().distinct(array);
+    }
   }
 
   @Override
