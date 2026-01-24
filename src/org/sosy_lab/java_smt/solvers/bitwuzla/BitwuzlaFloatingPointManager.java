@@ -25,6 +25,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+
   private final BitwuzlaFormulaCreator bitwuzlaCreator;
   private final TermManager termManager;
   private final Term roundingMode;
@@ -33,8 +34,11 @@ public class BitwuzlaFloatingPointManager
   private static int counter = 0;
 
   protected BitwuzlaFloatingPointManager(
-      BitwuzlaFormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      BitwuzlaFormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      BitwuzlaBitvectorFormulaManager pBvMgr,
+      BitwuzlaBooleanFormulaManager pBmgr) {
+    super(pCreator, pBvMgr, pBmgr);
     bitwuzlaCreator = pCreator;
     termManager = pCreator.getTermManager();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
@@ -156,6 +160,16 @@ public class BitwuzlaFloatingPointManager
       throw new UnsupportedOperationException(
           "Attempted cast of FP to an unsupported type: " + pTargetType + ".");
     }
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Term fp) {
+    return fp.sort().fp_sig_size();
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Term fp) {
+    return fp.sort().fp_exp_size();
   }
 
   @Override

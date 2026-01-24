@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.Expr;
@@ -41,8 +43,11 @@ public class CVC4FloatingPointFormulaManager
   private final Expr roundingMode;
 
   protected CVC4FloatingPointFormulaManager(
-      CVC4FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      CVC4FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      CVC4BitvectorFormulaManager pBvFormulaManager,
+      CVC4BooleanFormulaManager pBoolFormulaManager) {
+    super(pCreator, pBvFormulaManager, pBoolFormulaManager);
     exprManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -372,5 +377,21 @@ public class CVC4FloatingPointFormulaManager
   @Override
   protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
     return exprManager.mkExpr(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Expr f) {
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
+    return (int) fpType.getSignificandSize();
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Expr f) {
+    Type type = f.getType();
+    checkArgument(type.isFloatingPoint());
+    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
+    return (int) fpType.getExponentSize();
   }
 }

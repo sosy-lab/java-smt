@@ -35,8 +35,11 @@ public class CVC5FloatingPointFormulaManager
   private final Term roundingMode;
 
   protected CVC5FloatingPointFormulaManager(
-      CVC5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      CVC5FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      CVC5BitvectorFormulaManager pBvFormulaManager,
+      CVC5BooleanFormulaManager pBoolFormulaManager) {
+    super(pCreator, pBvFormulaManager, pBoolFormulaManager);
     termManager = pCreator.getEnv();
     solver = pCreator.getSolver();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
@@ -443,5 +446,17 @@ public class CVC5FloatingPointFormulaManager
   @Override
   protected Term round(Term pFormula, FloatingPointRoundingMode pRoundingMode) {
     return termManager.mkTerm(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Term f) {
+    Sort sort = f.getSort();
+    return sort.getFloatingPointSignificandSize();
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Term f) {
+    Sort sort = f.getSort();
+    return sort.getFloatingPointExponentSize();
   }
 }

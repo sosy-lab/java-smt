@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -21,6 +22,7 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 public class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
@@ -222,6 +224,36 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     BitvectorFormula result = delegate.toIeeeBitvector(number);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number, String bitvectorConstantName) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    BitvectorFormulaAndBooleanFormula res = delegate.toIeeeBitvector(number, bitvectorConstantName);
+    debugging.addFormulaTerm(res.getBitvectorFormula());
+    debugging.addFormulaTerm(res.getBooleanFormula());
+    return res;
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula number,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    specialFPConstantHandling.forEach(
+        (key, value) -> {
+          debugging.assertFormulaInContext(key);
+          debugging.assertFormulaInContext(value);
+        });
+    BitvectorFormulaAndBooleanFormula res =
+        delegate.toIeeeBitvector(number, bitvectorConstantName, specialFPConstantHandling);
+    debugging.addFormulaTerm(res.getBitvectorFormula());
+    debugging.addFormulaTerm(res.getBooleanFormula());
+    return res;
   }
 
   @Override
@@ -508,5 +540,19 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     BooleanFormula result = delegate.isNegative(number);
     debugging.addFormulaTerm(result);
     return result;
+  }
+
+  @Override
+  public int getMantissaSizeWithSignBit(FloatingPointFormula number) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    return delegate.getMantissaSizeWithSignBit(number);
+  }
+
+  @Override
+  public int getExponentSize(FloatingPointFormula number) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(number);
+    return delegate.getExponentSize(number);
   }
 }

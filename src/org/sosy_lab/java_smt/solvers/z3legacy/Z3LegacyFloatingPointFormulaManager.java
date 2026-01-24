@@ -29,8 +29,11 @@ class Z3LegacyFloatingPointFormulaManager
   private final long roundingMode;
 
   Z3LegacyFloatingPointFormulaManager(
-      Z3LegacyFormulaCreator creator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(creator);
+      Z3LegacyFormulaCreator creator,
+      Z3LegacyBitvectorFormulaManager bvMgr,
+      Z3LegacyBooleanFormulaManager boolMgr,
+      FloatingPointRoundingMode pFloatingPointRoundingMode) {
+    super(creator, bvMgr, boolMgr);
     z3context = creator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
@@ -202,6 +205,16 @@ class Z3LegacyFloatingPointFormulaManager
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     return Native.mkFpaToIeeeBv(z3context, pNumber);
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Long f) {
+    return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Long f) {
+    return Native.fpaGetSbits(z3context, Native.getSort(z3context, f));
   }
 
   @Override

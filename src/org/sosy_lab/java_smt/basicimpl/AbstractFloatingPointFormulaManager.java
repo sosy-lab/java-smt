@@ -8,13 +8,19 @@
 
 package org.sosy_lab.java_smt.basicimpl;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -48,10 +54,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private final Map<FloatingPointRoundingMode, TFormulaInfo> roundingModes;
 
+  private final AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bvMgr;
+
+  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bMgr;
+
   protected AbstractFloatingPointFormulaManager(
-      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator) {
+      FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
+      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr,
+      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBMgr) {
     super(pCreator);
     roundingModes = new HashMap<>();
+    bvMgr = pBvMgr;
+    bMgr = pBMgr;
   }
 
   protected abstract TFormulaInfo getDefaultRoundingMode();
@@ -160,7 +174,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type);
 
   protected static boolean isNegativeZero(Double pN) {
-    Preconditions.checkNotNull(pN);
+    checkNotNull(pN);
     return Double.valueOf("-0.0").equals(pN);
   }
 
@@ -261,7 +275,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   public FloatingPointFormula fromIeeeBitvector(
       BitvectorFormula pNumber, FloatingPointType pTargetType) {
     BitvectorType bvType = (BitvectorType) formulaCreator.getFormulaType(pNumber);
-    Preconditions.checkArgument(
+    checkArgument(
         bvType.getSize() == pTargetType.getTotalSize(),
         MoreStrings.lazyString(
             () ->
@@ -279,7 +293,99 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return getFormulaCreator().encapsulateBitvector(toIeeeBitvectorImpl(extractInfo(pNumber)));
   }
 
-  protected abstract TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber);
+  @SuppressWarnings("unused")
+  protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
+    throw new UnsupportedOperationException(
+        "The chosen solver does not support transforming "
+            + "FloatingPointFormula to IEEE bitvectors. Try using the fallback "
+            + "methods toIeeeBitvector"
+            + "(FloatingPointFormula, String) and/or "
+            + "toIeeeBitvector(FloatingPointFormula, String, Map)");
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula f, String bitvectorConstantName) {
+    return toIeeeBitvector(f, bitvectorConstantName, ImmutableMap.of());
+  }
+
+  @Override
+  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
+      FloatingPointFormula f,
+      String bitvectorConstantName,
+      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
+
+    FormulaType.FloatingPointType fpType =
+        (FloatingPointType) getFormulaCreator().getFormulaType(f);
+    // The BV is sign bit + exponent + mantissa without hidden bit
+    int mantissaSizeWithoutHiddenBit = fpType.getMantissaSizeWithoutHiddenBit();
+    int exponentSize = fpType.getExponentSize();
+    BitvectorFormula bvFormula =
+        bvMgr.makeVariable(1 + exponentSize + mantissaSizeWithoutHiddenBit, bitvectorConstantName);
+
+    // When building new Fp types, we don't include the sign bit
+    FloatingPointFormula fromIeeeBitvector =
+        fromIeeeBitvector(
+            bvFormula,
+            getFloatingPointTypeFromSizesWithoutHiddenBit(
+                exponentSize, mantissaSizeWithoutHiddenBit));
+
+    // assignment() allows a value to be NaN etc.
+    // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
+    // standard, what solvers return might be distinct.
+    BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
+
+    // Build special numbers so that we can compare them in the map
+    FloatingPointType precision =
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit);
+    Set<FloatingPointFormula> specialNumbers =
+        ImmutableSet.of(
+            makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
+
+    BitvectorFormula toIeeeBv = bvFormula;
+    for (Entry<FloatingPointFormula, BitvectorFormula> entry :
+        specialFPConstantHandling.entrySet()) {
+      FloatingPointFormula fpConst = entry.getKey();
+
+      // We check that FP const special numbers are used (info from SMTLib2-standard)
+      // NaN has multiple possible definitions.
+      // +/- Infinity each has 2; e.g., +infinity for sort (_ FloatingPoint 2 3) is represented
+      //  equivalently by (_ +oo 2 3) and (fp #b0 #b11 #b00).
+      // -0 only has one representation; i.e. (_ -zero 3 2) abbreviates (fp #b1 #b000 #b0), and
+      //  is therefore disallowed.
+      // This automatically checks the correct precision as well!
+      checkArgument(
+          specialNumbers.contains(fpConst),
+          "You are only allowed to specify a mapping for special FP numbers with more than one"
+              + " well-defined bitvector representation, i.e. NaN and +/- Infinity. Their precision"
+              + " has to match the precision of the formula to be represented as bitvector.");
+
+      BitvectorFormula bvTerm = entry.getValue();
+      checkArgument(
+          bvMgr.getLength(bvTerm) == bvMgr.getLength(bvFormula),
+          "The size of the bitvector terms used as mapped values needs to be equal to the size of"
+              + " the bitvector returned by this method");
+
+      BooleanFormula assumption = assignment(fpConst, f);
+      toIeeeBv = bMgr.ifThenElse(assumption, bvTerm, toIeeeBv);
+    }
+
+    return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
+  }
+
+  @Override
+  public int getMantissaSizeWithSignBit(FloatingPointFormula f) {
+    return getMantissaSizeWithSignBitImpl(extractInfo(f));
+  }
+
+  protected abstract int getMantissaSizeWithSignBitImpl(TFormulaInfo f);
+
+  @Override
+  public int getExponentSize(FloatingPointFormula f) {
+    return getExponentSizeImpl(extractInfo(f));
+  }
+
+  protected abstract int getExponentSizeImpl(TFormulaInfo f);
 
   @Override
   public FloatingPointFormula negate(FloatingPointFormula pNumber) {
@@ -541,5 +647,29 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       values[size - 1 - i] = integer.testBit(i) ? '1' : '0';
     }
     return String.copyValueOf(values);
+  }
+
+  public static final class BitvectorFormulaAndBooleanFormula {
+    private final BitvectorFormula bitvectorFormula;
+    private final BooleanFormula booleanFormula;
+
+    private BitvectorFormulaAndBooleanFormula(
+        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
+      bitvectorFormula = checkNotNull(pBitvectorFormula);
+      booleanFormula = checkNotNull(pBooleanFormula);
+    }
+
+    private static BitvectorFormulaAndBooleanFormula of(
+        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
+      return new BitvectorFormulaAndBooleanFormula(pBitvectorFormula, pBooleanFormula);
+    }
+
+    public BitvectorFormula getBitvectorFormula() {
+      return bitvectorFormula;
+    }
+
+    public BooleanFormula getBooleanFormula() {
+      return booleanFormula;
+    }
   }
 }

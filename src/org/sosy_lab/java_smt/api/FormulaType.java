@@ -320,7 +320,6 @@ public abstract class FormulaType<T extends Formula> {
       return true;
     }
 
-    /** Returns the size of the exponent. */
     public int getExponentSize() {
       return exponentSize;
     }

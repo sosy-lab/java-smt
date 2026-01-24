@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_exp_width;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_fp_type_mant_width;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_abs;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_fp_bits_number;
@@ -61,8 +63,11 @@ class Mathsat5FloatingPointFormulaManager
   private final long roundingMode;
 
   Mathsat5FloatingPointFormulaManager(
-      Mathsat5FormulaCreator pCreator, FloatingPointRoundingMode pFloatingPointRoundingMode) {
-    super(pCreator);
+      Mathsat5FormulaCreator pCreator,
+      FloatingPointRoundingMode pFloatingPointRoundingMode,
+      Mathsat5BitvectorFormulaManager pBvFormulaManager,
+      Mathsat5BooleanFormulaManager pBoolFormulaManager) {
+    super(pCreator, pBvFormulaManager, pBoolFormulaManager);
 
     mathsatEnv = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
@@ -248,6 +253,17 @@ class Mathsat5FloatingPointFormulaManager
   @Override
   protected Long toIeeeBitvectorImpl(Long pNumber) {
     return Mathsat5NativeApi.msat_make_fp_as_ieeebv(mathsatEnv, pNumber);
+  }
+
+  @Override
+  protected int getMantissaSizeWithSignBitImpl(Long f) {
+    // The mantissa includes the sign bit according to the SMTLib2 standard, but MathSAT does not.
+    return msat_get_fp_type_mant_width(mathsatEnv, msat_term_get_type(f)) + 1;
+  }
+
+  @Override
+  protected int getExponentSizeImpl(Long f) {
+    return msat_get_fp_type_exp_width(mathsatEnv, msat_term_get_type(f));
   }
 
   @Override
