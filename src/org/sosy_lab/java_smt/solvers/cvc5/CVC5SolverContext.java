@@ -15,6 +15,7 @@ import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.cvc5.CVC5ApiRecoverableException;
 import io.github.cvc5.Context;
 import io.github.cvc5.Solver;
@@ -206,10 +207,12 @@ public final class CVC5SolverContext extends AbstractSolverContext {
     return "CVC5 " + solver.getVersion();
   }
 
+  @SuppressFBWarnings(
+      value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+      justification = "Static reference counter guarded by class-level synchronization")
   @Override
   public void close() {
-    if (creator != null) {
-      closed = true;
+    if (!closed) {
       synchronized (CVC5SolverContext.class) {
         if (instances == 1) {
           // Delete all solver objects if we're closing the last instance
@@ -222,6 +225,7 @@ public final class CVC5SolverContext extends AbstractSolverContext {
         instances--;
       }
       creator = null;
+      closed = true;
     }
   }
 
