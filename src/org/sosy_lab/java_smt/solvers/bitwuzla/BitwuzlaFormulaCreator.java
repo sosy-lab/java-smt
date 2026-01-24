@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableSetCopy;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
@@ -58,8 +59,8 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, BitwuzlaDeclaration> {
-  private final TermManager termManager;
+public class BitwuzlaFormulaCreator
+    extends FormulaCreator<Term, Sort, TermManager, BitwuzlaDeclaration> {
 
   private final Table<String, Sort, Term> formulaCache = HashBasedTable.create();
 
@@ -80,17 +81,12 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   private final Map<String, Term> constraintsForVariables = new HashMap<>();
 
   protected BitwuzlaFormulaCreator(TermManager pTermManager) {
-    super(null, pTermManager.mk_bool_sort(), null, null, null, null);
-    termManager = pTermManager;
-  }
-
-  TermManager getTermManager() {
-    return termManager;
+    super(pTermManager, pTermManager.mk_bool_sort(), null, null, null, null);
   }
 
   @Override
   public Sort getBitvectorType(int bitwidth) {
-    return termManager.mk_bv_sort(bitwidth);
+    return environment.mk_bv_sort(bitwidth);
   }
 
   @Override
@@ -104,7 +100,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
   // system instead use bitwuzla_mk_fp_value_from_real somehow or convert myself
   @Override
   public Sort getFloatingPointType(FloatingPointType type) {
-    return termManager.mk_fp_sort(type.getExponentSize(), type.getMantissaSize() + 1);
+    return environment.mk_fp_sort(type.getExponentSize(), type.getMantissaSizeWithHiddenBit());
   }
 
   @Override
@@ -123,7 +119,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
 
   @Override
   public Sort getArrayType(Sort indexType, Sort elementType) {
-    return termManager.mk_array_sort(indexType, elementType);
+    return environment.mk_array_sort(indexType, elementType);
   }
 
   @Override
@@ -157,7 +153,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return maybeFormula;
     }
 
-    Term newVar = termManager.mk_const(pSort, varName);
+    Term newVar = environment.mk_const(pSort, varName);
     formulaCache.put(varName, pSort, newVar);
     return newVar;
   }
@@ -171,7 +167,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // return maybeVar;
     // }
 
-    Term newVar = termManager.mk_var(sort, name);
+    Term newVar = environment.mk_var(sort, name);
     // boundFormulaCache.put(name, sort, newVar);
     return newVar;
   }
@@ -180,8 +176,8 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
     // UFs play by different rules. For them, we need to extract the domain
     if (pSort.is_fp()) {
       int exponent = pSort.fp_exp_size();
-      int mantissa = pSort.fp_sig_size() - 1;
-      return FormulaType.getFloatingPointType(exponent, mantissa);
+      int mantissaWithHiddenBit = pSort.fp_sig_size();
+      return getFloatingPointTypeFromSizesWithHiddenBit(exponent, mantissaWithHiddenBit);
     } else if (pSort.is_bv()) {
       return FormulaType.getBitvectorTypeWithSize(pSort.bv_size());
     } else if (pSort.is_array()) {
@@ -389,8 +385,9 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
             "FloatingPointFormula with actual type " + sort + ": " + pFormula);
       }
       int exp = sort.fp_exp_size();
-      int man = sort.fp_sig_size() - 1;
-      return (FormulaType<T>) FormulaType.getFloatingPointType(exp, man);
+      int mantissaWithHiddenBit = sort.fp_sig_size();
+      return (FormulaType<T>)
+          getFloatingPointTypeFromSizesWithHiddenBit(exp, mantissaWithHiddenBit);
     } else if (sort.is_rm()) {
       return (FormulaType<T>) FormulaType.FloatingPointRoundingModeType;
     }
@@ -451,7 +448,7 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       for (int i = 0; i < boundVars.length; i++) {
         map.put(boundVars[i], freeVars[i]);
       }
-      body = termManager.substitute_term(body, map);
+      body = environment.substitute_term(body, map);
 
       Quantifier quant = kind.equals(Kind.EXISTS) ? Quantifier.EXISTS : Quantifier.FORALL;
       return visitor.visitQuantifier(
@@ -507,19 +504,19 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       // The term might be indexed, then we need index creation
       Term term = declaration.getTerm();
       Kind properKind = term.kind();
-      return termManager.mk_term(properKind, new Vector_Term(args), term.indices());
+      return environment.mk_term(properKind, new Vector_Term(args), term.indices());
     }
 
     if (!declaration.isKind() && declaration.getTerm().sort().is_fun()) {
       Vector_Term functionAndArgs = new Vector_Term();
       functionAndArgs.add(declaration.getTerm());
       functionAndArgs.addAll(args);
-      return termManager.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
+      return environment.mk_term(Kind.APPLY, functionAndArgs, new Vector_Int());
     }
 
     assert declaration.isKind();
 
-    return termManager.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
+    return environment.mk_term(declaration.getKind(), new Vector_Term(args), new Vector_Int());
   }
 
   @Override
@@ -529,14 +526,14 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       // TODO: implement
       throw new UnsupportedOperationException("Bitwuzla does not support 0 arity UFs.");
     }
-    Sort functionSort = termManager.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
+    Sort functionSort = environment.mk_fun_sort(new Vector_Sort(pArgTypes), pReturnType);
 
     Term maybeFormula = formulaCache.get(name, functionSort);
     if (maybeFormula != null) {
       return BitwuzlaDeclaration.create(maybeFormula);
     }
 
-    Term uf = termManager.mk_const(functionSort, name);
+    Term uf = environment.mk_const(functionSort, name);
     formulaCache.put(name, functionSort, uf);
     return BitwuzlaDeclaration.create(uf);
   }
@@ -600,9 +597,11 @@ public class BitwuzlaFormulaCreator extends FormulaCreator<Term, Sort, Void, Bit
       return new BigInteger(term.to_bv(), 2);
     }
     if (sort.is_fp()) {
-      int sizeExponent = sort.fp_exp_size();
-      int sizeMantissa = sort.fp_sig_size() - 1;
-      return FloatingPointNumber.of(term.to_bv(), sizeExponent, sizeMantissa);
+      int exponentSize = sort.fp_exp_size();
+      int mantissaSizeWithHiddenBit = sort.fp_sig_size();
+      return FloatingPointNumber.of(
+          term.to_bv(),
+          getFloatingPointTypeFromSizesWithHiddenBit(exponentSize, mantissaSizeWithHiddenBit));
     }
     throw new AssertionError("Unknown value type.");
   }
