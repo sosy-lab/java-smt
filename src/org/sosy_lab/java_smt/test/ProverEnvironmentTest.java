@@ -16,7 +16,6 @@ import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.CVC5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.MATHSAT5;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.OPENSMT;
 import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.PRINCESS;
-import static org.sosy_lab.java_smt.SolverContextFactory.Solvers.SMTINTERPOL;
 import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE;
 import static org.sosy_lab.java_smt.api.SolverContext.ProverOptions.GENERATE_UNSAT_CORE_OVER_ASSUMPTIONS;
@@ -384,6 +383,30 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
+  // For the second proof here, MathSAT5 produces a clause-hyp node that has no formula.
+  // So the resolution chain is done with the following clauses {} {x1=2} choosing the pivot x1=2.
+  // See this formatted native proof:
+  // Formula: null
+  // Rule: res-chain
+  // No. Children: 3
+  // Child 1:
+  //  Formula: null
+  //  Rule: clause-hyp
+  //  No. Children: 0
+  // Child 2:
+  //  Formula: (`=_int` 'x1 2)
+  //  Rule: null
+  //  No. Children: 0
+  // Child 3:
+  //  Formula: null
+  //  Rule: clause-hyp
+  //  No. Children: 1
+  //  Child 1:
+  //    Formula: (`=_int` 'x1 2)
+  //    Rule: null
+  //    No. Children: 0
+  // To solve this, the proof transformation assigns false, as the formula for clause-hyp nodes
+  // that have no children.
   @Test
   public void getProofAfterGetProofClearingStackAndAddingDifferentAssertionsTest()
       throws InterruptedException, SolverException {
@@ -527,13 +550,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
     while (!stack.isEmpty()) {
       Proof proof = stack.pop();
-      ProofRule rule = proof.getRule();
+      Optional<ProofRule> rule = proof.getRule();
       Optional<Formula> formula = proof.getFormula();
 
-      assertThat(rule).isNotNull();
-      assertThat(rule).isInstanceOf(ProofRule.class);
+      if (rule.isPresent()) assertThat(rule.get()).isInstanceOf(ProofRule.class);
       assertThat(proof.getChildren()).isNotNull();
-      assertThat(formula.isPresent()).isTrue();
+      if (solverToUse().equals(CVC5)) assertThat(formula.isPresent()).isTrue();
 
       for (Proof child : proof.getChildren()) {
         assertThat(child).isNotNull();

@@ -16,13 +16,17 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_get_
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5Proof.fromMsatProof;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.ShutdownNotifier;
@@ -82,25 +86,28 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
     msat_destroy_proof_manager(pm);
 
     return root;
-
-    // return getProof0();
   }
 
   // update all RES_CHAIN nodes in the proof DAG by computing resolution
   // formulas and return the updated root node with formulas attached.
-  private void clausifyResChain(Proof root, BooleanFormulaManager bfmgr) {
-    Map<Proof, Boolean> visited = new HashMap<>(); // Track visited nodes
+  private void clausifyResChain(Proof pRoot, BooleanFormulaManager pBfmgr) {
+    Map<Proof, Boolean> tempVisited;
+    ImmutableMap<Proof, Boolean> visited = ImmutableMap.of();
     Deque<Proof> stack = new ArrayDeque<>();
 
-    stack.push(root); // Start with the root node
-    visited.put(root, Boolean.FALSE); // Mark root as unvisited
+    stack.push(pRoot); // Start with the root node
+    tempVisited = new LinkedHashMap<>(visited);
+    tempVisited.put(pRoot, Boolean.FALSE); // Mark root as unvisited
+    visited = ImmutableMap.copyOf(tempVisited);
 
     while (!stack.isEmpty()) {
       Proof node = stack.peek(); // Look at the top node, but don't pop yet
 
-      if (visited.get(node).equals(Boolean.FALSE)) {
+      if (Objects.equals(visited.get(node), false)) {
         // First time visiting this node
-        visited.put(node, Boolean.TRUE); // Mark node as visited
+        tempVisited = new LinkedHashMap<>(visited);
+        tempVisited.put(node, Boolean.TRUE); // Mark node as visited
+        visited = ImmutableMap.copyOf(tempVisited);
 
         // Push all children onto stack
         if (!node.isLeaf()) {
@@ -110,7 +117,9 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
             Proof child = children.get(i);
             if (!visited.containsKey(child)) {
               stack.push(child); // Only push unvisited children
-              visited.put(child, Boolean.FALSE); // Mark child as unvisited
+              tempVisited = new LinkedHashMap<>(visited);
+              tempVisited.put(child, Boolean.FALSE); // Mark child as unvisited
+              visited = ImmutableMap.copyOf(tempVisited);
             }
           }
         }
@@ -118,21 +127,23 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
         // All children have been visited, now process the node
         stack.pop(); // Pop the current node as we are done processing its children
 
-        // Check if this node is a RES_CHAIN, process if true
-        if (node.getRule().equals(Rule.RES_CHAIN)) {
-          processResChain(node, bfmgr); // Process RES_CHAIN node
+        if (node.getRule().isPresent()) {
+          // Check if this node is a RES_CHAIN, process if true
+          if (node.getRule().get().equals(Rule.RES_CHAIN)) {
+            processResChain(node, pBfmgr); // Process RES_CHAIN node
+          }
         }
       }
     }
   }
 
   // process proof nodes and compute formulas for res-chain nodes
-  private void processResChain(Proof node, BooleanFormulaManager bfmgr) {
-    Set<Proof> childrenSet = node.getChildren();
-    List<Proof> children = new ArrayList<>(childrenSet);
+  private void processResChain(Proof pNode, BooleanFormulaManager pBfmgr) {
+    ImmutableSet<Proof> childrenSet = pNode.getChildren();
+    ImmutableList<Proof> children = ImmutableList.copyOf(childrenSet);
 
     // If the current node is a RES_CHAIN, compute the resolved formula
-    if (node.getRule().equals(Rule.RES_CHAIN)) {
+    if (pNode.getRule().get().equals(Rule.RES_CHAIN)) {
       // Sanity check: res-chain nodes must have an odd number of children (clause, pivot, clause,
       // ..., clause)
       if (children.size() < 3 || children.size() % 2 == 0) {
@@ -146,126 +157,124 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
       for (int i = 1; i < children.size() - 1; i += 2) {
         BooleanFormula pivot = (BooleanFormula) children.get(i).getFormula().orElseThrow();
         BooleanFormula nextClause = (BooleanFormula) children.get(i + 1).getFormula().orElseThrow();
-        current = resolve(current, nextClause, pivot, bfmgr); // Perform resolution step
+        current = resolve(current, nextClause, pivot, pBfmgr); // Perform resolution step
       }
 
       // Store the resolved formula in the current node
-      ((Mathsat5Proof) node).setFormula(current);
+      ((Mathsat5Proof) pNode).setFormula(current);
     }
   }
 
   // Perform resolution between two clauses using a given pivot
   private BooleanFormula resolve(
-      BooleanFormula clause1,
-      BooleanFormula clause2,
-      BooleanFormula pivot,
-      BooleanFormulaManager bfmgr) {
-    List<BooleanFormula> literals1 = flattenLiterals(clause1, bfmgr);
-    List<BooleanFormula> literals2 = flattenLiterals(clause2, bfmgr);
+      BooleanFormula pClause1,
+      BooleanFormula pClause2,
+      BooleanFormula pPivot,
+      BooleanFormulaManager pBfmgr) {
+    List<BooleanFormula> literals1 = flattenLiterals(pClause1, pBfmgr);
+    List<BooleanFormula> literals2 = flattenLiterals(pClause2, pBfmgr);
 
-    // Use LinkedHashSet to maintain order and uniqueness
-    Set<BooleanFormula> combined = new LinkedHashSet<>();
+    Set<BooleanFormula> tempCombined;
+    ImmutableSet<BooleanFormula> combined = ImmutableSet.of();
 
     // Add literals from first clause, filtering out the pivot/complement
     for (BooleanFormula lit : literals1) {
-      if (!lit.equals(pivot) && !isComplement(lit, pivot, bfmgr)) {
-        combined.add(lit);
+      if (!lit.equals(pPivot) && !isComplement(lit, pPivot, pBfmgr)) {
+        tempCombined = new LinkedHashSet<>(combined);
+        tempCombined.add(lit);
+        combined = ImmutableSet.copyOf(tempCombined);
       }
     }
 
     // Add literals from second clause, filtering out the pivot/complement
     for (BooleanFormula lit : literals2) {
-      if (!lit.equals(pivot) && !isComplement(lit, pivot, bfmgr)) {
-        combined.add(lit);
+      if (!lit.equals(pPivot) && !isComplement(lit, pPivot, pBfmgr)) {
+        tempCombined = new LinkedHashSet<>(combined);
+        tempCombined.add(lit);
+        combined = ImmutableSet.copyOf(tempCombined);
       }
     }
 
     if (combined.isEmpty()) {
-      return bfmgr.makeFalse();
+      return pBfmgr.makeFalse();
     } else if (combined.size() == 1) {
       return combined.iterator().next();
     } else {
-      return bfmgr.or(new ArrayList<>(combined));
+      return pBfmgr.or(new ArrayList<>(combined));
     }
   }
 
   // Helper method to flatten an OR-formula into a list of disjunctive literals.
   // Correctly treats AND and other operators as atomic literals for resolution purposes.
   private List<BooleanFormula> flattenLiterals(
-      BooleanFormula formula, BooleanFormulaManager bfmgr) {
+      BooleanFormula pFormula, BooleanFormulaManager pBfmgr) {
     List<BooleanFormula> result = new ArrayList<>();
 
-    bfmgr.visit(
-        formula,
+    pBfmgr.visit(
+        pFormula,
         new BooleanFormulaVisitor<>() {
           @Override
-          public TraversalProcess visitOr(List<BooleanFormula> operands) {
-            for (BooleanFormula op : operands) {
-              result.addAll(flattenLiterals(op, bfmgr));
+          public TraversalProcess visitOr(List<BooleanFormula> pOperands) {
+            for (BooleanFormula op : pOperands) {
+              result.addAll(flattenLiterals(op, pBfmgr));
             }
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitAnd(List<BooleanFormula> operands) {
-            result.add(formula);
+          public TraversalProcess visitAnd(List<BooleanFormula> pOperands) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitNot(BooleanFormula operand) {
-            result.add(formula);
+          public TraversalProcess visitNot(BooleanFormula pOperand) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitAtom(
-              BooleanFormula atom, FunctionDeclaration<BooleanFormula> decl) {
-            result.add(formula);
+              BooleanFormula atom, FunctionDeclaration<BooleanFormula> pDecl) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitXor(BooleanFormula first, BooleanFormula second) {
-            result.add(formula);
+          public TraversalProcess visitXor(BooleanFormula pFirst, BooleanFormula pSecond) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitEquivalence(BooleanFormula first, BooleanFormula second) {
-            result.add(formula);
+          public TraversalProcess visitEquivalence(BooleanFormula pFirst, BooleanFormula pSecond) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitImplication(BooleanFormula first, BooleanFormula second) {
-            result.add(formula);
+          public TraversalProcess visitImplication(BooleanFormula pFirst, BooleanFormula pSecond) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitIfThenElse(
-              BooleanFormula c, BooleanFormula t, BooleanFormula e) {
-            result.add(formula);
+              BooleanFormula pI, BooleanFormula pT, BooleanFormula pE) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
           public TraversalProcess visitQuantifier(
-              Quantifier q, BooleanFormula qBody, List<Formula> vars, BooleanFormula body) {
-            result.add(formula);
+              Quantifier pQ, BooleanFormula pQBody, List<Formula> pVars, BooleanFormula pBody) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
 
           @Override
-          public TraversalProcess visitConstant(boolean value) {
-            result.add(formula);
-            return TraversalProcess.SKIP;
-          }
-
-          @Override
-          public TraversalProcess visitBoundVar(BooleanFormula var, int index) {
-            result.add(formula);
+          public TraversalProcess visitConstant(boolean pValue) {
+            result.add(pFormula);
             return TraversalProcess.SKIP;
           }
         });
@@ -274,7 +283,7 @@ class Mathsat5TheoremProver extends Mathsat5AbstractProver<Void> implements Prov
   }
 
   // Check whether two formulas are logical complements using the FormulaManager
-  private boolean isComplement(BooleanFormula a, BooleanFormula b, BooleanFormulaManager bfmgr) {
-    return bfmgr.not(a).equals(b) || bfmgr.not(b).equals(a);
+  private boolean isComplement(BooleanFormula pA, BooleanFormula pB, BooleanFormulaManager pBfmgr) {
+    return pBfmgr.not(pA).equals(pB) || pBfmgr.not(pB).equals(pA);
   }
 }

@@ -23,13 +23,10 @@ class Mathsat5ProofRule implements ProofRule {
     // proofs and terms, where terms are the pivots for the resolution. For example:
     // "res-chain p1 v p2" represents a resolution step between p1 and p2 on the pivot
     // v"
-    CLAUSE_HYP(), // " which are the clauses of the (CNF conversion of the) input problem. They have
-    // a list of terms as children"
+    CLAUSE_HYP() // " which are the clauses of the (CNF conversion of the) input problem. They have
+  // a list of terms as children"
 
-    EMPTY(); // We introduce this rule for term nodes that do not have a proof rule attached, even
-
-    // if they are pivots. In the future it might be good to a PIVOT rule so that those can have
-    // that instead.
+  ;
 
     @Override
     public String getName() {

@@ -10,6 +10,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_false;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_or;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_child;
@@ -17,16 +18,17 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proo
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_get_term;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_proof_is_term;
 
+import com.google.common.collect.ImmutableMap;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.proofs.Proof;
-import org.sosy_lab.java_smt.api.proofs.ProofFrame;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 import org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5ProofRule.Rule;
@@ -41,21 +43,22 @@ class Mathsat5Proof extends AbstractProof {
    * either a {@link ProofRule} or a {@link Formula} in a given node.
    *
    * @param pProver The prover environment.
-   * @param rootProof The root proof object.
+   * @param pRootProof The root proof object.
    * @return The proof node.
    */
-  protected static Mathsat5Proof fromMsatProof(ProverEnvironment pProver, long rootProof) {
+  protected static Mathsat5Proof fromMsatProof(ProverEnvironment pProver, long pRootProof) {
 
     Deque<MsatProofFrame> stack = new ArrayDeque<>();
-    Map<Long, Mathsat5Proof> computed = new HashMap<>();
+    Map<Long, Mathsat5Proof> tempComputed;
+    ImmutableMap<Long, Mathsat5Proof> computed = ImmutableMap.of();
 
-    stack.push(new MsatProofFrame(rootProof));
+    stack.push(new MsatProofFrame(pRootProof));
 
     while (!stack.isEmpty()) {
       MsatProofFrame frame = stack.peek();
 
       if (!frame.isVisited()) {
-        frame.setAsVisited(true);
+        frame.setAsVisited();
         String rule =
             msat_proof_get_name(frame.getProof()) == null
                 ? "null"
@@ -89,17 +92,18 @@ class Mathsat5Proof extends AbstractProof {
         stack.pop();
 
         String rule = msat_proof_get_name(frame.getProof());
-        ProofRule proofRule;
+        Optional<ProofRule> proofRule;
 
         // If the theory-lemma rule includes a last argument that is not a term, it means it has
         // a proof attached to it. Not all rules are known beforehand so they are not in the enum.
         try {
           proofRule =
-              rule == null
-                  ? Rule.EMPTY
-                  : Rule.valueOf(rule.toUpperCase(Locale.ENGLISH).replace("-", "_"));
+              Optional.ofNullable(
+                  rule == null
+                      ? null
+                      : Rule.valueOf(rule.toUpperCase(Locale.ENGLISH).replace("-", "_")));
         } catch (IllegalArgumentException e) {
-          proofRule = new Mathsat5ProofRule(rule);
+          proofRule = Optional.of(new Mathsat5ProofRule(rule));
         }
 
         Mathsat5Proof node;
@@ -122,60 +126,73 @@ class Mathsat5Proof extends AbstractProof {
             node.addChild(childNode);
           }
         }
-        computed.put(frame.getProof(), node);
+        tempComputed = new LinkedHashMap<>(computed);
+        tempComputed.put(frame.getProof(), node);
+        computed = ImmutableMap.copyOf(tempComputed);
       }
     }
-    return computed.get(rootProof);
+    assert computed.get(pRootProof) != null;
+    return computed.get(pRootProof);
   }
 
   @Nullable
   private static Formula generateFormula(
-      MsatProofFrame frame, Mathsat5TheoremProver prover, ProofRule rule) {
-    Mathsat5FormulaCreator formulaCreator = prover.creator;
+      MsatProofFrame frame, Mathsat5TheoremProver pProver, Optional<ProofRule> pRule) {
+    ProofRule rule;
+    Mathsat5FormulaCreator formulaCreator = pProver.creator;
     Formula formula = null;
     long proof = frame.getProof();
     int children = msat_proof_get_arity(proof);
     // If rule is EMPTY the proof should be a term and we encapsulate directly
-    if (rule.equals(Rule.EMPTY)) {
+    if (pRule.isEmpty()) {
       formula =
           formulaCreator.encapsulate(
               formulaCreator.getFormulaType(msat_proof_get_term(proof)),
               msat_proof_get_term(proof));
       // For clause-hype, we create the clause using the children
-    } else if (rule.equals(Rule.CLAUSE_HYP)) {
-      assert msat_proof_get_arity(proof) > 0;
-      long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
-      for (int i = 1; i < children; i++) {
-        long child = msat_proof_get_term(msat_proof_get_child(proof, i));
-        or = msat_make_or(prover.curEnv, or, child);
-      }
-      formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(or), or);
-    } else if (rule.equals(Rule.RES_CHAIN)) {
-      // Generating the formula for the resolution chain should be easier after the whole DAG is
-      // built
-    } else if (rule.equals(Rule.THEORY_LEMMA)) {
-      if (msat_proof_is_term(msat_proof_get_child(proof, 0))) {
-        long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
-        for (int i = 1; i < children; i++) {
-          if (msat_proof_is_term(msat_proof_get_child(proof, i))) {
+    } else {
+      rule = pRule.get();
+      if (rule.equals(Rule.CLAUSE_HYP)) {
+        // This solver sometimes creates empty clauses so clause-hyp nodes have no children, to
+        // solve this false is assigned as the formula of such a proof step.
+        if (msat_proof_get_arity(proof) <= 0) {
+          formula = formulaCreator.encapsulateWithTypeOf(msat_make_false(pProver.curEnv));
+        } else {
+          long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
+          for (int i = 1; i < children; i++) {
             long child = msat_proof_get_term(msat_proof_get_child(proof, i));
-            or = msat_make_or(prover.curEnv, or, child);
+            or = msat_make_or(pProver.curEnv, or, child);
           }
+          formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(or), or);
         }
-        formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(or), or);
+
+      } else if (rule.equals(Rule.RES_CHAIN)) {
+        // Generating the formula for the resolution chain should be easier after the whole DAG is
+        // built
+      } else if (rule.equals(Rule.THEORY_LEMMA)) {
+        if (msat_proof_is_term(msat_proof_get_child(proof, 0))) {
+          long or = msat_proof_get_term(msat_proof_get_child(proof, 0));
+          for (int i = 1; i < children; i++) {
+            if (msat_proof_is_term(msat_proof_get_child(proof, i))) {
+              long child = msat_proof_get_term(msat_proof_get_child(proof, i));
+              or = msat_make_or(pProver.curEnv, or, child);
+            }
+          }
+          formula = formulaCreator.encapsulate(formulaCreator.getFormulaType(or), or);
+        }
       }
     }
     return formula;
   }
 
   protected static class MsatProofFrame extends ProofFrame<Long> {
-    MsatProofFrame(Long proof) {
-      super(proof);
+    MsatProofFrame(Long pProof) {
+      super(pProof);
     }
   }
 
-  protected Mathsat5Proof(@Nullable ProofRule rule, Formula formula) {
-    super(rule, formula);
+  protected Mathsat5Proof(Optional<ProofRule> pRule, Formula pFormula) {
+    super(pRule, pFormula);
   }
 
   @Override
