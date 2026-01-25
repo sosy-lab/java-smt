@@ -200,7 +200,7 @@ jobs:
         shell: pwsh
         run: |
           $archDir = if ("${{ matrix.arch }}" -eq "arm64") { "arm64-windows" } else { "x86_64-windows" }
-          $searchPath = "lib/java/runtime-*/" + (if ("${{ matrix.arch }}" -eq "arm64") { "arm64" } else { "x64" })
+          $searchPath = "lib/java/runtime-*/" + $(if ("${{ matrix.arch }}" -eq "arm64") { "arm64" } else { "x64" })
           Get-ChildItem -Path $searchPath -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/$archDir/" -Force
 
       - name: Run tests
