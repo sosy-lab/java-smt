@@ -16,12 +16,13 @@ on:
 
 jobs:
   linux:
-    name: Linux (Java ${{ matrix.java-version }})
+    name: Linux (${{ matrix.arch }}, Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
         java-version: [11, 17, 21, 24]
-    runs-on: ubuntu-latest
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -32,6 +33,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
 
       - name: Restore Cache with Ivy and Ant
         uses: actions/cache/restore@v5
@@ -58,7 +60,7 @@ jobs:
         run: ant unit-tests-quick
         env:
           # MathSAT5 needs this to find the correct libstdc++ version, as Temurin JDKs ship a too-new version.
-          LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
+          LD_PRELOAD: /usr/lib/${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
 
       - name: Save Cache with Ivy and Ant
         uses: actions/cache/save@v5
@@ -73,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-linux-java${{ matrix.java-version }}
+          name: junit-results-linux-${{ matrix.arch }}-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
@@ -81,12 +83,13 @@ jobs:
             replay_pid*.log
 
   macos:
-    name: macOS (Java ${{ matrix.java-version }})
+    name: macOS (${{ matrix.arch }}, Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
         java-version: [11, 17, 21, 24]
-    runs-on: macos-latest
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-latest' || 'macos-15-intel' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -97,6 +100,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
 
       - name: Restore Cache with Ivy and Ant
         uses: actions/cache/restore@v5
@@ -119,8 +123,9 @@ jobs:
 
       - name: Prepare native libraries
         run: |
-          mkdir -p lib/native/arm64-macosx/
-          find lib/java -name "*.dylib" -exec cp {} lib/native/arm64-macosx/ \;
+          ARCH_DIR="${{ matrix.arch == 'arm64' && 'arm64-macosx' || 'x86_64-macosx' }}"
+          mkdir -p "lib/native/$ARCH_DIR/"
+          find lib/java -name "*.dylib" -exec cp {} "lib/native/$ARCH_DIR/" \;
 
       - name: Run tests
         run: ant unit-tests-quick
@@ -138,7 +143,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-macos-java${{ matrix.java-version }}
+          name: junit-results-macos-${{ matrix.arch }}-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
@@ -146,12 +151,13 @@ jobs:
             replay_pid*.log
 
   windows:
-    name: Windows (Java ${{ matrix.java-version }})
+    name: Windows (${{ matrix.arch }}, Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
         java-version: [11, 17, 21, 24]
-    runs-on: windows-latest
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -162,6 +168,7 @@ jobs:
         with:
           java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
 
       - name: Restore Cache with Ivy and Ant
         uses: actions/cache/restore@v5
@@ -185,7 +192,9 @@ jobs:
       - name: Prepare native libraries
         shell: pwsh
         run: |
-          Get-ChildItem -Path "lib/java" -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/x86_64-windows/" -Force
+          $archDir = if ("${{ matrix.arch }}" -eq "arm64") { "arm64-windows" } else { 
+          "x86_64-windows" }
+          Get-ChildItem -Path "lib/java" -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/$archDir/" -Force
 
       - name: Run tests
         run: ant unit-tests-quick
@@ -203,7 +212,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-windows-java${{ matrix.java-version }}
+          name: junit-results-windows-${{ matrix.arch }}-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
