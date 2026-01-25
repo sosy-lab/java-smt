@@ -51,6 +51,13 @@ jobs:
       - name: Build dependencies
         run: ant build-dependencies
 
+      - name: Debug info
+        run: |
+          java -version
+          javac -version
+          ant -version
+          ldd lib/native/x86_64-linux/*so
+
       - name: Build project
         run: ant build
 
