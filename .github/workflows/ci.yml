@@ -56,6 +56,9 @@ jobs:
 
       - name: Run tests
         run: ant unit-tests-quick
+        env:
+          # MathSAT5 needs this to find the correct libstdc++ version, as Temurin JDKs ship a too-new version.
+          LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
       - name: Save Cache with Ivy and Ant
         uses: actions/cache/save@v4
