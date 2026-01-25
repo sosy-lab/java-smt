@@ -124,8 +124,9 @@ jobs:
       - name: Prepare native libraries
         run: |
           ARCH_DIR="${{ matrix.arch == 'arm64' && 'arm64-macosx' || 'x86_64-macosx' }}"
+          SEARCH_PATH="lib/java/runtime-*/${{ matrix.arch == 'arm64' && 'arm64' || 'x64' }}"
           mkdir -p "lib/native/$ARCH_DIR/"
-          find lib/java -name "*.dylib" -exec cp {} "lib/native/$ARCH_DIR/" \;
+          find $SEARCH_PATH -name "*.dylib" -exec cp {} "lib/native/$ARCH_DIR/" \;
 
       - name: Run tests
         run: ant unit-tests-quick
@@ -198,9 +199,9 @@ jobs:
       - name: Prepare native libraries
         shell: pwsh
         run: |
-          $archDir = if ("${{ matrix.arch }}" -eq "arm64") { "arm64-windows" } else { 
-          "x86_64-windows" }
-          Get-ChildItem -Path "lib/java" -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/$archDir/" -Force
+          $archDir = if ("${{ matrix.arch }}" -eq "arm64") { "arm64-windows" } else { "x86_64-windows" }
+          $searchPath = "lib/java/runtime-*/" + (if ("${{ matrix.arch }}" -eq "arm64") { "arm64" } else { "x64" })
+          Get-ChildItem -Path $searchPath -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/$archDir/" -Force
 
       - name: Run tests
         run: ant unit-tests-quick
