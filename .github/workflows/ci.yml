@@ -23,18 +23,18 @@ jobs:
         java: [11, 17, 21]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ~/.ivy2/cache
@@ -61,7 +61,7 @@ jobs:
           LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
       - name: Save Cache with Ivy and Ant
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: always() # also on error
         with:
           path: |
@@ -70,7 +70,7 @@ jobs:
           key: linux-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: junit-results-linux-java${{ matrix.java }}
@@ -88,18 +88,18 @@ jobs:
         java: [11, 17, 21]
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             ~/.ivy2/cache
@@ -126,7 +126,7 @@ jobs:
         run: ant unit-tests-quick
 
       - name: Save Cache with Ivy and Ant
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: always() # also on error
         with:
           path: |
@@ -135,7 +135,7 @@ jobs:
           key: macos-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: junit-results-macos-java${{ matrix.java }}
@@ -153,18 +153,18 @@ jobs:
         java: [11, 17, 21]
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: |
             C:\Users\runneradmin\.ivy2\cache
@@ -191,7 +191,7 @@ jobs:
         run: ant unit-tests-quick
 
       - name: Save Cache with Ivy and Ant
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         if: always() # also on error
         with:
           path: |
@@ -200,7 +200,7 @@ jobs:
           key: windows-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: junit-results-windows-java${{ matrix.java }}
