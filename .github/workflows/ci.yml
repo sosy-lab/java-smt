@@ -155,8 +155,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java-version: [11, 17, 21, 24]
-        arch: [x64, arm64]
+        include:
+          # GithubCI does not support Windows ARM64 runners with all JDKs, so we list them explicitly.
+          - { arch: x64, java-version: 11 }
+          - { arch: x64, java-version: 17 }
+          - { arch: x64, java-version: 21 }
+          - { arch: x64, java-version: 24 }
+          - { arch: arm64, java-version: 21 }
+          - { arch: arm64, java-version: 23 }
     runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
     steps:
       - uses: actions/checkout@v6
