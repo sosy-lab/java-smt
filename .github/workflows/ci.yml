@@ -16,21 +16,21 @@ on:
 
 jobs:
   linux:
-    name: Linux (Java ${{ matrix.java }})
+    name: Linux (Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
-        java: [11, 17, 21]
+        java-version: [11, 17, 21]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Set up JDK ${{ matrix.java }}
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
@@ -73,7 +73,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-linux-java${{ matrix.java }}
+          name: junit-results-linux-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
@@ -81,21 +81,21 @@ jobs:
             replay_pid*.log
 
   macos:
-    name: macOS (Java ${{ matrix.java }})
+    name: macOS (Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
-        java: [11, 17, 21]
+        java-version: [11, 17, 21]
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Set up JDK ${{ matrix.java }}
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
@@ -138,7 +138,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-macos-java${{ matrix.java }}
+          name: junit-results-macos-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
@@ -146,21 +146,21 @@ jobs:
             replay_pid*.log
 
   windows:
-    name: Windows (Java ${{ matrix.java }})
+    name: Windows (Java ${{ matrix.java-version }})
     strategy:
       fail-fast: false
       matrix:
-        java: [11, 17, 21]
+        java-version: [11, 17, 21]
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - name: Set up JDK ${{ matrix.java }}
+      - name: Set up JDK ${{ matrix.java-version }}
         uses: actions/setup-java@v5
         with:
-          java-version: ${{ matrix.java }}
+          java-version: ${{ matrix.java-version }}
           distribution: 'temurin'
 
       - name: Restore Cache with Ivy and Ant
@@ -203,7 +203,7 @@ jobs:
         uses: actions/upload-artifact@v6
         if: always()
         with:
-          name: junit-results-windows-java${{ matrix.java }}
+          name: junit-results-windows-java${{ matrix.java-version }}
           path: |
             junit/TEST-*.xml
             JUnit.html
