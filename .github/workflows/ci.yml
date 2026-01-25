@@ -41,9 +41,9 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: linux-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
           restore-keys: |
-            linux-${{ matrix.arch }}-ivy-
+            linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
             linux-ivy-
 
       - name: Install Ant
@@ -70,7 +70,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: linux-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v6
@@ -109,9 +109,9 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: macos-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
           restore-keys: |
-            macos-${{ matrix.arch }}-ivy-
+            macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
             macos-ivy-
 
       - name: Install Ant
@@ -140,7 +140,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: macos-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v6
@@ -185,9 +185,9 @@ jobs:
           path: |
             C:\Users\runneradmin\.ivy2\cache
             C:\Users\runneradmin\.ant\lib
-          key: windows-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
           restore-keys: |
-            windows-${{ matrix.arch }}-ivy-
+            windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
             windows-ivy-
 
       - name: Install Ant
@@ -216,7 +216,7 @@ jobs:
           path: |
             C:\Users\runneradmin\.ivy2\cache
             C:\Users\runneradmin\.ant\lib
-          key: windows-${{ matrix.arch }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v6
