@@ -39,7 +39,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: linux-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: linux-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
           restore-keys: |
             linux-ivy-
 
@@ -67,7 +67,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: linux-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: linux-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -104,7 +104,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: macos-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: macos-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
           restore-keys: |
             macos-ivy-
 
@@ -132,7 +132,7 @@ jobs:
           path: |
             ~/.ivy2/cache
             ~/.ant/lib
-          key: macos-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: macos-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
@@ -169,7 +169,7 @@ jobs:
           path: |
             C:\Users\runneradmin\.ivy2\cache
             C:\Users\runneradmin\.ant\lib
-          key: windows-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: windows-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
           restore-keys: |
             windows-ivy-
 
@@ -197,7 +197,7 @@ jobs:
           path: |
             C:\Users\runneradmin\.ivy2\cache
             C:\Users\runneradmin\.ant\lib
-          key: windows-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          key: windows-ivy-${{ hashFiles('build.xml', 'build/build-ivy.xml') }}
 
       - name: Archive Test Results
         uses: actions/upload-artifact@v4
