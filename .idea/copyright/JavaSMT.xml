@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
 
 <component name="CopyrightManager">
   <copyright>
-    <option name="notice" value="This file is part of JavaSMT,&#10;an API wrapper for a collection of SMT solvers:&#10;https://github.com/sosy-lab/java-smt&#10;&#10;SPDX-FileCopyrightText: 2024 Dirk Beyer &lt;https://www.sosy-lab.org&gt;&#10;&#10;SPDX-License-Identifier: Apache-2.0" />
+    <option name="notice" value="This file is part of JavaSMT,&#10;an API wrapper for a collection of SMT solvers:&#10;https://github.com/sosy-lab/java-smt&#10;&#10;SPDX-FileCopyrightText: &amp;#36;today.year Dirk Beyer &lt;https://www.sosy-lab.org&gt;&#10;&#10;SPDX-License-Identifier: Apache-2.0" />
     <option name="myName" value="JavaSMT" />
   </copyright>
 </component>
