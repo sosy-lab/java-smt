@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 /** A proof of unsatisfiability returned by CVC5 transformed to the general proof API. */
-public class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
+public final class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
 
   static CVC5Proof generateProofImpl(
       io.github.cvc5.Proof pProof, CVC5FormulaCreator pFormulaCreator) throws CVC5ApiException {
