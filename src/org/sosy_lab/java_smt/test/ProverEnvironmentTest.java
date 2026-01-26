@@ -322,7 +322,11 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       Proof proof = prover.getProof();
+      if (solverToUse().equals(MATHSAT5))
+        throw new AssertionError("Expected " + "UnsupportedOperationException was not thrown");
       assertThat(proof).isNotNull();
+    } catch (UnsupportedOperationException e) {
+      assertThat(solverToUse().equals(MATHSAT5));
     }
   }
 
