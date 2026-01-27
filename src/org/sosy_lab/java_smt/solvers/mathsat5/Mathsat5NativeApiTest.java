@@ -9,13 +9,16 @@
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_assert_formula;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_check_sat;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_config;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_env;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_create_shared_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_arity;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_decl_get_name;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_config;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_env;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_model_iterator;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_destroy_proof_manager;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_from_smtlib2;
@@ -33,6 +36,7 @@ import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_eq;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_equal;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_exp;
+import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_false;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_log;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_not;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.msat_make_number;
@@ -99,7 +103,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
   }
 
   @Test
-  public void proofTest() throws IllegalStateException, InterruptedException, SolverException {
+  public void proofTest() throws SolverException, InterruptedException {
     long cfg = msat_create_config();
 
     msat_set_option_checked(cfg, "proof_generation", "true");
@@ -107,20 +111,108 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
     env = msat_create_env(cfg);
     msat_destroy_config(cfg);
 
-    const0 = msat_make_number(env, "0");
-    const1 = msat_make_number(env, "1");
-    long rationalType = msat_get_rational_type(env);
-    var = msat_make_variable(env, "rat", rationalType);
+    testProofManager(env);
+  }
 
-    msat_push_backtrack_point(env);
+  // Tests if it is possible to enable proof generation in a shared environment after it was not
+  // enabled in the original
+  @Test
+  public void proofSharedEnvironmentTest() throws SolverException, InterruptedException {
+    long cfg = msat_create_config();
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
 
-    msat_assert_formula(env, msat_make_equal(env, var, const0));
-    msat_assert_formula(env, msat_make_equal(env, var, const1));
+    cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    long sharedEnv = msat_create_shared_env(cfg, env);
+    msat_destroy_config(cfg);
+
+    testProofManager(sharedEnv);
+  }
+
+  // MathSAT5 can not produce a msat_manager because there is no proof in this case. See
+  // ProverEnvironmentTest class
+  @SuppressWarnings("CheckReturnValue")
+  @Test
+  public void testProofOfFalse() throws SolverException, InterruptedException {
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    env = msat_create_env(cfg);
+    msat_destroy_config(cfg);
+
+    long bottom = msat_make_false(env);
+    msat_assert_formula(env, bottom);
+    boolean isSat = msat_check_sat(env);
+    assertThat(isSat).isFalse();
+
+    assertThrows(IllegalArgumentException.class, () -> msat_get_proof_manager(env));
+  }
+
+  @Test
+  public void apiExampleProofTest() throws SolverException, InterruptedException {
+
+    long cfg = msat_create_config();
+    msat_set_option_checked(cfg, "proof_generation", "true");
+    msat_set_option_checked(cfg, "preprocessor.toplevel_propagation", "false");
+    msat_set_option_checked(cfg, "preprocessor.simplification", "0");
+    msat_set_option_checked(cfg, "theory.bv.eager", "false"); // for BV, only the lazy solver is
+
+    msat_set_option_checked(cfg, "theory.fp.mode", "2");
+
+    long localEnv = msat_create_env(cfg);
+    msat_destroy_config(cfg);
+
+    long f;
+
+    String smtlib2 =
+        "(declare-fun x1 () Real)"
+            + "(declare-fun x2 () Real)"
+            + "(declare-fun x3 () Real)"
+            + "(declare-fun y1 () Real)"
+            + "(declare-fun y2 () Real)"
+            + "(declare-fun y3 () Real)"
+            + "(declare-fun b () Real)"
+            + "(declare-fun f (Real) Real)"
+            + "(declare-fun g (Real) Real)"
+            + "(declare-fun a () Bool)"
+            + "(declare-fun c () Bool)"
+            + "(assert (and a (= (+ (f y1) y2) y3) (<= y1 x1)))"
+            + "(assert (and (= x2 (g b)) (= y2 (g b)) (<= x1 y1) (< x3 y3)))"
+            + "(assert (= a (= (+ (f x1) x2) x3)))"
+            + "(assert (and (or a c) (not c)))";
+    f = msat_from_smtlib2(localEnv, smtlib2);
+
+    msat_assert_formula(localEnv, f);
+
+    boolean isSat = msat_check_sat(localEnv);
+
+    assertThat(isSat).isFalse();
+
+    long pm = msat_get_proof_manager(localEnv);
+
+    long proof = msat_get_proof(pm);
+
+    assertThat(msat_proof_is_term(proof)).isFalse();
+
+    msat_destroy_proof_manager(pm);
+    msat_destroy_env(localEnv);
+  }
+
+  private void testProofManager(long testEnv) throws SolverException, InterruptedException {
+    const0 = msat_make_number(testEnv, "0");
+    const1 = msat_make_number(testEnv, "1");
+    long rationalType = msat_get_rational_type(testEnv);
+    var = msat_make_variable(testEnv, "rat", rationalType);
+
+    msat_push_backtrack_point(testEnv);
+
+    msat_assert_formula(testEnv, msat_make_equal(testEnv, var, const0));
+    msat_assert_formula(testEnv, msat_make_equal(testEnv, var, const1));
 
     // UNSAT
-    assertThat(msat_check_sat(env)).isFalse();
+    assertThat(msat_check_sat(testEnv)).isFalse();
 
-    long proofMgr = msat_get_proof_manager(env);
+    long proofMgr = msat_get_proof_manager(testEnv);
     long proof = msat_get_proof(proofMgr);
 
     assertThat(msat_proof_is_term(proof)).isFalse();
@@ -208,7 +300,7 @@ public class Mathsat5NativeApiTest extends Mathsat5AbstractNativeApiTest {
 
   /** Similar problem as sin(pi); Calculates endlessly (even asin(0) == 0). */
   @Ignore
-  public void asinTest() throws IllegalStateException, InterruptedException, SolverException {
+  public void asinTest() throws SolverException, InterruptedException {
     long asin = msat_make_asin(env, var);
 
     msat_push_backtrack_point(env);
