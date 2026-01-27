@@ -185,8 +185,7 @@ SPDX-License-Identifier: Apache-2.0
             <arg value="bitwuzla.i"/>
         </exec>
 
-        <!-- Apply patch for the phantom reference issue: Sorts and Terms are currently not being deleted, even when the TermManager is closed-->
-        <!-- FIXME: This will lead to memory leaks. We should look for a proper fix. -->
+        <!-- Apply patch to fix memory management issues -->
         <exec executable="patch" failonerror="true">
             <arg value="-p0"/>
             <arg value="--no-backup-if-mismatch"/>
@@ -198,7 +197,7 @@ SPDX-License-Identifier: Apache-2.0
     <target name="build-bitwuzla-bindings-jni" depends="build-bitwuzla-wrapper">
         <!-- compile java proxies and create jar file -->
         <mkdir dir="${source.path}/build"/>
-        <javac release="11" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
+        <javac release="11" debug="true" srcdir="${source.path}/src/" destdir="${source.path}/build" includeantruntime="false" failonerror="true">
             <include name="org/sosy_lab/java_smt/solvers/bitwuzla/api/*.java"/>
         </javac>
         <jar destfile="${bitwuzla.dist.dir}/bitwuzla-${bitwuzla.version}.jar" basedir="${source.path}/build"/>

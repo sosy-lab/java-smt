@@ -16,36 +16,19 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class Bitwuzla {
-  private transient long swigCPtr;
-  private transient boolean swigCMemOwn;
+public class Bitwuzla extends AbstractReference {
 
   protected Bitwuzla(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+    super(cPtr, cMemoryOwn);
   }
 
   protected static long getCPtr(Bitwuzla obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected void swigSetCMemOwn(boolean own) {
-    swigCMemOwn = own;
-  }
-
-  @SuppressWarnings({"deprecation", "removal"})
-  protected void finalize() {
-    delete();
-  }
-
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        BitwuzlaNativeJNI.delete_Bitwuzla(swigCPtr);
-      }
-      swigCPtr = 0;
-    }
+  @Override
+  void deleteCPtr() {
+    BitwuzlaNativeJNI.delete_Bitwuzla(swigCPtr);
   }
 
   public Bitwuzla(TermManager tm, Options options) {
