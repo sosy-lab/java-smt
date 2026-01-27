@@ -13,6 +13,7 @@ import static org.junit.Assert.assertThrows;
 
 import com.google.common.base.Preconditions;
 import io.github.cvc5.CVC5ApiException;
+import io.github.cvc5.Context;
 import io.github.cvc5.Kind;
 import io.github.cvc5.Op;
 import io.github.cvc5.Proof;
@@ -94,8 +95,7 @@ public class CVC5NativeAPITest {
 
   @After
   public void freeEnvironment() {
-    solver.deletePointer();
-    termManager.deletePointer();
+    Context.deletePointers();
   }
 
   /*
