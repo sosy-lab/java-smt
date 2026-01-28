@@ -151,7 +151,7 @@ class Mathsat5Proof extends AbstractProof {
               msat_proof_get_term(proof));
       // For clause-hype, we create the clause using the children
     } else {
-      rule = pRule.get();
+      rule = pRule.orElseThrow();
       if (rule.equals(Rule.CLAUSE_HYP)) {
         // This solver sometimes creates empty clauses so clause-hyp nodes have no children, to
         // solve this false is assigned as the formula of such a proof step.
