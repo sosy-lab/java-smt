@@ -220,7 +220,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
     }
   }
 
@@ -285,7 +285,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Retrieve and verify proof
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
     }
   }
 
@@ -343,7 +343,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
     }
   }
 
@@ -367,7 +367,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
 
       // assert integer formulas and test again
       prover.addConstraint(imgr.equal(x1, two));
@@ -377,7 +377,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof secondProof = prover.getProof();
-      checkProof(secondProof);
+      verifyProofObjectValidity(secondProof);
 
       assertThat(proof).isNotEqualTo(secondProof);
     }
@@ -406,7 +406,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
 
       prover.pop();
       prover.pop();
@@ -420,7 +420,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof secondProof = prover.getProof();
-      checkProof(secondProof);
+      verifyProofObjectValidity(secondProof);
 
       assertThat(proof).isNotEqualTo(secondProof);
     }
@@ -482,7 +482,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
     }
   }
 
@@ -512,12 +512,12 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
 
       // Test getProof()
       Proof proof = prover.getProof();
-      checkProof(proof);
+      verifyProofObjectValidity(proof);
     }
   }
 
   // Traverses a proof and asserts that certain values are not null, instances, etc.
-  private void checkProof(Proof pRoot) {
+  private void verifyProofObjectValidity(Proof pRoot) {
     assertThat(pRoot).isNotNull();
 
     Deque<Proof> stack = new ArrayDeque<>();
