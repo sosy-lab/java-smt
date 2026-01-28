@@ -516,7 +516,15 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
     }
   }
 
-  // Traverses a proof and asserts that certain values are not null, instances, etc.
+  /**
+   * Helper function that tests that every proof has valid information stored (proof rules,
+   * formulas, successors).
+   *
+   * <p>In this case a formula must be present, because only CVC5 is implemented. However, the
+   * implementation of solvers which not always expose a formula is a work in progress.
+   *
+   * @param pRoot the root of the proof DAG to be tested.
+   */
   private void verifyProofObjectValidity(Proof pRoot) {
     assertThat(pRoot).isNotNull();
 
