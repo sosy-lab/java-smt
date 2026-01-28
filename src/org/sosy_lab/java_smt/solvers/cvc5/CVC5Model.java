@@ -19,9 +19,12 @@ import io.github.cvc5.Solver;
 import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
@@ -50,20 +53,42 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     return solver.getValue(f);
   }
 
+  private Set<Term> collectModelTerms(Collection<Term> asserted) {
+    ImmutableSet.Builder<Term> builder = ImmutableSet.builder();
+    var cache = new HashSet<Term>();
+    var work = new ArrayDeque<Term>();
+    work.addAll(asserted);
+    while (!work.isEmpty()) {
+      var term = work.pop();
+      if (!cache.contains(term)) {
+        cache.add(term);
+        var kind = term.getKind();
+        if (kind == Kind.CONSTANT) {
+          builder.add(term);
+        } else if (kind == Kind.APPLY_UF) {
+          builder.add(term);
+          for (int c = 1; c < term.getNumChildren(); c++) {
+            work.push(term.getChild(c));
+          }
+        } else {
+          for (int c = 0; c < term.getNumChildren(); c++) {
+            work.push(term.getChild(c));
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+
   private ImmutableList<ValueAssignment> generateModel(Collection<Term> assertedExpressions) {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    for (Term expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(
-          expr,
-          true,
-          (name, f) -> {
-            try {
-              builder.addAll(getAssignments(f));
-            } catch (CVC5ApiException e) {
-              throw new IllegalArgumentException(
-                  "Failure when retrieving assignments for term '" + f + "'.", e);
-            }
-          });
+    for (Term symbol : collectModelTerms(assertedExpressions)) {
+      try {
+        builder.addAll(getAssignments(symbol));
+      } catch (CVC5ApiException e) {
+        throw new IllegalArgumentException(
+            "Failure when retrieving assignments for term '" + symbol + "'.", e);
+      }
     }
     return builder.build().asList();
   }
@@ -205,10 +230,6 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     }
 
     // handle simple assignments
-    ImmutableList.Builder<Object> argumentInterpretationBuilder = ImmutableList.builder();
-    for (int i = 0; i < pKeyTerm.getNumChildren(); i++) {
-      argumentInterpretationBuilder.add(evaluateImpl(pKeyTerm.getChild(i)));
-    }
     return ImmutableList.of(
         new ValueAssignment(
             creator.encapsulateWithTypeOf(pKeyTerm),
@@ -216,7 +237,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
             creator.encapsulateBoolean(termManager.mkTerm(Kind.EQUAL, pKeyTerm, valueTerm)),
             ((CVC5FormulaCreator) creator).getName(pKeyTerm),
             creator.convertValue(pKeyTerm, valueTerm),
-            argumentInterpretationBuilder.build()));
+            ImmutableList.of()));
   }
 
   @Override
