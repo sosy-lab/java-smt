@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.basicimpl;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
 import com.google.common.collect.ImmutableMap;
@@ -323,12 +322,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BitvectorFormula bvFormula =
         bvMgr.makeVariable(1 + exponentSize + mantissaSizeWithoutHiddenBit, bitvectorConstantName);
 
-    // When building new Fp types, we don't include the sign bit
-    FloatingPointFormula fromIeeeBitvector =
-        fromIeeeBitvector(
-            bvFormula,
-            getFloatingPointTypeFromSizesWithoutHiddenBit(
-                exponentSize, mantissaSizeWithoutHiddenBit));
+    FloatingPointFormula fromIeeeBitvector = fromIeeeBitvector(bvFormula, fpType);
 
     // assignment() allows a value to be NaN etc.
     // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
@@ -336,10 +330,8 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
     // Build special numbers so that we can compare them in the map
-    FloatingPointType type =
-        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit);
     Set<FloatingPointFormula> specialNumbers =
-        ImmutableSet.of(makeNaN(type), makePlusInfinity(type), makeMinusInfinity(type));
+        ImmutableSet.of(makeNaN(fpType), makePlusInfinity(fpType), makeMinusInfinity(fpType));
 
     BitvectorFormula toIeeeBv = bvFormula;
     for (Entry<FloatingPointFormula, BitvectorFormula> entry :
