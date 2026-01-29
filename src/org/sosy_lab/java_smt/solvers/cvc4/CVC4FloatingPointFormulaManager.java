@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
 import edu.stanford.CVC4.Expr;

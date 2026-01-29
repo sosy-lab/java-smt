@@ -353,11 +353,9 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
     FormulaType.FloatingPointType fpType =
         (FloatingPointType) getFormulaCreator().getFormulaType(f);
-    // The BV is sign bit + exponent + mantissa without hidden bit
-    int mantissaSizeWithoutHiddenBit = fpType.getMantissaSizeWithoutHiddenBit();
-    int exponentSize = fpType.getExponentSize();
-    BitvectorFormula bvFormula =
-        bvMgr.makeVariable(1 + exponentSize + mantissaSizeWithoutHiddenBit, bitvectorConstantName);
+    // The BV is sign bit + exponent + mantissa without hidden bit, which is always equal to the
+    // total size as defined in SMTLIB2 with exponent + mantissa with hidden bit
+    BitvectorFormula bvFormula = bvMgr.makeVariable(fpType.getTotalSize(), bitvectorConstantName);
 
     FloatingPointFormula fromIeeeBitvector = fromIeeeBitvector(bvFormula, fpType);
 
