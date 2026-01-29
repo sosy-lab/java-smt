@@ -364,15 +364,18 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
   }
 
-  @Override
-  public int getMantissaSizeWithSignBit(FloatingPointFormula f) {
-    return getMantissaSizeWithSignBitImpl(extractInfo(f));
+  /**
+   * Returns the bit size of the mantissa with the hidden bit of a given {@link
+   * FloatingPointFormula}.
+   */
+  private int getMantissaSizeWithHiddenBit(FloatingPointFormula f) {
+    return getMantissaSizeWithHiddenBitImpl(extractInfo(f));
   }
 
-  protected abstract int getMantissaSizeWithSignBitImpl(TFormulaInfo f);
+  protected abstract int getMantissaSizeWithHiddenBitImpl(TFormulaInfo f);
 
-  @Override
-  public int getExponentSize(FloatingPointFormula f) {
+  /** Returns the bit size of the exponent of a given {@link FloatingPointFormula}. */
+  private int getExponentSize(FloatingPointFormula f) {
     return getExponentSizeImpl(extractInfo(f));
   }
 

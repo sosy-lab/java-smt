@@ -163,7 +163,7 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
-  protected int getMantissaSizeWithSignBitImpl(Term fp) {
+  protected int getMantissaSizeWithHiddenBitImpl(Term fp) {
     return fp.sort().fp_sig_size();
   }
 

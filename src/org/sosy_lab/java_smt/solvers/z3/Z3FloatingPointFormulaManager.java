@@ -336,7 +336,7 @@ class Z3FloatingPointFormulaManager
   }
 
   @Override
-  protected int getMantissaSizeWithSignBitImpl(Long f) {
+  protected int getMantissaSizeWithHiddenBitImpl(Long f) {
     return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
   }
 

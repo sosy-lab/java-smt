@@ -449,7 +449,7 @@ public class CVC5FloatingPointFormulaManager
   }
 
   @Override
-  protected int getMantissaSizeWithSignBitImpl(Term f) {
+  protected int getMantissaSizeWithHiddenBitImpl(Term f) {
     Sort sort = f.getSort();
     return sort.getFloatingPointSignificandSize();
   }
