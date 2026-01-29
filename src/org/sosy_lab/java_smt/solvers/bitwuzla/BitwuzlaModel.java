@@ -59,8 +59,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
     work.addAll(asserted);
     while (!work.isEmpty()) {
       var term = work.pop();
-      if (!cache.contains(term)) {
-        cache.add(term);
+      if (cache.add(term)) {
         var kind = term.kind();
         if (kind == Kind.CONSTANT) {
           builder.add(term);

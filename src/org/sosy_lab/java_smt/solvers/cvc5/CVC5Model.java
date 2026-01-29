@@ -60,8 +60,7 @@ public class CVC5Model extends AbstractModel<Term, Sort, TermManager> {
     work.addAll(asserted);
     while (!work.isEmpty()) {
       var term = work.pop();
-      if (!cache.contains(term)) {
-        cache.add(term);
+      if (cache.add(term)) {
         var kind = term.getKind();
         if (kind == Kind.CONSTANT) {
           builder.add(term);
