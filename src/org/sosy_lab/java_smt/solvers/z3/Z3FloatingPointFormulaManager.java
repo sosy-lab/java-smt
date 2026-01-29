@@ -334,14 +334,4 @@ class Z3FloatingPointFormulaManager
   protected Long round(Long pFormula, FloatingPointRoundingMode pRoundingMode) {
     return Native.mkFpaRoundToIntegral(z3context, getRoundingModeImpl(pRoundingMode), pFormula);
   }
-
-  @Override
-  protected int getMantissaSizeWithHiddenBitImpl(Long f) {
-    return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Long f) {
-    return Native.fpaGetSbits(z3context, Native.getSort(z3context, f));
-  }
 }

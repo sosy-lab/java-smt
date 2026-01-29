@@ -302,7 +302,6 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType();
     return new Mathsat5FloatingPointFormula(pTerm);
   }
 

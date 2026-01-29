@@ -208,16 +208,6 @@ class Z3LegacyFloatingPointFormulaManager
   }
 
   @Override
-  protected int getMantissaSizeWithHiddenBitImpl(Long f) {
-    return Native.fpaGetEbits(z3context, Native.getSort(z3context, f));
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Long f) {
-    return Native.fpaGetSbits(z3context, Native.getSort(z3context, f));
-  }
-
-  @Override
   protected Long negate(Long pNumber) {
     return Native.mkFpaNeg(z3context, pNumber);
   }

@@ -368,7 +368,6 @@ class Z3LegacyFormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Long pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType();
     cleanupReferences();
     return storePhantomReference(new Z3FloatingPointLegacyFormula(getEnv(), pTerm), pTerm);
   }

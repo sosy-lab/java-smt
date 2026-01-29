@@ -166,10 +166,6 @@ public abstract class FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> {
   }
 
   protected FloatingPointFormula encapsulateFloatingPoint(TFormulaInfo pTerm) {
-    checkArgument(
-        getFormulaType(pTerm).isFloatingPointType(),
-        "Floatingpoint formula has unexpected type: %s",
-        getFormulaType(pTerm));
     return new FloatingPointFormulaImpl<>(pTerm);
   }
 

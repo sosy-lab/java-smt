@@ -8,7 +8,6 @@
 
 package org.sosy_lab.java_smt.solvers.cvc4;
 
-import static com.google.common.base.Preconditions.checkArgument;
 
 import com.google.common.collect.ImmutableList;
 import edu.stanford.CVC4.BitVector;
@@ -377,21 +376,5 @@ public class CVC4FloatingPointFormulaManager
   @Override
   protected Expr round(Expr pFormula, FloatingPointRoundingMode pRoundingMode) {
     return exprManager.mkExpr(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
-  }
-
-  @Override
-  protected int getMantissaSizeWithHiddenBitImpl(Expr f) {
-    Type type = f.getType();
-    checkArgument(type.isFloatingPoint());
-    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
-    return (int) fpType.getSignificandSize();
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Expr f) {
-    Type type = f.getType();
-    checkArgument(type.isFloatingPoint());
-    edu.stanford.CVC4.FloatingPointType fpType = new edu.stanford.CVC4.FloatingPointType(type);
-    return (int) fpType.getExponentSize();
   }
 }

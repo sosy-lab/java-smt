@@ -163,16 +163,6 @@ public class BitwuzlaFloatingPointManager
   }
 
   @Override
-  protected int getMantissaSizeWithHiddenBitImpl(Term fp) {
-    return fp.sort().fp_sig_size();
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Term fp) {
-    return fp.sort().fp_exp_size();
-  }
-
-  @Override
   protected Term castFromImpl(
       Term pNumber, boolean pSigned, FloatingPointType pTargetType, Term pRoundingMode) {
     FormulaType<?> formulaType = getFormulaCreator().getFormulaType(pNumber);

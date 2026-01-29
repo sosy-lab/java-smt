@@ -447,16 +447,4 @@ public class CVC5FloatingPointFormulaManager
   protected Term round(Term pFormula, FloatingPointRoundingMode pRoundingMode) {
     return termManager.mkTerm(Kind.FLOATINGPOINT_RTI, getRoundingModeImpl(pRoundingMode), pFormula);
   }
-
-  @Override
-  protected int getMantissaSizeWithHiddenBitImpl(Term f) {
-    Sort sort = f.getSort();
-    return sort.getFloatingPointSignificandSize();
-  }
-
-  @Override
-  protected int getExponentSizeImpl(Term f) {
-    Sort sort = f.getSort();
-    return sort.getFloatingPointExponentSize();
-  }
 }
