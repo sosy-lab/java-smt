@@ -1173,6 +1173,9 @@ public class InterpolatingProverTest
       case Z3:
         p3 = 12345;
         break;
+      case CVC4:
+        p3 = 12345;
+        break;
       default:
         p3 = null; // unexpected solver for interpolation
     }
