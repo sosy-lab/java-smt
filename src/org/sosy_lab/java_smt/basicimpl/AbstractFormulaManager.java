@@ -415,7 +415,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     try {
       return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
     } catch (IllegalArgumentException illegalArgumentException) {
-      if (illegalArgumentException.getMessage().contains("fp.as_ieee_bv")) {
+      if (illegalArgumentException.getMessage() != null
+          && illegalArgumentException.getMessage().contains("fp.as_ieee_bv")) {
         String additionalMessage =
             "; Note: operation 'fp.as_ieee_bv' is not supported in most SMT solvers. Instead, try"
                 + " utilizing the SMTLIB2 keyword 'to_fp' which is supported in most SMT solvers"
