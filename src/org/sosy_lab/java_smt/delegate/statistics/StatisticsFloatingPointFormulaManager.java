@@ -384,16 +384,4 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
     stats.fpOperations.getAndIncrement();
     return delegate.isNegative(pNumber);
   }
-
-  @Override
-  public int getMantissaSizeWithSignBit(FloatingPointFormula pNumber) {
-    stats.fpOperations.getAndIncrement();
-    return delegate.getMantissaSizeWithSignBit(pNumber);
-  }
-
-  @Override
-  public int getExponentSize(FloatingPointFormula pNumber) {
-    stats.fpOperations.getAndIncrement();
-    return delegate.getExponentSize(pNumber);
-  }
 }

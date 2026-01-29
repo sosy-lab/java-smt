@@ -549,13 +549,4 @@ public interface FloatingPointFormulaManager {
    * </ul>
    */
   BooleanFormula isNegative(FloatingPointFormula number);
-
-  /**
-   * Returns the size of the mantissa (also called a coefficient or significant), including the sign
-   * bit, for the given {@link FloatingPointFormula}.
-   */
-  int getMantissaSizeWithSignBit(FloatingPointFormula number);
-
-  /** Returns the size of the exponent for the given {@link FloatingPointFormula}. */
-  int getExponentSize(FloatingPointFormula number);
 }

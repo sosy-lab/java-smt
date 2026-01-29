@@ -914,8 +914,6 @@ public class FloatingPointFormulaManagerTest
     var singlePrec = FormulaType.getSinglePrecisionFloatingPointType();
     var fpSinglePrec = fpmgr.makeNumber(0.0, singlePrec);
     // Sizes of the type and the actual term should match
-    assertThat(fpmgr.getExponentSize(fpSinglePrec)).isEqualTo(8);
-    assertThat(fpmgr.getMantissaSizeWithSignBit(fpSinglePrec)).isEqualTo(24);
     assertThat(singlePrec.getExponentSize()).isEqualTo(8);
     assertThat(singlePrec.getMantissaSizeWithHiddenBit()).isEqualTo(24);
     assertThat(singlePrec.getExponentSize() + singlePrec.getMantissaSizeWithHiddenBit())
@@ -1962,8 +1960,6 @@ public class FloatingPointFormulaManagerTest
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, singlePrecType);
-          assertThat(fpmgr.getMantissaSizeWithSignBit(fpFromBv) + fpmgr.getExponentSize(fpFromBv))
-              .isEqualTo(singlePrecType.getTotalSize());
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
                   sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), singlePrecType);
@@ -1972,8 +1968,6 @@ public class FloatingPointFormulaManagerTest
           assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())
               .isEqualTo(singlePrecType.getMantissaSizeWithHiddenBit() - 1);
           final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
-          assertThat(fpmgr.getMantissaSizeWithSignBit(fp1) + fpmgr.getExponentSize(fp1))
-              .isEqualTo(singlePrecType.getTotalSize());
           final FloatingPointFormula fp2 = fpmgr.makeNumber(pFloat, singlePrecType);
           final BooleanFormula assignment1 = fpmgr.assignment(fpFromBv, fp1);
           final BooleanFormula assignment2 = fpmgr.assignment(fpFromBv, fp2);
@@ -1994,8 +1988,6 @@ public class FloatingPointFormulaManagerTest
           final FloatingPointFormula fpFromBv =
               fpmgr.makeNumber(
                   BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), sign, doublePrecType);
-          assertThat(fpmgr.getMantissaSizeWithSignBit(fpFromBv) + fpmgr.getExponentSize(fpFromBv))
-              .isEqualTo(doublePrecType.getTotalSize());
           final FloatingPointNumber fpNumber =
               FloatingPointNumber.of(
                   sign, BigInteger.valueOf(exponent), BigInteger.valueOf(mantissa), doublePrecType);
@@ -2004,8 +1996,6 @@ public class FloatingPointFormulaManagerTest
           assertThat(fpNumber.getMantissaSizeWithoutHiddenBit())
               .isEqualTo(doublePrecType.getMantissaSizeWithHiddenBit() - 1);
           final FloatingPointFormula fp1 = fpmgr.makeNumber(fpNumber);
-          assertThat(fpmgr.getMantissaSizeWithSignBit(fp1) + fpmgr.getExponentSize(fp1))
-              .isEqualTo(doublePrecType.getTotalSize());
           final FloatingPointFormula fp2 = fpmgr.makeNumber(pDouble, doublePrecType);
           final BooleanFormula assignment1 = fpmgr.assignment(fpFromBv, fp1);
           final BooleanFormula assignment2 = fpmgr.assignment(fpFromBv, fp2);
