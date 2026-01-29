@@ -336,11 +336,10 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
 
     // Build special numbers so that we can compare them in the map
-    FloatingPointType precision =
+    FloatingPointType type =
         getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit);
     Set<FloatingPointFormula> specialNumbers =
-        ImmutableSet.of(
-            makeNaN(precision), makePlusInfinity(precision), makeMinusInfinity(precision));
+        ImmutableSet.of(makeNaN(type), makePlusInfinity(type), makeMinusInfinity(type));
 
     BitvectorFormula toIeeeBv = bvFormula;
     for (Entry<FloatingPointFormula, BitvectorFormula> entry :
@@ -353,12 +352,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       //  equivalently by (_ +oo 2 3) and (fp #b0 #b11 #b00).
       // -0 only has one representation; i.e. (_ -zero 3 2) abbreviates (fp #b1 #b000 #b0), and
       //  is therefore disallowed.
-      // This automatically checks the correct precision as well!
+      // This automatically checks the correct type as well!
       checkArgument(
           specialNumbers.contains(fpConst),
           "You are only allowed to specify a mapping for special FP numbers with more than one"
-              + " well-defined bitvector representation, i.e. NaN and +/- Infinity. Their precision"
-              + " has to match the precision of the formula to be represented as bitvector.");
+              + " well-defined bitvector representation, i.e. NaN and +/- Infinity. Their type"
+              + " has to match the type of the formula to be represented as bitvector.");
 
       BitvectorFormula bvTerm = entry.getValue();
       checkArgument(
