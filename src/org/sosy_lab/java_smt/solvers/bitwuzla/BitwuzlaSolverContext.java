@@ -18,6 +18,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
@@ -87,6 +88,9 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
 
   private boolean closed = false;
 
+  /** Counts the number of (open) Bitwuzla solver contexts. * */
+  private static int instances = 0;
+
   BitwuzlaSolverContext(
       BitwuzlaFormulaManager pManager,
       BitwuzlaFormulaCreator pCreator,
@@ -108,6 +112,12 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Consumer<String> pLoader)
       throws InvalidConfigurationException {
+
+    synchronized (BitwuzlaSolverContext.class) {
+      // Increase counter *before* any Bitwuzla objects are created
+      instances++;
+    }
+
     loadLibrary(pLoader);
 
     TermManager termManager = new TermManager();
@@ -238,11 +248,20 @@ public final class BitwuzlaSolverContext extends AbstractSolverContext {
    *
    * <p>Necessary for the solvers implemented in native code, frees the associated memory.
    */
+  @SuppressFBWarnings(
+      value = "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+      justification = "Static reference counter guarded by class-level synchronization")
   @Override
   public void close() {
-    if (!closed) {
-      creator.getTermManager().delete();
-      closed = true;
+    synchronized (BitwuzlaSolverContext.class) {
+      if (!closed) {
+        closed = true;
+        if (instances == 1) {
+          // Delete all solver objects if we're closing the last instance
+          TermManager.deleteReferences();
+        }
+        instances--;
+      }
     }
   }
 
