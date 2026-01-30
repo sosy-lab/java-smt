@@ -25,12 +25,9 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public class BitwuzlaFloatingPointManager
     extends AbstractFloatingPointFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
-  private final BitwuzlaFormulaCreator bitwuzlaCreator;
+
   private final TermManager termManager;
   private final Term roundingMode;
-
-  // Keeps track of the temporary variables that are created for fp-to-bv casts
-  private static int counter = 0;
 
   protected BitwuzlaFloatingPointManager(
       BitwuzlaFormulaCreator pCreator,
@@ -38,7 +35,6 @@ public class BitwuzlaFloatingPointManager
       BitwuzlaBitvectorFormulaManager pBvMgr,
       BitwuzlaBooleanFormulaManager pBmgr) {
     super(pCreator, pBvMgr);
-    bitwuzlaCreator = pCreator;
     termManager = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }
