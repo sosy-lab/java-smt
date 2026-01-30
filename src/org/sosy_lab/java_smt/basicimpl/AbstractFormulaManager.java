@@ -419,9 +419,9 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
           && (illegalArgumentException.getMessage().contains("to_ieee_bv")
               || illegalArgumentException.getMessage().contains("as_ieee_bv"))) {
         String additionalMessage =
-            "; Note: operation 'to_ieee_bv' is not supported in most SMT solvers. You can try using"
-                + " the SMTLIB2 standards preferred way to encode this operation, by utilizing the"
-                + " \"to_fp\" operation.";
+            "; Note: operations 'to_ieee_bv' and 'as_ieee_bv' are not supported in most SMT"
+                + " solvers. You can try using the SMTLIB2 standards preferred way to encode this"
+                + " operation by utilizing the 'to_fp' operation.";
         throw new IllegalArgumentException(
             illegalArgumentException.getMessage() + additionalMessage, illegalArgumentException);
       }
