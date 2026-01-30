@@ -416,15 +416,12 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
       return formulaCreator.encapsulateBoolean(parseImpl(sanitize(formulaStr)));
     } catch (IllegalArgumentException illegalArgumentException) {
       if (illegalArgumentException.getMessage() != null
-          && illegalArgumentException.getMessage().contains("fp.as_ieee_bv")) {
+          && (illegalArgumentException.getMessage().contains("to_ieee_bv")
+              || illegalArgumentException.getMessage().contains("as_ieee_bv"))) {
         String additionalMessage =
-            "; Note: operation 'fp.as_ieee_bv' is not supported in most SMT solvers. Instead, try"
-                + " utilizing the SMTLIB2 keyword 'to_fp' which is supported in most SMT solvers"
-                + " with Bitvector and Floating-Point support. In case the SMTLIB2 output has been"
-                + " created using JavaSMT, try replacing the FloatingPointFormulaManager method"
-                + " toIeeeBitvector(FloatingPointFormula), with either"
-                + " toIeeeBitvector(FloatingPointFormula, String) or"
-                + " toIeeeBitvector(FloatingPointFormula, String, Map).";
+            "; Note: operation 'to_ieee_bv' is not supported in most SMT solvers. You can try using"
+                + " the SMTLIB2 standards preferred way to encode this operation, by utilizing the"
+                + " \"to_fp\" operation.";
         throw new IllegalArgumentException(
             illegalArgumentException.getMessage() + additionalMessage, illegalArgumentException);
       }
