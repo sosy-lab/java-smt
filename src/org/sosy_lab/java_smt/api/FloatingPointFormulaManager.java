@@ -336,18 +336,19 @@ public interface FloatingPointFormulaManager {
       FloatingPointFormula number, String bitvectorConstantName);
 
   /**
-   * Create an equality of the bitvector representation of the given {@link FloatingPointFormula}s
-   * value with the given {@link BitvectorFormula}, conforming to the IEEE 754-2008 floating-point
-   * format. The size m of the given {@link BitvectorFormula} has to be equal to the sum of the
-   * sizes of the exponent eb and mantissa sb (including the hidden bit) of the given {@link
-   * FloatingPointFormula}. This implementation can be used independently of {@link
-   * #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on an SMT solvers support for
-   * {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special FP values (NaN, Inf, etc.)
-   * is not defined, and returned values are solver dependent. This method is based on a suggestion
-   * in the (<a href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with
-   * eb being the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the
-   * hidden bit, and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter,
-   * illustrated in SMTLIB2 as:
+   * Create a {@link BooleanFormula} representing the equality of the bitvector representation of
+   * the given {@link FloatingPointFormula}s value with the given {@link BitvectorFormula},
+   * conforming to the IEEE 754-2008 floating-point format. The size m of the given {@link
+   * BitvectorFormula} has to be equal to the sum of the sizes of the exponent eb and mantissa sb
+   * (including the hidden bit) of the given {@link FloatingPointFormula}. This implementation can
+   * be used independently of {@link #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on
+   * an SMT solvers support for {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special
+   * FP values (NaN, Inf, etc.) is not defined, and returned values are solver dependent. This
+   * method is based on a suggestion in the (<a
+   * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with eb being
+   * the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the hidden bit,
+   * and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter, illustrated
+   * in SMTLIB2 as:
    *
    * <p>(= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber)
    *
