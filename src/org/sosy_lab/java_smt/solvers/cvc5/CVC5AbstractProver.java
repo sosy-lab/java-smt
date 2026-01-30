@@ -10,7 +10,7 @@ package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.sosy_lab.java_smt.solvers.cvc5.CVC5Proof.generateProofImpl;
+import static org.sosy_lab.java_smt.solvers.cvc5.CVC5ProofNode.generateProofImpl;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.HashMultimap;
@@ -44,7 +44,7 @@ import org.sosy_lab.java_smt.api.Evaluator;
 import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.basicimpl.AbstractProverWithAllSat;
 
 abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
@@ -321,7 +321,7 @@ abstract class CVC5AbstractProver<T> extends AbstractProverWithAllSat<T> {
   }
 
   @Override
-  public Proof getProof() throws SolverException, InterruptedException {
+  public ProofNode getProof() throws SolverException, InterruptedException {
     checkGenerateProofs();
     checkState(!closed);
     checkState(isUnsat());

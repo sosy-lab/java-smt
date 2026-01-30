@@ -24,7 +24,7 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 
 /** Wraps a basic prover environment with a logging object. */
 class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
@@ -122,8 +122,8 @@ class LoggingBasicProverEnvironment<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public Proof getProof() throws SolverException, InterruptedException {
-    Proof p = wrapped.getProof();
+  public ProofNode getProof() throws SolverException, InterruptedException {
+    ProofNode p = wrapped.getProof();
     return p;
   }
 

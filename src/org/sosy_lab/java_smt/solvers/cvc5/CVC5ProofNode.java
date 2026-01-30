@@ -18,19 +18,20 @@ import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
-import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
+import org.sosy_lab.java_smt.basicimpl.AbstractProofNode;
 
 /** A proof of unsatisfiability returned by CVC5 transformed to the general proof API. */
-public final class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractProof {
+public final class CVC5ProofNode extends AbstractProofNode {
 
-  static CVC5Proof generateProofImpl(
+  static CVC5ProofNode generateProofImpl(
       io.github.cvc5.Proof pProof, CVC5FormulaCreator pFormulaCreator) throws CVC5ApiException {
 
     Deque<CVC5Frame> stack = new ArrayDeque<>();
-    Map<io.github.cvc5.Proof, CVC5Proof> tempComputed;
+    Map<io.github.cvc5.Proof, CVC5ProofNode> tempComputed;
 
-    ImmutableMap<io.github.cvc5.Proof, CVC5Proof> computed = ImmutableMap.of();
+    ImmutableMap<io.github.cvc5.Proof, CVC5ProofNode> computed = ImmutableMap.of();
 
     stack.push(new CVC5Frame(pProof));
 
@@ -58,7 +59,7 @@ public final class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractPro
         // Generate formula
         Term term = frame.getProof().getResult();
         Formula pFormula = pFormulaCreator.encapsulate(pFormulaCreator.getFormulaType(term), term);
-        CVC5Proof pn = new CVC5Proof(proofRule, pFormula);
+        CVC5ProofNode pn = new CVC5ProofNode(proofRule, pFormula);
         for (int i = 0; i < numChildren; i++) {
           io.github.cvc5.Proof child = frame.getProof().getChildren()[i];
 
@@ -80,13 +81,13 @@ public final class CVC5Proof extends org.sosy_lab.java_smt.basicimpl.AbstractPro
     }
   }
 
-  private CVC5Proof(ProofRule pProofRule, Formula pFormula) {
+  private CVC5ProofNode(ProofRule pProofRule, Formula pFormula) {
 
     super(pProofRule, pFormula);
   }
 
   @Override
-  protected void addChild(Proof pChild) {
+  protected void addChild(ProofNode pChild) {
     super.addChild(pChild);
   }
 

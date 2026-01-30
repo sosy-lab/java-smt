@@ -42,7 +42,7 @@ import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.Proof;
+import org.sosy_lab.java_smt.api.proofs.ProofNode;
 import org.sosy_lab.java_smt.api.proofs.ProofRule;
 
 public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -219,8 +219,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -283,9 +283,9 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bmgr.and(bmgr.or(a, c), bmgr.not(c)));
       assertThat(prover.isUnsat()).isTrue();
 
-      // Retrieve and verify proof
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      // Retrieve and verify proofNode
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -301,7 +301,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       @SuppressWarnings("unused")
-      Proof proof = prover.getProof();
+      ProofNode proofNode = prover.getProof();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -321,8 +321,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
-      Proof proof = prover.getProof();
-      assertThat(proof).isNotNull();
+      ProofNode proofNode = prover.getProof();
+      assertThat(proofNode).isNotNull();
     }
   }
 
@@ -342,8 +342,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -366,8 +366,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
 
       // assert integer formulas and test again
       prover.addConstraint(imgr.equal(x1, two));
@@ -376,10 +376,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof secondProof = prover.getProof();
-      verifyProofObjectValidity(secondProof);
+      ProofNode secondProofNode = prover.getProof();
+      verifyProofObjectValidity(secondProofNode);
 
-      assertThat(proof).isNotEqualTo(secondProof);
+      assertThat(proofNode).isNotEqualTo(secondProofNode);
     }
   }
 
@@ -405,8 +405,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
 
       prover.pop();
       prover.pop();
@@ -419,10 +419,10 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof secondProof = prover.getProof();
-      verifyProofObjectValidity(secondProof);
+      ProofNode secondProofNode = prover.getProof();
+      verifyProofObjectValidity(secondProofNode);
 
-      assertThat(proof).isNotEqualTo(secondProof);
+      assertThat(proofNode).isNotEqualTo(secondProofNode);
     }
   }
 
@@ -438,7 +438,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       @SuppressWarnings("unused")
-      Proof proof = prover.getProof();
+      ProofNode proofNode = prover.getProof();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -481,8 +481,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -511,8 +511,8 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      Proof proof = prover.getProof();
-      verifyProofObjectValidity(proof);
+      ProofNode proofNode = prover.getProof();
+      verifyProofObjectValidity(proofNode);
     }
   }
 
@@ -525,23 +525,23 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
    *
    * @param pRoot the root of the proof DAG to be tested.
    */
-  private void verifyProofObjectValidity(Proof pRoot) {
+  private void verifyProofObjectValidity(ProofNode pRoot) {
     assertThat(pRoot).isNotNull();
 
-    Deque<Proof> stack = new ArrayDeque<>();
+    Deque<ProofNode> stack = new ArrayDeque<>();
     stack.push(pRoot);
 
     while (!stack.isEmpty()) {
-      Proof proof = stack.pop();
-      ProofRule rule = proof.getRule();
-      Optional<Formula> formula = proof.getFormula();
+      ProofNode proofNode = stack.pop();
+      ProofRule rule = proofNode.getRule();
+      Optional<Formula> formula = proofNode.getFormula();
 
       assertThat(rule).isNotNull();
       assertThat(rule).isInstanceOf(ProofRule.class);
-      assertThat(proof.getChildren()).isNotNull();
+      assertThat(proofNode.getChildren()).isNotNull();
       assertThat(formula.isPresent()).isTrue();
 
-      for (Proof child : proof.getChildren()) {
+      for (ProofNode child : proofNode.getChildren()) {
         assertThat(child).isNotNull();
         stack.push(child);
       }
