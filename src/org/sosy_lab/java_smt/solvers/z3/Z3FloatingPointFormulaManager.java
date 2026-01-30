@@ -33,7 +33,7 @@ class Z3FloatingPointFormulaManager
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Z3BitvectorFormulaManager pBvFormulaManager,
       Z3BooleanFormulaManager pBoolFormulaManager) {
-    super(creator, pBvFormulaManager, pBoolFormulaManager);
+    super(creator, pBvFormulaManager);
     z3context = creator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
   }

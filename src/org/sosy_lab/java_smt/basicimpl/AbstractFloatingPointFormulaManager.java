@@ -52,16 +52,12 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
 
   private final AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bvMgr;
 
-  private final AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> bMgr;
-
   protected AbstractFloatingPointFormulaManager(
       FormulaCreator<TFormulaInfo, TType, TEnv, TFuncDecl> pCreator,
-      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr,
-      AbstractBooleanFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBMgr) {
+      AbstractBitvectorFormulaManager<TFormulaInfo, TType, TEnv, TFuncDecl> pBvMgr) {
     super(pCreator);
     roundingModes = new HashMap<>();
     bvMgr = pBvMgr;
-    bMgr = pBMgr;
   }
 
   protected abstract TFormulaInfo getDefaultRoundingMode();

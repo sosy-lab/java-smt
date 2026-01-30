@@ -65,7 +65,7 @@ class Mathsat5FloatingPointFormulaManager
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       Mathsat5BitvectorFormulaManager pBvFormulaManager,
       Mathsat5BooleanFormulaManager pBoolFormulaManager) {
-    super(pCreator, pBvFormulaManager, pBoolFormulaManager);
+    super(pCreator, pBvFormulaManager);
 
     mathsatEnv = pCreator.getEnv();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);

@@ -39,7 +39,7 @@ public class CVC5FloatingPointFormulaManager
       FloatingPointRoundingMode pFloatingPointRoundingMode,
       CVC5BitvectorFormulaManager pBvFormulaManager,
       CVC5BooleanFormulaManager pBoolFormulaManager) {
-    super(pCreator, pBvFormulaManager, pBoolFormulaManager);
+    super(pCreator, pBvFormulaManager);
     termManager = pCreator.getEnv();
     solver = pCreator.getSolver();
     roundingMode = getRoundingModeImpl(pFloatingPointRoundingMode);
