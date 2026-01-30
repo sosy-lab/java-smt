@@ -299,9 +299,13 @@ public interface FloatingPointFormulaManager {
   FloatingPointFormula fromIeeeBitvector(BitvectorFormula number, FloatingPointType pTargetType);
 
   /**
-   * Create a formula that produces a representation of the given floating-point value as a
-   * bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting bitvector is
-   * equal to the total size of the {@link FloatingPointNumber}s precision.
+   * Returns a {@link BitvectorFormula} equal to the representation of the given floating-point
+   * value as a bitvector conforming to the IEEE 754-2008 FP format. The bit size of the resulting
+   * bitvector is equal to the total size of the {@link FloatingPointFormula}s {@link
+   * FloatingPointType}. This method is not natively supported by all solvers, and SMTLIB2 output
+   * generated containing formulas originating from this method is often not parsable by other
+   * solvers. You can use the method {@link #toIeeeBitvector(FloatingPointFormula,
+   * BitvectorFormula)} to avoid both problems.
    */
   BitvectorFormula toIeeeBitvector(FloatingPointFormula number);
 

@@ -325,10 +325,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   protected TFormulaInfo toIeeeBitvectorImpl(TFormulaInfo pNumber) {
     throw new UnsupportedOperationException(
         "The chosen solver does not support transforming "
-            + "FloatingPointFormula to IEEE bitvectors. Try using the fallback "
-            + "methods toIeeeBitvector"
-            + "(FloatingPointFormula, String) and/or "
-            + "toIeeeBitvector(FloatingPointFormula, String, Map)");
+            + "floating-point formulas to IEEE bitvectors natively");
   }
 
   @Override
