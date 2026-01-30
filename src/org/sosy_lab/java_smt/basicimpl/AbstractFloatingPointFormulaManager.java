@@ -12,14 +12,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager.checkVariableName;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
@@ -340,61 +336,6 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   }
 
   @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula f, String bitvectorConstantName) {
-    return toIeeeBitvector(f, bitvectorConstantName, ImmutableMap.of());
-  }
-
-  @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula f,
-      String bitvectorConstantName,
-      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
-
-    FormulaType.FloatingPointType fpType =
-        (FloatingPointType) getFormulaCreator().getFormulaType(f);
-    // The BV is sign bit + exponent + mantissa without hidden bit, which is always equal to the
-    // total size as defined in SMTLIB2 with exponent + mantissa with hidden bit
-    BitvectorFormula bvFormula = bvMgr.makeVariable(fpType.getTotalSize(), bitvectorConstantName);
-
-    BooleanFormula additionalConstraint = toIeeeBitvector(f, bvFormula);
-
-    // Build special numbers so that we can compare them in the map
-    Set<FloatingPointFormula> specialNumbers =
-        ImmutableSet.of(makeNaN(fpType), makePlusInfinity(fpType), makeMinusInfinity(fpType));
-
-    BitvectorFormula toIeeeBv = bvFormula;
-    for (Entry<FloatingPointFormula, BitvectorFormula> entry :
-        specialFPConstantHandling.entrySet()) {
-      FloatingPointFormula fpConst = entry.getKey();
-
-      // We check that FP const special numbers are used (info from SMTLib2-standard)
-      // NaN has multiple possible definitions.
-      // +/- Infinity each has 2; e.g., +infinity for sort (_ FloatingPoint 2 3) is represented
-      //  equivalently by (_ +oo 2 3) and (fp #b0 #b11 #b00).
-      // -0 only has one representation; i.e. (_ -zero 3 2) abbreviates (fp #b1 #b000 #b0), and
-      //  is therefore disallowed.
-      // This automatically checks the correct type as well!
-      checkArgument(
-          specialNumbers.contains(fpConst),
-          "You are only allowed to specify a mapping for special FP numbers with more than one"
-              + " well-defined bitvector representation, i.e. NaN and +/- Infinity. Their type"
-              + " has to match the type of the formula to be represented as bitvector.");
-
-      BitvectorFormula bvTerm = entry.getValue();
-      checkArgument(
-          bvMgr.getLength(bvTerm) == bvMgr.getLength(bvFormula),
-          "The size of the bitvector terms used as mapped values needs to be equal to the size of"
-              + " the bitvector returned by this method");
-
-      BooleanFormula assumption = assignment(fpConst, f);
-      toIeeeBv = bMgr.ifThenElse(assumption, bvTerm, toIeeeBv);
-    }
-
-    return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
-  }
-
-  @Override
   public BooleanFormula toIeeeBitvector(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     FormulaType.FloatingPointType fpType =
@@ -678,29 +619,5 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
       values[size - 1 - i] = integer.testBit(i) ? '1' : '0';
     }
     return String.copyValueOf(values);
-  }
-
-  public static final class BitvectorFormulaAndBooleanFormula {
-    private final BitvectorFormula bitvectorFormula;
-    private final BooleanFormula booleanFormula;
-
-    private BitvectorFormulaAndBooleanFormula(
-        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
-      bitvectorFormula = checkNotNull(pBitvectorFormula);
-      booleanFormula = checkNotNull(pBooleanFormula);
-    }
-
-    private static BitvectorFormulaAndBooleanFormula of(
-        BitvectorFormula pBitvectorFormula, BooleanFormula pBooleanFormula) {
-      return new BitvectorFormulaAndBooleanFormula(pBitvectorFormula, pBooleanFormula);
-    }
-
-    public BitvectorFormula getBitvectorFormula() {
-      return bitvectorFormula;
-    }
-
-    public BooleanFormula getBooleanFormula() {
-      return booleanFormula;
-    }
   }
 }

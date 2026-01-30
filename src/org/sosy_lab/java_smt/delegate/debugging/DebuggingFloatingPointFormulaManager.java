@@ -10,7 +10,6 @@ package org.sosy_lab.java_smt.delegate.debugging;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -22,7 +21,6 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 public class DebuggingFloatingPointFormulaManager implements FloatingPointFormulaManager {
   private final FloatingPointFormulaManager delegate;
@@ -227,17 +225,6 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
   }
 
   @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula number, String bitvectorConstantName) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(number);
-    BitvectorFormulaAndBooleanFormula res = delegate.toIeeeBitvector(number, bitvectorConstantName);
-    debugging.addFormulaTerm(res.getBitvectorFormula());
-    debugging.addFormulaTerm(res.getBooleanFormula());
-    return res;
-  }
-
-  @Override
   public BooleanFormula toIeeeBitvector(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     debugging.assertThreadLocal();
@@ -245,25 +232,6 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
     debugging.assertFormulaInContext(bitvectorFormulaSetToBeEqualToFpNumber);
     BooleanFormula res = delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
     debugging.addFormulaTerm(res);
-    return res;
-  }
-
-  @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula number,
-      String bitvectorConstantName,
-      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
-    debugging.assertThreadLocal();
-    debugging.assertFormulaInContext(number);
-    specialFPConstantHandling.forEach(
-        (key, value) -> {
-          debugging.assertFormulaInContext(key);
-          debugging.assertFormulaInContext(value);
-        });
-    BitvectorFormulaAndBooleanFormula res =
-        delegate.toIeeeBitvector(number, bitvectorConstantName, specialFPConstantHandling);
-    debugging.addFormulaTerm(res.getBitvectorFormula());
-    debugging.addFormulaTerm(res.getBooleanFormula());
     return res;
   }
 

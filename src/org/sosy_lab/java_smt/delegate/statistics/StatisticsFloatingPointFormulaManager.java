@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Map;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
 import org.sosy_lab.java_smt.api.BooleanFormula;
@@ -24,7 +23,6 @@ import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
-import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager.BitvectorFormulaAndBooleanFormula;
 
 class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManager {
 
@@ -184,26 +182,10 @@ class StatisticsFloatingPointFormulaManager implements FloatingPointFormulaManag
   }
 
   @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula number, String bitvectorConstantName) {
-    stats.fpOperations.getAndIncrement();
-    return delegate.toIeeeBitvector(number, bitvectorConstantName);
-  }
-
-  @Override
   public BooleanFormula toIeeeBitvector(
       FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
     stats.fpOperations.getAndIncrement();
     return delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
-  }
-
-  @Override
-  public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
-      FloatingPointFormula number,
-      String bitvectorConstantName,
-      Map<FloatingPointFormula, BitvectorFormula> specialFPConstantHandling) {
-    stats.fpOperations.getAndIncrement();
-    return delegate.toIeeeBitvector(number, bitvectorConstantName, specialFPConstantHandling);
   }
 
   @Override
