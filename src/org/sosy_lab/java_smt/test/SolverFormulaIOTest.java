@@ -13,6 +13,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 import static com.google.common.truth.TruthJUnit.assume;
 import static org.junit.Assert.assertThrows;
+import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.HashMultimap;
@@ -478,7 +479,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     requireFloats();
     requireBitvectors();
 
-    FloatingPointType fpType = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
     FloatingPointFormula fp = fpmgr.makeVariable("fp", fpType);
     BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
     BitvectorFormula bvFromFpFallback =
@@ -514,7 +515,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     requireFloats();
     requireBitvectors();
 
-    FloatingPointType fpType = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
     FloatingPointFormula fpVar = fpmgr.makeVariable("fpVar", fpType);
     BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
     BitvectorFormula bvFromFpFallback =
@@ -536,7 +537,7 @@ public class SolverFormulaIOTest extends SolverBasedTest0.ParameterizedSolverBas
     requireBitvectors();
     requireNativeFPToBitvector();
 
-    FloatingPointType fpType = FloatingPointType.getSinglePrecisionFloatingPointType();
+    FloatingPointType fpType = getSinglePrecisionFloatingPointType();
     FloatingPointFormula fpVar = fpmgr.makeVariable("fpVar", fpType);
     BitvectorFormula someOtherBv = bvmgr.makeVariable(fpType.getTotalSize(), "someOtherBv");
     BitvectorFormula bvFromFpNative = fpmgr.toIeeeBitvector(fpVar);
