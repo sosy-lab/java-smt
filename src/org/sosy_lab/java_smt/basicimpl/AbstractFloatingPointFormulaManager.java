@@ -357,12 +357,7 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     // total size as defined in SMTLIB2 with exponent + mantissa with hidden bit
     BitvectorFormula bvFormula = bvMgr.makeVariable(fpType.getTotalSize(), bitvectorConstantName);
 
-    FloatingPointFormula fromIeeeBitvector = fromIeeeBitvector(bvFormula, fpType);
-
-    // assignment() allows a value to be NaN etc.
-    // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
-    // standard, what solvers return might be distinct.
-    BooleanFormula additionalConstraint = assignment(fromIeeeBitvector, f);
+    BooleanFormula additionalConstraint = toIeeeBitvector(f, bvFormula);
 
     // Build special numbers so that we can compare them in the map
     Set<FloatingPointFormula> specialNumbers =
@@ -397,6 +392,29 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
     }
 
     return BitvectorFormulaAndBooleanFormula.of(toIeeeBv, additionalConstraint);
+  }
+
+  @Override
+  public BooleanFormula toIeeeBitvector(
+      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
+    FormulaType.FloatingPointType fpType =
+        (FloatingPointType) getFormulaCreator().getFormulaType(fpNumber);
+    checkArgument(
+        fpType.getTotalSize() == bvMgr.getLength(bitvectorFormulaSetToBeEqualToFpNumber),
+        "The size of the bitvector term %s is %s, but needs to be equal to the size of"
+            + " the Floating-Point term %s with size %s",
+        bitvectorFormulaSetToBeEqualToFpNumber,
+        bvMgr.getLength(bitvectorFormulaSetToBeEqualToFpNumber),
+        fpNumber,
+        fpType.getTotalSize());
+
+    FloatingPointFormula fromIeeeBitvector =
+        fromIeeeBitvector(bitvectorFormulaSetToBeEqualToFpNumber, fpType);
+
+    // We use assignment(), as it allows a fp value to be NaN etc.
+    // Note: All fp.to_* functions are unspecified for NaN and infinity input values in the
+    // standard, what solvers return might be distinct.
+    return assignment(fromIeeeBitvector, fpNumber);
   }
 
   @Override

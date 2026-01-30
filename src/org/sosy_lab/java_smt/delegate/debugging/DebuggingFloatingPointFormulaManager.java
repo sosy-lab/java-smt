@@ -238,6 +238,17 @@ public class DebuggingFloatingPointFormulaManager implements FloatingPointFormul
   }
 
   @Override
+  public BooleanFormula toIeeeBitvector(
+      FloatingPointFormula fpNumber, BitvectorFormula bitvectorFormulaSetToBeEqualToFpNumber) {
+    debugging.assertThreadLocal();
+    debugging.assertFormulaInContext(fpNumber);
+    debugging.assertFormulaInContext(bitvectorFormulaSetToBeEqualToFpNumber);
+    BooleanFormula res = delegate.toIeeeBitvector(fpNumber, bitvectorFormulaSetToBeEqualToFpNumber);
+    debugging.addFormulaTerm(res);
+    return res;
+  }
+
+  @Override
   public BitvectorFormulaAndBooleanFormula toIeeeBitvector(
       FloatingPointFormula number,
       String bitvectorConstantName,
