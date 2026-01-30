@@ -177,7 +177,7 @@ public final class Z3LegacySolverContext extends AbstractSolverContext {
         new Z3LegacyBitvectorFormulaManager(creator, booleanTheory);
     Z3LegacyFloatingPointFormulaManager floatingPointTheory =
         new Z3LegacyFloatingPointFormulaManager(
-            creator, bitvectorTheory, booleanTheory, pFloatingPointRoundingMode);
+            creator, bitvectorTheory, pFloatingPointRoundingMode);
     Z3LegacyQuantifiedFormulaManager quantifierManager =
         new Z3LegacyQuantifiedFormulaManager(creator);
     Z3LegacyArrayFormulaManager arrayManager = new Z3LegacyArrayFormulaManager(creator);

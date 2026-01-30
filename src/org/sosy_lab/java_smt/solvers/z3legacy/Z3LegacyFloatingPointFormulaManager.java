@@ -31,7 +31,6 @@ class Z3LegacyFloatingPointFormulaManager
   Z3LegacyFloatingPointFormulaManager(
       Z3LegacyFormulaCreator creator,
       Z3LegacyBitvectorFormulaManager bvMgr,
-      Z3LegacyBooleanFormulaManager boolMgr,
       FloatingPointRoundingMode pFloatingPointRoundingMode) {
     super(creator, bvMgr);
     z3context = creator.getEnv();

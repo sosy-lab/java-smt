@@ -213,7 +213,7 @@ public final class Mathsat5SolverContext extends AbstractSolverContext {
         new Mathsat5BitvectorFormulaManager(creator, booleanTheory);
     Mathsat5FloatingPointFormulaManager floatingPointTheory =
         new Mathsat5FloatingPointFormulaManager(
-            creator, pFloatingPointRoundingMode, bitvectorTheory, booleanTheory);
+            creator, pFloatingPointRoundingMode, bitvectorTheory);
     Mathsat5ArrayFormulaManager arrayTheory = new Mathsat5ArrayFormulaManager(creator);
     Mathsat5EnumerationFormulaManager enumerationTheory = null;
     if (!settings.loadOptimathsat5) {
