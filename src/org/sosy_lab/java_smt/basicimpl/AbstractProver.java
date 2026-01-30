@@ -32,7 +32,7 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment;
 import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
 
@@ -288,7 +288,7 @@ public abstract class AbstractProver<T> implements BasicProverEnvironment<T> {
   }
 
   @Override
-  public ProofNode getProof() throws InterruptedException, SolverException {
+  public Proof getProof() throws InterruptedException, SolverException {
     throw new UnsupportedOperationException(
         "ProofNode generation is not available for the current solver.");
   }

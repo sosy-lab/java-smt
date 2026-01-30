@@ -8,20 +8,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.sosy_lab.java_smt.basicimpl;
+package org.sosy_lab.java_smt.solvers.cvc5;
 
 import org.sosy_lab.java_smt.api.proofs.Proof;
 import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.basicimpl.AbstractProof;
 
-public class AbstractProof implements Proof {
-  public final ProofNode root;
-
-  public AbstractProof(ProofNode pRoot) {
-    root = pRoot;
-  }
-
-  @Override
-  public ProofNode getProofRoot() {
-    return root;
+class CVC5Proof extends AbstractProof implements Proof {
+  CVC5Proof(ProofNode pRoot) {
+    super(pRoot);
   }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 /**
  * Super interface for {@link ProverEnvironment} and {@link InterpolatingProverEnvironment} that
@@ -166,7 +166,7 @@ public interface BasicProverEnvironment<T> extends AutoCloseable {
    * method should be called only immediately after an {@link #isUnsat()} call that returned <code>
    * true</code>.
    */
-  ProofNode getProof() throws SolverException, InterruptedException;
+  Proof getProof() throws SolverException, InterruptedException;
 
   /**
    * Closes the prover environment. The object should be discarded, and should not be used after

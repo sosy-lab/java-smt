@@ -10,11 +10,17 @@
 
 package org.sosy_lab.java_smt.api.proofs;
 
-import com.google.common.collect.ImmutableSet;
-
+/**
+ * This class provides a proof of unsatisifabilty for a given query. It allows the retrieval of the
+ * root proof node in the proof DAG.
+ */
 public interface Proof {
 
-  public ImmutableSet<ProofNode> getProofNodes();
-
+  /**
+   * Returns the root proof node of the DAG from this proof.
+   *
+   * @return an object of type {@link ProofNode} the root proof node.
+   * @see ProofNode
+   */
   public ProofNode getProofRoot();
 }

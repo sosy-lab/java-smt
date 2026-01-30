@@ -219,7 +219,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
     }
   }
@@ -284,7 +284,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Retrieve and verify proofNode
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
     }
   }
@@ -301,7 +301,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isFalse();
 
       @SuppressWarnings("unused")
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -321,7 +321,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       prover.addConstraint(bottom);
       assertThat(prover.isUnsat()).isTrue();
 
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       assertThat(proofNode).isNotNull();
     }
   }
@@ -342,7 +342,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
     }
   }
@@ -366,7 +366,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
 
       // assert integer formulas and test again
@@ -376,7 +376,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode secondProofNode = prover.getProof();
+      ProofNode secondProofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(secondProofNode);
 
       assertThat(proofNode).isNotEqualTo(secondProofNode);
@@ -405,7 +405,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
 
       prover.pop();
@@ -419,7 +419,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode secondProofNode = prover.getProof();
+      ProofNode secondProofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(secondProofNode);
 
       assertThat(proofNode).isNotEqualTo(secondProofNode);
@@ -438,7 +438,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       @SuppressWarnings("unused")
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       throw new AssertionError("Expected IllegalStateException was not thrown");
 
     } catch (IllegalStateException e) {
@@ -481,7 +481,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
     }
   }
@@ -511,7 +511,7 @@ public class ProverEnvironmentTest extends SolverBasedTest0.ParameterizedSolverB
       assertThat(prover.isUnsat()).isTrue();
 
       // Test getProof()
-      ProofNode proofNode = prover.getProof();
+      ProofNode proofNode = prover.getProof().getProofRoot();
       verifyProofObjectValidity(proofNode);
     }
   }

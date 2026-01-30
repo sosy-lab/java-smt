@@ -22,7 +22,7 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverException;
-import org.sosy_lab.java_smt.api.proofs.ProofNode;
+import org.sosy_lab.java_smt.api.proofs.Proof;
 
 class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnvironment<T> {
 
@@ -123,7 +123,7 @@ class SynchronizedBasicProverEnvironmentWithContext<T> implements BasicProverEnv
   }
 
   @Override
-  public ProofNode getProof() throws SolverException, InterruptedException {
+  public Proof getProof() throws SolverException, InterruptedException {
     return delegate.getProof();
   }
 
