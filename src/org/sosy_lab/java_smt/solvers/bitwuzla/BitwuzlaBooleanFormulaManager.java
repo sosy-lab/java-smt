@@ -15,7 +15,7 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 
 public class BitwuzlaBooleanFormulaManager
-    extends AbstractBooleanFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+    extends AbstractBooleanFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final TermManager termManager;
 
   private final Term pTrue;
@@ -23,7 +23,7 @@ public class BitwuzlaBooleanFormulaManager
 
   protected BitwuzlaBooleanFormulaManager(BitwuzlaFormulaCreator pCreator) {
     super(pCreator);
-    termManager = pCreator.getTermManager();
+    termManager = pCreator.getEnv();
     pTrue = termManager.mk_true();
     pFalse = termManager.mk_false();
   }

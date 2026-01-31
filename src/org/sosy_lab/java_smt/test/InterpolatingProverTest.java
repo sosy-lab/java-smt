@@ -176,10 +176,10 @@ public class InterpolatingProverTest
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    // build formula:  [false, false]
-    BooleanFormula A = bmgr.makeBoolean(false);
-    BooleanFormula B = bmgr.makeBoolean(false);
-    BooleanFormula C = bmgr.makeBoolean(false);
+    // build formula stack:  [false, false, false]
+    BooleanFormula A = bmgr.makeFalse();
+    BooleanFormula B = bmgr.makeFalse();
+    BooleanFormula C = bmgr.makeFalse();
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -187,24 +187,70 @@ public class InterpolatingProverTest
 
     assertThat(stack).isUnsatisfiable();
 
-    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeBoolean(true));
+    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeTrue());
+
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
+    BooleanFormula expectedInterpolant = bmgr.makeFalse();
+    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
+      expectedInterpolant = bmgr.makeTrue(); // LegacyZ3 has an issue here.
+    }
     assertThat(
             ImmutableList.of(
                 stack.getInterpolant(ImmutableList.of(TA)),
                 stack.getInterpolant(ImmutableList.of(TB)),
                 stack.getInterpolant(ImmutableList.of(TC))))
-        .contains(bmgr.makeBoolean(false));
+        .contains(expectedInterpolant);
     assertThat(
             ImmutableList.of(
                 stack.getInterpolant(ImmutableList.of(TA, TB)),
                 stack.getInterpolant(ImmutableList.of(TB, TC)),
                 stack.getInterpolant(ImmutableList.of(TC, TA))))
-        .contains(bmgr.makeBoolean(false));
-    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC)))
-        .isEqualTo(bmgr.makeBoolean(false));
+        .contains(expectedInterpolant);
+    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC))).isEqualTo(bmgr.makeFalse());
 
     stack.close();
+  }
+
+  @Test
+  public <T> void illegalStateTest() throws InterruptedException, SolverException {
+    var varA = bmgr.makeVariable("a");
+    var varB = bmgr.makeVariable("b");
+
+    // Call without a SAT check
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varB));
+
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Call when the assertions are not UNSAT
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varB));
+
+      assertThat(prover.isUnsat()).isFalse();
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Call when the SAT check is outdated
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varA));
+      assertThat(prover.isUnsat()).isTrue();
+      prover.addConstraint(varB);
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Finally, call after a SAT check that returned UNSAT
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varA));
+      assertThat(prover.isUnsat()).isTrue();
+      checkItpSequence(
+          ImmutableList.of(varA, bmgr.not(varA)),
+          ImmutableList.of(prover.getInterpolant(ImmutableList.of(f1))));
+    }
   }
 
   @Test
@@ -1175,6 +1221,9 @@ public class InterpolatingProverTest
         break;
       case CVC4:
         p3 = 12345;
+        break;
+      case Z3_WITH_INTERPOLATION:
+        p3 = 12350;
         break;
       default:
         p3 = null; // unexpected solver for interpolation

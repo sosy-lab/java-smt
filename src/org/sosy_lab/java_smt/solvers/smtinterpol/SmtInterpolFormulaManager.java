@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.smtinterpol;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Iterables.getOnlyElement;
 
 import de.uni_freiburg.informatik.ultimate.logic.AnnotatedTerm;
@@ -26,6 +27,7 @@ import de.uni_freiburg.informatik.ultimate.smtinterpol.option.OptionMap;
 import de.uni_freiburg.informatik.ultimate.smtinterpol.smtlib2.ParseEnvironment;
 import java.io.StringReader;
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
@@ -69,6 +71,16 @@ public class SmtInterpolFormulaManager
   }
 
   @Override
+  protected Term equalImpl(Collection<Term> pArgs) {
+    return getEnvironment().getTheory().equals(pArgs.toArray(new Term[0]));
+  }
+
+  @Override
+  protected Term distinctImpl(Collection<Term> pArgs) {
+    return getEnvironment().getTheory().distinct(pArgs.toArray(new Term[0]));
+  }
+
+  @Override
   public Term parseImpl(String pS) throws IllegalArgumentException {
     FormulaCollectionScript parseScript =
         new FormulaCollectionScript(getEnvironment(), getEnvironment().getTheory());
@@ -90,6 +102,10 @@ public class SmtInterpolFormulaManager
       throw new IllegalArgumentException(nested);
     }
 
+    checkArgument(
+        parseScript.getAssertedTerms().size() == 1,
+        "Expected exactly one formula, but got %s",
+        parseScript.getAssertedTerms().size());
     Term term = getOnlyElement(parseScript.getAssertedTerms());
     return new FormulaUnLet().unlet(term);
   }

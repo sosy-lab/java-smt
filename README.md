@@ -11,10 +11,10 @@ SPDX-License-Identifier: Apache-2.0
 # JavaSMT
 
 [![Build Status](https://gitlab.com/sosy-lab/software/java-smt/badges/master/pipeline.svg)](https://gitlab.com/sosy-lab/software/java-smt/pipelines)
-[![Build Status on Windows](https://ci.appveyor.com/api/projects/status/08sy37awx7kvflo7/branch/master?svg=true)](https://ci.appveyor.com/project/sosy-lab/java-smt/branch/master)
+[![Github CI](https://github.com/sosy-lab/java-smt/actions/workflows/ci.yml/badge.svg)](https://github.com/sosy-lab/java-smt/actions/workflows/ci.yml)
 ![Test Coverage](https://gitlab.com/sosy-lab/software/java-smt/badges/master/coverage.svg)
 [![Apache 2.0 License](https://img.shields.io/badge/license-Apache--2-brightgreen.svg?style=flat)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.sosy-lab/java-smt)
+[![Maven Central](https://maven-badges.sml.io/maven-central/org.sosy-lab/java-smt/badge.svg)](https://maven-badges.sml.io/maven-central/org.sosy-lab/java-smt)
 
 JavaSMT is a common API layer for accessing various SMT solvers.
 The API is optimized for performance (using JavaSMT has very little runtime
@@ -73,6 +73,7 @@ JavaSMT supports several SMT solvers (see [Getting Started](doc/Getting-started.
 | [SMTInterpol](https://ultimate.informatik.uni-freiburg.de/smtinterpol/) | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | Java-based SMT solver |
 | [Yices2](https://yices.csl.sri.com/) | :heavy_check_mark: |  | [maybe](https://github.com/sosy-lab/java-smt/pull/215) |  | [maybe](https://github.com/sosy-lab/java-smt/pull/400)⁴ |  |  |
 | [Z3](https://github.com/Z3Prover/z3) | :heavy_check_mark:³ | :heavy_check_mark:³ | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | mature and well-known solver |
+| [Z3_WITH_INTERPOLATION](https://github.com/Z3Prover/z3) | :heavy_check_mark: | :heavy_check_mark: |  |  |  |  | an older version of Z3 that still provides interpolation support |
 
 We support a reasonable list of operating systems and versions.
 - Our main target is Linux (mainly Ubuntu or comparable Linux distributions).

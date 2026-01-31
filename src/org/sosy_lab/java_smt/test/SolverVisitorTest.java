@@ -516,13 +516,15 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               Integer.toBinaryString(Float.floatToRawIntBits(entry.getKey().floatValue())),
               32,
               '0'));
-      checkFloatConstant(FormulaType.getFloatingPointType(5, 10), entry.getKey(), entry.getValue());
+      checkFloatConstant(
+          FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(5, 10),
+          entry.getKey(),
+          entry.getValue());
     }
   }
 
   private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
-    FloatingPointNumber fp =
-        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize());
+    FloatingPointNumber fp = FloatingPointNumber.of(bits, prec);
 
     ConstantsVisitor visitor = new ConstantsVisitor();
     mgr.visit(fpmgr.makeNumber(value, prec), visitor);
@@ -619,7 +621,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    var fpType = FormulaType.getFloatingPointType(5, 10);
+    var fpType = FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(5, 10);
     var visitor =
         new DefaultFormulaVisitor<Void>() {
           @Override
@@ -744,6 +746,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     RegexFormula r = smgr.makeRegex("regex1");
@@ -770,6 +777,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     StringFormula z = smgr.makeString("zAsString");
@@ -811,6 +823,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInRegexFormulaVisit() {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     RegexFormula r = smgr.makeRegex("regex1");
     RegexFormula s = smgr.makeRegex("regex2");
 
@@ -832,6 +849,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     IntegerFormula offset = imgr.makeVariable("offset");
