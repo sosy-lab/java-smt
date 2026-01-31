@@ -148,6 +148,11 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
   }
 
   @Override
+  protected Term simplify(Term f) throws InterruptedException {
+    return creator.getSolver().simplify(f);
+  }
+
+  @Override
   public <T extends Formula> T substitute(
       final T f, final Map<? extends Formula, ? extends Formula> fromToMapping) {
     Map<Term, Term> castedMap = new LinkedHashMap<>();

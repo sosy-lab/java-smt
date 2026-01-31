@@ -181,7 +181,8 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
     Term interpolant;
     try {
       itpSolver.assertFormula(phiPlus);
-      interpolant = itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus));
+      interpolant =
+          itpSolver.simplify(itpSolver.getInterpolant(termManager.mkTerm(Kind.NOT, phiMinus)));
     } finally {
       itpSolver.deletePointer();
     }

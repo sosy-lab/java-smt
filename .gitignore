@@ -61,6 +61,8 @@ solvers_maven_conf/*.asc
 /Javadoc
 /Javadoc-z3
 /gh-pages
+/traces
+/scripts/solver.log
 
 .idea/
 

@@ -648,6 +648,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.STRING_FROM_CODE, FunctionDeclarationKind.STR_FROM_CODE)
           .put(Kind.STRING_LT, FunctionDeclarationKind.STR_LT)
           .put(Kind.STRING_LEQ, FunctionDeclarationKind.STR_LE)
+          .put(Kind.REGEXP_NONE, FunctionDeclarationKind.RE_NONE)
           .put(Kind.REGEXP_PLUS, FunctionDeclarationKind.RE_PLUS)
           .put(Kind.REGEXP_STAR, FunctionDeclarationKind.RE_STAR)
           .put(Kind.REGEXP_OPT, FunctionDeclarationKind.RE_OPTIONAL)
@@ -660,6 +661,12 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.SELECT, FunctionDeclarationKind.SELECT)
           .put(Kind.STORE, FunctionDeclarationKind.STORE)
           .put(Kind.CONST_ARRAY, FunctionDeclarationKind.CONST)
+          // Separation logic
+          .put(Kind.SEP_EMP, FunctionDeclarationKind.SEP_EMP)
+          .put(Kind.SEP_NIL, FunctionDeclarationKind.SEP_NIL)
+          .put(Kind.SEP_PTO, FunctionDeclarationKind.SEP_PTO)
+          .put(Kind.SEP_STAR, FunctionDeclarationKind.SEP_STAR)
+          .put(Kind.SEP_WAND, FunctionDeclarationKind.SEP_WAND)
           .build();
 
   private FunctionDeclarationKind getDeclarationKind(Term f) {
