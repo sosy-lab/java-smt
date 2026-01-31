@@ -402,7 +402,6 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     return false;
   }
 
-
   @Override
   public boolean isUnsatWithAssumptions(Collection<BooleanFormula> assumptions)
       throws SolverException, InterruptedException {
