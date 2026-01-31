@@ -26,8 +26,8 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
       setDefault(
           AbstractSolverContext.class,
           (AbstractSolverContext) SolverContextFactory.createSolverContext(Solvers.PRINCESS));
-    } catch (InvalidConfigurationException pE) {
-      throw new RuntimeException(pE);
+    } catch (InvalidConfigurationException e) {
+      throw new RuntimeException(e);
     }
   }
 }
