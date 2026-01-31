@@ -24,7 +24,6 @@ import com.google.common.truth.Truth;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -130,7 +129,9 @@ public abstract class SolverBasedTest0 {
     return Solvers.SMTINTERPOL;
   }
 
-  /** This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront. */
+  /**
+   * This method is only called, if OpenSMT is called. OpenSMT needs to know the logic upfront.
+   */
   protected Logics logicToUse() {
     return Logics.QF_AUFLIRA;
   }
@@ -224,7 +225,9 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  /** Skip test if the solver does not support integers. */
+  /**
+   * Skip test if the solver does not support integers.
+   */
   protected final void requireIntegers() {
     assume()
         .withMessage("Solver %s does not support the theory of integers", solverToUse())
@@ -232,7 +235,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support rationals. */
+  /**
+   * Skip test if the solver does not support rationals.
+   */
   protected final void requireRationals() {
     assume()
         .withMessage("Solver %s does not support the theory of rationals", solverToUse())
@@ -247,7 +252,9 @@ public abstract class SolverBasedTest0 {
         .isNotEqualTo(Solvers.OPENSMT);
   }
 
-  /** Skip test if the solver does not support bitvectors. */
+  /**
+   * Skip test if the solver does not support bitvectors.
+   */
   protected final void requireBitvectors() {
     assume()
         .withMessage("Solver %s does not support the theory of bitvectors", solverToUse())
@@ -277,7 +284,9 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  /** Skip test if the solver does not support quantifiers. */
+  /**
+   * Skip test if the solver does not support quantifiers.
+   */
   protected final void requireQuantifiers() {
     assume()
         .withMessage("Solver %s does not support quantifiers", solverToUse())
@@ -294,7 +303,9 @@ public abstract class SolverBasedTest0 {
         .isNoneOf(Solvers.BOOLECTOR, Solvers.MATHSAT5, Solvers.YICES2, Solvers.BITWUZLA);
   }
 
-  /** Skip test if the solver does not support arrays. */
+  /**
+   * Skip test if the solver does not support arrays.
+   */
   protected final void requireArrays() {
     assume()
         .withMessage("Solver %s does not support the theory of arrays", solverToUse())
@@ -309,7 +320,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support strings. */
+  /**
+   * Skip test if the solver does not support strings.
+   */
   protected final void requireStrings() {
     assume()
         .withMessage("Solver %s does not support the theory of strings", solverToUse())
@@ -321,7 +334,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support enumeration theory. */
+  /**
+   * Skip test if the solver does not support enumeration theory.
+   */
   protected final void requireEnumeration() {
     assume()
         .withMessage("Solver %s does not support the theory of enumerations", solverToUse())
@@ -336,7 +351,9 @@ public abstract class SolverBasedTest0 {
         .isNotNull();
   }
 
-  /** Skip test if the solver does not support optimization. */
+  /**
+   * Skip test if the solver does not support optimization.
+   */
   protected final void requireOptimization() {
     try {
       context.newOptimizationProverEnvironment().close();
@@ -350,7 +367,7 @@ public abstract class SolverBasedTest0 {
 
   protected final void requireInterpolation(ProverOptions... options) {
     List<ProverOptions> optionList =
-        (options == null) ? Collections.emptyList() : Arrays.asList(options);
+        (options == null) ? ImmutableList.of() : Arrays.asList(options);
     if (optionList.contains(null) || optionList.isEmpty()) {
       assume()
           .withMessage("Solver %s does not support native interpolation", solverToUse())
@@ -489,14 +506,18 @@ public abstract class SolverBasedTest0 {
     return assertUsing(context).that(formula);
   }
 
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  /**
+   * Check that the interpolant in the subject is valid fot the formulas A and B.
+   */
   public void isValidInterpolant(BooleanFormula interpolant, BooleanFormula a, BooleanFormula b)
       throws SolverException, InterruptedException {
     // TODO: move into assertion framework
     isValidInterpolant(interpolant, ImmutableList.of(a), ImmutableList.of(b));
   }
 
-  /** Check that the interpolant in the subject is valid fot the formulas A and B. */
+  /**
+   * Check that the interpolant in the subject is valid fot the formulas A and B.
+   */
   public void isValidInterpolant(
       BooleanFormula interpolant,
       List<BooleanFormula> formulasOfA,
@@ -628,9 +649,9 @@ public abstract class SolverBasedTest0 {
       List<Object[]> lst = new ArrayList<>();
       for (Solvers solver : Solvers.values()) {
         // No arg for no option (== solver native interpolation)
-        lst.add(new Object[] {solver, null});
+        lst.add(new Object[]{solver, null});
         for (ProverOptions itpStrat : ALL_INTERPOLATION_STRATEGIES) {
-          lst.add(new Object[] {solver, itpStrat});
+          lst.add(new Object[]{solver, itpStrat});
         }
       }
       return lst;
