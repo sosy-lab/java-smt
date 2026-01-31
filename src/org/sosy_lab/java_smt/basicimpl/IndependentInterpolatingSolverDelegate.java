@@ -120,28 +120,34 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
     if (interpolationStrategy == null) {
       interpolant = delegate.getInterpolant(identifiersForA);
 
-    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_PROJECTION_BASED_INTERPOLANTS)) {
-      interpolant =
-          getModelBasedProjectionInterpolant(
-              conjugatedFormulasOfA,
-              conjugatedFormulasOfB,
-              variablesInA,
-              variablesInB,
-              sharedVariables);
-    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_FORWARD_INTERPOLANTS)) {
-      // Will generate interpolants based on quantifier elimination
-      if (exclusiveVariablesInA.isEmpty()) {
-        return conjugatedFormulasOfA;
-      }
-      interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
-    } else if (interpolationStrategy.equals(ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
-      if (exclusiveVariablesInB.isEmpty()) {
-        return bmgr.not(conjugatedFormulasOfB);
-      }
-      // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
-      interpolant = getUniformBackwardInterpolant(conjugatedFormulasOfB, exclusiveVariablesInB);
     } else {
-      throw new AssertionError("Unknown interpolation strategy.");
+      switch (interpolationStrategy) {
+        case GENERATE_PROJECTION_BASED_INTERPOLANTS:
+          interpolant =
+              getModelBasedProjectionInterpolant(
+                  conjugatedFormulasOfA,
+                  conjugatedFormulasOfB,
+                  variablesInA,
+                  variablesInB,
+                  sharedVariables);
+          break;
+        case GENERATE_UNIFORM_FORWARD_INTERPOLANTS:
+          // Will generate interpolants based on quantifier elimination
+          if (exclusiveVariablesInA.isEmpty()) {
+            return conjugatedFormulasOfA;
+          }
+          interpolant = getUniformForwardInterpolant(conjugatedFormulasOfA, exclusiveVariablesInA);
+          break;
+        case GENERATE_UNIFORM_BACKWARD_INTERPOLANTS:
+          if (exclusiveVariablesInB.isEmpty()) {
+            return bmgr.not(conjugatedFormulasOfB);
+          }
+          // Note: uses the A -> i -> B is valid definition for Craig-Interpolants, so we negate B
+          interpolant = getUniformBackwardInterpolant(conjugatedFormulasOfB, exclusiveVariablesInB);
+          break;
+        default:
+          throw new AssertionError("Unknown interpolation strategy.");
+      }
     }
 
     assert satisfiesInterpolationCriteria(

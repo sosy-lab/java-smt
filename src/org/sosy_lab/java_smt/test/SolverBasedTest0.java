@@ -390,7 +390,7 @@ public abstract class SolverBasedTest0 {
     }
   }
 
-  protected final void requireSeqItp(ProverOptions... options) {
+  protected void requireSeqItp(ProverOptions... options) {
     assume()
         .withMessage(
             "Solver independent interpolation strategy %s does not support sequential "
@@ -401,7 +401,7 @@ public abstract class SolverBasedTest0 {
         .containsNoneIn(INDEPENDENT_INTERPOLATION_STRATEGIES);
   }
 
-  protected final void requireTreeItp(ProverOptions... options) {
+  protected void requireTreeItp(ProverOptions... options) {
     requireInterpolation();
     assume()
         .withMessage(
@@ -640,6 +640,26 @@ public abstract class SolverBasedTest0 {
 
     protected ProverOptions itpStrategyToUse() {
       return interpolationStrategy;
+    }
+
+    @Override
+    protected void requireSeqItp(ProverOptions... options) {
+      List<ProverOptions> allOptions = new ArrayList<>(Arrays.asList(options));
+
+      if (itpStrategyToUse() != null) {
+        allOptions.add(itpStrategyToUse());
+      }
+
+      super.requireSeqItp(allOptions.toArray(new ProverOptions[0]));
+    }
+
+    @Override
+    protected void requireTreeItp(ProverOptions... options) {
+      List<ProverOptions> allOptions = new ArrayList<>(Arrays.asList(options));
+      if (itpStrategyToUse() != null) {
+        allOptions.add(itpStrategyToUse());
+      }
+      super.requireTreeItp(allOptions.toArray(new ProverOptions[0]));
     }
   }
 }

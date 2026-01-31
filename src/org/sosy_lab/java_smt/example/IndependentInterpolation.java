@@ -3,7 +3,7 @@
  * an API wrapper for a collection of SMT solvers:
  * https://github.com/sosy-lab/java-smt
  *
- * SPDX-FileCopyrightText: 2024 Dirk Beyer <https://www.sosy-lab.org>
+ * SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -35,6 +35,9 @@ public final class IndependentInterpolation {
     // never called
   }
 
+  private static final ProverOptions STRATEGY =
+      ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS;
+
   public static void main(String[] args)
       throws InvalidConfigurationException, SolverException, InterruptedException {
 
@@ -50,9 +53,9 @@ public final class IndependentInterpolation {
     try (SolverContext context =
             SolverContextFactory.createSolverContext(config, logger, notifier, solver);
         InterpolatingProverEnvironment<?> prover =
-            context.newProverEnvironmentWithInterpolation(
-                ProverOptions.GENERATE_UNIFORM_BACKWARD_INTERPOLANTS)) {
+            context.newProverEnvironmentWithInterpolation(STRATEGY)) {
       logger.log(Level.WARNING, "Using solver " + solver + " in version " + context.getVersion());
+      logger.log(Level.INFO, "Interpolation strategy: " + STRATEGY);
 
       BooleanFormulaManager bmgr = context.getFormulaManager().getBooleanFormulaManager();
       IntegerFormulaManager imgr = context.getFormulaManager().getIntegerFormulaManager();
@@ -98,15 +101,29 @@ public final class IndependentInterpolation {
 
     // create and assert some formulas
     // instead of 'named' formulas, we return a 'handle' (of generic type T)
-    prover.addConstraint(bmgr.and(imgr.equal(y, z), imgr.equal(z, two)));
-    T ip1 = prover.addConstraint(bmgr.and(imgr.equal(x, one), imgr.equal(y, x)));
+
+    BooleanFormula formulaB = bmgr.and(imgr.equal(y, z), imgr.equal(z, two));
+    BooleanFormula formulaA = bmgr.and(imgr.equal(x, one), imgr.equal(y, x));
+    prover.addConstraint(formulaB);
+    T ip1 = prover.addConstraint(formulaA);
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
     Preconditions.checkState(unsat, "The example for interpolation should be UNSAT");
 
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip1));
-    logger.log(Level.INFO, "Interpolants are:", itp);
+    logger.log(
+        Level.INFO,
+        String.format(
+            "Interpolation Result:%n"
+                + "  Strategy: %s%n"
+                + "  Formula A: %s%n"
+                + "  Formula B: %s%n"
+                + "  Interpolant: %s",
+            STRATEGY,
+            formulaA.toString().length() > 500 ? "Too large to display" : formulaA,
+            formulaB.toString().length() > 500 ? "Too large to display" : formulaB,
+            itp));
   }
 
   private static <T> void interpolateExample2(
@@ -126,9 +143,11 @@ public final class IndependentInterpolation {
     IntegerFormula one = imgr.makeNumber(1);
     IntegerFormula zero = imgr.makeNumber(0);
 
-    prover.addConstraint(imgr.lessThan(y, zero));
-    T ip1 =
-        prover.addConstraint(bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one))));
+    BooleanFormula formulaB = imgr.lessThan(y, zero);
+    BooleanFormula formulaA = bmgr.and(imgr.greaterThan(x, zero), imgr.equal(y, imgr.add(x, one)));
+
+    prover.addConstraint(formulaB);
+    T ip1 = prover.addConstraint(formulaA);
 
     // check for satisfiability
     boolean unsat = prover.isUnsat();
@@ -136,5 +155,17 @@ public final class IndependentInterpolation {
 
     BooleanFormula itp = prover.getInterpolant(ImmutableList.of(ip1));
     logger.log(Level.INFO, "Interpolants are:", itp);
+    logger.log(
+        Level.INFO,
+        String.format(
+            "Interpolation Result:%n"
+                + "  Strategy: %s%n"
+                + "  Formula A: %s%n"
+                + "  Formula B: %s%n"
+                + "  Interpolant: %s",
+            STRATEGY,
+            formulaA.toString().length() > 500 ? "Too large to display" : formulaA,
+            formulaB.toString().length() > 500 ? "Too large to display" : formulaB,
+            itp));
   }
 }
