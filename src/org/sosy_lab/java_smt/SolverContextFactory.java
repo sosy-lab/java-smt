@@ -40,6 +40,7 @@ import org.sosy_lab.java_smt.solvers.princess.PrincessSolverContext;
 import org.sosy_lab.java_smt.solvers.smtinterpol.SmtInterpolSolverContext;
 import org.sosy_lab.java_smt.solvers.yices2.Yices2SolverContext;
 import org.sosy_lab.java_smt.solvers.z3.Z3SolverContext;
+import org.sosy_lab.java_smt.solvers.z3legacy.Z3LegacySolverContext;
 
 /**
  * Factory class for loading and generating solver contexts. Generates a {@link SolverContext}
@@ -55,6 +56,7 @@ public class SolverContextFactory {
     MATHSAT5,
     SMTINTERPOL,
     Z3,
+    Z3_WITH_INTERPOLATION,
     PRINCESS,
     BOOLECTOR,
     CVC4,
@@ -281,6 +283,17 @@ public class SolverContextFactory {
 
       case Z3:
         return Z3SolverContext.create(
+            logger,
+            config,
+            shutdownNotifier,
+            logfile,
+            randomSeed,
+            floatingPointRoundingMode,
+            nonLinearArithmetic,
+            loader);
+
+      case Z3_WITH_INTERPOLATION:
+        return Z3LegacySolverContext.create(
             logger,
             config,
             shutdownNotifier,

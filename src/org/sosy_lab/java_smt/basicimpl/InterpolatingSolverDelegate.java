@@ -72,12 +72,17 @@ public class InterpolatingSolverDelegate extends AbstractProver<String>
   }
 
   @Override
+  protected boolean hasPersistentModel() {
+    return false;
+  }
+
+  @Override
   public int size() {
     return delegate.size();
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsatImpl() throws SolverException, InterruptedException {
     return delegate.isUnsat();
   }
 

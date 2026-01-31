@@ -17,8 +17,11 @@ import static org.sosy_lab.java_smt.api.FormulaType.IntegerType;
 import static org.sosy_lab.java_smt.api.FormulaType.getBitvectorTypeWithSize;
 import static org.sosy_lab.java_smt.test.ProverEnvironmentSubject.assertThat;
 
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -45,6 +49,7 @@ import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.BitvectorType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
+import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.Model;
 import org.sosy_lab.java_smt.api.Model.ValueAssignment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -52,6 +57,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
 import org.sosy_lab.java_smt.api.SolverException;
+import org.sosy_lab.java_smt.api.visitors.DefaultFormulaVisitor;
 
 /** Test that values from models are appropriately parsed. */
 public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
@@ -86,11 +92,33 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       FormulaType.getArrayType(getBitvectorTypeWithSize(32), getBitvectorTypeWithSize(32));
 
   private static final ImmutableList<Solvers> SOLVERS_WITH_PARTIAL_MODEL =
-      ImmutableList.of(Solvers.Z3);
+      ImmutableList.of(Solvers.Z3, Solvers.Z3_WITH_INTERPOLATION, Solvers.PRINCESS);
+  private static final ImmutableList<Solvers> SOLVERS_WITH_PERSISTENT_MODEL =
+      ImmutableList.of(
+          Solvers.MATHSAT5,
+          Solvers.Z3,
+          Solvers.Z3_WITH_INTERPOLATION,
+          Solvers.SMTINTERPOL,
+          Solvers.YICES2);
+
+  /** Model value for irrelevant variable. */
+  private BigInteger defaultValue;
 
   @Before
   public void setup() {
     requireModel();
+
+    switch (solverToUse()) {
+      case SMTINTERPOL:
+      case Z3:
+        defaultValue = BigInteger.TWO;
+        break;
+      case BOOLECTOR:
+        defaultValue = BigInteger.valueOf(255);
+        break;
+      default:
+        defaultValue = BigInteger.ZERO;
+    }
   }
 
   @Test
@@ -103,6 +131,17 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
       }
 
       assertThat(prover.getModelAssignments()).isEmpty();
+    }
+  }
+
+  @Test
+  public void testModelAccessWithoutSatCheck() throws InterruptedException {
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeTrue());
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
+      prover.push(bmgr.makeVariable("x"));
+      assertThrows(IllegalStateException.class, () -> prover.getModel());
     }
   }
 
@@ -916,9 +955,9 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
   @Test
   public void testPartialModelsUF() throws SolverException, InterruptedException {
     assume()
-        .withMessage("As of now, only Z3 supports partial model evaluation")
-        .that(solver)
-        .isEqualTo(Solvers.Z3);
+        .withMessage("Solver %s does not support partial model evaluation", solverToUse())
+        .that(solverToUse())
+        .isIn(SOLVERS_WITH_PARTIAL_MODEL);
     try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
       IntegerFormula x = imgr.makeVariable("x");
       IntegerFormula f = fmgr.declareAndCallUF("f", IntegerType, x);
@@ -1213,10 +1252,7 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireArrayModel();
 
-    assume()
-        .withMessage("Solvers have problems with multi-dimensional arrays")
-        .that(solverToUse())
-        .isNoneOf(Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2);
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -1272,10 +1308,15 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrayModel();
 
     assume()
-        .withMessage("Solvers have problems with multi-dimensional arrays")
+        .withMessage("Boolector supports bitvector arrays only")
         .that(solverToUse())
-        .isNoneOf(
-            Solvers.PRINCESS, Solvers.CVC4, Solvers.YICES2, Solvers.BOOLECTOR, Solvers.BITWUZLA);
+        .isNotEqualTo(Solvers.BOOLECTOR);
+    assume()
+        .withMessage(
+            "Yices2 does not report any specific element value for the array, "
+                + "but reports only default 123")
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.YICES2);
 
     // (= (select (select (select arr 5) 3) 1) x)
     // (= x 123)"
@@ -1331,11 +1372,6 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireIntegers();
     requireArrays();
     requireArrayModel();
-
-    assume()
-        .withMessage("As of now, only Princess does not support multi-dimensional arrays")
-        .that(solver)
-        .isNotEqualTo(Solvers.PRINCESS);
 
     // create formula for "arr[5][3][1]==x && x==123"
     BooleanFormula f =
@@ -2449,18 +2485,405 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     requireArrays();
     requireBitvectors();
 
-    assume()
-        .withMessage("Solver is quite slow for this example")
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.PRINCESS);
-
     BooleanFormula formula =
         context
             .getFormulaManager()
             .parse(
                 Files.readString(Path.of("src/org/sosy_lab/java_smt/test/SMT2_UF_and_Array.smt2")));
 
+    assume()
+        .withMessage("Solver is quite slow for this example")
+        .that(solverToUse())
+        .isNoneOf(Solvers.CVC5, Solvers.MATHSAT5, Solvers.PRINCESS, Solvers.BITWUZLA);
+
     checkModelIteration(formula, false);
+  }
+
+  /** Returns the arguments of an UF or array definition from the model. */
+  private Iterable<Formula> getFunctionArgs(Formula pValue) {
+    requireVisitor();
+    return mgr.visit(
+        pValue,
+        new DefaultFormulaVisitor<>() {
+          @Override
+          protected Iterable<Formula> visitDefault(Formula f) {
+            throw new IllegalArgumentException();
+          }
+
+          @Override
+          public Iterable<Formula> visitFreeVariable(Formula f, String name) {
+            // Base case for array values
+            return ImmutableList.of();
+          }
+
+          @Override
+          public Iterable<Formula> visitFunction(
+              Formula f, List<Formula> args, FunctionDeclaration<?> functionDeclaration) {
+            if (functionDeclaration.getKind().equals(FunctionDeclarationKind.SELECT)) {
+              return FluentIterable.concat(
+                  getFunctionArgs(args.get(0)), ImmutableList.of(args.get(1)));
+            } else {
+              // Assume its an UF value
+              return args;
+            }
+          }
+        });
+  }
+
+  /** Evaluate the UF or array constraint and check that the model contains the expected values. */
+  private void checkModelContains(
+      BooleanFormula pFormula, String pVar, Map<List<Formula>, Formula> expected) {
+    requireArrayModel();
+
+    try (var prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.addConstraint(pFormula);
+      assertThat(prover.isUnsat()).isFalse();
+
+      ImmutableMap.Builder<List<Formula>, Formula> builder = ImmutableMap.builder();
+      try (var model = prover.getModel()) {
+        for (var assignment : model.asList()) {
+          if (assignment.getName().equals(pVar)) {
+            builder.put(
+                ImmutableList.copyOf(getFunctionArgs(assignment.getKey())),
+                assignment.getValueAsFormula());
+          }
+        }
+      }
+      var model = builder.buildOrThrow();
+
+      // Check that the model contains all expected assignments, except maybe one that may be
+      // covered by the default value
+      assertWithMessage(
+              "Model assignments are different.\nActual model: %s\nExpected model: %s",
+              model, expected)
+          .that(Maps.difference(model, expected).entriesDiffering())
+          .isEmpty();
+      assertWithMessage(
+              "Model assignments differ too much.\nActual model: %s\nExpected model: %s",
+              model, expected)
+          .that(Maps.difference(model, expected).entriesOnlyOnRight().size())
+          .isLessThan(2);
+
+    } catch (SolverException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  @Test
+  public void testArray1Bv() {
+    requireArrays();
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array = amgr.makeArray("array", bitvectorType, bitvectorType);
+
+    var idx = bvmgr.makeBitvector(8, 1);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(amgr.select(array, idx), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testArray2Bv() {
+    requireArrays();
+    requireBitvectors();
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array = amgr.makeArray("array", bitvectorType, bitvectorType);
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(amgr.select(array, idxA), valA),
+            bvmgr.equal(amgr.select(array, idxB), valB)),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testArray1BvBV() {
+    requireArrays();
+    requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array =
+        amgr.makeArray(
+            "array", bitvectorType, FormulaType.getArrayType(bitvectorType, bitvectorType));
+
+    var idxA = bvmgr.makeBitvector(8, 1);
+    var idxB = bvmgr.makeBitvector(8, 7);
+    var val = bvmgr.makeBitvector(8, 10);
+
+    checkModelContains(
+        bvmgr.equal(amgr.select(amgr.select(array, idxA), idxB), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testArray2BvBv() {
+    requireArrays();
+    requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
+
+    // Test for 2d bitvector arrays with formula like:
+    //     array[1][7] = 10  and  array[3][2] = 5  and  array[5][4] = 20
+    // We have no default value, so the solver can choose any value for other indices,
+    // and thus, we can miss one of the assignments in the model.
+    var bitvectorType = FormulaType.getBitvectorTypeWithSize(8);
+    var array =
+        amgr.makeArray(
+            "array", bitvectorType, FormulaType.getArrayType(bitvectorType, bitvectorType));
+
+    var idxA1 = bvmgr.makeBitvector(8, 1);
+    var idxA2 = bvmgr.makeBitvector(8, 7);
+    var valA = bvmgr.makeBitvector(8, 10);
+
+    var idxB1 = bvmgr.makeBitvector(8, 3);
+    var idxB2 = bvmgr.makeBitvector(8, 2);
+    var valB = bvmgr.makeBitvector(8, 5);
+
+    var idxC1 = bvmgr.makeBitvector(8, 5);
+    var idxC2 = bvmgr.makeBitvector(8, 4);
+    var valC = bvmgr.makeBitvector(8, 20);
+
+    checkModelContains(
+        bmgr.and(
+            bvmgr.equal(amgr.select(amgr.select(array, idxA1), idxA2), valA),
+            bvmgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB),
+            bvmgr.equal(amgr.select(amgr.select(array, idxC1), idxC2), valC)),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA,
+            ImmutableList.of(idxB1, idxB2), valB,
+            ImmutableList.of(idxC1, idxC2), valC));
+  }
+
+  @Test
+  public void testArrayStore1BvBvBv() {
+    // Test for 3d bitvector arrays with exactly one element, and default value 0:
+    //     array[1][7][21] = 11 && all other elements = 0,
+    // modeled as:
+    //     array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+
+    var scalarType = FormulaType.getBitvectorTypeWithSize(8);
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = bvmgr.makeBitvector(scalarType.getSize(), 1);
+    var idxB = bvmgr.makeBitvector(scalarType.getSize(), 7);
+    var idxC1 = bvmgr.makeBitvector(scalarType.getSize(), 2);
+    var val = bvmgr.makeBitvector(scalarType.getSize(), 1);
+
+    // create empty 3d array, with default value 0
+    var scalarConst = bvmgr.makeBitvector(scalarType.getSize(), 0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    // store the value at the given indices
+    var array1Value = amgr.store(array1Const, idxC1, val);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC1), val));
+  }
+
+  @Test
+  public void testArrayStore2BvBvBv() {
+    // Test for 3d bitvector arrays with exactly two elements, and default value 0:
+    //     array[1][7][21] = 11 && array[1][7][22] = 12 && all other elements = 0
+    // modeled as:
+    //     array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireBitvectors();
+
+    assume().that(solver).isNotEqualTo(Solvers.BOOLECTOR); // Doesn't support multiple indices
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // Yices does not give nested array models
+
+    // FIXME CVC4 array model is sometimes broken in JavaSMT. Unfixable in CVC4, fixed in CVC5.
+    assume().that(solver).isNotEqualTo(Solvers.CVC4);
+
+    var scalarType = FormulaType.getBitvectorTypeWithSize(8);
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = bvmgr.makeBitvector(scalarType.getSize(), 1);
+    var idxB = bvmgr.makeBitvector(scalarType.getSize(), 7);
+    var idxC1 = bvmgr.makeBitvector(scalarType.getSize(), 21);
+    var idxC2 = bvmgr.makeBitvector(scalarType.getSize(), 22);
+    var val1 = bvmgr.makeBitvector(scalarType.getSize(), 11);
+    var val2 = bvmgr.makeBitvector(scalarType.getSize(), 12);
+
+    // create empty 3d array, with default value 0
+    var scalarConst = bvmgr.makeBitvector(scalarType.getSize(), 0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    // store the value at the given indices
+    var array1Value = amgr.store(amgr.store(array1Const, idxC1, val1), idxC2, val2);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA, idxB, idxC1), val1, ImmutableList.of(idxA, idxB, idxC2), val2));
+  }
+
+  @Test
+  public void testArray1Int() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array = amgr.makeArray("array", IntegerType, IntegerType);
+
+    var idx = imgr.makeNumber(1);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(amgr.select(array, idx), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idx), val));
+  }
+
+  @Test
+  public void testArray2Int() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    var array = amgr.makeArray("array", IntegerType, IntegerType);
+
+    var idxA = imgr.makeNumber(1);
+    var valA = imgr.makeNumber(10);
+
+    var idxB = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(
+            imgr.equal(amgr.select(array, idxA), valA), imgr.equal(amgr.select(array, idxB), valB)),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA), valA, ImmutableList.of(idxB), valB));
+  }
+
+  @Test
+  public void testArray1IntInt() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+
+    var array =
+        amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
+
+    var idxA = imgr.makeNumber(1);
+    var idxB = imgr.makeNumber(7);
+    var val = imgr.makeNumber(10);
+
+    checkModelContains(
+        imgr.equal(amgr.select(amgr.select(array, idxA), idxB), val),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB), val));
+  }
+
+  @Test
+  public void testArrayStore1IntIntInt() {
+    // Test for 3d integer arrays with exactly one element
+    // array = (Store (const ...) idxA (Store (const ..) idxB (Store (const ...) idx C val))
+    requireArrays();
+    requireIntegers();
+    requireConstArrays();
+
+    assume().that(solver).isNotEqualTo(Solvers.CVC4); // FIXME Broken in JavaSMT
+
+    var scalarType = FormulaType.IntegerType;
+
+    var array1Type = FormulaType.getArrayType(scalarType, scalarType);
+    var array2Type = FormulaType.getArrayType(scalarType, array1Type);
+    var array3Type = FormulaType.getArrayType(scalarType, array2Type);
+
+    var array = amgr.makeArray("array", array3Type.getIndexType(), array3Type.getElementType());
+
+    var idxA = imgr.makeNumber(1);
+    var idxB = imgr.makeNumber(7);
+    var idxC = imgr.makeNumber(2);
+    var val = imgr.makeNumber(10);
+
+    var scalarConst = imgr.makeNumber(0);
+    var array1Const = amgr.makeArray(array1Type, scalarConst);
+    var array2Const = amgr.makeArray(array2Type, array1Const);
+    var array3Const = amgr.makeArray(array3Type, array2Const);
+
+    var array1Value = amgr.store(array1Const, idxC, val);
+    var array2Value = amgr.store(array2Const, idxB, array1Value);
+    var array3Value = amgr.store(array3Const, idxA, array2Value);
+
+    checkModelContains(
+        amgr.equivalence(array, array3Value),
+        "array",
+        ImmutableMap.of(ImmutableList.of(idxA, idxB, idxC), val));
+  }
+
+  @Test
+  public void testArray2IntInt() {
+    requireArrays();
+    requireArrayModel();
+    requireIntegers();
+
+    assume().that(solver).isNotEqualTo(Solvers.YICES2); // FIXME Broken in JavaSMT
+
+    var array =
+        amgr.makeArray("array", IntegerType, FormulaType.getArrayType(IntegerType, IntegerType));
+
+    var idxA1 = imgr.makeNumber(1);
+    var idxA2 = imgr.makeNumber(7);
+    var valA = imgr.makeNumber(10);
+
+    var idxB1 = imgr.makeNumber(3);
+    var idxB2 = imgr.makeNumber(2);
+    var valB = imgr.makeNumber(5);
+
+    checkModelContains(
+        bmgr.and(
+            imgr.equal(amgr.select(amgr.select(array, idxA1), idxA2), valA),
+            imgr.equal(amgr.select(amgr.select(array, idxB1), idxB2), valB)),
+        "array",
+        ImmutableMap.of(
+            ImmutableList.of(idxA1, idxA2), valA, ImmutableList.of(idxB1, idxB2), valB));
   }
 
   @Test
@@ -2524,6 +2947,211 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     } finally {
       m.close();
     }
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterAnotherAddConstraint()
+      throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "y"));
+    }
+    prover.push(initialConstraint); // PUSH x=y -> arbitrary model
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pushing something else
+    final BooleanFormula newConstraint;
+    if (imgr != null) {
+      newConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(5));
+    } else {
+      newConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 5));
+    }
+    prover.addConstraint(newConstraint); // ADD x=5
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    final List<ValueAssignment> assignments = m.asList();
+    assertThat(assignments).hasSize(2);
+    System.out.println(assignments);
+    if (imgr != null) {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    } else {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(defaultValue);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(defaultValue);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterAnotherPush() throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeVariable("y"));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeVariable(8, "y"));
+    }
+    prover.push(initialConstraint); // PUSH x=y -> arbitrary model
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pushing something else
+    final BooleanFormula newConstraint;
+    if (imgr != null) {
+      newConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(5));
+    } else {
+      newConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 5));
+    }
+    prover.push(newConstraint); // PUSH x=5
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    final List<ValueAssignment> assignments = m.asList();
+    assertThat(assignments).hasSize(2);
+    System.out.println(assignments);
+    if (imgr != null) {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(imgr.makeVariable("y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    } else {
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "x"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+      assertThat(
+              assignments.stream()
+                  .anyMatch(
+                      a ->
+                          a.getKey().equals(bvmgr.makeVariable(8, "y"))
+                              && a.getValue().equals(defaultValue)))
+          .isTrue();
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(defaultValue);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(defaultValue);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
+  }
+
+  @Test
+  @SuppressWarnings("resource")
+  public void delayedAccessToModelAfterPop() throws SolverException, InterruptedException {
+    ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS);
+    final BooleanFormula initialConstraint;
+    if (imgr != null) {
+      initialConstraint = imgr.equal(imgr.makeVariable("x"), imgr.makeNumber(1));
+    } else {
+      initialConstraint = bvmgr.equal(bvmgr.makeVariable(8, "x"), bvmgr.makeBitvector(8, 1));
+    }
+    prover.push(initialConstraint); // PUSH x=1
+    assertThat(prover).isSatisfiable();
+
+    // get model for initial constraint
+    Model m = prover.getModel();
+
+    // change stack by pop
+    prover.pop();
+    assertThat(prover).isSatisfiable();
+
+    // try to access the previously generated model as explicit list
+    if (imgr != null) {
+      assertThat(m.asList().get(0).getKey()).isEqualTo(imgr.makeVariable("x"));
+      assertThat(m.asList().get(0).getValue()).isEqualTo(BigInteger.ONE);
+    } else {
+      assertThat(m.asList().get(0).getKey()).isEqualTo(bvmgr.makeVariable(8, "x"));
+      assertThat(m.asList().get(0).getValue()).isEqualTo(BigInteger.ONE);
+    }
+
+    // try to access the previously generated model,
+    // this should either fail fast or succeed with the old model (x=1)
+    try {
+      if (imgr != null) {
+        assertThat(m.evaluate(imgr.makeVariable("x"))).isEqualTo(BigInteger.ONE);
+      } else {
+        assertThat(m.evaluate(bvmgr.makeVariable(8, "x"))).isEqualTo(BigInteger.ONE);
+      }
+      assertThat(solverToUse()).isIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } catch (IllegalStateException e) {
+      assertThat(solverToUse()).isNotIn(SOLVERS_WITH_PERSISTENT_MODEL);
+    } finally {
+      m.close();
+    }
+    prover.close();
   }
 
   @Test
@@ -2643,7 +3271,8 @@ public class ModelTest extends SolverBasedTest0.ParameterizedSolverBasedTest0 {
     // Warning: do never call "toString" on this formula!
     BooleanFormula f = bmgr.makeVariable("basis");
 
-    int maxDepth = 30; // if every solver is fast enough, we could increase this number up to 100.
+    // if every solver is fast enough, we could increase this number up to 100.
+    int maxDepth = solverToUse() == Solvers.BITWUZLA ? 17 : 30;
 
     for (int depth = 0; depth < maxDepth; depth++) {
       T var = makeVar.apply(depth);

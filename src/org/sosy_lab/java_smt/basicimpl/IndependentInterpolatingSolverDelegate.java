@@ -399,8 +399,13 @@ public class IndependentInterpolatingSolverDelegate<T> extends AbstractProver<T>
   }
 
   @Override
-  public boolean isUnsat() throws SolverException, InterruptedException {
+  public boolean isUnsatImpl() throws SolverException, InterruptedException {
     return delegate.isUnsat();
+  }
+
+  @Override
+  public boolean hasPersistentModel() {
+    return false;
   }
 
   @Override

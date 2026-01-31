@@ -13,20 +13,24 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Tokenizer;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Map_TermTerm;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Options;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Parser;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Int;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
 public final class BitwuzlaFormulaManager
-    extends AbstractFormulaManager<Term, Sort, Void, BitwuzlaDeclaration> {
+    extends AbstractFormulaManager<Term, Sort, TermManager, BitwuzlaDeclaration> {
   private final BitwuzlaFormulaCreator creator;
   private final Options bitwuzlaOption;
 
@@ -58,6 +62,16 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
+  public Term equalImpl(Collection<Term> pArgs) {
+    return creator.getEnv().mk_term(Kind.EQUAL, new Vector_Term(pArgs), new Vector_Int());
+  }
+
+  @Override
+  public Term distinctImpl(Collection<Term> pArgs) {
+    return creator.getEnv().mk_term(Kind.DISTINCT, new Vector_Term(pArgs), new Vector_Int());
+  }
+
+  @Override
   public Term parseImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
     List<String> tokens = Tokenizer.tokenize(formulaStr);
@@ -69,15 +83,11 @@ public final class BitwuzlaFormulaManager
     for (String token : tokens) {
       if (Tokenizer.isDeclarationToken(token)) {
         // FIXME: Do we need to support function definitions here?
-        Parser declParser = new Parser(creator.getTermManager(), bitwuzlaOption);
+        Parser declParser = new Parser(creator.getEnv(), bitwuzlaOption);
         declParser.parse(token, true, false);
         Term parsed = declParser.get_declared_funs().get(0);
 
         String symbol = parsed.symbol();
-        if (symbol.startsWith("|") && symbol.endsWith("|")) {
-          // Strip quotes from the name
-          symbol = symbol.substring(1, symbol.length() - 1);
-        }
         Sort sort = parsed.sort();
 
         // Check if the symbol is already defined in the variable cache
@@ -122,7 +132,7 @@ public final class BitwuzlaFormulaManager
     String input = String.join("\n", processed.build());
 
     // Add the declarations to the input and parse everything
-    Parser parser = new Parser(creator.getTermManager(), bitwuzlaOption);
+    Parser parser = new Parser(creator.getEnv(), bitwuzlaOption);
     parser.parse(decls + input, true, false);
 
     // After the run, get the final assertion from the parser
@@ -147,7 +157,7 @@ public final class BitwuzlaFormulaManager
     }
 
     // Substitute all symbols from the context with their original terms
-    result = creator.getTermManager().substitute_term(result, subst);
+    result = creator.getEnv().substitute_term(result, subst);
 
     // Return the updated term
     return result;
@@ -163,7 +173,7 @@ public final class BitwuzlaFormulaManager
     if (pTerm.is_value()) {
       return "(assert " + pTerm + ")";
     }
-    Bitwuzla bitwuzla = new Bitwuzla(creator.getTermManager());
+    Bitwuzla bitwuzla = new Bitwuzla(creator.getEnv());
     for (Term t : creator.getConstraintsForTerm(pTerm)) {
       bitwuzla.assert_formula(t);
     }
@@ -177,6 +187,6 @@ public final class BitwuzlaFormulaManager
 
   @Override
   public Term simplify(Term t) {
-    return new Bitwuzla(creator.getTermManager()).simplify(t);
+    return new Bitwuzla(creator.getEnv()).simplify(t);
   }
 }
