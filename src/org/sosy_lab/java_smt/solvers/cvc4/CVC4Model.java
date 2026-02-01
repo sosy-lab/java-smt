@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import edu.stanford.CVC4.ArrayType;
@@ -71,7 +70,7 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     // (This problem has been fixed on CVC5/Bitwula)
     var cache = new HashSet<CVC4Formula>();
     var work = new ArrayDeque<CVC4Formula>();
-    work.addAll(FluentIterable.from(asserted).transform(CVC4Formula::new).toList());
+    work.addAll(transformedImmutableListCopy(asserted, CVC4Formula::new));
     while (!work.isEmpty()) {
       var next = work.pop();
       if (cache.add(next)) {
