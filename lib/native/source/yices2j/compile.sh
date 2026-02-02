@@ -34,12 +34,11 @@ cd ${DIR}
 
 JNI_HEADERS="$(../get_jni_headers.sh)"
 
-RELATIVE_ROOT_DIR="../../../.."
-YICES_SRC_DIR=$RELATIVE_ROOT_DIR/"$1"/src/include
-YICES_LIB_DIR=$RELATIVE_ROOT_DIR/"$1"/build/x86_64-pc-linux-gnu-release/lib/
-GMP_HEADER_DIR=$RELATIVE_ROOT_DIR/"$2"
-GMP_LIB_DIR=$GMP_HEADER_DIR/.libs
-GPERF_HEADER_DIR=$RELATIVE_ROOT_DIR/"$3"
+YICES_SRC_DIR="$1"/include
+YICES_LIB_DIR="$1"/lib
+GMP_HEADER_DIR="$2"/include
+GMP_LIB_DIR="$2"/lib
+GPERF_HEADER_DIR="$3"
 GPERF_LIB_DIR=$GPERF_HEADER_DIR/lib
 
 # check requirements

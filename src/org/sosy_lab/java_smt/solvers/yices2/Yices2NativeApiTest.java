@@ -54,6 +54,7 @@ import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_free_co
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_function_type;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_by_name;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_get_term_name;
+import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_has_mcsat;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_idiv;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_iff;
 import static org.sosy_lab.java_smt.solvers.yices2.Yices2NativeApi.yices_init;
@@ -609,8 +610,13 @@ public class Yices2NativeApiTest {
 
   @Test
   public void isThreadSafe() {
-    // TODO: this explains why our concurrency tests fail ;D FIX!
-    assertThat(yices_is_thread_safe()).isEqualTo(0);
+    // Check that we compiled with --thread-safety to make it reentrant
+    assertThat(yices_is_thread_safe()).isEqualTo(1);
+  }
+
+  @Test
+  public void hasMCSat() {
+    assertThat(yices_has_mcsat()).isEqualTo(0);
   }
 
   @Test

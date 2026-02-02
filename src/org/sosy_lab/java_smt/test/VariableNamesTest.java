@@ -527,8 +527,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
 
   @Test
   public void testBoolVariableDump() {
-    // FIXME: Broken on yices2, fixed in 2.7.0
-    assume().that(solverToUse()).isNotEqualTo(Solvers.YICES2);
     for (String name : getAllNames()) {
       BooleanFormula var = createVariableWith(bmgr::makeVariable, name);
       if (var != null) {

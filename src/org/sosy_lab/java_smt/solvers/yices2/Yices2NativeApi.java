@@ -10,6 +10,7 @@ package org.sosy_lab.java_smt.solvers.yices2;
 
 import java.util.function.Supplier;
 import org.sosy_lab.common.ShutdownNotifier;
+import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.basicimpl.ShutdownHook;
 
 @SuppressWarnings({"unused", "checkstyle:methodname", "checkstyle:parametername"})
@@ -29,61 +30,62 @@ public final class Yices2NativeApi {
   public static final int YICES_CONSTRUCTOR_ERROR = -1;
   public static final int YICES_BOOL_CONST = 0;
   public static final int YICES_ARITH_CONST = 1;
-  public static final int YICES_BV_CONST = 2;
-  public static final int YICES_SCALAR_CONST = 3; // NOT used in JavaSMT
-  public static final int YICES_VARIABLE = 4;
-  public static final int YICES_UNINTERPRETED_TERM = 5;
+  public static final int YICES_ARITH_FF_CONSTANT = 2; // finite field rational constant
+  public static final int YICES_BV_CONST = 3;
+  public static final int YICES_SCALAR_CONST = 4; // NOT used in JavaSMT
+  public static final int YICES_VARIABLE = 5;
+  public static final int YICES_UNINTERPRETED_TERM = 6;
 
-  public static final int YICES_ITE_TERM = 6; // if-then-else
-  public static final int YICES_APP_TERM = 7; // application of an uninterpreted function
-  public static final int YICES_UPDATE_TERM = 8; // function update
-  public static final int YICES_TUPLE_TERM = 9; // tuple constructor
-  public static final int YICES_EQ_TERM = 10; // equality
-  public static final int YICES_DISTINCT_TERM = 11; // distinct t_1 ... t_n
-  public static final int YICES_FORALL_TERM = 12; // quantifier
-  public static final int YICES_LAMBDA_TERM = 13; // lambda
-  public static final int YICES_NOT_TERM = 14; // (not t)
-  public static final int YICES_OR_TERM = 15; // n-ary OR
-  public static final int YICES_XOR_TERM = 16; // n-ary XOR
+  public static final int YICES_ITE_TERM = 7; // if-then-else
+  public static final int YICES_APP_TERM = 8; // application of an uninterpreted function
+  public static final int YICES_UPDATE_TERM = 9; // function update
+  public static final int YICES_TUPLE_TERM = 10; // tuple constructor
+  public static final int YICES_EQ_TERM = 11; // equality
+  public static final int YICES_DISTINCT_TERM = 12; // distinct t_1 ... t_n
+  public static final int YICES_FORALL_TERM = 13; // quantifier
+  public static final int YICES_LAMBDA_TERM = 14; // lambda
+  public static final int YICES_NOT_TERM = 15; // (not t)
+  public static final int YICES_OR_TERM = 16; // n-ary OR
+  public static final int YICES_XOR_TERM = 17; // n-ary XOR
 
-  public static final int YICES_BV_ARRAY = 17; // array of boolean terms
-  public static final int YICES_BV_DIV = 18; // unsigned division
-  public static final int YICES_BV_REM = 19; // unsigned remainder
-  public static final int YICES_BV_SDIV = 20; // signed division
-  public static final int YICES_BV_SREM = 21; // remainder in signed division (rounding to 0)
-  public static final int YICES_BV_SMOD = 22; // remainder in signed division (rounding to
+  public static final int YICES_BV_ARRAY = 18; // array of boolean terms
+  public static final int YICES_BV_DIV = 19; // unsigned division
+  public static final int YICES_BV_REM = 20; // unsigned remainder
+  public static final int YICES_BV_SDIV = 21; // signed division
+  public static final int YICES_BV_SREM = 22; // remainder in signed division (rounding to 0)
+  public static final int YICES_BV_SMOD = 23; // remainder in signed division (rounding to
   // -infinity)
-  public static final int YICES_BV_SHL = 23; // shift left (padding with 0)
-  public static final int YICES_BV_LSHR = 24; // logical shift right (padding with 0)
-  public static final int YICES_BV_ASHR = 25; // arithmetic shift right (padding with sign bit)
-  public static final int YICES_BV_GE_ATOM = 26; // unsigned comparison: (t1 >= t2)
-  public static final int YICES_BV_SGE_ATOM = 27; // signed comparison (t1 >= t2)
-  public static final int YICES_ARITH_GE_ATOM = 28; // atom (t1 >= t2) for arithmetic terms: t2 is
+  public static final int YICES_BV_SHL = 24; // shift left (padding with 0)
+  public static final int YICES_BV_LSHR = 25; // logical shift right (padding with 0)
+  public static final int YICES_BV_ASHR = 26; // arithmetic shift right (padding with sign bit)
+  public static final int YICES_BV_GE_ATOM = 27; // unsigned comparison: (t1 >= t2)
+  public static final int YICES_BV_SGE_ATOM = 28; // signed comparison (t1 >= t2)
+  public static final int YICES_ARITH_GE_ATOM = 29; // atom (t1 >= t2) for arithmetic terms: t2 is
   // always 0
-  public static final int YICES_ARITH_ROOT_ATOM = 29; // atom (0 <= k <= root_count(p)) && (x r
+  public static final int YICES_ARITH_ROOT_ATOM = 30; // atom (0 <= k <= root_count(p)) && (x r
   // root(p,k)) for r in <, <=, ==, !=, >, >=
 
-  public static final int YICES_ABS = 30; // absolute value
-  public static final int YICES_CEIL = 31; // ceil
-  public static final int YICES_FLOOR = 32; // floor
-  public static final int YICES_RDIV = 33; // real division (as in x/y)
-  public static final int YICES_IDIV = 34; // integer division
-  public static final int YICES_IMOD = 35; // modulo
-  public static final int YICES_IS_INT_ATOM = 36; // integrality test: (is-int t)
-  public static final int YICES_DIVIDES_ATOM = 37; // divisibility test: (divides t1 t2)
+  public static final int YICES_ABS = 31; // absolute value
+  public static final int YICES_CEIL = 32; // ceil
+  public static final int YICES_FLOOR = 33; // floor
+  public static final int YICES_RDIV = 34; // real division (as in x/y)
+  public static final int YICES_IDIV = 35; // integer division
+  public static final int YICES_IMOD = 36; // modulo
+  public static final int YICES_IS_INT_ATOM = 37; // integrality test: (is-int t)
+  public static final int YICES_DIVIDES_ATOM = 38; // divisibility test: (divides t1 t2)
 
   // projections
-  public static final int YICES_SELECT_TERM = 38; // tuple projection
-  public static final int YICES_BIT_TERM = 39; // bit-select: extract the i-th bit of a bitvector
+  public static final int YICES_SELECT_TERM = 39; // tuple projection
+  public static final int YICES_BIT_TERM = 40; // bit-select: extract the i-th bit of a bitvector
 
   // sums
-  public static final int YICES_BV_SUM = 40; // sum of pairs a * t where a is a bitvector constant
+  public static final int YICES_BV_SUM = 41; // sum of pairs a * t where a is a bitvector constant
   // (and t is a bitvector term)
-  public static final int YICES_ARITH_SUM = 41; // sum of pairs a * t where a is a rational (and t
+  public static final int YICES_ARITH_SUM = 42; // sum of pairs a * t where a is a rational (and t
   // is an arithmetic term)
-
-  // products
-  public static final int YICES_POWER_PRODUCT = 42; // power products: (t1^d1 * ... * t_n^d_n)
+  public static final int YICES_ARITH_FF_SUM = 43; // sum of pairs a * t where a is an finite
+  // field constant (and t is an finite field arithmetic term) products
+  public static final int YICES_POWER_PRODUCT = 44; // power products: (t1^d1 * ... * t_n^d_n)
 
   // Workaround as Yices misses some useful operators,
   // MAX_INT avoids collisions with existing constants
@@ -98,11 +100,41 @@ public final class Yices2NativeApi {
   public static final int YVAL_BOOL = 1;
   public static final int YVAL_RATIONAL = 2;
   public static final int YVAL_ALGEBRAIC = 3;
-  public static final int YVAL_BV = 4;
-  public static final int YVAL_SCALAR = 5;
-  public static final int YVAL_TUPLE = 6;
-  public static final int YVAL_FUNCTION = 7;
-  public static final int YVAL_MAPPING = 8;
+  public static final int YVAL_FINITEFIELD = 4;
+  public static final int YVAL_BV = 5;
+  public static final int YVAL_SCALAR = 6;
+  public static final int YVAL_TUPLE = 7;
+  public static final int YVAL_FUNCTION = 8;
+  public static final int YVAL_MAPPING = 9;
+
+  public static int tagForValKind(int valKind) {
+    switch (valKind) {
+      case 0:
+        return YVAL_UNKNOWN; // UNKNOWN_VALUE
+      case 1:
+        return YVAL_BOOL; // BOOLEAN_VALUE
+      case 2:
+        return YVAL_RATIONAL; // RATIONAL_VALUE
+      case 3:
+        return YVAL_FINITEFIELD; // FINITEFIELD_VALUE
+      case 4:
+        return YVAL_ALGEBRAIC; // ALGEBRAIC_VALUE
+      case 5:
+        return YVAL_BV; // BITVECTOR_VALUE
+      case 6:
+        return YVAL_TUPLE; // TUPPLE_VALUE
+      case 7:
+        return YVAL_SCALAR; // UNINTERPRETED_VALUE
+      case 8:
+        return YVAL_FUNCTION; // FUNCTION_VALUE
+      case 9:
+        return YVAL_MAPPING; // MAP_VALUE
+      case 10:
+        return YVAL_FUNCTION; // UPDATE_VALUE
+      default:
+        throw new IllegalArgumentException("Unknown valKind: " + valKind);
+    }
+  }
 
   /*
    * Yices initialization and exit
@@ -658,7 +690,7 @@ public final class Yices2NativeApi {
    * @param params Set to 0 for default search parameters.
    */
   public static boolean yices_check_sat(long ctx, long params, ShutdownNotifier shutdownNotifier)
-      throws IllegalStateException, InterruptedException {
+      throws IllegalStateException, InterruptedException, SolverException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context(ctx, params), ctx, shutdownNotifier);
   }
@@ -668,7 +700,7 @@ public final class Yices2NativeApi {
    */
   public static boolean yices_check_sat_with_assumptions(
       long ctx, long params, int size, int[] assumptions, ShutdownNotifier shutdownNotifier)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     return satCheckWithShutdownNotifier(
         () -> yices_check_context_with_assumptions(ctx, params, size, assumptions),
         ctx,
@@ -678,7 +710,7 @@ public final class Yices2NativeApi {
   @SuppressWarnings("try")
   private static boolean satCheckWithShutdownNotifier(
       Supplier<Integer> satCheck, long pCtx, ShutdownNotifier shutdownNotifier)
-      throws InterruptedException {
+      throws InterruptedException, SolverException {
     int result;
     try (ShutdownHook hook = new ShutdownHook(shutdownNotifier, () -> yices_stop_search(pCtx))) {
       shutdownNotifier.shutdownIfNecessary();
@@ -688,16 +720,18 @@ public final class Yices2NativeApi {
     return check_result(result);
   }
 
-  private static boolean check_result(int result) {
+  private static boolean check_result(int result) throws InterruptedException, SolverException {
     switch (result) {
       case YICES_STATUS_SAT:
         return true;
       case YICES_STATUS_UNSAT:
         return false;
+      case YICES_STATUS_INTERRUPTED:
+        throw new InterruptedException();
+      case YICES_STATUS_ERROR:
+        throw new SolverException("SAT check returned \"unknown\"");
       default:
-        // TODO Further ERROR CLARIFICATION
-        String code = (result == YICES_STATUS_UNKNOWN) ? "\"unknown\"" : result + "";
-        throw new IllegalStateException("Yices check returned:" + code);
+        throw new SolverException("Internal solver exception");
     }
   }
 
@@ -796,6 +830,11 @@ public final class Yices2NativeApi {
    * @return int 1 if the Yices2-lib is compiled thread-safe and 0 otherwise
    */
   public static native int yices_is_thread_safe();
+
+  /**
+   * @return int 1 if the Yices2-lib is compiled with MCSAT support and 0 otherwise
+   */
+  public static native int yices_has_mcsat();
 
   /** The function first checks whether f is satisifiable or unsatisfiable. */
   public static native int yices_check_formula(int term, String logic, long model, String delegate);

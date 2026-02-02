@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.junit.Test;
 import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.InterpolatingProverEnvironment;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
@@ -172,6 +173,11 @@ public class SolverFormulaWithAssumptionsTest
     (assert (not A))
     (check-sat-assumptions (A))
     */
+
+    assume()
+        .withMessage("Yices2 is too slow in this test")
+        .that(solver)
+        .isNotEqualTo(Solvers.YICES2);
 
     BooleanFormula a = bmgr.makeVariable("a");
     try (ProverEnvironment pe = context.newProverEnvironment()) {
