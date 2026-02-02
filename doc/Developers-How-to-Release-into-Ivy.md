@@ -339,19 +339,34 @@ ant publish-optimathsat \
 ### Publishing Yices2
 
 Yices2 consists of two components: the solver binary and the Java components in JavaSMT.
-The Java components were splitt from the rest of JavaSMT because of the GPL.
+The Java components were split from the rest of JavaSMT because of the GPL.
 
 #### Publishing the solver binary for Yices2
 
-Prepare gperf and gmp (required for our own static binary):
+We recommend using one of our Ubuntu docker images for building Yices2 as the container already
+contains one of the dependencies (`gmp`) in a precompiled version. The following instructions will
+still work without the image, however, some of the paths may have to be adjusted, and `gmp`
+needs to be downloaded and compiled (with `PIC` support) separately
+
+Prepare `gperf` (a dependency of Yices2, and not inluded in the docker image):
 ```bash
-wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz && tar -zxvf gperf-3.1.tar.gz && cd gperf-3.1 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
-wget https://gmplib.org/download/gmp/gmp-6.2.0.tar.xz && tar -xvf gmp-6.2.0.tar.xz && cd gmp-6.2.0 && ./configure --enable-cxx --with-pic --disable-shared --enable-fat && make
+wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.3.tar.gz
+tar -zxvf gperf-3.3.tar.gz
+cd gperf-3.3
+./configure --enable-cxx --with-pic --disable-shared --enable-fat
+make -j
 ```
 
 Download and build Yices2 from source:
 ```bash
-git clone git@github.com:SRI-CSL/yices2.git && cd yices2 && autoconf && ./configure --with-pic-gmp=../gmp-6.2.0/.libs/libgmp.a && make
+git clone git@github.com:SRI-CSL/yices2.git
+cd yices2
+autoconf
+export LDFLAGS=-L/dependencies/gmp-6.3.0/install/x64-linux/lib
+export CFLAGS=-I/dependencies/gmp-6.3.0/install/x64-linux/include
+./configure --enable-thread-safety --prefix=/workspace/yices2/install
+make -j
+make install
 ```
 
 Get the version of Yices2:
@@ -359,9 +374,13 @@ Get the version of Yices2:
 git describe --tags
 ```
 
-Publish the solver binary from within JavaSMT (adjust all paths to your system!):
+Publish the solver binary from within JavaSMT:
 ```bash
-ant publish-yices2 -Dyices2.path=../solvers/yices2 -Dgmp.path=../solvers/gmp-6.2.0 -Dgperf.path=../solvers/gperf-3.1 -Dyices2.version=2.6.2-89-g0f77dc4b
+ant publish-yices2 \
+  -Dyices2.path=/workspace/yices2/install \
+  -Dgmp.path=/dependencies/gmp-6.3.0/install/x64-linux \
+  -Dgperf.path=/workspace/gperf-3.3 \ 
+  -Dyices2.version=2.7.0-g85cf17e4
 ```
 
 Afterward, you need to update the version number in `solvers_ivy_conf/ivy_javasmt_yices2.xml` and publish new Java components for Yices2.
