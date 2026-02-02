@@ -12,6 +12,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.sosy_lab.common.collect.Collections3.transformedImmutableListCopy;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import edu.stanford.CVC4.ArrayType;
@@ -20,9 +21,12 @@ import edu.stanford.CVC4.ExprManager;
 import edu.stanford.CVC4.Kind;
 import edu.stanford.CVC4.SmtEngine;
 import edu.stanford.CVC4.Type;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.sosy_lab.java_smt.basicimpl.AbstractModel;
 
 public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
@@ -60,10 +64,38 @@ public class CVC4Model extends AbstractModel<Expr, Type, ExprManager> {
     return prover.exportExpr(smtEngine.getValue(prover.importExpr(f)));
   }
 
+  private Set<Expr> collectModelTerms(Collection<Expr> asserted) {
+    ImmutableSet.Builder<Expr> builder = ImmutableSet.builder();
+    // We wrap Expr in CVC4Formula for the hash() override. Without the override, we end up
+    // collecting duplicate terms
+    // (This problem has been fixed on CVC5/Bitwula)
+    var cache = new HashSet<CVC4Formula>();
+    var work = new ArrayDeque<CVC4Formula>();
+    work.addAll(Collections2.transform(asserted, CVC4Formula::new));
+    while (!work.isEmpty()) {
+      var next = work.pop();
+      if (cache.add(next)) {
+        var term = next.getTerm();
+        var kind = term.getKind();
+        if (kind == Kind.VARIABLE) {
+          builder.add(term);
+        } else {
+          if (kind == Kind.APPLY_UF) {
+            builder.add(term);
+          }
+          for (int c = 0; c < term.getNumChildren(); c++) {
+            work.push(new CVC4Formula(term.getChild(c)));
+          }
+        }
+      }
+    }
+    return builder.build();
+  }
+
   private ImmutableList<ValueAssignment> generateModel(Collection<Expr> assertedExpressions) {
     ImmutableSet.Builder<ValueAssignment> builder = ImmutableSet.builder();
-    for (Expr expr : assertedExpressions) {
-      creator.extractVariablesAndUFs(expr, true, (name, f) -> builder.addAll(getAssignments(f)));
+    for (Expr expr : collectModelTerms(assertedExpressions)) {
+      builder.addAll(getAssignments(expr));
     }
     return builder.build().asList();
   }
