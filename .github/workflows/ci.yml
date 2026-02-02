@@ -1,0 +1,230 @@
+# This file is part of JavaSMT,
+# an API wrapper for a collection of SMT solvers:
+# https://github.com/sosy-lab/java-smt
+#
+# SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  linux:
+    name: Linux (${{ matrix.arch }}, Java ${{ matrix.java-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [11, 17, 21, 24]
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'arm64' && 'ubuntu-24.04-arm' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
+            linux-ivy-
+
+      - name: Install Ant
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ant
+
+      - name: Build dependencies
+        run: ant build-dependencies
+
+      - name: Build project
+        run: ant build
+
+      - name: Run tests
+        run: ant unit-tests-quick
+        env:
+          # MathSAT5 needs this to find the correct libstdc++ version, as Temurin JDKs ship a too-new version.
+          LD_PRELOAD: /usr/lib/${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu' || 'x86_64-linux-gnu' }}/libstdc++.so.6
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v5
+        if: always() # also on error
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: linux-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+
+      - name: Archive Test Results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: junit-results-linux-${{ matrix.arch }}-java${{ matrix.java-version }}
+          path: |
+            junit/TEST-*.xml
+            JUnit.html
+            hs_err_pid*.log
+            replay_pid*.log
+
+  macos:
+    name: macOS (${{ matrix.arch }}, Java ${{ matrix.java-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: [11, 17, 21, 24]
+        arch: [x64, arm64]
+    runs-on: ${{ matrix.arch == 'arm64' && 'macos-latest' || 'macos-15-intel' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
+            macos-ivy-
+
+      - name: Install Ant
+        run: brew install ant
+
+      - name: Build dependencies
+        run: ant build-dependencies
+
+      - name: Build project
+        run: ant build
+
+      - name: Prepare native libraries
+        run: |
+          ARCH_DIR="${{ matrix.arch == 'arm64' && 'arm64-macosx' || 'x86_64-macosx' }}"
+          SEARCH_PATH="lib/java/runtime-*/${{ matrix.arch == 'arm64' && 'arm64' || 'x64' }}"
+          mkdir -p "lib/native/$ARCH_DIR/"
+          find $SEARCH_PATH -name "*.dylib" -exec cp {} "lib/native/$ARCH_DIR/" \;
+
+      - name: Run tests
+        run: ant unit-tests-quick
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v5
+        if: always() # also on error
+        with:
+          path: |
+            ~/.ivy2/cache
+            ~/.ant/lib
+          key: macos-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+
+      - name: Archive Test Results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: junit-results-macos-${{ matrix.arch }}-java${{ matrix.java-version }}
+          path: |
+            junit/TEST-*.xml
+            JUnit.html
+            hs_err_pid*.log
+            replay_pid*.log
+
+  windows:
+    name: Windows (${{ matrix.arch }}, Java ${{ matrix.java-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # GithubCI does not support Windows ARM64 runners with all JDKs, so we list them explicitly.
+          - { arch: x64, java-version: 11 }
+          - { arch: x64, java-version: 17 }
+          - { arch: x64, java-version: 21 }
+          - { arch: x64, java-version: 24 }
+          - { arch: arm64, java-version: 21 }
+          - { arch: arm64, java-version: 23 }
+    runs-on: ${{ matrix.arch == 'arm64' && 'windows-11-arm' || 'windows-latest' }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v5
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: 'temurin'
+          architecture: ${{ matrix.arch }}
+
+      - name: Restore Cache with Ivy and Ant
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            C:\Users\runneradmin\.ivy2\cache
+            C:\Users\runneradmin\.ant\lib
+          key: windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+          restore-keys: |
+            windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-
+            windows-ivy-
+
+      - name: Install Ant
+        run: choco install ant -y
+
+      - name: Build dependencies
+        run: ant build-dependencies
+
+      - name: Build project
+        run: ant build
+
+      - name: Prepare native libraries
+        shell: pwsh
+        run: |
+          $archDir = if ("${{ matrix.arch }}" -eq "arm64") { "arm64-windows" } else { "x86_64-windows" }
+          $searchPath = "lib/java/runtime-*/" + $(if ("${{ matrix.arch }}" -eq "arm64") { "arm64" } else { "x64" })
+          Get-ChildItem -Path $searchPath -Filter "*.dll" -Recurse | Copy-Item -Destination "lib/native/$archDir/" -Force
+
+      - name: Run tests
+        run: ant unit-tests-quick
+
+      - name: Save Cache with Ivy and Ant
+        uses: actions/cache/save@v5
+        if: always() # also on error
+        with:
+          path: |
+            C:\Users\runneradmin\.ivy2\cache
+            C:\Users\runneradmin\.ant\lib
+          key: windows-${{ matrix.arch }}-java${{ matrix.java-version }}-ivy-${{ hashFiles('build.xml', 'lib/ivy.xml', 'build/build-ivy.xml') }}
+
+      - name: Archive Test Results
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: junit-results-windows-${{ matrix.arch }}-java${{ matrix.java-version }}
+          path: |
+            junit/TEST-*.xml
+            JUnit.html
+            hs_err_pid*.log
+            replay_pid*.log

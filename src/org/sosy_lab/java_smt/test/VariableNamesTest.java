@@ -296,8 +296,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNameBvArray() throws SolverException, InterruptedException {
     requireBitvectors();
     requireArrays();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : NAMES) {
       testName0(
           name,
@@ -335,8 +333,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void testNameUFBv() throws SolverException, InterruptedException {
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       testName0(
           name,
@@ -401,10 +397,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not (yet) return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -487,10 +480,7 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
                 Quantifier pQuantifier,
                 List<Formula> pBoundVariables,
                 BooleanFormula pBody) {
-              if (solverToUse() != Solvers.PRINCESS) {
-                // TODO Princess does not return quantified variables.
-                assertThat(pBoundVariables).hasSize(1);
-              }
+              assertThat(pBoundVariables).hasSize(1);
               for (Formula f : pBoundVariables) {
                 Map<String, Formula> map = mgr.extractVariables(f);
                 assertThat(map).hasSize(1);
@@ -604,8 +594,6 @@ public class VariableNamesTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testBvArrayVariable() {
     requireArrays();
     requireBitvectors();
-    // Someone who knows princess has to debug this!
-    assume().that(solverToUse()).isNotEqualTo(Solvers.PRINCESS);
     for (String name : getAllNames()) {
       createVariableWith(
           v ->

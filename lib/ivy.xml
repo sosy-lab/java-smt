@@ -5,7 +5,7 @@ This file is part of JavaSMT,
 an API wrapper for a collection of SMT solvers:
 https://github.com/sosy-lab/java-smt
 
-SPDX-FileCopyrightText: 2023 Dirk Beyer <https://www.sosy-lab.org>
+SPDX-FileCopyrightText: 2026 Dirk Beyer <https://www.sosy-lab.org>
 
 SPDX-License-Identifier: Apache-2.0
 -->
@@ -53,6 +53,9 @@ SPDX-License-Identifier: Apache-2.0
         <conf name="runtime-bitwuzla" extends="runtime-bitwuzla-x64,runtime-bitwuzla-arm64" description="only one solver included"/>
         <conf name="runtime-bitwuzla-x64" extends="core" description="only one solver included"/>
         <conf name="runtime-bitwuzla-arm64" extends="core" description="only one solver included"/>
+        <conf name="runtime-z3-legacy" extends="runtime-z3-legacy-x64,runtime-z3-legacy-arm64" description="only one solver included"/>
+        <conf name="runtime-z3-legacy-x64" extends="core" description="only one solver included"/>
+        <conf name="runtime-z3-legacy-arm64" extends="core" description="only one solver included"/>
 
         <!-- default config, provides only x64 for backwards-compatibility -->
         <conf name="runtime" extends="runtime-x64" description="all solvers for x64 architecture included"/>
@@ -68,7 +71,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- The normal dependencies with all solvers included, except those unter GPL. -->
         <conf name="runtime-x64-without-gpl"
-              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5-x64,runtime-boolector,runtime-bitwuzla-x64"
+              extends="runtime-mathsat-x64,runtime-opensmt-x64,runtime-optimathsat,runtime-smtinterpol,runtime-princess,runtime-z3-x64,runtime-cvc4,runtime-cvc5-x64,runtime-boolector,runtime-bitwuzla-x64,runtime-z3-legacy-x64"
               description="all solvers for x64 architecture included, except those under GPL"/>
         <conf name="runtime-arm64-without-gpl"
               extends="runtime-mathsat-arm64,runtime-opensmt-arm64,runtime-smtinterpol,runtime-princess,runtime-cvc5-arm64,runtime-z3-arm64,runtime-bitwuzla-arm64"
@@ -108,10 +111,10 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Google Core Libraries for Java
              Contains a lot of helpful data structures. -->
-        <dependency org="com.google.guava" name="guava" rev="33.4.0-jre" conf="core->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava" rev="33.4.8-jre" conf="core->default; contrib->sources"/>
 
         <!--  Guava-testlib contains many useful testing utilities -->
-        <dependency org="com.google.guava" name="guava-testlib" rev="33.4.0-jre" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.guava" name="guava-testlib" rev="33.4.8-jre" conf="test->default; contrib->sources"/>
 
         <!-- Dependency on Ivy itself so that we can ugprade it easily.
              Change version number in build/build-ivy.xml for upgrading. -->
@@ -123,7 +126,7 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="com.google.auto.value" name="auto-value-annotations" rev="1.11.0" conf="build->default; contrib->sources"/>
 
         <!-- Annotations we use for @Nullable etc. -->
-        <dependency org="org.checkerframework" name="checker-qual" rev="3.48.4" conf="core->default; contrib->sources"/>
+        <dependency org="org.checkerframework" name="checker-qual" rev="3.51.0" conf="core->default; contrib->sources"/>
 
         <!-- JUnit
              Testing framework. -->
@@ -131,7 +134,7 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- JaCoCo
              Library for code coverage -->
-        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.12" conf="build->default"/>
+        <dependency org="org.jacoco" name="org.jacoco.ant" rev="0.8.13" conf="build->default"/>
 
         <!-- The JUnit task for Ant so that we can run the tests.
              The property used here is defined in build.xml according to the current Ant version. -->
@@ -140,13 +143,13 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- Truth
              Library for writing literal assertions. -->
-        <dependency org="com.google.truth" name="truth" rev="1.4.4" conf="test->default; contrib->sources"/>
-        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.4.4" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth" name="truth" rev="1.4.5" conf="test->default; contrib->sources"/>
+        <dependency org="com.google.truth.extensions" name="truth-java8-extension" rev="1.4.5" conf="test->default; contrib->sources"/>
 
         <!-- Google error-prone
              Compiler adaptor with some useful checks for common errors. -->
-        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.28.0" conf="build->default" />
-        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.28.0" conf="build->default; contrib->sources" />
+        <dependency org="com.google.errorprone" name="error_prone_core" rev="2.41.0" conf="build->default" />
+        <dependency org="com.google.errorprone" name="error_prone_annotations" rev="2.41.0" conf="build->default; contrib->sources" />
 
         <!-- Eclipse JDT Compiler
              For additional compiler warnings. -->
@@ -154,32 +157,32 @@ SPDX-License-Identifier: Apache-2.0
 
         <!-- google-java-format
              A source-code formatter for Java -->
-        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.25.2" conf="format-source->default"/>
+        <dependency org="com.google.googlejavaformat" name="google-java-format" rev="1.28.0" conf="format-source->default"/>
 
         <!-- SpotBugs -->
-        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.8.6" conf="spotbugs->default"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-ant" rev="4.9.4" conf="spotbugs->default"/>
         <!-- JAR with annotations needs to be present at runtime because we use Nullable.class -->
-        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.8.6" conf="core->default; contrib->sources"/>
+        <dependency org="com.github.spotbugs" name="spotbugs-annotations" rev="4.9.4" conf="core->default; contrib->sources"/>
         <dependency org="com.google.code.findbugs" name="jsr305" rev="3.0.2" conf="core->default; contrib->sources"/>
 
         <!-- Checkstyle -->
         <dependency org="com.github.sevntu-checkstyle" name="sevntu-checks" rev="1.44.1" conf="checkstyle->default"/>
-        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="10.21.1" conf="checkstyle->default"/>
+        <dependency org="com.puppycrawl.tools" name="checkstyle" rev="11.0.1" conf="checkstyle->default"/>
 
         <!-- SmtInterpol -->
         <dependency org="de.uni-freiburg.informatik.ultimate" name="smtinterpol" rev="2.5-1242-g5c50fb6d" conf="runtime-smtinterpol->master; contrib->sources"/>
 
         <!-- Princess and Ostrich for our Maven release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-11-08" conf="runtime-princess-with-javacup->default; contrib->sources"/>
-        <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="1.4.1" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess-with-javacup->default; contrib->sources"/>
+        <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="2.0" conf="runtime-princess-with-javacup->default; contrib->sources"/>
         <!-- Princess and Ostrich for our Ivy release -->
-        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2024-11-08" conf="runtime-princess->default; contrib->sources">
+        <dependency org="io.github.uuverifiers" name="princess_2.13" rev="2025-11-17" conf="runtime-princess->default; contrib->sources">
             <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
             <exclude org="net.sf.squirrel-sql.thirdparty-non-maven" name="java-cup"/>
         </dependency>
-        <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="1.4.1" conf="runtime-princess->default; contrib->sources">
+        <dependency org="io.github.uuverifiers" name="ostrich_2.13" rev="2.0" conf="runtime-princess->default; contrib->sources">
             <!-- Exclude dependency on java-cup and replace it with java-cup-runtime, which is enough.
                We use the JAR that is published by us instead of the one from net.sf.squirrel-sql.thirdparty-non-maven
                because the latter does not provide a separate JAR for java-cup-runtime. -->
@@ -188,17 +191,18 @@ SPDX-License-Identifier: Apache-2.0
         <dependency org="edu.tum.cs" name="java-cup" rev="11b-20160615" conf="runtime-princess->runtime"/>
 
         <!-- Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.11-sosy1" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.15.2" conf="runtime-z3-x64->solver-z3-x64; runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-mathsat" rev="5.6.15" conf="runtime-mathsat-x64->solver-mathsat-x64; runtime-mathsat-arm64->solver-mathsat-arm64" />
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3" rev="4.15.4" conf="runtime-z3-x64->solver-z3-x64; runtime-z3-arm64->solver-z3-arm64; contrib->sources,javadoc" />
         <dependency org="org.sosy_lab" name="javasmt-solver-opensmt" rev="2.9.0-gef441e1c" conf="runtime-opensmt-x64->solver-opensmt-x64; runtime-opensmt-arm64->solver-opensmt-arm64; contrib->sources,javadoc"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-optimathsat" rev="1.7.3-sosy1" conf="runtime-optimathsat->solver-optimathsat" />
         <dependency org="org.sosy_lab" name="javasmt-solver-cvc4" rev="1.8-prerelease-2020-06-24-g7825d8f28" conf="runtime-cvc4->solver-cvc4" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="2025-07-29-6dacfa5" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-cvc5" rev="2026-01-21-f621457" conf="runtime-cvc5-x64->solver-cvc5-x64; runtime-cvc5-arm64->solver-cvc5-arm64"/>
         <dependency org="org.sosy_lab" name="javasmt-solver-boolector" rev="3.2.2-g1a89c229" conf="runtime-boolector->solver-boolector" />
-        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.1-gc1454189" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-bitwuzla" rev="0.8.2-108-g86432ccd" conf="runtime-bitwuzla-x64->solver-bitwuzla-x64; runtime-bitwuzla-arm64->solver-bitwuzla-arm64; contrib->sources,javadoc"/>
+        <dependency org="org.sosy_lab" name="javasmt-solver-z3-legacy" rev="4.5.0-gd57a2a6dc" conf="runtime-z3-legacy-x64->solver-z3-legacy-x64; runtime-z3-legacy-arm64->solver-z3-legacy-arm64" />
 
         <!-- additional JavaSMT components with Solver Binaries -->
-        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-682-g0dbe8366f" conf="runtime-yices2->runtime; contrib->sources"/>
+        <dependency org="org.sosy_lab" name="javasmt-yices2" rev="5.0.1-722-g90a66d7fa" conf="runtime-yices2->runtime; contrib->sources" />
         <!-- <dependency org="org.sosy_lab" name="javasmt-solver-yices2" rev="2.6.4-264-g553897f5" conf="runtime->solver-yices2" /> -->
 
         <!-- Several JARs declare animal-sniffer-annotations.jar as dependency in their manifest, although they do not really need it.

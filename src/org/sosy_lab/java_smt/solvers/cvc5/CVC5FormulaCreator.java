@@ -9,7 +9,9 @@
 package org.sosy_lab.java_smt.solvers.cvc5;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithHiddenBit;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -32,10 +34,14 @@ import io.github.cvc5.Sort;
 import io.github.cvc5.Term;
 import io.github.cvc5.TermManager;
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.ArrayFormula;
@@ -44,15 +50,19 @@ import org.sosy_lab.java_smt.api.BooleanFormula;
 import org.sosy_lab.java_smt.api.EnumerationFormula;
 import org.sosy_lab.java_smt.api.FloatingPointFormula;
 import org.sosy_lab.java_smt.api.FloatingPointNumber;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingMode;
+import org.sosy_lab.java_smt.api.FloatingPointRoundingModeFormula;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.ArrayFormulaType;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
+import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.FunctionDeclarationKind;
 import org.sosy_lab.java_smt.api.QuantifiedFormulaManager.Quantifier;
 import org.sosy_lab.java_smt.api.RegexFormula;
 import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.visitors.FormulaVisitor;
+import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 import org.sosy_lab.java_smt.basicimpl.FormulaCreator;
 import org.sosy_lab.java_smt.basicimpl.FunctionDeclarationImpl;
 import org.sosy_lab.java_smt.solvers.cvc5.CVC5Formula.CVC5ArrayFormula;
@@ -76,8 +86,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   // <Name, Sort.toString, Term> because CVC5 returns distinct pointers for types, while the
   // String representation is equal (and they are equal)
-  private final Table<String, String, Term> variablesCache = HashBasedTable.create();
-  private final Map<String, Term> functionsCache = new HashMap<>();
+  protected final Table<String, String, Term> variablesCache = HashBasedTable.create();
+  protected final Map<String, Term> functionsCache = new HashMap<>();
+
   private final TermManager termManager;
   private final Solver solver;
 
@@ -103,7 +114,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     if (existingVar != null) {
       return existingVar;
     }
-    Preconditions.checkArgument(
+    checkArgument(
         !variablesCache.containsRow(name),
         "Symbol %s requested with type %s, but already used with type %s",
         name,
@@ -141,15 +152,16 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   @Override
   public Sort getFloatingPointType(FloatingPointType pType) {
     try {
-      // plus sign bit
-      return termManager.mkFloatingPointSort(pType.getExponentSize(), pType.getMantissaSize() + 1);
+      // plus hidden bit
+      return termManager.mkFloatingPointSort(
+          pType.getExponentSize(), pType.getMantissaSizeWithHiddenBit());
     } catch (CVC5ApiException e) {
       throw new IllegalArgumentException(
           "Cannot create floatingpoint sort with exponent size "
               + pType.getExponentSize()
               + " and mantissa "
-              + pType.getMantissaSize()
-              + " (plus sign bit).",
+              + pType.getMantissaSizeWithHiddenBit()
+              + " (including hidden bit).",
           e);
     }
   }
@@ -222,9 +234,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     } else if (sort.isBitVector()) {
       return FormulaType.getBitvectorTypeWithSize(sort.getBitVectorSize());
     } else if (sort.isFloatingPoint()) {
-      // CVC5 wants the sign bit as part of the mantissa. We add that manually in creation.
-      return FormulaType.getFloatingPointType(
-          sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize() - 1);
+      // CVC5 wants the hidden bit as part of the mantissa. We add that manually in creation.
+      return getFloatingPointTypeFromSizesWithHiddenBit(
+          sort.getFloatingPointExponentSize(), sort.getFloatingPointSignificandSize());
     } else if (sort.isRoundingMode()) {
       return FormulaType.FloatingPointRoundingModeType;
     } else if (sort.isReal()) {
@@ -316,6 +328,15 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   }
 
   @Override
+  protected FloatingPointRoundingModeFormula encapsulateRoundingMode(Term pTerm) {
+    assert getFormulaType(pTerm).isFloatingPointRoundingModeType()
+        : String.format(
+            "%s is no FP rounding mode, but %s (%s)",
+            pTerm, pTerm.getSort(), getFormulaType(pTerm));
+    return new CVC5FloatingPointRoundingModeFormula(pTerm);
+  }
+
+  @Override
   @SuppressWarnings("MethodTypeParameterName")
   protected <TI extends Formula, TE extends Formula> ArrayFormula<TI, TE> encapsulateArray(
       Term pTerm, FormulaType<TI> pIndexType, FormulaType<TE> pElementType) {
@@ -345,7 +366,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
     return new CVC5EnumerationFormula(pTerm);
   }
 
-  private String getName(Term e) {
+  String getName(Term e) {
     checkState(!e.isNull());
     String repr = e.toString();
     try {
@@ -361,7 +382,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       // Some function
       // Functions are packaged like this: (functionName arg1 arg2 ...)
       // But can use |(name)| to enable () inside of the variable name
-      // TODO what happens for function names containing whitepsace?
+      // TODO what happens for function names containing whitespace?
       String dequoted = dequote(repr);
       return Iterables.get(Splitter.on(' ').split(dequoted.substring(1)), 0);
     } else {
@@ -399,7 +420,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitConstant(formula, convertFloatingPoint(f));
 
       } else if (f.isRoundingModeValue()) {
-        return visitor.visitConstant(formula, f.getRoundingModeValue());
+        return visitor.visitConstant(formula, getRoundingMode(f));
 
       } else if (f.isConstArray()) {
         Term constant = f.getConstArrayBase();
@@ -417,7 +438,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         // BOUND vars are used for all vars that are bound to a quantifier in CVC5.
         // We resubstitute them back to the original free.
         // CVC5 doesn't give you the de-brujin index
-        Term originalVar = accessVariablesCache(formula.toString(), sort);
+        Term originalVar = getFreeVariableFromCache(formula.toString(), sort, visitor);
         return visitor.visitBoundVariable(encapsulate(originalVar), 0);
 
       } else if (f.getKind() == Kind.FORALL || f.getKind() == Kind.EXISTS) {
@@ -427,7 +448,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         List<Formula> freeVars = new ArrayList<>();
         for (Term boundVar : f.getChild(0)) { // unpack grand-children of f.
           String name = getName(boundVar);
-          Term freeVar = Preconditions.checkNotNull(accessVariablesCache(name, boundVar.getSort()));
+          Term freeVar = getFreeVariableFromCache(name, boundVar.getSort(), visitor);
           body = body.substitute(boundVar, freeVar);
           freeVars.add(encapsulate(freeVar));
         }
@@ -439,7 +460,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
         return visitor.visitFreeVariable(formula, dequote(f.toString()));
 
       } else if (f.getKind() == Kind.APPLY_CONSTRUCTOR) {
-        Preconditions.checkState(
+        checkState(
             f.getNumChildren() == 1, "Unexpected formula '%s' with sort '%s'", f, f.getSort());
         return visitor.visitConstant(formula, f.getChild(0).getSymbol());
 
@@ -543,6 +564,7 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.LEQ, FunctionDeclarationKind.LTE)
           .put(Kind.GT, FunctionDeclarationKind.GT)
           .put(Kind.GEQ, FunctionDeclarationKind.GTE)
+          .put(Kind.INT_TO_BITVECTOR, FunctionDeclarationKind.INT_TO_BV)
           // Bitvector theory
           .put(Kind.BITVECTOR_ADD, FunctionDeclarationKind.BV_ADD)
           .put(Kind.BITVECTOR_SUB, FunctionDeclarationKind.BV_SUB)
@@ -574,9 +596,11 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
           .put(Kind.BITVECTOR_LSHR, FunctionDeclarationKind.BV_LSHR)
           .put(Kind.BITVECTOR_ROTATE_LEFT, FunctionDeclarationKind.BV_ROTATE_LEFT_BY_INT)
           .put(Kind.BITVECTOR_ROTATE_RIGHT, FunctionDeclarationKind.BV_ROTATE_RIGHT_BY_INT)
-          // Floating-point theory
           .put(Kind.TO_INTEGER, FunctionDeclarationKind.FLOOR)
           .put(Kind.TO_REAL, FunctionDeclarationKind.TO_REAL)
+          .put(Kind.BITVECTOR_SBV_TO_INT, FunctionDeclarationKind.SBV_TO_INT)
+          .put(Kind.BITVECTOR_UBV_TO_INT, FunctionDeclarationKind.UBV_TO_INT)
+          // Floating-point theory
           .put(Kind.FLOATINGPOINT_TO_SBV, FunctionDeclarationKind.FP_CASTTO_SBV)
           .put(Kind.FLOATINGPOINT_TO_UBV, FunctionDeclarationKind.FP_CASTTO_UBV)
           .put(Kind.FLOATINGPOINT_TO_FP_FROM_FP, FunctionDeclarationKind.FP_CASTTO_FP)
@@ -765,25 +789,22 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       functionsCache.put(pName, exp);
 
     } else {
+      var cachedDomain = exp.getSort().getFunctionDomainSorts();
+      var cachedRange = exp.getSort().getFunctionCodomainSort();
       Preconditions.checkArgument(
-          exp.getSort().equals(exp.getSort()),
-          "Symbol %s already in use for different return type %s",
-          exp,
-          exp.getSort());
-      for (int i = 1; i < exp.getNumChildren(); i++) {
-        // CVC5s first argument in a function/Uf is the declaration, we don't need that here
-        try {
-          Preconditions.checkArgument(
-              pArgTypes.get(i).equals(exp.getChild(i).getSort()),
-              "Argument %s with type %s does not match expected type %s",
-              i - 1,
-              pArgTypes.get(i),
-              exp.getChild(i).getSort());
-        } catch (CVC5ApiException e) {
-          throw new IllegalArgumentException(
-              "Failure visiting the Term '" + exp + "' at index " + i + ".", e);
-        }
+          pArgTypes.size() == cachedDomain.length,
+          "Function %s already defined with a different number of arguments",
+          pName);
+      for (int i = 0; i < cachedDomain.length; i++) {
+        checkArgument(
+            cachedDomain[i].equals(pArgTypes.get(i)),
+            "Function %s already defined with different types",
+            pName);
       }
+      Preconditions.checkArgument(
+          pReturnType.equals(cachedRange),
+          "Function %s already defined with different types",
+          pName);
     }
     return exp;
   }
@@ -816,6 +837,9 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
       } else if (value.isFloatingPointValue()) {
         return convertFloatingPoint(value);
 
+      } else if (value.isRoundingModeValue()) {
+        return getRoundingMode(value);
+
       } else if (value.isBooleanValue()) {
         return value.getBooleanValue();
 
@@ -838,21 +862,139 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
   private FloatingPointNumber convertFloatingPoint(Term value) throws CVC5ApiException {
     final var fpValue = value.getFloatingPointValue();
     final var expWidth = Ints.checkedCast(fpValue.first);
-    final var mantWidth = Ints.checkedCast(fpValue.second - 1); // without sign bit
+    final var mantWidth = Ints.checkedCast(fpValue.second); // with hidden bit
     final var bvValue = fpValue.third;
-    Preconditions.checkState(bvValue.isBitVectorValue());
+    checkState(bvValue.isBitVectorValue());
     final var bits = bvValue.getBitVectorValue();
-    return FloatingPointNumber.of(bits, expWidth, mantWidth);
+    return FloatingPointNumber.of(
+        bits, getFloatingPointTypeFromSizesWithHiddenBit(expWidth, mantWidth));
   }
 
-  private Term accessVariablesCache(String name, Sort sort) {
+  @Override
+  public FloatingPointRoundingMode getRoundingMode(Term pTerm) {
+    checkArgument(pTerm.isRoundingModeValue(), "Term '%s' is not a rounding mode.", pTerm);
+    try {
+      switch (pTerm.getRoundingModeValue()) {
+        case ROUND_NEAREST_TIES_TO_AWAY:
+          return FloatingPointRoundingMode.NEAREST_TIES_AWAY;
+        case ROUND_NEAREST_TIES_TO_EVEN:
+          return FloatingPointRoundingMode.NEAREST_TIES_TO_EVEN;
+        case ROUND_TOWARD_NEGATIVE:
+          return FloatingPointRoundingMode.TOWARD_NEGATIVE;
+        case ROUND_TOWARD_POSITIVE:
+          return FloatingPointRoundingMode.TOWARD_POSITIVE;
+        case ROUND_TOWARD_ZERO:
+          return FloatingPointRoundingMode.TOWARD_ZERO;
+        default:
+          throw new IllegalArgumentException(
+              String.format("Unknown rounding mode in Term '%s'.", pTerm));
+      }
+    } catch (CVC5ApiException e) {
+      throw new IllegalArgumentException(
+          String.format("Failure trying to get the rounding mode of Term '%s'.", pTerm), e);
+    }
+  }
+
+  /**
+   * Returns the free variable for the given name and sort of a bound variable from the variables
+   * cache. Will throw a {@link NullPointerException} if no variable is known for the input!
+   */
+  private Term getFreeVariableFromCache(String name, Sort sort, FormulaVisitor<?> visitor) {
+    if (visitor instanceof BoundVariablesRegisteringRecursiveVisitor) {
+      ((BoundVariablesRegisteringRecursiveVisitor) visitor).registerBoundVariable(name, sort);
+    }
     Term existingVar = variablesCache.get(name, sort.toString());
-    Preconditions.checkNotNull(
+    return checkNotNull(
         existingVar,
-        "Symbol %s requested with type %s, but already used with type %s",
+        "Symbol %s requested with type %s, but %s",
         name,
         sort,
-        variablesCache.row(name).keySet());
-    return existingVar;
+        variablesCache.containsRow(name)
+            ? "the used symbol is already registered with type " + variablesCache.row(name).keySet()
+            : "the used symbol is unknown to the variables cache");
+  }
+
+  /**
+   * Caches all bound variables nested in the boolean input term that are unknown to the variable
+   * cache with a free variable copy in it.
+   */
+  protected void registerBoundVariablesWithVisitor(Term input) {
+    checkArgument(
+        input.getSort().isBoolean(),
+        "Only boolean terms can be used to register " + "bound variables as free variables!");
+
+    BoundVariablesRegisteringRecursiveVisitor boundVariablesRegisteringRecursiveVisitor =
+        new BoundVariablesRegisteringRecursiveVisitor(this);
+
+    boundVariablesRegisteringRecursiveVisitor.addToQueue(encapsulateBoolean(input));
+    while (!boundVariablesRegisteringRecursiveVisitor.isQueueEmpty()) {
+      Formula tt = boundVariablesRegisteringRecursiveVisitor.pop();
+      TraversalProcess process = visit(tt, boundVariablesRegisteringRecursiveVisitor);
+      if (process == TraversalProcess.ABORT) {
+        return;
+      }
+    }
+  }
+
+  private static final class BoundVariablesRegisteringRecursiveVisitor
+      implements FormulaVisitor<TraversalProcess> {
+
+    private final Set<Formula> seen = new HashSet<>();
+    private final Deque<Formula> toVisit = new ArrayDeque<>();
+
+    private final CVC5FormulaCreator usedCreator;
+
+    BoundVariablesRegisteringRecursiveVisitor(CVC5FormulaCreator pCreator) {
+      usedCreator = checkNotNull(pCreator);
+    }
+
+    private void registerBoundVariable(String boundVariableName, Sort boundVarSort) {
+      String boundSort = boundVarSort.toString();
+      Term existingVar = usedCreator.variablesCache.get(boundVariableName, boundSort);
+      if (existingVar == null) {
+        existingVar = usedCreator.makeVariable(boundVarSort, boundVariableName);
+        usedCreator.variablesCache.put(boundVariableName, boundSort, existingVar);
+      }
+    }
+
+    void addToQueue(Formula f) {
+      if (seen.add(f)) {
+        toVisit.push(f);
+      }
+    }
+
+    boolean isQueueEmpty() {
+      return toVisit.isEmpty();
+    }
+
+    Formula pop() {
+      return toVisit.pop();
+    }
+
+    @Override
+    public TraversalProcess visitFreeVariable(Formula pF, String pName) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitConstant(Formula pF, Object pValue) {
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitFunction(
+        Formula pF, List<Formula> pArgs, FunctionDeclaration<?> pFunctionDeclaration) {
+      for (Formula f : pArgs) {
+        addToQueue(f);
+      }
+      return TraversalProcess.CONTINUE;
+    }
+
+    @Override
+    public TraversalProcess visitQuantifier(
+        BooleanFormula pF, Quantifier pQuantifier, List<Formula> boundVars, BooleanFormula pBody) {
+      addToQueue(pBody);
+      return TraversalProcess.CONTINUE;
+    }
   }
 }

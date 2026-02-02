@@ -257,6 +257,8 @@ public class MixedArithmeticsTest extends SolverBasedTest0.ParameterizedSolverBa
   @Test
   public void floorTest() throws SolverException, InterruptedException {
     requireRationalFloor();
+    // FIXME Princess will loop forever. Report to the developers
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
     testIntegerOperation(rmgr::floor, imgr.makeNumber(1.0), imgr.makeNumber(1.0));
     testIntegerOperation(rmgr::floor, rmgr.makeNumber(1.5), imgr.makeNumber(1.0));
   }

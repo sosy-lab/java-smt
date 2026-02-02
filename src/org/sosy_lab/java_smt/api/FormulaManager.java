@@ -8,8 +8,10 @@
 
 package org.sosy_lab.java_smt.api;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -19,6 +21,16 @@ import org.sosy_lab.java_smt.api.visitors.TraversalProcess;
 
 /** FormulaManager class contains all operations which can be performed on formulas. */
 public interface FormulaManager {
+
+  /**
+   * Standardized message for not implemented API methods.
+   *
+   * <p>This constant can be used in {@link UnsupportedOperationException} to indicate that a
+   * certain method is not implemented by some subclass. We recommend using this constant in API
+   * extensions where the default implementation throws an exception.
+   */
+  String API_METHOD_NOT_IMPLEMENTED =
+      "The requested method is not implemented in the current implementation of this interface.";
 
   /**
    * Returns the Integer-Theory. Because most SAT-solvers support automatic casting between Integer-
@@ -120,6 +132,46 @@ public interface FormulaManager {
    * @return Constructed formula
    */
   <T extends Formula> T makeApplication(FunctionDeclaration<T> declaration, Formula... args);
+
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
+  default BooleanFormula equal(Formula... pArgs) {
+    return equal(ImmutableList.copyOf(pArgs));
+  }
+
+  /**
+   * Create an equality formula between the given arguments. We return "true" if all arguments are
+   * equal, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for equality, ordering does not matter.
+   * @return Equality formula
+   */
+  BooleanFormula equal(Collection<Formula> pArgs);
+
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
+  default BooleanFormula distinct(Formula... pArgs) {
+    return distinct(ImmutableList.copyOf(pArgs));
+  }
+
+  /**
+   * Create a distinctness formula between the given arguments. We return "true" if all arguments
+   * are pairwise distinct, even if there are less than two arguments.
+   *
+   * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
+   * @return Distinctness formula
+   */
+  BooleanFormula distinct(Collection<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

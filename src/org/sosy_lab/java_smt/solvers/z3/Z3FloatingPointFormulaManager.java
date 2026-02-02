@@ -8,6 +8,8 @@
 
 package org.sosy_lab.java_smt.solvers.z3;
 
+import static com.google.common.base.Verify.verify;
+
 import com.google.common.collect.ImmutableList;
 import com.microsoft.z3.Native;
 import java.math.BigInteger;
@@ -20,7 +22,8 @@ import org.sosy_lab.java_smt.basicimpl.AbstractFloatingPointFormulaManager;
 class Z3FloatingPointFormulaManager
     extends AbstractFloatingPointFormulaManager<Long, Long, Long, Long> {
 
-  private static final FloatingPointType highPrec = FormulaType.getFloatingPointType(15, 112);
+  private static final FloatingPointType highPrec =
+      FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(15, 112);
 
   private final long z3context;
   private final long roundingMode;
@@ -78,7 +81,10 @@ class Z3FloatingPointFormulaManager
 
     final long signSort = getFormulaCreator().getBitvectorType(1);
     final long expoSort = getFormulaCreator().getBitvectorType(type.getExponentSize());
-    final long mantSort = getFormulaCreator().getBitvectorType(type.getMantissaSize());
+    // The mantissa without hidden bit is correct here to generate the FP correctly with a
+    // mantissa incremented by one (with the hidden bit) below!
+    final long mantSort =
+        getFormulaCreator().getBitvectorType(type.getMantissaSizeWithoutHiddenBit());
 
     final long signBv = Native.mkNumeral(z3context, sign.isNegative() ? "1" : "0", signSort);
     Native.incRef(z3context, signBv);
@@ -91,6 +97,17 @@ class Z3FloatingPointFormulaManager
     Native.decRef(z3context, mantBv);
     Native.decRef(z3context, expoBv);
     Native.decRef(z3context, signBv);
+
+    // The relation of mantissa without hidden bit above to the mantissa with hidden bit here is
+    // the result of how SMTLIB2 defines its floating-point numbers. While the IEEE standard uses
+    // "sign bit + exponent + mantissa without hidden bit", SMTLIB2 uses "exponent + mantissa with
+    // hidden bit" as total size.
+    verify(
+        type.getMantissaSizeWithHiddenBit()
+            == Native.fpaGetSbits(z3context, Native.getSort(z3context, fp)));
+    assert type.getTotalSize()
+        == Native.fpaGetEbits(z3context, Native.getSort(z3context, fp))
+            + Native.fpaGetSbits(z3context, Native.getSort(z3context, fp));
     return fp;
   }
 
@@ -99,7 +116,7 @@ class Z3FloatingPointFormulaManager
     // Z3 does not allow specifying a rounding mode for numerals,
     // so we create it first with a high precision and then round it down explicitly.
     if (pType.getExponentSize() <= highPrec.getExponentSize()
-        || pType.getMantissaSize() <= highPrec.getMantissaSize()) {
+        || pType.getMantissaSizeWithHiddenBit() <= highPrec.getMantissaSizeWithHiddenBit()) {
       long highPrecNumber = Native.mkNumeral(z3context, pN, mkFpaSort(highPrec));
       Native.incRef(z3context, highPrecNumber);
       long smallPrecNumber =

@@ -74,7 +74,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public BooleanFormula getInterpolant(Collection<String> pFormulasOfA)
       throws SolverException, InterruptedException {
-    checkState(!closed);
+    checkGenerateInterpolants();
     checkArgument(
         getAssertedConstraintIds().containsAll(pFormulasOfA),
         "interpolation can only be done over previously asserted formulas.");
@@ -92,6 +92,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
   @Override
   public List<BooleanFormula> getSeqInterpolants(List<? extends Collection<String>> partitions)
       throws SolverException, InterruptedException {
+    checkGenerateInterpolants();
     checkArgument(!partitions.isEmpty(), "at least one partition should be available.");
     final ImmutableSet<String> assertedConstraintIds = getAssertedConstraintIds();
     checkArgument(
@@ -105,7 +106,7 @@ public class CVC5InterpolatingProver extends CVC5AbstractProver<String>
       Collection<Term> formulasA =
           FluentIterable.from(partitions.get(i - 1))
               .transform(assertedTerms.peek()::get)
-              .append(previousItp)
+              .append(new Term[] {previousItp}) // class Term is Iterable<Term>, be careful here
               .toSet();
       Collection<Term> formulasB =
           FluentIterable.concat(partitions.subList(i, n))

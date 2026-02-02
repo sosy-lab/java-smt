@@ -91,6 +91,7 @@ public final class Yices2NativeApi {
   // MAX_INT avoids collisions with existing constants
   public static final int YICES_AND = Integer.MAX_VALUE - 1;
   public static final int YICES_BV_MUL = Integer.MAX_VALUE - 2;
+  public static final int YICES_ARRAY_SELECT = Integer.MAX_VALUE - 3;
 
   /*
    * Yices model tags

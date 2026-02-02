@@ -211,11 +211,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.greaterOrEquals(x, y, true),
               bvmgr.greaterOrEquals(x, y, false))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-        if (Solvers.PRINCESS != solver) {
-          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-        }
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
         assertThatFormula(f).isEquivalentTo(f2);
@@ -243,11 +239,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               bvmgr.rotateLeft(x, y),
               bvmgr.rotateRight(x, y))) {
         mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-        if (Solvers.PRINCESS != solver) {
-          // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-          // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-          mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-        }
+        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
         BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
         assertThat(f2).isEqualTo(f);
         assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
@@ -261,12 +253,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BitvectorFormula n = bvmgr.makeBitvector(8, 13);
 
     for (BitvectorFormula f : new BitvectorFormula[] {n}) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      if (Solvers.PRINCESS != solver) {
-        // Princess models BV theory with intervals, such as "mod_cast(lower, upper , value)".
-        // The interval function is of FunctionDeclarationKind.OTHER and thus we cannot check it.
-        mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
-      }
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       BitvectorFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(bmgr.not(bvmgr.equal(f, f2))).isUnsatisfiable();
@@ -281,7 +269,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
           0, 1, 2, 17, 127, 255, -1, -2, -17, -127, 127000, 255000, -100, -200, -1700, -127000,
           -255000,
         }) {
-      ConstantsVisitor visitor = new ConstantsVisitor();
+      SolverVisitorTest.ConstantsVisitor visitor = new ConstantsVisitor();
       mgr.visit(imgr.makeNumber(n), visitor);
       assertThat(visitor.found).containsExactly(BigInteger.valueOf(n));
     }
@@ -308,6 +296,57 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
       mgr.visit(rmgr.makeNumber(Rational.ofLongs(n, 321)), visitor);
       assertThat(visitor.found).containsExactly(Rational.ofLongs(n, 321));
     }
+  }
+
+  @Test
+  public void integerDivisionVisit() {
+    requireIntegers();
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS); // Princess will rewrite the term
+
+    IntegerFormula x = imgr.makeVariable("x");
+    IntegerFormula y = imgr.makeVariable("y");
+    IntegerFormula c = imgr.makeNumber(7);
+
+    if (solver.equals(Solvers.MATHSAT5)) {
+      // MathSAT will rewrite if we don't use a variable in the denominator
+      checkKind(imgr.divide(x, y), FunctionDeclarationKind.DIV);
+    } else {
+      // Otherwise, just use a constant to support solvers that don't have non-linear arithmetics
+      checkKind(imgr.divide(x, c), FunctionDeclarationKind.DIV);
+    }
+  }
+
+  @Test
+  public void integerToBitvectorConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    // TODO Find out if mod_cast/int_cast could be mapped to (S)BV_TO_INT and INT_TO_BV
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    IntegerFormula x = imgr.makeVariable("x");
+    checkKind(bvmgr.makeBitvector(8, x), FunctionDeclarationKind.INT_TO_BV);
+  }
+
+  @Test
+  public void bitvectorToIntegerConversionVisit() {
+    requireIntegers();
+    requireBitvectors();
+
+    // Yices does not support integer to bitvector conversions
+    assume().that(solver).isNotEqualTo(Solvers.YICES2);
+    // CVC4, CVC5 and Z3 will rewrite SBV_TO_INT to a term that only uses unsigned integers
+    assume().that(solver).isNoneOf(Solvers.Z3, Solvers.CVC4, Solvers.CVC5);
+    // Princess uses mod_casts internally, which makes it hard to figure out when conversion happen
+    assume().that(solver).isNotEqualTo(Solvers.PRINCESS);
+
+    BitvectorFormula y = bvmgr.makeVariable(8, "y");
+
+    checkKind(bvmgr.toIntegerFormula(y, true), FunctionDeclarationKind.SBV_TO_INT);
+    checkKind(bvmgr.toIntegerFormula(y, false), FunctionDeclarationKind.UBV_TO_INT);
   }
 
   @Test
@@ -477,13 +516,15 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
               Integer.toBinaryString(Float.floatToRawIntBits(entry.getKey().floatValue())),
               32,
               '0'));
-      checkFloatConstant(FormulaType.getFloatingPointType(5, 10), entry.getKey(), entry.getValue());
+      checkFloatConstant(
+          FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(5, 10),
+          entry.getKey(),
+          entry.getValue());
     }
   }
 
   private void checkFloatConstant(FloatingPointType prec, double value, String bits) {
-    FloatingPointNumber fp =
-        FloatingPointNumber.of(bits, prec.getExponentSize(), prec.getMantissaSize());
+    FloatingPointNumber fp = FloatingPointNumber.of(bits, prec);
 
     ConstantsVisitor visitor = new ConstantsVisitor();
     mgr.visit(fpmgr.makeNumber(value, prec), visitor);
@@ -580,7 +621,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
         .that(solverToUse())
         .isNoneOf(Solvers.CVC4, Solvers.CVC5);
 
-    var fpType = FormulaType.getFloatingPointType(5, 10);
+    var fpType = FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(5, 10);
     var visitor =
         new DefaultFormulaVisitor<Void>() {
           @Override
@@ -676,10 +717,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
                   break;
                 case BV_NOT:
                 case BV_NEG:
-                  // Yices is special in some cases
-                  if (Solvers.YICES2 != solverToUse()) {
-                    assertThat(pArgs).hasSize(1);
-                  }
+                  assertThat(pArgs).hasSize(1);
                   break;
                 case BV_ADD:
                   assertThat(pArgs).contains(x);
@@ -688,6 +726,7 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
                 case BV_MUL:
                   assertThat(pArgs).contains(y);
                   assertThat(pArgs).hasSize(2);
+                  // Yices is special in some cases
                   if (Solvers.YICES2 != solverToUse()) {
                     assertThat(pArgs).contains(x);
                   }
@@ -707,6 +746,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInBooleanFormulaIdVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     RegexFormula r = smgr.makeRegex("regex1");
@@ -722,8 +766,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             smgr.prefix(x, y),
             smgr.suffix(x, y),
             smgr.in(x, r))) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
       assertThatFormula(f).isEquivalentTo(f2);
@@ -733,6 +777,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInStringFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     StringFormula z = smgr.makeString("zAsString");
@@ -747,7 +796,8 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.charAt(x, offset))
             .add(smgr.toStringFormula(offset))
             .add(smgr.concat(x, y, z));
-    if (solverToUse() != Solvers.PRINCESS) { // TODO Princess crashes with MatchError of IFunApp
+    if (solverToUse() != Solvers.PRINCESS) {
+      // TODO Princess crashes with MatchError of IFunApp, fixed in Ostrich 2.0
       formulas.add(smgr.fromCodePoint(cp));
     }
     if (solverToUse() != Solvers.Z3) {
@@ -773,6 +823,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInRegexFormulaVisit() {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     RegexFormula r = smgr.makeRegex("regex1");
     RegexFormula s = smgr.makeRegex("regex2");
 
@@ -782,13 +837,10 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
             .add(smgr.closure(r))
             .add(smgr.concat(r, r, r, s, s, s))
             .add(smgr.cross(r));
-    if (solverToUse() != Solvers.Z3) {
-      formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
-      // invalid function OTHER/INTERNAL in visitor, bug in Z3?
-    }
+    formulas.add(smgr.difference(r, s)).add(smgr.complement(r));
     for (RegexFormula f : formulas.build()) {
-      mgr.visit(f, new FunctionDeclarationVisitorNoUF());
-      mgr.visit(f, new FunctionDeclarationVisitorNoOther(mgr));
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoUF());
+      mgr.visit(f, new SolverVisitorTest.FunctionDeclarationVisitorNoOther(mgr));
       RegexFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
       assertThat(f2).isEqualTo(f);
     }
@@ -797,6 +849,11 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   @Test
   public void stringInIntegerFormulaVisit() throws SolverException, InterruptedException {
     requireStrings();
+    assume()
+        .withMessage("Solver %s does not support the complete theory of strings", solverToUse())
+        .that(solverToUse())
+        .isNotEqualTo(Solvers.Z3_WITH_INTERPOLATION);
+
     StringFormula x = smgr.makeVariable("xVariable");
     StringFormula y = smgr.makeVariable("yVariable");
     IntegerFormula offset = imgr.makeVariable("offset");
@@ -1159,8 +1216,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNestedIntegerFormulaQuantifierHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
-    // Z3 returns UNKNOWN as its quantifiers can not handle this.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -1181,8 +1236,6 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
   public void testNestedIntegerFormulaQuantifierRecursiveHandling() throws Exception {
     requireQuantifiers();
     requireIntegers();
-    // Z3 returns UNKNOWN as its quantifiers can not handle this.
-    assume().that(solverToUse()).isNotEqualTo(Solvers.Z3);
     assume()
         .withMessage("Yices2 quantifier support is very limited at the moment")
         .that(solverToUse())
@@ -1629,5 +1682,92 @@ public class SolverVisitorTest extends SolverBasedTest0.ParameterizedSolverBased
     BooleanFormula f2 = mgr.transformRecursively(f, new FormulaTransformationVisitor(mgr) {});
     assertThat(f2).isEqualTo(f);
     assertThatFormula(f).isEquivalentTo(f2);
+  }
+
+  @Test
+  public void testQuantifierAndBoundVariablesWithIntegers() {
+    requireQuantifiers();
+    requireArrays();
+    requireIntegers();
+    requireVisitor();
+
+    IntegerFormula four = imgr.makeNumber(4);
+    IntegerFormula var1 = imgr.makeVariable("var1");
+    IntegerFormula var2 = imgr.makeVariable("var2");
+    IntegerFormula var3 = imgr.makeVariable("var3");
+
+    ArrayFormula<IntegerFormula, IntegerFormula> array1 =
+        amgr.makeArray("array1", FormulaType.IntegerType, FormulaType.IntegerType);
+    ArrayFormula<IntegerFormula, IntegerFormula> array2 =
+        amgr.makeArray("array2", FormulaType.IntegerType, FormulaType.IntegerType);
+
+    IntegerFormula bvIndex = imgr.add(var2, imgr.multiply(four, var1));
+    BooleanFormula body = amgr.equivalence(array2, amgr.store(array1, bvIndex, var3));
+
+    List<? extends Formula> freeVars = ImmutableList.of(var2, var3, array2);
+    List<? extends Formula> boundVars = ImmutableList.of(var1, array1);
+    List<? extends Formula> allVars = ImmutableList.of(var1, var2, var3, array1, array2);
+    Map<String, Formula> variablesInBody = mgr.extractVariables(body);
+    assertThat(variablesInBody.values()).containsExactlyElementsIn(allVars);
+
+    for (Quantifier quantifier : Quantifier.values()) {
+      BooleanFormula quantifiedFormula = qmgr.mkQuantifier(quantifier, boundVars, body);
+
+      Map<String, Formula> variablesInQuantifiedFormula = mgr.extractVariables(quantifiedFormula);
+      Map<String, Formula> variablesAndUFsInQuantifiedFormula =
+          mgr.extractVariablesAndUFs(quantifiedFormula);
+
+      assertThat(variablesAndUFsInQuantifiedFormula).isEqualTo(variablesInQuantifiedFormula);
+      assertThat(variablesInQuantifiedFormula.values()).containsExactlyElementsIn(freeVars);
+      assertThat(variablesInQuantifiedFormula.values()).containsNoneIn(boundVars);
+
+      // TODO: add collection of bound variables through new visitor implementation and test
+      //  failure of the old
+    }
+  }
+
+  @Test
+  public void testQuantifierAndBoundVariablesWithBitvectors() {
+    requireQuantifiers();
+    requireArrays();
+    requireBitvectors();
+    requireVisitor();
+
+    int bvLen = 32;
+    BitvectorType bvType = FormulaType.getBitvectorTypeWithSize(bvLen);
+
+    BitvectorFormula four = bvmgr.makeBitvector(bvLen, 4);
+    BitvectorFormula var1 = bvmgr.makeVariable(bvType, "var1");
+    BitvectorFormula var2 = bvmgr.makeVariable(bvType, "var2");
+    BitvectorFormula var3 = bvmgr.makeVariable(bvType, "var3");
+
+    ArrayFormula<BitvectorFormula, BitvectorFormula> array1 =
+        amgr.makeArray("array1", bvType, bvType);
+    ArrayFormula<BitvectorFormula, BitvectorFormula> array2 =
+        amgr.makeArray("array2", bvType, bvType);
+
+    BitvectorFormula bvIndex = bvmgr.add(var2, bvmgr.multiply(four, var1));
+    BooleanFormula body = amgr.equivalence(array2, amgr.store(array1, bvIndex, var3));
+
+    List<? extends Formula> freeVars = ImmutableList.of(var2, var3, array2);
+    List<? extends Formula> boundVars = ImmutableList.of(var1, array1);
+    List<? extends Formula> allVars = ImmutableList.of(var1, var2, var3, array1, array2);
+    Map<String, Formula> variablesInBody = mgr.extractVariables(body);
+    assertThat(variablesInBody.values()).containsExactlyElementsIn(allVars);
+
+    for (Quantifier quantifier : Quantifier.values()) {
+      BooleanFormula quantifiedFormula = qmgr.mkQuantifier(quantifier, boundVars, body);
+
+      Map<String, Formula> variablesInQuantifiedFormula = mgr.extractVariables(quantifiedFormula);
+      Map<String, Formula> variablesAndUFsInQuantifiedFormula =
+          mgr.extractVariablesAndUFs(quantifiedFormula);
+
+      assertThat(variablesAndUFsInQuantifiedFormula).isEqualTo(variablesInQuantifiedFormula);
+      assertThat(variablesInQuantifiedFormula.values()).containsExactlyElementsIn(freeVars);
+      assertThat(variablesInQuantifiedFormula.values()).containsNoneIn(boundVars);
+
+      // TODO: add collection of bound variables through new visitor implementation and test
+      //  failure of the old
+    }
   }
 }

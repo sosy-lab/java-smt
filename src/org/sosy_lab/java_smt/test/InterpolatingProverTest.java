@@ -164,10 +164,10 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
       throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
-    // build formula:  [false, false]
-    BooleanFormula A = bmgr.makeBoolean(false);
-    BooleanFormula B = bmgr.makeBoolean(false);
-    BooleanFormula C = bmgr.makeBoolean(false);
+    // build formula stack:  [false, false, false]
+    BooleanFormula A = bmgr.makeFalse();
+    BooleanFormula B = bmgr.makeFalse();
+    BooleanFormula C = bmgr.makeFalse();
 
     T TA = stack.push(A);
     T TB = stack.push(B);
@@ -175,34 +175,75 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
 
     assertThat(stack).isUnsatisfiable();
 
-    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeBoolean(true));
+    assertThat(stack.getInterpolant(ImmutableList.of())).isEqualTo(bmgr.makeTrue());
+
     // some interpolant needs to be FALSE, however, it can be at arbitrary position.
+    BooleanFormula expectedInterpolant = bmgr.makeFalse();
+    if (solverToUse() == Solvers.Z3_WITH_INTERPOLATION) {
+      expectedInterpolant = bmgr.makeTrue(); // LegacyZ3 has an issue here.
+    }
     assertThat(
             ImmutableList.of(
                 stack.getInterpolant(ImmutableList.of(TA)),
                 stack.getInterpolant(ImmutableList.of(TB)),
                 stack.getInterpolant(ImmutableList.of(TC))))
-        .contains(bmgr.makeBoolean(false));
+        .contains(expectedInterpolant);
     assertThat(
             ImmutableList.of(
                 stack.getInterpolant(ImmutableList.of(TA, TB)),
                 stack.getInterpolant(ImmutableList.of(TB, TC)),
                 stack.getInterpolant(ImmutableList.of(TC, TA))))
-        .contains(bmgr.makeBoolean(false));
-    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC)))
-        .isEqualTo(bmgr.makeBoolean(false));
+        .contains(expectedInterpolant);
+    assertThat(stack.getInterpolant(ImmutableList.of(TA, TB, TC))).isEqualTo(bmgr.makeFalse());
 
     stack.close();
   }
 
   @Test
+  public <T> void illegalStateTest() throws InterruptedException, SolverException {
+    var varA = bmgr.makeVariable("a");
+    var varB = bmgr.makeVariable("b");
+
+    // Call without a SAT check
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varB));
+
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Call when the assertions are not UNSAT
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varB));
+
+      assertThat(prover.isUnsat()).isFalse();
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Call when the SAT check is outdated
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varA));
+      assertThat(prover.isUnsat()).isTrue();
+      prover.addConstraint(varB);
+      assertThrows(IllegalStateException.class, () -> prover.getInterpolant(ImmutableList.of(f1)));
+    }
+
+    // Finally, call after a SAT check that returned UNSAT
+    try (InterpolatingProverEnvironment<T> prover = newEnvironmentForTest()) {
+      T f1 = prover.addConstraint(varA);
+      prover.addConstraint(bmgr.not(varA));
+      assertThat(prover.isUnsat()).isTrue();
+      checkItpSequence(
+          ImmutableList.of(varA, bmgr.not(varA)),
+          ImmutableList.of(prover.getInterpolant(ImmutableList.of(f1))));
+    }
+  }
+
+  @Test
   public <T> void binaryBVInterpolation1() throws SolverException, InterruptedException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -254,18 +295,13 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
     assume()
         .withMessage("Solver does not support tree-interpolation.")
         .that(solver)
-        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS);
+        .isAnyOf(Solvers.SMTINTERPOL, Solvers.PRINCESS, Solvers.Z3_WITH_INTERPOLATION);
   }
 
   @Test
   public <T> void sequentialInterpolation() throws SolverException, InterruptedException {
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
     requireIntegers();
-
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
 
     int i = index.getFreshId();
 
@@ -425,11 +461,6 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
   @Test
   public <T> void sequentialBVInterpolation() throws SolverException, InterruptedException {
     requireBitvectors();
-
-    assume()
-        .withMessage("Solver %s runs into timeout on this test", solverToUse())
-        .that(solverToUse())
-        .isNotEqualTo(Solvers.CVC5);
 
     InterpolatingProverEnvironment<T> stack = newEnvironmentForTest();
 
@@ -1163,6 +1194,9 @@ public class InterpolatingProverTest extends SolverBasedTest0.ParameterizedSolve
         break;
       case SMTINTERPOL:
         p3 = "some string";
+        break;
+      case Z3_WITH_INTERPOLATION:
+        p3 = 12350;
         break;
       default:
         p3 = null; // unexpected solver for interpolation
