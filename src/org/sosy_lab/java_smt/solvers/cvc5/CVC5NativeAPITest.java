@@ -1410,12 +1410,12 @@ public class CVC5NativeAPITest {
 
     assertThat(proof.getRule()).isEqualTo(ProofRule.SCOPE);
 
-    // Test getChildren
+    // Test getArguments
     assertThat(proof.getChildren()).isNotNull();
 
     assertThat(proof.getChildren()[0]).isNotNull();
 
-    // The way the proof DAG is structured, the root has one child, which has also one child and
+    // The way this proof DAG is structured, the root has one child, which has also one child and
     // the child of the latter has more than one child.
     Proof[] childOfSecondProof = proof.getChildren()[0].getChildren();
 
