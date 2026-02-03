@@ -24,7 +24,6 @@ import java.util.List;
  * @param <T> The type of the objects which can be used to select formulas for interpolant creation.
  */
 public interface InterpolatingProverEnvironment<T> extends BasicProverEnvironment<T> {
-
   /**
    * Get an interpolant for two groups of formulas. This should be called only immediately after an
    * {@link #isUnsat()} call that returned <code>true</code>.
