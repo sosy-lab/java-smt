@@ -774,8 +774,7 @@ public class FloatingPointFormulaManagerTest
       final BitvectorFormula bvNaN =
           bvmgr.makeBitvector(
               singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
-
-      final FloatingPointFormula fpFromBv = fpmgr.fromIeeeBitvector(bvNaN, singlePrecType);
+      final FloatingPointFormula fpFromBv = fpmgr.makeVariable("bvNaN", singlePrecType);
       BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpFromBv, bvNaN);
 
       BooleanFormula fpFromBvIsNan = fpmgr.isNaN(fpFromBv);
@@ -784,16 +783,15 @@ public class FloatingPointFormulaManagerTest
       BooleanFormula fpFromBvIsNotEqualItself =
           bmgr.not(fpmgr.equalWithFPSemantics(fpFromBv, fpFromBv));
       BooleanFormula assertion =
-          bmgr.and(fpFromBvIsNan, fpFromBvIsNotEqualNaN, fpFromBvIsNotEqualItself);
+          bmgr.implication(
+              xToIeeeConstraint,
+              bmgr.and(fpFromBvIsNan, fpFromBvIsNotEqualNaN, fpFromBvIsNotEqualItself));
 
       assertThatFormula(assertion).isTautological();
 
       try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
-        prover.push(xToIeeeConstraint);
-        prover.push(fpFromBvIsNan);
-        prover.push(fpFromBvIsNotEqualNaN);
-        prover.push(fpFromBvIsNotEqualItself);
-
+        prover.push(xToIeeeConstraint); // xToIeeeConstraint has to be true!
+        prover.push(assertion);
         assertThat(prover).isSatisfiable();
 
         try (Model model = prover.getModel()) {
@@ -820,6 +818,48 @@ public class FloatingPointFormulaManagerTest
           }
         }
       }
+    }
+  }
+
+  @Test
+  public void toIeeeBitvectorFallbackEqualityWithNaN32()
+      throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    for (String nan : SINGLE_PREC_NANS) {
+      final BitvectorFormula bvNaN =
+          bvmgr.makeBitvector(
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+      final FloatingPointFormula fpFromBv = fpmgr.makeVariable("fp_from_bv", singlePrecType);
+      BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpFromBv, bvNaN);
+
+      BooleanFormula fpFromBvIsEqualNaN =
+          fpmgr.equalWithFPSemantics(fpmgr.makeNaN(singlePrecType), fpFromBv);
+      BooleanFormula fpFromBvIsEqualItself = fpmgr.equalWithFPSemantics(fpFromBv, fpFromBv);
+
+      assertThatFormula(bmgr.implication(xToIeeeConstraint, bmgr.not(fpFromBvIsEqualNaN)))
+          .isTautological();
+      assertThatFormula(bmgr.implication(xToIeeeConstraint, bmgr.not(fpFromBvIsEqualItself)))
+          .isTautological();
+    }
+  }
+
+  @Test
+  public void fromIeeeBitvectorEqualityWithNaN32() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    for (String nan : SINGLE_PREC_NANS) {
+      final BitvectorFormula bvNaN =
+          bvmgr.makeBitvector(
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+      final FloatingPointFormula fpFromBv = fpmgr.fromIeeeBitvector(bvNaN, singlePrecType);
+
+      BooleanFormula fpFromBvIsEqualNaN =
+          fpmgr.equalWithFPSemantics(fpmgr.makeNaN(singlePrecType), fpFromBv);
+      BooleanFormula fpFromBvIsEqualItself = fpmgr.equalWithFPSemantics(fpFromBv, fpFromBv);
+
+      assertThatFormula(bmgr.not(fpFromBvIsEqualNaN)).isTautological();
+      assertThatFormula(bmgr.not(fpFromBvIsEqualItself)).isTautological();
     }
   }
 
