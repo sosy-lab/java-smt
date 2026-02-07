@@ -89,20 +89,21 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
    */
   protected FloatingPointFormula wrapFloatingPointAndAssertType(
       TFormulaInfo pTerm, @Nullable FloatingPointType pTypeForAssertions) {
+    FormulaType<?> type = getFormulaCreator().getFormulaType(pTerm);
     checkArgument(
-        getFormulaCreator().getFormulaType(pTerm).isFloatingPointType(),
+        type.isFloatingPointType(),
         "Floating-Point formula %s has unexpected type: %s",
         pTerm,
-        getFormulaCreator().getFormulaType(pTerm));
+        type);
     if (pTypeForAssertions != null) {
       // The type derived from the term in the creator is usually built from the exponent and
       // mantissa sizes, hence comparing it to the type used to create the FP term checks that it
       // was created correctly. (There are other tests checking FP type correctness)
       checkArgument(
-          getFormulaCreator().getFormulaType(pTerm).equals(pTypeForAssertions),
+          type.equals(pTypeForAssertions),
           "Floating-Point formula %s type %s is not equal to expected type %s",
           pTerm,
-          getFormulaCreator().getFormulaType(pTerm),
+          type,
           pTypeForAssertions);
     }
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
