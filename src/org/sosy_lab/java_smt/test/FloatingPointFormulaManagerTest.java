@@ -770,10 +770,10 @@ public class FloatingPointFormulaManagerTest
     // Solvers transform arbitrary input NaNs into a single NaN representation
     String defaultNaN = null;
 
-    for (String nan : SINGLE_PREC_NANS) {
+    for (String nanString : SINGLE_PREC_NANS) {
       final BitvectorFormula bvNaN =
           bvmgr.makeBitvector(
-              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nanString, 2)));
       final FloatingPointFormula fpFromBv = fpmgr.makeVariable("bvNaN", singlePrecType);
       BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpFromBv, bvNaN);
 
@@ -826,10 +826,10 @@ public class FloatingPointFormulaManagerTest
       throws SolverException, InterruptedException {
     requireBitvectors();
 
-    for (String nan : SINGLE_PREC_NANS) {
+    for (String nanString : SINGLE_PREC_NANS) {
       final BitvectorFormula bvNaN =
           bvmgr.makeBitvector(
-              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nanString, 2)));
       final FloatingPointFormula fpFromBv = fpmgr.makeVariable("fp_from_bv", singlePrecType);
       BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpFromBv, bvNaN);
 
@@ -848,10 +848,10 @@ public class FloatingPointFormulaManagerTest
   public void fromIeeeBitvectorEqualityWithNaN32() throws SolverException, InterruptedException {
     requireBitvectors();
 
-    for (String nan : SINGLE_PREC_NANS) {
+    for (String nanString : SINGLE_PREC_NANS) {
       final BitvectorFormula bvNaN =
           bvmgr.makeBitvector(
-              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nanString, 2)));
       final FloatingPointFormula fpFromBv = fpmgr.fromIeeeBitvector(bvNaN, singlePrecType);
 
       BooleanFormula fpFromBvIsEqualNaN =
