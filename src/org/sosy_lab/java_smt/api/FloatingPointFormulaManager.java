@@ -317,12 +317,11 @@ public interface FloatingPointFormulaManager {
    * (including the hidden bit) of the given {@link FloatingPointFormula}. This implementation can
    * be used independently of {@link #toIeeeBitvector(FloatingPointFormula)}, as it does not rely on
    * an SMT solvers support for {@link #toIeeeBitvector(FloatingPointFormula)}. Behavior for special
-   * FP values (NaN, Inf, etc.) is not defined, and returned values are solver dependent. This
-   * method is based on a suggestion in the (<a
-   * href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with eb being
-   * the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the hidden bit,
-   * and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter, illustrated
-   * in SMTLIB2 as:
+   * FP values (NaN, Inf, etc.), is solver dependent. This method is based on a suggestion in the
+   * (<a href="https://smt-lib.org/theories-FloatingPoint.shtml">SMTLIB2 standard</a>), with eb
+   * being the {@link FloatingPointFormula}s exponent bit size, sb being its mantissa with the
+   * hidden bit, and eb + sb equal to the bit size of the used {@link BitvectorFormula} parameter,
+   * illustrated in SMTLIB2 as:
    *
    * <p>(= ((_ to_fp eb sb) bitvectorFormulaSetToBeEqualToFpNumber) fpNumber)
    *
