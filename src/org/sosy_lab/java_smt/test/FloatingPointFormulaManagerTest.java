@@ -58,6 +58,19 @@ public class FloatingPointFormulaManagerTest
   // numbers are small enough to be precise with single precision
   private static final int[] SINGLE_PREC_INTS = new int[] {0, 1, 2, 5, 10, 20, 50, 100, 200, 500};
 
+  // Multiple distinct NaN numbers (not all, just some common ones) as defined in IEEE 754-2008 as
+  // 32 bit bitvectors for single-precision floating-point numbers. All bitvectors are defined as
+  // IEEE 754 (sign bit + exponent bits + mantissa bits (without hidden bit))
+  private static final Set<String> SINGLE_PREC_NANS =
+      ImmutableSet.of(
+          "01111111110000000000000000000000",
+          "11111111110000000000000000000000",
+          "01111111100000000000000000000001",
+          "11111111100000000000000000000001",
+          "01111111111111111111111111111111",
+          "11111111111111111111111111111111",
+          "01111111100000000000000000001100");
+
   private static final int NUM_RANDOM_TESTS = 50;
 
   private FloatingPointType singlePrecType;
@@ -745,6 +758,107 @@ public class FloatingPointFormulaManagerTest
                         bmgr.not(fpmgr.isNaN(x)),
                         bvmgr.equal(signBit, bvmgr.makeBitvector(1, 1))))))
         .isTautological();
+  }
+
+  // Test that multiple FP NaNs built from bitvectors compare to NaN in SMT FP theory and their
+  // values and that a solver always just returns a single NaN bitwise representation per default
+  @Test
+  public void toIeeeBitvectorFallbackEqualityWithDistinctNaN32()
+      throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    // Solvers transform arbitrary input NaNs into a single NaN representation
+    String defaultNaN = null;
+
+    for (String nan : SINGLE_PREC_NANS) {
+      final BitvectorFormula bvNaN =
+          bvmgr.makeBitvector(
+              singlePrecType.getTotalSize(), BigInteger.valueOf(Long.valueOf(nan, 2)));
+
+      final FloatingPointFormula fpFromBv = fpmgr.fromIeeeBitvector(bvNaN, singlePrecType);
+      BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpFromBv, bvNaN);
+
+      BooleanFormula fpFromBvIsNan = fpmgr.isNaN(fpFromBv);
+      BooleanFormula fpFromBvIsNotEqualNaN =
+          bmgr.not(fpmgr.equalWithFPSemantics(fpmgr.makeNaN(singlePrecType), fpFromBv));
+      BooleanFormula fpFromBvIsNotEqualItself =
+          bmgr.not(fpmgr.equalWithFPSemantics(fpFromBv, fpFromBv));
+      BooleanFormula assertion =
+          bmgr.and(fpFromBvIsNan, fpFromBvIsNotEqualNaN, fpFromBvIsNotEqualItself);
+
+      assertThatFormula(assertion).isTautological();
+
+      try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+        prover.push(xToIeeeConstraint);
+        prover.push(fpFromBvIsNan);
+        prover.push(fpFromBvIsNotEqualNaN);
+        prover.push(fpFromBvIsNotEqualItself);
+
+        assertThat(prover).isSatisfiable();
+
+        try (Model model = prover.getModel()) {
+          BigInteger bvAsBigInt = model.evaluate(bvNaN);
+          // toBinaryString() is not returning the sign bit if its 0, so we need to add it
+          String bvAsBvString = Long.toBinaryString(model.evaluate(bvNaN).longValueExact());
+          if (bvAsBvString.length() != singlePrecType.getTotalSize()) {
+            if (bvAsBigInt.signum() >= 0) {
+              bvAsBvString = "0" + bvAsBvString;
+            }
+          }
+
+          // The used bitvector is really a (known) NaN
+          assertThat(bvAsBvString).isIn(SINGLE_PREC_NANS);
+
+          FloatingPointNumber fpNanValue = model.evaluate(fpFromBv);
+          // The FP is also a (known) NaN
+          String fpNanAsString = fpNanValue.toString();
+          assertThat(fpNanAsString).isIn(SINGLE_PREC_NANS);
+          if (defaultNaN == null) {
+            defaultNaN = fpNanAsString;
+          } else {
+            assertThat(fpNanAsString).isEqualTo(defaultNaN);
+          }
+        }
+      }
+    }
+  }
+
+  // Tests FP NaN to bitvector representations
+  @Test
+  public void toIeeeBitvectorNaNRepresentation32() throws SolverException, InterruptedException {
+    requireBitvectors();
+
+    final BitvectorFormula bvNaN = bvmgr.makeVariable(singlePrecType.getTotalSize(), "bvNaN");
+
+    final FloatingPointFormula fpNan = fpmgr.makeNaN(singlePrecType);
+    BooleanFormula xToIeeeConstraint = fpmgr.toIeeeBitvector(fpNan, bvNaN);
+
+    try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
+      prover.push(xToIeeeConstraint);
+      assertThat(prover).isSatisfiable();
+
+      try (Model model = prover.getModel()) {
+        BigInteger bvNaNAsBigInt = model.evaluate(bvNaN);
+        // toBinaryString() is not returning the sign bit if its 0, so we need to add it
+        String bvAsBvString = Long.toBinaryString(model.evaluate(bvNaN).longValueExact());
+        if (bvAsBvString.length() != singlePrecType.getTotalSize()) {
+          if (bvNaNAsBigInt.signum() >= 0) {
+            bvAsBvString = "0" + bvAsBvString;
+          }
+        }
+
+        // The bitvector is really a (known) NaN
+        assertThat(bvAsBvString).isIn(SINGLE_PREC_NANS);
+
+        FloatingPointNumber fpNanValue = model.evaluate(fpNan);
+        // The FP is also a (known) NaN
+        String fpNanAsString = fpNanValue.toString();
+        assertThat(fpNanAsString).isIn(SINGLE_PREC_NANS);
+
+        // No solver uses the same bit representation for NaN in the FP number and bitvector
+        assertThat(fpNanAsString).isNotEqualTo(bvAsBvString);
+      }
+    }
   }
 
   // Tests toIeeeBitvector() fallback == toIeeeBitvector() solver native for special numbers,
