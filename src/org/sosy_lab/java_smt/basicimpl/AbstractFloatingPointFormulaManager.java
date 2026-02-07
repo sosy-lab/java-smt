@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.sosy_lab.common.MoreStrings;
 import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.api.BitvectorFormula;
@@ -84,33 +83,34 @@ public abstract class AbstractFloatingPointFormulaManager<TFormulaInfo, TType, T
   /**
    * @param pTerm the term to be wrapped in a {@link FloatingPointFormula}.
    * @param pTypeForAssertions the {@link FloatingPointType} used to create pTerm. This argument is
-   *     only used to verify the exponent and mantissa sizes of pTerm. Ignored if null.
+   *     only used to verify the exponent and mantissa sizes of pTerm.
    * @return input term pTerm in a {@link FloatingPointFormula}.
    */
   protected FloatingPointFormula wrapFloatingPointAndAssertType(
-      TFormulaInfo pTerm, @Nullable FloatingPointType pTypeForAssertions) {
+      TFormulaInfo pTerm, FloatingPointType pTypeForAssertions) {
+
+    FormulaType<?> type = getFormulaCreator().getFormulaType(pTerm);
+    // The type derived from the term in the creator is usually built from the exponent and
+    // mantissa sizes, hence comparing it to the type used to create the FP term checks that it
+    // was created correctly. (There are other tests checking FP type correctness)
+    checkArgument(
+        type.equals(checkNotNull(pTypeForAssertions)),
+        "Floating-Point formula %s type %s is not equal to expected type %s",
+        pTerm,
+        type,
+        pTypeForAssertions);
+
+    return getFormulaCreator().encapsulateFloatingPoint(pTerm);
+  }
+
+  protected FloatingPointFormula wrapFloatingPoint(TFormulaInfo pTerm) {
     FormulaType<?> type = getFormulaCreator().getFormulaType(pTerm);
     checkArgument(
         type.isFloatingPointType(),
         "Floating-Point formula %s has unexpected type: %s",
         pTerm,
         type);
-    if (pTypeForAssertions != null) {
-      // The type derived from the term in the creator is usually built from the exponent and
-      // mantissa sizes, hence comparing it to the type used to create the FP term checks that it
-      // was created correctly. (There are other tests checking FP type correctness)
-      checkArgument(
-          type.equals(pTypeForAssertions),
-          "Floating-Point formula %s type %s is not equal to expected type %s",
-          pTerm,
-          type,
-          pTypeForAssertions);
-    }
     return getFormulaCreator().encapsulateFloatingPoint(pTerm);
-  }
-
-  protected FloatingPointFormula wrapFloatingPoint(TFormulaInfo pTerm) {
-    return wrapFloatingPointAndAssertType(pTerm, null);
   }
 
   @Override
