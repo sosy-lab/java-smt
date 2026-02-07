@@ -322,8 +322,6 @@ public class CVC5FormulaCreator extends FormulaCreator<Term, Sort, TermManager, 
 
   @Override
   protected FloatingPointFormula encapsulateFloatingPoint(Term pTerm) {
-    assert getFormulaType(pTerm).isFloatingPointType()
-        : String.format("%s is no FP, but %s (%s)", pTerm, pTerm.getSort(), getFormulaType(pTerm));
     return new CVC5FloatingPointFormula(pTerm);
   }
 
