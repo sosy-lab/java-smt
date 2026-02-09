@@ -63,17 +63,7 @@ final class PrincessFormulaManager
     if (pArg1 instanceof IFormula) {
       return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArgs2);
     } else {
-      FormulaType<?> type1 = getFormulaCreator().getFormulaType(pArg1);
-      FormulaType<?> type2 = getFormulaCreator().getFormulaType(pArgs2);
-      if (type1.equals(type2)) { // identical types
-        return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs2);
-      } else if (type1.isNumeralType() && type2.isNumeralType()) {
-        // different types, but both are numerals, so we can compare them as rationals
-        return ((PrincessRationalFormulaManager) getRationalFormulaManager()).equal(pArg1, pArgs2);
-      } else {
-        throw new IllegalArgumentException(
-            String.format("Cannot compare formulas of different types: %s and %s", type1, type2));
-      }
+      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs2);
     }
   }
 

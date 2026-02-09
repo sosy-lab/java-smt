@@ -143,6 +143,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // OpenSMT does not support mixed terms
 
     IntegerFormula intVar = imgr.makeVariable("intVar");
     RationalFormula ratVar = rmgr.makeVariable("ratVar");
@@ -294,6 +295,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       throws SolverException, InterruptedException {
     requireIntegers();
     requireRationals();
+    assume().that(solver).isNotEqualTo(Solvers.OPENSMT); // OpenSMT does not support mixed terms
 
     IntegerFormula intVar = imgr.makeVariable("intVar");
     RationalFormula ratVar = rmgr.makeVariable("ratVar");

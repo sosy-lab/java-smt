@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -78,29 +76,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     if (array.length < 2) {
       return getEnvironment().mkTrue();
     } else {
-      return getEnvironment().mkTerm(Kind.EQUAL, toType(array));
-    }
-  }
-
-  /**
-   * CVC5 only supports equality between terms of the same type or between Integer and Real. Thus,
-   * we convert all terms to the same type if there are more than 1 type. We convert Integer to
-   * Real, as this is the only supported mixed type equality.
-   */
-  private Term[] toType(Term[] array) {
-    Set<Sort> sorts = Arrays.stream(array).map(Term::getSort).collect(Collectors.toSet());
-    if (sorts.size() == 1) {
-      return array;
-    } else if (sorts.size() == 2
-        && sorts.contains(getEnvironment().getIntegerSort())
-        && sorts.contains(getEnvironment().getRealSort())) {
-      CVC5RationalFormulaManager rmgr = (CVC5RationalFormulaManager) getRationalFormulaManager();
-      return Arrays.stream(array).map(rmgr::toType).toArray(Term[]::new);
-    } else {
-      throw new IllegalArgumentException(
-          "CVC5 only supports equality between terms of the same type or between Integer and Real,"
-              + " but got types: "
-              + sorts);
+      return getEnvironment().mkTerm(Kind.EQUAL, array);
     }
   }
 
@@ -110,7 +86,7 @@ class CVC5FormulaManager extends AbstractFormulaManager<Term, Sort, TermManager,
     if (array.length < 2) {
       return getEnvironment().mkTrue();
     } else {
-      return getEnvironment().mkTerm(Kind.DISTINCT, toType(array));
+      return getEnvironment().mkTerm(Kind.DISTINCT, array);
     }
   }
 

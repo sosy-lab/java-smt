@@ -268,21 +268,14 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   /** Override if the solver API only supports binary equality. */
   protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
-    return equalImpl(ImmutableList.of(pArg1, pArgs));
+    throw new UnsupportedOperationException(
+        "equalImpl(x, y) must be implemented in a subclass, if required.");
   }
 
   @Override
   public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
-    final ImmutableSet<FormulaType<Formula>> types =
-        FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
-    Preconditions.checkArgument(
-        types.size() < 2
-            || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
-        types.size(),
-        types);
-    return formulaCreator.encapsulateBoolean(
-        equalImpl(FluentIterable.from(pArgs).transform(formulaCreator::extractInfo)));
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(equalImpl(args));
   }
 
   /** Override if the solver API supports equality with many arguments. */
@@ -310,16 +303,30 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
 
   @Override
   public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(distinctImpl(args));
+  }
+
+  private FluentIterable<TFormulaInfo> getTFormulaInfosForComparison(Iterable<Formula> pArgs) {
     final ImmutableSet<FormulaType<Formula>> types =
         FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
     Preconditions.checkArgument(
         types.size() < 2
             || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
-        "All arguments to `distinct` must have the same type, but found %s different types: %s",
+        "All arguments for comparison must have the same type, but found %s different types: %s",
         types.size(),
         types);
-    return formulaCreator.encapsulateBoolean(
-        distinctImpl(FluentIterable.from(pArgs).transform(formulaCreator::extractInfo)));
+    FluentIterable<TFormulaInfo> args =
+        FluentIterable.from(pArgs).transform(formulaCreator::extractInfo);
+    if (types.contains(FormulaType.IntegerType) && types.contains(FormulaType.RationalType)) {
+      // We can compare Integer and Rational terms, so we convert all terms to Rational
+      args =
+          args.transform(
+              ((AbstractNumeralFormulaManager<TFormulaInfo, ?, ?, ?, ?, ?>)
+                      getRationalFormulaManager())
+                  ::toType);
+    }
+    return args;
   }
 
   /** Override if the solver API supports <code>distinct</code>. */
