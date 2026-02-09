@@ -24,9 +24,10 @@ import org.sosy_lab.java_smt.solvers.bitwuzla.api.Bitwuzla;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Kind;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Sort;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Term;
+import org.sosy_lab.java_smt.solvers.bitwuzla.api.TermManager;
 import org.sosy_lab.java_smt.solvers.bitwuzla.api.Vector_Term;
 
-class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
+class BitwuzlaModel extends AbstractModel<Term, Sort, TermManager> {
 
   // The prover env, not the creator env!
   private final Bitwuzla bitwuzlaEnv;
@@ -94,9 +95,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
       Term index = value.get(1);
       Term element = value.get(2);
       Term select =
-          ((BitwuzlaFormulaCreator) creator)
-              .getTermManager()
-              .mk_term(Kind.ARRAY_SELECT, expr, index);
+          ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(Kind.ARRAY_SELECT, expr, index);
 
       // CASE 1: nested array dimension, let's recurse deeper
       if (expr.sort().array_element().is_array()) {
@@ -131,7 +130,7 @@ class BitwuzlaModel extends AbstractModel<Term, Sort, Void> {
     if (left.sort().is_fp() || right.sort().is_fp()) {
       kind = Kind.FP_EQUAL;
     }
-    return ((BitwuzlaFormulaCreator) creator).getTermManager().mk_term(kind, left, right);
+    return ((BitwuzlaFormulaCreator) creator).getEnv().mk_term(kind, left, right);
   }
 
   private ValueAssignment getAssignmentForUfInstantiation(Term pTerm) {

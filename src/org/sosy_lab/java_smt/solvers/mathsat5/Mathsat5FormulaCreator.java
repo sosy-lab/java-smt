@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.solvers.mathsat5;
 
+import static org.sosy_lab.java_smt.api.FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_AND;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_CONST;
 import static org.sosy_lab.java_smt.solvers.mathsat5.Mathsat5NativeApi.MSAT_TAG_ARRAY_READ;
@@ -225,7 +226,7 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
     } else if (msat_is_bv_type(env, type)) {
       return FormulaType.getBitvectorTypeWithSize(msat_get_bv_type_size(env, type));
     } else if (msat_is_fp_type(env, type)) {
-      return FormulaType.getFloatingPointType(
+      return FormulaType.getFloatingPointTypeFromSizesWithoutHiddenBit(
           msat_get_fp_type_exp_width(env, type), msat_get_fp_type_mant_width(env, type));
     } else if (msat_is_fp_roundingmode_type(env, type)) {
       return FormulaType.FloatingPointRoundingModeType;
@@ -253,7 +254,9 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
   @Override
   public Long getFloatingPointType(FloatingPointType pType) {
-    return msat_get_fp_type(getEnv(), pType.getExponentSize(), pType.getMantissaSize());
+    // MathSAT5 automatically adds 1 to the mantissa, as it expects it to be without it.
+    return msat_get_fp_type(
+        getEnv(), pType.getExponentSize(), pType.getMantissaSizeWithoutHiddenBit());
   }
 
   @SuppressWarnings("unchecked")
@@ -604,13 +607,18 @@ class Mathsat5FormulaCreator extends FormulaCreator<Long, Long, Long, Long> {
 
     BigInteger bits = new BigInteger(matcher.group(1));
     int expWidth = Integer.parseInt(matcher.group(2));
-    int mantWidth = Integer.parseInt(matcher.group(3));
+    // The term representation in MathSAT5 does not include the hidden bit
+    int mantWidthWithoutHiddenBit = Integer.parseInt(matcher.group(3));
 
-    Sign sign = Sign.of(bits.testBit(expWidth + mantWidth));
-    BigInteger exponent = extractBitsFrom(bits, mantWidth, expWidth);
-    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidth);
+    Sign sign = Sign.of(bits.testBit(expWidth + mantWidthWithoutHiddenBit));
+    BigInteger exponent = extractBitsFrom(bits, mantWidthWithoutHiddenBit, expWidth);
+    BigInteger mantissa = extractBitsFrom(bits, 0, mantWidthWithoutHiddenBit);
 
-    return FloatingPointNumber.of(sign, exponent, mantissa, expWidth, mantWidth);
+    return FloatingPointNumber.of(
+        sign,
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(expWidth, mantWidthWithoutHiddenBit));
   }
 
   /**

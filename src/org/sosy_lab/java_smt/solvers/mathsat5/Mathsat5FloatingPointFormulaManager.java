@@ -102,27 +102,42 @@ class Mathsat5FloatingPointFormulaManager
       BigInteger exponent, BigInteger mantissa, Sign sign, FloatingPointType type) {
     final String signStr = sign.isNegative() ? "1" : "0";
     final String exponentStr = getBvRepresentation(exponent, type.getExponentSize());
-    final String mantissaStr = getBvRepresentation(mantissa, type.getMantissaSize());
+    // MathSAT5 expects the mantissa to not include the hidden bit
+    final String mantissaStr =
+        getBvRepresentation(mantissa, type.getMantissaSizeWithoutHiddenBit());
     final String bitvecForm = signStr + exponentStr + mantissaStr;
     final BigInteger bitvecValue = new BigInteger(bitvecForm, 2);
     return msat_make_fp_bits_number(
-        mathsatEnv, bitvecValue.toString(), type.getExponentSize(), type.getMantissaSize());
+        mathsatEnv,
+        bitvecValue.toString(),
+        type.getExponentSize(),
+        type.getMantissaSizeWithoutHiddenBit());
   }
 
   @Override
   protected Long makeNumberAndRound(String pN, FloatingPointType pType, Long pRoundingMode) {
     try {
       if (isNegativeZero(Double.valueOf(pN))) {
+        // MathSAT5 expects the mantissa to not include the hidden bit
         return msat_make_fp_neg(
             mathsatEnv,
             msat_make_fp_rat_number(
-                mathsatEnv, "0", pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode));
+                mathsatEnv,
+                "0",
+                pType.getExponentSize(),
+                pType.getMantissaSizeWithoutHiddenBit(),
+                pRoundingMode));
       }
     } catch (NumberFormatException e) {
       // ignore and fallback to floating point from rational numbers
     }
+    // MathSAT5 expects the mantissa to not include the hidden bit
     return msat_make_fp_rat_number(
-        mathsatEnv, pN, pType.getExponentSize(), pType.getMantissaSize(), pRoundingMode);
+        mathsatEnv,
+        pN,
+        pType.getExponentSize(),
+        pType.getMantissaSizeWithoutHiddenBit(),
+        pRoundingMode);
   }
 
   @Override
@@ -132,17 +147,23 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long makePlusInfinityImpl(FloatingPointType type) {
-    return msat_make_fp_plus_inf(mathsatEnv, type.getExponentSize(), type.getMantissaSize());
+    // MathSAT5 expects the mantissa to not include the hidden bit
+    return msat_make_fp_plus_inf(
+        mathsatEnv, type.getExponentSize(), type.getMantissaSizeWithoutHiddenBit());
   }
 
   @Override
   protected Long makeMinusInfinityImpl(FloatingPointType type) {
-    return msat_make_fp_minus_inf(mathsatEnv, type.getExponentSize(), type.getMantissaSize());
+    // MathSAT5 expects the mantissa to not include the hidden bit
+    return msat_make_fp_minus_inf(
+        mathsatEnv, type.getExponentSize(), type.getMantissaSizeWithoutHiddenBit());
   }
 
   @Override
   protected Long makeNaNImpl(FloatingPointType type) {
-    return msat_make_fp_nan(mathsatEnv, type.getExponentSize(), type.getMantissaSize());
+    // MathSAT5 expects the mantissa to not include the hidden bit
+    return msat_make_fp_nan(
+        mathsatEnv, type.getExponentSize(), type.getMantissaSizeWithoutHiddenBit());
   }
 
   @Override
@@ -150,10 +171,11 @@ class Mathsat5FloatingPointFormulaManager
       Long pNumber, boolean pSigned, FormulaType<?> pTargetType, Long pRoundingMode) {
     if (pTargetType.isFloatingPointType()) {
       FormulaType.FloatingPointType targetType = (FormulaType.FloatingPointType) pTargetType;
+      // MathSAT5 expects the mantissa to not include the hidden bit
       return msat_make_fp_cast(
           mathsatEnv,
           targetType.getExponentSize(),
-          targetType.getMantissaSize(),
+          targetType.getMantissaSizeWithoutHiddenBit(),
           pRoundingMode,
           pNumber);
 
@@ -179,18 +201,19 @@ class Mathsat5FloatingPointFormulaManager
       return castToImpl(pNumber, pSigned, pTargetType, pRoundingMode);
 
     } else if (formulaType.isBitvectorType()) {
+      // MathSAT5 expects the mantissa to not include the hidden bit
       if (pSigned) {
         return msat_make_fp_from_sbv(
             mathsatEnv,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize(),
+            pTargetType.getMantissaSizeWithoutHiddenBit(),
             pRoundingMode,
             pNumber);
       } else {
         return msat_make_fp_from_ubv(
             mathsatEnv,
             pTargetType.getExponentSize(),
-            pTargetType.getMantissaSize(),
+            pTargetType.getMantissaSizeWithoutHiddenBit(),
             pRoundingMode,
             pNumber);
       }
@@ -214,8 +237,12 @@ class Mathsat5FloatingPointFormulaManager
 
   @Override
   protected Long fromIeeeBitvectorImpl(Long pNumber, FloatingPointType pTargetType) {
+    // MathSAT5 expects the mantissa to not include the hidden bit
     return Mathsat5NativeApi.msat_make_fp_from_ieeebv(
-        mathsatEnv, pTargetType.getExponentSize(), pTargetType.getMantissaSize(), pNumber);
+        mathsatEnv,
+        pTargetType.getExponentSize(),
+        pTargetType.getMantissaSizeWithoutHiddenBit(),
+        pNumber);
   }
 
   @Override

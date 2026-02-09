@@ -16,44 +16,48 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla.api;
 
-public class TermManager {
-  private transient long swigCPtr;
-  protected transient boolean swigCMemOwn;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
+public class TermManager extends AbstractReference {
+
+  private static final Deque<Reference> references = new ArrayDeque<>();
 
   protected TermManager(long cPtr, boolean cMemoryOwn) {
-    swigCMemOwn = cMemoryOwn;
-    swigCPtr = cPtr;
+    super(cPtr, cMemoryOwn);
   }
 
   protected static long getCPtr(TermManager obj) {
     return (obj == null) ? 0 : obj.swigCPtr;
   }
 
-  protected static long swigRelease(TermManager obj) {
-    long ptr = 0;
-    if (obj != null) {
-      if (!obj.swigCMemOwn)
-        throw new RuntimeException("Cannot release ownership as memory is not owned");
-      ptr = obj.swigCPtr;
-      obj.swigCMemOwn = false;
-      obj.delete();
+  @Override
+  void deleteCPtr() {
+    BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
+  }
+
+  static void addReference(Reference pointer) {
+    synchronized (TermManager.class) {
+      references.addLast(pointer);
     }
-    return ptr;
   }
 
-  @SuppressWarnings({"deprecation", "removal"})
-  protected void finalize() {
-    delete();
+  static void removeReference(Reference pointer) {
+    synchronized (TermManager.class) {
+      references.removeLastOccurrence(pointer);
+    }
   }
 
-  public synchronized void delete() {
-    if (swigCPtr != 0) {
-      if (swigCMemOwn) {
-        swigCMemOwn = false;
-        // Disabled to fix memory management issues
-        // BitwuzlaNativeJNI.delete_TermManager(swigCPtr);
+  /**
+   * Destroy all native references.
+   *
+   * <p>Call this method when closing the final TermManager to destroy all native objects and free their memory
+   **/
+  public static void deleteReferences() {
+    synchronized (TermManager.class) {
+      while (!references.isEmpty()) {
+        references.peekLast().close();
       }
-      swigCPtr = 0;
     }
   }
 
