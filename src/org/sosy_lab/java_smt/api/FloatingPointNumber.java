@@ -165,18 +165,7 @@ public abstract class FloatingPointNumber {
   @Deprecated(
       since = "2025.01, because using a boolean flag as signBit is misleading",
       forRemoval = true)
-  @InlineMe(
-      replacement =
-          "FloatingPointNumber.of(Sign.of(sign), exponent, mantissa,"
-              + " getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize,"
-              + " mantissaSizeWithoutHiddenBit))",
-      imports = {
-        "org.sosy_lab.java_smt.api.FloatingPointNumber",
-        "org.sosy_lab.java_smt.api.FloatingPointNumber.Sign",
-      },
-      staticImports =
-          "org.sosy_lab.java_smt.api.FormulaType"
-              + ".getFloatingPointTypeFromSizesWithoutHiddenBit")
+  @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointNumber of(
       boolean sign,
       BigInteger exponent,
