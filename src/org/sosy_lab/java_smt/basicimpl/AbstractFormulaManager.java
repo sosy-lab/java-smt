@@ -267,6 +267,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   /** Override if the solver API only supports binary equality. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
     throw new UnsupportedOperationException(
         "equalImpl(x, y) must be implemented in a subclass, if required.");
@@ -307,6 +308,7 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     return formulaCreator.encapsulateBoolean(distinctImpl(args));
   }
 
+  @SuppressWarnings("unchecked")
   private FluentIterable<TFormulaInfo> getTFormulaInfosForComparison(Iterable<Formula> pArgs) {
     final ImmutableSet<FormulaType<Formula>> types =
         FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
