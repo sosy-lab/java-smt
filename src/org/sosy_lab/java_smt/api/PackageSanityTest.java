@@ -17,6 +17,10 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
 
   {
     setDistinctValues(FormulaType.class, FormulaType.BooleanType, FormulaType.IntegerType);
+    setDistinctValues(
+        FloatingPointType.class,
+        FloatingPointType.getSinglePrecisionFloatingPointType(),
+        FloatingPointType.getDoublePrecisionFloatingPointType());
     setDefault(FloatingPointType.class, getSinglePrecisionFloatingPointType());
   }
 }
