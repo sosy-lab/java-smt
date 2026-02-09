@@ -102,7 +102,12 @@ public abstract class FloatingPointNumber {
    */
   public abstract BigInteger getMantissa();
 
-  public abstract int getExponentSize();
+  /** Returns the {@link FloatingPointType} of this {@link FloatingPointNumber} */
+  public abstract FloatingPointType getFloatingPointType();
+
+  public int getExponentSize() {
+    return getFloatingPointType().getExponentSize();
+  }
 
   /**
    * Returns the size of the mantissa (also called a coefficient or significand), excluding the sign
@@ -123,14 +128,16 @@ public abstract class FloatingPointNumber {
    * Returns the size of the mantissa (also called a coefficient or significand), excluding the
    * hidden bit.
    */
-  public abstract int getMantissaSizeWithoutHiddenBit();
+  public int getMantissaSizeWithoutHiddenBit() {
+    return getFloatingPointType().getMantissaSizeWithoutHiddenBit();
+  }
 
   /**
    * Returns the size of the mantissa (also called a coefficient or significand), including the
    * hidden bit.
    */
   public int getMantissaSizeWithHiddenBit() {
-    return getMantissaSizeWithoutHiddenBit() + 1;
+    return getFloatingPointType().getMantissaSizeWithHiddenBit();
   }
 
   /**
@@ -210,7 +217,10 @@ public abstract class FloatingPointNumber {
     Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
     Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
     return new AutoValue_FloatingPointNumber(
-        sign, exponent, mantissa, exponentSize, mantissaSizeWithoutHiddenBit);
+        sign,
+        exponent,
+        mantissa,
+        getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
   }
 
   /**
@@ -229,12 +239,7 @@ public abstract class FloatingPointNumber {
     checkNotNull(floatingPointType);
     Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
     Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
-    return new AutoValue_FloatingPointNumber(
-        sign,
-        exponent,
-        mantissa,
-        floatingPointType.getExponentSize(),
-        floatingPointType.getMantissaSizeWithoutHiddenBit());
+    return new AutoValue_FloatingPointNumber(sign, exponent, mantissa, floatingPointType);
   }
 
   /**
