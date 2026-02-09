@@ -172,6 +172,8 @@ public abstract class FloatingPointNumber {
       BigInteger mantissa,
       int exponentSize,
       int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
     return of(
         Sign.of(sign),
         exponent,
@@ -202,6 +204,9 @@ public abstract class FloatingPointNumber {
       BigInteger mantissa,
       int exponentSize,
       int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(sign);
+    checkNotNull(exponent);
+    checkNotNull(mantissa);
     return of(
         sign,
         exponent,
@@ -222,7 +227,6 @@ public abstract class FloatingPointNumber {
    */
   public static FloatingPointNumber of(
       Sign sign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
-    checkNotNull(floatingPointType);
     Preconditions.checkArgument(
         exponent.compareTo(BigInteger.ZERO) >= 0, "Exponent must not be negative");
     Preconditions.checkArgument(
@@ -251,6 +255,7 @@ public abstract class FloatingPointNumber {
   @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointNumber of(
       String bits, int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    checkNotNull(bits);
     return of(
         bits,
         getFloatingPointTypeFromSizesWithoutHiddenBit(exponentSize, mantissaSizeWithoutHiddenBit));
@@ -265,7 +270,6 @@ public abstract class FloatingPointNumber {
    *     based on this type.
    */
   public static FloatingPointNumber of(String bits, FloatingPointType floatingPointType) {
-    checkNotNull(floatingPointType);
     // Note: sign bit + exponent size + mantissa size without hidden bit == exponent size + mantissa
     // size with hidden bit
     var exponentSize = floatingPointType.getExponentSize();
