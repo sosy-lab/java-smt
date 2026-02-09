@@ -237,12 +237,16 @@ public abstract class FloatingPointNumber {
   public static FloatingPointNumber of(
       Sign sign, BigInteger exponent, BigInteger mantissa, FloatingPointType floatingPointType) {
     checkNotNull(floatingPointType);
-    Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
-    Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
     Preconditions.checkArgument(
-        exponent.bitLength() <= floatingPointType.getExponentSize());
+        exponent.compareTo(BigInteger.ZERO) >= 0, "Exponent must not be negative");
     Preconditions.checkArgument(
-        mantissa.bitLength() <= floatingPointType.getMantissaSizeWithoutHiddenBit());
+        mantissa.compareTo(BigInteger.ZERO) >= 0, "Mantissa must not be negative");
+    Preconditions.checkArgument(
+        exponent.bitLength() <= floatingPointType.getExponentSize(),
+        "Exponent is too large for the exponent size");
+    Preconditions.checkArgument(
+        mantissa.bitLength() <= floatingPointType.getMantissaSizeWithoutHiddenBit(),
+        "Mantissa is too large for the mantissa size");
     return new AutoValue_FloatingPointNumber(sign, exponent, mantissa, floatingPointType);
   }
 
