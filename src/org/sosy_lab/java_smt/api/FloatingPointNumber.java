@@ -102,7 +102,7 @@ public abstract class FloatingPointNumber {
    */
   public abstract BigInteger getMantissa();
 
-  /** Returns the {@link FloatingPointType} of this {@link FloatingPointNumber} */
+  /** Returns the {@link FloatingPointType} of this {@link FloatingPointNumber}. */
   public abstract FloatingPointType getFloatingPointType();
 
   public int getExponentSize() {
