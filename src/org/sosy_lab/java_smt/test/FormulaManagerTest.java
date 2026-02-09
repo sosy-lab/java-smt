@@ -34,6 +34,8 @@ import org.sosy_lab.java_smt.api.FormulaManager;
 import org.sosy_lab.java_smt.api.FormulaType;
 import org.sosy_lab.java_smt.api.FunctionDeclaration;
 import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
+import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverException;
 import org.sosy_lab.java_smt.api.visitors.FormulaTransformationVisitor;
 
@@ -84,7 +86,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
   }
 
   @Test
-  public void testEquality() {
+  public void testEquality() throws SolverException, InterruptedException {
     // Check if `=` terms are rewritten
     var formulaType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
 
@@ -95,6 +97,7 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
     var f = mgr.makeEqual(var1, var2, var3);
     var g = bmgr.and(mgr.makeEqual(var1, var2), mgr.makeEqual(var2, var3));
 
+    assertThatFormula(f).isEquisatisfiableTo(g);
     if (solver == Solvers.SMTINTERPOL) {
       // Only SmtInterpol support equality with more than two arguments
       assertThat(f).isNotEqualTo(g);
@@ -102,6 +105,61 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       // ... all other solvers will rewrite
       assertThat(f).isEqualTo(g);
     }
+  }
+
+  /**
+   * Check that an exception is thrown if the arguments to `=` don't have compatible types. However,
+   * some types are compatible if a solver can convert them internally (e.g. Integer and Rational
+   * --> see {@link #testEquality_withIntegerAndRationalTypes}).
+   */
+  @Test
+  public void testEquality_withDifferentTypes() {
+
+    // Incompatible types: Boolean and Numeric
+    var boolVar = mgr.makeVariable(BooleanType, "boolVar");
+    var numVarType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+    var numVar = mgr.makeVariable(numVarType, "numVar");
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(boolVar, numVar));
+
+    // Incompatible types: Bitvector of different sizes
+    if (bvmgr != null) {
+      var bv8 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv8");
+      var bv16 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv16");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(bv8, bv16));
+    }
+
+    // Incompatible types: Array of different types
+    if (amgr != null) {
+      var domainType = numVarType;
+      var rangeType = numVarType == IntegerType ? RationalType : getBitvectorTypeWithSize(16);
+      var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
+      var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeEqual(arr1, arr2));
+    }
+  }
+
+  @Test
+  public void testEquality_withIntegerAndRationalTypes()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireRationals();
+
+    IntegerFormula intVar = imgr.makeVariable("intVar");
+    RationalFormula ratVar = rmgr.makeVariable("ratVar");
+    BooleanFormula eqVar = mgr.makeEqual(intVar, ratVar);
+    assertThatFormula(eqVar).isSatisfiable();
+
+    IntegerFormula intNum5 = imgr.makeNumber(5);
+    RationalFormula ratNum5 = rmgr.makeNumber(5);
+    BooleanFormula eqNum = mgr.makeEqual(intNum5, ratNum5);
+    assertThatFormula(eqNum).isTautological();
+
+    RationalFormula ratNum6 = rmgr.makeNumber(6);
+    BooleanFormula eqNumFalse = mgr.makeEqual(intNum5, ratNum6);
+    assertThatFormula(eqNumFalse).isUnsatisfiable();
+
+    BooleanFormula eqIntVarRatConst = mgr.makeEqual(intVar, ratNum5);
+    assertThatFormula(eqIntVarRatConst).isSatisfiable();
   }
 
   private class Rebuilder extends FormulaTransformationVisitor {
@@ -197,6 +255,74 @@ public class FormulaManagerTest extends SolverBasedTest0.ParameterizedSolverBase
       // Solvers that keep the distinct term
       // Note that Bitwuzla will partially rewrite and only supports distinct for 2 arguments
       assertThat(f).isNotEqualTo(g);
+    }
+  }
+
+  /**
+   * Check that an exception is thrown if the arguments to `distinct` don't have compatible types.
+   * However, some types are compatible if a solver can convert them internally (e.g. Integer and
+   * Rational --> {@link #testDistinct_withIntegerAndRationalTypes}).
+   */
+  @Test
+  public void testDistinct_withDifferentTypes() {
+
+    // Incompatible types: Boolean and Numeric
+    var boolVar = mgr.makeVariable(BooleanType, "boolVar");
+    var numVarType = imgr != null ? IntegerType : getBitvectorTypeWithSize(8);
+    var numVar = mgr.makeVariable(numVarType, "numVar");
+    assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(boolVar, numVar));
+
+    // Incompatible types: Bitvector of different sizes
+    if (bvmgr != null) {
+      var bv8 = mgr.makeVariable(getBitvectorTypeWithSize(8), "bv8");
+      var bv16 = mgr.makeVariable(getBitvectorTypeWithSize(16), "bv16");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(bv8, bv16));
+    }
+
+    // Incompatible types: Array of different types
+    if (amgr != null) {
+      var domainType = numVarType;
+      var rangeType = numVarType == IntegerType ? RationalType : getBitvectorTypeWithSize(16);
+      var arr1 = mgr.makeVariable(getArrayType(domainType, rangeType), "arr1");
+      var arr2 = mgr.makeVariable(getArrayType(rangeType, domainType), "arr2");
+      assertThrows(IllegalArgumentException.class, () -> mgr.makeDistinct(arr1, arr2));
+    }
+  }
+
+  @Test
+  public void testDistinct_withIntegerAndRationalTypes()
+      throws SolverException, InterruptedException {
+    requireIntegers();
+    requireRationals();
+
+    IntegerFormula intVar = imgr.makeVariable("intVar");
+    RationalFormula ratVar = rmgr.makeVariable("ratVar");
+    BooleanFormula distinctVar = mgr.makeDistinct(intVar, ratVar);
+    assertThatFormula(distinctVar).isSatisfiable();
+
+    IntegerFormula intNum5 = imgr.makeNumber(5);
+    RationalFormula ratNum5 = rmgr.makeNumber(5);
+    BooleanFormula distinctNum = mgr.makeDistinct(intNum5, ratNum5);
+    assertThatFormula(distinctNum).isUnsatisfiable();
+
+    RationalFormula ratNum6 = rmgr.makeNumber(6);
+    BooleanFormula distinctNumTrue = mgr.makeDistinct(intNum5, ratNum6);
+    assertThatFormula(distinctNumTrue).isTautological();
+
+    BooleanFormula distinctIntVarRatConst = mgr.makeDistinct(intVar, ratNum5);
+    assertThatFormula(distinctIntVarRatConst).isSatisfiable();
+
+    // build assertion: distinct(intVar, 5) && intVar == 5 --> should be unsat
+    try (ProverEnvironment prover = context.newProverEnvironment()) {
+      prover.addConstraint(distinctIntVarRatConst);
+      assertThat(prover.isUnsat()).isFalse();
+      prover.push();
+      prover.addConstraint(imgr.equal(intVar, intNum5)); // intVar == 5
+      assertThat(prover.isUnsat()).isTrue();
+      prover.pop();
+      prover.push();
+      prover.addConstraint(imgr.equal(intVar, imgr.makeNumber(7))); // intVar == 7
+      assertThat(prover.isUnsat()).isFalse();
     }
   }
 

@@ -276,7 +276,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     final ImmutableSet<FormulaType<Formula>> types =
         FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
     Preconditions.checkArgument(
-        types.size() < 2,
+        types.size() < 2
+            || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
         "All arguments to `equal` must have the same type, but found %s different types: %s",
         types.size(),
         types);
@@ -312,7 +313,8 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
     final ImmutableSet<FormulaType<Formula>> types =
         FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
     Preconditions.checkArgument(
-        types.size() < 2,
+        types.size() < 2
+            || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
         "All arguments to `distinct` must have the same type, but found %s different types: %s",
         types.size(),
         types);

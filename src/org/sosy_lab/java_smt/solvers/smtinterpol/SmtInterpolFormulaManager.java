@@ -76,7 +76,7 @@ public class SmtInterpolFormulaManager
     if (array.length < 2) {
       return getEnvironment().getTheory().mTrue;
     } else {
-      return getEnvironment().getTheory().equals(array);
+      return getEnvironment().term("=", array);
     }
   }
 
@@ -86,7 +86,7 @@ public class SmtInterpolFormulaManager
     if (array.length < 2) {
       return getEnvironment().getTheory().mTrue;
     } else {
-      return getEnvironment().getTheory().distinct(array);
+      return getEnvironment().term("distinct", array);
     }
   }
 
