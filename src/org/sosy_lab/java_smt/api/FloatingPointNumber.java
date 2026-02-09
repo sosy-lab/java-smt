@@ -239,6 +239,10 @@ public abstract class FloatingPointNumber {
     checkNotNull(floatingPointType);
     Preconditions.checkArgument(exponent.compareTo(BigInteger.ZERO) >= 0);
     Preconditions.checkArgument(mantissa.compareTo(BigInteger.ZERO) >= 0);
+    Preconditions.checkArgument(
+        exponent.bitLength() <= floatingPointType.getExponentSize());
+    Preconditions.checkArgument(
+        mantissa.bitLength() <= floatingPointType.getMantissaSizeWithoutHiddenBit());
     return new AutoValue_FloatingPointNumber(sign, exponent, mantissa, floatingPointType);
   }
 
