@@ -272,9 +272,6 @@ public abstract class FloatingPointNumber {
     // size with hidden bit
     var exponentSize = floatingPointType.getExponentSize();
     var mantissaSizeWithoutHiddenBit = floatingPointType.getMantissaSizeWithoutHiddenBit();
-    Preconditions.checkArgument(exponentSize >= 0, "Exponent size must not be negative");
-    Preconditions.checkArgument(
-        mantissaSizeWithoutHiddenBit >= 0, "Mantissa size must not be negative");
     Preconditions.checkArgument(
         bits.length() == floatingPointType.getTotalSize(),
         "Bitsize (%s) of floating point numeral does not match the size of sign, exponent and "
