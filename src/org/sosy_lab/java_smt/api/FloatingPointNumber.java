@@ -165,7 +165,6 @@ public abstract class FloatingPointNumber {
   @Deprecated(
       since = "2025.01, because using a boolean flag as signBit is misleading",
       forRemoval = true)
-  @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointNumber of(
       boolean sign,
       BigInteger exponent,
@@ -197,7 +196,6 @@ public abstract class FloatingPointNumber {
   @Deprecated(
       since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
       forRemoval = true)
-  @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointNumber of(
       Sign sign,
       BigInteger exponent,
@@ -250,7 +248,6 @@ public abstract class FloatingPointNumber {
   @Deprecated(
       since = "2026.01, because mantissa arguments with/without sign bits can be misleading",
       forRemoval = true)
-  @SuppressWarnings("InlineMeSuggester")
   public static FloatingPointNumber of(
       String bits, int exponentSize, int mantissaSizeWithoutHiddenBit) {
     checkNotNull(bits);
