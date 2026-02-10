@@ -249,10 +249,10 @@ public abstract class FormulaType<T extends Formula> {
    */
   public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
       int exponentSize, int mantissaSizeWithoutHiddenBit) {
-    checkArgument(exponentSize >= 2, "Exponent size must be at least 2");
+    checkArgument(exponentSize > 1, "Exponent size must be greater than 1");
     checkArgument(
-        mantissaSizeWithoutHiddenBit >= 1,
-        "Mantissa size (without 'hidden bit') must be at least 1");
+        mantissaSizeWithoutHiddenBit > 0,
+        "Mantissa size (without 'hidden bit') must be greater than 0");
     return new FloatingPointType(exponentSize, mantissaSizeWithoutHiddenBit);
   }
 
@@ -276,8 +276,8 @@ public abstract class FormulaType<T extends Formula> {
   public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
       int exponentSize, int mantissaSizeWithHiddenBit) {
     checkArgument(
-        mantissaSizeWithHiddenBit >= 2,
-        "Mantissa size (including the 'hidden bit') must be at least 2");
+        mantissaSizeWithHiddenBit > 1,
+        "Mantissa size (including the 'hidden bit') must be greater than 1");
     return getFloatingPointTypeFromSizesWithoutHiddenBit(
         exponentSize, mantissaSizeWithHiddenBit - 1);
   }
