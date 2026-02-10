@@ -8,10 +8,9 @@
 
 package org.sosy_lab.java_smt.api;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -140,8 +139,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  default BooleanFormula equal(Formula... pArgs) {
-    return equal(ImmutableList.copyOf(pArgs));
+  default BooleanFormula makeEqual(Formula... pArgs) {
+    return makeEqual(Arrays.asList(pArgs));
   }
 
   /**
@@ -151,7 +150,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for equality, ordering does not matter.
    * @return Equality formula
    */
-  BooleanFormula equal(Collection<Formula> pArgs);
+  BooleanFormula makeEqual(Iterable<Formula> pArgs);
 
   /**
    * Create a distinctness formula between the given arguments. We return "true" if all arguments
@@ -160,8 +159,8 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  default BooleanFormula distinct(Formula... pArgs) {
-    return distinct(ImmutableList.copyOf(pArgs));
+  default BooleanFormula makeDistinct(Formula... pArgs) {
+    return makeDistinct(Arrays.asList(pArgs));
   }
 
   /**
@@ -171,7 +170,7 @@ public interface FormulaManager {
    * @param pArgs Arguments to be compared for distinctness, ordering does not matter.
    * @return Distinctness formula
    */
-  BooleanFormula distinct(Collection<Formula> pArgs);
+  BooleanFormula makeDistinct(Iterable<Formula> pArgs);
 
   /** Returns the type of the given Formula. */
   <T extends Formula> FormulaType<T> getFormulaType(T formula);

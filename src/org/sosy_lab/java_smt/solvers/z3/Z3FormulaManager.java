@@ -14,7 +14,6 @@ import com.google.common.primitives.Longs;
 import com.microsoft.z3.Native;
 import com.microsoft.z3.Z3Exception;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -69,8 +68,13 @@ final class Z3FormulaManager extends AbstractFormulaManager<Long, Long, Long, Lo
   }
 
   @Override
-  public Long distinctImpl(Collection<Long> pArgs) {
-    return Native.mkDistinct(getEnvironment(), pArgs.size(), Longs.toArray(pArgs));
+  public Long distinctImpl(Iterable<Long> pArgs) {
+    long[] array = Longs.toArray(ImmutableList.copyOf(pArgs));
+    if (array.length < 2) {
+      return Native.mkTrue(getEnvironment());
+    } else {
+      return Native.mkDistinct(getEnvironment(), array.length, array);
+    }
   }
 
   @Override

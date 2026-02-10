@@ -12,7 +12,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.sosy_lab.common.Appender;
@@ -153,16 +152,16 @@ class SynchronizedFormulaManager implements FormulaManager {
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
     synchronized (sync) {
-      return delegate.equal(pArgs);
+      return delegate.makeEqual(pArgs);
     }
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
     synchronized (sync) {
-      return delegate.distinct(pArgs);
+      return delegate.makeDistinct(pArgs);
     }
   }
 

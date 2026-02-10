@@ -59,11 +59,11 @@ final class PrincessFormulaManager
   }
 
   @Override
-  protected IExpression equalImpl(IExpression pArg1, IExpression pArgs) {
+  protected IExpression equalImpl(IExpression pArg1, IExpression pArgs2) {
     if (pArg1 instanceof IFormula) {
-      return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArgs);
+      return new IBinFormula(IBinJunctor.Eqv(), (IFormula) pArg1, (IFormula) pArgs2);
     } else {
-      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs);
+      return ((ITerm) pArg1).$eq$eq$eq((ITerm) pArgs2);
     }
   }
 

@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -268,28 +267,20 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   /** Override if the solver API only supports binary equality. */
+  @SuppressWarnings("unused")
   protected TFormulaInfo equalImpl(TFormulaInfo pArg1, TFormulaInfo pArgs) {
-    return equalImpl(ImmutableList.of(pArg1, pArgs));
+    throw new UnsupportedOperationException(
+        "equalImpl(x, y) must be implemented in a subclass, if required.");
   }
 
   @Override
-  public BooleanFormula equal(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
-      return booleanManager.makeTrue(); // trivially true
-    }
-    final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
-    Preconditions.checkArgument(
-        ImmutableSet.copyOf(types).size() == 1,
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
-        types.size(),
-        types);
-    return formulaCreator.encapsulateBoolean(
-        equalImpl(Collections2.transform(pArgs, formulaCreator::extractInfo)));
+  public BooleanFormula makeEqual(Iterable<Formula> pArgs) {
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(equalImpl(args));
   }
 
   /** Override if the solver API supports equality with many arguments. */
-  protected TFormulaInfo equalImpl(Collection<TFormulaInfo> pArgs) {
+  protected TFormulaInfo equalImpl(Iterable<TFormulaInfo> pArgs) {
     List<TFormulaInfo> equalities = new ArrayList<>();
     for (TFormulaInfo[] pair : pairwise(pArgs)) {
       equalities.add(equalImpl(pair[0], pair[1]));
@@ -312,22 +303,36 @@ public abstract class AbstractFormulaManager<TFormulaInfo, TType, TEnv, TFuncDec
   }
 
   @Override
-  public BooleanFormula distinct(Collection<Formula> pArgs) {
-    if (pArgs.size() < 2) {
-      return booleanManager.makeTrue(); // trivially true
-    }
-    final Collection<FormulaType<Formula>> types =
-        Collections2.transform(pArgs, formulaCreator::getFormulaType);
+  public BooleanFormula makeDistinct(Iterable<Formula> pArgs) {
+    FluentIterable<TFormulaInfo> args = getTFormulaInfosForComparison(pArgs);
+    return formulaCreator.encapsulateBoolean(distinctImpl(args));
+  }
+
+  @SuppressWarnings("unchecked")
+  private FluentIterable<TFormulaInfo> getTFormulaInfosForComparison(Iterable<Formula> pArgs) {
+    final ImmutableSet<FormulaType<Formula>> types =
+        FluentIterable.from(pArgs).transform(formulaCreator::getFormulaType).toSet();
     Preconditions.checkArgument(
-        ImmutableSet.copyOf(types).size() == 1,
-        "All arguments to `equal` must have the same type, but found %s different types: %s",
+        types.size() < 2
+            || ImmutableSet.of(FormulaType.IntegerType, FormulaType.RationalType).equals(types),
+        "All arguments for comparison must have the same type, but found %s different types: %s",
         types.size(),
         types);
-    return formulaCreator.encapsulateBoolean(distinctImpl(formulaCreator.extractInfo(pArgs)));
+    FluentIterable<TFormulaInfo> args =
+        FluentIterable.from(pArgs).transform(formulaCreator::extractInfo);
+    if (types.contains(FormulaType.IntegerType) && types.contains(FormulaType.RationalType)) {
+      // We can compare Integer and Rational terms, so we convert all terms to Rational
+      args =
+          args.transform(
+              ((AbstractNumeralFormulaManager<TFormulaInfo, ?, ?, ?, ?, ?>)
+                      getRationalFormulaManager())
+                  ::toType);
+    }
+    return args;
   }
 
   /** Override if the solver API supports <code>distinct</code>. */
-  protected TFormulaInfo distinctImpl(Collection<TFormulaInfo> pArgs) {
+  protected TFormulaInfo distinctImpl(Iterable<TFormulaInfo> pArgs) {
     List<TFormulaInfo> inequalities = new ArrayList<>();
     for (TFormulaInfo[] pair : allUniquePairs(pArgs)) {
       inequalities.add(booleanManager.not(equalImpl(pair[0], pair[1])));
