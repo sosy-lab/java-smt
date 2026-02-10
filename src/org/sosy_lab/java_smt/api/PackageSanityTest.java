@@ -8,8 +8,6 @@
 
 package org.sosy_lab.java_smt.api;
 
-import static org.sosy_lab.java_smt.api.FormulaType.getSinglePrecisionFloatingPointType;
-
 import com.google.common.testing.AbstractPackageSanityTests;
 import org.sosy_lab.java_smt.api.FormulaType.FloatingPointType;
 
@@ -21,6 +19,5 @@ public class PackageSanityTest extends AbstractPackageSanityTests {
         FloatingPointType.class,
         FormulaType.getSinglePrecisionFloatingPointType(),
         FormulaType.getDoublePrecisionFloatingPointType());
-    setDefault(FloatingPointType.class, getSinglePrecisionFloatingPointType());
   }
 }
