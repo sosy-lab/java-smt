@@ -8,6 +8,7 @@
 
 package org.sosy_lab.java_smt.api;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_EXPONENT_SIZE;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.DOUBLE_PRECISION_MANTISSA_SIZE_WITHOUT_HIDDEN_BIT;
 import static org.sosy_lab.java_smt.api.FloatingPointNumber.SINGLE_PRECISION_EXPONENT_SIZE;
@@ -248,6 +249,10 @@ public abstract class FormulaType<T extends Formula> {
    */
   public static FloatingPointType getFloatingPointTypeFromSizesWithoutHiddenBit(
       int exponentSize, int mantissaSizeWithoutHiddenBit) {
+    checkArgument(exponentSize > 1, "Exponent size must be greater than 1");
+    checkArgument(
+        mantissaSizeWithoutHiddenBit > 0,
+        "Mantissa size (without 'hidden bit') must be greater than 0");
     return new FloatingPointType(exponentSize, mantissaSizeWithoutHiddenBit);
   }
 
@@ -270,6 +275,9 @@ public abstract class FormulaType<T extends Formula> {
    */
   public static FloatingPointType getFloatingPointTypeFromSizesWithHiddenBit(
       int exponentSize, int mantissaSizeWithHiddenBit) {
+    checkArgument(
+        mantissaSizeWithHiddenBit > 1,
+        "Mantissa size (including the 'hidden bit') must be greater than 1");
     return getFloatingPointTypeFromSizesWithoutHiddenBit(
         exponentSize, mantissaSizeWithHiddenBit - 1);
   }
