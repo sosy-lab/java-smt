@@ -8,11 +8,14 @@
 
 package org.sosy_lab.java_smt.solvers.bitwuzla;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
+import java.util.Collection;
 import java.util.List;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
@@ -88,6 +91,78 @@ public final class BitwuzlaFormulaManager
     Table<String, Sort, Term> cache = creator.getCache();
 
     // Process the declarations
+    Collection<String> symbolsDeclarationFromTokens = getDeclarationsFromTokens(tokens, cache);
+
+    // Build SMT-LIB2 declarations for all variables in the cache
+    Collection<String> symbolsDeclarationFromCache = getDeclaredSymbolsFromCache(cache);
+
+    String decls = String.join("\n", symbolsDeclarationFromCache);
+    String input = String.join("\n", symbolsDeclarationFromTokens);
+
+    // Add the declarations to the input and parse everything
+    Parser parser = new Parser(creator.getEnv(), bitwuzlaOption);
+    parser.parse(decls + input, true, false);
+
+    // After the run, get the final assertion from the parser
+    Vector_Term assertions = parser.bitwuzla().get_assertions();
+    Preconditions.checkArgument(
+        !assertions.isEmpty(), "No assertion found in input string \"%s\"", formulaStr);
+    Term assertion = Iterables.getLast(assertions);
+
+    // Now get all symbols that were declared in the input
+    Vector_Term declared = parser.get_declared_funs();
+
+    Term result = synchronizeSymbolsWithCache(declared, cache, assertion);
+
+    // Return the updated term
+    return result;
+  }
+
+  /**
+   * Collect all new symbols from the parser and synchronize them with the variable cache. Finally,
+   * substitute all symbols from the assertion with their original terms from the cache to be
+   * consistent with previously created formulas.
+   *
+   * @return a term where all symbols are synchronized with the cache and can be used together with
+   *     previously created formulas.
+   */
+  private Term synchronizeSymbolsWithCache(
+      Vector_Term declared, Table<String, Sort, Term> cache, Term assertion) {
+    // Process the symbols from the parser
+    Map_TermTerm subst = new Map_TermTerm();
+    for (Term term : declared) {
+      if (cache.containsRow(term.symbol())) {
+        // Symbol is from the context: add the original term to the substitution map
+        subst.put(term, cache.get(term.symbol(), term.sort()));
+      } else {
+        // Symbol is new, add it to the context
+        cache.put(term.symbol(), term.sort(), term);
+      }
+    }
+
+    // Substitute all symbols from the context with their original terms
+    return creator.getEnv().substitute_term(assertion, subst);
+  }
+
+  /** Return SMTLIB for all symbols from the cache, with one declaration per line. */
+  private static Collection<String> getDeclaredSymbolsFromCache(Table<String, Sort, Term> cache) {
+    ImmutableList.Builder<String> builder = ImmutableList.builder();
+    for (Cell<String, Sort, Term> c : cache.cellSet()) {
+      String symbol = c.getValue().toString();
+      List<Sort> args = ImmutableList.of();
+      Sort sort = c.getColumnKey();
+      if (sort.is_fun()) {
+        args = sort.fun_domain();
+        sort = sort.fun_codomain();
+      }
+      String argsStr = Joiner.on(" ").join(args);
+      builder.add(String.format("(declare-fun %s (%s) %s)", symbol, argsStr, sort));
+    }
+    return builder.build();
+  }
+
+  private Collection<String> getDeclarationsFromTokens(
+      List<String> tokens, Table<String, Sort, Term> cache) {
     ImmutableList.Builder<String> processed = ImmutableList.builder();
     for (String token : tokens) {
       if (Tokenizer.isDeclarationToken(token)) {
@@ -113,63 +188,7 @@ public final class BitwuzlaFormulaManager
       // Otherwise, keep the command
       processed.add(token);
     }
-
-    // Build SMT-LIB2 declarations for all variables in the cache
-    ImmutableList.Builder<String> builder = ImmutableList.builder();
-    for (Cell<String, Sort, Term> c : cache.cellSet()) {
-      String symbol = c.getValue().toString();
-      List<Sort> args = ImmutableList.of();
-      Sort sort = c.getColumnKey();
-      if (sort.is_fun()) {
-        args = sort.fun_domain();
-        sort = sort.fun_codomain();
-      }
-      StringBuilder decl = new StringBuilder();
-      decl.append("(declare-fun").append(" ");
-      decl.append(symbol).append(" ");
-      decl.append("(");
-      for (Sort p : args) {
-        decl.append(p).append(" ");
-      }
-      decl.append(")").append(" ");
-      decl.append(sort);
-      decl.append(")");
-
-      builder.add(decl.toString());
-    }
-    String decls = String.join("\n", builder.build());
-    String input = String.join("\n", processed.build());
-
-    // Add the declarations to the input and parse everything
-    Parser parser = new Parser(creator.getEnv(), bitwuzlaOption);
-    parser.parse(decls + input, true, false);
-
-    // After the run, get the final assertion from the parser
-    Vector_Term assertions = parser.bitwuzla().get_assertions();
-    Preconditions.checkArgument(
-        !assertions.isEmpty(), "No assertion found in input string \"%s\"", formulaStr);
-    Term result = Iterables.getLast(assertions);
-
-    // Now get all symbols that were declared in the input
-    Vector_Term declared = parser.get_declared_funs();
-
-    // Process the symbols from the parser
-    Map_TermTerm subst = new Map_TermTerm();
-    for (Term term : declared) {
-      if (cache.containsRow(term.symbol())) {
-        // Symbol is from the context: add the original term to the substitution map
-        subst.put(term, cache.get(term.symbol(), term.sort()));
-      } else {
-        // Symbol is new, add it to the context
-        cache.put(term.symbol(), term.sort(), term);
-      }
-    }
-
-    // Substitute all symbols from the context with their original terms
-    result = creator.getEnv().substitute_term(result, subst);
-
-    // Return the updated term
-    return result;
+    return processed.build();
   }
 
   @Override
