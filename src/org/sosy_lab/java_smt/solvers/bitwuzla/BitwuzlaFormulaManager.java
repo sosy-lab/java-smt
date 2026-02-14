@@ -11,12 +11,11 @@ package org.sosy_lab.java_smt.solvers.bitwuzla;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Table;
 import com.google.common.collect.Table.Cell;
 import java.util.Collection;
 import java.util.List;
+import org.sosy_lab.common.collect.Collections3;
 import org.sosy_lab.java_smt.api.Formula;
 import org.sosy_lab.java_smt.basicimpl.AbstractFormulaManager;
 import org.sosy_lab.java_smt.basicimpl.Tokenizer;
@@ -84,35 +83,51 @@ public final class BitwuzlaFormulaManager
   }
 
   @Override
-  public Term parseImpl(String formulaStr) throws IllegalArgumentException {
+  protected List<Term> parseAllImpl(String formulaStr) throws IllegalArgumentException {
     // Split the input string into a list of SMT-LIB2 commands
     List<String> tokens = Tokenizer.tokenize(formulaStr);
 
     Table<String, Sort, Term> cache = creator.getCache();
 
+    Collection<String> assertionCommands =
+        tokens.stream().filter(Tokenizer::isAssertToken).collect(ImmutableList.toImmutableList());
+    if (assertionCommands.isEmpty()) {
+      return ImmutableList.of();
+    }
+
     // Process the declarations
-    Collection<String> symbolsDeclarationFromTokens = getDeclarationsFromTokens(tokens, cache);
+    Collection<String> declarationsFromTokens = getDeclarationsFromTokens(tokens, cache);
 
     // Build SMT-LIB2 declarations for all variables in the cache
-    Collection<String> symbolsDeclarationFromCache = getDeclaredSymbolsFromCache(cache);
+    Collection<String> declarationFromCache = getDeclaredSymbolsFromCache(cache);
 
-    String decls = String.join("\n", symbolsDeclarationFromCache);
-    String input = String.join("\n", symbolsDeclarationFromTokens);
+    String declsFromCache = String.join("\n", declarationFromCache);
+    String declsFromTokens = String.join("\n", declarationsFromTokens);
+    String assertionsFromTokens = String.join("\n", assertionCommands);
 
     // Add the declarations to the input and parse everything
     Parser parser = new Parser(creator.getEnv(), bitwuzlaOption);
-    parser.parse(decls + input, true, false);
+    try {
+      parser.parse(declsFromCache + declsFromTokens + assertionsFromTokens, true, false);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Failed to parse input string \"%s\" with declarations \"%s\" and \"%s\"",
+              assertionsFromTokens, declsFromCache, declsFromTokens),
+          e);
+    }
 
     // After the run, get the final assertion from the parser
     Vector_Term assertions = parser.bitwuzla().get_assertions();
     Preconditions.checkArgument(
         !assertions.isEmpty(), "No assertion found in input string \"%s\"", formulaStr);
-    Term assertion = Iterables.getLast(assertions);
 
     // Now get all symbols that were declared in the input
     Vector_Term declared = parser.get_declared_funs();
 
-    Term result = synchronizeSymbolsWithCache(declared, cache, assertion);
+    List<Term> result =
+        Collections3.transformedImmutableListCopy(
+            assertions, assertion -> synchronizeSymbolsWithCache(declared, cache, assertion));
 
     // Return the updated term
     return result;
@@ -161,11 +176,21 @@ public final class BitwuzlaFormulaManager
     return builder.build();
   }
 
+  /**
+   * Collect all declaration commands from the input tokens, parse them, and check if they are
+   * consistent with the variable cache. If a declaration is consistent with the cache, skip it,
+   * otherwise throw an exception.
+   *
+   * @return the list of all new-declaration non-assertion commands
+   */
   private Collection<String> getDeclarationsFromTokens(
       List<String> tokens, Table<String, Sort, Term> cache) {
-    ImmutableList.Builder<String> processed = ImmutableList.builder();
+    ImmutableList.Builder<String> newDeclarations = ImmutableList.builder();
     for (String token : tokens) {
-      if (Tokenizer.isDeclarationToken(token)) {
+      if (Tokenizer.isAssertToken(token)) {
+        // Skip assertions, they will be parsed at the end together with the declarations
+        continue;
+      } else if (Tokenizer.isDeclarationToken(token)) {
         // FIXME: Do we need to support function definitions here?
         Parser declParser = new Parser(creator.getEnv(), bitwuzlaOption);
         declParser.parse(token, true, false);
@@ -179,16 +204,19 @@ public final class BitwuzlaFormulaManager
           if (!cache.contains(symbol, sort)) {
             // Sort of the definition that we parsed does not match the sort from the variable
             // cache.
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(
+                String.format(
+                    "Symbol %s is already defined with a different sort %s in the variable cache",
+                    symbol, cache.row(symbol)));
           }
           // Skip if it's just a redefinition
           continue;
         }
       }
       // Otherwise, keep the command
-      processed.add(token);
+      newDeclarations.add(token);
     }
-    return processed.build();
+    return newDeclarations.build();
   }
 
   @Override

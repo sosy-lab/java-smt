@@ -30,6 +30,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.sosy_lab.java_smt.api.Formula;
@@ -89,9 +90,16 @@ public class Yices2FormulaManager extends AbstractFormulaManager<Integer, Intege
   }
 
   @Override
-  public Integer parseImpl(String pS) throws IllegalArgumentException {
-    // TODO Might expect Yices input language instead of smt-lib2 notation
-    return yices_parse_term(pS);
+  protected List<Integer> parseAllImpl(String pSmtScript) throws IllegalArgumentException {
+    // Yices2's yices_parse_term does not natively support parsing multiple assertions from a single
+    // string
+    // and returning them as a list. It is designed for a single term or assertion.
+    // For backward compatibility and to meet the API contract as best as possible,
+    // we will parse the entire script as a single term and return it in a list.
+    // If the script contains multiple assertions, only the first one might be effectively parsed,
+    // or the parser might fail depending on the SMT-LIB structure.
+    Integer parsedTerm = yices_parse_term(pSmtScript);
+    return ImmutableList.of(parsedTerm);
   }
 
   /** Helper function to (pretty) print yices2 sorts. */

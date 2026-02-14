@@ -31,6 +31,7 @@ import ap.parser.SMTParser2InputAbsy.SMTFunctionType;
 import ap.parser.SMTTypes.SMTType;
 import ap.terfor.ConstantTerm;
 import ap.terfor.preds.Predicate;
+import ap.theories.ADT.ADTProxySort;
 import ap.theories.arrays.ExtArray;
 import ap.theories.arrays.ExtArray.ArraySort;
 import ap.theories.bitvectors.ModuloArithmetic;
@@ -589,7 +590,9 @@ class PrincessEnvironment {
       return FormulaType.IntegerType;
     } else if (sort == PrincessEnvironment.FRACTION_SORT) {
       return FormulaType.RationalType;
-    } else if (sort == PrincessEnvironment.STRING_SORT) {
+    } else if (sort == PrincessEnvironment.STRING_SORT
+        || (sort instanceof ADTProxySort && "String".equals(sort.toString())) // string constant
+    ) {
       return FormulaType.StringType;
     } else if (sort == PrincessEnvironment.REGEX_SORT) {
       return FormulaType.RegexType;

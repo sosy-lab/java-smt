@@ -14,6 +14,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.github.cvc5.CVC5ApiException;
@@ -27,9 +29,11 @@ import io.github.cvc5.SymbolManager;
 import io.github.cvc5.Term;
 import io.github.cvc5.modes.InputLanguage;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.sosy_lab.common.collect.Collections3;
 
 class CVC5Parser {
 
@@ -37,6 +41,7 @@ class CVC5Parser {
   private static final Pattern PARSING_UNDECLARED_SYMBOL_PATTERN =
       Pattern.compile("Symbol '(?<undeclaredSymbol>.*)' not declared as a variable");
   private static final String PARSER_ERROR_CVC5 = "Error when parsing using CVC5: ";
+  private static final String COMMAND_ASSERT = "assert";
 
   private final CVC5FormulaCreator creator;
   private final CVC5FormulaManager formulaManager;
@@ -46,13 +51,18 @@ class CVC5Parser {
     formulaManager = checkNotNull(pCVC5FormulaManager);
   }
 
-  Term parse(String pSmtQuery) {
+  List<Term> parseAll(String pSmtQuery) {
     final SymbolManager symbolManager = new SymbolManager(creator.getEnv());
     final Solver parseSolver = new Solver(creator.getEnv());
     final InputParser parser = getParser(symbolManager, parseSolver);
     try {
-      parseQuery(pSmtQuery, parser, symbolManager, parseSolver);
-      return getAndRegisterParsedTerm(parseSolver, symbolManager);
+      int numberOfAssertions = parseQuery(pSmtQuery, parser, symbolManager, parseSolver);
+      if (numberOfAssertions == 0) {
+        return ImmutableList.of();
+      }
+      Term[] assertionsAndDeclarations = parseSolver.getAssertions();
+      return getAndRegisterParsedTerms(
+          assertionsAndDeclarations, symbolManager, numberOfAssertions);
     } finally {
       parser.deletePointer();
       parseSolver.deletePointer();
@@ -103,17 +113,15 @@ class CVC5Parser {
    * case of undeclared symbols, it attempts to recover by including their declarations from the
    * formula creator's caches and retries parsing until successful or unrecoverable error occurs.
    */
-  private void parseQuery(
+  private int parseQuery(
       String smtQuery,
       final InputParser parser,
       final SymbolManager symbolManager,
       final Solver parseSolver) {
-    boolean retryNeeded = true;
-    while (retryNeeded) {
+    while (true) { // loop until successful parsing or unrecoverable error
       parser.setStringInput(InputLanguage.SMT_LIB_2_6, smtQuery, "");
       try {
-        executeAllCommandsFromQuery(parser, symbolManager, parseSolver);
-        retryNeeded = false; // Success!
+        return executeAllCommandsFromQuery(parser, symbolManager, parseSolver);
       } catch (CVC5ParserException e) {
         smtQuery = attemptRecovery(smtQuery, e);
         // If attemptRecovery returns null, it means it couldn't find the symbol, so we rethrow
@@ -128,10 +136,22 @@ class CVC5Parser {
    * @throws CVC5ParserException if parsing fails for any reason, including undeclared symbols or
    *     invalid format.
    * @throws IllegalArgumentException if the parser returns an unexpected result.
+   * @return the number of asserted terms, from a command "assert" and not from "declare-fun".
    */
-  private void executeAllCommandsFromQuery(
+  /* Info about the return-type:
+     We could also return the asserted terms directly here,
+     but need to do the registration of the terms here as well, which causes performance overhead,
+     and we are in the loop for detecting already-declared symbols, so we avoid that overhead.
+     Additionally, calling "solver.getAssertions()" after each assert-command is expensive,
+     because it returns "all" assertions up to that point, which is redundant work.
+     So we just return the number of assertions and do the rest after successful parsing.
+     We expect the assertions from the parseSolver.getAssertions() the match
+     the returned number plus additional assertions for function-declarations.
+  */
+  private int executeAllCommandsFromQuery(
       InputParser parser, SymbolManager symbolManager, Solver parseSolver)
       throws CVC5ParserException {
+    int numberOfAssertions = 0;
     for (Command cmd = parser.nextCommand(); !cmd.isNull(); cmd = parser.nextCommand()) {
       String result = cmd.invoke(parseSolver, symbolManager);
       checkArgument(
@@ -139,7 +159,11 @@ class CVC5Parser {
           "%sUnexpected parser result: %s",
           PARSER_ERROR_CVC5,
           result);
+      if (COMMAND_ASSERT.equals(cmd.getCommandName())) {
+        numberOfAssertions++;
+      }
     }
+    return numberOfAssertions;
   }
 
   /**
@@ -175,23 +199,26 @@ class CVC5Parser {
     return declaration.append(smtQuery).toString();
   }
 
-  private Term getAndRegisterParsedTerm(Solver parseSolver, SymbolManager symbolManager) {
+  private List<Term> getAndRegisterParsedTerms(
+      Term[] assertionsAndDeclarations, SymbolManager symbolManager, int numberOfAssertions) {
 
     // Register new terms in our caches and check for errors in declarations
     Map<Term, Term> substitutions =
         getSymbolSubstitutions(symbolManager.getNamedTerms(), symbolManager.getDeclaredTerms());
 
-    // Get the assertions out of the solver and re-substitute definitions outside of assertions
-    Term parsedTerm = getAssertedTerm(parseSolver.getAssertions());
+    // Get the assertions out of the solver and re-substitute declarations outside of assertions
+    List<Term> parsedTerms = getAssertedTerms(assertionsAndDeclarations, numberOfAssertions);
 
     // If the symbols used in the term were already declared before parsing, the term uses new
     // ones with the same name, so we need to substitute them!
-    parsedTerm = formulaManager.substitute(parsedTerm, substitutions);
+    parsedTerms =
+        Collections3.transformedImmutableListCopy(
+            parsedTerms, t -> formulaManager.substitute(t, substitutions));
 
     // Quantified formulas do not give us the bound variables in getDeclaredTerms() above.
     // Find them and register a free equivalent
-    creator.registerBoundVariablesWithVisitor(parsedTerm);
-    return parsedTerm;
+    parsedTerms.forEach(creator::registerBoundVariablesWithVisitor);
+    return parsedTerms;
   }
 
   /**
@@ -262,34 +289,47 @@ class CVC5Parser {
 
   /**
    * Collects the asserted term from the array of assertions returned by CVC5 after parsing.
-   * Additionally, re-substitutes definitions outside of assertions back into the asserted term.
+   * Additionally, re-substitutes declarations outside of assertions back into the asserted term.
    */
-  private static Term getAssertedTerm(Term[] assertions) {
+  private static List<Term> getAssertedTerms(
+      Term[] assertionsAndDeclarations, int numberOfAssertions) {
     checkArgument(
-        assertions.length > 0,
+        assertionsAndDeclarations.length > 0,
         "%sNo term found. Did the input query contain assertions?",
         PARSER_ERROR_CVC5);
+    checkArgument(
+        assertionsAndDeclarations.length >= numberOfAssertions,
+        "%sNumber of assertions is less than the number of assert-commands parsed.",
+        PARSER_ERROR_CVC5);
 
-    // There is only one assertion at index 0 in the parser's assertions array
-    Term parsedTerm = checkNotNull(assertions[0]);
+    // Collect additional definitions from assertions for later substitution.
+    List<Term> functionDefinitions =
+        FluentIterable.from(assertionsAndDeclarations)
+            // skip the real assertions, the rest are definitions
+            .skip(numberOfAssertions)
+            .toList()
+            // use reversed order, such that transitive substitutions can be applied correctly
+            .reverse();
 
-    // Additional definitions are provided from index 1 to length-1 in reversed order,
-    // such that transitive substitutions can be applied correctly.
-    for (int i = assertions.length - 1; i >= 1; i--) {
-      final Term definition = checkNotNull(assertions[i]);
-      checkArgument(
-          definition.getKind() == Kind.EQUAL,
-          "%sUnexpected term '%s' with kind '%s'",
-          PARSER_ERROR_CVC5,
-          definition,
-          definition.getKind());
-      try {
-        parsedTerm = parsedTerm.substitute(definition.getChild(0), definition.getChild(1));
-      } catch (CVC5ApiException apiException) {
-        throw new IllegalArgumentException(
-            PARSER_ERROR_CVC5 + apiException.getMessage(), apiException);
+    ImmutableList.Builder<Term> assertedTerms = ImmutableList.builder();
+    for (int i = 0; i < numberOfAssertions; i++) {
+      Term assertedTerm = assertionsAndDeclarations[i];
+      for (Term definition : functionDefinitions) {
+        checkArgument(
+            definition.getKind() == Kind.EQUAL,
+            "%sUnexpected term '%s' with kind '%s'",
+            PARSER_ERROR_CVC5,
+            definition,
+            definition.getKind());
+        try {
+          assertedTerm = assertedTerm.substitute(definition.getChild(0), definition.getChild(1));
+        } catch (CVC5ApiException apiException) {
+          throw new IllegalArgumentException(
+              PARSER_ERROR_CVC5 + apiException.getMessage(), apiException);
+        }
       }
+      assertedTerms.add(assertedTerm);
     }
-    return parsedTerm;
+    return assertedTerms.build();
   }
 }
